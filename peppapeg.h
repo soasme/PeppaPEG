@@ -163,6 +163,9 @@ typedef struct P4_Expression {
 
 typedef struct P4_Grammar {
     P4_Expression*      exprs;
+    P4_Error            err;
+    P4_String           errmsg;
+    P4_Expression*      whitespaces;
 } P4_Grammar;
 
 typedef struct P4_Token{
@@ -203,36 +206,62 @@ P4_PUBLIC(void)           P4_AddMember(P4_Expression*, P4_Expression*);
 
 P4_PUBLIC(void)           P4_DeleteExpression(P4_Expression*);
 
-P4_PUBLIC(P4_String)      P4_ToString(P4_Expression*);
+P4_PUBLIC(P4_String)      P4_PrintExpression(P4_Expression*);
+
+P4_PUBLIC(bool)           P4_IsRule(P4_Expression*);
+
+P4_PUBLIC(bool)           P4_IsSquashed(P4_Expression*);
+P4_PUBLIC(bool)           P4_IsLifted(P4_Expression*);
+P4_PUBLIC(bool)           P4_IsTighted(P4_Expression*);
+P4_PUBLIC(void)           P4_SetExpressionFlag(P4_Expression*, uint8_t);
+P4_PUBLIC(void)           P4_SetSquashed(P4_Expression*);
+P4_PUBLIC(void)           P4_SetLifted(P4_Expression*);
+P4_PUBLIC(void)           P4_SetTighted(P4_Expression*);
+P4_PUBLIC(void)           P4_UnsetSquashed(P4_Expression*);
+P4_PUBLIC(void)           P4_UnsetLifted(P4_Expression*);
+P4_PUBLIC(void)           P4_UnsetTighted(P4_Expression*);
 
 P4_PUBLIC(P4_Grammar*)    P4_CreateGrammar(void);
 P4_PUBLIC(void)           P4_DeleteGrammar(P4_Grammar*);
 
 P4_PUBLIC(void)           P4_AddGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
 P4_PUBLIC(void)           P4_AddNumeric(P4_Grammar*, P4_RuleID, size_t);
-P4_PUBLIC(P4_Expression*) P4_AddLiteral(P4_Grammar*, const P4_String, bool sensitive);
-P4_PUBLIC(P4_Expression*) P4_AddRange(P4_Grammar*, P4_Rune, P4_Rune);
-P4_PUBLIC(P4_Expression*) P4_AddReference(P4_Grammar*, P4_RuleID);
-P4_PUBLIC(P4_Expression*) P4_AddPositive(P4_Grammar*, P4_Expression*);
-P4_PUBLIC(P4_Expression*) P4_AddNegative(P4_Grammar*, P4_Expression*);
-P4_PUBLIC(P4_Expression*) P4_AddSequence(P4_Grammar*);
-P4_PUBLIC(P4_Expression*) P4_AddChoice(P4_Grammar*);
-P4_PUBLIC(P4_Expression*) P4_AddZeroOrOnce(P4_Grammar*, P4_Expression*);
-P4_PUBLIC(P4_Expression*) P4_AddZeroOrMore(P4_Grammar*, P4_Expression*);
-P4_PUBLIC(P4_Expression*) P4_AddOnceOrMore(P4_Grammar*, P4_Expression*);
-P4_PUBLIC(P4_Expression*) P4_AddRepeatMin(P4_Grammar*, P4_Expression*, uint64_t);
-P4_PUBLIC(P4_Expression*) P4_AddRepeatMax(P4_Grammar*, P4_Expression*, uint64_t);
-P4_PUBLIC(P4_Expression*) P4_AddRepeatMinMax(P4_Grammar*, P4_Expression*, uint64_t, uint64_t);
-P4_PUBLIC(P4_Expression*) P4_AddRepeatExact(P4_Grammar*, P4_Expression*, uint64_t);
+P4_PUBLIC(P4_Expression*) P4_AddLiteral(P4_Grammar*, P4_RuleID, const P4_String, bool sensitive);
+P4_PUBLIC(P4_Expression*) P4_AddRange(P4_Grammar*, P4_RuleID, P4_Rune, P4_Rune);
+P4_PUBLIC(P4_Expression*) P4_AddReference(P4_Grammar*, P4_RuleID, P4_RuleID);
+P4_PUBLIC(P4_Expression*) P4_AddPositive(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_PUBLIC(P4_Expression*) P4_AddNegative(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_PUBLIC(P4_Expression*) P4_AddSequence(P4_Grammar*, P4_RuleID);
+P4_PUBLIC(P4_Expression*) P4_AddChoice(P4_Grammar*, P4_RuleID);
+P4_PUBLIC(P4_Expression*) P4_AddZeroOrOnce(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_PUBLIC(P4_Expression*) P4_AddZeroOrMore(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_PUBLIC(P4_Expression*) P4_AddOnceOrMore(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_PUBLIC(P4_Expression*) P4_AddRepeatMin(P4_Grammar*, P4_RuleID, P4_Expression*, uint64_t);
+P4_PUBLIC(P4_Expression*) P4_AddRepeatMax(P4_Grammar*, P4_RuleID, P4_Expression*, uint64_t);
+P4_PUBLIC(P4_Expression*) P4_AddRepeatMinMax(P4_Grammar*, P4_RuleID, P4_Expression*, uint64_t, uint64_t);
+P4_PUBLIC(P4_Expression*) P4_AddRepeatExact(P4_Grammar*, P4_RuleID, P4_Expression*, uint64_t);
 
 P4_PUBLIC(void)           P4_DeleteGrammarRule(P4_Grammar*, P4_RuleID);
 P4_PUBLIC(P4_Expression*) P4_GetGrammar_rule(P4_Grammar*, P4_RuleID);
 
-P4_PUBLIC(P4_Token*)      P4_Parse(P4_Grammar*, P4_RuleID, P4_String input, P4_String* err);
-P4_PUBLIC(P4_Token*)      P4_ParseWithLength(P4_Grammar*, P4_RuleID, P4_String input, P4_Position pos, P4_String* err);
+P4_PUBLIC(P4_Token*)      P4_Parse(P4_Grammar*, P4_RuleID, P4_String input);
+P4_PUBLIC(P4_Token*)      P4_ParseWithLength(P4_Grammar*, P4_RuleID, P4_String input, P4_Position pos);
+
+P4_PUBLIC(bool)           P4_HasError(P4_Grammar*);
+P4_PUBLIC(P4_String)      P4_PrintError(P4_Grammar*);
+P4_PUBLIC(void)           P4_SetError(P4_Grammar*, P4_Error);
+
+P4_PUBLIC(void)           P4_SetWhitespaces(P4_Grammar*, P4_Expression* space, P4_Expression* comment);
+P4_PUBLIC(P4_Expression*) P4_GetWhitespaces(P4_Grammar*);
+
+P4_PUBLIC(void)           P4_GrammarReset(P4_Grammar*);
 
 P4_PUBLIC(P4_Token*)      P4_CreateToken(P4_String, P4_Slice, P4_Expression*);
 P4_PUBLIC(void)           P4_DeleteToken(P4_Token*);
+P4_PUBLIC(void)           P4_AppendToken(P4_Token*, P4_Token*);
+P4_PUBLIC(void)           P4_AdoptToken(P4_Token*, P4_Token*);
+
+P4_PUBLIC(P4_String)      P4_PrintToken(P4_Token*);
 
 #ifdef __cplusplus
 }

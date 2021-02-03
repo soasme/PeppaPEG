@@ -1,7 +1,11 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "peppapeg.h"
+
+# define MARK_POS(s, p) P4_Position (p) = P4_GetPosition((s));
+# define MOVE_POS(s, p) P4_SetPosition((s), (p));
 
 typedef struct P4_State {
     /* The input text. */
@@ -12,28 +16,52 @@ typedef struct P4_State {
     size_t          depth;
     /* The parsed position of the input text. */
     P4_Position     pos;
-    /* The root expr to parse. */
-    P4_Expression*  expr;
-    /* The error message when error occurs. */
-    P4_String       errmsg;
+    /* The grammar. */
+    P4_Grammar*     grammar;
+    /* The expression call stack. */
+    P4_Expression*  frames;
+    size_t          frames_size;
+    size_t          frames_cap;
 } P4_State;
 
-P4_PRIVATE(P4_Token*)   P4_Match(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)   P4_MatchNumeric(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)   P4_MatchLiteral(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)   P4_MatchRange(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)   P4_MatchReference(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)   P4_MatchPositive(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)   P4_MatchNegative(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)   P4_MatchSequence(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)   P4_MatchChoice(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)   P4_MatchZeroOrOnce(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)   P4_MatchZeroOrMore(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)   P4_MatchOnceOrMore(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)   P4_MatchRepeatMin(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)   P4_MatchRepeatMax(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)   P4_MatchRepeatMinMax(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)   P4_MatchRepeatExact(P4_State*, P4_Expression*);
+P4_PRIVATE(inline size_t)       P4_ReadRune(P4_String, P4_Rune*);
+P4_PRIVATE(inline int)          P4_CaseCmpInsensitive(P4_String, P4_String, size_t);
+
+P4_PRIVATE(P4_State*)           P4_CreateState(P4_Grammar*, P4_String);
+P4_PRIVATE(void)                P4_DeleteState(P4_State*);
+
+P4_PRIVATE(P4_Position)         P4_GetPosition(P4_State*);
+P4_PRIVATE(void)                P4_SetPosition(P4_State*, P4_Position);
+
+P4_PRIVATE(inline P4_String)    P4_RemainingText(P4_State*);
+
+P4_PRIVATE(inline bool)         P4_NeedLoosen(P4_State*, P4_Expression*);
+P4_PRIVATE(inline bool)         P4_NeedSquash(P4_State*, P4_Expression*);
+P4_PRIVATE(inline bool)         P4_NeedSilent(P4_State*, P4_Expression*);
+
+P4_PRIVATE(void)                P4_RaiseError(P4_State*, P4_Error, P4_String);
+P4_PRIVATE(void)                P4_RescueError(P4_State*);
+
+P4_PRIVATE(void)                P4_PushFrame(P4_State*, P4_Expression*);
+P4_PRIVATE(P4_Expression*)      P4_PopFrame(P4_State*);
+P4_PRIVATE(P4_Expression*)      P4_PeekFrame(P4_State*);
+
+P4_PRIVATE(P4_Token*)           P4_Match(P4_State*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchNumeric(P4_State*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchLiteral(P4_State*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchRange(P4_State*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchReference(P4_State*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchPositive(P4_State*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchNegative(P4_State*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchSequence(P4_State*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchChoice(P4_State*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchZeroOrOnce(P4_State*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchZeroOrMore(P4_State*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchOnceOrMore(P4_State*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchRepeatMin(P4_State*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchRepeatMax(P4_State*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchRepeatMinMax(P4_State*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchRepeatExact(P4_State*, P4_Expression*);
 
 /*
  * Get version string.
@@ -83,7 +111,7 @@ P4_ReadRune(P4_String s, P4_Rune* c) {
  * Like strcmp, but works for a case insensitive UTF-8 string.
  */
 P4_PRIVATE(inline int)
-caseicmp(P4_String src, P4_String dst, size_t len) {
+P4_CaseCmpInsensitive(P4_String src, P4_String dst, size_t len) {
     uint32_t srcch = 0x0, dstch = 0x0;
     size_t srcsz = 0, dstsz = 0;
     int cmp = 0, remaining = len;

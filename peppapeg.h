@@ -71,7 +71,7 @@ extern "C"
 # define P4_FLAG_TIGHT                  0x100
 
 /* A position in the text. */
-typedef uint64_t        P4_Position;
+typedef size_t          P4_Position;
 
 /* A slice of position 0 to position 1. */
 typedef P4_Position     P4_Slice[2];
@@ -129,7 +129,7 @@ typedef struct P4_Expression {
     struct P4_Expression*           prev;
     struct P4_Expression*           next;
     union {
-        uint64_t                    num;
+        size_t                      num;
         /* Used by P4_Literal. */
         struct {
             P4_String               literal;
@@ -184,7 +184,7 @@ typedef struct P4_Token{
 
 P4_PUBLIC(P4_String)  P4_Version(void);
 
-P4_PUBLIC(P4_Expression*) P4_CreateNumeric(uint64_t);
+P4_PUBLIC(P4_Expression*) P4_CreateNumeric(size_t);
 P4_PUBLIC(P4_Expression*) P4_CreateLiteral(const P4_String, bool sensitive);
 P4_PUBLIC(P4_Expression*) P4_CreateRange(P4_Rune, P4_Rune);
 P4_PUBLIC(P4_Expression*) P4_CreateReference(P4_RuleID);
@@ -202,12 +202,34 @@ P4_PUBLIC(P4_Expression*) P4_CreateRepeatExact(P4_Expression*, uint64_t);
 P4_PUBLIC(void)           P4_AddMember(P4_Expression*, P4_Expression*);
 
 P4_PUBLIC(void)           P4_DeleteExpression(P4_Expression*);
-P4_PUBLIC(P4_String)      P4_Print(P4_Expression*);
+
+P4_PUBLIC(P4_String)      P4_ToString(P4_Expression*);
 
 P4_PUBLIC(P4_Grammar*)    P4_CreateGrammar(void);
 P4_PUBLIC(void)           P4_DeleteGrammar(P4_Grammar*);
+
 P4_PUBLIC(void)           P4_AddGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_PUBLIC(void)           P4_AddNumeric(P4_Grammar*, P4_RuleID, size_t);
+P4_PUBLIC(P4_Expression*) P4_AddLiteral(P4_Grammar*, const P4_String, bool sensitive);
+P4_PUBLIC(P4_Expression*) P4_AddRange(P4_Grammar*, P4_Rune, P4_Rune);
+P4_PUBLIC(P4_Expression*) P4_AddReference(P4_Grammar*, P4_RuleID);
+P4_PUBLIC(P4_Expression*) P4_AddPositive(P4_Grammar*, P4_Expression*);
+P4_PUBLIC(P4_Expression*) P4_AddNegative(P4_Grammar*, P4_Expression*);
+P4_PUBLIC(P4_Expression*) P4_AddSequence(P4_Grammar*);
+P4_PUBLIC(P4_Expression*) P4_AddChoice(P4_Grammar*);
+P4_PUBLIC(P4_Expression*) P4_AddZeroOrOnce(P4_Grammar*, P4_Expression*);
+P4_PUBLIC(P4_Expression*) P4_AddZeroOrMore(P4_Grammar*, P4_Expression*);
+P4_PUBLIC(P4_Expression*) P4_AddOnceOrMore(P4_Grammar*, P4_Expression*);
+P4_PUBLIC(P4_Expression*) P4_AddRepeatMin(P4_Grammar*, P4_Expression*, uint64_t);
+P4_PUBLIC(P4_Expression*) P4_AddRepeatMax(P4_Grammar*, P4_Expression*, uint64_t);
+P4_PUBLIC(P4_Expression*) P4_AddRepeatMinMax(P4_Grammar*, P4_Expression*, uint64_t, uint64_t);
+P4_PUBLIC(P4_Expression*) P4_AddRepeatExact(P4_Grammar*, P4_Expression*, uint64_t);
+
 P4_PUBLIC(void)           P4_DeleteGrammarRule(P4_Grammar*, P4_RuleID);
+P4_PUBLIC(P4_Expression*) P4_GetGrammar_rule(P4_Grammar*, P4_RuleID);
+
+P4_PUBLIC(P4_Token*)      P4_Parse(P4_Grammar*, P4_RuleID, P4_String input, P4_String* err);
+P4_PUBLIC(P4_Token*)      P4_ParseWithLength(P4_Grammar*, P4_RuleID, P4_String input, P4_Position pos, P4_String* err);
 
 #ifdef __cplusplus
 }

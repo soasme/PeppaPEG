@@ -76,16 +76,13 @@ typedef enum {
     P4_RepeatExact,
 } P4_ExpressionKind;
 
-typedef struct P4_State {
-    P4_String       text;
-    P4_Position     pos;
-} P4_State;
-
 typedef struct P4_Expression {
-    P4_RuleID           id;
-    P4_ExpressionKind   kind;
-    uint8_t             flags;
+    P4_RuleID                       id;
+    P4_ExpressionKind               kind;
+    uint8_t                         flags;
+    struct P4_Expression*           next;
     union {
+        uint64_t                    num;
         /* Used by P4_Literal. */
         struct {
             P4_String               literal;
@@ -93,12 +90,13 @@ typedef struct P4_Expression {
         };
 
         /* Used by P4_Reference..P4_Negative. */
-        P4_RuleID                   ref;
+        P4_RuleID                   refid;
+        struct P4_Expression*       refexpr;
 
         /* Used by P4_Range. */
         struct {
-            P4_Position             start;
-            P4_Position             end;
+            P4_Rune                 start;
+            P4_Rune                 end;
         };
 
         /* Used by P4_Sequence..P4_Choice. */
@@ -110,11 +108,17 @@ typedef struct P4_Expression {
         /* Used by P4_ZeroOrOnce..P4_RepeatExact . */
         struct {
             struct P4_Expression*   repeat;
-            P4_Position             min;
-            P4_Position             max;
+            uint64_t                min;
+            uint64_t                max;
         };
     };
 } P4_Expression;
+
+typedef struct P4_State {
+    P4_String       text;
+    P4_Position     pos;
+    P4_Expression*  exprs;
+} P4_State;
 
 typedef struct P4_Token{
     /* The full text. */
@@ -134,6 +138,27 @@ typedef struct P4_Token{
 } P4_Token;
 
 P4_PUBLIC(P4_String)  P4_Version(void);
+
+P4_PUBLIC(P4_Expression*) P4_CreateNumeric(uint64_t);
+P4_PUBLIC(P4_Expression*) P4_CreateLiteral(const P4_String, bool sensitive);
+P4_PUBLIC(P4_Expression*) P4_CreateRange(P4_Rune, P4_Rune);
+P4_PUBLIC(P4_Expression*) P4_CreateReference(P4_RuleID);
+P4_PUBLIC(P4_Expression*) P4_CreatePositive(P4_Expression*);
+P4_PUBLIC(P4_Expression*) P4_CreateNegative(P4_Expression*);
+P4_PUBLIC(P4_Expression*) P4_CreateSequence(void);
+P4_PUBLIC(P4_Expression*) P4_CreateChoice(void);
+P4_PUBLIC(P4_Expression*) P4_CreateZeroOrOnce(P4_Expression*);
+P4_PUBLIC(P4_Expression*) P4_CreateZeroOrMore(P4_Expression*);
+P4_PUBLIC(P4_Expression*) P4_CreateOnceOrMore(P4_Expression*);
+P4_PUBLIC(P4_Expression*) P4_CreateRepeatMin(P4_Expression*, uint64_t);
+P4_PUBLIC(P4_Expression*) P4_CreateRepeatMax(P4_Expression*, uint64_t);
+P4_PUBLIC(P4_Expression*) P4_CreateRepeatMinMax(P4_Expression*, uint64_t, uint64_t);
+P4_PUBLIC(P4_Expression*) P4_CreateRepeatExact(P4_Expression*, uint64_t);
+P4_PUBLIC(void)           P4_AddMember(P4_Expression*, P4_Expression*);
+
+P4_PUBLIC(void)           P4_Delete(P4_Expression*);
+
+P4_PUBLIC(P4_String)      P4_Print(P4_Expression*);
 
 #ifdef __cplusplus
 }

@@ -1,13 +1,10 @@
+enable_testing()
+
 add_library(unity STATIC unity/src/unity.c)
 
 set(
     unity_testcases
     print_version
-)
-
-add_custom_target(
-    check
-    COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
 )
 
 foreach(unity_testcase ${unity_testcases})
@@ -19,4 +16,8 @@ foreach(unity_testcase ${unity_testcases})
     )
 endforeach()
 
-add_dependencies(check ${unity_testcases})
+add_custom_target(
+    check
+    COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
+    DEPENDS ${unity_testcases}
+)

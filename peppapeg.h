@@ -231,6 +231,9 @@ P4_PUBLIC(P4_Expression*) P4_GetGrammar_rule(P4_Grammar*, P4_RuleID);
 P4_PUBLIC(P4_Token*)      P4_Parse(P4_Grammar*, P4_RuleID, P4_String input, P4_String* err);
 P4_PUBLIC(P4_Token*)      P4_ParseWithLength(P4_Grammar*, P4_RuleID, P4_String input, P4_Position pos, P4_String* err);
 
+P4_PUBLIC(P4_Token*)      P4_CreateToken(P4_String, P4_Slice, P4_Expression*);
+P4_PUBLIC(void)           P4_DeleteToken(P4_Token*);
+
 #ifdef __cplusplus
 }
 #endif

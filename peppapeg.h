@@ -133,6 +133,8 @@ typedef struct P4_Token{
     struct P4_Token*    tail;
 } P4_Token;
 
+P4_PUBLIC(P4_String)  P4_Version(void);
+
 #ifdef __cplusplus
 }
 #endif

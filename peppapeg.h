@@ -36,6 +36,7 @@ extern "C"
 #include <stdbool.h>
 
 # define P4_PUBLIC(type) type
+# define P4_PRIVATE(type) static type
 
 # define P4_MAJOR_VERSION 0
 # define P4_MINOR_VERSION 1
@@ -102,10 +103,30 @@ typedef enum {
     P4_RepeatExact,
 } P4_ExpressionKind;
 
+typedef enum {
+    /* When there is an internal error. Please raise an issue: https://github.com/soasme/peppapeg/issues. */
+    P4_InternalError = 1,
+    /* When no text is matched. */
+    P4_MatchError,
+    /* When no name is resolved. */
+    P4_NameError,
+    /* When the given value is of unexpected type. */
+    P4_ValueError,
+    /* When the index is out of boundary. */
+    P4_IndexError,
+    /* When the id is out of the table. */
+    P4_KeyError,
+    /* When the parse gets stuck forever. */
+    P4_AdvanceError,
+    /* When out of memory. */
+    P4_MemoryError,
+} P4_Error;
+
 typedef struct P4_Expression {
     P4_RuleID                       id;
     P4_ExpressionKind               kind;
     uint8_t                         flags;
+    struct P4_Expression*           prev;
     struct P4_Expression*           next;
     union {
         uint64_t                    num;
@@ -140,11 +161,9 @@ typedef struct P4_Expression {
     };
 } P4_Expression;
 
-typedef struct P4_State {
-    P4_String       text;
-    P4_Position     pos;
-    P4_Expression*  exprs;
-} P4_State;
+typedef struct P4_Grammar {
+    P4_Expression*      exprs;
+} P4_Grammar;
 
 typedef struct P4_Token{
     /* The full text. */
@@ -182,9 +201,13 @@ P4_PUBLIC(P4_Expression*) P4_CreateRepeatMinMax(P4_Expression*, uint64_t, uint64
 P4_PUBLIC(P4_Expression*) P4_CreateRepeatExact(P4_Expression*, uint64_t);
 P4_PUBLIC(void)           P4_AddMember(P4_Expression*, P4_Expression*);
 
-P4_PUBLIC(void)           P4_Delete(P4_Expression*);
-
+P4_PUBLIC(void)           P4_DeleteExpression(P4_Expression*);
 P4_PUBLIC(P4_String)      P4_Print(P4_Expression*);
+
+P4_PUBLIC(P4_Grammar*)    P4_CreateGrammar(void);
+P4_PUBLIC(void)           P4_DeleteGrammar(P4_Grammar*);
+P4_PUBLIC(void)           P4_AddGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_PUBLIC(void)           P4_DeleteGrammarRule(P4_Grammar*, P4_RuleID);
 
 #ifdef __cplusplus
 }

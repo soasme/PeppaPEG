@@ -1,0 +1,22 @@
+add_library(unity STATIC unity/src/unity.c)
+
+set(
+    unity_testcases
+    print_version
+)
+
+add_custom_target(
+    check
+    COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
+)
+
+foreach(unity_testcase ${unity_testcases})
+    add_executable("${unity_testcase}" "${unity_testcase}.c" "unity_setup.c")
+    target_link_libraries("${unity_testcase}" "${P4_LIB}" unity)
+    add_test(
+        NAME "${unity_testcase}"
+        COMMAND "./${unity_testcase}"
+    )
+endforeach()
+
+add_dependencies(check ${unity_testcases})

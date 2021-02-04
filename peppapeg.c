@@ -29,6 +29,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <assert.h>
 #include "peppapeg.h"
 
 # define MARK_POS(s, p) P4_Position (p) = P4_GetPosition((s));
@@ -275,6 +276,78 @@ P4_PopFrame(P4_State* s) {
     s->frames_size--;
     P4_Expression* result = s->frames[s->frames_size];
     s->frames[s->frames_size+1] = NULL;
+    return result;
+}
+
+P4_PRIVATE(P4_Token*)
+P4_Match(P4_State* s, P4_Expression* e) {
+    P4_Token* result = NULL;
+
+    if (e == NULL) {
+        P4_SetError(s->grammar, P4_NullError, 0);
+        return result;
+    }
+
+    if (P4_IsRule(e) && P4_PushFrame(s, e) == 0) {
+        P4_SetError(s->grammar, P4_MemoryError, 0);
+        return result;
+    }
+
+    switch (e->kind) {
+        case P4_Literal:
+            result = P4_MatchLiteral(s, e);
+            break;
+        default:
+            P4_SetError(s->grammar, P4_InternalError, 0);
+            result = NULL;
+            break;
+    }
+
+    if (P4_IsRule(e))
+        P4_PopFrame(s);
+
+    if (P4_HasError(s->grammar)) {
+        assert(result == NULL);
+        return result;
+    }
+
+    return result;
+}
+
+P4_PRIVATE(P4_Token*)
+P4_MatchLiteral(P4_State* s, P4_Expression* e) {
+    P4_String str = NULL;
+    P4_Token* result = NULL;
+
+    if (P4_HasError(s->grammar))
+        return NULL;
+
+    if (*(str = P4_RemainingText(s)) == '\0') {
+        P4_SetError(s->grammar, P4_AdvanceError, 0);
+        return NULL;
+    }
+
+    size_t litlen = strlen(e->literal);
+
+    MARK_POS(s, startpos);
+    if ((!e->sensitive && P4_CaseCmpInsensitive(e->literal, str, litlen) != 0)
+            || (e->sensitive && memcmp(e->literal, str, litlen) != 0)) {
+        P4_SetError(s->grammar, P4_MatchError, 0);
+        return NULL;
+    }
+    MOVE_POS(s, startpos+litlen);
+    MARK_POS(s, endpos);
+
+    if (P4_NeedSilent(s, e)) {
+        return NULL;
+    }
+
+    P4_Slice slice = {startpos, endpos};
+    if ((result = P4_CreateToken(s->text, slice, e)) == NULL) {
+        P4_SetError(s->grammar, P4_MemoryError, 0);
+        return NULL;
+    }
+
     return result;
 }
 
@@ -609,8 +682,28 @@ P4_Parse(P4_Grammar* grammar, P4_RuleID id, P4_String input) {
 }
 
 P4_PUBLIC(P4_Token*)
-P4_ParseWithLength(P4_Grammar* grammar, P4_RuleID id, P4_String input, P4_Position offset) {
-    return NULL; // TODO;
+P4_ParseWithLength(P4_Grammar* grammar, P4_RuleID id, P4_String input, P4_Position len) {
+    P4_State* state = NULL;
+    P4_Expression* expr = NULL;
+    P4_Token* result = NULL;
+
+    if ((expr = P4_GetGrammarRule(grammar, id))== NULL) {
+        P4_SetError(grammar, P4_NameError, 0);
+        goto end;
+    }
+
+    if ((state = P4_CreateState(grammar, input, len)) == NULL) {
+        P4_SetError(grammar, P4_MemoryError, 0);
+        goto end;
+    }
+
+    result = P4_Match(state, expr);
+
+end:
+    if (state != NULL)
+        P4_DeleteState(state);
+
+    return result;
 }
 
 P4_PUBLIC(void)
@@ -618,6 +711,7 @@ P4_SetError(P4_Grammar* grammar, P4_Error err, P4_String errmsg) {
     grammar->err = err;
 
     if (errmsg != NULL) {
+        free(grammar->errmsg);
         grammar->errmsg = strdup(errmsg);
     }
 }

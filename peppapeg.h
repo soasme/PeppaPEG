@@ -110,10 +110,12 @@ typedef enum {
     P4_IndexError,
     /* When the id is out of the table. */
     P4_KeyError,
-    /* When the parse gets stuck forever. */
+    /* When the parse gets stuck forever or has reached the end. */
     P4_AdvanceError,
     /* When out of memory. */
     P4_MemoryError,
+    /* When null is encountered. */
+    P4_NullError,
 } P4_Error;
 
 typedef struct P4_Expression {

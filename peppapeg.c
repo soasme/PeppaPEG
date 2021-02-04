@@ -1,3 +1,29 @@
+/*
+ * PeppaPeg -  A C-Implementation PEG Parser.
+ *
+ * MIT License
+ *
+ * Copyright (c) 2021 Ju
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+*/
+
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
@@ -20,7 +46,7 @@ typedef struct P4_State {
     /* The parsed position of the input text. */
     P4_Position     pos;
     /* The expression call stack. */
-    P4_Expression*  frames;
+    P4_Expression** frames;
     size_t          frames_size;
     size_t          frames_cap;
 } P4_State;
@@ -43,9 +69,8 @@ P4_PRIVATE(inline bool)         P4_NeedSilent(P4_State*, P4_Expression*);
 P4_PRIVATE(void)                P4_RaiseError(P4_State*, P4_Error, P4_String);
 P4_PRIVATE(void)                P4_RescueError(P4_State*);
 
-P4_PRIVATE(void)                P4_PushFrame(P4_State*, P4_Expression*);
+P4_PRIVATE(size_t)              P4_PushFrame(P4_State*, P4_Expression*);
 P4_PRIVATE(P4_Expression*)      P4_PopFrame(P4_State*);
-P4_PRIVATE(P4_Expression*)      P4_PeekFrame(P4_State*);
 
 P4_PRIVATE(P4_Token*)           P4_Match(P4_State*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchNumeric(P4_State*, P4_Expression*);
@@ -163,6 +188,94 @@ P4_RemainingText(P4_State* state) {
         return NULL;
 
     return state->text+state->pos;
+}
+
+
+/* Determine if the implicit whitespace should be applied. */
+P4_PRIVATE(inline bool)
+P4_NeedLoosen(P4_State* s, P4_Expression* e) {
+    // (1) when there is no implicit whitespace rule.
+    if (s->grammar->whitespaces == NULL)
+        return false;
+
+
+    for (int i = 0; i < s->frames_size; i++) {
+        // (2) when we're already matching whitespace.
+        if (s->grammar->whitespaces == s->frames[i])
+            return false;
+
+        // (3) when e is a tighted expression.
+        if (P4_IsTighted(s->frames[i]))
+            return false;
+    }
+
+    return true;
+}
+
+/* Determine if the inner token should be squashed. */
+P4_PRIVATE(inline bool)
+P4_NeedSquash(P4_State* s, P4_Expression* e) {
+    for (int i = s->frames_size-2; i>=0; i--) {
+        if (P4_IsSquashed(s->frames[i]))
+            return true;
+    }
+    return false;
+}
+
+/* Determine if token should be dismissed. */
+P4_PRIVATE(inline bool)
+P4_NeedSilent(P4_State* s, P4_Expression* e) {
+    return !P4_IsRule(e) || P4_IsLifted(e) || P4_NeedSquash(s, e);
+}
+
+
+P4_PRIVATE(void)
+P4_RaiseError(P4_State* s, P4_Error err, P4_String errmsg) {
+    s->grammar->err = err;
+    if (errmsg)
+        s->grammar->errmsg = strdup(errmsg);
+    else
+        s->grammar->errmsg = 0;
+}
+
+P4_PRIVATE(void)
+P4_RescueError(P4_State* s) {
+    s->grammar->err = 0;
+    if (s->grammar->errmsg) {
+        free(s->grammar->errmsg);
+        s->grammar->errmsg = 0;
+    }
+}
+
+P4_PRIVATE(size_t)
+P4_PushFrame(P4_State* s, P4_Expression* e) {
+
+# define DEFAULT_CAP 32
+
+    if (s->frames_cap == 0) {
+        s->frames_cap = DEFAULT_CAP;
+        s->frames = malloc(sizeof(P4_Expression*) * s->frames_cap);
+    } else if (s->frames_size >= s->frames_cap){
+        s->frames_cap <<= 1;
+        s->frames = realloc(s->frames, s->frames_cap); // potential memory leak
+    }
+
+    if (s->frames == NULL) {
+        return 0;
+    }
+
+    s->frames[s->frames_size++] = e;
+    return s->frames_size;
+}
+
+P4_PRIVATE(P4_Expression*)
+P4_PopFrame(P4_State* s) {
+    if (s->frames_cap == 0 || s->frames_size == 0)
+        return NULL;
+    s->frames_size--;
+    P4_Expression* result = s->frames[s->frames_size];
+    s->frames[s->frames_size+1] = NULL;
+    return result;
 }
 
 // PUBLIC functions start from here.

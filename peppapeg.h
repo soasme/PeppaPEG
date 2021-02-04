@@ -42,7 +42,7 @@ extern "C"
 # define P4_MINOR_VERSION 1
 # define P4_PATCH_VERSION 0
 
-# define P4_FLAG_NONE                   0x0
+# define P4_FLAG_NONE                   ((uint8_t)(0x0))
 
 /*
  * Let the children tokens disappear!
@@ -52,7 +52,7 @@ extern "C"
  *    b c
  *   d e
  * */
-# define P4_FLAG_SQUASH_CHILDREN        0x1
+# define P4_FLAG_SQUASHED               ((uint8_t)(0x1))
 
 /*
  * Replace the token with the children tokens.
@@ -62,13 +62,13 @@ extern "C"
  *   (b) c ===> d e c
  *   d e
  * */
-# define P4_FLAG_LIFT_CHILDREN          0x10
+# define P4_FLAG_LIFTED                 ((uint8_t)(0x10))
 
 /*
  * Apply implicit whitespaces rule.
  * Used by repetition and sequence expressions.
  */
-# define P4_FLAG_TIGHT                  0x100
+# define P4_FLAG_TIGHTED                ((uint8_t)(0x100))
 
 /* A position in the text. */
 typedef size_t          P4_Position;
@@ -94,13 +94,7 @@ typedef enum {
     P4_Negative,
     P4_Sequence,
     P4_Choice,
-    P4_ZeroOrOnce,
-    P4_ZeroOrMore,
-    P4_OnceOrMore,
-    P4_RepeatMin,
-    P4_RepeatMax,
-    P4_RepeatMinMax,
-    P4_RepeatExact,
+    P4_Repeat,
 } P4_ExpressionKind;
 
 typedef enum {
@@ -142,13 +136,13 @@ typedef struct P4_Expression {
 
         /* Used by P4_Range. */
         struct {
-            P4_Rune                 start;
-            P4_Rune                 end;
+            P4_Rune                 lower;
+            P4_Rune                 upper;
         };
 
         /* Used by P4_Sequence..P4_Choice. */
         struct {
-            struct P4_Expression*   members;
+            struct P4_Expression**  members;
             uint32_t                count;
         };
 
@@ -162,9 +156,13 @@ typedef struct P4_Expression {
 } P4_Expression;
 
 typedef struct P4_Grammar {
-    P4_Expression*      exprs;
+    /* A P4_Choice expression that includes all rules. */
+    P4_Expression*      rules;
+    /* The error code. */
     P4_Error            err;
+    /* The error message. */
     P4_String           errmsg;
+    /* The implicit whitespaces rule expression. */
     P4_Expression*      whitespaces;
 } P4_Grammar;
 
@@ -176,7 +174,7 @@ typedef struct P4_Token{
      */
     P4_Slice            slice;
     /* The matching grammar expression. */
-    P4_Expression       expr;
+    P4_Expression*      expr;
     /* The sibling token. NULL if not exists. */
     struct P4_Token*    next;
     /* The first child of inner tokens. NULL if not exists. */
@@ -185,7 +183,7 @@ typedef struct P4_Token{
     struct P4_Token*    tail;
 } P4_Token;
 
-P4_PUBLIC(P4_String)  P4_Version(void);
+P4_PUBLIC(P4_String)      P4_Version(void);
 
 P4_PUBLIC(P4_Expression*) P4_CreateNumeric(size_t);
 P4_PUBLIC(P4_Expression*) P4_CreateLiteral(const P4_String, bool sensitive);
@@ -193,21 +191,24 @@ P4_PUBLIC(P4_Expression*) P4_CreateRange(P4_Rune, P4_Rune);
 P4_PUBLIC(P4_Expression*) P4_CreateReference(P4_RuleID);
 P4_PUBLIC(P4_Expression*) P4_CreatePositive(P4_Expression*);
 P4_PUBLIC(P4_Expression*) P4_CreateNegative(P4_Expression*);
-P4_PUBLIC(P4_Expression*) P4_CreateSequence(void);
-P4_PUBLIC(P4_Expression*) P4_CreateChoice(void);
+P4_PUBLIC(P4_Expression*) P4_CreateSequence(size_t, ...);
+P4_PUBLIC(P4_Expression*) P4_CreateChoice(size_t, ...);
+P4_PUBLIC(P4_Expression*) P4_CreateRepeat(P4_Expression*, uint64_t, uint64_t);
+P4_PUBLIC(P4_Expression*) P4_CreateRepeatMin(P4_Expression*, uint64_t);
+P4_PUBLIC(P4_Expression*) P4_CreateRepeatMax(P4_Expression*, uint64_t);
+P4_PUBLIC(P4_Expression*) P4_CreateRepeatExact(P4_Expression*, uint64_t);
 P4_PUBLIC(P4_Expression*) P4_CreateZeroOrOnce(P4_Expression*);
 P4_PUBLIC(P4_Expression*) P4_CreateZeroOrMore(P4_Expression*);
 P4_PUBLIC(P4_Expression*) P4_CreateOnceOrMore(P4_Expression*);
-P4_PUBLIC(P4_Expression*) P4_CreateRepeatMin(P4_Expression*, uint64_t);
-P4_PUBLIC(P4_Expression*) P4_CreateRepeatMax(P4_Expression*, uint64_t);
-P4_PUBLIC(P4_Expression*) P4_CreateRepeatMinMax(P4_Expression*, uint64_t, uint64_t);
-P4_PUBLIC(P4_Expression*) P4_CreateRepeatExact(P4_Expression*, uint64_t);
-P4_PUBLIC(void)           P4_AddMember(P4_Expression*, P4_Expression*);
+
+P4_PUBLIC(P4_Expression**) P4_AddMember(P4_Expression*, P4_Expression*);
+P4_PUBLIC(size_t)         P4_GetMembersCount(P4_Expression*);
 
 P4_PUBLIC(void)           P4_DeleteExpression(P4_Expression*);
 
 P4_PUBLIC(P4_String)      P4_PrintExpression(P4_Expression*);
 
+P4_PUBLIC(void)           P4_SetRuleID(P4_Expression*, P4_RuleID);
 P4_PUBLIC(bool)           P4_IsRule(P4_Expression*);
 
 P4_PUBLIC(bool)           P4_IsSquashed(P4_Expression*);
@@ -217,6 +218,7 @@ P4_PUBLIC(void)           P4_SetExpressionFlag(P4_Expression*, uint8_t);
 P4_PUBLIC(void)           P4_SetSquashed(P4_Expression*);
 P4_PUBLIC(void)           P4_SetLifted(P4_Expression*);
 P4_PUBLIC(void)           P4_SetTighted(P4_Expression*);
+P4_PUBLIC(void)           P4_UnsetExpressionFlag(P4_Expression*, uint8_t);
 P4_PUBLIC(void)           P4_UnsetSquashed(P4_Expression*);
 P4_PUBLIC(void)           P4_UnsetLifted(P4_Expression*);
 P4_PUBLIC(void)           P4_UnsetTighted(P4_Expression*);
@@ -242,14 +244,14 @@ P4_PUBLIC(P4_Expression*) P4_AddRepeatMinMax(P4_Grammar*, P4_RuleID, P4_Expressi
 P4_PUBLIC(P4_Expression*) P4_AddRepeatExact(P4_Grammar*, P4_RuleID, P4_Expression*, uint64_t);
 
 P4_PUBLIC(void)           P4_DeleteGrammarRule(P4_Grammar*, P4_RuleID);
-P4_PUBLIC(P4_Expression*) P4_GetGrammar_rule(P4_Grammar*, P4_RuleID);
-
-P4_PUBLIC(P4_Token*)      P4_Parse(P4_Grammar*, P4_RuleID, P4_String input);
-P4_PUBLIC(P4_Token*)      P4_ParseWithLength(P4_Grammar*, P4_RuleID, P4_String input, P4_Position pos);
+P4_PUBLIC(P4_Expression*) P4_GetGrammarRule(P4_Grammar*, P4_RuleID);
 
 P4_PUBLIC(bool)           P4_HasError(P4_Grammar*);
 P4_PUBLIC(P4_String)      P4_PrintError(P4_Grammar*);
-P4_PUBLIC(void)           P4_SetError(P4_Grammar*, P4_Error);
+P4_PUBLIC(void)           P4_SetError(P4_Grammar*, P4_Error, P4_String);
+
+P4_PUBLIC(P4_Token*)      P4_Parse(P4_Grammar*, P4_RuleID, P4_String input);
+P4_PUBLIC(P4_Token*)      P4_ParseWithLength(P4_Grammar*, P4_RuleID, P4_String input, P4_Position offset);
 
 P4_PUBLIC(void)           P4_SetWhitespaces(P4_Grammar*, P4_Expression* space, P4_Expression* comment);
 P4_PUBLIC(P4_Expression*) P4_GetWhitespaces(P4_Grammar*);

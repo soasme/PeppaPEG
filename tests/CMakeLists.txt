@@ -5,6 +5,7 @@ add_library(unity STATIC unity/src/unity.c)
 set(
     unity_testcases
     print_version
+    test_literal
 )
 
 foreach(unity_testcase ${unity_testcases})

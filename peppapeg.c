@@ -618,7 +618,7 @@ P4_UnsetTighted(P4_Expression* expr) {
 P4_PUBLIC(P4_Grammar*)
 P4_CreateGrammar(void) {
     P4_Grammar* grammar = malloc(sizeof(P4_Grammar));
-    grammar->rules = 0;
+    grammar->rules = P4_CreateChoice(0);
     grammar->err   = 0;
     grammar->errmsg = 0;
     grammar->whitespaces = 0;

@@ -1,5 +1,5 @@
 /*
- * PeppaPeg -  A C-Implementation PEG Parser.
+ * Peppa PEG -  Ultra lightweight PEG Parser in ANSI C.
  *
  * MIT License
  *

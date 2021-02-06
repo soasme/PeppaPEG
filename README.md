@@ -1,6 +1,6 @@
 # Peppa PEG
 
-A PEG Parser in ANSI C ✨ 🐷 ✨.
+Ultra lightweight PEG Parser in ANSI C. ✨ 🐷 ✨.
 
 ## Hello, There!
 

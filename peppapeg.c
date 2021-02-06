@@ -24,334 +24,887 @@
  * SOFTWARE.
 */
 
-#include <ctype.h>
-#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <stdarg.h>
 #include <assert.h>
+
 #include "peppapeg.h"
 
-# define MARK_POS(s, p) P4_Position (p) = P4_GetPosition((s));
-# define MOVE_POS(s, p) P4_SetPosition((s), (p));
+# define                        EACH_INDEX() (p - pstart)
+# define                        EACH(item, array, length) (\
+        typeof(*(array)) *p = (array), *pstart = (array), (item) = *p;\
+        p < &((array)[length]); \
+        p++, (item) = *p\
+)
 
-typedef struct P4_State {
-    /* The grammar. */
-    P4_Grammar*     grammar;
-    /* The input text. */
-    P4_String       text;
-    /* The size of input text. Shortcut for strlen(s->text). */
-    size_t          size;
-    /* The depth of nested AST. */
-    size_t          depth;
-    /* The parsed position of the input text. */
-    P4_Position     pos;
-    /* The expression call stack. */
-    P4_Expression** frames;
-    size_t          frames_size;
-    size_t          frames_cap;
-} P4_State;
+# define                        NO_ERROR(s) ((s)->err == P4_Ok)
+# define                        NO_MATCH(s) ((s)->err == P4_MatchError)
 
-P4_PRIVATE(inline size_t)       P4_ReadRune(P4_String, P4_Rune*);
-P4_PRIVATE(inline int)          P4_CaseCmpInsensitive(P4_String, P4_String, size_t);
+#define                         autofree __attribute__ ((cleanup (cleanup_freep)))
 
-P4_PRIVATE(P4_State*)           P4_CreateState(P4_Grammar*, P4_String, size_t);
-P4_PRIVATE(void)                P4_DeleteState(P4_State*);
+P4_PRIVATE(inline void)
+cleanup_freep (void *p)
+{
+  void **pp = (void **) p;
+  if (*pp)
+    free (*pp);
+}
 
-P4_PRIVATE(P4_Position)         P4_GetPosition(P4_State*);
-P4_PRIVATE(void)                P4_SetPosition(P4_State*, P4_Position);
+# define                        P4_AdoptToken(head, tail, list) do { \
+                                    if ((list) != NULL) {\
+                                        if ((head) == NULL) (head) = (list); \
+                                        if ((tail) == NULL) (tail) = (list); \
+                                        else (tail)->next = (list); \
+                                        if ((tail) != NULL) {\
+                                            while ((tail)->next != NULL) \
+                                                (tail) = (tail)->next; \
+                                        } \
+                                    } \
+                                } while (0)
 
-P4_PRIVATE(inline P4_String)    P4_RemainingText(P4_State*);
+P4_PRIVATE(inline P4_Position)  P4_GetPosition(P4_Source*);
+P4_PRIVATE(void)                P4_SetPosition(P4_Source*, P4_Position);
 
-P4_PRIVATE(inline bool)         P4_NeedLoosen(P4_State*, P4_Expression*);
-P4_PRIVATE(inline bool)         P4_NeedSquash(P4_State*, P4_Expression*);
-P4_PRIVATE(inline bool)         P4_NeedSilent(P4_State*, P4_Expression*);
+# define                        P4_MarkPosition(s, p) P4_Position (p) = P4_GetPosition(s);
 
-P4_PRIVATE(void)                P4_RaiseError(P4_State*, P4_Error, P4_String);
-P4_PRIVATE(void)                P4_RescueError(P4_State*);
+P4_PRIVATE(inline P4_String)    P4_RemainingText(P4_Source*);
 
-P4_PRIVATE(size_t)              P4_PushFrame(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Expression*)      P4_PopFrame(P4_State*);
+P4_PRIVATE(inline bool)         P4_NeedLoosen(P4_Source*, P4_Expression*);
+P4_PRIVATE(inline bool)         P4_NeedSquash(P4_Source*, P4_Expression*);
+P4_PRIVATE(inline bool)         P4_NeedLift(P4_Source*, P4_Expression*);
 
-P4_PRIVATE(P4_Token*)           P4_Match(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchNumeric(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchLiteral(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchRange(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchReference(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchPositive(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchNegative(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchSequence(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchChoice(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchZeroOrOnce(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchZeroOrMore(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchOnceOrMore(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchRepeatMin(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchRepeatMax(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchRepeatMinMax(P4_State*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchRepeatExact(P4_State*, P4_Expression*);
+P4_PRIVATE(inline void)         P4_RaiseError(P4_Source*, P4_Error, P4_String);
+P4_PRIVATE(inline void)         P4_RescueError(P4_Source*);
+
+P4_PRIVATE(P4_Error)            P4_PushFrame(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Error)            P4_PopFrame(P4_Source*, P4_Expression**);
+
+P4_PRIVATE(P4_Expression*)      P4_GetReference(P4_Source*, P4_Expression*);
+
+P4_PRIVATE(P4_Token*)           P4_Match(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchNumeric(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchLiteral(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchRange(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchReference(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchPositive(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchNegative(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchSequence(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchChoice(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchRepeat(P4_Source*, P4_Expression*);
 
 /*
- * Reads a single UTF-8 code point from the string.
- * Returns the number of bytes of this code point.
- *
- * Example::
- *
- *     > uint32_t c = 0x0
- *     > read_codepoint("你好", &c)
- *     3
- *     > printf("%p %d\n", c, c)
- *     0x4f60 20320
+ * Determine if e is a tightness expr.
  */
-P4_PRIVATE(inline size_t)
-P4_ReadRune(P4_String s, P4_Rune* c) {
-    if ((s[0] & 0b10000000) == 0) { // 1 byte code point, ASCII
-        *c = (s[0] & 0b01111111);
-        return 1;
-    } else if ((s[0] & 0b11100000) == 0b11000000) { // 2 byte code point
-        *c = (s[0] & 0b00011111) << 6 | (s[1] & 0b00111111);
-        return 2;
-    } else if ((s[0] & 0b11110000) == 0b11100000) { // 3 byte code point
-        *c = (s[0] & 0b00001111) << 12 | (s[1] & 0b00111111) << 6 | (s[2] & 0b00111111);
-        return 3;
-    } else if ((s[0] & 0b11111000) == 0b11110000) { // 4 byte code point
-        *c = (s[0] & 0b00000111) << 18 | (s[1] & 0b00111111) << 12 | (s[2] & 0b00111111) << 6 | (s[3] & 0b00111111);
-        return 4;
-    } else {
-        *c = 0x0;
-        return 0;
-    }
+static inline bool
+is_tight(P4_Expression* e) {
+    return (e->flag & P4_FLAG_TIGHT) != 0;
 }
+
 
 /*
- * Compare case-insensitive string src v/s dest.
- *
- * Like strcmp, but works for a case insensitive UTF-8 string.
+ * Determine if e is a hollowness expr.
  */
-P4_PRIVATE(inline int)
-P4_CaseCmpInsensitive(P4_String src, P4_String dst, size_t len) {
-    uint32_t srcch = 0x0, dstch = 0x0;
-    size_t srcsz = 0, dstsz = 0;
-    int cmp = 0, remaining = len;
-    if (strlen(dst) < len) return -1;
-    while (*src != 0x0 && *dst != 0x0) {
-        srcsz = P4_ReadRune(src, &srcch);
-        dstsz = P4_ReadRune(dst, &dstch);
-        if (srcsz < dstsz) return -1;
-        if (srcsz > dstsz) return 1;
-        if (srcsz != 1 && srcch != dstch) return srcch > dstch ? 1 : -1;
-        cmp = tolower(srcch) - tolower(dstch);
-        if (srcsz == 1 && cmp != 0) return cmp;
-        src = src + srcsz;
-        dst = dst + dstsz;
-        remaining--;
-        if (remaining == 0) return 0;
-    }
-    return 0;
-}
-
-P4_PRIVATE(P4_State*)
-P4_CreateState(P4_Grammar* grammar, P4_String text, size_t size) {
-    P4_State* state = (P4_State*) malloc (sizeof(P4_Grammar));
-    state->grammar = grammar;
-    state->text = text;
-    state->size = size;
-    state->depth = 0;
-    state->pos = 0;
-    state->frames = 0;
-    state->frames_size = 0;
-    state->frames_cap = 0;
-    return state;
-}
-
-P4_PRIVATE(void)
-P4_DeleteState(P4_State* state) {
-    if (state) {
-        if (state->frames) {
-            free(state->frames);
-        }
-        free(state);
-    }
-}
-
-P4_PRIVATE(P4_Position)
-P4_GetPosition(P4_State* state) {
-    return state->pos;
-}
-
-P4_PRIVATE(void)
-P4_SetPosition(P4_State* state, P4_Position pos) {
-    state->pos = pos;
-}
-
-P4_PRIVATE(inline P4_String)
-P4_RemainingText(P4_State* state) {
-    if (state->pos > state->size)
-        return NULL;
-
-    return state->text+state->pos;
+static inline bool
+is_squashed(P4_Expression* e) {
+    return (e->flag & P4_FLAG_SQUASHED) != 0;
 }
 
 
-/* Determine if the implicit whitespace should be applied. */
+/*
+ * Determine if e is a bareness expr.
+ */
+static inline bool
+is_lifted(P4_Expression* e) {
+    return (e->flag & P4_FLAG_LIFTED) != 0;
+}
+
+
+/*
+ * Determine if e is a continuance expr.
+ */
+static inline bool
+is_scoped(P4_Expression* e) {
+    return (e->flag & P4_FLAG_SCOPED) != 0;
+}
+
+
+/*
+ * Determine if e is an intermediate expr,
+ * e.g, the expr has no left-hand symbol as its name.
+ *
+ * For example:
+ * a = { "a" }, `"a"` is a literal non-intermediate expr.
+ * b = { a ~ "b" }, `"b"` is a literal intermediate expr.
+ */
+static inline bool
+is_intermediate(P4_Expression* e) {
+    // TODO: remove e->name condition.
+    return e->name == NULL && e->id == 0;
+}
+
+
+
+/*
+ * Determine if the implicit whitespace should be applied.
+ */
 P4_PRIVATE(inline bool)
-P4_NeedLoosen(P4_State* s, P4_Expression* e) {
+P4_NeedLoosen(P4_Source* s, P4_Expression* e) {
+    assert(s != NULL && e != NULL && s->frames_len >= 0);
+
+    // Insert no whitespace
+
     // (1) when there is no implicit whitespace rule.
-    if (s->grammar->whitespaces == NULL)
+    if (P4_GetWhitespaces(s->grammar) == NULL)
         return false;
 
+    // (2) when we're already matching whitespace.
+    if (s->whitespacing)
+        return false;
 
-    for (int i = 0; i < s->frames_size; i++) {
-        // (2) when we're already matching whitespace.
-        if (s->grammar->whitespaces == s->frames[i])
-            return false;
+    // Traverse the frame stack from the highest frame,
+    for (int i = s->frames_len-1; i >=0; i--) {
+        // (3) when e is inside a continuance expression and no tightness at all.
+        if (!is_tight(s->frames[i]) && is_scoped(s->frames[i]))
+            return true;
+    }
 
+    // traversing the frame stack since the inner most,
+    for (int i = 0; i < s->frames_len; i++) {
         // (3) when e is a tighted expression.
-        if (P4_IsTighted(s->frames[i]))
+        if (is_tight(s->frames[i]))
             return false;
     }
 
     return true;
 }
 
-/* Determine if the inner token should be squashed. */
+/*
+ * Determine if inner tokens should be generated.
+ */
 P4_PRIVATE(inline bool)
-P4_NeedSquash(P4_State* s, P4_Expression* e) {
-    for (int i = s->frames_size-2; i>=0; i--) {
-        if (P4_IsSquashed(s->frames[i]))
+P4_NeedSquash(P4_Source* s, P4_Expression* e) {
+    // A continuance expr forces no hollowness.
+    if (is_scoped(e))
+        return false;
+
+    // Start from expr's parent.
+    for (int i = s->frames_len-2; i>=0; i--) {
+        // Any of expr's ancestor being continuance forces no hollowness.
+        if (is_scoped(s->frames[i]))
+            return false;
+
+        // Otherwise, being the descendant of hollowness token should be hollowed.
+        if (is_squashed(s->frames[i]))
             return true;
     }
+
     return false;
 }
 
-/* Determine if token should be dismissed. */
+/*
+ * Determine if the corresponding token to `e` should be ignored.
+ *
+ * 1. Intermediate expr.
+ * 2. Bareness expr.
+ * 3. Hollowed expr.
+ */
 P4_PRIVATE(inline bool)
-P4_NeedSilent(P4_State* s, P4_Expression* e) {
-    return !P4_IsRule(e) || P4_IsLifted(e) || P4_NeedSquash(s, e);
+P4_NeedLift(P4_Source* s, P4_Expression* e) {
+    return is_intermediate(e) || is_lifted(e) || P4_NeedSquash(s, e);
 }
 
 
-P4_PRIVATE(void)
-P4_RaiseError(P4_State* s, P4_Error err, P4_String errmsg) {
-    s->grammar->err = err;
-    if (errmsg)
-        s->grammar->errmsg = strdup(errmsg);
-    else
-        s->grammar->errmsg = 0;
+/*
+ * Raise an error.
+ *
+ * Set err and errmsg to state.
+ */
+P4_PRIVATE(inline void)
+P4_RaiseError(P4_Source* s, P4_Error err, P4_String errmsg) {
+    s->err = err;
+    s->errmsg = strdup(errmsg);
+    /*
+    size_t len = strlen(errmsg)+10;
+    for (int i=s->frames_len-1; i>=0; i--) {
+        if (s->frames[i]->name) {
+            len += 9;
+        } else {
+            len += strlen(s->frames[i]->name);
+        }
+        len += 2;
+    }
+    s->errmsg = (P4_String) calloc(len, sizeof(char));
+
+    for (int i=s->frames_len-1; i>=0; i--) {
+        if (s->frames[i]->name) {
+            strcat(s->errmsg, s->frames[i]->name);
+        } else {
+            strcat(s->errmsg, "<UNKNOWN>");
+        }
+        strcat(s->errmsg, ": ");
+    }
+
+    strcat(s->errmsg, errmsg);
+    */
 }
 
-P4_PRIVATE(void)
-P4_RescueError(P4_State* s) {
-    s->grammar->err = 0;
-    if (s->grammar->errmsg) {
-        free(s->grammar->errmsg);
-        s->grammar->errmsg = 0;
+
+/*
+ * Clear an error.
+ *
+ * It allows the parser to keep parsing the text.
+ */
+P4_PRIVATE(inline void)
+P4_RescueError(P4_Source* s) {
+    s->err = P4_Ok;
+    if (s->errmsg != NULL) {
+        free(s->errmsg);
+        s->errmsg = strdup("");
     }
 }
 
-P4_PRIVATE(size_t)
-P4_PushFrame(P4_State* s, P4_Expression* e) {
+
+/*
+ * Initialize a token.
+ */
+P4_Token*
+P4_CreateToken (const P4_String     str,
+                size_t              slice_i,
+                size_t              slice_j,
+                P4_Expression*      expr) {
+    P4_Token* token;
+
+    if ((token=malloc(sizeof(P4_Token))) == NULL)
+        return NULL;
+
+    token->text         = str;
+    token->slice.i      = slice_i;
+    token->slice.j      = slice_j;
+    token->expr         = expr;
+    token->next         = NULL;
+    token->head         = NULL;
+    token->tail         = NULL;
+
+    return token;
+}
+
+
+/*
+ * Free the token.
+ *
+ * Danger: if free the token only without cleaning next & head & tail,
+ * they're in risk of being dangled.
+ */
+P4_PRIVATE(void)
+P4_DeleteTokenNode(P4_Token* token) {
+    assert(token != NULL);
+    if (token)
+        free(token);
+}
+
+
+/*
+ * Free all of the children tokens of the token.
+ */
+P4_PRIVATE(void)
+P4_DeleteTokenChildren(P4_Token* token) {
+    assert(token != NULL);
+    P4_Token*   child   = token->head;
+    P4_Token*   tmp     = NULL;
+
+    while (child) {
+        tmp = child->next;
+        if (child->head)
+            P4_DeleteTokenChildren(child);
+        P4_DeleteTokenNode(child);
+        child = tmp;
+    }
+}
+
+
+/*
+ * Free the token list and all the children nodes of each
+ * node in the token list.
+ */
+P4_PUBLIC(void)
+P4_DeleteToken(P4_Token* token) {
+    P4_Token* tmp = NULL;
+    while (token) {
+        tmp     = token->next;
+        P4_DeleteTokenChildren(token);
+        P4_DeleteTokenNode(token);
+        token   = tmp;
+    }
+}
+
+
+/*
+ * Push e into s->frames.
+ */
+P4_PRIVATE(P4_Error)
+P4_PushFrame(P4_Source* s, P4_Expression* e) {
 
 # define DEFAULT_CAP 32
-
     if (s->frames_cap == 0) {
-        s->frames_cap = DEFAULT_CAP;
+        s->frames_cap = 32;
         s->frames = malloc(sizeof(P4_Expression*) * s->frames_cap);
-    } else if (s->frames_size >= s->frames_cap){
+    } else if (s->frames_len >= s->frames_cap) {
         s->frames_cap <<= 1;
-        s->frames = realloc(s->frames, s->frames_cap); // potential memory leak
+        s->frames = realloc(s->frames, s->frames_cap); // memory leak?
     }
+    if (s->frames == NULL)
+        return P4_MemoryError;
 
-    if (s->frames == NULL) {
-        return 0;
-    }
-
-    s->frames[s->frames_size++] = e;
-    return s->frames_size;
+    s->frames[s->frames_len] = e;
+    s->frames_len++;
+    return P4_Ok;
 }
 
-P4_PRIVATE(P4_Expression*)
-P4_PopFrame(P4_State* s) {
-    if (s->frames_cap == 0 || s->frames_size == 0)
+
+/*
+ * Pop e from s->frames.
+ */
+P4_PRIVATE(P4_Error)
+P4_PopFrame(P4_Source* s, P4_Expression** e) {
+    if (s->frames_cap == 0 || s->frames_len == 0)
+        return P4_MemoryError;
+
+    assert(s->frames != NULL);
+
+    s->frames_len--;
+
+    if (e != NULL)
+        *e = s->frames[s->frames_len];
+
+    s->frames[s->frames_len+1] = 0;
+    return P4_Ok;
+}
+
+
+P4_PRIVATE(P4_Token*)
+P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
+    assert(NO_ERROR(s));
+
+    P4_String str = P4_RemainingText(s);
+
+# define EOT(s) (*(s) == 0x0)
+
+    if (EOT(str)) {
+        P4_RaiseError(s, P4_MatchError, "eof");
         return NULL;
-    s->frames_size--;
-    P4_Expression* result = s->frames[s->frames_size];
-    s->frames[s->frames_size+1] = NULL;
+    }
+
+    size_t len = strlen(e->literal);
+
+    P4_MarkPosition(s, startpos);
+    if ((!e->sensitive && P4_CaseCmpInsensitive(e->literal, str, len) != 0)
+            || (e->sensitive && memcmp(e->literal, str, len) != 0)) {
+        P4_RaiseError(s, P4_MatchError, "literal not match");
+        return NULL;
+    }
+    P4_SetPosition(s, startpos+len);
+    P4_MarkPosition(s, endpos);
+
+    if (P4_NeedLift(s, e))
+        return NULL;
+
+    P4_Token* result = NULL;
+    if ((result=P4_CreateToken (s->content, startpos, endpos, e)) == NULL) {
+        P4_RaiseError(s, P4_MemoryError, "");
+        return NULL;
+    }
+
     return result;
 }
 
 P4_PRIVATE(P4_Token*)
-P4_Match(P4_State* s, P4_Expression* e) {
+P4_MatchRange(P4_Source* s, P4_Expression* e) {
+    assert(NO_ERROR(s));
+
+    P4_String str = P4_RemainingText(s);
+    if (*str == '\0') {
+        P4_RaiseError(s, P4_MatchError, "eof");
+        return NULL;
+    }
+
+    P4_MarkPosition(s, startpos);
+
+    uint32_t rune = 0x0;
+    size_t size = P4_ReadRune(str, &rune);
+
+#define IN_RANGE(e, c) ((c)>=(e)->range[0] && (c)<=(e)->range[1])
+
+    if (!IN_RANGE(e, rune)) {
+        P4_RaiseError(s, P4_MatchError, "not in range");
+        return NULL;
+    }
+
+    P4_SetPosition(s, startpos+size);
+    P4_MarkPosition(s, endpos);
+
+    if (P4_NeedLift(s, e))
+        return NULL;
+
+    P4_Token* result = NULL;
+    if ((result=P4_CreateToken (s->content, startpos, endpos, e)) == NULL) {
+        P4_RaiseError(s, P4_MemoryError, "oom");
+        return NULL;
+    }
+
+    return result;
+}
+
+P4_PRIVATE(P4_Expression*)
+P4_GetReference(P4_Source* s, P4_Expression* e) {
+    if (e->ref_expr != NULL)
+        return e->ref_expr;
+
+    if (e->ref_id != 0) {
+        e->ref_expr = P4_GetGrammarRule(s->grammar, e->ref_id);
+    }
+
+    return e->ref_expr;
+}
+
+P4_PRIVATE(P4_Token*)
+P4_MatchReference(P4_Source* s, P4_Expression* e) {
+    assert(NO_ERROR(s));
+
+    if (e->ref_expr == NULL && e->ref_id != 0) {
+        e->ref_expr = P4_GetGrammarRule(s->grammar, e->ref_id);
+    }
+
+    assert(e->ref_expr != NULL || e->ref_match != NULL);
+
+    P4_MarkPosition(s, startpos);
+    P4_Expression* ref = e->ref_expr != NULL ? e->ref_expr : e;
+    P4_MatchFunction match = e->ref_match != NULL \
+                               ? e->ref_match : P4_Expression_match;
+    P4_Token* reftok = match(s, ref);
+    P4_MarkPosition(s, endpos);
+
+    // Ref matching is terminated when error occurred.
+    if (!NO_ERROR(s))
+        return NULL;
+
+    // The referenced token is returned when silenced.
+    if (P4_NeedLift(s, e))
+        return reftok;
+
+    // A single reference expr can be a rule: `e = { ref }`
+    // In such a case, a token for `e` with single child `ref` is created.
+    //
     P4_Token* result = NULL;
 
-    if (e == NULL) {
-        P4_SetError(s->grammar, P4_NullError, 0);
-        return result;
+    if ((result=P4_CreateToken (s->content, startpos, endpos, e)) == NULL) {
+        P4_RaiseError(s, P4_MemoryError, "oom");
+        return NULL;
     }
 
-    if (P4_IsRule(e) && P4_PushFrame(s, e) == 0) {
-        P4_SetError(s->grammar, P4_MemoryError, 0);
-        return result;
+    P4_AdoptToken(result->head, result->tail, reftok);
+    return result;
+}
+
+P4_PRIVATE(P4_Token*)
+P4_MatchSequence(P4_Source* s, P4_Expression* e) {
+    assert(NO_ERROR(s));
+
+    P4_Token *head = NULL,
+             *tail = NULL,
+             *tok = NULL,
+             *whitespace = NULL;
+
+    P4_MarkPosition(s, startpos);
+
+    for EACH(member, e->members, e->count) {
+        // Optional `WHITESPACE` and `COMMENT` are inserted between every member.
+        if (P4_NeedLoosen(s, e)
+                && EACH_INDEX() > 0) {
+            whitespace = P4_Expression_match_implicit_whitespace(s, NULL);
+            if (!NO_ERROR(s)) goto finalize;
+            P4_AdoptToken(head, tail, whitespace);
+        }
+
+        tok = P4_Expression_match(s, member);
+
+        // If any of the sequence members fails, the entire sequence fails.
+        // Puke the eaten text and free all created tokens.
+        if (!NO_ERROR(s)) {
+            goto finalize;
+        }
+
+        P4_AdoptToken(head, tail, tok);
     }
+
+    if (P4_NeedLift(s, e))
+        return head;
+
+    P4_Token* ret = P4_CreateToken (s->content, startpos, P4_GetPosition(s), e);
+    if (ret == NULL) {
+        P4_RaiseError(s, P4_MemoryError, "oom");
+        return NULL;
+    }
+
+    ret->head = head;
+    ret->tail = tail;
+    return ret;
+
+finalize:
+    P4_SetPosition(s, startpos);
+    P4_DeleteToken(head);
+    return NULL;
+}
+
+P4_PRIVATE(P4_Token*)
+P4_MatchChoice(P4_Source* s, P4_Expression* e) {
+    P4_Token* tok = NULL;
+
+    // A member is attempted if previous yields no match.
+    // The oneof match matches successfully immediately if any match passes.
+    P4_MarkPosition(s, startpos);
+    for EACH(member, e->members, e->count) {
+        tok = P4_Expression_match(s, member);
+        if (NO_ERROR(s)) break;
+        if (NO_MATCH(s)) {
+            // retry until the last one.
+            if (EACH_INDEX() < e->count-1) {
+                P4_RescueError(s);
+                P4_SetPosition(s, startpos);
+            // fail when the last one is a no-match.
+            } else {
+                P4_RaiseError(s, P4_MatchError, "no match");
+                goto finalize;
+            }
+        }
+    }
+    P4_MarkPosition(s, endpos);
+
+    if (P4_NeedLift(s, e))
+        return tok;
+
+    P4_Token* oneof = P4_CreateToken (s->content, startpos, endpos, e);
+    if (oneof == NULL) {
+        P4_RaiseError(s, P4_MemoryError, "oom");
+        goto finalize;
+    }
+
+    P4_AdoptToken(oneof->head, oneof->tail, tok);
+    return oneof;
+
+finalize:
+    P4_SetPosition(s, startpos);
+    free(tok);
+    return NULL;
+}
+
+/*
+ * Repetition matcher function.
+ *
+ * Returns a token in a greedy fashion.
+ *
+ * There are seven repetition mode: zeroormore, zerooronce,
+ */
+P4_PRIVATE(P4_Token*)
+P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
+    size_t min = -1, max = -1, repeated = 0;
+
+    assert(e->repeat_min != min || e->repeat_max != max); // need at least one of min/max.
+    assert(e->repeat_expr != NULL); // need repeat expression.
+    assert(NO_ERROR(s));
+
+# define IS_REF(e) ((e)->kind == P4_Reference)
+# define IS_PROGRESSING(k) ((k)==P4_Positive \
+                            || (k)==P4_Negative)
+
+    // when expression inside repetition is non-progressing, it repeats indefinitely.
+    // let's prevent such a case.
+    if (IS_PROGRESSING(e->repeat_expr->kind) ||
+            (IS_REF(e->repeat_expr)
+             && IS_PROGRESSING(P4_GetReference(s, e->repeat_expr)->kind))) {
+        P4_RaiseError(s, P4_AdvanceError, "no progressing in repetition");
+        return NULL; // TODO: need to handle SOI as well. pest.rs incurs OOM for SOI+.
+    }
+
+    min = e->repeat_min;
+    max = e->repeat_max;
+
+    P4_Position startpos = P4_GetPosition(s);
+    P4_Token *head = NULL, *tail = NULL, *tok = NULL, *whitespace = NULL;
+
+    while (*P4_RemainingText(s) != '\0') {
+        P4_MarkPosition(s, before_implicit);
+
+        // implicit `WHITESPACE` and `COMMENT` are inserted
+        // between every repetition.
+        if (P4_NeedLoosen(s, e)
+                && repeated > 0 ) {
+            whitespace = P4_Expression_match_implicit_whitespace(s, NULL);
+            if (!NO_ERROR(s)) goto finalize;
+            P4_AdoptToken(head, tail, whitespace);
+        }
+
+        tok = P4_Expression_match(s, e->repeat_expr);
+
+        if (NO_MATCH(s)) {
+            assert(tok == NULL);
+
+            // considering the case: MATCH WHITESPACE MATCH WHITESPACE NO_MATCH
+            if (P4_NeedLoosen(s, e)            //           ^          ^
+                    && repeated > 0)           //           ^          ^ we are here
+                P4_SetPosition(s, before_implicit);  //           ^ puke extra whitespace
+                                               //           ^ now we are here
+
+            if (min != -1 && repeated < min) {
+                P4_RaiseError(s, P4_MatchError, "insufficient repetitions");
+                goto finalize;
+            } else {                       // sufficient repetitions.
+                P4_RescueError(s);
+                break;
+            }
+        }
+
+        if (!NO_ERROR(s))
+            goto finalize;
+
+        repeated++;
+        P4_AdoptToken(head, tail, tok);
+
+        if (max != -1 && repeated == max) { // enough attempts
+            P4_RescueError(s);
+            break;
+        }
+    }
+
+    // there should be no error when repetition is successful.
+    assert(NO_ERROR(s));
+
+    // fails when attempts are excessive, e.g. repeated > max.
+    if (max != -1 && repeated > max) {
+        P4_RaiseError(s, P4_MatchError, "excessive repetitions");
+        goto finalize;
+    }
+
+    if (P4_GetPosition(s) == startpos) // success but no token is produced.
+        goto finalize;
+
+
+    if (P4_NeedLift(s, e))
+        return head;
+
+    P4_Token* repetition = P4_CreateToken (s->content, startpos, P4_GetPosition(s), e);
+    if (repetition == NULL) {
+        P4_RaiseError(s, P4_MemoryError, "oom");
+        return NULL;
+    }
+
+    P4_AdoptToken(repetition->head, repetition->tail, head);
+    return repetition;
+
+// cleanup before returning NULL.
+// tokens between head..tail should be freed.
+finalize:
+    P4_SetPosition(s, startpos);
+    P4_DeleteToken(head);
+    return NULL;
+}
+
+
+P4_PRIVATE(P4_Token*)
+P4_MatchPositive(P4_Source* s, P4_Expression* e) {
+    assert(NO_ERROR(s) && e->ref_expr != NULL);
+
+    P4_MarkPosition(s, startpos);
+
+    P4_Token* token = P4_Expression_match(s, e->ref_expr);
+    if (token != NULL)
+        P4_DeleteToken(token);
+
+    P4_SetPosition(s, startpos);
+
+    return NULL;
+}
+
+P4_PRIVATE(P4_Token*)
+P4_MatchNegative(P4_Source* s, P4_Expression* e) {
+    assert(NO_ERROR(s) && e->ref_expr != NULL);
+
+    P4_MarkPosition(s, startpos);
+    P4_Token* token = P4_Expression_match(s, e->ref_expr);
+    P4_SetPosition(s, startpos);
+
+    if (NO_ERROR(s)) {
+        P4_DeleteToken(token);
+        P4_RaiseError(s, P4_MatchError, "should not appear");
+    } else if (s->err == P4_MatchError) {
+        P4_RescueError(s);
+    }
+
+    return NULL;
+}
+
+P4_Token*
+P4_Expression_dispatch(P4_Source* s, P4_Expression* e) {
+    P4_Token* result = NULL;
 
     switch (e->kind) {
         case P4_Literal:
             result = P4_MatchLiteral(s, e);
             break;
+        case P4_Range:
+            result = P4_MatchRange(s, e);
+            break;
+        case P4_Reference:
+            result = P4_MatchReference(s, e);
+            break;
+        case P4_Sequence:
+            result = P4_MatchSequence(s, e);
+            break;
+        case P4_Choice:
+            result = P4_MatchChoice(s, e);
+            break;
+        case P4_Positive:
+            result = P4_MatchPositive(s, e);
+            break;
+        case P4_Negative:
+            result = P4_MatchNegative(s, e);
+            break;
+        case P4_Repeat:
+            result = P4_MatchRepeat(s, e);
+            break;
         default:
-            P4_SetError(s->grammar, P4_InternalError, 0);
+            P4_RaiseError(s, P4_ValueError, "no such kind");
             result = NULL;
             break;
     }
 
-    if (P4_IsRule(e))
-        P4_PopFrame(s);
-
-    if (P4_HasError(s->grammar)) {
-        assert(result == NULL);
-        return result;
-    }
-
     return result;
 }
 
-P4_PRIVATE(P4_Token*)
-P4_MatchLiteral(P4_State* s, P4_Expression* e) {
-    P4_String str = NULL;
+/*
+ * The match function updates the state given an expression.
+ *
+ * It returns a token linked list, NULL if no token is generated.
+ * State pos will advance if needed.
+ * Not-advancing pos / NULL returning token list do not indicate a failed match.
+ * It fails when state err/errmsg are set.
+ * It propagate the failed match up to the top level.
+ */
+P4_Token*
+P4_Expression_match(P4_Source* s, P4_Expression* e) {
+    assert(e != NULL);
+
+    if (s->err != P4_NoError) {
+        return NULL;
+    }
+
+    P4_Error     err = P4_NoError;
     P4_Token* result = NULL;
 
-    if (P4_HasError(s->grammar))
-        return NULL;
-
-    if (*(str = P4_RemainingText(s)) == '\0') {
-        P4_SetError(s->grammar, P4_AdvanceError, 0);
+    if (!is_intermediate(e) && (err = P4_PushFrame(s, e)) != P4_Ok) {
+        P4_RaiseError(s, err, "failed to push frame");
         return NULL;
     }
 
-    size_t litlen = strlen(e->literal);
+    result = P4_Expression_dispatch(s, e);
 
-    MARK_POS(s, startpos);
-    if ((!e->sensitive && P4_CaseCmpInsensitive(e->literal, str, litlen) != 0)
-            || (e->sensitive && memcmp(e->literal, str, litlen) != 0)) {
-        P4_SetError(s->grammar, P4_MatchError, 0);
-        return NULL;
-    }
-    MOVE_POS(s, startpos+litlen);
-    MARK_POS(s, endpos);
-
-    if (P4_NeedSilent(s, e)) {
+    if (!is_intermediate(e) && (err = P4_PopFrame(s, NULL)) != P4_Ok) {
+        P4_RaiseError(s, err, "failed to pop frame");
+        P4_DeleteToken(result);
         return NULL;
     }
 
-    P4_Slice slice = {startpos, endpos};
-    if ((result = P4_CreateToken(s->text, slice, e)) == NULL) {
-        P4_SetError(s->grammar, P4_MemoryError, 0);
+    if (s->err != P4_NoError) {
+        assert(result == NULL);
         return NULL;
     }
 
     return result;
 }
 
-// PUBLIC functions start from here.
+P4_Token*
+P4_Expression_match_any(P4_Source* s, P4_Expression* e) {
+    P4_String str = P4_RemainingText(s);
+
+# define UTF8_CHARLEN(b) (( 0xe5000000 >> (( (b) >> 3 ) & 0x1e )) & 3 ) + 1
+
+    P4_MarkPosition(s, startpos);
+    size_t   len = UTF8_CHARLEN(*str);
+    P4_SetPosition(s, startpos+len);
+
+    return NULL;
+}
+
+P4_Token*
+P4_Expression_match_soi(P4_Source* s, P4_Expression* e) {
+    if (P4_GetPosition(s) != 0)
+        P4_RaiseError(s, P4_MatchError, "not soi");
+    return NULL;
+}
+
+P4_Token*
+P4_Expression_match_eoi(P4_Source* s, P4_Expression* e) {
+
+    if (P4_GetPosition(s) != strlen(s->content)) {
+        P4_RaiseError(s, P4_MatchError, "not eoi");
+    }
+    return NULL;
+}
+
+P4_Token*
+P4_Expression_match_implicit_whitespace(P4_Source* s, P4_Expression* e) {
+    // implicit whitespace is guaranteed to be an unnamed rule.
+    // state flag is guaranteed to be none.
+    assert(NO_ERROR(s));
+
+    if (s->grammar == NULL)
+        return NULL;
+
+    P4_Expression* implicit_whitespace = P4_GetWhitespaces(s->grammar);
+    assert(implicit_whitespace != NULL);
+
+    // (1) Temporarily set implicit whitespace to empty.
+    s->whitespacing = true;
+
+    // (2) Perform implicit whitespace checks.
+    //     We won't do implicit whitespace inside an implicit whitespace expr.
+    P4_Token* result = P4_Expression_match(s, implicit_whitespace);
+    if (NO_MATCH(s))
+        P4_RescueError(s);
+
+    // (3) Set implicit whitespace back.
+    s->whitespacing = false;
+
+    return result;
+}
+
+// Poor performance, refactor me.
+P4_PUBLIC(void)
+P4_PrintSourceAst(P4_Token* token, P4_String buf, size_t indent) {
+    P4_Token* current = token;
+    char idstr[6];
+    idstr[0] = 'R';
+    while (current != NULL) {
+        for (size_t i = 0; i < indent; i++) strcat(buf, " ");
+        strcat(buf, "- ");
+        sprintf(idstr+1, "%d", current->expr->id);
+        strcat(buf, idstr);
+        if (current->head == NULL) {
+            strcat(buf, ": \"");
+            size_t substr_len = (current->slice.j - current->slice.i);
+            autofree P4_String substr = malloc( sizeof(char) * (substr_len+1) );
+            memcpy(substr, current->text+current->slice.i, substr_len);
+            substr[substr_len] = '\0';
+            strcat(buf, substr);
+            strcat(buf, "\"\n");
+        } else {
+            strcat(buf, "\n");
+            P4_PrintSourceAst(current->head, buf, indent+2);
+        }
+        current = current->next;
+    }
+}
 
 /*
  * Get version string.
@@ -363,6 +916,7 @@ P4_Version(void) {
     return version;
 }
 
+/*
 P4_PUBLIC(P4_Expression*)
 P4_CreateNumeric(size_t num) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
@@ -370,6 +924,7 @@ P4_CreateNumeric(size_t num) {
     expr->num = num;
     return expr;
 }
+*/
 
 P4_PUBLIC(P4_Expression*)
 P4_CreateLiteral(const P4_String literal, bool sensitive) {
@@ -384,8 +939,8 @@ P4_PUBLIC(P4_Expression*)
 P4_CreateRange(P4_Rune lower, P4_Rune upper) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->kind = P4_Range;
-    expr->lower = lower;
-    expr->upper = upper;
+    expr->range[0] = lower;
+    expr->range[1] = upper;
     return expr;
 }
 
@@ -393,7 +948,7 @@ P4_PUBLIC(P4_Expression*)
 P4_CreateReference(P4_RuleID id) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->kind = P4_Reference;
-    expr->refid = id;
+    expr->ref_id = id;
     return expr;
 }
 
@@ -401,7 +956,7 @@ P4_PUBLIC(P4_Expression*)
 P4_CreatePositive(P4_Expression* refexpr) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->kind = P4_Positive;
-    expr->refexpr = refexpr;
+    expr->ref_expr = refexpr;
     return expr;
 }
 
@@ -409,7 +964,7 @@ P4_PUBLIC(P4_Expression*)
 P4_CreateNegative(P4_Expression* refexpr) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->kind = P4_Negative;
-    expr->refexpr = refexpr;
+    expr->ref_expr = refexpr;
     return expr;
 }
 
@@ -446,332 +1001,228 @@ P4_CreateChoice(size_t count, ...) {
 }
 
 P4_PUBLIC(P4_Expression*)
-P4_CreateRepeat(P4_Expression* repeat, uint64_t min, uint64_t max) {
+P4_CreateRepeatMinMax(P4_Expression* repeat, size_t min, size_t max) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->kind = P4_Repeat;
-    expr->repeat = repeat;
-    expr->min = min;
-    expr->max = max;
+    expr->repeat_expr = repeat;
+    expr->repeat_min = min;
+    expr->repeat_max = max;
     return expr;
 }
 
 P4_PUBLIC(P4_Expression*)
-P4_CreateRepeatMin(P4_Expression* repeat, uint64_t min) {
-    return P4_CreateRepeat(repeat, min, -1);
+P4_CreateRepeatMin(P4_Expression* repeat, size_t min) {
+    return P4_CreateRepeatMinMax(repeat, min, -1);
 }
 
 P4_PUBLIC(P4_Expression*)
-P4_CreateRepeatMax(P4_Expression* repeat, uint64_t max) {
-    return P4_CreateRepeat(repeat, -1, max);
+P4_CreateRepeatMax(P4_Expression* repeat, size_t max) {
+    return P4_CreateRepeatMinMax(repeat, -1, max);
 }
 
 P4_PUBLIC(P4_Expression*)
-P4_CreateRepeatExact(P4_Expression* repeat, uint64_t minmax) {
-    return P4_CreateRepeat(repeat, minmax, minmax);
+P4_CreateRepeatExact(P4_Expression* repeat, size_t minmax) {
+    return P4_CreateRepeatMinMax(repeat, minmax, minmax);
 }
 
 P4_PUBLIC(P4_Expression*)
 P4_CreateZeroOrOnce(P4_Expression* repeat) {
-    return P4_CreateRepeat(repeat, 0, 1);
+    return P4_CreateRepeatMinMax(repeat, 0, 1);
 }
 
 P4_PUBLIC(P4_Expression*)
 P4_CreateZeroOrMore(P4_Expression* repeat) {
-    return P4_CreateRepeat(repeat, 0, -1);
+    return P4_CreateRepeatMinMax(repeat, 0, -1);
 }
 
 P4_PUBLIC(P4_Expression*)
 P4_CreateOnceOrMore(P4_Expression* repeat) {
-    return P4_CreateRepeat(repeat, 1, -1);
-}
-
-P4_PUBLIC(P4_Expression**)
-P4_AddMember(P4_Expression* expr, P4_Expression* member) {
-    // TODO: more efficient memory management.
-    size_t newcount= expr->count + 1;
-    P4_Expression** newbuf = realloc(expr->members, newcount*sizeof(P4_Expression*));
-
-    if (newbuf == NULL) {
-        return NULL;
-    }
-
-    expr->members = newbuf;
-    expr->members[newcount-1] = member;
-
-    return newbuf;
-}
-
-P4_PUBLIC(size_t)
-P4_GetMembersCount(P4_Expression* expr) {
-    return expr->count;
+    return P4_CreateRepeatMinMax(repeat, 1, -1);
 }
 
 P4_PUBLIC(void)
-P4_DeleteExpression(P4_Expression* expr) {
-    if (expr == NULL)
-        return;
-
-    switch (expr->kind) {
-        case P4_Literal:
-            free(expr->literal);
-            expr->literal = NULL;
-            break;
-
-        case P4_Positive:
-        case P4_Negative:
-            P4_DeleteExpression(expr->refexpr);
-            expr->refexpr = NULL;
-            break;
-
-        case P4_Sequence:
-        case P4_Choice:
-            for (int i = 0; i < expr->count; i++)
-                P4_DeleteExpression(expr->members[i]);
-            free(expr->members);
-            expr->members = NULL;
-            break;
-
-        case P4_Repeat:
-            P4_DeleteExpression(expr->repeat);
-            expr->repeat = NULL;
-            break;
-
-        default:
-            break;
-    }
-
-    free(expr);
-}
-
-
-P4_PUBLIC(P4_String)
-P4_PrintExpression(P4_Expression* expr) {
-    return strdup("<Expression>"); // TODO
-}
-
-P4_PUBLIC(void)
-P4_SetRuleID(P4_Expression* expr, P4_RuleID id) {
-    expr->id = id;
+P4_SetRuleID(P4_Expression* e, P4_RuleID id) {
+    e->id = id;
 }
 
 P4_PUBLIC(bool)
-P4_IsRule(P4_Expression* expr) {
-    return expr->id != 0;
+P4_IsRule(P4_Expression* e) {
+    return !is_intermediate(e);
 }
 
-P4_PUBLIC(bool)
-P4_IsSquashed(P4_Expression* expr) {
-    return (expr->flags & P4_FLAG_SQUASHED) != 0;
-}
-
-P4_PUBLIC(bool)
-P4_IsLifted(P4_Expression* expr) {
-    return (expr->flags & P4_FLAG_LIFTED) != 0;
-}
-
-P4_PUBLIC(bool)
-P4_IsTighted(P4_Expression* expr) {
-    return (expr->flags & P4_FLAG_TIGHTED) != 0;
-}
-
-P4_PUBLIC(void)
-P4_SetExpressionFlag(P4_Expression* expr, uint8_t flag) {
-    expr->flags |= flag;
-}
-
-P4_PUBLIC(void)
-P4_SetSquashed(P4_Expression* expr) {
-    P4_SetExpressionFlag(expr, P4_FLAG_SQUASHED);
-}
-
-P4_PUBLIC(void)
-P4_SetLifted(P4_Expression* expr) {
-    P4_SetExpressionFlag(expr, P4_FLAG_LIFTED);
-}
-
-P4_PUBLIC(void)
-P4_SetTighted(P4_Expression* expr) {
-    P4_SetExpressionFlag(expr, P4_FLAG_TIGHTED);
-}
-
-P4_PUBLIC(void)
-P4_UnsetExpressionFlag(P4_Expression* expr, uint8_t flag) {
-    expr->flags &= ~flag;
-}
-
-
-P4_PUBLIC(void)
-P4_UnsetSquashed(P4_Expression* expr) {
-    P4_UnsetExpressionFlag(expr, P4_FLAG_SQUASHED);
-}
-
-P4_PUBLIC(void)
-P4_UnsetLifted(P4_Expression* expr) {
-    P4_UnsetExpressionFlag(expr, P4_FLAG_LIFTED);
-}
-
-P4_PUBLIC(void)
-P4_UnsetTighted(P4_Expression* expr) {
-    P4_UnsetExpressionFlag(expr, P4_FLAG_TIGHTED);
-}
-
-P4_PUBLIC(P4_Grammar*)
-P4_CreateGrammar(void) {
+P4_PUBLIC(P4_Grammar*)    P4_CreateGrammar(void) {
     P4_Grammar* grammar = malloc(sizeof(P4_Grammar));
-    grammar->rules = P4_CreateChoice(0);
-    grammar->err   = 0;
-    grammar->errmsg = 0;
-    grammar->whitespaces = 0;
+    grammar->rules = NULL;
+    grammar->count = 0;
+    grammar->cap = 0;
     return grammar;
 }
 
 P4_PUBLIC(void)
 P4_DeleteGrammar(P4_Grammar* grammar) {
-    if (grammar->rules != NULL) {
-        P4_DeleteExpression(grammar->rules);
-        grammar->rules = NULL;
+    if (grammar) {
+        // TODO: free each rule.
+        free(grammar->rules);
+        free(grammar);
     }
-
-    if (grammar->errmsg != NULL) {
-        free(grammar->errmsg);
-        grammar->errmsg = NULL;
-    }
-
-    if (grammar->whitespaces != NULL) {
-        P4_DeleteExpression(grammar->whitespaces);
-        grammar->whitespaces = NULL;
-    }
-
-    free(grammar);
-}
-
-P4_PUBLIC(void)
-P4_AddGrammarRule(P4_Grammar* grammar, P4_RuleID id, P4_Expression* expr) {
-    if (P4_AddMember(grammar->rules, expr) == NULL) {
-        P4_SetError(grammar, P4_MemoryError, 0);
-        return;
-    }
-
-    P4_SetRuleID(expr, id);
 }
 
 P4_PUBLIC(P4_Expression*)
 P4_GetGrammarRule(P4_Grammar* grammar, P4_RuleID id) {
-    P4_Expression* expr = NULL;
-    for (int i = 0; i < grammar->rules->count; i++) {
-        expr = grammar->rules->members[i];
-        if (expr != NULL && expr->id == id)
-            return expr;
-    }
+    for EACH(rule, grammar->rules, grammar->count)
+        if (rule->id == id)
+            return rule;
     return NULL;
 }
 
-P4_PUBLIC(bool)
-P4_HasError(P4_Grammar* grammar) {
-    return grammar->err != 0;
-}
-
-P4_PUBLIC(P4_String)
-P4_PrintError(P4_Grammar* grammar) {
-    return strdup(grammar->errmsg);
-}
-
-P4_PUBLIC(P4_Token*)
-P4_Parse(P4_Grammar* grammar, P4_RuleID id, P4_String input) {
-    return P4_ParseWithLength(grammar, id, input, strlen(input));
-}
-
-P4_PUBLIC(P4_Token*)
-P4_ParseWithLength(P4_Grammar* grammar, P4_RuleID id, P4_String input, P4_Position len) {
-    P4_State* state = NULL;
-    P4_Expression* expr = NULL;
-    P4_Token* result = NULL;
-
-    if ((expr = P4_GetGrammarRule(grammar, id))== NULL) {
-        P4_SetError(grammar, P4_NameError, 0);
-        goto end;
+P4_PUBLIC(size_t)
+P4_AddGrammarRule(P4_Grammar* grammar, P4_RuleID id, P4_Expression* expr) {
+    if (grammar->cap == 0) {
+        grammar->cap = 32;
+        grammar->rules = malloc(sizeof(P4_Expression*) * grammar->cap);
+    } else if (grammar->count >= grammar->cap) {
+        grammar->cap <<= 1;
+        grammar->rules = realloc(grammar->rules, sizeof(P4_Expression*) * grammar->cap); // TODO: leak
     }
 
-    if ((state = P4_CreateState(grammar, input, len)) == NULL) {
-        P4_SetError(grammar, P4_MemoryError, 0);
-        goto end;
+    if (grammar->rules == NULL)
+        return 0;
+
+    grammar->rules[grammar->count++] = expr;
+    expr->id = id;
+    return grammar->count;
+}
+
+P4_PUBLIC(P4_Source*)    P4_CreateSource(P4_String content, P4_RuleID rule_id) {
+    P4_Source* source = malloc(sizeof(P4_Source));
+    source->content = content;
+    source->rule_id = rule_id;
+    source->pos = 0;
+    source->err = P4_Ok;
+    source->errmsg = NULL;
+    source->root = NULL;
+    source->frames = NULL;
+    source->frames_len = 0;
+    source->frames_cap = 0;
+    return source;
+}
+
+P4_PUBLIC(void)          P4_DeleteSource(P4_Source* source) {
+    if (source == NULL)
+        return;
+
+    if (source->frames)
+        free(source->frames);
+
+    if (source->errmsg)
+        free(source->errmsg);
+
+    if (source->root)
+        P4_DeleteToken(source->root);
+
+    free(source);
+}
+
+P4_PUBLIC(P4_Token*)     P4_GetSourceAst(P4_Source* source) {
+    return source->root;
+}
+
+P4_PUBLIC(P4_Error)
+P4_Parse(P4_Grammar* grammar, P4_Source* source) {
+    if (source->err != P4_Ok)
+        return source->err;
+
+    if (source->root != NULL)
+        return P4_Ok;
+
+    source->grammar = grammar;
+
+    P4_Expression* expr     = P4_GetGrammarRule(grammar, source->rule_id);
+    P4_Token*      tok      = P4_Expression_match(source, expr);
+
+    source->root            = tok;
+
+    return source->err;
+}
+
+P4_PUBLIC(P4_Error)
+P4_SetWhitespaces(P4_Grammar* g, P4_RuleID whitespace_rule_id, P4_RuleID comment_rule_id) {
+    P4_Expression* repeat = NULL;
+
+    size_t count = (whitespace_rule_id != 0) + (comment_rule_id != 0);
+
+    if (count == 0)
+        return P4_Ok;
+
+    if (whitespace_rule_id != 0) {
+        g->whitespace = P4_CreateReference(whitespace_rule_id);
+        if (g->whitespace == NULL)
+            goto end;
+        g->whitespace->ref_expr = P4_GetGrammarRule(g, whitespace_rule_id);
     }
 
-    result = P4_Match(state, expr);
+    if (comment_rule_id != 0) {
+        g->comment = P4_CreateReference(comment_rule_id);
+        if (g->comment == NULL)
+            goto end;
+        g->comment->ref_expr = P4_GetGrammarRule(g, whitespace_rule_id);
+    }
+
+    if (count == 1 && whitespace_rule_id != 0)
+        repeat = g->whitespace;
+
+    else if (count == 1 && comment_rule_id != 0)
+        repeat = g->comment;
+
+    else if (count == 2) {
+        repeat = P4_CreateChoice(2, g->whitespace, g->comment);
+        if (repeat == NULL)
+            goto end;
+    }
+
+    if ((g->implicit_whitespace = P4_CreateZeroOrMore(repeat))== NULL)
+        goto end;
+
+    return P4_Ok;
 
 end:
-    if (state != NULL)
-        P4_DeleteState(state);
+    if (g->comment)
+        free(g->comment); // TODO: change to delete expression
 
-    return result;
+    if (g->whitespace)
+        free(g->whitespace); // TODO: change to delete expression
+
+    if (g->implicit_whitespace)
+        free(g->implicit_whitespace); // TODO: change to delete expression.
+
+    return P4_MemoryError;
+}
+
+P4_PUBLIC(P4_Expression*) P4_GetWhitespaces(P4_Grammar* g) {
+    return g == NULL ? NULL : g->implicit_whitespace;
 }
 
 P4_PUBLIC(void)
-P4_SetError(P4_Grammar* grammar, P4_Error err, P4_String errmsg) {
-    grammar->err = err;
-
-    if (errmsg != NULL) {
-        free(grammar->errmsg);
-        grammar->errmsg = strdup(errmsg);
-    }
+P4_SetExpressionFlag(P4_Expression* e, P4_ExpressionFlag f) {
+    assert(e != NULL);
+    e->flag |= f;
 }
 
-P4_PUBLIC(P4_Token*)
-P4_CreateToken(P4_String text, P4_Slice slice, P4_Expression* expr) {
-    P4_Token* token = malloc(sizeof(P4_Token));
-    token->text = text;
-    token->slice[0] = slice[0];
-    token->slice[1] = slice[1];
-    token->expr = expr;
-    token->next = token->head = token->tail = NULL;
-    return token;
+P4_PRIVATE(inline P4_Position)
+P4_GetPosition(P4_Source* s) {
+    return s->pos;
 }
 
-P4_PUBLIC(void)
-P4_DeleteToken(P4_Token* token) {
-    if (token == NULL)
-        return;
-
-    if (token->head == NULL) {
-        free(token);
-        return;
-    }
-
-    P4_Token* current = token;
-    P4_Token* tmp = NULL;
-    while (current != NULL) {
-        tmp = current->next;
-        P4_DeleteToken(current);
-        current = tmp;
-    }
+P4_PRIVATE(inline void)
+P4_SetPosition(P4_Source* s, P4_Position pos) {
+    s->pos = pos;
 }
 
-P4_PUBLIC(void)
-P4_AppendToken(P4_Token* token, P4_Token* sibling) {
-    token->next = sibling;
+/*
+ * Get the remaining text.
+ */
+P4_PRIVATE(inline P4_String)
+P4_RemainingText(P4_Source* s) {
+    return s->content + s->pos;
 }
 
-P4_PUBLIC(void)
-P4_AdoptToken(P4_Token* token, P4_Token* child) {
-    if (child == NULL)
-        return;
-
-    if (token->head == NULL)
-        token->head = child;
-
-    if (token->tail == NULL)
-        token->tail = child;
-    else
-        token->tail->next = child;
-
-    if (token->tail != NULL) {
-        while (token->tail->next != NULL) {
-            token->tail = token->tail->next;
-        }
-    }
-}
-
-P4_PUBLIC(P4_String)
-P4_PrintToken(P4_Token* token) {
-    return strdup("<Token>"); // TODO
-}

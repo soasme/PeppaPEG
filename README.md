@@ -35,19 +35,25 @@ You can create such a data structure by `P4_CreateGrammar()`.
 P4_Grammar* grammar = P4_CreateGrammar();
 ```
 
-You can add a rule by calling `P4_AddGrammarRule`.
-You should provide an integer ID and associate it with a rule expression (`P4_Expression`).
+Let's create our very first rule by calling `P4_CreateLiteral`.
+The literal rule can match "Hello World" only, as the parameter `true`
+indicates the rule being case sensitive.
 
-Let's just set ID=1 for a literal rule that matches `"Hello World"`, `"hello world"`, or `"HeLlO worlD"`, etc. Parameter `false` indicates our string literal is case insensitive.
+```c
+P4_Expression* rule = P4_CreateLiteral("Hello World", false);
+```
+
+Once done, associate the rule with an integer ID.
 
 ```c
 # define HW_ID 1
 
-P4_AddGrammarRule(grammar, HW_ID, P4_CreateLiteral("Hello World", false));
+P4_AddGrammarRule(grammar, HW_ID, rule);
 ```
 
-You need to wrap up the string in to a data structure `P4_Source`.
-When creating `P4_Source` object, you also set the rule to apply when parsing by a given ID.
+Next, you need to wrap up the source string in to a data structure `P4_Source`.
+When creating the `P4_Source` object, you also specify the rule ID.
+This will decides which rule to apply to the source when parsing.
 
 ```c
 P4_Source*  source = P4_CreateSource("Hello World", HW_ID);

@@ -10,6 +10,7 @@ set(
     test_sequence
     test_choice
     test_reference
+    test_positive
 )
 
 foreach(unity_testcase ${unity_testcases})

@@ -295,7 +295,7 @@ P4_MatchError
 ## Choice
 
 Choice is another container of multiple rules.
-It matches to the input only when one of the inner rules matches successfully.
+It matches to the input when one of the inner rules matches successfully.
 
 When multiple rules match, the first matched rule is used.
 
@@ -309,7 +309,7 @@ In this example, we wrap up two literals into a Choice.
 ```c
 >> P4_AddChoice(grammar, ID, 2);
 P4_Ok
->> P4_Expression exprID = P4_GetGrammarRule(Grammar, ID);
+>> P4_Expression exprID = P4_GetGrammarRule(grammar, ID);
 >> P4_AddMember(exprID, 0, P4_CreateLiteral("HELLO WORLD", true));
 P4_Ok
 >> P4_AddMember(exprID, 1, P4_CreateLiteral("你好, 世界", true));
@@ -329,6 +329,76 @@ P4_MatchError
 ```
 
 ## Reference
+
+Reference is a lazy-referenced rule.
+
+Analogy to Reference is variable.
+
+In this example we create two references inside a sequence rule using `P4_CreateReference`.
+
+* Function `P4_CreateReference` accepts one parameter: `P4_RuleID id`. The id must be defined before calling `P4_Parse`.
+
+```c
+>> # define ENTRY 1
+>> # define HELLO 2
+>> # define WORLD 3
+
+>> P4_AddLiteral(grammar, HELLO, "HELLO", true);
+P4_Ok
+>> P4_AddLiteral(grammar, WORLD, "WORLD", true);
+P4_Ok
+>> P4_AddSequence(grammar, ENTRY, 2);
+P4_Ok
+>> P4_Expression entry = P4_GetGrammarRule(grammar, ENTRY);
+
+>> P4_AddMember(entry, 0, P4_CreateReference(HELLO));
+P4_Ok
+>> P4_AddMember(entry, 1, P4_CreateReference(WORLD);
+P4_Ok
+
+>> P4_Source* source = P4_Source("HELLOWORLD", ID);
+>> P4_Parse(grammar, source);
+P4_Ok
+```
+
+Reference resolves the referenced rule expression in runtime.
+This allows referencing a rule defined later.
+
+```c
+>> P4_AddSequence(grammar, ENTRY, 2);
+P4_Ok
+>> P4_Expression entry = P4_GetGrammarRule(grammar, ENTRY);
+
+>> P4_AddMember(entry, 0, P4_CreateReference(HELLO));
+P4_Ok
+>> P4_AddMember(entry, 1, P4_CreateReference(WORLD);
+P4_Ok
+
+>> P4_AddLiteral(grammar, HELLO, "HELLO", true);
+P4_Ok
+>> P4_AddLiteral(grammar, WORLD, "WORLD", true);
+P4_Ok
+
+>> P4_Source* source = P4_Source("HELLOWORLD", ID);
+>> P4_Parse(grammar, source);
+P4_Ok
+```
+
+Match fails when the referenced ID doesn't have a rule expression registered.
+
+```c
+>> P4_AddSequence(grammar, ENTRY, 2);
+P4_Ok
+>> P4_Expression entry = P4_GetGrammarRule(grammar, ENTRY);
+>> P4_AddMember(entry, 0, P4_CreateReference(HELLO));
+P4_Ok
+>> P4_AddMember(entry, 1, P4_CreateReference(WORLD);
+P4_Ok
+
+>> P4_Source* source = P4_Source("HELLOWORLD", ID);
+>> P4_Parse(grammar, source);
+P4_NameError
+```
 
 ## Positive
 

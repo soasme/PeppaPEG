@@ -279,8 +279,9 @@ P4_PUBLIC(P4_Expression*) P4_CreateZeroOrOnce(P4_Expression*);
 P4_PUBLIC(P4_Expression*) P4_CreateZeroOrMore(P4_Expression*);
 P4_PUBLIC(P4_Expression*) P4_CreateOnceOrMore(P4_Expression*);
 
-P4_PUBLIC(P4_Expression**) P4_AddMember(P4_Expression*, P4_Expression*);
+P4_PUBLIC(P4_Error)       P4_AddMember(P4_Expression*, size_t, P4_Expression*);
 P4_PUBLIC(size_t)         P4_GetMembersCount(P4_Expression*);
+P4_PUBLIC(P4_Expression*) P4_GetMember(P4_Expression*, size_t);
 
 P4_PUBLIC(void)           P4_DeleteExpression(P4_Expression*);
 
@@ -311,8 +312,8 @@ P4_PUBLIC(P4_Error)       P4_AddRange(P4_Grammar*, P4_RuleID, P4_Rune, P4_Rune);
 P4_PUBLIC(P4_Error)       P4_AddReference(P4_Grammar*, P4_RuleID, P4_RuleID);
 P4_PUBLIC(P4_Error)       P4_AddPositive(P4_Grammar*, P4_RuleID, P4_Expression*);
 P4_PUBLIC(P4_Error)       P4_AddNegative(P4_Grammar*, P4_RuleID, P4_Expression*);
-P4_PUBLIC(P4_Error)       P4_AddSequence(P4_Grammar*, P4_RuleID);
-P4_PUBLIC(P4_Error)       P4_AddChoice(P4_Grammar*, P4_RuleID);
+P4_PUBLIC(P4_Error)       P4_AddSequence(P4_Grammar*, P4_RuleID, size_t);
+P4_PUBLIC(P4_Error)       P4_AddChoice(P4_Grammar*, P4_RuleID, size_t);
 P4_PUBLIC(P4_Error)       P4_AddZeroOrOnce(P4_Grammar*, P4_RuleID, P4_Expression*);
 P4_PUBLIC(P4_Error)       P4_AddZeroOrMore(P4_Grammar*, P4_RuleID, P4_Expression*);
 P4_PUBLIC(P4_Error)       P4_AddOnceOrMore(P4_Grammar*, P4_RuleID, P4_Expression*);

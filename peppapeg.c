@@ -968,12 +968,18 @@ P4_CreateNegative(P4_Expression* refexpr) {
     return expr;
 }
 
-P4_PUBLIC(P4_Expression*)
-P4_CreateSequence(size_t count, ...) {
+P4_PRIVATE(P4_Expression*)
+P4_CreateContainer(size_t count) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
-    expr->kind = P4_Sequence;
     expr->count = count;
     expr->members = malloc(sizeof(P4_Expression*) * count);
+    return expr;
+}
+
+P4_PUBLIC(P4_Expression*)
+P4_CreateSequence(size_t count, ...) {
+    P4_Expression* expr = P4_CreateContainer(count);
+    expr->kind = P4_Sequence;
 
     va_list members;
     va_start (members, count);
@@ -986,10 +992,8 @@ P4_CreateSequence(size_t count, ...) {
 
 P4_PUBLIC(P4_Expression*)
 P4_CreateChoice(size_t count, ...) {
-    P4_Expression* expr = malloc(sizeof(P4_Expression));
+    P4_Expression* expr = P4_CreateContainer(count);
     expr->kind = P4_Choice;
-    expr->count = count;
-    expr->members = malloc(sizeof(P4_Expression*) * count);
 
     va_list members;
     va_start (members, count);
@@ -1288,6 +1292,94 @@ end:
     }
 
     return err;
+}
+
+P4_PUBLIC(P4_Error)
+P4_AddSequence(P4_Grammar* grammar, P4_RuleID id, size_t size) {
+    P4_Error        err  = P4_Ok;
+    P4_Expression*  expr = NULL;
+
+    if (grammar == NULL || id == 0) {
+        err = P4_NullError;
+        goto end;
+    }
+
+    if ((expr = P4_CreateContainer(size)) == NULL) {
+        err = P4_MemoryError;
+        goto end;
+    }
+
+    expr->kind = P4_Sequence;
+
+    size_t rules_size = grammar->count + 1;
+
+    if (P4_AddGrammarRule(grammar, id, expr) != rules_size) {
+        err = P4_MemoryError;
+        goto end;
+    }
+
+    return P4_Ok;
+
+end:
+    if (expr != NULL) {
+        // P4_DeleteExpression(expr);
+    }
+
+    return err;
+}
+
+P4_PUBLIC(P4_Error)
+P4_AddMember(P4_Expression* expr, size_t offset, P4_Expression* member) {
+    if (expr == NULL
+            || member == NULL
+            || expr->members == NULL
+            || expr->count == 0) {
+        return P4_NullError;
+    }
+
+    if (expr->kind != P4_Sequence
+            && expr->kind != P4_Choice) {
+        return P4_ValueError;
+    }
+
+    if (offset < 0
+            || offset >= expr->count) {
+        return P4_IndexError;
+    }
+
+    expr->members[offset] = member;
+    return P4_Ok;
+}
+
+P4_PUBLIC(size_t)
+P4_GetMembersCount(P4_Expression* expr) {
+    if (expr == NULL) {
+        return 0;
+    }
+
+    return expr->count;
+}
+
+
+P4_PUBLIC(P4_Expression*)
+P4_GetMember(P4_Expression* expr, size_t offset) {
+    if (expr == NULL
+            || expr->members == NULL
+            || expr->count == 0) {
+        return NULL;
+    }
+
+    if (expr->kind != P4_Sequence
+            || expr->kind != P4_Choice) {
+        return NULL;
+    }
+
+    if (offset < 0
+            || offset >= expr->count) {
+        return NULL;
+    }
+
+    return expr->members[offset];
 }
 
 P4_PUBLIC(P4_Slice*)

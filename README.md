@@ -214,9 +214,9 @@ P4_Ok
 P4_Ok
 ```
 
-### Range
+## Range
 
-Range Literal matches a character that falls between lower and upper code points.
+Range matches a character that falls between lower and upper code points.
 
 In this example we match an ASCII digit.
 
@@ -230,7 +230,7 @@ P4_Ok
 P4_Ok
 ```
 
-Range Literal supports UTF-8 characters.
+Range supports UTF-8 characters.
 
 In this example we match code points from `U+4E00` to `U+9FCC`, e.g. CJK unified ideographs block. ([好](https://zh.m.wiktionary.org/zh/%E5%A5%BD) is `U+597D`.)
 
@@ -248,62 +248,99 @@ P4_Ok
 P4_MatchError
 ```
 
-### Reference
+## Sequence
 
-### Positive
+Sequence is a container of multiple rules.
+It matches the input only when all of the inner rules match successfully.
 
-### Negative
+Any inner rule failed match results in a complete failure for the Sequence rule.
+The scenario of not fully matches also count as a failed match.
 
-### Sequence
+An analogy to Sequence is like logic operator `and`.
 
-### Choice
+In this example, we wrap up three literals into a sequence.
 
-### ZeroOrOnce
+* You need to specify `size=3` when calling `P4_AddSequence`.
+* You need to specify the exact offset `0`, `1`, `2` when calling `P4_AddMember`.
 
-### ZeroOrMore
+```c
+>> P4_AddSequence(Grammar, ID, 3);
+P4_Ok
+>> P4_Expression exprID = P4_GetGrammarRule(Grammar, ID);
+>> P4_AddMember(exprID, 0, P4_CreateLiteral("HELLO", true));
+P4_Ok
+>> P4_AddMember(exprID, 1, P4_CreateLiteral(" ", true));
+P4_Ok
+>> P4_AddMember(exprID, 2, P4_CreateLiteral("WORLD", true));
+P4_Ok
 
-### OnceOrMore
+>> P4_Source* source = P4_Source("HELLO WORLD", ID);
+>> P4_Parse(grammar, source);
+P4_Ok
 
-### RepeatMin
-### RepeatMax
-### RepeatMinMax
-### RepeatExact
+>> P4_Source* source = P4_Source("HELLO ", ID);
+>> P4_Parse(grammar, source);
+P4_MatchError
 
-## Peppa PEG Flags
+>> P4_Source* source = P4_Source("HELLO WORL", ID);
+>> P4_Parse(grammar, source);
+P4_MatchError
+```
 
-### SQUASHED
+## Choice
 
-### LIFTED
+## Reference
 
-### TIGHT
+## Positive
 
-### SCOPED
+## Negative
 
-### SPACED
+## ZeroOrOnce
 
-## Peppa PEG Tokens
+## ZeroOrMore
 
-## Peppa PEG Built-in Rules
+## OnceOrMore
 
-### SOI
+## RepeatMin
+## RepeatMax
+## RepeatMinMax
+## RepeatExact
 
-### EOI
+# Peppa PEG Flags
 
-### ASCII_LETTERS
+## SQUASHED
 
-### ASCII_LOWER
+## LIFTED
 
-### ASCII_UPPER
+## TIGHT
 
-### DIGITS
+## SCOPED
 
-### HEXDIGITS
+## SPACED
 
-### OCTDIGITS
+# Peppa PEG Tokens
 
-### PUNCTUATION
+# Peppa PEG Built-in Rules
 
-### WHITESPACE
+## SOI
+
+## EOI
+
+## ASCII_LETTERS
+
+## ASCII_LOWER
+
+## ASCII_UPPER
+
+## DIGITS
+
+## HEXDIGITS
+
+## OCTDIGITS
+
+## PUNCTUATION
+
+## WHITESPACE
 
 ## TODO
 

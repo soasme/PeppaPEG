@@ -223,6 +223,7 @@ P4_NeedSquash(P4_Source* s, P4_Expression* e) {
             return false;
 
         // Otherwise, being the descendant of hollowness token should be hollowed.
+        // printf("frame %d: id=%lu, %d\n", i, s->frames[i]->id, s->frames[i]->flag);
         if (is_squashed(s->frames[i]))
             return true;
     }
@@ -239,6 +240,7 @@ P4_NeedSquash(P4_Source* s, P4_Expression* e) {
  */
 P4_PRIVATE(inline bool)
 P4_NeedLift(P4_Source* s, P4_Expression* e) {
+    // printf("need lift: id=%lu, %d %d %d\n", e->id, is_intermediate(e),  is_lifted(e) , P4_NeedSquash(s, e));
     return is_intermediate(e) || is_lifted(e) || P4_NeedSquash(s, e);
 }
 
@@ -956,6 +958,7 @@ P4_CreateNumeric(size_t num) {
 P4_PUBLIC(P4_Expression*)
 P4_CreateLiteral(const P4_String literal, bool sensitive) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
+    expr->flag = 0;
     expr->kind = P4_Literal;
     expr->literal = strdup(literal);
     expr->sensitive = sensitive;
@@ -965,6 +968,7 @@ P4_CreateLiteral(const P4_String literal, bool sensitive) {
 P4_PUBLIC(P4_Expression*)
 P4_CreateRange(P4_Rune lower, P4_Rune upper) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
+    expr->flag = 0;
     expr->kind = P4_Range;
     expr->range[0] = lower;
     expr->range[1] = upper;
@@ -974,6 +978,7 @@ P4_CreateRange(P4_Rune lower, P4_Rune upper) {
 P4_PUBLIC(P4_Expression*)
 P4_CreateReference(P4_RuleID id) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
+    expr->flag = 0;
     expr->kind = P4_Reference;
     expr->ref_id = id;
     return expr;
@@ -982,6 +987,7 @@ P4_CreateReference(P4_RuleID id) {
 P4_PUBLIC(P4_Expression*)
 P4_CreatePositive(P4_Expression* refexpr) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
+    expr->flag = 0;
     expr->kind = P4_Positive;
     expr->ref_expr = refexpr;
     return expr;
@@ -990,6 +996,7 @@ P4_CreatePositive(P4_Expression* refexpr) {
 P4_PUBLIC(P4_Expression*)
 P4_CreateNegative(P4_Expression* refexpr) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
+    expr->flag = 0;
     expr->kind = P4_Negative;
     expr->ref_expr = refexpr;
     return expr;
@@ -998,6 +1005,7 @@ P4_CreateNegative(P4_Expression* refexpr) {
 P4_PRIVATE(P4_Expression*)
 P4_CreateContainer(size_t count) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
+    expr->flag = 0;
     expr->count = count;
     expr->members = malloc(sizeof(P4_Expression*) * count);
     return expr;
@@ -1034,6 +1042,7 @@ P4_CreateChoice(size_t count, ...) {
 P4_PUBLIC(P4_Expression*)
 P4_CreateRepeatMinMax(P4_Expression* repeat, size_t min, size_t max) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
+    expr->flag = 0;
     expr->kind = P4_Repeat;
     expr->repeat_expr = repeat;
     expr->repeat_min = min;
@@ -1303,6 +1312,22 @@ P4_SetMember(P4_Expression* expr, size_t offset, P4_Expression* member) {
     }
 
     expr->members[offset] = member;
+    return P4_Ok;
+}
+
+P4_PUBLIC(P4_Error)
+P4_SetReferenceMember(P4_Expression* expr, size_t offset, P4_RuleID ref) {
+    P4_Expression* ref_expr = P4_CreateReference(ref);
+    if (ref_expr == NULL) {
+        return P4_MemoryError;
+    }
+
+    P4_Error error = P4_SetMember(expr, offset, ref_expr);
+    if (error != P4_Ok) {
+        // TODO: P4_DeleteExpression(ref_expr);
+        return error;
+    }
+
     return P4_Ok;
 }
 

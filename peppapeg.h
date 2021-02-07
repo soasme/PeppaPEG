@@ -279,7 +279,7 @@ P4_PUBLIC(P4_Expression*) P4_CreateZeroOrOnce(P4_Expression*);
 P4_PUBLIC(P4_Expression*) P4_CreateZeroOrMore(P4_Expression*);
 P4_PUBLIC(P4_Expression*) P4_CreateOnceOrMore(P4_Expression*);
 
-P4_PUBLIC(P4_Error)       P4_AddMember(P4_Expression*, size_t, P4_Expression*);
+P4_PUBLIC(P4_Error)       P4_SetMember(P4_Expression*, size_t, P4_Expression*);
 P4_PUBLIC(size_t)         P4_GetMembersCount(P4_Expression*);
 P4_PUBLIC(P4_Expression*) P4_GetMember(P4_Expression*, size_t);
 

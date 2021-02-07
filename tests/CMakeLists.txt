@@ -9,6 +9,7 @@ set(
     test_range
     test_sequence
     test_choice
+    test_reference
 )
 
 foreach(unity_testcase ${unity_testcases})

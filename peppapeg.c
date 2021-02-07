@@ -64,6 +64,33 @@ cleanup_freep (void *p)
                                     } \
                                 } while (0)
 
+// TODO: DeleteExpression when failed.
+# define                        P4_AddSomeGrammarRule(g, id, rule) do { \
+                                    P4_Error err = P4_Ok;       \
+                                    P4_Expression* expr = NULL; \
+                                                                \
+                                    if (grammar == NULL || id == 0) { \
+                                        err = P4_NullError;     \
+                                        goto end;               \
+                                    }                           \
+                                    if ((expr = (rule)) == NULL) { \
+                                        err = P4_MemoryError;   \
+                                        goto end;               \
+                                    }                           \
+                                                                \
+                                    size_t size = grammar->count + 1; \
+                                    if (P4_AddGrammarRule(grammar, id, expr)!=size) {\
+                                        err = P4_MemoryError;   \
+                                        goto end;               \
+                                    }                           \
+                                                                \
+                                    break;                      \
+                                    end:                        \
+                                    if (expr != NULL) {         \
+                                    }                           \
+                                    return err;                 \
+} while (0)
+
 P4_PRIVATE(inline P4_Position)  P4_GetPosition(P4_Source*);
 P4_PRIVATE(void)                P4_SetPosition(P4_Source*, P4_Position);
 
@@ -1232,138 +1259,32 @@ P4_RemainingText(P4_Source* s) {
 
 P4_PUBLIC(P4_Error)
 P4_AddLiteral(P4_Grammar* grammar, P4_RuleID id, const P4_String literal, bool sensitive) {
-    P4_Error        err  = P4_Ok;
-    P4_Expression*  expr = NULL;
-
-    if (grammar == NULL || literal == NULL || id == 0) {
-        err = P4_NullError;
-        goto end;
-    }
-
-    if ((expr = P4_CreateLiteral(literal, sensitive)) == NULL) {
-        err = P4_MemoryError;
-        goto end;
-    }
-
-    size_t size = grammar->count + 1;
-
-    if (P4_AddGrammarRule(grammar, id, expr) != size) {
-        err = P4_MemoryError;
-        goto end;
-    }
-
+    P4_AddSomeGrammarRule(grammar, id, P4_CreateLiteral(literal, sensitive));
     return P4_Ok;
-
-end:
-    if (expr != NULL) {
-        // P4_DeleteExpression(expr);
-    }
-
-    return err;
 }
 
 P4_PUBLIC(P4_Error)
 P4_AddRange(P4_Grammar* grammar, P4_RuleID id, P4_Rune lower, P4_Rune upper) {
-    P4_Error        err  = P4_Ok;
-    P4_Expression*  expr = NULL;
-
-    if (grammar == NULL || id == 0) {
-        err = P4_NullError;
-        goto end;
-    }
-
-    if ((expr = P4_CreateRange(lower, upper)) == NULL) {
-        err = P4_MemoryError;
-        goto end;
-    }
-
-    size_t size = grammar->count + 1;
-
-    if (P4_AddGrammarRule(grammar, id, expr) != size) {
-        err = P4_MemoryError;
-        goto end;
-    }
-
+    P4_AddSomeGrammarRule(grammar, id, P4_CreateRange(lower, upper));
     return P4_Ok;
-
-end:
-    if (expr != NULL) {
-        // P4_DeleteExpression(expr);
-    }
-
-    return err;
 }
 
 P4_PUBLIC(P4_Error)
 P4_AddSequence(P4_Grammar* grammar, P4_RuleID id, size_t size) {
-    P4_Error        err  = P4_Ok;
-    P4_Expression*  expr = NULL;
-
-    if (grammar == NULL || id == 0) {
-        err = P4_NullError;
-        goto end;
-    }
-
-    if ((expr = P4_CreateContainer(size)) == NULL) {
-        err = P4_MemoryError;
-        goto end;
-    }
-
-    expr->kind = P4_Sequence;
-
-    size_t rules_size = grammar->count + 1;
-
-    if (P4_AddGrammarRule(grammar, id, expr) != rules_size) {
-        err = P4_MemoryError;
-        goto end;
-    }
-
+    P4_AddSomeGrammarRule(grammar, id, P4_CreateContainer(size));
+    P4_GetGrammarRule(grammar, id)->kind = P4_Sequence;
     return P4_Ok;
-
-end:
-    if (expr != NULL) {
-        // P4_DeleteExpression(expr);
-    }
-
-    return err;
 }
 
 P4_PUBLIC(P4_Error)
 P4_AddChoice(P4_Grammar* grammar, P4_RuleID id, size_t size) {
-    P4_Error        err  = P4_Ok;
-    P4_Expression*  expr = NULL;
-
-    if (grammar == NULL || id == 0) {
-        err = P4_NullError;
-        goto end;
-    }
-
-    if ((expr = P4_CreateContainer(size)) == NULL) {
-        err = P4_MemoryError;
-        goto end;
-    }
-
-    expr->kind = P4_Choice;
-
-    size_t rules_size = grammar->count + 1;
-
-    if (P4_AddGrammarRule(grammar, id, expr) != rules_size) {
-        err = P4_MemoryError;
-        goto end;
-    }
-
+    P4_AddSomeGrammarRule(grammar, id, P4_CreateContainer(size));
+    P4_GetGrammarRule(grammar, id)->kind = P4_Choice;
     return P4_Ok;
-
-end:
-    if (expr != NULL) {
-        // P4_DeleteExpression(expr);
-    }
-
-    return err;
 }
 
 P4_PUBLIC(P4_Error)
-P4_AddMember(P4_Expression* expr, size_t offset, P4_Expression* member) {
+P4_SetMember(P4_Expression* expr, size_t offset, P4_Expression* member) {
     if (expr == NULL
             || member == NULL
             || expr->members == NULL
@@ -1414,6 +1335,16 @@ P4_GetMember(P4_Expression* expr, size_t offset) {
     }
 
     return expr->members[offset];
+}
+
+P4_PUBLIC(P4_Error)
+P4_AddReference(P4_Grammar* grammar, P4_RuleID id, P4_RuleID ref) {
+    if (ref == 0) {
+        return P4_NullError;
+    }
+
+    P4_AddSomeGrammarRule(grammar, id, P4_CreateReference(ref));
+    return P4_Ok;
 }
 
 P4_PUBLIC(P4_Slice*)

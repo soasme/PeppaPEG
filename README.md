@@ -261,17 +261,17 @@ An analogy to Sequence is logic operator `and`.
 In this example, we wrap up three literals into a Sequence.
 
 * You need to specify `size=3` when calling `P4_AddSequence`.
-* You need to specify the exact offset `0`, `1`, `2` when calling `P4_AddMember`.
+* You need to specify the exact offset `0`, `1`, `2` when calling `P4_SetMember`.
 
 ```c
 >> P4_AddSequence(grammar, ID, 3);
 P4_Ok
 >> P4_Expression exprID = P4_GetGrammarRule(grammar, ID);
->> P4_AddMember(exprID, 0, P4_CreateLiteral("HELLO", true));
+>> P4_SetMember(exprID, 0, P4_CreateLiteral("HELLO", true));
 P4_Ok
->> P4_AddMember(exprID, 1, P4_CreateLiteral(" ", true));
+>> P4_SetMember(exprID, 1, P4_CreateLiteral(" ", true));
 P4_Ok
->> P4_AddMember(exprID, 2, P4_CreateLiteral("WORLD", true));
+>> P4_SetMember(exprID, 2, P4_CreateLiteral("WORLD", true));
 P4_Ok
 
 >> P4_Source* source = P4_Source("HELLO WORLD", ID);
@@ -310,15 +310,15 @@ An analogy to Choice is logic operator `or`.
 In this example, we wrap up two literals into a Choice.
 
 * You need to specify `size=2` when calling `P4_AddChoice`.
-* You need to specify the exact offset `0`, `1`  when calling `P4_AddMember`.
+* You need to specify the exact offset `0`, `1`  when calling `P4_SetMember`.
 
 ```c
 >> P4_AddChoice(grammar, ID, 2);
 P4_Ok
 >> P4_Expression exprID = P4_GetGrammarRule(grammar, ID);
->> P4_AddMember(exprID, 0, P4_CreateLiteral("HELLO WORLD", true));
+>> P4_SetMember(exprID, 0, P4_CreateLiteral("HELLO WORLD", true));
 P4_Ok
->> P4_AddMember(exprID, 1, P4_CreateLiteral("你好, 世界", true));
+>> P4_SetMember(exprID, 1, P4_CreateLiteral("你好, 世界", true));
 P4_Ok
 
 >> P4_Source* source = P4_Source("HELLO WORLD", ID);
@@ -357,9 +357,9 @@ P4_Ok
 P4_Ok
 >> P4_Expression entry = P4_GetGrammarRule(grammar, ENTRY);
 
->> P4_AddMember(entry, 0, P4_CreateReference(HELLO));
+>> P4_SetMember(entry, 0, P4_CreateReference(HELLO));
 P4_Ok
->> P4_AddMember(entry, 1, P4_CreateReference(WORLD);
+>> P4_SetMember(entry, 1, P4_CreateReference(WORLD);
 P4_Ok
 
 >> P4_Source* source = P4_Source("HELLOWORLD", ENTRY);
@@ -375,9 +375,9 @@ This allows referencing a rule defined later.
 P4_Ok
 >> P4_Expression entry = P4_GetGrammarRule(grammar, ENTRY);
 
->> P4_AddMember(entry, 0, P4_CreateReference(HELLO));
+>> P4_SetMember(entry, 0, P4_CreateReference(HELLO));
 P4_Ok
->> P4_AddMember(entry, 1, P4_CreateReference(WORLD);
+>> P4_SetMember(entry, 1, P4_CreateReference(WORLD);
 P4_Ok
 
 >> P4_AddLiteral(grammar, HELLO, "HELLO", true);
@@ -396,9 +396,9 @@ Match fails when the referenced ID doesn't have a rule expression registered.
 >> P4_AddSequence(grammar, ENTRY, 2);
 P4_Ok
 >> P4_Expression entry = P4_GetGrammarRule(grammar, ENTRY);
->> P4_AddMember(entry, 0, P4_CreateReference(HELLO));
+>> P4_SetMember(entry, 0, P4_CreateReference(HELLO));
 P4_Ok
->> P4_AddMember(entry, 1, P4_CreateReference(WORLD);
+>> P4_SetMember(entry, 1, P4_CreateReference(WORLD);
 P4_Ok
 
 >> P4_Source* source = P4_Source("HELLOWORLD", ENTRY);
@@ -420,9 +420,9 @@ P4_Ok
 >> P4_AddSequence(grammar, ENTRY, 2);
 P4_Ok
 >> P4_Expression entry = P4_GetGrammarRule(grammar, ENTRY);
->> P4_AddMember(entry, 0, P4_CreateReference(POS));
+>> P4_SetMember(entry, 0, P4_CreateReference(POS));
 P4_Ok
->> P4_AddMember(entry, 1, P4_CreateLiteral("Hello World", false));
+>> P4_SetMember(entry, 1, P4_CreateLiteral("Hello World", false));
 P4_Ok
 
 >> P4_Source* source = P4_Source("Hello world", ENTRY);
@@ -449,9 +449,9 @@ P4_Ok
 >> P4_AddSequence(grammar, ENTRY, 2);
 P4_Ok
 >> P4_Expression entry = P4_GetGrammarRule(grammar, ENTRY);
->> P4_AddMember(entry, 0, P4_CreateReference(NEG));
+>> P4_SetMember(entry, 0, P4_CreateReference(NEG));
 P4_Ok
->> P4_AddMember(entry, 1, P4_CreateLiteral("Hello World", false));
+>> P4_SetMember(entry, 1, P4_CreateLiteral("Hello World", false));
 P4_Ok
 
 >> P4_Source* source = P4_Source("Hello world", ENTRY);

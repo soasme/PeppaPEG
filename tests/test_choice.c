@@ -23,11 +23,11 @@ P4_PRIVATE(void) test_match_literal_choices_successfully(void) {
 
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddMember(e1, 0, P4_CreateLiteral("HELLO WORLD", true))
+        P4_SetMember(e1, 0, P4_CreateLiteral("HELLO WORLD", true))
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddMember(e1, 1, P4_CreateLiteral("你好, 世界", true))
+        P4_SetMember(e1, 1, P4_CreateLiteral("你好, 世界", true))
     );
 
     P4_Source* source = P4_CreateSource("你好, 世界", R1);
@@ -73,11 +73,11 @@ P4_PRIVATE(void) test_match_literal_choices_successfully2(void) {
 
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddMember(e1, 0, P4_CreateLiteral("HELLO WORLD", true))
+        P4_SetMember(e1, 0, P4_CreateLiteral("HELLO WORLD", true))
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddMember(e1, 1, P4_CreateLiteral("你好, 世界", true))
+        P4_SetMember(e1, 1, P4_CreateLiteral("你好, 世界", true))
     );
 
     P4_Source* source = P4_CreateSource("HELLO WORLD", R1);
@@ -125,11 +125,11 @@ P4_PRIVATE(void) test_match_literal_choices_no_option_raise_match_error(void) {
 
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddMember(e1, 0, P4_CreateLiteral("HELLO WORLD", true))
+        P4_SetMember(e1, 0, P4_CreateLiteral("HELLO WORLD", true))
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddMember(e1, 1, P4_CreateLiteral("你好, 世界", true))
+        P4_SetMember(e1, 1, P4_CreateLiteral("你好, 世界", true))
     );
 
     P4_Source* source = P4_CreateSource("HELLO WORL", R1);

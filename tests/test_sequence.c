@@ -23,15 +23,15 @@ P4_PRIVATE(void) test_match_literal_sequence_successfully(void) {
 
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddMember(e1, 0, P4_CreateLiteral("你好", true))
+        P4_SetMember(e1, 0, P4_CreateLiteral("你好", true))
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddMember(e1, 1, P4_CreateLiteral(" ", true))
+        P4_SetMember(e1, 1, P4_CreateLiteral(" ", true))
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddMember(e1, 2, P4_CreateLiteral("WORLD", true))
+        P4_SetMember(e1, 2, P4_CreateLiteral("WORLD", true))
     );
 
     P4_Source* source = P4_CreateSource("你好 WORLD", R1);
@@ -79,15 +79,15 @@ P4_PRIVATE(void) test_match_literal_sequence_partially_raise_match_error(void) {
 
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddMember(e1, 0, P4_CreateLiteral("你好", true))
+        P4_SetMember(e1, 0, P4_CreateLiteral("你好", true))
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddMember(e1, 1, P4_CreateLiteral(" ", true))
+        P4_SetMember(e1, 1, P4_CreateLiteral(" ", true))
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddMember(e1, 2, P4_CreateLiteral("WORLD", true))
+        P4_SetMember(e1, 2, P4_CreateLiteral("WORLD", true))
     );
 
     P4_Source* source = P4_CreateSource("你好 ", R1);
@@ -128,15 +128,15 @@ P4_PRIVATE(void) test_match_literal_sequence_having_member_nomatch_raise_match_e
 
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddMember(e1, 0, P4_CreateLiteral("你好", true))
+        P4_SetMember(e1, 0, P4_CreateLiteral("你好", true))
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddMember(e1, 1, P4_CreateLiteral(" ", true))
+        P4_SetMember(e1, 1, P4_CreateLiteral(" ", true))
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddMember(e1, 2, P4_CreateLiteral("WORLD", true))
+        P4_SetMember(e1, 2, P4_CreateLiteral("WORLD", true))
     );
 
     P4_Source* source = P4_CreateSource("你好 WORL", R1);

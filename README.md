@@ -107,7 +107,7 @@ P4_DeleteSource(source);
 P4_DeleteGrammar(grammar);
 ```
 
-## Example
+## Full Example Code
 
 A more complete code for the [Basic Usage](#basic-usage) example is like below.
 
@@ -191,6 +191,7 @@ P4_Ok
 >> P4_Parse(grammar, source);
 P4_MatchError
 ```
+
 ## Case Insensitive Literal
 
 Case Insensitive Literal matches the same ignoring the cases.
@@ -212,6 +213,36 @@ P4_Ok
 ```
 
 ### Range
+
+Range Literal matches a character that falls between lower and upper code points.
+
+In this example we match an ASCII digit.
+
+```c
+>> P4_AddLiteral(Grammar, ID, '0', '9');
+P4_Ok
+
+>> P4_Source* source = P4_Source("0", ID);
+>> P4_Parse(grammar, source);
+P4_Ok
+```
+
+Range Literal supports UTF-8 characters.
+
+In this example we match code points from `U+4E00` to `U+9FCC`, e.g. CJK unified ideographs block. ([好](https://zh.m.wiktionary.org/zh/%E5%A5%BD) is `U+597D`.)
+
+```c
+>> P4_AddLiteral(Grammar, ID, 0x4E00, 0x9FFF);
+P4_Ok
+
+>> P4_Source* source = P4_Source("好", ID);
+>> P4_Parse(grammar, source);
+P4_Ok
+
+>> P4_Source* source = P4_Source("Good", ID);
+>> P4_Parse(grammar, source);
+P4_MatchError
+```
 
 ### Reference
 

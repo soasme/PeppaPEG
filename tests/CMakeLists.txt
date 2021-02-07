@@ -6,6 +6,7 @@ set(
     unity_testcases
     print_version
     test_literal
+    test_range
 )
 
 foreach(unity_testcase ${unity_testcases})

@@ -1226,18 +1226,49 @@ P4_RemainingText(P4_Source* s) {
     return s->content + s->pos;
 }
 
-
 P4_PUBLIC(P4_Error)
 P4_AddLiteral(P4_Grammar* grammar, P4_RuleID id, const P4_String literal, bool sensitive) {
     P4_Error        err  = P4_Ok;
     P4_Expression*  expr = NULL;
 
-    if (grammar == NULL || literal == NULL) {
+    if (grammar == NULL || literal == NULL || id == 0) {
         err = P4_NullError;
         goto end;
     }
 
     if ((expr = P4_CreateLiteral(literal, sensitive)) == NULL) {
+        err = P4_MemoryError;
+        goto end;
+    }
+
+    size_t size = grammar->count + 1;
+
+    if (P4_AddGrammarRule(grammar, id, expr) != size) {
+        err = P4_MemoryError;
+        goto end;
+    }
+
+    return P4_Ok;
+
+end:
+    if (expr != NULL) {
+        // P4_DeleteExpression(expr);
+    }
+
+    return err;
+}
+
+P4_PUBLIC(P4_Error)
+P4_AddRange(P4_Grammar* grammar, P4_RuleID id, P4_Rune lower, P4_Rune upper) {
+    P4_Error        err  = P4_Ok;
+    P4_Expression*  expr = NULL;
+
+    if (grammar == NULL || id == 0) {
+        err = P4_NullError;
+        goto end;
+    }
+
+    if ((expr = P4_CreateRange(lower, upper)) == NULL) {
         err = P4_MemoryError;
         goto end;
     }

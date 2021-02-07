@@ -348,6 +348,7 @@ P4_PUBLIC(P4_Token*)        P4_CreateToken(P4_String, size_t, size_t, P4_Express
 P4_PUBLIC(void)             P4_DeleteToken(P4_Token*);
 P4_PUBLIC(void)             P4_AppendToken(P4_Token*, P4_Token*);
 P4_PUBLIC(P4_Slice*)        P4_GetTokenSlice(P4_Token*);
+P4_PUBLIC(P4_String)        P4_CopyTokenString(P4_Token*);
 
 
 /*

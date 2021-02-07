@@ -1232,7 +1232,7 @@ P4_AddLiteral(P4_Grammar* grammar, P4_RuleID id, const P4_String literal, bool s
     P4_Error        err  = P4_Ok;
     P4_Expression*  expr = NULL;
 
-    if (literal == NULL) {
+    if (grammar == NULL || literal == NULL) {
         err = P4_NullError;
         goto end;
     }
@@ -1265,4 +1265,19 @@ P4_GetTokenSlice(P4_Token* token) {
         return NULL;
 
     return &(token->slice);
+}
+
+P4_PUBLIC(P4_String)
+P4_CopyTokenString(P4_Token* token) {
+    if (token == NULL)
+        return NULL;
+
+    size_t    len = token->slice.j - token->slice.i;
+    assert(len >= 0);
+
+    P4_String str = malloc(len+1);
+    strncpy(str, token->text + token->slice.i, len);
+    str[len] = '\0';
+
+    return str;
 }

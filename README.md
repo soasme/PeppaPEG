@@ -158,7 +158,53 @@ Hope you have a basic understanding of how Peppa PEG is used.
 
 ## Peppa PEG Rules
 
-### Literal
+### Case Sensitive Literal
+### Case Insensitive Literal
+
+Case Sensitive literal matches the exact same string.
+When adding the literal rule, set `sensitive=true`.
+
+```c
+>> P4_AddLiteral(Grammar, ID, "Case Sensitive", true);
+P4_Ok
+
+>> P4_Source* source = P4_Source("CASE SENSITIVE", ID);
+>> P4_Parse(grammar, source);
+P4_Ok
+
+>> P4_Source* source = P4_Parse("CASE SENSITIVE", ID);
+>> P4_Parse(grammar, source);
+P4_MatchError
+```
+
+Case Insensitive Literal matches the same ignoring the cases.
+When adding the literal rule, set `sensitive=false`.
+
+```c
+>> P4_AddLiteral(Grammar, ID, "Case Insensitive", true);
+P4_Ok
+
+>> P4_Source* source = P4_Source("CASE INSENSITIVE", ID);
+>> P4_Parse(grammar, source);
+P4_Ok
+
+>> P4_Source* source = P4_Parse("CASE SENSITIVE", ID);
+>> P4_Parse(grammar, source);
+P4_Ok
+```
+
+The `sensitive` option only works for ASCII letters (a-z, A-Z).
+
+The Literal rule support parsing UTF-8 strings.
+
+```c
+>> P4_AddLiteral(Grammar, ID, "你好, WORLD", false);
+P4_Ok
+
+>> P4_Source* source = P4_Source("你好, world", ID);
+>> P4_Parse(grammar, source);
+P4_Ok
+```
 
 ### Range
 

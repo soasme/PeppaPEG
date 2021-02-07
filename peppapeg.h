@@ -295,7 +295,7 @@ P4_PUBLIC(void)           P4_SetExpressionFlag(P4_Expression*, P4_ExpressionFlag
 P4_PUBLIC(void)           P4_SetSquashed(P4_Expression*);
 P4_PUBLIC(void)           P4_SetLifted(P4_Expression*);
 P4_PUBLIC(void)           P4_SetTighted(P4_Expression*);
-P4_PUBLIC(void)           P4_UnsetExpressionFlag(P4_Expression*, uint8_t);
+P4_PUBLIC(void)           P4_UnsetExpressionFlag(P4_Expression*, P4_ExpressionFlag);
 P4_PUBLIC(void)           P4_UnsetSquashed(P4_Expression*);
 P4_PUBLIC(void)           P4_UnsetLifted(P4_Expression*);
 P4_PUBLIC(void)           P4_UnsetTighted(P4_Expression*);
@@ -315,10 +315,10 @@ P4_PUBLIC(P4_Error)       P4_AddChoice(P4_Grammar*, P4_RuleID, size_t);
 P4_PUBLIC(P4_Error)       P4_AddZeroOrOnce(P4_Grammar*, P4_RuleID, P4_Expression*);
 P4_PUBLIC(P4_Error)       P4_AddZeroOrMore(P4_Grammar*, P4_RuleID, P4_Expression*);
 P4_PUBLIC(P4_Error)       P4_AddOnceOrMore(P4_Grammar*, P4_RuleID, P4_Expression*);
-P4_PUBLIC(P4_Error)       P4_AddRepeatMin(P4_Grammar*, P4_RuleID, P4_Expression*, uint64_t);
-P4_PUBLIC(P4_Error)       P4_AddRepeatMax(P4_Grammar*, P4_RuleID, P4_Expression*, uint64_t);
-P4_PUBLIC(P4_Error)       P4_AddRepeatMinMax(P4_Grammar*, P4_RuleID, P4_Expression*, uint64_t, uint64_t);
-P4_PUBLIC(P4_Error)       P4_AddRepeatExact(P4_Grammar*, P4_RuleID, P4_Expression*, uint64_t);
+P4_PUBLIC(P4_Error)       P4_AddRepeatMin(P4_Grammar*, P4_RuleID, P4_Expression*, size_t);
+P4_PUBLIC(P4_Error)       P4_AddRepeatMax(P4_Grammar*, P4_RuleID, P4_Expression*, size_t);
+P4_PUBLIC(P4_Error)       P4_AddRepeatMinMax(P4_Grammar*, P4_RuleID, P4_Expression*, size_t, size_t);
+P4_PUBLIC(P4_Error)       P4_AddRepeatExact(P4_Grammar*, P4_RuleID, P4_Expression*, size_t);
 
 P4_PUBLIC(void)           P4_DeleteGrammarRule(P4_Grammar*, P4_RuleID);
 P4_PUBLIC(P4_Expression*) P4_GetGrammarRule(P4_Grammar*, P4_RuleID);

@@ -12,6 +12,7 @@ set(
     test_reference
     test_positive
     test_negative
+    test_repeat
 )
 
 foreach(unity_testcase ${unity_testcases})

@@ -715,6 +715,11 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         goto finalize;
     }
 
+    if (min != -1 && repeated < min) {
+        P4_RaiseError(s, P4_MatchError, "insufficient repetitions");
+        goto finalize;
+    }
+
     if (P4_GetPosition(s) == startpos) // success but no token is produced.
         goto finalize;
 
@@ -1386,6 +1391,69 @@ P4_AddReference(P4_Grammar* grammar, P4_RuleID id, P4_RuleID ref) {
     }
 
     P4_AddSomeGrammarRule(grammar, id, P4_CreateReference(ref));
+    return P4_Ok;
+}
+
+P4_PUBLIC(P4_Error)
+P4_AddZeroOrOnce(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat) {
+    if (repeat == NULL)
+        return P4_NullError;
+
+    P4_AddSomeGrammarRule(grammar, id, P4_CreateZeroOrOnce(repeat));
+    return P4_Ok;
+}
+
+P4_PUBLIC(P4_Error)
+P4_AddZeroOrMore(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat) {
+    if (repeat == NULL)
+        return P4_NullError;
+
+    P4_AddSomeGrammarRule(grammar, id, P4_CreateZeroOrMore(repeat));
+    return P4_Ok;
+}
+
+P4_PUBLIC(P4_Error)
+P4_AddOnceOrMore(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat) {
+    if (repeat == NULL)
+        return P4_NullError;
+
+    P4_AddSomeGrammarRule(grammar, id, P4_CreateOnceOrMore(repeat));
+    return P4_Ok;
+}
+
+P4_PUBLIC(P4_Error)
+P4_AddRepeatMin(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat, size_t min) {
+    if (repeat == NULL)
+        return P4_NullError;
+
+    P4_AddSomeGrammarRule(grammar, id, P4_CreateRepeatMin(repeat, min));
+    return P4_Ok;
+}
+
+P4_PUBLIC(P4_Error)
+P4_AddRepeatMax(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat, size_t max) {
+    if (repeat == NULL)
+        return P4_NullError;
+
+    P4_AddSomeGrammarRule(grammar, id, P4_CreateRepeatMax(repeat, max));
+    return P4_Ok;
+}
+
+P4_PUBLIC(P4_Error)
+P4_AddRepeatMinMax(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat, size_t min, size_t max) {
+    if (repeat == NULL)
+        return P4_NullError;
+
+    P4_AddSomeGrammarRule(grammar, id, P4_CreateRepeatMinMax(repeat, min, max));
+    return P4_Ok;
+}
+
+P4_PUBLIC(P4_Error)
+P4_AddRepeatExact(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat, size_t num) {
+    if (repeat == NULL)
+        return P4_NullError;
+
+    P4_AddSomeGrammarRule(grammar, id, P4_CreateRepeatExact(repeat, num));
     return P4_Ok;
 }
 

@@ -166,10 +166,10 @@ Let's explore more Peppa PEG Rules.
 The Literal rule supports parsing UTF-8 strings.
 
 ```c
->> P4_AddLiteral(Grammar, ID, "你好, WORLD", false);
+>> P4_AddLiteral(Grammar, ID, "你好, WORLD", true);
 P4_Ok
 
->> P4_Source* source = P4_Source("你好, world", ID);
+>> P4_Source* source = P4_Source("你好, WORLD", ID);
 >> P4_Parse(grammar, source);
 P4_Ok
 ```
@@ -180,6 +180,7 @@ Case Sensitive literal matches the exact same string.
 When adding the literal rule, set `sensitive=true`.
 
 ```c
+//                                              sensitive
 >> P4_AddLiteral(Grammar, ID, "Case Sensitive", true);
 P4_Ok
 
@@ -200,7 +201,8 @@ When adding the literal rule, set `sensitive=false`.
 The `sensitive` option only works for ASCII letters (a-z, A-Z).
 
 ```c
->> P4_AddLiteral(Grammar, ID, "Case Insensitive", false);
+//                                                    sensitive
+>> P4_AddLiteral(Grammar,     ID, "Case Insensitive", false);
 P4_Ok
 
 >> P4_Source* source = P4_Source("CASE INSENSITIVE", ID);
@@ -219,7 +221,8 @@ Range Literal matches a character that falls between lower and upper code points
 In this example we match an ASCII digit.
 
 ```c
->> P4_AddLiteral(Grammar, ID, '0', '9');
+//                            lower     upper
+>> P4_AddLiteral(Grammar, ID, '0',      '9');
 P4_Ok
 
 >> P4_Source* source = P4_Source("0", ID);
@@ -232,7 +235,8 @@ Range Literal supports UTF-8 characters.
 In this example we match code points from `U+4E00` to `U+9FCC`, e.g. CJK unified ideographs block. ([好](https://zh.m.wiktionary.org/zh/%E5%A5%BD) is `U+597D`.)
 
 ```c
->> P4_AddLiteral(Grammar, ID, 0x4E00, 0x9FFF);
+//                            lower     upper
+>> P4_AddLiteral(Grammar, ID, 0x4E00,   0x9FFF);
 P4_Ok
 
 >> P4_Source* source = P4_Source("好", ID);

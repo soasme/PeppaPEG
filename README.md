@@ -2,13 +2,13 @@
 
 Ultra lightweight PEG Parser in ANSI C. ✨ 🐷 ✨.
 
-## Hello, There!
+# Hello, There!
 
 Want to parse a programming language using PEG? Use Peppa PEG!
 
-## Usage
+# Usage
 
-### Copy `peppapeg.h` / `peppapeg.c`.
+## Copy `peppapeg.h` / `peppapeg.c`.
 
 Peppa PEG has a header file and a C file, so you can easily add
 it to your project by copying files "peppapeg.h" and "peppapeg.c".
@@ -21,7 +21,7 @@ Once copied, add include macro and start using the library!
 #include "peppapeg.h"
 ```
 
-### Basic Usage
+## Basic Usage
 
 All of the data structures and functions provided by Peppa PEG
 start with `P4_`. ;) \
@@ -159,10 +159,22 @@ int main(int argc, char* argv[]) {
 Hope you have a basic understanding of how Peppa PEG is used.
 Let's explore more Peppa PEG Rules.
 
-## Peppa PEG Rules
+# Peppa PEG Rules
 
-### Case Sensitive Literal
-### Case Insensitive Literal
+# Literal
+
+The Literal rule supports parsing UTF-8 strings.
+
+```c
+>> P4_AddLiteral(Grammar, ID, "你好, WORLD", false);
+P4_Ok
+
+>> P4_Source* source = P4_Source("你好, world", ID);
+>> P4_Parse(grammar, source);
+P4_Ok
+```
+
+## Case Sensitive Literal
 
 Case Sensitive literal matches the exact same string.
 When adding the literal rule, set `sensitive=true`.
@@ -179,12 +191,15 @@ P4_Ok
 >> P4_Parse(grammar, source);
 P4_MatchError
 ```
+## Case Insensitive Literal
 
 Case Insensitive Literal matches the same ignoring the cases.
 When adding the literal rule, set `sensitive=false`.
 
+The `sensitive` option only works for ASCII letters (a-z, A-Z).
+
 ```c
->> P4_AddLiteral(Grammar, ID, "Case Insensitive", true);
+>> P4_AddLiteral(Grammar, ID, "Case Insensitive", false);
 P4_Ok
 
 >> P4_Source* source = P4_Source("CASE INSENSITIVE", ID);
@@ -192,19 +207,6 @@ P4_Ok
 P4_Ok
 
 >> P4_Source* source = P4_Parse("CASE SENSITIVE", ID);
->> P4_Parse(grammar, source);
-P4_Ok
-```
-
-The `sensitive` option only works for ASCII letters (a-z, A-Z).
-
-The Literal rule supports parsing UTF-8 strings.
-
-```c
->> P4_AddLiteral(Grammar, ID, "你好, WORLD", false);
-P4_Ok
-
->> P4_Source* source = P4_Source("你好, world", ID);
 >> P4_Parse(grammar, source);
 P4_Ok
 ```

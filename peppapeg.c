@@ -1226,3 +1226,35 @@ P4_RemainingText(P4_Source* s) {
     return s->content + s->pos;
 }
 
+
+P4_PUBLIC(P4_Error)
+P4_AddLiteral(P4_Grammar* grammar, P4_RuleID id, const P4_String literal, bool sensitive) {
+    P4_Error        err  = P4_Ok;
+    P4_Expression*  expr = NULL;
+
+    if (literal == NULL) {
+        err = P4_NullError;
+        goto end;
+    }
+
+    if ((expr = P4_CreateLiteral(literal, sensitive)) == NULL) {
+        err = P4_MemoryError;
+        goto end;
+    }
+
+    size_t size = grammar->count + 1;
+
+    if (P4_AddGrammarRule(grammar, id, expr) != size) {
+        expr = P4_MemoryError;
+        goto end;
+    }
+
+    return P4_Ok;
+
+end:
+    if (expr != NULL) {
+        // P4_DeleteExpression(expr);
+    }
+
+    return err;
+}

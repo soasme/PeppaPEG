@@ -356,7 +356,7 @@ P4_Ok
 >> P4_AddMember(entry, 1, P4_CreateReference(WORLD);
 P4_Ok
 
->> P4_Source* source = P4_Source("HELLOWORLD", ID);
+>> P4_Source* source = P4_Source("HELLOWORLD", ENTRY);
 >> P4_Parse(grammar, source);
 P4_Ok
 ```
@@ -379,7 +379,7 @@ P4_Ok
 >> P4_AddLiteral(grammar, WORLD, "WORLD", true);
 P4_Ok
 
->> P4_Source* source = P4_Source("HELLOWORLD", ID);
+>> P4_Source* source = P4_Source("HELLOWORLD", ENTRY);
 >> P4_Parse(grammar, source);
 P4_Ok
 ```
@@ -395,7 +395,7 @@ P4_Ok
 >> P4_AddMember(entry, 1, P4_CreateReference(WORLD);
 P4_Ok
 
->> P4_Source* source = P4_Source("HELLOWORLD", ID);
+>> P4_Source* source = P4_Source("HELLOWORLD", ENTRY);
 >> P4_Parse(grammar, source);
 P4_NameError
 ```

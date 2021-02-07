@@ -8,6 +8,7 @@ set(
     test_literal
     test_range
     test_sequence
+    test_choice
 )
 
 foreach(unity_testcase ${unity_testcases})

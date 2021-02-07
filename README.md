@@ -166,7 +166,7 @@ Let's explore more Peppa PEG Rules.
 The Literal rule supports parsing UTF-8 strings.
 
 ```c
->> P4_AddLiteral(Grammar, ID, "你好, WORLD", true);
+>> P4_AddLiteral(grammar, ID, "你好, WORLD", true);
 P4_Ok
 
 >> P4_Source* source = P4_Source("你好, WORLD", ID);
@@ -181,7 +181,7 @@ When adding the literal rule, set `sensitive=true`.
 
 ```c
 //                                              sensitive
->> P4_AddLiteral(Grammar, ID, "Case Sensitive", true);
+>> P4_AddLiteral(grammar, ID, "Case Sensitive", true);
 P4_Ok
 
 >> P4_Source* source = P4_Source("CASE SENSITIVE", ID);
@@ -202,7 +202,7 @@ The `sensitive` option only works for ASCII letters (a-z, A-Z).
 
 ```c
 //                                                    sensitive
->> P4_AddLiteral(Grammar,     ID, "Case Insensitive", false);
+>> P4_AddLiteral(grammar,     ID, "Case Insensitive", false);
 P4_Ok
 
 >> P4_Source* source = P4_Source("CASE INSENSITIVE", ID);
@@ -222,7 +222,7 @@ In this example we match an ASCII digit.
 
 ```c
 //                            lower     upper
->> P4_AddLiteral(Grammar, ID, '0',      '9');
+>> P4_AddLiteral(grammar, ID, '0',      '9');
 P4_Ok
 
 >> P4_Source* source = P4_Source("0", ID);
@@ -236,7 +236,7 @@ In this example we match code points from `U+4E00` to `U+9FCC`, e.g. CJK unified
 
 ```c
 //                            lower     upper
->> P4_AddLiteral(Grammar, ID, 0x4E00,   0x9FFF);
+>> P4_AddLiteral(grammar, ID, 0x4E00,   0x9FFF);
 P4_Ok
 
 >> P4_Source* source = P4_Source("好", ID);
@@ -255,15 +255,15 @@ It matches to the input only when all of the inner rules match successfully.
 
 An analogy to Sequence is logic operator `and`.
 
-In this example, we wrap up three literals into a sequence.
+In this example, we wrap up three literals into a Sequence.
 
 * You need to specify `size=3` when calling `P4_AddSequence`.
 * You need to specify the exact offset `0`, `1`, `2` when calling `P4_AddMember`.
 
 ```c
->> P4_AddSequence(Grammar, ID, 3);
+>> P4_AddSequence(grammar, ID, 3);
 P4_Ok
->> P4_Expression exprID = P4_GetGrammarRule(Grammar, ID);
+>> P4_Expression exprID = P4_GetGrammarRule(grammar, ID);
 >> P4_AddMember(exprID, 0, P4_CreateLiteral("HELLO", true));
 P4_Ok
 >> P4_AddMember(exprID, 1, P4_CreateLiteral(" ", true));
@@ -293,6 +293,40 @@ P4_MatchError
 ```
 
 ## Choice
+
+Choice is another container of multiple rules.
+It matches to the input only when one of the inner rules matches successfully.
+
+When multiple rules match, the first matched rule is used.
+
+An analogy to Choice is logic operator `or`.
+
+In this example, we wrap up two literals into a Choice.
+
+* You need to specify `size=2` when calling `P4_AddChoice`.
+* You need to specify the exact offset `0`, `1`  when calling `P4_AddMember`.
+
+```c
+>> P4_AddChoice(grammar, ID, 2);
+P4_Ok
+>> P4_Expression exprID = P4_GetGrammarRule(Grammar, ID);
+>> P4_AddMember(exprID, 0, P4_CreateLiteral("HELLO WORLD", true));
+P4_Ok
+>> P4_AddMember(exprID, 1, P4_CreateLiteral("你好, 世界", true));
+P4_Ok
+
+>> P4_Source* source = P4_Source("HELLO WORLD", ID);
+>> P4_Parse(grammar, source);
+P4_Ok
+
+>> P4_Source* source = P4_Source("你好, 世界", ID);
+>> P4_Parse(grammar, source);
+P4_Ok
+
+>> P4_Source* source = P4_Source("HELLO 世界", ID);
+>> P4_Parse(grammar, source);
+P4_MatchError
+```
 
 ## Reference
 

@@ -1329,6 +1329,40 @@ end:
 }
 
 P4_PUBLIC(P4_Error)
+P4_AddChoice(P4_Grammar* grammar, P4_RuleID id, size_t size) {
+    P4_Error        err  = P4_Ok;
+    P4_Expression*  expr = NULL;
+
+    if (grammar == NULL || id == 0) {
+        err = P4_NullError;
+        goto end;
+    }
+
+    if ((expr = P4_CreateContainer(size)) == NULL) {
+        err = P4_MemoryError;
+        goto end;
+    }
+
+    expr->kind = P4_Choice;
+
+    size_t rules_size = grammar->count + 1;
+
+    if (P4_AddGrammarRule(grammar, id, expr) != rules_size) {
+        err = P4_MemoryError;
+        goto end;
+    }
+
+    return P4_Ok;
+
+end:
+    if (expr != NULL) {
+        // P4_DeleteExpression(expr);
+    }
+
+    return err;
+}
+
+P4_PUBLIC(P4_Error)
 P4_AddMember(P4_Expression* expr, size_t offset, P4_Expression* member) {
     if (expr == NULL
             || member == NULL

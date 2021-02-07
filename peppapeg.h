@@ -169,8 +169,6 @@ typedef struct P4_Source {
     struct P4_Expression*   comment;
 } P4_Source;
 
-typedef struct P4_Token* (*P4_MatchFunction)(struct P4_Source*, struct P4_Expression*);
-
 typedef struct P4_Expression {
     // name of expression.
     // an expression with a name is a peg rule.
@@ -198,7 +196,6 @@ typedef struct P4_Expression {
             P4_String               reference;
             P4_RuleID               ref_id;
             struct P4_Expression*   ref_expr;
-            P4_MatchFunction        ref_match;
         };
 
         /* Used by P4_Range. */

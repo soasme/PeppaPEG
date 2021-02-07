@@ -505,13 +505,13 @@ P4_MatchReference(P4_Source* s, P4_Expression* e) {
         e->ref_expr = P4_GetGrammarRule(s->grammar, e->ref_id);
     }
 
-    assert(e->ref_expr != NULL || e->ref_match != NULL);
+    if (e->ref_expr == NULL) {
+        P4_RaiseError(s, P4_NameError, "");
+        return NULL;
+    }
 
     P4_MarkPosition(s, startpos);
-    P4_Expression* ref = e->ref_expr != NULL ? e->ref_expr : e;
-    P4_MatchFunction match = e->ref_match != NULL \
-                               ? e->ref_match : P4_Expression_match;
-    P4_Token* reftok = match(s, ref);
+    P4_Token* reftok = P4_Expression_match(s, e->ref_expr);
     P4_MarkPosition(s, endpos);
 
     // Ref matching is terminated when error occurred.
@@ -981,6 +981,7 @@ P4_CreateReference(P4_RuleID id) {
     expr->flag = 0;
     expr->kind = P4_Reference;
     expr->ref_id = id;
+    expr->ref_expr = NULL;
     return expr;
 }
 

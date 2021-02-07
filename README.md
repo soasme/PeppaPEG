@@ -53,6 +53,14 @@ Once done, associate the rule with an integer ID to the grammar.
 P4_AddGrammarRule(grammar, HW_ID, rule);
 ```
 
+To make it easier, `P4_CreateLiteral` and `P4_AddGrammarRule` can be merged into one single call `P4_AddLiteral`.
+
+```c
+# define HW_ID 1
+
+P4_AddLiteral(grammar, HW_ID, "Hello World", false);
+```
+
 Next, you need to wrap up the source string in to a data structure `P4_Source`.
 
 * Function `P4_CreateSource` returns a `P4_Source` struct. Except the source string, you also specify the rule ID, which decided the exact rule to apply when parsing.
@@ -116,14 +124,8 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    P4_Expression* rule = P4_CreateLiteral("HelloWorld", false);
-    if (rule == NULL) {
-        printf("Error: CreateLiteral: MemoryError.\n");
-        return 1;
-    }
-
-    if (P4_AddGrammarRule(grammar, SIMPLE_LITERAL, rule) != P4_Ok) {
-        printf("Error: AddGrammarRule: MemoryError.\n");
+    if (P4_AddLiteral(grammar, SIMPLE_LITERAL, "HelloWorld", false) != P4_Ok) {
+        printf("Error: AddLiteral: MemoryError.\n");
         return 1;
     }
 
@@ -155,6 +157,7 @@ int main(int argc, char* argv[]) {
 ```
 
 Hope you have a basic understanding of how Peppa PEG is used.
+Let's explore more Peppa PEG Rules.
 
 ## Peppa PEG Rules
 
@@ -195,7 +198,7 @@ P4_Ok
 
 The `sensitive` option only works for ASCII letters (a-z, A-Z).
 
-The Literal rule support parsing UTF-8 strings.
+The Literal rule supports parsing UTF-8 strings.
 
 ```c
 >> P4_AddLiteral(Grammar, ID, "你好, WORLD", false);

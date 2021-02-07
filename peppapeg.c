@@ -1245,7 +1245,7 @@ P4_AddLiteral(P4_Grammar* grammar, P4_RuleID id, const P4_String literal, bool s
     size_t size = grammar->count + 1;
 
     if (P4_AddGrammarRule(grammar, id, expr) != size) {
-        expr = P4_MemoryError;
+        err = P4_MemoryError;
         goto end;
     }
 
@@ -1257,4 +1257,12 @@ end:
     }
 
     return err;
+}
+
+P4_PUBLIC(P4_Slice*)
+P4_GetTokenSlice(P4_Token* token) {
+    if (token == NULL)
+        return NULL;
+
+    return &(token->slice);
 }

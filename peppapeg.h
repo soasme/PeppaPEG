@@ -339,14 +339,15 @@ P4_PUBLIC(P4_Error)       P4_Parse(P4_Grammar*, P4_Source*);
 // TODO: May not necessary.
 // We can set expr->flag |= P4_FLAG_SPACED.
 // Then cache a container of all these exprs of a choice kind.
-P4_PUBLIC(P4_Error)       P4_SetWhitespaces(P4_Grammar*, P4_RuleID, P4_RuleID);
-P4_PUBLIC(P4_Expression*) P4_GetWhitespaces(P4_Grammar*);
+P4_PUBLIC(P4_Error)         P4_SetWhitespaces(P4_Grammar*, P4_RuleID, P4_RuleID);
+P4_PUBLIC(P4_Expression*)   P4_GetWhitespaces(P4_Grammar*);
 
-P4_PUBLIC(void)           P4_GrammarReset(P4_Grammar*);
+P4_PUBLIC(void)             P4_GrammarReset(P4_Grammar*);
 
-P4_PUBLIC(P4_Token*)      P4_CreateToken(P4_String, size_t, size_t, P4_Expression*);
-P4_PUBLIC(void)           P4_DeleteToken(P4_Token*);
-P4_PUBLIC(void)           P4_AppendToken(P4_Token*, P4_Token*);
+P4_PUBLIC(P4_Token*)        P4_CreateToken(P4_String, size_t, size_t, P4_Expression*);
+P4_PUBLIC(void)             P4_DeleteToken(P4_Token*);
+P4_PUBLIC(void)             P4_AppendToken(P4_Token*, P4_Token*);
+P4_PUBLIC(P4_Slice*)        P4_GetTokenSlice(P4_Token*);
 
 
 /*

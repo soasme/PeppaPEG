@@ -250,13 +250,10 @@ P4_MatchError
 
 ## Sequence
 
-Sequence is a container of multiple rules.
-It matches the input only when all of the inner rules match successfully.
+Sequence is a container of multiple rules in order.
+It matches to the input only when all of the inner rules match successfully.
 
-Any inner rule failed match results in a complete failure for the Sequence rule.
-The scenario of not fully matches also count as a failed match.
-
-An analogy to Sequence is like logic operator `and`.
+An analogy to Sequence is logic operator `and`.
 
 In this example, we wrap up three literals into a sequence.
 
@@ -277,11 +274,19 @@ P4_Ok
 >> P4_Source* source = P4_Source("HELLO WORLD", ID);
 >> P4_Parse(grammar, source);
 P4_Ok
+```
 
+Match fails when any inner rule not matching successfully.
+
+```c
 >> P4_Source* source = P4_Source("HELLO ", ID);
 >> P4_Parse(grammar, source);
 P4_MatchError
+```
 
+Match fails when not all inner rules matching the input.
+
+```c
 >> P4_Source* source = P4_Source("HELLO WORL", ID);
 >> P4_Parse(grammar, source);
 P4_MatchError

@@ -251,7 +251,10 @@ P4_MatchError
 ## Sequence
 
 Sequence is a container of multiple rules in order.
-It matches to the input only when all of the inner rules match successfully.
+
+When applying the Sequence rule to text, the first sequence member is attempted.
+If the attempt succeeds, the second sequence member is attempted, so on and on.
+If any one of the attempts fails, the Sequence rule fails.
 
 An analogy to Sequence is logic operator `and`.
 
@@ -295,7 +298,10 @@ P4_MatchError
 ## Choice
 
 Choice is another container of multiple rules.
-It matches to the input when one of the inner rules matches successfully.
+
+When applying the Choice rule to text, the first Choice member is attempted.
+If the attempt fails, the second Choice member is attempted, so on and on.
+If any one of the attempts succeeds, the Choice rule succeeds immediately and the rest of the Choice members will not be attempted.
 
 When multiple rules match, the first matched rule is used.
 

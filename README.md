@@ -124,7 +124,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    if (P4_AddLiteral(grammar, SIMPLE_LITERAL, "HelloWorld", false) != P4_Ok) {
+    if (P4_AddLiteral(grammar, HW_ID, "HelloWorld", false) != P4_Ok) {
         printf("Error: AddLiteral: MemoryError.\n");
         return 1;
     }
@@ -261,7 +261,7 @@ An analogy to Sequence is logic operator `and`.
 In this example, we wrap up three literals into a Sequence.
 
 * You need to specify `size=3` when calling `P4_AddSequence`.
-* You need to specify the exact offset `0`, `1`, `2` when calling `P4_SetMember`.
+* You need to specify the exact offset `0`, `1`, `2` when calling `P4_SetMember`. WARNING: Resetting member at offset may lead to memory leak. Be cautious.
 
 ```c
 >> P4_AddSequence(grammar, ID, 3);
@@ -294,6 +294,7 @@ Match fails when not all inner rules matching the input.
 >> P4_Parse(grammar, source);
 P4_MatchError
 ```
+
 
 ## Choice
 

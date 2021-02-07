@@ -1288,6 +1288,14 @@ P4_AddPositive(P4_Grammar* grammar, P4_RuleID id, P4_Expression* ref_expr) {
 }
 
 P4_PUBLIC(P4_Error)
+P4_AddNegative(P4_Grammar* grammar, P4_RuleID id, P4_Expression* ref_expr) {
+    if (ref_expr == NULL)
+        return P4_NullError;
+    P4_AddSomeGrammarRule(grammar, id, P4_CreateNegative(ref_expr));
+    return P4_Ok;
+}
+
+P4_PUBLIC(P4_Error)
 P4_AddSequence(P4_Grammar* grammar, P4_RuleID id, size_t size) {
     P4_AddSomeGrammarRule(grammar, id, P4_CreateContainer(size));
     P4_GetGrammarRule(grammar, id)->kind = P4_Sequence;

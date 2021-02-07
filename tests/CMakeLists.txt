@@ -11,6 +11,7 @@ set(
     test_choice
     test_reference
     test_positive
+    test_negative
 )
 
 foreach(unity_testcase ${unity_testcases})

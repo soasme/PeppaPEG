@@ -795,11 +795,11 @@ P4_Token*
 P4_Expression_match(P4_Source* s, P4_Expression* e) {
     assert(e != NULL);
 
-    if (s->err != P4_NoError) {
+    if (s->err != P4_Ok) {
         return NULL;
     }
 
-    P4_Error     err = P4_NoError;
+    P4_Error     err = P4_Ok;
     P4_Token* result = NULL;
 
     if (!is_intermediate(e) && (err = P4_PushFrame(s, e)) != P4_Ok) {
@@ -815,7 +815,7 @@ P4_Expression_match(P4_Source* s, P4_Expression* e) {
         return NULL;
     }
 
-    if (s->err != P4_NoError) {
+    if (s->err != P4_Ok) {
         assert(result == NULL);
         return NULL;
     }

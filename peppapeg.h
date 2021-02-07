@@ -87,7 +87,7 @@ extern "C"
 # define P4_FLAG_SPACED                 ((uint32_t)(0x10000))
 
 /* The flag of expression. */
-typedef uint32_t P4_ExpressionFlag;
+typedef uint32_t        P4_ExpressionFlag;
 
 /* A position in the text. */
 typedef size_t          P4_Position;
@@ -95,9 +95,9 @@ typedef size_t          P4_Position;
 /* A slice in the text. */
 typedef struct P4_Slice {
     /* The start position of the slice. */
-    P4_Position       i;
+    P4_Position         i;
     /* The stop position of the slice. */
-    P4_Position       j;
+    P4_Position         j;
 }                       P4_Slice;
 
 /* An UTF8 rune */
@@ -112,7 +112,7 @@ typedef uint32_t        P4_RuleID;
 /* A range of two runes. */
 typedef P4_Rune P4_RuneRange[2];
 
-
+/* The expression kind. */
 typedef enum {
     // P4_Numeric,
     P4_Literal,
@@ -125,11 +125,9 @@ typedef enum {
     P4_Repeat,
 } P4_ExpressionKind;
 
-# define P4_Ok P4_NoError
-
 typedef enum {
     /* No error is like a bless. */
-    P4_NoError          = 0,
+    P4_Ok               = 0,
     /* When there is an internal error.
      * Please raise an issue: https://github.com/soasme/peppapeg/issues. */
     P4_InternalError    = 1,

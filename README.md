@@ -408,7 +408,60 @@ P4_NameError
 
 ## Positive
 
+Positive rule look text ahead but do not consume it. If the incoming text don't match, the rule fails.
+
+* Function `P4_AddPositive` adds a Positive rule to grammar.
+
+```c
+>> # define POS     1
+>> # define ENTRY   2
+>> P4_AddPositive(grammar, POS, P4_CreateLiteral("H", true));
+P4_Ok
+>> P4_AddSequence(grammar, ENTRY, 2);
+P4_Ok
+>> P4_Expression entry = P4_GetGrammarRule(grammar, ENTRY);
+>> P4_AddMember(entry, 0, P4_CreateReference(POS));
+P4_Ok
+>> P4_AddMember(entry, 1, P4_CreateLiteral("Hello World", false));
+P4_Ok
+
+>> P4_Source* source = P4_Source("Hello world", ENTRY);
+>> P4_Parse(grammar, source);
+P4_Ok
+
+>> P4_Source* source = P4_Source("hello world", ENTRY);
+>> P4_Parse(grammar, source);
+P4_MatchError
+```
+
 ## Negative
+
+Negative rule look text ahead but do not consume it.
+If the incoming text matches, the rule fails.
+
+* Function `P4_AddNegative` adds a Negative rule to grammar.
+
+```c
+>> # define NEG     1
+>> # define ENTRY   2
+>> P4_AddNegative(grammar, NEG, P4_CreateLiteral("H", true));
+P4_Ok
+>> P4_AddSequence(grammar, ENTRY, 2);
+P4_Ok
+>> P4_Expression entry = P4_GetGrammarRule(grammar, ENTRY);
+>> P4_AddMember(entry, 0, P4_CreateReference(NEG));
+P4_Ok
+>> P4_AddMember(entry, 1, P4_CreateLiteral("Hello World", false));
+P4_Ok
+
+>> P4_Source* source = P4_Source("Hello world", ENTRY);
+>> P4_Parse(grammar, source);
+P4_MatchError
+
+>> P4_Source* source = P4_Source("hello world", ENTRY);
+>> P4_Parse(grammar, source);
+P4_Ok
+```
 
 ## ZeroOrOnce
 
@@ -466,6 +519,7 @@ P4_NameError
 - [ ] New Expression Kind: Panic.
 - [ ] New Expression Kind: BackReference.
 - [ ] New Expression Kind: Function.
+- [ ] Specify joiner for Sequence and Repeat.
 - [ ] Run in VERBOSE mode.
 - [ ] Performance test.
 - [ ] Callbacks for P4_Token.

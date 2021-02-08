@@ -2,13 +2,45 @@
 
 Ultra lightweight PEG Parser in ANSI C. ✨ 🐷 ✨.
 
+# Table of Contents
+
+* [Hello, There](#hello-there)
+* [Usage](#usage)
+  * [Copy `peppapeg.h` / `peppapeg.c`](#copy-peppapegh--peppapegc)
+  * [Basic Usage](#basic-usage)
+  * [Full Example Code](#full-example-code)
+* [Peppa PEG Rules](#peppa-peg-rules)
+  * [Literal](#literal)
+    * [Case Sensitive Literal](#case-sensitive-literal)
+    * [Case Insensitive Literal](#case-insensitive-literal)
+  * [Range](#range)
+  * [Sequence](#sequence)
+  * [Choice](#choice)
+  * [Reference](#reference)
+  * [Positive](#positive)
+  * [Negative](#negative)
+  * [ZeroOrOnce](#zerooronce)
+  * [ZeroOrMore](#zeroormore)
+  * [OnceOrMore](#onceormore)
+  * [RepeatMin](#repeatmin)
+  * [RepeatMax](#repeatmax)
+  * [RepeatMinMax](#repeatminmax)
+  * [RepeatExact](#repeatexact)
+* [Peppa PEG Flags](#peppa-peg-flags)
+  * [`P4_FLAG_SQUASHED`](#p4_flag_squashed)
+  * [`P4_FLAG_LIFTED`](#p4_flag_lifted)
+  * [`P4_FLAG_SCOPED`](#p4_flag_scoped)
+  * [`P4_FLAG_SPACED`](#p4_flag_spaced)
+  * [`P4_FLAG_TIGHT`](#p4_flag_tight)
+* [Peppy Hacking Peppa PEG!](peppy-hacking-peppa-peg)
+
 # Hello, There!
 
 Want to parse a programming language using PEG? Use Peppa PEG!
 
 # Usage
 
-## Copy `peppapeg.h` / `peppapeg.c`.
+## Copy `peppapeg.h` / `peppapeg.c`
 
 Peppa PEG has a header file and a C file, so you can easily add
 it to your project by copying files "peppapeg.h" and "peppapeg.c".
@@ -680,6 +712,6 @@ P4_Ok
 P4_MatchError
 ```
 
-# Peppy Packing Peppa PEG!
+# Peppy Hacking Peppa PEG!
 
 Made with ❤️  by [Ju Lin](https://github.com/soasme).

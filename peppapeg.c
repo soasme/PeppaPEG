@@ -64,7 +64,6 @@ cleanup_freep (void *p)
                                     } \
                                 } while (0)
 
-// TODO: DeleteExpression when failed.
 # define                        P4_AddSomeGrammarRule(g, id, rule) do { \
                                     P4_Error err = P4_Ok;       \
                                     P4_Expression* expr = NULL; \
@@ -87,6 +86,7 @@ cleanup_freep (void *p)
                                     break;                      \
                                     end:                        \
                                     if (expr != NULL) {         \
+                                        P4_DeleteExpression(expr); \
                                     }                           \
                                     return err;                 \
 } while (0)
@@ -241,8 +241,7 @@ is_scoped(P4_Expression* e) {
  */
 static inline bool
 is_intermediate(P4_Expression* e) {
-    // TODO: remove e->name condition.
-    return e->name == NULL && e->id == 0;
+    return e->id == 0;
 }
 
 
@@ -1159,13 +1158,16 @@ P4_PUBLIC(P4_Grammar*)    P4_CreateGrammar(void) {
     grammar->rules = NULL;
     grammar->count = 0;
     grammar->cap = 0;
+    grammar->implicit_whitespace = NULL;
     return grammar;
 }
 
 P4_PUBLIC(void)
 P4_DeleteGrammar(P4_Grammar* grammar) {
     if (grammar) {
-        // TODO: free each rule.
+        for EACH(rule, grammar->rules, grammar->count)
+            if (rule)
+                P4_DeleteExpression(rule);
         free(grammar->rules);
         free(grammar);
     }
@@ -1296,13 +1298,15 @@ P4_SetWhitespaces(P4_Grammar* grammar) {
 
 end:
     if (rules[0] != NULL)
-        free(rules[0]); // TODO: change to delete expression
+        P4_DeleteExpression(rules[0]);
 
     if (rules[1] != NULL)
-        free(rules[1]); // TODO: change to delete expression
+        P4_DeleteExpression(rules[1]);
 
-    if (grammar->implicit_whitespace != NULL)
-        free(grammar->implicit_whitespace); // TODO: change to delete expression.
+    if (grammar->implicit_whitespace != NULL) {
+        P4_DeleteExpression(grammar->implicit_whitespace);
+        grammar->implicit_whitespace = NULL;
+    }
 
     return P4_MemoryError;
 }
@@ -1415,7 +1419,7 @@ P4_SetReferenceMember(P4_Expression* expr, size_t offset, P4_RuleID ref) {
 
     P4_Error error = P4_SetMember(expr, offset, ref_expr);
     if (error != P4_Ok) {
-        // TODO: P4_DeleteExpression(ref_expr);
+        P4_DeleteExpression(ref_expr);
         return error;
     }
 
@@ -1451,6 +1455,38 @@ P4_GetMember(P4_Expression* expr, size_t offset) {
     }
 
     return expr->members[offset];
+}
+
+P4_PUBLIC(void)
+P4_DeleteExpression(P4_Expression* expr) {
+    if (expr == NULL)
+        return;
+
+    switch (expr->kind) {
+        case P4_Literal:
+            if (expr->literal)
+                free(expr->literal);
+            break;
+        // case P4_Reference is quite special - it is not the owner of ref_expr.
+        case P4_Positive:
+        case P4_Negative:
+            if (expr->ref_expr)
+                P4_DeleteExpression(expr->ref_expr);
+            break;
+        case P4_Sequence:
+        case P4_Choice:
+            for EACH(member, expr->members, expr->count)
+                if (member)
+                    P4_DeleteExpression(member);
+            free(expr->members);
+            break;
+        case P4_Repeat:
+            if (expr->repeat_expr)
+                P4_DeleteExpression(expr->repeat_expr);
+            break;
+    }
+
+    free(expr);
 }
 
 P4_PUBLIC(P4_Error)

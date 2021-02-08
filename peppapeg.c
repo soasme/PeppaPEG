@@ -1020,8 +1020,9 @@ P4_CreateNumeric(size_t num) {
 P4_PUBLIC(P4_Expression*)
 P4_CreateLiteral(const P4_String literal, bool sensitive) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
-    expr->flag = 0;
+    expr->id = 0;
     expr->kind = P4_Literal;
+    expr->flag = 0;
     expr->literal = strdup(literal);
     expr->sensitive = sensitive;
     return expr;
@@ -1030,8 +1031,9 @@ P4_CreateLiteral(const P4_String literal, bool sensitive) {
 P4_PUBLIC(P4_Expression*)
 P4_CreateRange(P4_Rune lower, P4_Rune upper) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
-    expr->flag = 0;
+    expr->id = 0;
     expr->kind = P4_Range;
+    expr->flag = 0;
     expr->range[0] = lower;
     expr->range[1] = upper;
     return expr;
@@ -1040,8 +1042,9 @@ P4_CreateRange(P4_Rune lower, P4_Rune upper) {
 P4_PUBLIC(P4_Expression*)
 P4_CreateReference(P4_RuleID id) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
-    expr->flag = 0;
+    expr->id = 0;
     expr->kind = P4_Reference;
+    expr->flag = 0;
     expr->ref_id = id;
     expr->ref_expr = NULL;
     return expr;
@@ -1050,8 +1053,9 @@ P4_CreateReference(P4_RuleID id) {
 P4_PUBLIC(P4_Expression*)
 P4_CreatePositive(P4_Expression* refexpr) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
-    expr->flag = 0;
+    expr->id = 0;
     expr->kind = P4_Positive;
+    expr->flag = 0;
     expr->ref_expr = refexpr;
     return expr;
 }
@@ -1059,8 +1063,9 @@ P4_CreatePositive(P4_Expression* refexpr) {
 P4_PUBLIC(P4_Expression*)
 P4_CreateNegative(P4_Expression* refexpr) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
-    expr->flag = 0;
+    expr->id = 0;
     expr->kind = P4_Negative;
+    expr->flag = 0;
     expr->ref_expr = refexpr;
     return expr;
 }
@@ -1068,6 +1073,7 @@ P4_CreateNegative(P4_Expression* refexpr) {
 P4_PRIVATE(P4_Expression*)
 P4_CreateContainer(size_t count) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
+    expr->id = 0;
     expr->flag = 0;
     expr->count = count;
     expr->members = malloc(sizeof(P4_Expression*) * count);
@@ -1105,6 +1111,7 @@ P4_CreateChoice(size_t count, ...) {
 P4_PUBLIC(P4_Expression*)
 P4_CreateRepeatMinMax(P4_Expression* repeat, size_t min, size_t max) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
+    expr->id = 0;
     expr->flag = 0;
     expr->kind = P4_Repeat;
     expr->repeat_expr = repeat;
@@ -1158,7 +1165,8 @@ P4_PUBLIC(P4_Grammar*)    P4_CreateGrammar(void) {
     grammar->rules = NULL;
     grammar->count = 0;
     grammar->cap = 0;
-    grammar->implicit_whitespace = NULL;
+    grammar->spaced_count = -1;
+    grammar->spaced_rules = NULL;
     return grammar;
 }
 
@@ -1291,8 +1299,10 @@ P4_SetWhitespaces(P4_Grammar* grammar) {
             goto end;
     }
 
-    if ((grammar->implicit_whitespace = P4_CreateZeroOrMore(repeat))== NULL)
+    if ((grammar->spaced_rules = P4_CreateZeroOrMore(repeat))== NULL)
         goto end;
+
+    grammar->spaced_count = count;
 
     return P4_Ok;
 
@@ -1303,10 +1313,12 @@ end:
     if (rules[1] != NULL)
         P4_DeleteExpression(rules[1]);
 
-    if (grammar->implicit_whitespace != NULL) {
-        P4_DeleteExpression(grammar->implicit_whitespace);
-        grammar->implicit_whitespace = NULL;
+    if (grammar->spaced_rules != NULL) {
+        P4_DeleteExpression(grammar->spaced_rules);
+        grammar->spaced_rules = NULL;
     }
+
+    grammar->spaced_count = -1;
 
     return P4_MemoryError;
 }
@@ -1315,10 +1327,10 @@ P4_PUBLIC(P4_Expression*) P4_GetWhitespaces(P4_Grammar* g) {
     if (g == NULL)
         return NULL;
 
-    if (g->implicit_whitespace == NULL) // TODO: need cache for the case when whitespace is NULL.
+    if (g->spaced_count == -1)
         P4_SetWhitespaces(g);
 
-    return g->implicit_whitespace;
+    return g->spaced_rules;
 }
 
 P4_PUBLIC(void)

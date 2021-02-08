@@ -203,14 +203,12 @@ P4_PRIVATE(void) test_match_reference_in_sequence_successfully(void) {
     TEST_ASSERT_EQUAL_STRING("OLAola", tokenstr);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL(token->head->expr, r1);
-    autofree P4_String str1 = P4_CopyTokenString(token->head);
-    TEST_ASSERT_EQUAL_STRING("OLA", str1);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("OLA", token->head);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token->head);
 
     TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL(token->tail->expr, r1);
-    autofree P4_String str2 = P4_CopyTokenString(token->tail);
-    TEST_ASSERT_EQUAL_STRING("ola", str2);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("ola", token->tail);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

@@ -107,7 +107,7 @@ typedef uint32_t        P4_Rune;
 typedef char*           P4_String;
 
 /* The identifier of a rule expression. */
-typedef uint32_t        P4_RuleID;
+typedef uint64_t        P4_RuleID;
 
 /* A range of two runes. */
 typedef P4_Rune P4_RuneRange[2];
@@ -170,10 +170,8 @@ typedef struct P4_Source {
 } P4_Source;
 
 typedef struct P4_Expression {
-    // name of expression.
-    // an expression with a name is a peg rule.
-    // DEPRECATED.
-    P4_String            name;
+    // The name of expression (only for debugging).
+    // P4_String            name;
     /* The id of expression. */
     P4_RuleID            id;
     /* The kind of expression. */
@@ -239,21 +237,16 @@ typedef struct P4_Token {
 
 
 typedef struct P4_Grammar{
-    // Deprecated.
-    struct P4_Grammar*      pest;
-    // the full text of rules.
-    P4_String               rules_text;
-
     /* the rules, e.g. the expressions with IDs. */
     struct P4_Expression**  rules;
     /* the total number of rules. */
     int                     count;
     /* the maximum number of rules. */
     int                     cap;
-
-    struct P4_Expression*   implicit_whitespace;
-    struct P4_Expression*   whitespace;
-    struct P4_Expression*   comment;
+    /* the total number of spaced rules. */
+    size_t                  spaced_count;
+    /* the repetition rule for spaced rules. */
+    struct P4_Expression*   spaced_rules;
 } P4_Grammar;
 
 
@@ -335,16 +328,16 @@ P4_PUBLIC(void)           P4_PrintSourceAst(P4_Token*, P4_String, size_t);
 
 P4_PUBLIC(P4_Error)       P4_Parse(P4_Grammar*, P4_Source*);
 
-P4_PUBLIC(P4_Error)         P4_SetWhitespaces(P4_Grammar*);
-P4_PUBLIC(P4_Expression*)   P4_GetWhitespaces(P4_Grammar*);
+P4_PUBLIC(P4_Error)       P4_SetWhitespaces(P4_Grammar*);
+P4_PUBLIC(P4_Expression*) P4_GetWhitespaces(P4_Grammar*);
 
-P4_PUBLIC(void)             P4_GrammarReset(P4_Grammar*);
+P4_PUBLIC(void)           P4_GrammarReset(P4_Grammar*);
 
-P4_PUBLIC(P4_Token*)        P4_CreateToken(P4_String, size_t, size_t, P4_Expression*);
-P4_PUBLIC(void)             P4_DeleteToken(P4_Token*);
-P4_PUBLIC(void)             P4_AppendToken(P4_Token*, P4_Token*);
-P4_PUBLIC(P4_Slice*)        P4_GetTokenSlice(P4_Token*);
-P4_PUBLIC(P4_String)        P4_CopyTokenString(P4_Token*);
+P4_PUBLIC(P4_Token*)      P4_CreateToken(P4_String, size_t, size_t, P4_Expression*);
+P4_PUBLIC(void)           P4_DeleteToken(P4_Token*);
+P4_PUBLIC(void)           P4_AppendToken(P4_Token*, P4_Token*);
+P4_PUBLIC(P4_Slice*)      P4_GetTokenSlice(P4_Token*);
+P4_PUBLIC(P4_String)      P4_CopyTokenString(P4_Token*);
 
 #ifdef __cplusplus
 }

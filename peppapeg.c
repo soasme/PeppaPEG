@@ -91,6 +91,9 @@ cleanup_freep (void *p)
                                     return err;                 \
 } while (0)
 
+P4_PRIVATE(inline size_t)       P4_ReadRune(P4_String s, P4_Rune* c);
+P4_PRIVATE(inline int)          P4_CaseCmpInsensitive(P4_String, P4_String, size_t);
+
 P4_PRIVATE(inline P4_Position)  P4_GetPosition(P4_Source*);
 P4_PRIVATE(void)                P4_SetPosition(P4_Source*, P4_Position);
 
@@ -120,6 +123,69 @@ P4_PRIVATE(P4_Token*)           P4_MatchNegative(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchSequence(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchChoice(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchRepeat(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchSpacedExpressions(P4_Source*, P4_Expression*);
+
+/*
+ * Reads a single UTF-8 code point from the string.
+ * Returns the number of bytes of this code point.
+ * Returns 0 if read failed.
+ *
+ * Example::
+ *
+ *     > uint32_t c = 0x0
+ *     > P4_ReadRune("你好", &c)
+ *     3
+ *     > printf("%p %d\n", c, c)
+ *     0x4f60 20320
+ */
+P4_PRIVATE(inline size_t)
+P4_ReadRune(P4_String s, P4_Rune* c) {
+    *c = 0;
+
+    if ((s[0] & 0b10000000) == 0) { // 1 byte code point, ASCII
+        *c = (s[0] & 0b01111111);
+        return 1;
+    } else if ((s[0] & 0b11100000) == 0b11000000) { // 2 byte code point
+        *c = (s[0] & 0b00011111) << 6 | (s[1] & 0b00111111);
+        return 2;
+    } else if ((s[0] & 0b11110000) == 0b11100000) { // 3 byte code point
+        *c = (s[0] & 0b00001111) << 12 | (s[1] & 0b00111111) << 6 | (s[2] & 0b00111111);
+        return 3;
+    } else if ((s[0] & 0b11111000) == 0b11110000) { // 4 byte code point
+        *c = (s[0] & 0b00000111) << 18 | (s[1] & 0b00111111) << 12 | (s[2] & 0b00111111) << 6 | (s[3] & 0b00111111);
+        return 4;
+    } else {
+        *c = 0x0;
+        return 0;
+    }
+}
+
+/*
+ * Compare case-insensitive string src v/s dest.
+ *
+ * Like strcmp, but works for a case insensitive UTF-8 string.
+ */
+P4_PRIVATE(inline int)
+P4_CaseCmpInsensitive(P4_String src, P4_String dst, size_t len) {
+    uint32_t srcch = 0x0, dstch = 0x0;
+    size_t srcsz = 0, dstsz = 0;
+    int cmp = 0, remaining = len;
+    if (strlen(dst) < len) return -1;
+    while (*src != 0x0 && *dst != 0x0) {
+        srcsz = P4_ReadRune(src, &srcch);
+        dstsz = P4_ReadRune(dst, &dstch);
+        if (srcsz < dstsz) return -1;
+        if (srcsz > dstsz) return 1;
+        if (srcsz != 1 && srcch != dstch) return srcch > dstch ? 1 : -1;
+        cmp = tolower(srcch) - tolower(dstch);
+        if (srcsz == 1 && cmp != 0) return cmp;
+        src = src + srcsz;
+        dst = dst + dstsz;
+        remaining--;
+        if (remaining == 0) return 0;
+    }
+    return 0;
+}
 
 /*
  * Determine if e is a tightness expr.
@@ -519,7 +585,7 @@ P4_MatchReference(P4_Source* s, P4_Expression* e) {
     }
 
     P4_MarkPosition(s, startpos);
-    P4_Token* reftok = P4_Expression_match(s, e->ref_expr);
+    P4_Token* reftok = P4_Match(s, e->ref_expr);
     P4_MarkPosition(s, endpos);
 
     // Ref matching is terminated when error occurred.
@@ -559,12 +625,12 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
         // Optional `WHITESPACE` and `COMMENT` are inserted between every member.
         if (P4_NeedLoosen(s, e)
                 && EACH_INDEX() > 0) {
-            whitespace = P4_Expression_match_implicit_whitespace(s, NULL);
+            whitespace = P4_MatchSpacedExpressions(s, NULL);
             if (!NO_ERROR(s)) goto finalize;
             P4_AdoptToken(head, tail, whitespace);
         }
 
-        tok = P4_Expression_match(s, member);
+        tok = P4_Match(s, member);
 
         // If any of the sequence members fails, the entire sequence fails.
         // Puke the eaten text and free all created tokens.
@@ -602,7 +668,7 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
     // The oneof match matches successfully immediately if any match passes.
     P4_MarkPosition(s, startpos);
     for EACH(member, e->members, e->count) {
-        tok = P4_Expression_match(s, member);
+        tok = P4_Match(s, member);
         if (NO_ERROR(s)) break;
         if (NO_MATCH(s)) {
             // retry until the last one.
@@ -677,12 +743,12 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         // between every repetition.
         if (P4_NeedLoosen(s, e)
                 && repeated > 0 ) {
-            whitespace = P4_Expression_match_implicit_whitespace(s, NULL);
+            whitespace = P4_MatchSpacedExpressions(s, NULL);
             if (!NO_ERROR(s)) goto finalize;
             P4_AdoptToken(head, tail, whitespace);
         }
 
-        tok = P4_Expression_match(s, e->repeat_expr);
+        tok = P4_Match(s, e->repeat_expr);
 
         if (NO_MATCH(s)) {
             assert(tok == NULL);
@@ -759,7 +825,7 @@ P4_MatchPositive(P4_Source* s, P4_Expression* e) {
 
     P4_MarkPosition(s, startpos);
 
-    P4_Token* token = P4_Expression_match(s, e->ref_expr);
+    P4_Token* token = P4_Match(s, e->ref_expr);
     if (token != NULL)
         P4_DeleteToken(token);
 
@@ -773,7 +839,7 @@ P4_MatchNegative(P4_Source* s, P4_Expression* e) {
     assert(NO_ERROR(s) && e->ref_expr != NULL);
 
     P4_MarkPosition(s, startpos);
-    P4_Token* token = P4_Expression_match(s, e->ref_expr);
+    P4_Token* token = P4_Match(s, e->ref_expr);
     P4_SetPosition(s, startpos);
 
     if (NO_ERROR(s)) {
@@ -834,7 +900,7 @@ P4_Expression_dispatch(P4_Source* s, P4_Expression* e) {
  * It propagate the failed match up to the top level.
  */
 P4_Token*
-P4_Expression_match(P4_Source* s, P4_Expression* e) {
+P4_Match(P4_Source* s, P4_Expression* e) {
     assert(e != NULL);
 
     if (s->err != P4_Ok) {
@@ -866,7 +932,7 @@ P4_Expression_match(P4_Source* s, P4_Expression* e) {
 }
 
 P4_Token*
-P4_Expression_match_any(P4_Source* s, P4_Expression* e) {
+P4_Match_any(P4_Source* s, P4_Expression* e) {
     P4_String str = P4_RemainingText(s);
 
 # define UTF8_CHARLEN(b) (( 0xe5000000 >> (( (b) >> 3 ) & 0x1e )) & 3 ) + 1
@@ -878,24 +944,8 @@ P4_Expression_match_any(P4_Source* s, P4_Expression* e) {
     return NULL;
 }
 
-P4_Token*
-P4_Expression_match_soi(P4_Source* s, P4_Expression* e) {
-    if (P4_GetPosition(s) != 0)
-        P4_RaiseError(s, P4_MatchError, "not soi");
-    return NULL;
-}
-
-P4_Token*
-P4_Expression_match_eoi(P4_Source* s, P4_Expression* e) {
-
-    if (P4_GetPosition(s) != strlen(s->content)) {
-        P4_RaiseError(s, P4_MatchError, "not eoi");
-    }
-    return NULL;
-}
-
-P4_Token*
-P4_Expression_match_implicit_whitespace(P4_Source* s, P4_Expression* e) {
+P4_PRIVATE(P4_Token*)
+P4_MatchSpacedExpressions(P4_Source* s, P4_Expression* e) {
     // implicit whitespace is guaranteed to be an unnamed rule.
     // state flag is guaranteed to be none.
     assert(NO_ERROR(s));
@@ -911,7 +961,7 @@ P4_Expression_match_implicit_whitespace(P4_Source* s, P4_Expression* e) {
 
     // (2) Perform implicit whitespace checks.
     //     We won't do implicit whitespace inside an implicit whitespace expr.
-    P4_Token* result = P4_Expression_match(s, implicit_whitespace);
+    P4_Token* result = P4_Match(s, implicit_whitespace);
     if (NO_MATCH(s))
         P4_RescueError(s);
 
@@ -1192,7 +1242,7 @@ P4_Parse(P4_Grammar* grammar, P4_Source* source) {
     source->grammar = grammar;
 
     P4_Expression* expr     = P4_GetGrammarRule(grammar, source->rule_id);
-    P4_Token*      tok      = P4_Expression_match(source, expr);
+    P4_Token*      tok      = P4_Match(source, expr);
 
     source->root            = tok;
 

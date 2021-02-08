@@ -4,7 +4,6 @@ add_library(unity STATIC unity/src/unity.c)
 
 set(
     unity_testcases
-    print_version
     test_literal
     test_range
     test_sequence

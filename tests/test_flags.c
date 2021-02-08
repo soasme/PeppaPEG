@@ -271,13 +271,56 @@ P4_PRIVATE(void) test_spaced_rule_should_be_ignored_in_tight_repeat2(void) {
 // Sequence # SQUASH
 /*
  * Rules:
- *  ENTRY = ZERO & ZERO # SQUASH
- *  ZERO  = "0"
+ *  ENTRY = Z & Z # SQUASH
+ *  Z  = "0"
  * Input:
  *  "00"
  * Output:
  *  ENTRY: "00"
  */
+P4_PRIVATE(void) test_squashed_rule_should_generate_no_children(void) {
+# define Z 3
+    P4_Grammar* grammar = P4_CreateGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddSequence(grammar, ENTRY, 2)
+    );
+    P4_Expression* entry = P4_GetGrammarRule(grammar, ENTRY);
+    TEST_ASSERT_NOT_NULL(entry);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_SetReferenceMember(entry, 0, Z)
+    );
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_SetReferenceMember(entry, 1, Z)
+    );
+    P4_SetExpressionFlag(entry, P4_FLAG_SQUASHED);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddLiteral(grammar, Z, "0", true)
+    );
+
+    P4_Source* source = P4_CreateSource("00", ENTRY);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_Parse(grammar, source)
+    );
+
+    P4_Token* token = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("00", token);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+
+    TEST_ASSERT_NULL(token->next);
+    TEST_ASSERT_NULL(token->head);
+    TEST_ASSERT_NULL(token->tail);
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
 
 // Repeat # SQUASH
 /*
@@ -289,6 +332,39 @@ P4_PRIVATE(void) test_spaced_rule_should_be_ignored_in_tight_repeat2(void) {
  * Output:
  *  ENTRY: "00000"
  */
+P4_PRIVATE(void) test_squashed_repeat_should_generate_no_children(void) {
+# define Z 3
+    P4_Grammar* grammar = P4_CreateGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddZeroOrMore(grammar, ENTRY, P4_CreateReference(Z))
+    );
+    P4_SetExpressionFlag(P4_GetGrammarRule(grammar, ENTRY), P4_FLAG_SQUASHED);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddLiteral(grammar, Z, "0", true)
+    );
+
+    P4_Source* source = P4_CreateSource("000000", ENTRY);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_Parse(grammar, source)
+    );
+
+    P4_Token* token = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("000000", token);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+
+    TEST_ASSERT_NULL(token->next);
+    TEST_ASSERT_NULL(token->head);
+    TEST_ASSERT_NULL(token->tail);
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
 
 // Others: No effect # SQUASH
 
@@ -297,26 +373,139 @@ P4_PRIVATE(void) test_spaced_rule_should_be_ignored_in_tight_repeat2(void) {
 // Literal # LIFT
 /*
  * Rules:
- *  ENTRY = ZERO*
- *  ZERO  = "0" # LIFT
+ *  ENTRY = "0" # LIFT
  * Input:
- *  "00000"
+ *  "0"
  * Output:
- *  ENTRY: "00000"
+ *  NULL
  */
+P4_PRIVATE(void) test_lifted_literal_should_generate_no_token(void) {
+    P4_Grammar* grammar = P4_CreateGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddLiteral(grammar, ENTRY, "0", false)
+    );
+    P4_SetExpressionFlag(P4_GetGrammarRule(grammar, ENTRY), P4_FLAG_LIFTED);
+
+    P4_Source* source = P4_CreateSource("0", ENTRY);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_Parse(grammar, source)
+    );
+
+    P4_Token* token = P4_GetSourceAst(source);
+    TEST_ASSERT_NULL(token);
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
 
 // Range # LIFT
-// Range # LIFT
+/*
+ * Rules:
+ *  ENTRY = '0'..'9' # LIFT
+ * Input:
+ *  "0"
+ * Output:
+ *  NULL
+ */
+P4_PRIVATE(void) test_lifted_range_should_generate_no_token(void) {
+    P4_Grammar* grammar = P4_CreateGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddRange(grammar, ENTRY, '0', '9')
+    );
+    P4_SetExpressionFlag(P4_GetGrammarRule(grammar, ENTRY), P4_FLAG_LIFTED);
+
+    P4_Source* source = P4_CreateSource("0", ENTRY);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_Parse(grammar, source)
+    );
+
+    P4_Token* token = P4_GetSourceAst(source);
+    TEST_ASSERT_NULL(token);
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
+
 // Choice # LIFT
+/*
+ * Rules:
+ *  ENTRY = "HELLO" | "KIA ORA" # LIFT
+ * Input:
+ *  "KIA ORA"
+ * Output:
+ *  NULL
+ */
+P4_PRIVATE(void) test_lifted_choice_should_generate_no_token(void) {
+    P4_Grammar* grammar = P4_CreateGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddChoice(grammar, ENTRY, 2)
+    );
+
+    P4_Expression* entry = P4_GetGrammarRule(grammar, ENTRY);
+    TEST_ASSERT_NOT_NULL(entry);
+    P4_SetExpressionFlag(entry, P4_FLAG_LIFTED);
+
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_SetMember(entry, 0, P4_CreateLiteral("HELLO WORLD", true))
+    );
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_SetMember(entry, 1, P4_CreateLiteral("KIA ORA", true))
+    );
+
+    P4_Source* source = P4_CreateSource("KIA ORA", ENTRY);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_Parse(grammar, source)
+    );
+
+    P4_Token* token = P4_GetSourceAst(source);
+    TEST_ASSERT_NULL(token);
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
 // Reference # LIFT
+
 // Repeat # LIFT
+P4_PRIVATE(void) test_match_zeroormore_multiple_times(void) {
+    P4_Grammar* grammar = P4_CreateGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddZeroOrMore(grammar, ENTRY, P4_CreateLiteral("0", true))
+    );
+    P4_SetExpressionFlag(P4_GetGrammarRule(grammar, ENTRY), P4_FLAG_LIFTED);
+
+    P4_Source* source = P4_CreateSource("00000", ENTRY);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_Parse(grammar, source)
+    );
+
+    P4_Token* token = P4_GetSourceAst(source);
+    TEST_ASSERT_NULL(token);
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
+
 // Positive/Negative: No effect # LIFT
 
 // ---
-
-// Sequence # SQUASH,LIFT
-
-// Repeat # SQUASH,LIFT
 
 // ---
 
@@ -341,6 +530,11 @@ int main(void) {
     RUN_TEST(test_spaced_rule_should_be_applied_in_repeat);
     RUN_TEST(test_spaced_rule_should_be_ignored_in_tight_repeat);
     RUN_TEST(test_spaced_rule_should_be_ignored_in_tight_repeat2);
+    RUN_TEST(test_squashed_rule_should_generate_no_children);
+    RUN_TEST(test_squashed_repeat_should_generate_no_children);
+    RUN_TEST(test_lifted_literal_should_generate_no_token);
+    RUN_TEST(test_lifted_range_should_generate_no_token);
+    RUN_TEST(test_lifted_choice_should_generate_no_token);
 
     return UNITY_END();
 }

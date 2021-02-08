@@ -3,6 +3,7 @@
 
 # define ENTRY 1
 # define WHITESPACE 2
+# define R1 3
 
 
 // Sequence # TIGHT
@@ -480,7 +481,7 @@ P4_PRIVATE(void) test_lifted_choice_should_generate_no_token(void) {
 // Reference # LIFT
 
 // Repeat # LIFT
-P4_PRIVATE(void) test_match_zeroormore_multiple_times(void) {
+P4_PRIVATE(void) test_lifted_repeat_should_generate_no_token(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -511,15 +512,229 @@ P4_PRIVATE(void) test_match_zeroormore_multiple_times(void) {
 
 // Sequence # SQUASH,
 // Literal # SCOPED.
+/*
+ * Rules:
+ *  ENTRY = R1 & R1 # SQUASHED
+ *  R1 = "1" # SCOPED
+ * Input:
+ *  "11"
+ * Output:
+ *  ENTRY:
+ *   ONE: "1"
+ *   ONE: "1"
+ */
+P4_PRIVATE(void) test_squashed_sequence_should_not_hide_scoped_literal(void) {
+    P4_Grammar* grammar = P4_CreateGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddSequence(grammar, ENTRY, 2)
+    );
+    P4_Expression* entry = P4_GetGrammarRule(grammar, ENTRY);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_SetReferenceMember(entry, 0, R1)
+    );
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_SetReferenceMember(entry, 1, R1)
+    );
+    P4_SetExpressionFlag(P4_GetGrammarRule(grammar, ENTRY), P4_FLAG_SQUASHED);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddLiteral(grammar, R1, "1", true)
+    );
+    P4_SetExpressionFlag(P4_GetGrammarRule(grammar, R1), P4_FLAG_SCOPED);
+
+    P4_Source* source = P4_CreateSource("11", ENTRY);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_Parse(grammar, source)
+    );
+
+    P4_Token* token = P4_GetSourceAst(source);
+
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("11", token);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+
+    TEST_ASSERT_NOT_NULL(token->head);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("1", token->head);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token->head);
+
+    TEST_ASSERT_EQUAL(token->head->next, token->tail);
+
+    TEST_ASSERT_NOT_NULL(token->tail);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("1", token->tail);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token->tail);
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
 
 // Sequence # SQUASH,LIFT
 // Literal # SCOPED.
+/*
+ * Rules:
+ *  ENTRY = R1 & R1 # SQUASHED,LIFTED
+ *  R1 = "1" # SCOPED
+ * Input:
+ *  "11"
+ * Output:
+ *  ONE: "1"
+ *  ONE: "1"
+ */
+P4_PRIVATE(void) test_squashed_lifted_sequence_should_not_hide_scoped_literal(void) {
+    P4_Grammar* grammar = P4_CreateGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddSequence(grammar, ENTRY, 2)
+    );
+    P4_Expression* entry = P4_GetGrammarRule(grammar, ENTRY);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_SetReferenceMember(entry, 0, R1)
+    );
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_SetReferenceMember(entry, 1, R1)
+    );
+    P4_SetExpressionFlag(P4_GetGrammarRule(grammar, ENTRY), P4_FLAG_SQUASHED | P4_FLAG_LIFTED);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddLiteral(grammar, R1, "1", true)
+    );
+    P4_SetExpressionFlag(P4_GetGrammarRule(grammar, R1), P4_FLAG_SCOPED);
 
-// Repeat # SQUASH,
+    P4_Source* source = P4_CreateSource("11", ENTRY);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_Parse(grammar, source)
+    );
+
+    P4_Token* token = P4_GetSourceAst(source);
+
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("1", token);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
+
+    TEST_ASSERT_NOT_NULL(token->next);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("1", token->next);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token->next);
+
+    TEST_ASSERT_NULL(token->head);
+    TEST_ASSERT_NULL(token->tail);
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
+
+// Repeat # SQUASHED,
 // Literal # SCOPED.
+/*
+ * Rules:
+ *  ENTRY = R1{2} # SQUASHED
+ *  R1 = "1" # SCOPED
+ * Input:
+ *  "11"
+ * Output:
+ *  ENTRY:
+ *   ONE: "1"
+ *   ONE: "1"
+ */
+P4_PRIVATE(void) test_squashed_repeat_should_not_hide_scoped_literal(void) {
+    P4_Grammar* grammar = P4_CreateGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddRepeatExact(grammar, ENTRY, P4_CreateReference(R1), 2)
+    );
+    P4_SetExpressionFlag(P4_GetGrammarRule(grammar, ENTRY), P4_FLAG_SQUASHED);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddLiteral(grammar, R1, "1", true)
+    );
+    P4_SetExpressionFlag(P4_GetGrammarRule(grammar, R1), P4_FLAG_SCOPED);
+
+    P4_Source* source = P4_CreateSource("11", ENTRY);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_Parse(grammar, source)
+    );
+
+    P4_Token* token = P4_GetSourceAst(source);
+
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("11", token);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+
+    TEST_ASSERT_NOT_NULL(token->head);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("1", token->head);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token->head);
+
+    TEST_ASSERT_EQUAL(token->head->next, token->tail);
+
+    TEST_ASSERT_NOT_NULL(token->tail);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("1", token->tail);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token->tail);
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
 
 // Repeat # SQUASH,LIFT
 // Literal # SCOPED.
+/*
+ * Rules:
+ *  ENTRY = R1{2} # SQUASHED,LIFTED
+ *  R1 = "1" # SCOPED
+ * Input:
+ *  "11"
+ * Output:
+ *  R1: "1"
+ *  R1: "1"
+ */
+P4_PRIVATE(void) test_squashed_lifted_repeat_should_not_hide_scoped_literal(void) {
+    P4_Grammar* grammar = P4_CreateGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddRepeatExact(grammar, ENTRY, P4_CreateReference(R1), 2)
+    );
+    P4_SetExpressionFlag(P4_GetGrammarRule(grammar, ENTRY), P4_FLAG_LIFTED | P4_FLAG_SQUASHED);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddLiteral(grammar, R1, "1", true)
+    );
+    P4_SetExpressionFlag(P4_GetGrammarRule(grammar, R1), P4_FLAG_SCOPED);
+
+    P4_Source* source = P4_CreateSource("11", ENTRY);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_Parse(grammar, source)
+    );
+
+    P4_Token* token = P4_GetSourceAst(source);
+
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("1", token);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
+
+    TEST_ASSERT_NOT_NULL(token->next);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("1", token->next);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token->next);
+
+    TEST_ASSERT_NULL(token->head);
+    TEST_ASSERT_NULL(token->tail);
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
 
 int main(void) {
     UNITY_BEGIN();
@@ -535,6 +750,11 @@ int main(void) {
     RUN_TEST(test_lifted_literal_should_generate_no_token);
     RUN_TEST(test_lifted_range_should_generate_no_token);
     RUN_TEST(test_lifted_choice_should_generate_no_token);
+    RUN_TEST(test_lifted_repeat_should_generate_no_token);
+
+    RUN_TEST(test_squashed_lifted_sequence_should_not_hide_scoped_literal);
+    RUN_TEST(test_squashed_repeat_should_not_hide_scoped_literal);
+    RUN_TEST(test_squashed_lifted_repeat_should_not_hide_scoped_literal);
 
     return UNITY_END();
 }

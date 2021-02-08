@@ -39,6 +39,8 @@ Ultra lightweight PEG Parser in ANSI C. ✨ 🐷 ✨.
 
 Want to parse a programming language using PEG? Use Peppa PEG!
 
+WARNING: Peppa PEG hasn't been benchmarked and has not been widely used. Use at your own risk!
+
 # Usage
 
 ## Copy `peppapeg.h` / `peppapeg.c`

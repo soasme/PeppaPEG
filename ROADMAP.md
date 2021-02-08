@@ -7,7 +7,8 @@
 - [ ] New Expression Kind: Panic.
 - [ ] New Expression Kind: BackReference.
 - [ ] New Expression Kind: Function.
-- [ ] Specify joiner for Sequence and Repeat.
 - [ ] Run in VERBOSE mode.
 - [ ] Performance test.
 - [ ] Callbacks for P4_Token.
+- [ ] Add traverse functions for Tokens.
+- [ ] Add Valgrind to the tests.

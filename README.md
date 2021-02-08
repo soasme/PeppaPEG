@@ -466,64 +466,219 @@ P4_Ok
 
 ## ZeroOrOnce
 
+Analogy to ZeroOrOnce is Regex `rule?`.
+
+Function `P4_AddZeroOrOnce` adds a repetition expression that repeat an expression for zero or once.
+
+```c
+>> P4_Expression* ZERO = P4_CreateLiteral("0", true);
+>> P4_AddZeroOrOnce(grammar, ENTRY, ZERO);
+
+>> P4_Source* source = P4_Source("0", ENTRY);
+>> P4_Parse(grammar, source);
+P4_Ok
+```
+
 ## ZeroOrMore
+
+Analogy to ZeroOrMore is Regex `rule*`.
+
+Function `P4_AddZeroOrMore` adds a repetition expression that repeat an expression for zero or more times.
+
+```c
+>> P4_Expression* ZERO = P4_CreateLiteral("0", true);
+>> P4_AddZeroOrMore(grammar, ENTRY, ZERO);
+
+>> P4_Source* source = P4_Source("00000", ENTRY);
+>> P4_Parse(grammar, source);
+P4_Ok
+```
 
 ## OnceOrMore
 
+Analogy to OnceOrMore is Regex `rule+`.
+
+Function `AddZeroOrMore` adds a repetition expression that repeat an expression for once or more times.
+
+```c
+>> P4_Expression* ZERO = P4_CreateLiteral("0", true);
+>> P4_AddOnceOrMore(grammar, ENTRY, ZERO);
+
+>> P4_Source* source = P4_Source("00000", ENTRY);
+>> P4_Parse(grammar, source);
+P4_Ok
+```
+
 ## RepeatMin
+
+Function `P4_AddRepeatMin` adds a repetition expression that repeat an expression for a minimum MIN times.
+
+Analogy to RepeatMin is Regex `rule{min,}`.
+
+```c
+>> P4_Expression* ZERO = P4_CreateLiteral("0", true);
+>> P4_AddRepeatMin(grammar, ENTRY, ZERO, 5);
+
+>> P4_Source* source = P4_Source("00000", ENTRY);
+>> P4_Parse(grammar, source);
+P4_Ok
+
+>> P4_Source* source = P4_Source("0000", ENTRY);
+>> P4_Parse(grammar, source);
+P4_MatchError
+```
+
 ## RepeatMax
+
+Function `P4_AddRepeatMin` adds a repetition expression that repeat an expression for a maximum MAX times.
+
+Analogy to RepeatMax is Regex `rule{,max}`.
+
+```c
+>> P4_Expression* ZERO = P4_CreateLiteral("0", true);
+>> P4_AddRepeatMax(grammar, ENTRY, ZERO, 5);
+
+>> P4_Source* source = P4_Source("00000", ENTRY);
+>> P4_Parse(grammar, source);
+P4_Ok
+
+>> P4_Source* source = P4_Source("000000", ENTRY);
+>> P4_Parse(grammar, source);
+P4_MatchError
+```
+
 ## RepeatMinMax
+
+Analogy to RepeatMinMax is Regex `rule{min,max}`.
+
+Function `P4_AddRepeatMinMax` adds a repetition expression that repeat an expression for a minimum MIN times and a maximum MAX times.
+
+```c
+>> P4_Expression* ZERO = P4_CreateLiteral("0", true);
+>> P4_AddRepeatMinMax(grammar, ENTRY, ZERO, 4, 5);
+
+>> P4_Source* source = P4_Source("000", ENTRY);
+>> P4_Parse(grammar, source);
+P4_MatchError
+
+>> P4_Source* source = P4_Source("00000", ENTRY);
+>> P4_Parse(grammar, source);
+P4_Ok
+
+>> P4_Source* source = P4_Source("000000", ENTRY);
+>> P4_Parse(grammar, source);
+P4_MatchError
+```
+
 ## RepeatExact
+
+Analogy to RepeatExact is Regex `rule{n}`.
+
+Function `P4_AddRepeatExact` adds a repetition expression that repeat an expression for exact N times.
+It's equivalent to `P4_AddRepeatMinMax(grammar, id, N, N)`.
+
+```c
+>> P4_Expression* ZERO = P4_CreateLiteral("0", true);
+>> P4_AddRepeatMinMax(grammar, ENTRY, ZERO, 5);
+
+>> P4_Source* source = P4_Source("00000", ENTRY);
+>> P4_Parse(grammar, source);
+P4_Ok
+
+>> P4_Source* source = P4_Source("000000", ENTRY);
+>> P4_Parse(grammar, source);
+P4_MatchError
+```
 
 # Peppa PEG Flags
 
-## SQUASHED
+## `P4_FLAG_SQUASHED`
 
-## LIFTED
+If the expression has `P4_FLAG_SQUASHED`, it will create no children tokens.
 
-## TIGHT
+```c
+>> P4_Expression* entry = P4_GetGrammarRule(grammar, ENTRY);
+>> P4_SetExpressionFlag(entry, P4_FLAG_SQUASHED);
+```
 
-## SCOPED
+The flag takes effect on the descending expressions.
 
-## SPACED
+## `P4_FLAG_LIFTED`
 
-# Peppa PEG Tokens
+If the expression has `P4_FLAG_LIFTED`, it will omit creating the node but lift the children nodes to the node where it was supposed to reside in the AST.
 
-# Peppa PEG Built-in Rules
+```c
+>> P4_Expression* entry = P4_GetGrammarRule(grammar, ENTRY);
+>> P4_SetExpressionFlag(entry, P4_FLAG_LIFTED);
+```
 
-## SOI
+The flag takes effect on the expression only.
 
-## EOI
+## `P4_FLAG_SCOPED`
 
-## ASCII_LETTERS
+If the expression has `P4_FLAG_SCOPED`, it will immediately cancel `P4_FLAG_SQUASHED`'s effect and start creating children token.
 
-## ASCII_LOWER
+```c
+>> P4_Expression* entry = P4_GetGrammarRule(grammar, RULE);
+>> P4_SetExpressionFlag(entry, P4_FLAG_SCOPED);
+```
 
-## ASCII_UPPER
+## `P4_FLAG_SPACED`
 
-## DIGITS
+If the expression has `P4_FLAG_SPACED` flag, it can be injected between tokens generated from Sequence and Repeat expressions.
 
-## HEXDIGITS
+```c
+>> P4_AddChoice(grammar, WHITESPACE, 3);
+P4_Ok
+>> P4_Expression* ws = P4_GetGrammarRule(grammar, id);
+>> P4_SetMember(ws, 0, P4_CreateLiteral(" ", true));
+P4_Ok
+>> P4_SetMember(ws, 1, P4_CreateLiteral("\t", true));
+P4_Ok
+>> P4_SetMember(ws, 2, P4_CreateLiteral("\n", true));
+P4_Ok
+>> P4_SetExpressionFlag(ws, P4_FLAG_SPACED | P4_FLAG_LIFTED);
+```
 
-## OCTDIGITS
+In this example, the ENTRY rule can match "0 0 0", "0\t0\t0", "00\n0".
+For example, `P4_CreateZeroOrMore(P4_CreateLiteral("0", true))` 
 
-## PUNCTUATION
+```c
+>> P4_AddZeroOrMore(grammar, ENTRY, P4_CreateLiteral("0", true));
+P4_Ok
 
-## WHITESPACE
+>> P4_Source* source = P4_Source("0 0 0", ENTRY);
+>> P4_Parse(grammar, source);
+P4_Ok
+```
 
-## TODO
+## `P4_FLAG_TIGHT`
 
-- [ ] Print error messages for Human.
-- [ ] New Expression Kind: Numeric.
-- [ ] New Expression Kind: CharacterSet.
-- [ ] New Expression Kind: Complement.
-- [ ] New Expression Kind: Panic.
-- [ ] New Expression Kind: BackReference.
-- [ ] New Expression Kind: Function.
-- [ ] Specify joiner for Sequence and Repeat.
-- [ ] Run in VERBOSE mode.
-- [ ] Performance test.
-- [ ] Callbacks for P4_Token.
+When the expression has `P4_FLAG_SPACED` flag, no expression with `P4_FLAG_SPACED` flag will be injected.
+
+The flag only works for Sequence and Repeat (ZeroOrMore, ZeroOrOnce, OnceOrMore, RepeatExact, etc).
+
+```c
+>> P4_AddChoice(grammar, WHITESPACE, 3);
+P4_Ok
+>> P4_Expression* ws = P4_GetGrammarRule(grammar, WHITESPACE);
+>> P4_SetMember(ws, 0, P4_CreateLiteral(" ", true));
+P4_Ok
+>> P4_SetMember(ws, 1, P4_CreateLiteral("\t", true));
+P4_Ok
+>> P4_SetMember(ws, 2, P4_CreateLiteral("\n", true));
+P4_Ok
+>> P4_SetExpressionFlag(ws, P4_FLAG_SPACED | P4_FLAG_LIFTED);
+
+>> P4_AddZeroOrMore(grammar, ENTRY, P4_CreateLiteral("0", true));
+P4_Ok
+>> P4_Expression* entry = P4_GetGrammarRule(grammar, ENTRY);
+>> P4_SetExpressionFlag(entry, P4_FLAG_TIGHT);
+
+>> P4_Source* source = P4_Source("0 0 0", ENTRY);
+>> P4_Parse(grammar, source);
+P4_MatchError
+```
 
 # Peppy Packing Peppa PEG!
 

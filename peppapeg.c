@@ -129,6 +129,14 @@ is_tight(P4_Expression* e) {
     return (e->flag & P4_FLAG_TIGHT) != 0;
 }
 
+/*
+ * Determine if e is a tightness expr.
+ */
+static inline bool
+is_spaced(P4_Expression* e) {
+    return (e->flag & P4_FLAG_SPACED) != 0;
+}
+
 
 /*
  * Determine if e is a hollowness expr.
@@ -1192,60 +1200,71 @@ P4_Parse(P4_Grammar* grammar, P4_Source* source) {
 }
 
 P4_PUBLIC(P4_Error)
-P4_SetWhitespaces(P4_Grammar* g, P4_RuleID whitespace_rule_id, P4_RuleID comment_rule_id) {
-    P4_Expression* repeat = NULL;
+P4_SetWhitespaces(P4_Grammar* grammar) {
+    size_t          count = 0;
+    P4_RuleID       ids[2] = {0};
+    P4_Expression*  rules[2] = {0};
+    P4_Expression*  repeat = NULL;
 
-    size_t count = (whitespace_rule_id != 0) + (comment_rule_id != 0);
+    for EACH(rule, grammar->rules, grammar->count) {
+        if (is_spaced(rule)) {
+            ids[count] = rule->id;
+            rules[count] = P4_CreateReference(rule->id);
 
-    if (count == 0)
+            if (rules[count] == NULL)
+                goto end;
+
+            rules[count]->ref_expr = rule;
+
+            count++;
+        }
+
+        if (count > 1)
+            break;
+    }
+
+    if (count == 0) {
         return P4_Ok;
 
-    if (whitespace_rule_id != 0) {
-        g->whitespace = P4_CreateReference(whitespace_rule_id);
-        if (g->whitespace == NULL)
-            goto end;
-        g->whitespace->ref_expr = P4_GetGrammarRule(g, whitespace_rule_id);
-    }
+    } else if (count == 1) {
+        repeat = rules[0];
 
-    if (comment_rule_id != 0) {
-        g->comment = P4_CreateReference(comment_rule_id);
-        if (g->comment == NULL)
-            goto end;
-        g->comment->ref_expr = P4_GetGrammarRule(g, whitespace_rule_id);
-    }
-
-    if (count == 1 && whitespace_rule_id != 0)
-        repeat = g->whitespace;
-
-    else if (count == 1 && comment_rule_id != 0)
-        repeat = g->comment;
-
-    else if (count == 2) {
-        repeat = P4_CreateChoice(2, g->whitespace, g->comment);
+    } else if (count == 2) {
+        repeat = P4_CreateChoice(2);
         if (repeat == NULL)
             goto end;
+        if (P4_SetMember(repeat, 0, rules[0]) != P4_Ok)
+            goto end;
+        if (P4_SetMember(repeat, 1, rules[1]) != P4_Ok)
+            goto end;
     }
 
-    if ((g->implicit_whitespace = P4_CreateZeroOrMore(repeat))== NULL)
+    if ((grammar->implicit_whitespace = P4_CreateZeroOrMore(repeat))== NULL)
         goto end;
 
     return P4_Ok;
 
 end:
-    if (g->comment)
-        free(g->comment); // TODO: change to delete expression
+    if (rules[0] != NULL)
+        free(rules[0]); // TODO: change to delete expression
 
-    if (g->whitespace)
-        free(g->whitespace); // TODO: change to delete expression
+    if (rules[1] != NULL)
+        free(rules[1]); // TODO: change to delete expression
 
-    if (g->implicit_whitespace)
-        free(g->implicit_whitespace); // TODO: change to delete expression.
+    if (grammar->implicit_whitespace != NULL)
+        free(grammar->implicit_whitespace); // TODO: change to delete expression.
 
     return P4_MemoryError;
 }
 
 P4_PUBLIC(P4_Expression*) P4_GetWhitespaces(P4_Grammar* g) {
-    return g == NULL ? NULL : g->implicit_whitespace;
+    if (g == NULL)
+        return NULL;
+
+    if (g->implicit_whitespace == NULL) // TODO: need cache for the case when whitespace is NULL.
+        P4_SetWhitespaces(g);
+
+    return g->implicit_whitespace;
 }
 
 P4_PUBLIC(void)

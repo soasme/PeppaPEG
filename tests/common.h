@@ -32,4 +32,26 @@ void TEST_ASSERT_EQUAL_TOKEN_RULE(P4_RuleID id, P4_Token* token) {
     TEST_ASSERT_EQUAL_UINT(id, token->expr->id);
 }
 
+void TEST_ADD_WHITESPACE(P4_Grammar* grammar, P4_RuleID id) {
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddChoice(grammar, id, 3)
+    );
+    P4_Expression* ws = P4_GetGrammarRule(grammar, id);
+    TEST_ASSERT_NOT_NULL(ws);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_SetMember(ws, 0, P4_CreateLiteral(" ", true))
+    );
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_SetMember(ws, 1, P4_CreateLiteral("\t", true))
+    );
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_SetMember(ws, 2, P4_CreateLiteral("\n", true))
+    );
+    P4_SetExpressionFlag(ws, P4_FLAG_SPACED | P4_FLAG_LIFTED);
+}
+
 # endif

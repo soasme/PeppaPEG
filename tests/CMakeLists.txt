@@ -13,6 +13,7 @@ set(
     test_positive
     test_negative
     test_repeat
+    test_flags
 )
 
 foreach(unity_testcase ${unity_testcases})

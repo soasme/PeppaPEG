@@ -33,6 +33,7 @@ Ultra lightweight PEG Parser in ANSI C. ✨ 🐷 ✨.
   * [`P4_FLAG_SPACED`](#p4_flag_spaced)
   * [`P4_FLAG_TIGHT`](#p4_flag_tight)
 * [Peppy Hacking Peppa PEG!](peppy-hacking-peppa-peg)
+  * [Test](#test)
 
 # Hello, There!
 
@@ -713,5 +714,16 @@ P4_MatchError
 ```
 
 # Peppy Hacking Peppa PEG!
+
+## Test
+
+Assume you have `cmake` and `gcc` installed.
+
+```bash
+$ cmake .
+$ make check
+...
+100% tests passed, 0 tests failed
+```
 
 Made with ❤️  by [Ju Lin](https://github.com/soasme).

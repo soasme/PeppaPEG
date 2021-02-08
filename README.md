@@ -37,7 +37,10 @@ Ultra lightweight PEG Parser in ANSI C. ✨ 🐷 ✨.
 
 # Hello, There!
 
-Want to parse a programming language using PEG? Use Peppa PEG!
+[PEG], or parsing expression grammar, describes a programming language using rules.
+In human words, it's for parsing programming languages.
+
+Peppa PEG is an ultra lightweight PEG parser in ANSI C.
 
 WARNING: Peppa PEG hasn't been benchmarked and has not been widely used. Use at your own risk!
 
@@ -64,23 +67,20 @@ Just count how many `P`s there are in the library name `Peppa PEG`!
 
 In this example, we'll create a grammar with one literal rule matching "Hello World", and let the grammar parse the string "Hello World".
 
-Struct `P4_Grammar` represents a grammar of many PEG rules.
-
-You can create such a data structure using `P4_CreateGrammar`.
+In Peppa PEG, we always start with the struct `P4_Grammar`, which represents a grammar of many PEG rules.
+We can create such a data structure using `P4_CreateGrammar`.
 
 ```c
 P4_Grammar* grammar = P4_CreateGrammar();
 ```
 
-Each PEG rule is a `P4_Expression` struct.
-
-* Function `P4_CreateLiteral` creates a literal rule. The parameter `true` indicates the rule being case sensitive.
+Each PEG rule is a `P4_Expression` struct. For example, function `P4_CreateLiteral` creates a case-insensitive literal rule.
 
 ```c
 P4_Expression* rule = P4_CreateLiteral("Hello World", false);
 ```
 
-Once done, associate the rule with an integer ID to the grammar.
+Once done, add the rule to the grammar with an integer ID. The ID should be greater than 0.
 
 ```c
 # define HW_ID 1
@@ -88,7 +88,8 @@ Once done, associate the rule with an integer ID to the grammar.
 P4_AddGrammarRule(grammar, HW_ID, rule);
 ```
 
-To make it easier, `P4_CreateLiteral` and `P4_AddGrammarRule` can be merged into one single call `P4_AddLiteral`.
+To make our lift easier, `P4_CreateLiteral` and `P4_AddGrammarRule` can be combined into one call `P4_AddLiteral`.
+This trick works for all the other [Rules](#peppa-peg-rules), such as `P4_AddRange`, `P4_AddSequence`, etc.
 
 ```c
 # define HW_ID 1
@@ -96,17 +97,25 @@ To make it easier, `P4_CreateLiteral` and `P4_AddGrammarRule` can be merged into
 P4_AddLiteral(grammar, HW_ID, "Hello World", false);
 ```
 
-Next, you need to wrap up the source string in to a data structure `P4_Source`.
+You may have seen a similar definition like below in a declarative way.
 
-* Function `P4_CreateSource` returns a `P4_Source` struct. Except the source string, you also specify the rule ID, which decided the exact rule to apply when parsing.
+```
+HW <- i"Hello World"
+```
+
+However, in Peppa PEG, we define rules in an imperative coding style. Yeah, pretty old school. ;)
+
+Next, we need to wrap the source string into a data structure `P4_Source`.
+
+Function `P4_CreateSource` returns a `P4_Source` struct. It needs two parameters: the source string and the entry rule ID.
 
 ```c
 P4_Source*  source = P4_CreateSource("Hello World", HW_ID);
 ```
 
-Now the stage is setup. All you need to do is to parse it and check the result.
-If everything is all right, it gives you a zero error code `P4_Ok`,
-otherwise other `P4_Error` codes.
+Now the stage is setup. All we need to do is to parse the source by calling `P4_Parse`.
+If everything is all right, it gives us a zero error code `P4_Ok`,
+otherwise other `P4_Error`, such as `P4_MatchError`, `P4_MemoryError`, etc.
 
 ```c
 if (P4_Parse(grammar, source) != P4_Ok) {
@@ -115,21 +124,35 @@ if (P4_Parse(grammar, source) != P4_Ok) {
 }
 ```
 
-The parsed result is an AST (abstract syntax tree), and each node in the
-AST is a `P4_Token` struct.
+Struct `P4_Source` keeps the parsed result as an AST (abstract syntax tree).
+Each node in the AST is a `P4_Token` struct.
 
-* Function `P4_GetSourceAst` gives you the root node of the AST. You may traverse the AST and do your homework now.
-  * `node->head` is the first children AST node.
-  * `node->tail` is the last children AST node.
-  * `node->next` is the next sibling AST node.
-  * `node->slice.i` is the start position in the source string that the node covers.
-  * `node->slice.j` is the end position in the source string that the node covers.
-
-In this example, `root->head`, `root->tail` and `root->next` are all NULL due to having only one rule and `root->slice` is `[0, strlen("Hello World")]`.
+Function `P4_GetSourceAst` returns the root node of the AST.
 
 ```c
 P4_Token* root = P4_GetSourceAst(source);
 // traverse: root->next, root->head, root->tail
+```
+
+To traverse the AST,
+
+* `node->head` is the first children AST node.
+* `node->tail` is the last children AST node.
+* `node->next` is the next sibling AST node.
+* `node->slice.i` is the start position in the source string that the node covers.
+* `node->slice.j` is the end position in the source string that the node covers.
+* Function `P4_CopyTokenString` returns the string the AST node covers. Note that it's our responsibility to free the string when finished.
+
+```c
+char*       text = P4_CopyTokenString(root);
+
+printf("root span: [%lu %lu]\n", root->slice.i, root->slice.j);
+printf("root next: %p\n", root->next);
+printf("root head: %p\n", root->head);
+printf("root tail: %p\n", root->tail);
+printf("root text: %s\n", text);
+
+free(text);
 ```
 
 Last but not least, don't forget cleaning things up.
@@ -179,11 +202,15 @@ int main(int argc, char* argv[]) {
     }
 
     P4_Token*   root = P4_GetSourceAst(source);
+    char*       text = P4_CopyTokenString(root);
+
     printf("root span: [%lu %lu]\n", root->slice.i, root->slice.j);
     printf("root next: %p\n", root->next);
     printf("root head: %p\n", root->head);
     printf("root tail: %p\n", root->tail);
+    printf("root text: %s\n", text);
 
+    free(text);
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
 
@@ -230,7 +257,7 @@ P4_MatchError
 
 ## Case Insensitive Literal
 
-Case Insensitive Literal matches the same ignoring the cases.
+Case Insensitive Literal matches the same string but ignoring the cases.
 When adding the literal rule, set `sensitive=false`.
 
 The `sensitive` option only works for ASCII letters (a-z, A-Z).
@@ -246,12 +273,12 @@ P4_Ok
 
 >> P4_Source* source = P4_Parse("CASE SENSITIVE", ID);
 >> P4_Parse(grammar, source);
-P4_Ok
+P4_MatchError
 ```
 
 ## Range
 
-Range matches a character that falls between lower and upper code points.
+Range matches a character that falls between the lower and upper characters.
 
 In this example we match an ASCII digit.
 
@@ -729,3 +756,5 @@ $ make check
 ```
 
 Made with ❤️  by [Ju Lin](https://github.com/soasme).
+
+[PEG]: https://en.wikipedia.org/wiki/Parsing_expression_grammar

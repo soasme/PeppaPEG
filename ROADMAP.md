@@ -11,4 +11,8 @@
 - [ ] Performance test.
 - [ ] Callbacks for P4_Token.
 - [ ] Add traverse functions for Tokens.
+- [ ] Add Flag Set/Unset functions.
 - [ ] Add Valgrind to the tests.
+- [ ] Allow replacing malloc/free functions.
+- [ ] Python Binding.
+- [x] ~~Flag SPACED.~~ Added in v1.0.0.

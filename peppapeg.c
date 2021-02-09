@@ -665,12 +665,14 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
                             || (k)==P4_Negative)
 
     // when expression inside repetition is non-progressing, it repeats indefinitely.
-    // let's prevent such a case.
+    // we know negative/positive definitely not progressing,
+    // and so does a reference to a negative/positive rule.
+    // Question: we may never list all the cases in this way. How to deal with it better?
     if (IS_PROGRESSING(e->repeat_expr->kind) ||
             (IS_REF(e->repeat_expr)
              && IS_PROGRESSING(P4_GetReference(s, e->repeat_expr)->kind))) {
         P4_RaiseError(s, P4_AdvanceError, "no progressing in repetition");
-        return NULL; // TODO: need to handle SOI as well. pest.rs incurs OOM for SOI+.
+        return NULL;
     }
 
     min = e->repeat_min;
@@ -682,8 +684,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     while (*P4_RemainingText(s) != '\0') {
         P4_MarkPosition(s, before_implicit);
 
-        // implicit `WHITESPACE` and `COMMENT` are inserted
-        // between every repetition.
+        // SPACED rule expressions are inserted between every repetition.
         if (P4_NeedLoosen(s, e)
                 && repeated > 0 ) {
             whitespace = P4_MatchSpacedExpressions(s, NULL);
@@ -1211,7 +1212,8 @@ P4_AddGrammarRule(P4_Grammar* grammar, P4_RuleID id, P4_Expression* expr) {
     return grammar->count;
 }
 
-P4_PUBLIC(P4_Source*)    P4_CreateSource(P4_String content, P4_RuleID rule_id) {
+P4_PUBLIC(P4_Source*)
+P4_CreateSource(P4_String content, P4_RuleID rule_id) {
     P4_Source* source = malloc(sizeof(P4_Source));
     source->content = content;
     source->rule_id = rule_id;
@@ -1225,7 +1227,8 @@ P4_PUBLIC(P4_Source*)    P4_CreateSource(P4_String content, P4_RuleID rule_id) {
     return source;
 }
 
-P4_PUBLIC(void)          P4_DeleteSource(P4_Source* source) {
+P4_PUBLIC(void)
+P4_DeleteSource(P4_Source* source) {
     if (source == NULL)
         return;
 
@@ -1241,7 +1244,8 @@ P4_PUBLIC(void)          P4_DeleteSource(P4_Source* source) {
     free(source);
 }
 
-P4_PUBLIC(P4_Token*)     P4_GetSourceAst(P4_Source* source) {
+P4_PUBLIC(P4_Token*)
+P4_GetSourceAst(P4_Source* source) {
     return source->root;
 }
 
@@ -1261,6 +1265,31 @@ P4_Parse(P4_Grammar* grammar, P4_Source* source) {
     source->root            = tok;
 
     return source->err;
+}
+
+
+P4_PUBLIC(bool)
+P4_HasError(P4_Source* src) {
+    if (src == NULL)
+        return false;
+
+    return src->err != P4_Ok;
+}
+
+P4_PUBLIC(P4_Error)
+P4_GetError(P4_Source* source) {
+    if (source == NULL)
+        return P4_NullError;
+
+    return source->err;
+}
+
+P4_PUBLIC(P4_String)
+P4_GetErrorMessage(P4_Source* source) {
+    if (source == NULL || source->errmsg == NULL)
+        return NULL;
+
+    return strdup(source->errmsg);
 }
 
 P4_PRIVATE(P4_Error)

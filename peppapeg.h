@@ -319,6 +319,7 @@ P4_PUBLIC(P4_Error)       P4_AddRepeatExact(P4_Grammar*, P4_RuleID, P4_Expressio
 
 P4_PUBLIC(void)           P4_DeleteGrammarRule(P4_Grammar*, P4_RuleID);
 P4_PUBLIC(P4_Expression*) P4_GetGrammarRule(P4_Grammar*, P4_RuleID);
+P4_PUBLIC(P4_Error)       P4_SetGrammarRuleFlag(P4_Grammar*, P4_RuleID, P4_ExpressionFlag);
 
 P4_PUBLIC(P4_Source*)     P4_CreateSource(P4_String, P4_RuleID);
 P4_PUBLIC(void)           P4_DeleteSource(P4_Source*);

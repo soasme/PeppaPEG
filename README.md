@@ -718,8 +718,7 @@ P4_MatchError
 If the expression has `P4_FLAG_SQUASHED`, it will create no children tokens.
 
 ```c
->> P4_Expression* entry = P4_GetGrammarRule(grammar, ENTRY);
->> P4_SetExpressionFlag(entry, P4_FLAG_SQUASHED);
+>> P4_SetGrammarRuleFlag(grammar, ENTRY, P4_FLAG_SQUASHED);
 ```
 
 The flag takes effect on the descending expressions.
@@ -729,8 +728,7 @@ The flag takes effect on the descending expressions.
 If the expression has `P4_FLAG_LIFTED`, it will omit creating the node but lift the children nodes to the node where it was supposed to reside in the AST.
 
 ```c
->> P4_Expression* entry = P4_GetGrammarRule(grammar, ENTRY);
->> P4_SetExpressionFlag(entry, P4_FLAG_LIFTED);
+>> P4_SetGrammarRuleFlag(grammar, ENTRY, P4_FLAG_LIFTED);
 ```
 
 The flag takes effect on the expression only.
@@ -740,8 +738,7 @@ The flag takes effect on the expression only.
 If the expression has `P4_FLAG_SCOPED`, it will immediately cancel `P4_FLAG_SQUASHED`'s effect and start creating children token.
 
 ```c
->> P4_Expression* entry = P4_GetGrammarRule(grammar, RULE);
->> P4_SetExpressionFlag(entry, P4_FLAG_SCOPED);
+>> P4_SetGrammarRuleFlag(grammar, ENTRY, P4_FLAG_SCOPED);
 ```
 
 ## `P4_FLAG_SPACED`
@@ -749,16 +746,14 @@ If the expression has `P4_FLAG_SCOPED`, it will immediately cancel `P4_FLAG_SQUA
 If the expression has `P4_FLAG_SPACED` flag, it can be injected between tokens generated from Sequence and Repeat expressions.
 
 ```c
->> P4_AddChoice(grammar, WHITESPACE, 3);
+>> P4_AddChoiceWithMembers(grammar, WHITESPACE, 3,
+..  P4_CreateLiteral(" ", true),
+..  P4_CreateLiteral("\t", true),
+..  P4_CreateLiteral("\n", true)
+.. );
 P4_Ok
->> P4_Expression* ws = P4_GetGrammarRule(grammar, id);
->> P4_SetMember(ws, 0, P4_CreateLiteral(" ", true));
+>> P4_SetGrammarRuleFlag(grammar, WHITESPACE, P4_FLAG_SPACED | P4_FLAG_LIFTED);
 P4_Ok
->> P4_SetMember(ws, 1, P4_CreateLiteral("\t", true));
-P4_Ok
->> P4_SetMember(ws, 2, P4_CreateLiteral("\n", true));
-P4_Ok
->> P4_SetExpressionFlag(ws, P4_FLAG_SPACED | P4_FLAG_LIFTED);
 ```
 
 In this example, the ENTRY rule can match "0 0 0", "0\t0\t0", "00\n0".
@@ -780,21 +775,18 @@ When the expression has `P4_FLAG_SPACED` flag, no expression with `P4_FLAG_SPACE
 The flag only works for Sequence and Repeat (ZeroOrMore, ZeroOrOnce, OnceOrMore, RepeatExact, etc).
 
 ```c
->> P4_AddChoice(grammar, WHITESPACE, 3);
+>> P4_AddChoiceWithMembers(grammar, WHITESPACE, 3,
+..  P4_CreateLiteral(" ", true),
+..  P4_CreateLiteral("\t", true),
+..  P4_CreateLiteral("\n", true)
+.. );
 P4_Ok
->> P4_Expression* ws = P4_GetGrammarRule(grammar, WHITESPACE);
->> P4_SetMember(ws, 0, P4_CreateLiteral(" ", true));
+>> P4_SetGrammarRuleFlag(grammar, WHITESPACE, P4_FLAG_SPACED | P4_FLAG_LIFTED);
 P4_Ok
->> P4_SetMember(ws, 1, P4_CreateLiteral("\t", true));
-P4_Ok
->> P4_SetMember(ws, 2, P4_CreateLiteral("\n", true));
-P4_Ok
->> P4_SetExpressionFlag(ws, P4_FLAG_SPACED | P4_FLAG_LIFTED);
 
 >> P4_AddZeroOrMore(grammar, ENTRY, P4_CreateLiteral("0", true));
 P4_Ok
->> P4_Expression* entry = P4_GetGrammarRule(grammar, ENTRY);
->> P4_SetExpressionFlag(entry, P4_FLAG_TIGHT);
+>> P4_SetGrammarRuleFlag(grammar, ENTRY, P4_FLAG_TIGHT);
 
 >> P4_Source* source = P4_Source("0 0 0", ENTRY);
 >> P4_Parse(grammar, source);

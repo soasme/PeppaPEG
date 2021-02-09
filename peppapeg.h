@@ -320,10 +320,6 @@ P4_PUBLIC(P4_Error)       P4_AddRepeatExact(P4_Grammar*, P4_RuleID, P4_Expressio
 P4_PUBLIC(void)           P4_DeleteGrammarRule(P4_Grammar*, P4_RuleID);
 P4_PUBLIC(P4_Expression*) P4_GetGrammarRule(P4_Grammar*, P4_RuleID);
 
-P4_PUBLIC(bool)           P4_HasError(P4_Grammar*);
-P4_PUBLIC(P4_String)      P4_PrintError(P4_Grammar*);
-P4_PUBLIC(void)           P4_SetError(P4_Grammar*, P4_Error, P4_String);
-
 P4_PUBLIC(P4_Source*)     P4_CreateSource(P4_String, P4_RuleID);
 P4_PUBLIC(void)           P4_DeleteSource(P4_Source*);
 
@@ -332,11 +328,12 @@ P4_PUBLIC(void)           P4_PrintSourceAst(P4_Token*, P4_String, size_t);
 
 P4_PUBLIC(P4_Error)       P4_Parse(P4_Grammar*, P4_Source*);
 
-P4_PUBLIC(void)           P4_GrammarReset(P4_Grammar*);
+P4_PUBLIC(bool)           P4_HasError(P4_Source*);
+P4_PUBLIC(P4_Error)       P4_GetError(P4_Source*);
+P4_PUBLIC(P4_String)      P4_GetErrorMessage(P4_Source*);
 
 P4_PUBLIC(P4_Token*)      P4_CreateToken(P4_String, size_t, size_t, P4_Expression*);
 P4_PUBLIC(void)           P4_DeleteToken(P4_Token*);
-P4_PUBLIC(void)           P4_AppendToken(P4_Token*, P4_Token*);
 P4_PUBLIC(P4_Slice*)      P4_GetTokenSlice(P4_Token*);
 P4_PUBLIC(P4_String)      P4_CopyTokenString(P4_Token*);
 

@@ -250,7 +250,7 @@ When adding the literal rule, set `sensitive=true`.
 >> P4_AddLiteral(grammar, ENTRY , "Case Sensitive", true);
 P4_Ok
 
->> P4_Source* source = P4_Source("CASE SENSITIVE", ENTRY );
+>> P4_Source* source = P4_Source("Case Sensitive", ENTRY );
 >> P4_Parse(grammar, source);
 P4_Ok
 

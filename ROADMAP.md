@@ -1,21 +1,23 @@
 # ROADMAP
 
 - [ ] Print error messages for Human.
+- [ ] Report line num & col.
+- [ ] Run in VERBOSE mode.
+- [ ] Performance test.
+- [ ] Add traverse functions for Tokens.
+- [ ] Callbacks for P4_Token.
+- [ ] INI parser example.
+- [ ] Add Valgrind to the tests.
 - [ ] New Expression Kind: Numeric.
 - [ ] New Expression Kind: CharacterSet.
 - [ ] New Expression Kind: Complement.
 - [ ] New Expression Kind: Panic.
 - [ ] New Expression Kind: BackReference.
 - [ ] New Expression Kind: Function.
-- [ ] Run in VERBOSE mode.
-- [ ] Performance test.
-- [ ] Callbacks for P4_Token.
-- [ ] Add traverse functions for Tokens.
-- [ ] Add Valgrind to the tests.
-- [ ] Allow replacing malloc/free functions.
 - [ ] Stop on first error v/s Recover from Panic.
+- [ ] Allow replacing malloc/free functions.
 - [ ] New Source Flag: Support UTF-8 BOM sequence (0xEF 0xBB 0xBF) at the start of source.
-- [ ] Report line num & col.
 - [ ] Python Binding.
+- [ ] NeedLoosen, NeedSquash, NeedLift should be well-tested.
 - [?] Add Flag Set/Unset functions. #1.
 - [x] ~~Flag SPACED.~~ Added in v1.0.0.

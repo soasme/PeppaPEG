@@ -36,6 +36,7 @@ Ultra lightweight PEG Parser in ANSI C. ✨ 🐷 ✨.
   * [`P4_FLAG_TIGHT`](#p4_flag_tight)
 * [Peppy Hacking Peppa PEG!](peppy-hacking-peppa-peg)
   * [Test](#test)
+  * [Examples](#examples)
 
 # Hello, There!
 
@@ -812,6 +813,10 @@ $ make check
 ...
 100% tests passed, 0 tests failed
 ```
+
+## Examples
+
+* Write an INI Parser using Peppa PEG: [ini.h](examples/ini.h), [ini.c](examples/ini.c).
 
 Made with ❤️  by [Ju Lin](https://github.com/soasme).
 

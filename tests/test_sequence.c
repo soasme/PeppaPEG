@@ -15,23 +15,11 @@ P4_PRIVATE(void) test_match_literal_sequence_successfully(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddSequence(grammar, ENTRY, 3)
-    );
-
-    P4_Expression* e1 = P4_GetGrammarRule(grammar, ENTRY);
-    TEST_ASSERT_NOT_NULL(e1);
-
-    TEST_ASSERT_EQUAL(
-        P4_Ok,
-        P4_SetMember(e1, 0, P4_CreateLiteral("你好", true))
-    );
-    TEST_ASSERT_EQUAL(
-        P4_Ok,
-        P4_SetMember(e1, 1, P4_CreateLiteral(" ", true))
-    );
-    TEST_ASSERT_EQUAL(
-        P4_Ok,
-        P4_SetMember(e1, 2, P4_CreateLiteral("WORLD", true))
+        P4_AddSequenceWithMembers(grammar, ENTRY, 3,
+            P4_CreateLiteral("你好", true),
+            P4_CreateLiteral(" ", true),
+            P4_CreateLiteral("WORLD", true)
+        )
     );
 
     P4_Source* source = P4_CreateSource("你好 WORLD", ENTRY);
@@ -71,23 +59,11 @@ P4_PRIVATE(void) test_match_literal_sequence_partially_raise_match_error(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddSequence(grammar, ENTRY, 3)
-    );
-
-    P4_Expression* e1 = P4_GetGrammarRule(grammar, ENTRY);
-    TEST_ASSERT_NOT_NULL(e1);
-
-    TEST_ASSERT_EQUAL(
-        P4_Ok,
-        P4_SetMember(e1, 0, P4_CreateLiteral("你好", true))
-    );
-    TEST_ASSERT_EQUAL(
-        P4_Ok,
-        P4_SetMember(e1, 1, P4_CreateLiteral(" ", true))
-    );
-    TEST_ASSERT_EQUAL(
-        P4_Ok,
-        P4_SetMember(e1, 2, P4_CreateLiteral("WORLD", true))
+        P4_AddSequenceWithMembers(grammar, ENTRY, 3,
+            P4_CreateLiteral("你好", true),
+            P4_CreateLiteral(" ", true),
+            P4_CreateLiteral("WORLD", true)
+        )
     );
 
     P4_Source* source = P4_CreateSource("你好 ", ENTRY);
@@ -120,23 +96,11 @@ P4_PRIVATE(void) test_match_literal_sequence_having_member_nomatch_raise_match_e
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddSequence(grammar, ENTRY, 3)
-    );
-
-    P4_Expression* e1 = P4_GetGrammarRule(grammar, ENTRY);
-    TEST_ASSERT_NOT_NULL(e1);
-
-    TEST_ASSERT_EQUAL(
-        P4_Ok,
-        P4_SetMember(e1, 0, P4_CreateLiteral("你好", true))
-    );
-    TEST_ASSERT_EQUAL(
-        P4_Ok,
-        P4_SetMember(e1, 1, P4_CreateLiteral(" ", true))
-    );
-    TEST_ASSERT_EQUAL(
-        P4_Ok,
-        P4_SetMember(e1, 2, P4_CreateLiteral("WORLD", true))
+        P4_AddSequenceWithMembers(grammar, ENTRY, 3,
+            P4_CreateLiteral("你好", true),
+            P4_CreateLiteral(" ", true),
+            P4_CreateLiteral("WORLD", true)
+        )
     );
 
     P4_Source* source = P4_CreateSource("你好 WORL", ENTRY);
@@ -171,22 +135,15 @@ P4_PRIVATE(void) test_match_reference_in_sequence_successfully(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddSequence(grammar, ENTRY, 2)
-    );
-    P4_Expression* entry = P4_GetGrammarRule(grammar, ENTRY);
-    TEST_ASSERT_EQUAL(
-        P4_Ok,
-        P4_SetReferenceMember(entry, 0, R1)
-    );
-    TEST_ASSERT_EQUAL(
-        P4_Ok,
-        P4_SetReferenceMember(entry, 1, R1)
+        P4_AddSequenceWithMembers(grammar, ENTRY, 2,
+            P4_CreateReference(R1),
+            P4_CreateReference(R1)
+        )
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,
         P4_AddLiteral(grammar, R1, "OLA", false)
     );
-    P4_Expression* r1 = P4_GetGrammarRule(grammar, R1);
 
     P4_Source* source = P4_CreateSource("OLAola", ENTRY);
     TEST_ASSERT_NOT_NULL(source);

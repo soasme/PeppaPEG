@@ -228,10 +228,12 @@ Let's explore more Peppa PEG Rules.
 The Literal rule supports parsing UTF-8 strings.
 
 ```c
->> P4_AddLiteral(grammar, ID, "你好, WORLD", true);
+// ENTRY <- "你好, WORLD"
+
+>> P4_AddLiteral(grammar, ENTRY, "你好, WORLD", true);
 P4_Ok
 
->> P4_Source* source = P4_Source("你好, WORLD", ID);
+>> P4_Source* source = P4_Source("你好, WORLD", ENTRY);
 >> P4_Parse(grammar, source);
 P4_Ok
 ```
@@ -242,15 +244,17 @@ Case Sensitive literal matches the exact same string.
 When adding the literal rule, set `sensitive=true`.
 
 ```c
+// ENTRY <- "Case Sensitive"
+
 //                                              sensitive
->> P4_AddLiteral(grammar, ID, "Case Sensitive", true);
+>> P4_AddLiteral(grammar, ENTRY , "Case Sensitive", true);
 P4_Ok
 
->> P4_Source* source = P4_Source("CASE SENSITIVE", ID);
+>> P4_Source* source = P4_Source("CASE SENSITIVE", ENTRY );
 >> P4_Parse(grammar, source);
 P4_Ok
 
->> P4_Source* source = P4_Parse("CASE SENSITIVE", ID);
+>> P4_Source* source = P4_Parse("CASE SENSITIVE", ENTRY );
 >> P4_Parse(grammar, source);
 P4_MatchError
 ```
@@ -263,15 +267,17 @@ When adding the literal rule, set `sensitive=false`.
 The `sensitive` option only works for ASCII letters (a-z, A-Z).
 
 ```c
+// ENTRY <- i"Case Insensitive"
+
 //                                                    sensitive
->> P4_AddLiteral(grammar,     ID, "Case Insensitive", false);
+>> P4_AddLiteral(grammar,  ENTRY, "Case Insensitive", false);
 P4_Ok
 
->> P4_Source* source = P4_Source("CASE INSENSITIVE", ID);
+>> P4_Source* source = P4_Source("CASE INSENSITIVE", ENTRY);
 >> P4_Parse(grammar, source);
 P4_Ok
 
->> P4_Source* source = P4_Parse("CASE SENSITIVE", ID);
+>> P4_Source* source = P4_Parse("CASE SENSITIVE", ENTRY);
 >> P4_Parse(grammar, source);
 P4_MatchError
 ```
@@ -283,11 +289,13 @@ Range matches a character that falls between the lower and upper characters.
 In this example we match an ASCII digit.
 
 ```c
-//                            lower     upper
->> P4_AddLiteral(grammar, ID, '0',      '9');
+// ENTRY <- [0-9]
+
+//                               lower     upper
+>> P4_AddLiteral(grammar, ENTRY, '0',      '9');
 P4_Ok
 
->> P4_Source* source = P4_Source("0", ID);
+>> P4_Source* source = P4_Source("0", ENTRY);
 >> P4_Parse(grammar, source);
 P4_Ok
 ```
@@ -297,15 +305,17 @@ Range supports UTF-8 characters.
 In this example we match code points from `U+4E00` to `U+9FCC`, e.g. CJK unified ideographs block. ([好](https://zh.m.wiktionary.org/zh/%E5%A5%BD) is `U+597D`.)
 
 ```c
-//                            lower     upper
->> P4_AddLiteral(grammar, ID, 0x4E00,   0x9FFF);
+// ENTRY <- [0x4E00-0x9FFF]
+
+//                               lower     upper
+>> P4_AddLiteral(grammar, ENTRY, 0x4E00,   0x9FFF);
 P4_Ok
 
->> P4_Source* source = P4_Source("好", ID);
+>> P4_Source* source = P4_Source("好", ENTRY);
 >> P4_Parse(grammar, source);
 P4_Ok
 
->> P4_Source* source = P4_Source("Good", ID);
+>> P4_Source* source = P4_Source("Good", ENTRY);
 >> P4_Parse(grammar, source);
 P4_MatchError
 ```
@@ -318,25 +328,46 @@ When applying the Sequence rule to text, the first sequence member is attempted.
 If the attempt succeeds, the second sequence member is attempted, so on and on.
 If any one of the attempts fails, the Sequence rule fails.
 
-An analogy to Sequence is logic operator `and`.
+* Function `P4_CreateSequence` creates a sequence. Example: `P4_CreateSequence(3)`.
+  * Function `P4_SetMember` set the member at the exact location. Example: `P4_SetMember(expr, 2, P4_CreateLiteral("HELLO", true))`.
+* Function `P4_CreateSequenceWithMembers` combines `P4_CreateSequence` and `P4_SetMember`.
+* Function `P4_AddSequence` adds a sequence to grammar rule set.
+* Function `P4_AddSequenceWithMembers` adds a sequence along with all the members to grammar rule set.
 
 In this example, we wrap up three literals into a Sequence.
 
-* You need to specify `size=3` when calling `P4_AddSequence`.
-* You need to specify the exact offset `0`, `1`, `2` when calling `P4_SetMember`. WARNING: Resetting member at offset may lead to memory leak. Be cautious.
+```c
+// ENTRY <- "HELLO" " " "WORLD"
+
+>> P4_AddSequence(grammar, ENTRY, 3);
+P4_Ok
+>> P4_Expression entry = P4_GetGrammarRule(grammar, ENTRY);
+>> P4_SetMember(entry, 0, P4_CreateLiteral("HELLO", true));
+P4_Ok
+>> P4_SetMember(entry, 1, P4_CreateLiteral(" ", true));
+P4_Ok
+>> P4_SetMember(entry, 2, P4_CreateLiteral("WORLD", true));
+P4_Ok
+
+>> P4_Source* source = P4_Source("HELLO WORLD", ENTRY);
+>> P4_Parse(grammar, source);
+P4_Ok
+```
+
+It's equivalent to the below version:
 
 ```c
->> P4_AddSequence(grammar, ID, 3);
-P4_Ok
->> P4_Expression exprID = P4_GetGrammarRule(grammar, ID);
->> P4_SetMember(exprID, 0, P4_CreateLiteral("HELLO", true));
-P4_Ok
->> P4_SetMember(exprID, 1, P4_CreateLiteral(" ", true));
-P4_Ok
->> P4_SetMember(exprID, 2, P4_CreateLiteral("WORLD", true));
+>> P4_AddSequenceWithMembers(
+..   grammar,
+..   ENTRY,
+..   3,
+..   P4_CreateLiteral("HELLO", true),
+..   P4_CreateLiteral(" ", true),
+..   P4_CreateLiteral("WORLD", true)
+.. );
 P4_Ok
 
->> P4_Source* source = P4_Source("HELLO WORLD", ID);
+>> P4_Source* source = P4_Source("HELLO WORLD", ENTRY);
 >> P4_Parse(grammar, source);
 P4_Ok
 ```
@@ -344,7 +375,7 @@ P4_Ok
 Match fails when any inner rule not matching successfully.
 
 ```c
->> P4_Source* source = P4_Source("HELLO ", ID);
+>> P4_Source* source = P4_Source("HELLO ", ENTRY);
 >> P4_Parse(grammar, source);
 P4_MatchError
 ```
@@ -352,11 +383,12 @@ P4_MatchError
 Match fails when not all inner rules matching the input.
 
 ```c
->> P4_Source* source = P4_Source("HELLO WORL", ID);
+>> P4_Source* source = P4_Source("HELLO WORL", ENTRY);
 >> P4_Parse(grammar, source);
 P4_MatchError
 ```
 
+Note that Sequence "owns" the members so `P4_DeleteExpression(sequence)` will free all members as well. Don't free the members by yourself!
 
 ## Choice
 
@@ -368,34 +400,60 @@ If any one of the attempts succeeds, the Choice rule succeeds immediately and th
 
 When multiple rules match, the first matched rule is used.
 
-An analogy to Choice is logic operator `or`.
+* Function `P4_CreateChoice` creates a choice. Example: `P4_CreateChoice(2)`.
+  * Function `P4_SetMember` set the member at the exact location. Example: `P4_SetMember(expr, 1, P4_CreateLiteral("HELLO", true))`.
+* Function `P4_CreateChoiceWithMembers` combines `P4_CreateChoice` and `P4_SetMember`. Example: `P4_CreateChoiceWithMembers(2, P4_CreateLiteral("HELLO", true), P4_CreateLiteral("KIA ORA", true))`.
+* Function `P4_AddChoice` adds a choice to grammar rule set. Example: `P4_AddChoice(grammar, ENTRY , 2)`.
+* Function `P4_AddChoiceWithMembers` adds a choice along with all the members to grammar rule set. Example: `P4_AddChoiceWithMembers(grammar, ENTRY , 2, P4_CreateLiteral("HELLO", true), P4_CreateLiteral("KIA ORA", true))`
 
 In this example, we wrap up two literals into a Choice.
 
-* You need to specify `size=2` when calling `P4_AddChoice`.
-* You need to specify the exact offset `0`, `1`  when calling `P4_SetMember`.
+```c
+// ENTRY <- "HELLO WORLD" / "你好, 世界"
+
+>> P4_AddChoice(grammar, ENTRY, 3);
+P4_Ok
+>> P4_Expression* entry = P4_GetGrammarRule(grammar, ENTRy);
+>> P4_SetMember(entry, 0, P4_CreateLiteral("HELLO", true));
+P4_Ok
+>> P4_SetMember(entry, 1, P4_CreateLiteral(" ", true));
+P4_Ok
+>> P4_SetMember(entry, 2, P4_CreateLiteral("WORLD", true));
+P4_Ok
+
+>> P4_Source* source = P4_Source("HELLO WORLD", ENTRY);
+>> P4_Parse(grammar, source);
+P4_Ok
+```
+
+It's equivalent to the below version:
 
 ```c
->> P4_AddChoice(grammar, ID, 2);
-P4_Ok
->> P4_Expression exprID = P4_GetGrammarRule(grammar, ID);
->> P4_SetMember(exprID, 0, P4_CreateLiteral("HELLO WORLD", true));
-P4_Ok
->> P4_SetMember(exprID, 1, P4_CreateLiteral("你好, 世界", true));
+// ENTRY <- "HELLO WORLD" / "你好, 世界"
+
+>> P4_AddChoiceWithMembers(
+..   grammar,
+..   ENTRY,
+..   2,
+..   P4_CreateLiteral("HELLO WORLD", true),
+..   P4_CreateLiteral("你好, 世界", true)
+.. );
 P4_Ok
 
->> P4_Source* source = P4_Source("HELLO WORLD", ID);
+>> P4_Source* source = P4_Source("HELLO WORLD", ENTRY);
 >> P4_Parse(grammar, source);
 P4_Ok
 
->> P4_Source* source = P4_Source("你好, 世界", ID);
+>> P4_Source* source = P4_Source("你好, 世界", ENTRY);
 >> P4_Parse(grammar, source);
 P4_Ok
 
->> P4_Source* source = P4_Source("HELLO 世界", ID);
+>> P4_Source* source = P4_Source("HELLO 世界", ENTRY);
 >> P4_Parse(grammar, source);
 P4_MatchError
 ```
+
+Note that Choice "owns" the members so `P4_DeleteExpression(sequence)` will free all members as well. Don't free the members by yourself!
 
 ## Reference
 
@@ -476,8 +534,8 @@ Positive rule look text ahead but do not consume it. If the incoming text don't 
 * Function `P4_AddPositive` adds a Positive rule to grammar.
 
 ```c
->> # define POS     1
->> # define ENTRY   2
+>> # define ENTRY   1
+>> # define POS     2
 >> P4_AddPositive(grammar, POS, P4_CreateLiteral("H", true));
 P4_Ok
 >> P4_AddSequence(grammar, ENTRY, 2);
@@ -505,8 +563,8 @@ If the incoming text matches, the rule fails.
 * Function `P4_AddNegative` adds a Negative rule to grammar.
 
 ```c
->> # define NEG     1
->> # define ENTRY   2
+>> # define ENTRY   1
+>> # define NEG     2
 >> P4_AddNegative(grammar, NEG, P4_CreateLiteral("H", true));
 P4_Ok
 >> P4_AddSequence(grammar, ENTRY, 2);

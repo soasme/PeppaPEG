@@ -1022,31 +1022,81 @@ P4_CreateContainer(size_t count) {
 }
 
 P4_PUBLIC(P4_Expression*)
-P4_CreateSequence(size_t count, ...) {
+P4_CreateSequence(size_t count) {
     P4_Expression* expr = P4_CreateContainer(count);
-    expr->kind = P4_Sequence;
 
-    va_list members;
-    va_start (members, count);
-    for (int i = 0; i < count; i++)
-        expr->members[i] = va_arg(members, P4_Expression*);
-    va_end (members);
+    if (expr == NULL)
+        return NULL;
+
+    expr->kind = P4_Sequence;
 
     return expr;
 }
 
 P4_PUBLIC(P4_Expression*)
-P4_CreateChoice(size_t count, ...) {
+P4_CreateChoice(size_t count) {
     P4_Expression* expr = P4_CreateContainer(count);
+
+    if (expr == NULL)
+        return NULL;
+
     expr->kind = P4_Choice;
+
+    return expr;
+}
+
+P4_PUBLIC(P4_Expression*)
+P4_CreateSequenceWithMembers(size_t count, ...) {
+    P4_Expression* expr = P4_CreateSequence(count);
+
+    if (expr == NULL)
+        return NULL;
 
     va_list members;
     va_start (members, count);
-    for (int i = 0; i < count; i++)
+
+    for (int i = 0; i < count; i++) {
         expr->members[i] = va_arg(members, P4_Expression*);
+
+        if (expr->members[i] == NULL) {
+            goto finalize;
+        }
+    }
+
     va_end (members);
 
     return expr;
+
+finalize:
+    P4_DeleteExpression(expr);
+    return NULL;
+}
+
+P4_PUBLIC(P4_Expression*)
+P4_CreateChoiceWithMembers(size_t count, ...) {
+    P4_Expression* expr = P4_CreateChoice(count);
+
+    if (expr == NULL)
+        return NULL;
+
+    va_list members;
+    va_start (members, count);
+
+    for (int i = 0; i < count; i++) {
+        expr->members[i] = va_arg(members, P4_Expression*);
+
+        if (expr->members[i] == NULL) {
+            goto finalize;
+        }
+    }
+
+    va_end (members);
+
+    return expr;
+
+finalize:
+    P4_DeleteExpression(expr);
+    return NULL;
 }
 
 P4_PUBLIC(P4_Expression*)
@@ -1334,10 +1384,62 @@ P4_AddSequence(P4_Grammar* grammar, P4_RuleID id, size_t size) {
 }
 
 P4_PUBLIC(P4_Error)
+P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_RuleID id, size_t count, ...) {
+    P4_AddSomeGrammarRule(grammar, id, P4_CreateSequence(count));
+    P4_Expression* expr = P4_GetGrammarRule(grammar, id);
+
+    va_list members;
+    va_start (members, count);
+
+    for (int i = 0; i < count; i++) {
+        expr->members[i] = va_arg(members, P4_Expression*);
+
+        if (expr->members[i] == NULL) {
+            goto finalize;
+        }
+    }
+
+    va_end (members);
+
+    return P4_Ok;
+
+finalize:
+    P4_DeleteExpression(expr);
+
+    return P4_MemoryError;
+}
+
+P4_PUBLIC(P4_Error)
 P4_AddChoice(P4_Grammar* grammar, P4_RuleID id, size_t size) {
     P4_AddSomeGrammarRule(grammar, id, P4_CreateContainer(size));
     P4_GetGrammarRule(grammar, id)->kind = P4_Choice;
     return P4_Ok;
+}
+
+P4_PUBLIC(P4_Error)
+P4_AddChoiceWithMembers(P4_Grammar* grammar, P4_RuleID id, size_t count, ...) {
+    P4_AddSomeGrammarRule(grammar, id, P4_CreateChoice(count));
+    P4_Expression* expr = P4_GetGrammarRule(grammar, id);
+
+    va_list members;
+    va_start (members, count);
+
+    for (int i = 0; i < count; i++) {
+        expr->members[i] = va_arg(members, P4_Expression*);
+
+        if (expr->members[i] == NULL) {
+            goto finalize;
+        }
+    }
+
+    va_end (members);
+
+    return P4_Ok;
+
+finalize:
+    P4_DeleteExpression(expr);
+
+    return P4_MemoryError;
 }
 
 P4_PUBLIC(P4_Error)

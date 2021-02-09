@@ -24,6 +24,16 @@
  * SOFTWARE.
  *
  * Example: Write an INI Parser using Peppa PEG.
+ *
+ *      $ gcc peppapeg.c examples/ini.c && ./a.out
+ *      Section=user
+ *      Value name=Ju Lin
+ *      Section=project
+ *      Value name=Peppa PEG
+ *      Value url=https://github.com/soasme/PeppaPEG
+ *      Value license=MIT
+ *      Value website=
+ *      Success!
  */
 
 #include <stdio.h>

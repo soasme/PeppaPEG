@@ -187,64 +187,6 @@ P4_CaseCmpInsensitive(P4_String src, P4_String dst, size_t len) {
     return 0;
 }
 
-/*
- * Determine if e is a tightness expr.
- */
-static inline bool
-is_tight(P4_Expression* e) {
-    return (e->flag & P4_FLAG_TIGHT) != 0;
-}
-
-/*
- * Determine if e is a tightness expr.
- */
-static inline bool
-is_spaced(P4_Expression* e) {
-    return (e->flag & P4_FLAG_SPACED) != 0;
-}
-
-
-/*
- * Determine if e is a hollowness expr.
- */
-static inline bool
-is_squashed(P4_Expression* e) {
-    return (e->flag & P4_FLAG_SQUASHED) != 0;
-}
-
-
-/*
- * Determine if e is a bareness expr.
- */
-static inline bool
-is_lifted(P4_Expression* e) {
-    return (e->flag & P4_FLAG_LIFTED) != 0;
-}
-
-
-/*
- * Determine if e is a continuance expr.
- */
-static inline bool
-is_scoped(P4_Expression* e) {
-    return (e->flag & P4_FLAG_SCOPED) != 0;
-}
-
-
-/*
- * Determine if e is an intermediate expr,
- * e.g, the expr has no left-hand symbol as its name.
- *
- * For example:
- * a = { "a" }, `"a"` is a literal non-intermediate expr.
- * b = { a ~ "b" }, `"b"` is a literal intermediate expr.
- */
-static inline bool
-is_intermediate(P4_Expression* e) {
-    return e->id == 0;
-}
-
-
 
 /*
  * Determine if the implicit whitespace should be applied.
@@ -266,14 +208,14 @@ P4_NeedLoosen(P4_Source* s, P4_Expression* e) {
     // Traverse the frame stack from the highest frame,
     for (int i = s->frames_len-1; i >=0; i--) {
         // (3) when e is inside a continuance expression and no tightness at all.
-        if (!is_tight(s->frames[i]) && is_scoped(s->frames[i]))
+        if (!P4_IsTight(s->frames[i]) && P4_IsScoped(s->frames[i]))
             return true;
     }
 
     // traversing the frame stack since the inner most,
     for (int i = 0; i < s->frames_len; i++) {
         // (3) when e is a tighted expression.
-        if (is_tight(s->frames[i]))
+        if (P4_IsTight(s->frames[i]))
             return false;
     }
 
@@ -286,18 +228,18 @@ P4_NeedLoosen(P4_Source* s, P4_Expression* e) {
 P4_PRIVATE(inline bool)
 P4_NeedSquash(P4_Source* s, P4_Expression* e) {
     // A continuance expr forces no hollowness.
-    if (is_scoped(e))
+    if (P4_IsScoped(e))
         return false;
 
     // Start from expr's parent.
     for (int i = s->frames_len-2; i>=0; i--) {
         // Any of expr's ancestor being continuance forces no hollowness.
-        if (is_scoped(s->frames[i]))
+        if (P4_IsScoped(s->frames[i]))
             return false;
 
         // Otherwise, being the descendant of hollowness token should be hollowed.
         // printf("frame %d: id=%lu, %d\n", i, s->frames[i]->id, s->frames[i]->flag);
-        if (is_squashed(s->frames[i]))
+        if (P4_IsSquashed(s->frames[i]))
             return true;
     }
 
@@ -313,8 +255,7 @@ P4_NeedSquash(P4_Source* s, P4_Expression* e) {
  */
 P4_PRIVATE(inline bool)
 P4_NeedLift(P4_Source* s, P4_Expression* e) {
-    // printf("need lift: id=%lu, %d %d %d\n", e->id, is_intermediate(e),  is_lifted(e) , P4_NeedSquash(s, e));
-    return is_intermediate(e) || is_lifted(e) || P4_NeedSquash(s, e);
+    return !P4_IsRule(e) || P4_IsLifted(e) || P4_NeedSquash(s, e);
 }
 
 
@@ -909,14 +850,14 @@ P4_Match(P4_Source* s, P4_Expression* e) {
     P4_Error     err = P4_Ok;
     P4_Token* result = NULL;
 
-    if (!is_intermediate(e) && (err = P4_PushFrame(s, e)) != P4_Ok) {
+    if (P4_IsRule(e) && (err = P4_PushFrame(s, e)) != P4_Ok) {
         P4_RaiseError(s, err, "failed to push frame");
         return NULL;
     }
 
     result = P4_Expression_dispatch(s, e);
 
-    if (!is_intermediate(e) && (err = P4_PopFrame(s, NULL)) != P4_Ok) {
+    if (P4_IsRule(e) && (err = P4_PopFrame(s, NULL)) != P4_Ok) {
         P4_RaiseError(s, err, "failed to pop frame");
         P4_DeleteToken(result);
         return NULL;
@@ -1157,7 +1098,7 @@ P4_SetRuleID(P4_Expression* e, P4_RuleID id) {
 
 P4_PUBLIC(bool)
 P4_IsRule(P4_Expression* e) {
-    return !is_intermediate(e);
+    return e->id != 0;
 }
 
 P4_PUBLIC(P4_Grammar*)    P4_CreateGrammar(void) {
@@ -1267,7 +1208,7 @@ P4_SetWhitespaces(P4_Grammar* grammar) {
     P4_Expression*  repeat = NULL;
 
     for EACH(rule, grammar->rules, grammar->count) {
-        if (is_spaced(rule)) {
+        if (P4_IsSpaced(rule)) {
             ids[count] = rule->id;
             rules[count] = P4_CreateReference(rule->id);
 
@@ -1595,4 +1536,84 @@ P4_CopyTokenString(P4_Token* token) {
     str[len] = '\0';
 
     return str;
+}
+
+/*
+ * Determine if expression has flag P4_FLAG_SQUASHED.
+ */
+P4_PUBLIC(bool)
+P4_IsSquashed(P4_Expression* e) {
+    return (e->flag & P4_FLAG_SQUASHED) != 0;
+}
+
+/*
+ * Determine if expression has flag P4_FLAG_LIFTED.
+ */
+P4_PUBLIC(bool)
+P4_IsLifted(P4_Expression* e) {
+    return (e->flag & P4_FLAG_LIFTED) != 0;
+}
+
+/*
+ * Determine if expression has flag P4_FLAG_TIGHT.
+ */
+P4_PUBLIC(bool)
+P4_IsTight(P4_Expression* e) {
+    return (e->flag & P4_FLAG_TIGHT) != 0;
+}
+
+/*
+ * Determine if expression has flag P4_FLAG_SPACED.
+ */
+P4_PUBLIC(bool)
+P4_IsSpaced(P4_Expression* e) {
+    return (e->flag & P4_FLAG_SPACED) != 0;
+}
+
+/*
+ * Set expression flag P4_FLAG_SQUASHED.
+ */
+P4_PUBLIC(bool)
+P4_IsScoped(P4_Expression* e) {
+    return (e->flag & P4_FLAG_SCOPED) != 0;
+}
+
+/*
+ * Set expression flag P4_FLAG_SQUASHED.
+ */
+P4_PUBLIC(void)
+P4_SetSquashed(P4_Expression* e) {
+    return P4_SetExpressionFlag(e, P4_FLAG_SQUASHED);
+}
+
+/*
+ * Set expression flag P4_FLAG_LIFTED.
+ */
+P4_PUBLIC(void)
+P4_SetLifted(P4_Expression* e) {
+    return P4_SetExpressionFlag(e, P4_FLAG_LIFTED);
+}
+
+/*
+ * Set expression flag P4_FLAG_TIGHT.
+ */
+P4_PUBLIC(void)
+P4_SetTight(P4_Expression* e) {
+    return P4_SetExpressionFlag(e, P4_FLAG_TIGHT);
+}
+
+/*
+ * Set expression flag P4_FLAG_SPACED.
+ */
+P4_PUBLIC(void)
+P4_SetSpaced(P4_Expression* e) {
+    return P4_SetExpressionFlag(e, P4_FLAG_SPACED);
+}
+
+/*
+ * Set expression flag P4_FLAG_SCOPED.
+ */
+P4_PUBLIC(void)
+P4_SetScoped(P4_Expression* e) {
+    return P4_SetExpressionFlag(e, P4_FLAG_SCOPED);
 }

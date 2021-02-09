@@ -283,15 +283,15 @@ P4_PUBLIC(bool)           P4_IsRule(P4_Expression*);
 
 P4_PUBLIC(bool)           P4_IsSquashed(P4_Expression*);
 P4_PUBLIC(bool)           P4_IsLifted(P4_Expression*);
-P4_PUBLIC(bool)           P4_IsTighted(P4_Expression*);
+P4_PUBLIC(bool)           P4_IsTight(P4_Expression*);
+P4_PUBLIC(bool)           P4_IsScoped(P4_Expression*);
+P4_PUBLIC(bool)           P4_IsSpaced(P4_Expression*);
 P4_PUBLIC(void)           P4_SetExpressionFlag(P4_Expression*, P4_ExpressionFlag);
 P4_PUBLIC(void)           P4_SetSquashed(P4_Expression*);
 P4_PUBLIC(void)           P4_SetLifted(P4_Expression*);
-P4_PUBLIC(void)           P4_SetTighted(P4_Expression*);
-P4_PUBLIC(void)           P4_UnsetExpressionFlag(P4_Expression*, P4_ExpressionFlag);
-P4_PUBLIC(void)           P4_UnsetSquashed(P4_Expression*);
-P4_PUBLIC(void)           P4_UnsetLifted(P4_Expression*);
-P4_PUBLIC(void)           P4_UnsetTighted(P4_Expression*);
+P4_PUBLIC(void)           P4_SetTight(P4_Expression*);
+P4_PUBLIC(void)           P4_SetSpaced(P4_Expression*);
+P4_PUBLIC(void)           P4_SetScoped(P4_Expression*);
 
 P4_PUBLIC(P4_Grammar*)    P4_CreateGrammar(void);
 P4_PUBLIC(void)           P4_DeleteGrammar(P4_Grammar*);

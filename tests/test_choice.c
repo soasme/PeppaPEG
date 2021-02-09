@@ -15,19 +15,10 @@ P4_PRIVATE(void) test_match_literal_choices_successfully(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddChoice(grammar, R1, 2)
-    );
-
-    P4_Expression* e1 = P4_GetGrammarRule(grammar, R1);
-    TEST_ASSERT_NOT_NULL(e1);
-
-    TEST_ASSERT_EQUAL(
-        P4_Ok,
-        P4_SetMember(e1, 0, P4_CreateLiteral("HELLO WORLD", true))
-    );
-    TEST_ASSERT_EQUAL(
-        P4_Ok,
-        P4_SetMember(e1, 1, P4_CreateLiteral("你好, 世界", true))
+        P4_AddChoiceWithMembers(grammar, R1, 2,
+            P4_CreateLiteral("HELLO WORLD", true),
+            P4_CreateLiteral("你好, 世界", true)
+        )
     );
 
     P4_Source* source = P4_CreateSource("你好, 世界", R1);
@@ -42,10 +33,8 @@ P4_PRIVATE(void) test_match_literal_choices_successfully(void) {
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
     TEST_ASSERT_NULL(token->tail);
-    TEST_ASSERT_EQUAL(token->expr, P4_GetGrammarRule(grammar, R1));
-
-    autofree P4_String tokenstr = P4_CopyTokenString(token);
-    TEST_ASSERT_EQUAL_STRING("你好, 世界", tokenstr);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("你好, 世界", token);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -65,19 +54,10 @@ P4_PRIVATE(void) test_match_literal_choices_successfully2(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddChoice(grammar, R1, 2)
-    );
-
-    P4_Expression* e1 = P4_GetGrammarRule(grammar, R1);
-    TEST_ASSERT_NOT_NULL(e1);
-
-    TEST_ASSERT_EQUAL(
-        P4_Ok,
-        P4_SetMember(e1, 0, P4_CreateLiteral("HELLO WORLD", true))
-    );
-    TEST_ASSERT_EQUAL(
-        P4_Ok,
-        P4_SetMember(e1, 1, P4_CreateLiteral("你好, 世界", true))
+        P4_AddChoiceWithMembers(grammar, R1, 2,
+            P4_CreateLiteral("HELLO WORLD", true),
+            P4_CreateLiteral("你好, 世界", true)
+        )
     );
 
     P4_Source* source = P4_CreateSource("HELLO WORLD", R1);
@@ -117,19 +97,10 @@ P4_PRIVATE(void) test_match_literal_choices_no_option_raise_match_error(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddChoice(grammar, R1, 2)
-    );
-
-    P4_Expression* e1 = P4_GetGrammarRule(grammar, R1);
-    TEST_ASSERT_NOT_NULL(e1);
-
-    TEST_ASSERT_EQUAL(
-        P4_Ok,
-        P4_SetMember(e1, 0, P4_CreateLiteral("HELLO WORLD", true))
-    );
-    TEST_ASSERT_EQUAL(
-        P4_Ok,
-        P4_SetMember(e1, 1, P4_CreateLiteral("你好, 世界", true))
+        P4_AddChoiceWithMembers(grammar, R1, 2,
+            P4_CreateLiteral("HELLO WORLD", true),
+            P4_CreateLiteral("你好, 世界", true)
+        )
     );
 
     P4_Source* source = P4_CreateSource("HELLO WORL", R1);

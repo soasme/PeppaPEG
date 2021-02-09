@@ -280,7 +280,7 @@ P4_PUBLIC(void)           P4_DeleteExpression(P4_Expression*);
 
 P4_PUBLIC(P4_String)      P4_PrintExpression(P4_Expression*);
 
-P4_PUBLIC(void)           P4_SetRuleID(P4_Expression*, P4_RuleID);
+P4_PUBLIC(P4_Error)       P4_SetRuleID(P4_Expression*, P4_RuleID);
 P4_PUBLIC(bool)           P4_IsRule(P4_Expression*);
 
 P4_PUBLIC(bool)           P4_IsSquashed(P4_Expression*);
@@ -331,9 +331,6 @@ P4_PUBLIC(P4_Token*)      P4_GetSourceAst(P4_Source*);
 P4_PUBLIC(void)           P4_PrintSourceAst(P4_Token*, P4_String, size_t);
 
 P4_PUBLIC(P4_Error)       P4_Parse(P4_Grammar*, P4_Source*);
-
-P4_PUBLIC(P4_Error)       P4_SetWhitespaces(P4_Grammar*);
-P4_PUBLIC(P4_Expression*) P4_GetWhitespaces(P4_Grammar*);
 
 P4_PUBLIC(void)           P4_GrammarReset(P4_Grammar*);
 

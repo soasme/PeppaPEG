@@ -1194,6 +1194,17 @@ P4_GetGrammarRule(P4_Grammar* grammar, P4_RuleID id) {
     return NULL;
 }
 
+P4_PUBLIC(P4_Error)
+P4_SetGrammarRuleFlag(P4_Grammar* grammar, P4_RuleID id, P4_ExpressionFlag flag) {
+    P4_Expression* expr = P4_GetGrammarRule(grammar, id);
+    if (expr == NULL)
+        return P4_NameError;
+
+    P4_SetExpressionFlag(expr, flag);
+
+    return P4_Ok;
+}
+
 P4_PUBLIC(size_t)
 P4_AddGrammarRule(P4_Grammar* grammar, P4_RuleID id, P4_Expression* expr) {
     if (grammar->cap == 0) {

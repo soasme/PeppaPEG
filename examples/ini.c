@@ -9,7 +9,9 @@ name=Ju Lin\n\
 \n\
 [project]\n\
 name=Peppa PEG\n\
-url=https://github.com/soasme/PeppaPEG\n";
+url=https://github.com/soasme/PeppaPEG\n\
+license=MIT\n\
+website=\n";
 
     P4_Grammar* ini = P4_CreateINIGrammar();
     if (ini == NULL) {
@@ -43,7 +45,10 @@ url=https://github.com/soasme/PeppaPEG\n";
                 break;
             case P4_INI_Property:
                 namestr = P4_CopyTokenString(node->head);
-                valuestr = P4_CopyTokenString(node->tail);
+                if (node->tail == node->head)
+                    valuestr = strdup("");
+                else
+                    valuestr = P4_CopyTokenString(node->tail);
                 printf("Value %s=%s\n", namestr, valuestr);
                 free(namestr);
                 free(valuestr);

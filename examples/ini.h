@@ -58,12 +58,12 @@ P4_PUBLIC(P4_Grammar*)  P4_CreateINIGrammar() {
     ))
         goto finalize;
 
-    // Property = Name "=" Value
+    // Property = Name "=" Value?
 
     if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_INI_Property, 3,
         P4_CreateReference(P4_INI_Name),
         P4_CreateLiteral("=", true),
-        P4_CreateReference(P4_INI_Value)
+        P4_CreateZeroOrOnce(P4_CreateReference(P4_INI_Value))
     ))
         goto finalize;
 

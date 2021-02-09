@@ -113,6 +113,9 @@ P4_PRIVATE(P4_Error)            P4_PopFrame(P4_Source*, P4_Expression**);
 
 P4_PRIVATE(P4_Expression*)      P4_GetReference(P4_Source*, P4_Expression*);
 
+P4_PRIVATE(P4_Error)            P4_SetWhitespaces(P4_Grammar*);
+P4_PRIVATE(P4_Expression*)      P4_GetWhitespaces(P4_Grammar*);
+
 P4_PRIVATE(P4_Token*)           P4_Match(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchNumeric(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchLiteral(P4_Source*, P4_Expression*);
@@ -1141,13 +1144,23 @@ P4_CreateOnceOrMore(P4_Expression* repeat) {
     return P4_CreateRepeatMinMax(repeat, 1, -1);
 }
 
-P4_PUBLIC(void)
+P4_PUBLIC(P4_Error)
 P4_SetRuleID(P4_Expression* e, P4_RuleID id) {
+    if (e == NULL)
+        return P4_NullError;
+
+    if (e->id != 0 || id == 0)
+        return P4_ValueError;
+
     e->id = id;
+    return P4_Ok;
 }
 
 P4_PUBLIC(bool)
 P4_IsRule(P4_Expression* e) {
+    if (e == NULL)
+        return false;
+
     return e->id != 0;
 }
 
@@ -1250,7 +1263,7 @@ P4_Parse(P4_Grammar* grammar, P4_Source* source) {
     return source->err;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PRIVATE(P4_Error)
 P4_SetWhitespaces(P4_Grammar* grammar) {
     size_t          count = 0;
     P4_RuleID       ids[2] = {0};
@@ -1314,7 +1327,8 @@ end:
     return P4_MemoryError;
 }
 
-P4_PUBLIC(P4_Expression*) P4_GetWhitespaces(P4_Grammar* g) {
+P4_PRIVATE(P4_Expression*)
+P4_GetWhitespaces(P4_Grammar* g) {
     if (g == NULL)
         return NULL;
 

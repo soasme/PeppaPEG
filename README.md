@@ -414,11 +414,9 @@ In this example, we wrap up two literals into a Choice.
 >> P4_AddChoice(grammar, ENTRY, 3);
 P4_Ok
 >> P4_Expression* entry = P4_GetGrammarRule(grammar, ENTRy);
->> P4_SetMember(entry, 0, P4_CreateLiteral("HELLO", true));
+>> P4_SetMember(entry, 0, P4_CreateLiteral("HELLO WORLD", true));
 P4_Ok
->> P4_SetMember(entry, 1, P4_CreateLiteral(" ", true));
-P4_Ok
->> P4_SetMember(entry, 2, P4_CreateLiteral("WORLD", true));
+>> P4_SetMember(entry, 1, P4_CreateLiteral("你好, 世界", true));
 P4_Ok
 
 >> P4_Source* source = P4_Source("HELLO WORLD", ENTRY);

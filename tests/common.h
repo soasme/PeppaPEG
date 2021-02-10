@@ -7,7 +7,7 @@
 
 #define autofree __attribute__ ((cleanup (cleanup_freep)))
 
-P4_PRIVATE(inline void)
+static void
 cleanup_freep (void *p)
 {
   void **pp = (void **) p;

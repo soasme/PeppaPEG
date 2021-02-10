@@ -44,7 +44,7 @@
 
 #define                         autofree __attribute__ ((cleanup (cleanup_freep)))
 
-P4_PRIVATE(inline void)
+P4_PRIVATE(void)
 cleanup_freep (void *p)
 {
   void **pp = (void **) p;
@@ -91,22 +91,22 @@ cleanup_freep (void *p)
                                     return err;                 \
 } while (0)
 
-P4_PRIVATE(inline size_t)       P4_ReadRune(P4_String s, P4_Rune* c);
-P4_PRIVATE(inline int)          P4_CaseCmpInsensitive(P4_String, P4_String, size_t);
+P4_PRIVATE(size_t)       P4_ReadRune(P4_String s, P4_Rune* c);
+P4_PRIVATE(int)          P4_CaseCmpInsensitive(P4_String, P4_String, size_t);
 
-P4_PRIVATE(inline P4_Position)  P4_GetPosition(P4_Source*);
+P4_PRIVATE(P4_Position)  P4_GetPosition(P4_Source*);
 P4_PRIVATE(void)                P4_SetPosition(P4_Source*, P4_Position);
 
 # define                        P4_MarkPosition(s, p) P4_Position (p) = P4_GetPosition(s);
 
-P4_PRIVATE(inline P4_String)    P4_RemainingText(P4_Source*);
+P4_PRIVATE(P4_String)    P4_RemainingText(P4_Source*);
 
-P4_PRIVATE(inline bool)         P4_NeedLoosen(P4_Source*, P4_Expression*);
-P4_PRIVATE(inline bool)         P4_NeedSquash(P4_Source*, P4_Expression*);
-P4_PRIVATE(inline bool)         P4_NeedLift(P4_Source*, P4_Expression*);
+P4_PRIVATE(bool)         P4_NeedLoosen(P4_Source*, P4_Expression*);
+P4_PRIVATE(bool)         P4_NeedSquash(P4_Source*, P4_Expression*);
+P4_PRIVATE(bool)         P4_NeedLift(P4_Source*, P4_Expression*);
 
-P4_PRIVATE(inline void)         P4_RaiseError(P4_Source*, P4_Error, P4_String);
-P4_PRIVATE(inline void)         P4_RescueError(P4_Source*);
+P4_PRIVATE(void)         P4_RaiseError(P4_Source*, P4_Error, P4_String);
+P4_PRIVATE(void)         P4_RescueError(P4_Source*);
 
 P4_PRIVATE(P4_Error)            P4_PushFrame(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Error)            P4_PopFrame(P4_Source*, P4_Expression**);
@@ -141,7 +141,7 @@ P4_PRIVATE(P4_Token*)           P4_MatchSpacedExpressions(P4_Source*, P4_Express
  *     > printf("%p %d\n", c, c)
  *     0x4f60 20320
  */
-P4_PRIVATE(inline size_t)
+P4_PRIVATE(size_t)
 P4_ReadRune(P4_String s, P4_Rune* c) {
     *c = 0;
 
@@ -168,7 +168,7 @@ P4_ReadRune(P4_String s, P4_Rune* c) {
  *
  * Like strcmp, but works for a case insensitive UTF-8 string.
  */
-P4_PRIVATE(inline int)
+P4_PRIVATE(int)
 P4_CaseCmpInsensitive(P4_String src, P4_String dst, size_t len) {
     uint32_t srcch = 0x0, dstch = 0x0;
     size_t srcsz = 0, dstsz = 0;
@@ -194,7 +194,7 @@ P4_CaseCmpInsensitive(P4_String src, P4_String dst, size_t len) {
 /*
  * Determine if the implicit whitespace should be applied.
  */
-P4_PRIVATE(inline bool)
+P4_PRIVATE(bool)
 P4_NeedLoosen(P4_Source* s, P4_Expression* e) {
     assert(s != NULL && e != NULL && s->frames_len >= 0);
 
@@ -228,7 +228,7 @@ P4_NeedLoosen(P4_Source* s, P4_Expression* e) {
 /*
  * Determine if inner tokens should be generated.
  */
-P4_PRIVATE(inline bool)
+P4_PRIVATE(bool)
 P4_NeedSquash(P4_Source* s, P4_Expression* e) {
     // A continuance expr forces no hollowness.
     if (P4_IsScoped(e))
@@ -256,7 +256,7 @@ P4_NeedSquash(P4_Source* s, P4_Expression* e) {
  * 2. Bareness expr.
  * 3. Hollowed expr.
  */
-P4_PRIVATE(inline bool)
+P4_PRIVATE(bool)
 P4_NeedLift(P4_Source* s, P4_Expression* e) {
     return !P4_IsRule(e) || P4_IsLifted(e) || P4_NeedSquash(s, e);
 }
@@ -267,7 +267,7 @@ P4_NeedLift(P4_Source* s, P4_Expression* e) {
  *
  * Set err and errmsg to state.
  */
-P4_PRIVATE(inline void)
+P4_PRIVATE(void)
 P4_RaiseError(P4_Source* s, P4_Error err, P4_String errmsg) {
     s->err = err;
     s->errmsg = strdup(errmsg);
@@ -302,7 +302,7 @@ P4_RaiseError(P4_Source* s, P4_Error err, P4_String errmsg) {
  *
  * It allows the parser to keep parsing the text.
  */
-P4_PRIVATE(inline void)
+P4_PRIVATE(void)
 P4_RescueError(P4_Source* s) {
     s->err = P4_Ok;
     if (s->errmsg != NULL) {
@@ -1373,12 +1373,12 @@ P4_SetExpressionFlag(P4_Expression* e, P4_ExpressionFlag f) {
     e->flag |= f;
 }
 
-P4_PRIVATE(inline P4_Position)
+P4_PRIVATE(P4_Position)
 P4_GetPosition(P4_Source* s) {
     return s->pos;
 }
 
-P4_PRIVATE(inline void)
+P4_PRIVATE(void)
 P4_SetPosition(P4_Source* s, P4_Position pos) {
     s->pos = pos;
 }
@@ -1386,7 +1386,7 @@ P4_SetPosition(P4_Source* s, P4_Position pos) {
 /*
  * Get the remaining text.
  */
-P4_PRIVATE(inline P4_String)
+P4_PRIVATE(P4_String)
 P4_RemainingText(P4_Source* s) {
     return s->content + s->pos;
 }

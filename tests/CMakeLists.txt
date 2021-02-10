@@ -19,6 +19,7 @@ foreach(unity_testcase ${unity_testcases})
     add_executable("${unity_testcase}" "${unity_testcase}.c" "unity_setup.c")
     target_link_libraries("${unity_testcase}" "${P4_LIB}" unity)
     target_compile_options("${unity_testcase}" PRIVATE "-g")
+    target_compile_options("${unity_testcase}" PRIVATE "-ansi")
     add_test(
         NAME "${unity_testcase}"
         COMMAND "./${unity_testcase}"

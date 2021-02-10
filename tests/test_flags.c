@@ -6,7 +6,7 @@
 # define R1 3
 
 
-// Sequence # TIGHT
+/* Sequence # TIGHT */
 
 /*
  * Rules:
@@ -134,7 +134,7 @@ P4_PRIVATE(void) test_spaced_rule_should_be_ignored_in_sequence2(void) {
 }
 
 
-// Repeat # TIGHT
+/* Repeat # TIGHT */
 
 /*
  * Rules:
@@ -249,9 +249,10 @@ P4_PRIVATE(void) test_spaced_rule_should_be_ignored_in_tight_repeat2(void) {
     P4_DeleteGrammar(grammar);
 }
 
-// ---
+/* --- */
 
-// Sequence # SQUASH
+/* Sequence # SQUASH */
+
 /*
  * Rules:
  *  ENTRY = Z & Z # SQUASH
@@ -299,7 +300,7 @@ P4_PRIVATE(void) test_squashed_rule_should_generate_no_children(void) {
     P4_DeleteGrammar(grammar);
 }
 
-// Repeat # SQUASH
+/* Repeat # SQUASH */
 /*
  * Rules:
  *  ENTRY = ZERO* # SQUASH
@@ -343,11 +344,11 @@ P4_PRIVATE(void) test_squashed_repeat_should_generate_no_children(void) {
     P4_DeleteGrammar(grammar);
 }
 
-// Others: No effect # SQUASH
+/* Others: No effect # SQUASH */
 
-// ---
+/* --- */
 
-// Literal # LIFT
+/* Literal # LIFT */
 /*
  * Rules:
  *  ENTRY = "0" # LIFT
@@ -379,7 +380,7 @@ P4_PRIVATE(void) test_lifted_literal_should_generate_no_token(void) {
     P4_DeleteGrammar(grammar);
 }
 
-// Range # LIFT
+/* Range # LIFT */
 /*
  * Rules:
  *  ENTRY = '0'..'9' # LIFT
@@ -411,7 +412,7 @@ P4_PRIVATE(void) test_lifted_range_should_generate_no_token(void) {
     P4_DeleteGrammar(grammar);
 }
 
-// Choice # LIFT
+/* Choice # LIFT */
 /*
  * Rules:
  *  ENTRY = "HELLO" | "KIA ORA" # LIFT
@@ -448,9 +449,9 @@ P4_PRIVATE(void) test_lifted_choice_should_generate_no_token(void) {
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
 }
-// Reference # LIFT
+/* Reference # LIFT */
 
-// Repeat # LIFT
+/* Repeat # LIFT */
 P4_PRIVATE(void) test_lifted_repeat_should_generate_no_token(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
@@ -474,14 +475,14 @@ P4_PRIVATE(void) test_lifted_repeat_should_generate_no_token(void) {
     P4_DeleteGrammar(grammar);
 }
 
-// Positive/Negative: No effect # LIFT
+/* Positive/Negative: No effect # LIFT */
 
-// ---
+/* --- */
 
-// ---
+/* --- */
 
-// Sequence # SQUASH,
-// Literal # SCOPED.
+/* Sequence # SQUASH, */
+/* Literal # SCOPED. */
 /*
  * Rules:
  *  ENTRY = R1 & R1 # SQUASHED
@@ -538,8 +539,8 @@ P4_PRIVATE(void) test_squashed_sequence_should_not_hide_scoped_literal(void) {
     P4_DeleteGrammar(grammar);
 }
 
-// Sequence # SQUASH,LIFT
-// Literal # SCOPED.
+/* Sequence # SQUASH,LIFT */
+/* Literal # SCOPED. */
 /*
  * Rules:
  *  ENTRY = R1 & R1 # SQUASHED,LIFTED
@@ -591,8 +592,8 @@ P4_PRIVATE(void) test_squashed_lifted_sequence_should_not_hide_scoped_literal(vo
     P4_DeleteGrammar(grammar);
 }
 
-// Repeat # SQUASHED,
-// Literal # SCOPED.
+/* Repeat # SQUASHED, */
+/* Literal # SCOPED. */
 /*
  * Rules:
  *  ENTRY = R1{2} # SQUASHED
@@ -645,8 +646,8 @@ P4_PRIVATE(void) test_squashed_repeat_should_not_hide_scoped_literal(void) {
     P4_DeleteGrammar(grammar);
 }
 
-// Repeat # SQUASH,LIFT
-// Literal # SCOPED.
+/* Repeat # SQUASH,LIFT */
+/* Literal # SCOPED. */
 /*
  * Rules:
  *  ENTRY = R1{2} # SQUASHED,LIFTED

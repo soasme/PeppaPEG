@@ -114,7 +114,7 @@ typedef P4_Rune P4_RuneRange[2];
 
 /* The expression kind. */
 typedef enum {
-    // P4_Numeric,
+    /* P4_Numeric, */
     P4_Literal,
     P4_Range,
     P4_Reference,
@@ -162,16 +162,11 @@ typedef struct P4_Source {
     size_t                  frames_cap;
     bool                    verbose;
     bool                    whitespacing;
-
-    // to be removed.
-    struct P4_Expression*   implicit_whitespace;
-    struct P4_Expression*   whitespace;
-    struct P4_Expression*   comment;
 } P4_Source;
 
 typedef struct P4_Expression {
-    // The name of expression (only for debugging).
-    // P4_String            name;
+    /* The name of expression (only for debugging). */
+    /* P4_String            name; */
     /* The id of expression. */
     P4_RuleID            id;
     /* The kind of expression. */
@@ -208,7 +203,7 @@ typedef struct P4_Expression {
         /* Used by P4_ZeroOrOnce..P4_RepeatExact.
          * repeat the expr for n times, n >= min and n <= max. */
         struct {
-            struct P4_Expression*   repeat_expr; // maybe we can merge it with ref_expr?
+            struct P4_Expression*   repeat_expr; /* maybe we can merge it with ref_expr? */
             size_t                  repeat_min;
             size_t                  repeat_max;
         };
@@ -253,7 +248,7 @@ typedef struct P4_Grammar{
 P4_PUBLIC(P4_String)      P4_Version(void);
 
 
-// P4_PUBLIC(P4_Expression*) P4_CreateNumeric(size_t);
+/* P4_PUBLIC(P4_Expression*) P4_CreateNumeric(size_t); */
 P4_PUBLIC(P4_Expression*) P4_CreateLiteral(const P4_String, bool sensitive);
 P4_PUBLIC(P4_Expression*) P4_CreateRange(P4_Rune, P4_Rune);
 P4_PUBLIC(P4_Expression*) P4_CreateReference(P4_RuleID);

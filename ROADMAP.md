@@ -18,6 +18,7 @@
 - [ ] New Source Flag: Support UTF-8 BOM sequence (0xEF 0xBB 0xBF) at the start of source.
 - [ ] Python Binding.
 - [ ] NeedLoosen, NeedSquash, NeedLift should be well-tested.
+- [ ] Auto generate documentation for functions and defined macros.
 - [x] Add Flag Set/Unset functions. Added in v1.1.0.
 - [x] INI parser example. Added in v1.1.0.
 - [x] ~~Flag SPACED.~~ Added in v1.0.0.

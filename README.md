@@ -810,6 +810,6 @@ $ make check
 
 * Write an INI Parser using Peppa PEG: [ini.h](examples/ini.h), [ini.c](examples/ini.c).
 
-Made with ❤️  by [Ju Lin](https://github.com/soasme).
+Made with ❤️  by [@soasme](https://github.com/soasme).
 
 [PEG]: https://en.wikipedia.org/wiki/Parsing_expression_grammar

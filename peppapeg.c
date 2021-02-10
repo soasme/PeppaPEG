@@ -447,7 +447,7 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
     P4_MarkPosition(s, startpos);
     if ((!e->sensitive && P4_CaseCmpInsensitive(e->literal, str, len) != 0)
             || (e->sensitive && memcmp(e->literal, str, len) != 0)) {
-        P4_RaiseError(s, P4_MatchError, "literal not match");
+        P4_RaiseError(s, P4_MatchError, "expect literal");
         return NULL;
     }
     P4_SetPosition(s, startpos+len);

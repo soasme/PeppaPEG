@@ -101,7 +101,7 @@ P4_PRIVATE(void) test_match_negative_consumes_no_input(void) {
     autofree P4_String tokenstr = P4_CopyTokenString(token);
     TEST_ASSERT_EQUAL_STRING("HELLO WORLD", tokenstr);
 
-    // R1(Positive) has no token produced.
+    /* R1(Positive) has no token produced. */
 
     TEST_ASSERT_NOT_NULL(token->head);
     TEST_ASSERT_EQUAL(token->head, token->tail);

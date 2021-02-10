@@ -6,7 +6,6 @@
 - [ ] Performance test.
 - [ ] Add traverse functions for Tokens.
 - [ ] Callbacks for P4_Token.
-- [ ] INI parser example.
 - [ ] Add Valgrind to the tests.
 - [ ] New Expression Kind: Numeric.
 - [ ] New Expression Kind: CharacterSet.
@@ -20,4 +19,5 @@
 - [ ] Python Binding.
 - [ ] NeedLoosen, NeedSquash, NeedLift should be well-tested.
 - [?] Add Flag Set/Unset functions. #1.
+- [x] INI parser example.
 - [x] ~~Flag SPACED.~~ Added in v1.0.0.

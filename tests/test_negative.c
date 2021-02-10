@@ -33,6 +33,7 @@ P4_PRIVATE(void) test_match_negative_successfully(void) {
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(11, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
@@ -93,6 +94,7 @@ P4_PRIVATE(void) test_match_negative_consumes_no_input(void) {
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(11, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
@@ -147,6 +149,7 @@ P4_PRIVATE(void) test_match_negative_failed(void) {
         P4_MatchError,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(0, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NULL(token);

@@ -24,6 +24,7 @@ P4_PRIVATE(void) test_match_ascii_digits_successfully(void) {
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(1, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
@@ -62,6 +63,7 @@ P4_PRIVATE(void) test_match_utf8_code_point_successfully(void) {
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(3, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
@@ -102,6 +104,7 @@ P4_PRIVATE(void) test_match_code_points_outside_range_cause_match_error(void) {
         P4_MatchError,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(0, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NULL(token);

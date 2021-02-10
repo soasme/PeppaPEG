@@ -35,6 +35,7 @@ P4_PRIVATE(void) test_spaced_rule_should_loosen_sequence(void) {
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(15, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
@@ -79,6 +80,7 @@ P4_PRIVATE(void) test_spaced_rule_should_be_ignored_in_sequence(void) {
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(10, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
@@ -123,6 +125,7 @@ P4_PRIVATE(void) test_spaced_rule_should_be_ignored_in_sequence2(void) {
         P4_MatchError,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(0, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NULL(token);
@@ -158,6 +161,7 @@ P4_PRIVATE(void) test_spaced_rule_should_be_applied_in_repeat(void) {
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(11, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
@@ -200,6 +204,7 @@ P4_PRIVATE(void) test_spaced_rule_should_be_ignored_in_tight_repeat(void) {
         P4_MatchError,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(0, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NULL(token);
@@ -233,6 +238,7 @@ P4_PRIVATE(void) test_spaced_rule_should_be_ignored_in_tight_repeat2(void) {
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(6, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
@@ -283,6 +289,7 @@ P4_PRIVATE(void) test_squashed_rule_should_generate_no_children(void) {
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(2, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
@@ -327,6 +334,7 @@ P4_PRIVATE(void) test_squashed_repeat_should_generate_no_children(void) {
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(6, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
@@ -369,6 +377,7 @@ P4_PRIVATE(void) test_lifted_literal_should_generate_no_token(void) {
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(1, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NULL(token);
@@ -401,6 +410,7 @@ P4_PRIVATE(void) test_lifted_range_should_generate_no_token(void) {
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(1, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NULL(token);
@@ -439,6 +449,7 @@ P4_PRIVATE(void) test_lifted_choice_should_generate_no_token(void) {
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(7, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NULL(token);
@@ -464,6 +475,7 @@ P4_PRIVATE(void) test_lifted_repeat_should_generate_no_token(void) {
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(5, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NULL(token);
@@ -515,6 +527,7 @@ P4_PRIVATE(void) test_squashed_sequence_should_not_hide_scoped_literal(void) {
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(2, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
 
@@ -571,6 +584,7 @@ P4_PRIVATE(void) test_squashed_lifted_sequence_should_not_hide_scoped_literal(vo
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(2, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
 
@@ -622,6 +636,7 @@ P4_PRIVATE(void) test_squashed_repeat_should_not_hide_scoped_literal(void) {
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(2, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
 
@@ -675,6 +690,7 @@ P4_PRIVATE(void) test_squashed_lifted_repeat_should_not_hide_scoped_literal(void
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(2, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
 

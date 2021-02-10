@@ -1257,7 +1257,12 @@ P4_DeleteSource(P4_Source* source) {
 
 P4_PUBLIC(P4_Token*)
 P4_GetSourceAst(P4_Source* source) {
-    return source->root;
+    return source == NULL ? NULL : source->root;
+}
+
+P4_PUBLIC(P4_Position)
+P4_GetSourcePosition(P4_Source* source) {
+    return source == NULL ? 0 : source->pos;
 }
 
 P4_PUBLIC(P4_Error)

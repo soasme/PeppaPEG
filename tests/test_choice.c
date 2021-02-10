@@ -27,6 +27,7 @@ P4_PRIVATE(void) test_match_literal_choices_successfully(void) {
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(14, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
@@ -66,6 +67,7 @@ P4_PRIVATE(void) test_match_literal_choices_successfully2(void) {
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(11, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
@@ -109,6 +111,7 @@ P4_PRIVATE(void) test_match_literal_choices_no_option_raise_match_error(void) {
         P4_MatchError,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(0, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NULL(token);

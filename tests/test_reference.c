@@ -31,6 +31,7 @@ P4_PRIVATE(void) test_match_reference_successfully(void) {
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(5, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
 
@@ -73,6 +74,7 @@ P4_PRIVATE(void) test_match_reference_not_defined_raise_name_error(void) {
         P4_NameError,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(0, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
 

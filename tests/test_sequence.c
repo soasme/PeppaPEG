@@ -28,6 +28,7 @@ P4_PRIVATE(void) test_match_literal_sequence_successfully(void) {
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(12, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
@@ -72,6 +73,7 @@ P4_PRIVATE(void) test_match_literal_sequence_partially_raise_match_error(void) {
         P4_MatchError,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(0, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NULL(token);
@@ -109,6 +111,7 @@ P4_PRIVATE(void) test_match_literal_sequence_having_member_nomatch_raise_match_e
         P4_MatchError,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(0, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NULL(token);
@@ -151,6 +154,7 @@ P4_PRIVATE(void) test_match_reference_in_sequence_successfully(void) {
         P4_Ok,
         P4_Parse(grammar, source)
     );
+    TEST_ASSERT_EQUAL(6, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
 

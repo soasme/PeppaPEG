@@ -293,8 +293,8 @@ P4_PUBLIC(void)           P4_SetScoped(P4_Expression*);
 P4_PUBLIC(P4_Grammar*)    P4_CreateGrammar(void);
 P4_PUBLIC(void)           P4_DeleteGrammar(P4_Grammar*);
 
-P4_PUBLIC(size_t)         P4_AddGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
-P4_PUBLIC(void)           P4_AddNumeric(P4_Grammar*, P4_RuleID, size_t);
+P4_PUBLIC(P4_Error)       P4_AddGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_PUBLIC(P4_Error)       P4_AddNumeric(P4_Grammar*, P4_RuleID, size_t);
 P4_PUBLIC(P4_Error)       P4_AddLiteral(P4_Grammar*, P4_RuleID, const P4_String, bool sensitive);
 P4_PUBLIC(P4_Error)       P4_AddRange(P4_Grammar*, P4_RuleID, P4_Rune, P4_Rune);
 P4_PUBLIC(P4_Error)       P4_AddReference(P4_Grammar*, P4_RuleID, P4_RuleID);

@@ -78,8 +78,7 @@ cleanup_freep (void *p)
                                     }                           \
                                                                 \
                                     size_t size = grammar->count + 1; \
-                                    if (P4_AddGrammarRule(grammar, id, expr)!=size) {\
-                                        err = P4_MemoryError;   \
+                                    if ((err=P4_AddGrammarRule(grammar, id, expr))!=P4_Ok) {\
                                         goto end;               \
                                     }                           \
                                                                 \
@@ -1205,22 +1204,32 @@ P4_SetGrammarRuleFlag(P4_Grammar* grammar, P4_RuleID id, P4_ExpressionFlag flag)
     return P4_Ok;
 }
 
-P4_PUBLIC(size_t)
+P4_PUBLIC(P4_Error)
 P4_AddGrammarRule(P4_Grammar* grammar, P4_RuleID id, P4_Expression* expr) {
-    if (grammar->cap == 0) {
-        grammar->cap = 32;
-        grammar->rules = malloc(sizeof(P4_Expression*) * grammar->cap);
-    } else if (grammar->count >= grammar->cap) {
-        grammar->cap <<= 1;
-        grammar->rules = realloc(grammar->rules, sizeof(P4_Expression*) * grammar->cap); // TODO: leak
+    size_t          cap   = grammar->cap;
+    P4_Expression** rules = grammar->rules;
+
+    if (grammar == NULL || id == 0 || expr == NULL)
+        return P4_NullError;
+
+    if (cap == 0) {
+        cap = 32;
+        rules = malloc(sizeof(P4_Expression*) * cap);
+    } else if (grammar->count >= cap) {
+        cap <<= 1;
+        rules = realloc(rules, sizeof(P4_Expression*) * cap);
     }
 
-    if (grammar->rules == NULL)
-        return 0;
+    if (rules == NULL)
+        return P4_MemoryError;
 
-    grammar->rules[grammar->count++] = expr;
     expr->id = id;
-    return grammar->count;
+
+    grammar->cap = cap;
+    grammar->rules = rules;
+    grammar->rules[grammar->count++] = expr;
+
+    return P4_Ok;
 }
 
 P4_PUBLIC(P4_Source*)

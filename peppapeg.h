@@ -210,6 +210,12 @@ typedef struct P4_Expression {
             size_t                  repeat_min;
             size_t                  repeat_max;
         };
+
+        /* Used by P4_BackReference. */
+        struct {
+            P4_String               backref_name;
+            struct P4_Expression*   backref_expr;
+        };
     };
 } P4_Expression;
 

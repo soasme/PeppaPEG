@@ -123,30 +123,33 @@ typedef enum {
     P4_Sequence,
     P4_Choice,
     P4_Repeat,
+    P4_BackReference,
 } P4_ExpressionKind;
 
 typedef enum {
     /* No error is like a bless. */
-    P4_Ok               = 0,
+    P4_Ok                   = 0,
     /* When there is an internal error.
      * Please raise an issue: https://github.com/soasme/peppapeg/issues. */
-    P4_InternalError    = 1,
+    P4_InternalError        = 1,
     /* When no text is matched. */
-    P4_MatchError       = 2,
+    P4_MatchError           = 2,
     /* When no name is resolved. */
-    P4_NameError        = 3,
+    P4_NameError            = 3,
     /* When the parse gets stuck forever or has reached the end. */
-    P4_AdvanceError     = 4,
+    P4_AdvanceError         = 4,
     /* When out of memory. */
-    P4_MemoryError      = 5,
+    P4_MemoryError          = 5,
     /* When the given value is of unexpected type. */
-    P4_ValueError       = 6,
+    P4_ValueError           = 6,
     /* When the index is out of boundary. */
-    P4_IndexError       = 7,
+    P4_IndexError           = 7,
     /* When the id is out of the table. */
-    P4_KeyError         = 8,
+    P4_KeyError             = 8,
     /* When null is encountered. */
-    P4_NullError        = 9,
+    P4_NullError            = 9,
+    /* When no back reference is found. */
+    P4_BackReferenceError   = 10,
 } P4_Error;
 
 typedef struct P4_Source {

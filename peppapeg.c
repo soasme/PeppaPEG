@@ -125,6 +125,7 @@ P4_PRIVATE(P4_Token*)           P4_MatchNegative(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchSequence(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchChoice(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchRepeat(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchBackReference(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchSpacedExpressions(P4_Source*, P4_Expression*);
 
 /*
@@ -761,6 +762,12 @@ finalize:
     return NULL;
 }
 
+P4_PRIVATE(P4_Token*)
+P4_MatchBackReference(P4_Source* s, P4_Expression* e) {
+    // TODO: implement back reference.
+    return NULL;
+}
+
 
 P4_PRIVATE(P4_Token*)
 P4_MatchPositive(P4_Source* s, P4_Expression* e) {
@@ -823,6 +830,9 @@ P4_Expression_dispatch(P4_Source* s, P4_Expression* e) {
             break;
         case P4_Repeat:
             result = P4_MatchRepeat(s, e);
+            break;
+        case P4_BackReference:
+            result = P4_MatchBackReference(s, e);
             break;
         default:
             P4_RaiseError(s, P4_ValueError, "no such kind");

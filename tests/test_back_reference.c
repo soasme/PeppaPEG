@@ -5,7 +5,7 @@
 /*
  * Rules:
  *  ENTRY = START END
- *  START = BACKREF("EOF", "EOF" / "EOT")
+ *  START = DEFREF("EOF", "EOF" / "EOT")
  *  END   = BACKREF("EOF")
  * Input:
  *  "EOTEOT"
@@ -35,7 +35,7 @@ P4_PRIVATE(void) test_match_back_reference_successfully(void) {
 /*
  * Rules:
  *  ENTRY = START END
- *  START = BACKREF("EOF", "EOF" / "EOT")
+ *  START = DEFREF("EOF", "EOF" / "EOT")
  *  END   = BACKREF("EOF")
  * Input:
  *  "EOTEOF"
@@ -63,7 +63,7 @@ P4_PRIVATE(void) test_match_back_reference_latter_not_match(void) {
 /*
  * Rules:
  *  ENTRY = START END
- *  START = BACKREF("EOF", "EOF" / "EOT")
+ *  START = DEFREF("EOF", "EOF" / "EOT")
  *  END   = BACKREF("EOF")
  * Input:
  *  "EOFEOT"

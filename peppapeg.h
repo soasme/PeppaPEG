@@ -212,10 +212,7 @@ typedef struct P4_Expression {
         };
 
         /* Used by P4_BackReference. */
-        struct {
-            P4_String               backref_name;
-            struct P4_Expression*   backref_expr;
-        };
+        size_t                      backref_index;
     };
 } P4_Expression;
 
@@ -274,8 +271,7 @@ P4_PUBLIC(P4_Expression*) P4_CreateRepeatExact(P4_Expression*, size_t);
 P4_PUBLIC(P4_Expression*) P4_CreateZeroOrOnce(P4_Expression*);
 P4_PUBLIC(P4_Expression*) P4_CreateZeroOrMore(P4_Expression*);
 P4_PUBLIC(P4_Expression*) P4_CreateOnceOrMore(P4_Expression*);
-P4_PUBLIC(P4_Expression*) P4_CreateDefineBackReference(P4_String, P4_Expression*);
-P4_PUBLIC(P4_Expression*) P4_CreateBackReference(P4_String);
+P4_PUBLIC(P4_Expression*) P4_CreateBackReference(size_t);
 
 P4_PUBLIC(P4_Error)       P4_SetMember(P4_Expression*, size_t, P4_Expression*);
 P4_PUBLIC(P4_Error)       P4_SetReferenceMember(P4_Expression*, size_t, P4_RuleID);
@@ -322,8 +318,7 @@ P4_PUBLIC(P4_Error)       P4_AddRepeatMin(P4_Grammar*, P4_RuleID, P4_Expression*
 P4_PUBLIC(P4_Error)       P4_AddRepeatMax(P4_Grammar*, P4_RuleID, P4_Expression*, size_t);
 P4_PUBLIC(P4_Error)       P4_AddRepeatMinMax(P4_Grammar*, P4_RuleID, P4_Expression*, size_t, size_t);
 P4_PUBLIC(P4_Error)       P4_AddRepeatExact(P4_Grammar*, P4_RuleID, P4_Expression*, size_t);
-P4_PUBLIC(P4_Error)       P4_AddDefineBackReference(P4_Grammar*, P4_RuleID, P4_String, P4_Expression*);
-P4_PUBLIC(P4_Error)       P4_AddBackReference(P4_Grammar*, P4_RuleID, P4_String);
+P4_PUBLIC(P4_Error)       P4_AddBackReference(P4_Grammar*, P4_RuleID, size_t);
 
 P4_PUBLIC(void)           P4_DeleteGrammarRule(P4_Grammar*, P4_RuleID);
 P4_PUBLIC(P4_Expression*) P4_GetGrammarRule(P4_Grammar*, P4_RuleID);

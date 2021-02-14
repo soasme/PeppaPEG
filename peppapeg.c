@@ -112,6 +112,8 @@ P4_PRIVATE(P4_Error)            P4_PopFrame(P4_Source*, P4_Expression**);
 
 P4_PRIVATE(P4_Expression*)      P4_GetReference(P4_Source*, P4_Expression*);
 
+P4_PRIVATE(P4_String)           P4_CopySliceString(P4_String, P4_Slice*);
+
 P4_PRIVATE(P4_Error)            P4_SetWhitespaces(P4_Grammar*);
 P4_PRIVATE(P4_Expression*)      P4_GetWhitespaces(P4_Grammar*);
 
@@ -562,6 +564,12 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
              *tok = NULL,
              *whitespace = NULL;
 
+    autofree P4_Slice* backrefs = malloc(sizeof(P4_Slice) * e->count);
+    if (backrefs == NULL) {
+        P4_RaiseError(s, P4_MemoryError, "OOM");
+        return NULL;
+    }
+
     P4_MarkPosition(s, startpos);
 
     for EACH(member, e->members, e->count) {
@@ -573,7 +581,37 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
             P4_AdoptToken(head, tail, whitespace);
         }
 
-        tok = P4_Match(s, member);
+        P4_MarkPosition(s, member_startpos);
+
+        if (member->kind == P4_BackReference) {
+            if (member->backref_index > e->count) {
+                P4_RaiseError(s, P4_IndexError, "backref index out of bound");
+                goto finalize;
+            }
+
+            P4_Slice* backref_slice = &(backrefs[member->backref_index]);
+            autofree P4_String litstr = P4_CopySliceString(s->content, backref_slice);
+            if (litstr == NULL) {
+                P4_RaiseError(s, P4_MemoryError, "OOM");
+                goto finalize;
+            }
+
+            P4_Expression* backref_expr = e->members[member->backref_index];
+            autofree P4_Expression* litexpr = P4_CreateLiteral(litstr, true);
+            if (litexpr == NULL) {
+                P4_RaiseError(s, P4_MemoryError, "OOM");
+                goto finalize;
+            }
+
+            litexpr->id = backref_expr->id;
+            tok = P4_MatchLiteral(s, litexpr);
+
+            if (tok != NULL)
+                tok->expr = backref_expr;
+
+        } else {
+            tok = P4_Match(s, member);
+        }
 
         // If any of the sequence members fails, the entire sequence fails.
         // Puke the eaten text and free all created tokens.
@@ -582,6 +620,8 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
         }
 
         P4_AdoptToken(head, tail, tok);
+        backrefs[EACH_INDEX()].i = member_startpos;
+        backrefs[EACH_INDEX()].j = P4_GetPosition(s);
     }
 
     if (P4_NeedLift(s, e))
@@ -1154,6 +1194,16 @@ P4_CreateOnceOrMore(P4_Expression* repeat) {
     return P4_CreateRepeatMinMax(repeat, 1, -1);
 }
 
+P4_PUBLIC(P4_Expression*)
+P4_CreateBackReference(size_t index) {
+    P4_Expression* expr = malloc(sizeof(P4_Expression));
+    expr->id = 0;
+    expr->kind = P4_BackReference;
+    expr->flag = 0;
+    expr->backref_index = index;
+    return expr;
+}
+
 P4_PUBLIC(P4_Error)
 P4_SetRuleID(P4_Expression* e, P4_RuleID id) {
     if (e == NULL)
@@ -1695,6 +1745,15 @@ P4_AddRepeatExact(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat, size
     return P4_Ok;
 }
 
+P4_PUBLIC(P4_Error)
+P4_AddBackReference(P4_Grammar* grammar, P4_RuleID id, size_t index) {
+    if (grammar == NULL || id == 0 || index == 0)
+        return P4_NullError;
+
+    P4_AddSomeGrammarRule(grammar, id, P4_CreateBackReference(index));
+    return P4_Ok;
+}
+
 P4_PUBLIC(P4_Slice*)
 P4_GetTokenSlice(P4_Token* token) {
     if (token == NULL)
@@ -1703,19 +1762,24 @@ P4_GetTokenSlice(P4_Token* token) {
     return &(token->slice);
 }
 
+P4_PRIVATE(P4_String)
+P4_CopySliceString(P4_String s, P4_Slice* slice) {
+    size_t    len = slice->j - slice->i;
+    assert(len >= 0);
+
+    P4_String str = malloc(len+1);
+    strncpy(str, s + slice->i, len);
+    str[len] = '\0';
+
+    return str;
+}
+
 P4_PUBLIC(P4_String)
 P4_CopyTokenString(P4_Token* token) {
     if (token == NULL)
         return NULL;
 
-    size_t    len = token->slice.j - token->slice.i;
-    assert(len >= 0);
-
-    P4_String str = malloc(len+1);
-    strncpy(str, token->text + token->slice.i, len);
-    str[len] = '\0';
-
-    return str;
+    return P4_CopySliceString(token->text, &(token->slice));
 }
 
 /*

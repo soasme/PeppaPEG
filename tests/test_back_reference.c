@@ -1,31 +1,59 @@
 #include "unity/src/unity.h"
 #include "common.h"
 
+# define ENTRY  1
+# define MARKER 2
 
 /*
  * Rules:
  *  ENTRY = MARKER "..." \1
  *  MARKER = "'" / "\""
  * Input:
- *  "..."
+ *  '...'
  * Output:
  *  ENTRY:
- *    START: "\""
- *    END: "\""
+ *    START: "'"
+ *    END: "'"
  */
 P4_PRIVATE(void) test_match_back_reference_successfully(void) {
     TEST_IGNORE_MESSAGE("backref not implementated");
 
-# define ENTRY  1
-# define R1     2
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
-    /* TODO: ADD BACKREF grammar rules. */
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddSequenceWithMembers(grammar, ENTRY, 3,
+            P4_CreateReference(MARKER),
+            P4_CreateLiteral("...", true),
+            P4_CreateBackReference(1)
+        )
+    );
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddChoiceWithMembers(grammar, MARKER, 2,
+            P4_CreateLiteral("'", true),
+            P4_CreateLiteral("\"", true)
+        )
+    );
 
-    P4_Source* source = P4_CreateSource("EOTEOT", ENTRY);
+    P4_Source* source = P4_CreateSource("'...'", ENTRY);
     TEST_ASSERT_NOT_NULL(source);
 
-    /* TODO: TEST BACKREF */
+    P4_Token* token = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("'...'", token);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+
+    P4_Token* head = token->head;
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("'", token);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(MARKER, token);
+
+    P4_Token* tail = token->tail;
+    TEST_ASSERT_NOT_NULL(tail);
+    TEST_ASSERT_NOT_EQUAL(head, tail);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("'", token);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(MARKER, token);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

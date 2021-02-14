@@ -4,15 +4,14 @@
 
 /*
  * Rules:
- *  ENTRY = START END
- *  START = DEFREF("EOF", "EOF" / "EOT")
- *  END   = BACKREF("EOF")
+ *  ENTRY = MARKER "..." \1
+ *  MARKER = "'" / "\""
  * Input:
- *  "EOTEOT"
+ *  "..."
  * Output:
  *  ENTRY:
- *    START: "EOT"
- *    END: "EOT"
+ *    START: "\""
+ *    END: "\""
  */
 P4_PRIVATE(void) test_match_back_reference_successfully(void) {
     TEST_IGNORE_MESSAGE("backref not implementated");
@@ -34,11 +33,10 @@ P4_PRIVATE(void) test_match_back_reference_successfully(void) {
 
 /*
  * Rules:
- *  ENTRY = START END
- *  START = DEFREF("EOF", "EOF" / "EOT")
- *  END   = BACKREF("EOF")
+ *  ENTRY = MARKER "..." \1
+ *  MARKER = "'" / "\""
  * Input:
- *  "EOTEOF"
+ *  "...'
  * Error:
  *  P4_MatchError
  * Output:
@@ -62,11 +60,10 @@ P4_PRIVATE(void) test_match_back_reference_latter_not_match(void) {
 
 /*
  * Rules:
- *  ENTRY = START END
- *  START = DEFREF("EOF", "EOF" / "EOT")
- *  END   = BACKREF("EOF")
+ *  ENTRY = MARKER "..." \1
+ *  MARKER = "'" / "\""
  * Input:
- *  "EOFEOT"
+ *  '..."
  * Error:
  *  P4_MatchError
  * Output:
@@ -90,12 +87,43 @@ P4_PRIVATE(void) test_match_back_reference_former_not_match(void) {
     P4_DeleteGrammar(grammar);
 }
 
+/*
+ * Rules:
+ *  ENTRY = MARKER "..." i\1
+ *  MARKER = i"TAG"
+ * Input:
+ *  TAG...tag"
+ * Output:
+ *  ENTRY:
+ *    MARKER: "TAG"
+ *    MARKER: "tag"
+ */
+P4_PRIVATE(void) test_match_back_reference_insensitive_match(void) {
+    TEST_IGNORE_MESSAGE("backref not implementated");
+
+# define ENTRY  1
+# define R1     2
+    P4_Grammar* grammar = P4_CreateGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+    /* TODO: ADD BACKREF grammar rules. */
+
+    P4_Source* source = P4_CreateSource("EOTEOT", ENTRY);
+    TEST_ASSERT_NOT_NULL(source);
+
+    /* TODO: TEST BACKREF */
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
+
+
 int main(void) {
     UNITY_BEGIN();
 
     RUN_TEST(test_match_back_reference_successfully);
     RUN_TEST(test_match_back_reference_former_not_match);
     RUN_TEST(test_match_back_reference_latter_not_match);
+    RUN_TEST(test_match_back_reference_insensitive_match);
 
     return UNITY_END();
 }

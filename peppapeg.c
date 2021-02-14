@@ -803,13 +803,6 @@ finalize:
 }
 
 P4_PRIVATE(P4_Token*)
-P4_MatchBackReference(P4_Source* s, P4_Expression* e) {
-    // TODO: implement back reference.
-    return NULL;
-}
-
-
-P4_PRIVATE(P4_Token*)
 P4_MatchPositive(P4_Source* s, P4_Expression* e) {
     assert(NO_ERROR(s) && e->ref_expr != NULL);
 
@@ -872,7 +865,8 @@ P4_Expression_dispatch(P4_Source* s, P4_Expression* e) {
             result = P4_MatchRepeat(s, e);
             break;
         case P4_BackReference:
-            result = P4_MatchBackReference(s, e);
+            P4_RaiseError(s, P4_ValueError, "BackReference only works in Sequence.");
+            result = NULL;
             break;
         default:
             P4_RaiseError(s, P4_ValueError, "no such kind");

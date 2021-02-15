@@ -1347,6 +1347,7 @@ P4_CreateSource(P4_String content, P4_RuleID rule_id) {
     source->frames = NULL;
     source->frames_len = 0;
     source->frames_cap = 0;
+    source->whitespacing = false;
     return source;
 }
 

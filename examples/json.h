@@ -59,6 +59,25 @@ typedef enum {
     P4_JSONEOI,
 } P4_JSONRuleID;
 
+/*
+ * Entry = Whitespace* (Object / Array / String / True / False / Null / Number) Whitespace* # LIFTED
+ * Array = "[" Entry ("," Entry)* "]" / "[" "]"
+ * Object = "{" ObjectItem ("," ObjectItem)* "}" / "{" "}"
+ * ObjectItem = String ":" Entry
+ * String = "\"" ([0x20-0x21] / [0x23-0x7f] / Escape)* "\""
+ * Escape = "\\" ("\"" / "/" / "\\" / "b" / "f" / "n" / "r" / "t" / UnicodeEscape)
+ * UnicodeEscape = "u" ([0-9][a-f][A-F]){4}
+ * True = "true"
+ * False = "false"
+ * Null = "null"
+ * Number = Minus? Integral Fractional? Exponent?
+ * Minus = "-"
+ * Plus = "+"
+ * Integral = "0" / [1-9] [0-9]+
+ * Fractional = "." [0-9]+
+ * Exponent = i"E" (Minus / Plus)? [0-9]+
+ * Whitespace = " " / "\t" / "\r" / "\n"
+ */
 P4_PUBLIC(P4_Grammar*)  P4_CreateJSONGrammar() {
     P4_Grammar* grammar = P4_CreateGrammar();
     if (grammar == NULL) {
@@ -93,10 +112,7 @@ P4_PUBLIC(P4_Grammar*)  P4_CreateJSONGrammar() {
         goto finalize;
 
     if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONExponent, 3,
-        P4_CreateChoiceWithMembers(2,
-            P4_CreateLiteral("e", true),
-            P4_CreateLiteral("E", true)
-        ),
+        P4_CreateLiteral("e", false),
         P4_CreateZeroOrOnce(
             P4_CreateChoiceWithMembers(2,
                 P4_CreateReference(P4_JSONPlus),

@@ -43,7 +43,7 @@ extern "C"
 # define P4_PRIVATE(type) static type
 
 # define P4_MAJOR_VERSION 1
-# define P4_MINOR_VERSION 1
+# define P4_MINOR_VERSION 2
 # define P4_PATCH_VERSION 0
 
 # define P4_FLAG_NONE                   ((uint32_t)(0x0))

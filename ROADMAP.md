@@ -11,7 +11,6 @@
 - [ ] New Expression Kind: CharacterSet.
 - [ ] New Expression Kind: Complement.
 - [ ] New Expression Kind: Panic.
-- [ ] New Expression Kind: BackReference.
 - [ ] New Expression Kind: Function.
 - [ ] Stop on first error v/s Recover from Panic.
 - [ ] Allow replacing malloc/free functions.
@@ -19,6 +18,7 @@
 - [ ] Python Binding.
 - [ ] NeedLoosen, NeedSquash, NeedLift should be well-tested.
 - [ ] Auto generate documentation for functions and defined macros.
+- [x] New Expression Kind: BackReference. Added in v1.2.0.
 - [x] Add Flag Set/Unset functions. Added in v1.1.0.
 - [x] INI parser example. Added in v1.1.0.
-- [x] ~~Flag SPACED.~~ Added in v1.0.0.
+- [x] Flag SPACED. Added in v1.0.0.

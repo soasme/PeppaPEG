@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.2.0 (15 Feb, 2021)
+
+* Add New Expression Kind: `P4_BackReference`. (#10)
+* Change the return value to `P4_Error` for `P4_AddGrammarRule`. (#9)
+* Added `P4_GetSourcePosition`. (#8)
+
 ## 1.1.0 (10 Feb, 2021)
 
 * C89 compliant. (#7)

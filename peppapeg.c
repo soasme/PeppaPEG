@@ -630,16 +630,18 @@ finalize:
 P4_PRIVATE(P4_Token*)
 P4_MatchChoice(P4_Source* s, P4_Expression* e) {
     P4_Token* tok = NULL;
+    P4_Expression* member = NULL;
 
     // A member is attempted if previous yields no match.
     // The oneof match matches successfully immediately if any match passes.
     P4_MarkPosition(s, startpos);
-    for EACH(member, e->members, e->count) {
+    for (int i = 0; i < e->count; i++) {
+        member = e->members[i];
         tok = P4_Match(s, member);
         if (NO_ERROR(s)) break;
         if (NO_MATCH(s)) {
             // retry until the last one.
-            if (EACH_INDEX() < e->count-1) {
+            if (i < e->count-1) {
                 P4_RescueError(s);
                 P4_SetPosition(s, startpos);
             // fail when the last one is a no-match.
@@ -1278,9 +1280,11 @@ P4_PUBLIC(P4_Grammar*)    P4_CreateGrammar(void) {
 P4_PUBLIC(void)
 P4_DeleteGrammar(P4_Grammar* grammar) {
     if (grammar) {
-        for EACH(rule, grammar->rules, grammar->count)
-            if (rule)
-                P4_DeleteExpression(rule);
+        for (int i = 0; i < grammar->count; i++) {
+            if (grammar->rules[i])
+                P4_DeleteExpression(grammar->rules[i]);
+            grammar->rules[i] = NULL;
+        }
         if (grammar->spaced_rules)
             P4_DeleteExpression(grammar->spaced_rules);
         free(grammar->rules);
@@ -1290,9 +1294,12 @@ P4_DeleteGrammar(P4_Grammar* grammar) {
 
 P4_PUBLIC(P4_Expression*)
 P4_GetGrammarRule(P4_Grammar* grammar, P4_RuleID id) {
-    for EACH(rule, grammar->rules, grammar->count)
-        if (rule->id == id)
+    P4_Expression* rule = NULL;
+    for (int i = 0; i < grammar->count; i++) {
+        rule = grammar->rules[i];
+        if (rule && rule->id == id)
             return rule;
+    }
     return NULL;
 }
 

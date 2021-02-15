@@ -559,6 +559,7 @@ P4_PRIVATE(P4_Token*)
 P4_MatchSequence(P4_Source* s, P4_Expression* e) {
     assert(NO_ERROR(s));
 
+    P4_Expression *member = NULL;
     P4_Token *head = NULL,
              *tail = NULL,
              *tok = NULL,
@@ -572,10 +573,12 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
 
     P4_MarkPosition(s, startpos);
 
-    for EACH(member, e->members, e->count) {
+    for (int i = 0; i < e->count; i++) {
+        member = e->members[i];
+
         // Optional `WHITESPACE` and `COMMENT` are inserted between every member.
         if (P4_NeedLoosen(s, e)
-                && EACH_INDEX() > 0) {
+                && i > 0) {
             whitespace = P4_MatchSpacedExpressions(s, NULL);
             if (!NO_ERROR(s)) goto finalize;
             P4_AdoptToken(head, tail, whitespace);
@@ -597,8 +600,8 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
         }
 
         P4_AdoptToken(head, tail, tok);
-        backrefs[EACH_INDEX()].i = member_startpos;
-        backrefs[EACH_INDEX()].j = P4_GetPosition(s);
+        backrefs[i].i = member_startpos;
+        backrefs[i].j = P4_GetPosition(s);
     }
 
     if (P4_NeedLift(s, e))
@@ -1417,8 +1420,11 @@ P4_SetWhitespaces(P4_Grammar* grammar) {
     P4_RuleID       ids[2] = {0};
     P4_Expression*  rules[2] = {0};
     P4_Expression*  repeat = NULL;
+    P4_Expression*  rule = NULL;
 
-    for EACH(rule, grammar->rules, grammar->count) {
+    for (int i = 0; i < grammar->count; i++) {
+        rule = grammar->rules[i];
+
         if (P4_IsSpaced(rule)) {
             ids[count] = rule->id;
             rules[count] = P4_CreateReference(rule->id);
@@ -1692,10 +1698,13 @@ P4_DeleteExpression(P4_Expression* expr) {
             break;
         case P4_Sequence:
         case P4_Choice:
-            for EACH(member, expr->members, expr->count)
-                if (member)
-                    P4_DeleteExpression(member);
+            for (int i = 0; i < expr->count; i++) {
+                if (expr->members[i])
+                    P4_DeleteExpression(expr->members[i]);
+                expr->members[i] = NULL;
+            }
             free(expr->members);
+            expr->members = NULL;
             break;
         case P4_Repeat:
             if (expr->repeat_expr)

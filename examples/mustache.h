@@ -64,7 +64,7 @@ typedef enum {
 /*
  * Entry = SOI Line*
  * Line = (Tag / Text)* (NewLine / EOI) # FLAG: TIGHT, Callback: UpdateIndent, TrimTokens
- * Text = NEGATIVE(Opener / NewLine) ANY* # FLAG: ATOMIC
+ * Text = (NEGATIVE(Opener / NewLine) ANY)* # FLAG: ATOMIC, TIGHT
  * NewLine = "\n" / "\r\n"
  * Tag = Opener TagContent Closer # Callback: SetDelimiter.
  * TagContent = SetDelimiter / Comment / Unescaped / TripleUnescaped / SectionOpen / SectionClose / Partial / Variable
@@ -109,7 +109,12 @@ P4_PUBLIC(P4_Grammar*)  P4_CreateMustacheGrammar() {
 
     if (P4_Ok != P4_AddZeroOrMore(grammar, P4_MustacheNonCloser,
         P4_CreateSequenceWithMembers(2,
-            P4_CreateNegative(P4_CreateReference(P4_MustacheCloser)),
+            P4_CreateNegative(
+                P4_CreateChoiceWithMembers(2,
+                    P4_CreateReference(P4_MustacheCloser),
+                    P4_CreateReference(P4_MustacheNewLine)
+                )
+            ),
             P4_CreateRange(1, 0x10ffff)
         )
     ))
@@ -223,6 +228,57 @@ P4_PUBLIC(P4_Grammar*)  P4_CreateMustacheGrammar() {
         goto finalize;
 
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_MustacheTagContent, P4_FLAG_LIFTED))
+        goto finalize;
+
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_MustacheNewLine, 2,
+        P4_CreateLiteral("\n", true),
+        P4_CreateLiteral("\r\n", true)
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_MustacheNewLine, P4_FLAG_LIFTED))
+        goto finalize;
+
+    if (P4_Ok != P4_AddZeroOrMore(grammar, P4_MustacheText,
+        P4_CreateSequenceWithMembers(2,
+            P4_CreateNegative(
+                P4_CreateChoiceWithMembers(2,
+                    P4_CreateReference(P4_MustacheOpener),
+                    P4_CreateReference(P4_MustacheNewLine)
+                )
+            ),
+            P4_CreateRange(1, 0x10ffff) /* ANY */
+        )
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_MustacheNewCloser, P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
+        goto finalize;
+
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheLine, 2,
+        P4_CreateZeroOrMore(
+            P4_CreateChoiceWithMembers(2,
+                P4_CreateReference(P4_MustacheTag),
+                P4_CreateReference(P4_MustacheText)
+            )
+        ),
+        P4_CreateReference(P4_MustacheEOI)
+        /*
+        P4_CreateChoiceWithMembers(2,
+            P4_CreateLiteral("\n", true),
+            P4_CreateReference(P4_MustacheEOI)
+        )
+        */
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_MustacheLine, P4_FLAG_TIGHT | P4_FLAG_LIFTED))
+        goto finalize;
+
+    if (P4_Ok != P4_AddPositive(grammar, P4_MustacheSOI, P4_CreateRange(1, 0x10ffff)))
+        goto finalize;
+
+    if (P4_Ok != P4_AddNegative(grammar, P4_MustacheEOI, P4_CreateRange(1, 0x10ffff)))
         goto finalize;
 
     return grammar;

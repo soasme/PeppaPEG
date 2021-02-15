@@ -272,6 +272,10 @@ P4_NeedLift(P4_Source* s, P4_Expression* e) {
 P4_PRIVATE(void)
 P4_RaiseError(P4_Source* s, P4_Error err, P4_String errmsg) {
     s->err = err;
+
+    if (s->errmsg != NULL)
+        free(s->errmsg);
+
     s->errmsg = strdup(errmsg);
     /*
     size_t len = strlen(errmsg)+10;

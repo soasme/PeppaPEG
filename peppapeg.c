@@ -32,13 +32,6 @@
 
 #include "peppapeg.h"
 
-# define                        EACH_INDEX() (p - pstart)
-# define                        EACH(item, array, length) (\
-        typeof(*(array)) *p = (array), *pstart = (array), (item) = *p;\
-        p < &((array)[length]); \
-        p++, (item) = *p\
-)
-
 # define                        NO_ERROR(s) ((s)->err == P4_Ok)
 # define                        NO_MATCH(s) ((s)->err == P4_MatchError)
 

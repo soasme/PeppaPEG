@@ -837,6 +837,13 @@ $ make check
 100% tests passed, 0 tests failed
 ```
 
+If valgrind is installed, you can also run the test along with memory leak check.
+
+```bash
+$ cmake -DENABLE_VALGRIND=ON .
+$ make check
+```
+
 ## Examples
 
 * Write an INI Parser using Peppa PEG: [ini.h](examples/ini.h), [ini.c](examples/ini.c).

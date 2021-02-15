@@ -3,10 +3,10 @@
 - [ ] Print error messages for Human.
 - [ ] Report line num & col.
 - [ ] Run in VERBOSE mode.
-- [ ] Performance test.
 - [ ] Add traverse functions for Tokens.
 - [ ] Callbacks for P4_Token.
-- [ ] Add Valgrind to the tests.
+- [ ] Dynamically change grammar rules.
+- [ ] Example JSON: rfc7159.
 - [ ] New Expression Kind: Numeric.
 - [ ] New Expression Kind: CharacterSet.
 - [ ] New Expression Kind: Complement.
@@ -15,9 +15,11 @@
 - [ ] Stop on first error v/s Recover from Panic.
 - [ ] Allow replacing malloc/free functions.
 - [ ] New Source Flag: Support UTF-8 BOM sequence (0xEF 0xBB 0xBF) at the start of source.
-- [ ] Python Binding.
 - [ ] NeedLoosen, NeedSquash, NeedLift should be well-tested.
-- [ ] Auto generate documentation for functions and defined macros.
+- [ ] Auto generate documentation for functions and defined macros. Example: doxygen.
+- [ ] Python Binding: example: cffi, misaka.
+- [ ] Benchmark: example: json-c.
+- [x] Add Valgrind to the tests. Added in v1.3.0.
 - [x] New Expression Kind: BackReference. Added in v1.2.0.
 - [x] Add Flag Set/Unset functions. Added in v1.1.0.
 - [x] INI parser example. Added in v1.1.0.

@@ -18,7 +18,8 @@ set(
     test_example_json
 )
 
-option(ENABLE_VALGRIND OFF "Enable vagrind memory leak report.")
+option(ENABLE_VALGRIND "Enable vagrind memory leak report." OFF)
+
 if (ENABLE_VALGRIND)
     find_program(VALGRIND valgrind)
     message("-- Valgrind found: ${VALGRIND}")

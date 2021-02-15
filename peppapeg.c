@@ -1281,6 +1281,8 @@ P4_DeleteGrammar(P4_Grammar* grammar) {
         for EACH(rule, grammar->rules, grammar->count)
             if (rule)
                 P4_DeleteExpression(rule);
+        if (grammar->spaced_rules)
+            P4_DeleteExpression(grammar->spaced_rules);
         free(grammar->rules);
         free(grammar);
     }

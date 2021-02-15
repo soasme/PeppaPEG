@@ -732,6 +732,11 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         if (!NO_ERROR(s))
             goto finalize;
 
+        if (P4_GetPosition(s) == before_implicit) {
+            P4_RaiseError(s, P4_AdvanceError, "Repeated expression consumes no input");
+            goto finalize;
+        }
+
         repeated++;
         P4_AdoptToken(head, tail, tok);
 
@@ -739,6 +744,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
             P4_RescueError(s);
             break;
         }
+
     }
 
     // there should be no error when repetition is successful.

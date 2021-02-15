@@ -398,7 +398,9 @@ Note that Sequence "owns" the members so `P4_DeleteExpression(sequence)` will fr
 
 Sequence expression can have BackReference members. They are useful when verbatim string of previous match is needed.
 
-Function `P4_CreateBackReference` creates a back reference with the index of a previous member. For example, the below grammar can match `'...'` or `"..."`, but cannot match `"...'` or `'..."`.
+Function `P4_CreateBackReference` creates a back reference with the index of a previous member. The index starts with zero.
+
+For example, the below grammar can match `'...'` or `"..."`, but cannot match `"...'` or `'..."`.
 
 ```c
 >> P4_AddSequenceWithMembers(grammar, ENTRY, 3,

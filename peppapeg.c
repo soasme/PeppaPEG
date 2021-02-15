@@ -1773,15 +1773,6 @@ P4_AddRepeatExact(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat, size
     return P4_Ok;
 }
 
-P4_PUBLIC(P4_Error)
-P4_AddBackReference(P4_Grammar* grammar, P4_RuleID id, size_t index) {
-    if (grammar == NULL || id == 0 || index == 0)
-        return P4_NullError;
-
-    P4_AddSomeGrammarRule(grammar, id, P4_CreateBackReference(index));
-    return P4_Ok;
-}
-
 P4_PUBLIC(P4_Slice*)
 P4_GetTokenSlice(P4_Token* token) {
     if (token == NULL)

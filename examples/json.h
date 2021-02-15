@@ -55,8 +55,6 @@ typedef enum {
     P4_JSONIntegral,
     P4_JSONFractional,
     P4_JSONExponent,
-    P4_JSONSOI,
-    P4_JSONEOI,
 } P4_JSONRuleID;
 
 /*
@@ -259,12 +257,6 @@ P4_PUBLIC(P4_Grammar*)  P4_CreateJSONGrammar() {
         goto finalize;
 
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_JSONEntry, P4_FLAG_LIFTED))
-        goto finalize;
-
-    if (P4_Ok != P4_AddPositive(grammar, P4_JSONSOI, P4_CreateRange(1, 0x10ffff)))
-        goto finalize;
-
-    if (P4_Ok != P4_AddNegative(grammar, P4_JSONEOI, P4_CreateRange(1, 0x10ffff)))
         goto finalize;
 
     if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_JSONWhitespace, 4,

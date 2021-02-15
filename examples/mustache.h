@@ -64,7 +64,7 @@ typedef enum {
 /*
  * Entry = SOI Line*
  * Line = (Tag / Text)* (NewLine / EOI) # FLAG: TIGHT, Callback: UpdateIndent, TrimTokens
- * Text = (NEGATIVE(Opener / NewLine) ANY)* # FLAG: ATOMIC, TIGHT
+ * Text = (NEGATIVE(Opener / NewLine) ANY)* Newline? # FLAG: ATOMIC, TIGHT
  * NewLine = "\n" / "\r\n"
  * Tag = Opener TagContent Closer # Callback: SetDelimiter.
  * TagContent = SetDelimiter / Comment / Unescaped / TripleUnescaped / SectionOpen / SectionClose / Partial / Variable
@@ -279,6 +279,12 @@ P4_PUBLIC(P4_Grammar*)  P4_CreateMustacheGrammar() {
         goto finalize;
 
     if (P4_Ok != P4_AddNegative(grammar, P4_MustacheEOI, P4_CreateRange(1, 0x10ffff)))
+        goto finalize;
+
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheEntry, 2,
+        P4_CreateReference(P4_MustacheSOI),
+        P4_CreateZeroOrMore(P4_CreateReference(P4_MustacheLine))
+    ))
         goto finalize;
 
     return grammar;

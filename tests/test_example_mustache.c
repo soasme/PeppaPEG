@@ -700,6 +700,37 @@ P4_PRIVATE(void) test_line_followed_by_newline(void) {
     P4_DeleteGrammar(grammar);
 }
 
+P4_PRIVATE(void) test_entry(void) {
+    P4_Grammar* grammar = P4_CreateMustacheGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+
+    P4_Source* source;
+
+    source = P4_CreateSource("abc\n{{xyz}}\n", P4_MustacheLine);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_Parse(grammar, source)
+    );
+    TEST_ASSERT_EQUAL(12, P4_GetSourcePosition(source));
+
+    P4_Token* token = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheText, token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("abc\n", token);
+
+    TEST_ASSERT_NOT_NULL(token->next);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token->next);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("{{xyz}}", token->next);
+
+    TEST_ASSERT_NOT_NULL(token->next->next);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheText, token->next->next);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("\n", token->next->next);
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -721,6 +752,7 @@ int main(void) {
     RUN_TEST(test_line_mixing_text_and_tag);
     RUN_TEST(test_line_mixing_text_and_tag2);
     RUN_TEST(test_line_followed_by_newline);
+    RUN_TEST(test_entry);
 
     return UNITY_END();
 }

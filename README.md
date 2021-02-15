@@ -841,6 +841,7 @@ $ make check
 
 * Write an INI Parser using Peppa PEG: [ini.h](examples/ini.h), [ini.c](examples/ini.c).
 * Write a Mustache Parser using Peppa PEG: [mustache.h](examples/mustache.h).
+* Write a JSON Parser using Peppa PEG: [json.h](examples/json.h).
 
 Made with ❤️  by [@soasme](https://github.com/soasme).
 

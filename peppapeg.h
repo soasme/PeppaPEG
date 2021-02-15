@@ -148,8 +148,6 @@ typedef enum {
     P4_KeyError             = 8,
     /* When null is encountered. */
     P4_NullError            = 9,
-    /* When no back reference is found. */
-    P4_BackReferenceError   = 10,
 } P4_Error;
 
 typedef struct P4_Source {

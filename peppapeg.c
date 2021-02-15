@@ -942,8 +942,6 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, size_t
         return NULL;
     }
 
-    P4_MarkPosition(s, startpos);
-
     if (index > e->count) {
         P4_RaiseError(s, P4_IndexError, "BackReference Index OutOfBound");
         return NULL;

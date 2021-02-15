@@ -24,6 +24,11 @@
  * SOFTWARE.
  *
  * Example: Write a Mustache Parser using Peppa PEG.
+ *
+ * TODO:
+ *
+ * + Dynamically set delimiter and trim tokens using rule callback.
+ * + Test mustache grammar using mustache official JSON test cases.
 */
 
 # ifndef P4_LANG_MUSTACHE_H

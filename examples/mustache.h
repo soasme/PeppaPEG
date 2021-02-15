@@ -116,8 +116,38 @@ P4_PUBLIC(P4_Grammar*)  P4_CreateMustacheGrammar() {
 
     if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheTag, 3,
         P4_CreateReference(P4_MustacheOpener),
-        P4_CreateReference(P4_MustacheNonCloser),
+        P4_CreateReference(P4_MustacheTagContent),
         P4_CreateReference(P4_MustacheCloser)
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheSectionOpen, 2,
+        P4_CreateChoiceWithMembers(2,
+            P4_CreateLiteral("#", true),
+            P4_CreateLiteral("^", true)
+        ),
+        P4_CreateReference(P4_MustacheNonCloser)
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheSectionClose, 2,
+        P4_CreateLiteral("/", true),
+        P4_CreateReference(P4_MustacheNonCloser)
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustachePartial, 2,
+        P4_CreateLiteral(">", true),
+        P4_CreateReference(P4_MustacheNonCloser)
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_AddReference(grammar, P4_MustacheVariable, P4_MustacheNonCloser))
+        goto finalize;
+
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_MustacheTagContent, 2,
+        P4_CreateReference(P4_MustachePartial),
+        P4_CreateReference(P4_MustacheVariable)
     ))
         goto finalize;
 

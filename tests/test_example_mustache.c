@@ -56,11 +56,39 @@ P4_PRIVATE(void) test_variable(void) {
     P4_DeleteGrammar(grammar);
 }
 
+P4_PRIVATE(void) test_partial(void) {
+    P4_Grammar* grammar = P4_CreateMustacheGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+
+    P4_Source* source;
+
+    source = P4_CreateSource("{{>xyz}}", P4_MustacheTag);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_Parse(grammar, source)
+    );
+    TEST_ASSERT_EQUAL(8, P4_GetSourcePosition(source));
+    P4_DeleteSource(source);
+
+    source = P4_CreateSource("{{> xyz }}", P4_MustacheTag);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_Parse(grammar, source)
+    );
+    TEST_ASSERT_EQUAL(10, P4_GetSourcePosition(source));
+    P4_DeleteSource(source);
+
+    P4_DeleteGrammar(grammar);
+}
+
 int main(void) {
     UNITY_BEGIN();
 
     RUN_TEST(test_whitespace);
     RUN_TEST(test_variable);
+    RUN_TEST(test_partial);
 
     return UNITY_END();
 }

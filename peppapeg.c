@@ -969,18 +969,27 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, size_t
         return NULL;
     }
 
-    autofree P4_Expression* litexpr = P4_CreateLiteral(litstr, true);
+    P4_Expression* litexpr = P4_CreateLiteral(litstr, true);
 
     if (litexpr == NULL) {
         P4_RaiseError(s, P4_MemoryError, "OOM");
         return NULL;
     }
 
-    litexpr->id = backref_expr->id;
+    if (backref_expr->kind == P4_Reference)
+        litexpr->id = backref_expr->ref_expr->id;
+    else
+        litexpr->id = backref_expr->id;
+
     P4_Token* tok = P4_MatchLiteral(s, litexpr);
 
     if (tok != NULL)
-        tok->expr = backref_expr;
+        if (backref_expr->kind == P4_Reference) /* TODO: other cases? */
+            tok->expr = backref_expr->ref_expr;
+        else
+            tok->expr = backref_expr;
+
+    P4_DeleteExpression(litexpr);
 
     return tok;
 }

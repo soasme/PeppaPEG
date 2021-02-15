@@ -112,6 +112,8 @@ P4_PRIVATE(P4_Error)            P4_PopFrame(P4_Source*, P4_Expression**);
 
 P4_PRIVATE(P4_Expression*)      P4_GetReference(P4_Source*, P4_Expression*);
 
+P4_PRIVATE(P4_String)           P4_CopySliceString(P4_String, P4_Slice*);
+
 P4_PRIVATE(P4_Error)            P4_SetWhitespaces(P4_Grammar*);
 P4_PRIVATE(P4_Expression*)      P4_GetWhitespaces(P4_Grammar*);
 
@@ -126,6 +128,7 @@ P4_PRIVATE(P4_Token*)           P4_MatchSequence(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchChoice(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchRepeat(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchSpacedExpressions(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Token*)           P4_MatchBackReference(P4_Source*, P4_Expression*, P4_Slice*, size_t);
 
 /*
  * Reads a single UTF-8 code point from the string.
@@ -561,6 +564,12 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
              *tok = NULL,
              *whitespace = NULL;
 
+    autofree P4_Slice* backrefs = malloc(sizeof(P4_Slice) * e->count);
+    if (backrefs == NULL) {
+        P4_RaiseError(s, P4_MemoryError, "OOM");
+        return NULL;
+    }
+
     P4_MarkPosition(s, startpos);
 
     for EACH(member, e->members, e->count) {
@@ -572,7 +581,14 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
             P4_AdoptToken(head, tail, whitespace);
         }
 
-        tok = P4_Match(s, member);
+        P4_MarkPosition(s, member_startpos);
+
+        if (member->kind == P4_BackReference) {
+            tok = P4_MatchBackReference(s, e, backrefs, member->backref_index);
+            if (!NO_ERROR(s)) goto finalize;
+        } else {
+            tok = P4_Match(s, member);
+        }
 
         // If any of the sequence members fails, the entire sequence fails.
         // Puke the eaten text and free all created tokens.
@@ -581,6 +597,8 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
         }
 
         P4_AdoptToken(head, tail, tok);
+        backrefs[EACH_INDEX()].i = member_startpos;
+        backrefs[EACH_INDEX()].j = P4_GetPosition(s);
     }
 
     if (P4_NeedLift(s, e))
@@ -761,7 +779,6 @@ finalize:
     return NULL;
 }
 
-
 P4_PRIVATE(P4_Token*)
 P4_MatchPositive(P4_Source* s, P4_Expression* e) {
     assert(NO_ERROR(s) && e->ref_expr != NULL);
@@ -823,6 +840,10 @@ P4_Expression_dispatch(P4_Source* s, P4_Expression* e) {
             break;
         case P4_Repeat:
             result = P4_MatchRepeat(s, e);
+            break;
+        case P4_BackReference:
+            P4_RaiseError(s, P4_ValueError, "BackReference only works in Sequence.");
+            result = NULL;
             break;
         default:
             P4_RaiseError(s, P4_ValueError, "no such kind");
@@ -912,6 +933,63 @@ P4_MatchSpacedExpressions(P4_Source* s, P4_Expression* e) {
     s->whitespacing = false;
 
     return result;
+}
+
+P4_PRIVATE(P4_Token*)
+P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, size_t index) {
+    if (backrefs == NULL) {
+        P4_RaiseError(s, P4_NullError, "");
+        return NULL;
+    }
+
+    if (index > e->count) {
+        P4_RaiseError(s, P4_IndexError, "BackReference Index OutOfBound");
+        return NULL;
+    }
+
+    P4_Slice* slice = &(backrefs[index]);
+    if (slice == NULL) {
+        P4_RaiseError(s, P4_IndexError, "BackReference Index OutOfBound");
+        return NULL;
+    }
+
+    autofree P4_String litstr = P4_CopySliceString(s->content, slice);
+
+    if (litstr == NULL) {
+        P4_RaiseError(s, P4_MemoryError, "OOM");
+        return NULL;
+    }
+
+    P4_Expression* backref_expr = e->members[index];
+
+    if (backref_expr == NULL) {
+        P4_RaiseError(s, P4_NullError, "Member NULL");
+        return NULL;
+    }
+
+    P4_Expression* litexpr = P4_CreateLiteral(litstr, true);
+
+    if (litexpr == NULL) {
+        P4_RaiseError(s, P4_MemoryError, "OOM");
+        return NULL;
+    }
+
+    if (backref_expr->kind == P4_Reference)
+        litexpr->id = backref_expr->ref_expr->id;
+    else
+        litexpr->id = backref_expr->id;
+
+    P4_Token* tok = P4_MatchLiteral(s, litexpr);
+
+    if (tok != NULL)
+        if (backref_expr->kind == P4_Reference) /* TODO: other cases? */
+            tok->expr = backref_expr->ref_expr;
+        else
+            tok->expr = backref_expr;
+
+    P4_DeleteExpression(litexpr);
+
+    return tok;
 }
 
 // Poor performance, refactor me.
@@ -1142,6 +1220,16 @@ P4_CreateZeroOrMore(P4_Expression* repeat) {
 P4_PUBLIC(P4_Expression*)
 P4_CreateOnceOrMore(P4_Expression* repeat) {
     return P4_CreateRepeatMinMax(repeat, 1, -1);
+}
+
+P4_PUBLIC(P4_Expression*)
+P4_CreateBackReference(size_t index) {
+    P4_Expression* expr = malloc(sizeof(P4_Expression));
+    expr->id = 0;
+    expr->kind = P4_BackReference;
+    expr->flag = 0;
+    expr->backref_index = index;
+    return expr;
 }
 
 P4_PUBLIC(P4_Error)
@@ -1693,19 +1781,24 @@ P4_GetTokenSlice(P4_Token* token) {
     return &(token->slice);
 }
 
+P4_PRIVATE(P4_String)
+P4_CopySliceString(P4_String s, P4_Slice* slice) {
+    size_t    len = slice->j - slice->i;
+    assert(len >= 0);
+
+    P4_String str = malloc(len+1);
+    strncpy(str, s + slice->i, len);
+    str[len] = '\0';
+
+    return str;
+}
+
 P4_PUBLIC(P4_String)
 P4_CopyTokenString(P4_Token* token) {
     if (token == NULL)
         return NULL;
 
-    size_t    len = token->slice.j - token->slice.i;
-    assert(len >= 0);
-
-    P4_String str = malloc(len+1);
-    strncpy(str, token->text + token->slice.i, len);
-    str[len] = '\0';
-
-    return str;
+    return P4_CopySliceString(token->text, &(token->slice));
 }
 
 /*

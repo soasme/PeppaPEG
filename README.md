@@ -17,6 +17,7 @@ Ultra lightweight PEG Parser in ANSI C. ✨ 🐷 ✨.
     * [Case Insensitive Literal](#case-insensitive-literal)
   * [Range](#range)
   * [Sequence](#sequence)
+    * [BackReference](#backreference)
   * [Choice](#choice)
   * [Reference](#reference)
   * [Positive](#positive)
@@ -392,6 +393,36 @@ P4_MatchError
 ```
 
 Note that Sequence "owns" the members so `P4_DeleteExpression(sequence)` will free all members as well. Don't free the members by yourself!
+
+### BackReference
+
+Sequence expression can have BackReference members. They are useful when verbatim string of previous match is needed.
+
+Function `P4_CreateBackReference` creates a back reference with the index of a previous member. The index starts with zero.
+
+For example, the below grammar can match `'...'` or `"..."`, but cannot match `"...'` or `'..."`.
+
+```c
+>> P4_AddSequenceWithMembers(grammar, ENTRY, 3,
+..   P4_CreateReference(MARKER),
+..   P4_CreateLiteral("...", true),
+..   P4_CreateBackReference(0)
+.. );
+>> P4_AddChoiceWithMembers(grammar, MARKER, 2,
+..   P4_CreateLiteral("'", true),
+..   P4_CreateLiteral("\"", true)
+.. );
+
+>> P4_Source* source = P4_Source("'...'", ENTRY);
+>> P4_Parse(grammar, source);
+P4_Ok
+
+>> P4_Source* source = P4_Source("\"...'", ENTRY);
+>> P4_Parse(grammar, source);
+P4_MatchError
+```
+
+BackReference can only be used in a Sequence and cannot be a grammar rule, therefore there is no `P4_AddBackReference` function.
 
 ## Choice
 

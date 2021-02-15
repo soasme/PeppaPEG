@@ -15,6 +15,7 @@ set(
     test_flags
     test_back_reference
     test_example_mustache
+    test_example_json
 )
 
 foreach(unity_testcase ${unity_testcases})

@@ -14,6 +14,7 @@ set(
     test_repeat
     test_flags
     test_back_reference
+    test_example_mustache
 )
 
 foreach(unity_testcase ${unity_testcases})

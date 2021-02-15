@@ -511,7 +511,6 @@ P4_PRIVATE(void) test_set_delimiter(void) {
         P4_Parse(grammar, source)
     );
     TEST_ASSERT_EQUAL(11, P4_GetSourcePosition(source));
-    P4_DeleteSource(source);
 
     P4_Token* token = P4_GetSourceAst(source);
 
@@ -527,6 +526,7 @@ P4_PRIVATE(void) test_set_delimiter(void) {
     TEST_ASSERT_NOT_NULL(token->tail);
     TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
 
+    P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
 }
 

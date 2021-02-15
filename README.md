@@ -831,10 +831,21 @@ P4_MatchError
 Assume you have `cmake` and `gcc` installed.
 
 ```bash
-$ cmake .
-$ make check
+(root) $ mkdir -p build
+(root) $ cd build
+(build) $ cmake ..
+(build) $ make check
 ...
 100% tests passed, 0 tests failed
+```
+
+If valgrind is installed, you can also run the test along with memory leak check.
+
+```bash
+(root) $ mkdir -p build
+(root) $ cd build
+(build) $ cmake -DENABLE_VALGRIND=ON ..
+(build) $ make check
 ```
 
 ## Examples

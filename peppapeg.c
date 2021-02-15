@@ -32,13 +32,6 @@
 
 #include "peppapeg.h"
 
-# define                        EACH_INDEX() (p - pstart)
-# define                        EACH(item, array, length) (\
-        typeof(*(array)) *p = (array), *pstart = (array), (item) = *p;\
-        p < &((array)[length]); \
-        p++, (item) = *p\
-)
-
 # define                        NO_ERROR(s) ((s)->err == P4_Ok)
 # define                        NO_MATCH(s) ((s)->err == P4_MatchError)
 
@@ -272,6 +265,10 @@ P4_NeedLift(P4_Source* s, P4_Expression* e) {
 P4_PRIVATE(void)
 P4_RaiseError(P4_Source* s, P4_Error err, P4_String errmsg) {
     s->err = err;
+
+    if (s->errmsg != NULL)
+        free(s->errmsg);
+
     s->errmsg = strdup(errmsg);
     /*
     size_t len = strlen(errmsg)+10;
@@ -559,6 +556,7 @@ P4_PRIVATE(P4_Token*)
 P4_MatchSequence(P4_Source* s, P4_Expression* e) {
     assert(NO_ERROR(s));
 
+    P4_Expression *member = NULL;
     P4_Token *head = NULL,
              *tail = NULL,
              *tok = NULL,
@@ -572,10 +570,12 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
 
     P4_MarkPosition(s, startpos);
 
-    for EACH(member, e->members, e->count) {
+    for (int i = 0; i < e->count; i++) {
+        member = e->members[i];
+
         // Optional `WHITESPACE` and `COMMENT` are inserted between every member.
         if (P4_NeedLoosen(s, e)
-                && EACH_INDEX() > 0) {
+                && i > 0) {
             whitespace = P4_MatchSpacedExpressions(s, NULL);
             if (!NO_ERROR(s)) goto finalize;
             P4_AdoptToken(head, tail, whitespace);
@@ -597,8 +597,8 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
         }
 
         P4_AdoptToken(head, tail, tok);
-        backrefs[EACH_INDEX()].i = member_startpos;
-        backrefs[EACH_INDEX()].j = P4_GetPosition(s);
+        backrefs[i].i = member_startpos;
+        backrefs[i].j = P4_GetPosition(s);
     }
 
     if (P4_NeedLift(s, e))
@@ -623,16 +623,18 @@ finalize:
 P4_PRIVATE(P4_Token*)
 P4_MatchChoice(P4_Source* s, P4_Expression* e) {
     P4_Token* tok = NULL;
+    P4_Expression* member = NULL;
 
     // A member is attempted if previous yields no match.
     // The oneof match matches successfully immediately if any match passes.
     P4_MarkPosition(s, startpos);
-    for EACH(member, e->members, e->count) {
+    for (int i = 0; i < e->count; i++) {
+        member = e->members[i];
         tok = P4_Match(s, member);
         if (NO_ERROR(s)) break;
         if (NO_MATCH(s)) {
             // retry until the last one.
-            if (EACH_INDEX() < e->count-1) {
+            if (i < e->count-1) {
                 P4_RescueError(s);
                 P4_SetPosition(s, startpos);
             // fail when the last one is a no-match.
@@ -1271,9 +1273,13 @@ P4_PUBLIC(P4_Grammar*)    P4_CreateGrammar(void) {
 P4_PUBLIC(void)
 P4_DeleteGrammar(P4_Grammar* grammar) {
     if (grammar) {
-        for EACH(rule, grammar->rules, grammar->count)
-            if (rule)
-                P4_DeleteExpression(rule);
+        for (int i = 0; i < grammar->count; i++) {
+            if (grammar->rules[i])
+                P4_DeleteExpression(grammar->rules[i]);
+            grammar->rules[i] = NULL;
+        }
+        if (grammar->spaced_rules)
+            P4_DeleteExpression(grammar->spaced_rules);
         free(grammar->rules);
         free(grammar);
     }
@@ -1281,9 +1287,12 @@ P4_DeleteGrammar(P4_Grammar* grammar) {
 
 P4_PUBLIC(P4_Expression*)
 P4_GetGrammarRule(P4_Grammar* grammar, P4_RuleID id) {
-    for EACH(rule, grammar->rules, grammar->count)
-        if (rule->id == id)
+    P4_Expression* rule = NULL;
+    for (int i = 0; i < grammar->count; i++) {
+        rule = grammar->rules[i];
+        if (rule && rule->id == id)
             return rule;
+    }
     return NULL;
 }
 
@@ -1338,6 +1347,7 @@ P4_CreateSource(P4_String content, P4_RuleID rule_id) {
     source->frames = NULL;
     source->frames_len = 0;
     source->frames_cap = 0;
+    source->whitespacing = false;
     return source;
 }
 
@@ -1417,8 +1427,11 @@ P4_SetWhitespaces(P4_Grammar* grammar) {
     P4_RuleID       ids[2] = {0};
     P4_Expression*  rules[2] = {0};
     P4_Expression*  repeat = NULL;
+    P4_Expression*  rule = NULL;
 
-    for EACH(rule, grammar->rules, grammar->count) {
+    for (int i = 0; i < grammar->count; i++) {
+        rule = grammar->rules[i];
+
         if (P4_IsSpaced(rule)) {
             ids[count] = rule->id;
             rules[count] = P4_CreateReference(rule->id);
@@ -1692,10 +1705,13 @@ P4_DeleteExpression(P4_Expression* expr) {
             break;
         case P4_Sequence:
         case P4_Choice:
-            for EACH(member, expr->members, expr->count)
-                if (member)
-                    P4_DeleteExpression(member);
+            for (int i = 0; i < expr->count; i++) {
+                if (expr->members[i])
+                    P4_DeleteExpression(expr->members[i]);
+                expr->members[i] = NULL;
+            }
             free(expr->members);
+            expr->members = NULL;
             break;
         case P4_Repeat:
             if (expr->repeat_expr)

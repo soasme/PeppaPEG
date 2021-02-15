@@ -239,16 +239,19 @@ P4_PUBLIC(P4_Grammar*)  P4_CreateMustacheGrammar() {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_MustacheNewLine, P4_FLAG_LIFTED))
         goto finalize;
 
-    if (P4_Ok != P4_AddZeroOrMore(grammar, P4_MustacheText,
-        P4_CreateSequenceWithMembers(2,
-            P4_CreateNegative(
-                P4_CreateChoiceWithMembers(2,
-                    P4_CreateReference(P4_MustacheOpener),
-                    P4_CreateReference(P4_MustacheNewLine)
-                )
-            ),
-            P4_CreateRange(1, 0x10ffff) /* ANY */
-        )
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheText, 2,
+        P4_CreateZeroOrMore(
+            P4_CreateSequenceWithMembers(2,
+                P4_CreateNegative(
+                    P4_CreateChoiceWithMembers(2,
+                        P4_CreateReference(P4_MustacheOpener),
+                        P4_CreateReference(P4_MustacheNewLine)
+                    )
+                ),
+                P4_CreateRange(1, 0x10ffff) /* ANY */
+            )
+        ),
+        P4_CreateZeroOrOnce(P4_CreateReference(P4_MustacheNewLine))
     ))
         goto finalize;
 
@@ -262,13 +265,10 @@ P4_PUBLIC(P4_Grammar*)  P4_CreateMustacheGrammar() {
                 P4_CreateReference(P4_MustacheText)
             )
         ),
-        P4_CreateReference(P4_MustacheEOI)
-        /*
         P4_CreateChoiceWithMembers(2,
-            P4_CreateLiteral("\n", true),
+            P4_CreateReference(P4_MustacheNewLine),
             P4_CreateReference(P4_MustacheEOI)
         )
-        */
     ))
         goto finalize;
 

@@ -542,7 +542,7 @@ P4_PRIVATE(void) test_text_followed_by_newline(void) {
         P4_Ok,
         P4_Parse(grammar, source)
     );
-    TEST_ASSERT_EQUAL(3, P4_GetSourcePosition(source));
+    TEST_ASSERT_EQUAL(4, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
 
@@ -683,18 +683,18 @@ P4_PRIVATE(void) test_line_followed_by_newline(void) {
 
     P4_Source* source;
 
-    source = P4_CreateSource("abc\n", P4_MustacheLine);
+    source = P4_CreateSource("abc\n\n", P4_MustacheLine);
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
         P4_Parse(grammar, source)
     );
-    TEST_ASSERT_EQUAL(4, P4_GetSourcePosition(source));
+    TEST_ASSERT_EQUAL(5, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
     TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheText, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("abc", token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("abc\n", token);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

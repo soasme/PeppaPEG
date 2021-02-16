@@ -32,15 +32,16 @@
 
 #include "peppapeg.h"
 
-# define IS_TIGHT(e) (((e)->flag & P4_FLAG_TIGHT) != 0)
-# define IS_SCOPED(e) (((e)->flag & P4_FLAG_SCOPED) != 0)
-# define IS_SPACED(e) (((e)->flag & P4_FLAG_SPACED) != 0)
-# define IS_SQUASHED(e) (((e)->flag & P4_FLAG_SQUASHED) != 0)
-# define IS_LIFTED(e) (((e)->flag & P4_FLAG_LIFTED) != 0)
+# define                        IS_TIGHT(e) (((e)->flag & P4_FLAG_TIGHT) != 0)
+# define                        IS_SCOPED(e) (((e)->flag & P4_FLAG_SCOPED) != 0)
+# define                        IS_SPACED(e) (((e)->flag & P4_FLAG_SPACED) != 0)
+# define                        IS_SQUASHED(e) (((e)->flag & P4_FLAG_SQUASHED) != 0)
+# define                        IS_LIFTED(e) (((e)->flag & P4_FLAG_LIFTED) != 0)
+# define                        IS_RULE(e) ((e)->id != 0)
 # define                        NO_ERROR(s) ((s)->err == P4_Ok)
 # define                        NO_MATCH(s) ((s)->err == P4_MatchError)
 
-#define                         autofree __attribute__ ((cleanup (cleanup_freep)))
+# define                        autofree __attribute__ ((cleanup (cleanup_freep)))
 
 P4_PRIVATE(void)
 cleanup_freep (void *p)
@@ -258,7 +259,7 @@ P4_NeedSquash(P4_Source* s, P4_Expression* e) {
  */
 P4_PRIVATE(bool)
 P4_NeedLift(P4_Source* s, P4_Expression* e) {
-    return !P4_IsRule(e) || IS_LIFTED(e) || P4_NeedSquash(s, e);
+    return !IS_RULE(e) || IS_LIFTED(e) || P4_NeedSquash(s, e);
 }
 
 
@@ -900,14 +901,14 @@ P4_Match(P4_Source* s, P4_Expression* e) {
     P4_Error     err = P4_Ok;
     P4_Token* result = NULL;
 
-    if (P4_IsRule(e) && (err = P4_PushFrame(s, e)) != P4_Ok) {
+    if (IS_RULE(e) && (err = P4_PushFrame(s, e)) != P4_Ok) {
         P4_RaiseError(s, err, "failed to push frame");
         return NULL;
     }
 
     result = P4_Expression_dispatch(s, e);
 
-    if (P4_IsRule(e) && (err = P4_PopFrame(s, NULL)) != P4_Ok) {
+    if (IS_RULE(e) && (err = P4_PopFrame(s, NULL)) != P4_Ok) {
         P4_RaiseError(s, err, "failed to pop frame");
         P4_DeleteToken(result);
         return NULL;

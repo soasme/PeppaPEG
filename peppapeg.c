@@ -194,6 +194,10 @@ P4_CaseCmpInsensitive(P4_String src, P4_String dst, size_t len) {
 
 /*
  * Determine if the implicit whitespace should be applied.
+ *
+ * XXX: As long as the state can be cached when the frame is pushed, we
+ * don't need to traverse the frame stack to know if loosen is needed.
+ *
  */
 P4_PRIVATE(bool)
 P4_NeedLoosen(P4_Source* s, P4_Expression* e) {
@@ -228,6 +232,10 @@ P4_NeedLoosen(P4_Source* s, P4_Expression* e) {
 
 /*
  * Determine if inner tokens should be generated.
+ *
+ * XXX: As long as the state can be cached when the frame is pushed, we
+ * don't need to traverse the frame stack to know if loosen is needed.
+ *
  */
 P4_PRIVATE(bool)
 P4_NeedSquash(P4_Source* s, P4_Expression* e) {
@@ -256,6 +264,7 @@ P4_NeedSquash(P4_Source* s, P4_Expression* e) {
  * 1. Intermediate expr.
  * 2. Bareness expr.
  * 3. Hollowed expr.
+ *
  */
 P4_PRIVATE(bool)
 P4_NeedLift(P4_Source* s, P4_Expression* e) {

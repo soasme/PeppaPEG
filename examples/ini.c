@@ -60,7 +60,7 @@ website=\n";
     P4_Source*  src = P4_CreateSource(input, P4_INI_Entry);
 
     if (P4_Ok != P4_Parse(ini, src)) {
-        printf("Error: Parse: (%lu) %s\n", P4_GetError(src), P4_GetErrorMessage(src));
+        printf("Error: Parse: (%u) %s\n", P4_GetError(src), P4_GetErrorMessage(src));
         return 1;
     }
 

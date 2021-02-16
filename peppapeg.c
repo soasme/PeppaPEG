@@ -306,6 +306,7 @@ P4_RescueError(P4_Source* s) {
     s->err = P4_Ok;
     if (s->errmsg != NULL) {
         free(s->errmsg);
+        s->errmsg = NULL;
         s->errmsg = strdup("");
     }
 }
@@ -390,20 +391,28 @@ P4_DeleteToken(P4_Token* token) {
  */
 P4_PRIVATE(P4_Error)
 P4_PushFrame(P4_Source* s, P4_Expression* e) {
+    if (s->frames_len > (s->grammar->depth)) {
+        return P4_StackError;
+    }
+
+    P4_Expression** frames = s->frames;
 
 # define DEFAULT_CAP 32
+
     if (s->frames_cap == 0) {
-        s->frames_cap = 32;
-        s->frames = malloc(sizeof(P4_Expression*) * s->frames_cap);
-    } else if (s->frames_len >= s->frames_cap) {
+        s->frames_cap = DEFAULT_CAP;
+        frames = malloc(sizeof(P4_Expression*) * s->frames_cap);
+    } else if (s->frames_len >= s->frames_cap - 1) {
         s->frames_cap <<= 1;
-        s->frames = realloc(s->frames, s->frames_cap); // memory leak?
+        frames = realloc(s->frames, sizeof(P4_Expression*) * s->frames_cap);
     }
-    if (s->frames == NULL)
+    if (frames == NULL)
         return P4_MemoryError;
 
+    s->frames = frames;
     s->frames[s->frames_len] = e;
     s->frames_len++;
+
     return P4_Ok;
 }
 
@@ -424,6 +433,7 @@ P4_PopFrame(P4_Source* s, P4_Expression** e) {
         *e = s->frames[s->frames_len];
 
     s->frames[s->frames_len+1] = 0;
+
     return P4_Ok;
 }
 
@@ -896,7 +906,7 @@ P4_Match(P4_Source* s, P4_Expression* e) {
     }
 
     if (s->err != P4_Ok) {
-        assert(result == NULL);
+        P4_DeleteToken(result);
         return NULL;
     }
 
@@ -989,11 +999,13 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, size_t
 
     P4_Token* tok = P4_MatchLiteral(s, litexpr);
 
-    if (tok != NULL)
-        if (backref_expr->kind == P4_Reference) /* TODO: other cases? */
+    if (tok != NULL) {
+        if (backref_expr->kind == P4_Reference) { /* TODO: other cases? */
             tok->expr = backref_expr->ref_expr;
-        else
+        } else {
             tok->expr = backref_expr;
+        }
+    }
 
     P4_DeleteExpression(litexpr);
 
@@ -1009,7 +1021,7 @@ P4_PrintSourceAst(P4_Token* token, P4_String buf, size_t indent) {
     while (current != NULL) {
         for (size_t i = 0; i < indent; i++) strcat(buf, " ");
         strcat(buf, "- ");
-        sprintf(idstr+1, "%d", current->expr->id);
+        sprintf(idstr+1, "%lu", current->expr->id);
         strcat(buf, idstr);
         if (current->head == NULL) {
             strcat(buf, ": \"");
@@ -1267,6 +1279,7 @@ P4_PUBLIC(P4_Grammar*)    P4_CreateGrammar(void) {
     grammar->cap = 0;
     grammar->spaced_count = -1;
     grammar->spaced_rules = NULL;
+    grammar->depth = 1024*8;
     return grammar;
 }
 
@@ -1716,6 +1729,8 @@ P4_DeleteExpression(P4_Expression* expr) {
         case P4_Repeat:
             if (expr->repeat_expr)
                 P4_DeleteExpression(expr->repeat_expr);
+            break;
+        default:
             break;
     }
 

@@ -148,6 +148,8 @@ typedef enum {
     P4_KeyError             = 8,
     /* When null is encountered. */
     P4_NullError            = 9,
+    /* When recursion limit is reached. */
+    P4_StackError           = 10,
 } P4_Error;
 
 typedef struct P4_Source {
@@ -159,8 +161,8 @@ typedef struct P4_Source {
     P4_String               errmsg;
     struct P4_Token*        root;
     struct P4_Expression**  frames;
-    size_t                  frames_len;
-    size_t                  frames_cap;
+    uint64_t                frames_len;
+    uint64_t                frames_cap;
     bool                    verbose;
     bool                    whitespacing;
 } P4_Source;
@@ -246,6 +248,7 @@ typedef struct P4_Grammar{
     size_t                  spaced_count;
     /* the repetition rule for spaced rules. */
     struct P4_Expression*   spaced_rules;
+    size_t                  depth;
 } P4_Grammar;
 
 

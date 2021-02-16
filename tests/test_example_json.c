@@ -319,6 +319,45 @@ P4_PRIVATE(void) test_array_one_item(void) {
     P4_DeleteGrammar(grammar);
 }
 
+P4_PRIVATE(void) test_array_deep_nesting(void) {
+    P4_Grammar* grammar = P4_CreateJSONGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+
+    P4_Source* source;
+
+    const int NESTING_DEPTH = 500;
+
+    P4_String input = malloc(sizeof(char) * (NESTING_DEPTH*2 + 1));
+    int i;
+
+    for (i = 0; i < NESTING_DEPTH; i++) {
+        input[i] = '[';
+        input[NESTING_DEPTH+i] = ']';
+    }
+    input[NESTING_DEPTH*2] = '\0';
+
+    source = P4_CreateSource(input, P4_JSONEntry);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_Parse(grammar, source)
+    );
+    TEST_ASSERT_EQUAL(NESTING_DEPTH*2, P4_GetSourcePosition(source));
+
+    P4_Token* token = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONArray, token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING(input, token);
+
+    TEST_ASSERT_NULL(token->next);
+
+    TEST_ASSERT_NOT_NULL(token->head);
+
+    free(input);
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
+
 P4_PRIVATE(void) test_array_multiple_items(void) {
     P4_Grammar* grammar = P4_CreateJSONGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
@@ -469,6 +508,7 @@ int main(void) {
     RUN_TEST(test_array_empty);
     RUN_TEST(test_array_one_item);
     RUN_TEST(test_array_multiple_items);
+    RUN_TEST(test_array_deep_nesting);
     RUN_TEST(test_objectitem);
     RUN_TEST(test_object_empty);
     RUN_TEST(test_object_one_item);

@@ -578,13 +578,15 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
         return NULL;
     }
 
+    bool needloosen = P4_NeedLoosen(s, e);
+
     P4_MarkPosition(s, startpos);
 
     for (int i = 0; i < e->count; i++) {
         member = e->members[i];
 
         // Optional `WHITESPACE` and `COMMENT` are inserted between every member.
-        if (P4_NeedLoosen(s, e)
+        if (needloosen
                 && i > 0) {
             whitespace = P4_MatchSpacedExpressions(s, NULL);
             if (!NO_ERROR(s)) goto finalize;
@@ -707,6 +709,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     min = e->repeat_min;
     max = e->repeat_max;
 
+    bool needloosen = P4_NeedLoosen(s, e);
     P4_Position startpos = P4_GetPosition(s);
     P4_Token *head = NULL, *tail = NULL, *tok = NULL, *whitespace = NULL;
 
@@ -714,7 +717,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         P4_MarkPosition(s, before_implicit);
 
         // SPACED rule expressions are inserted between every repetition.
-        if (P4_NeedLoosen(s, e)
+        if (needloosen
                 && repeated > 0 ) {
             whitespace = P4_MatchSpacedExpressions(s, NULL);
             if (!NO_ERROR(s)) goto finalize;
@@ -727,7 +730,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
             assert(tok == NULL);
 
             // considering the case: MATCH WHITESPACE MATCH WHITESPACE NO_MATCH
-            if (P4_NeedLoosen(s, e)            //           ^          ^
+            if (needloosen                     //           ^          ^
                     && repeated > 0)           //           ^          ^ we are here
                 P4_SetPosition(s, before_implicit);  //           ^ puke extra whitespace
                                                //           ^ now we are here

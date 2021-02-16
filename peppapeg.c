@@ -32,10 +32,16 @@
 
 #include "peppapeg.h"
 
+# define                        IS_TIGHT(e) (((e)->flag & P4_FLAG_TIGHT) != 0)
+# define                        IS_SCOPED(e) (((e)->flag & P4_FLAG_SCOPED) != 0)
+# define                        IS_SPACED(e) (((e)->flag & P4_FLAG_SPACED) != 0)
+# define                        IS_SQUASHED(e) (((e)->flag & P4_FLAG_SQUASHED) != 0)
+# define                        IS_LIFTED(e) (((e)->flag & P4_FLAG_LIFTED) != 0)
+# define                        IS_RULE(e) ((e)->id != 0)
 # define                        NO_ERROR(s) ((s)->err == P4_Ok)
 # define                        NO_MATCH(s) ((s)->err == P4_MatchError)
 
-#define                         autofree __attribute__ ((cleanup (cleanup_freep)))
+# define                        autofree __attribute__ ((cleanup (cleanup_freep)))
 
 P4_PRIVATE(void)
 cleanup_freep (void *p)
@@ -188,6 +194,10 @@ P4_CaseCmpInsensitive(P4_String src, P4_String dst, size_t len) {
 
 /*
  * Determine if the implicit whitespace should be applied.
+ *
+ * XXX: As long as the state can be cached when the frame is pushed, we
+ * don't need to traverse the frame stack to know if loosen is needed.
+ *
  */
 P4_PRIVATE(bool)
 P4_NeedLoosen(P4_Source* s, P4_Expression* e) {
@@ -206,14 +216,14 @@ P4_NeedLoosen(P4_Source* s, P4_Expression* e) {
     // Traverse the frame stack from the highest frame,
     for (int i = s->frames_len-1; i >=0; i--) {
         // (3) when e is inside a continuance expression and no tightness at all.
-        if (!P4_IsTight(s->frames[i]) && P4_IsScoped(s->frames[i]))
+        if (!IS_TIGHT(s->frames[i]) && IS_SCOPED(s->frames[i]))
             return true;
     }
 
     // traversing the frame stack since the inner most,
     for (int i = 0; i < s->frames_len; i++) {
         // (3) when e is a tighted expression.
-        if (P4_IsTight(s->frames[i]))
+        if (IS_TIGHT(s->frames[i]))
             return false;
     }
 
@@ -222,22 +232,26 @@ P4_NeedLoosen(P4_Source* s, P4_Expression* e) {
 
 /*
  * Determine if inner tokens should be generated.
+ *
+ * XXX: As long as the state can be cached when the frame is pushed, we
+ * don't need to traverse the frame stack to know if loosen is needed.
+ *
  */
 P4_PRIVATE(bool)
 P4_NeedSquash(P4_Source* s, P4_Expression* e) {
     // A continuance expr forces no hollowness.
-    if (P4_IsScoped(e))
+    if (IS_SCOPED(e))
         return false;
 
     // Start from expr's parent.
     for (int i = s->frames_len-2; i>=0; i--) {
         // Any of expr's ancestor being continuance forces no hollowness.
-        if (P4_IsScoped(s->frames[i]))
+        if (IS_SCOPED(s->frames[i]))
             return false;
 
         // Otherwise, being the descendant of hollowness token should be hollowed.
         // printf("frame %d: id=%lu, %d\n", i, s->frames[i]->id, s->frames[i]->flag);
-        if (P4_IsSquashed(s->frames[i]))
+        if (IS_SQUASHED(s->frames[i]))
             return true;
     }
 
@@ -250,10 +264,11 @@ P4_NeedSquash(P4_Source* s, P4_Expression* e) {
  * 1. Intermediate expr.
  * 2. Bareness expr.
  * 3. Hollowed expr.
+ *
  */
 P4_PRIVATE(bool)
 P4_NeedLift(P4_Source* s, P4_Expression* e) {
-    return !P4_IsRule(e) || P4_IsLifted(e) || P4_NeedSquash(s, e);
+    return !IS_RULE(e) || IS_LIFTED(e) || P4_NeedSquash(s, e);
 }
 
 
@@ -895,14 +910,14 @@ P4_Match(P4_Source* s, P4_Expression* e) {
     P4_Error     err = P4_Ok;
     P4_Token* result = NULL;
 
-    if (P4_IsRule(e) && (err = P4_PushFrame(s, e)) != P4_Ok) {
+    if (IS_RULE(e) && (err = P4_PushFrame(s, e)) != P4_Ok) {
         P4_RaiseError(s, err, "failed to push frame");
         return NULL;
     }
 
     result = P4_Expression_dispatch(s, e);
 
-    if (P4_IsRule(e) && (err = P4_PopFrame(s, NULL)) != P4_Ok) {
+    if (IS_RULE(e) && (err = P4_PopFrame(s, NULL)) != P4_Ok) {
         P4_RaiseError(s, err, "failed to pop frame");
         P4_DeleteToken(result);
         return NULL;
@@ -1448,7 +1463,7 @@ P4_SetWhitespaces(P4_Grammar* grammar) {
     for (int i = 0; i < grammar->count; i++) {
         rule = grammar->rules[i];
 
-        if (P4_IsSpaced(rule)) {
+        if (IS_SPACED(rule)) {
             ids[count] = rule->id;
             rules[count] = P4_CreateReference(rule->id);
 

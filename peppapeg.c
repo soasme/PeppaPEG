@@ -32,6 +32,11 @@
 
 #include "peppapeg.h"
 
+# define IS_TIGHT(e) (((e)->flag & P4_FLAG_TIGHT) != 0)
+# define IS_SCOPED(e) (((e)->flag & P4_FLAG_SCOPED) != 0)
+# define IS_SPACED(e) (((e)->flag & P4_FLAG_SPACED) != 0)
+# define IS_SQUASHED(e) (((e)->flag & P4_FLAG_SQUASHED) != 0)
+# define IS_LIFTED(e) (((e)->flag & P4_FLAG_LIFTED) != 0)
 # define                        NO_ERROR(s) ((s)->err == P4_Ok)
 # define                        NO_MATCH(s) ((s)->err == P4_MatchError)
 
@@ -206,14 +211,14 @@ P4_NeedLoosen(P4_Source* s, P4_Expression* e) {
     // Traverse the frame stack from the highest frame,
     for (int i = s->frames_len-1; i >=0; i--) {
         // (3) when e is inside a continuance expression and no tightness at all.
-        if (!P4_IsTight(s->frames[i]) && P4_IsScoped(s->frames[i]))
+        if (!IS_TIGHT(s->frames[i]) && IS_SCOPED(s->frames[i]))
             return true;
     }
 
     // traversing the frame stack since the inner most,
     for (int i = 0; i < s->frames_len; i++) {
         // (3) when e is a tighted expression.
-        if (P4_IsTight(s->frames[i]))
+        if (IS_TIGHT(s->frames[i]))
             return false;
     }
 
@@ -226,18 +231,18 @@ P4_NeedLoosen(P4_Source* s, P4_Expression* e) {
 P4_PRIVATE(bool)
 P4_NeedSquash(P4_Source* s, P4_Expression* e) {
     // A continuance expr forces no hollowness.
-    if (P4_IsScoped(e))
+    if (IS_SCOPED(e))
         return false;
 
     // Start from expr's parent.
     for (int i = s->frames_len-2; i>=0; i--) {
         // Any of expr's ancestor being continuance forces no hollowness.
-        if (P4_IsScoped(s->frames[i]))
+        if (IS_SCOPED(s->frames[i]))
             return false;
 
         // Otherwise, being the descendant of hollowness token should be hollowed.
         // printf("frame %d: id=%lu, %d\n", i, s->frames[i]->id, s->frames[i]->flag);
-        if (P4_IsSquashed(s->frames[i]))
+        if (IS_SQUASHED(s->frames[i]))
             return true;
     }
 
@@ -253,7 +258,7 @@ P4_NeedSquash(P4_Source* s, P4_Expression* e) {
  */
 P4_PRIVATE(bool)
 P4_NeedLift(P4_Source* s, P4_Expression* e) {
-    return !P4_IsRule(e) || P4_IsLifted(e) || P4_NeedSquash(s, e);
+    return !P4_IsRule(e) || IS_LIFTED(e) || P4_NeedSquash(s, e);
 }
 
 
@@ -1448,7 +1453,7 @@ P4_SetWhitespaces(P4_Grammar* grammar) {
     for (int i = 0; i < grammar->count; i++) {
         rule = grammar->rules[i];
 
-        if (P4_IsSpaced(rule)) {
+        if (IS_SPACED(rule)) {
             ids[count] = rule->id;
             rules[count] = P4_CreateReference(rule->id);
 

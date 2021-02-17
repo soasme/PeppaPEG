@@ -32,6 +32,11 @@
 
 #include "peppapeg.h"
 
+# define LOOSEN 0x1
+# define SQUASH 0x10
+# define IS_SILENT(f) (((f) & SQUASH) != 0)
+# define SET_SILENT(f) ((f) |= SQUASH)
+
 # define                        IS_TIGHT(e) (((e)->flag & P4_FLAG_TIGHT) != 0)
 # define                        IS_SCOPED(e) (((e)->flag & P4_FLAG_SCOPED) != 0)
 # define                        IS_SPACED(e) (((e)->flag & P4_FLAG_SPACED) != 0)
@@ -239,23 +244,7 @@ P4_NeedLoosen(P4_Source* s, P4_Expression* e) {
  */
 P4_PRIVATE(bool)
 P4_NeedSquash(P4_Source* s, P4_Expression* e) {
-    // A continuance expr forces no hollowness.
-    if (IS_SCOPED(e))
-        return false;
-
-    // Start from expr's parent.
-    for (int i = s->frames_len-2; i>=0; i--) {
-        // Any of expr's ancestor being continuance forces no hollowness.
-        if (IS_SCOPED(s->frames[i]))
-            return false;
-
-        // Otherwise, being the descendant of hollowness token should be hollowed.
-        // printf("frame %d: id=%lu, %d\n", i, s->frames[i]->id, s->frames[i]->flag);
-        if (IS_SQUASHED(s->frames[i]))
-            return true;
-    }
-
-    return false;
+    return IS_SILENT(s->frame_flags[s->frames_len-1]);
 }
 
 /*
@@ -400,7 +389,6 @@ P4_DeleteToken(P4_Token* token) {
     }
 }
 
-
 /*
  * Push e into s->frames.
  */
@@ -411,6 +399,7 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
     }
 
     P4_Expression** frames = s->frames;
+    uint64_t*       frame_flags = s->frame_flags;
 
 # define DEFAULT_CAP 32
 
@@ -424,8 +413,30 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
     if (frames == NULL)
         return P4_MemoryError;
 
+    if (frame_flags == NULL) {
+        frame_flags = malloc(sizeof(uint64_t) * s->frames_cap);
+    } else if (frames != s->frames ){
+        frame_flags = realloc(s->frame_flags, sizeof(uint64_t) * s->frames_cap);
+    }
+
+    if (frame_flags == NULL)
+        return P4_MemoryError;
+
+
+    uint64_t frame_flag = 0;
+
+    if (!IS_SCOPED(e)) {
+        if (
+            (s->frames_len > 0 && IS_SQUASHED(s->frames[s->frames_len-1]))
+            || (s->frames_len > 0 && IS_SILENT(s->frame_flags[s->frames_len-1]))
+        )
+            SET_SILENT(frame_flag);
+    }
+
     s->frames = frames;
+    s->frame_flags = frame_flags;
     s->frames[s->frames_len] = e;
+    s->frame_flags[s->frames_len] = frame_flag;
     s->frames_len++;
 
     return P4_Ok;
@@ -1378,6 +1389,7 @@ P4_CreateSource(P4_String content, P4_RuleID rule_id) {
     source->frames = NULL;
     source->frames_len = 0;
     source->frames_cap = 0;
+    source->frame_flags = NULL;
     source->whitespacing = false;
     return source;
 }
@@ -1389,6 +1401,9 @@ P4_DeleteSource(P4_Source* source) {
 
     if (source->frames)
         free(source->frames);
+
+    if (source->frame_flags)
+        free(source->frame_flags);
 
     if (source->errmsg)
         free(source->errmsg);

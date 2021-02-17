@@ -160,11 +160,12 @@ typedef struct P4_Source {
     P4_Error                err;
     P4_String               errmsg;
     struct P4_Token*        root;
+    bool                    verbose;
+    bool                    whitespacing;
     struct P4_Expression**  frames;
     uint64_t                frames_len;
     uint64_t                frames_cap;
-    bool                    verbose;
-    bool                    whitespacing;
+    uint64_t*               frame_flags;
 } P4_Source;
 
 typedef struct P4_Expression {

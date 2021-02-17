@@ -20,9 +20,10 @@
 - [ ] Python Binding: example: cffi, misaka.
 - [ ] Benchmark: example: json-c. `valgrind --tool=massif --massif-out-file=massif.out ./build/tests/test_example_json && ms_print massif.out ms_print.out`.
 - [ ] Add depth setter.
-- [ ] Cache squash.
-- [ ] Cache loosen.
 - [ ] Cache literal len.
+- [ ] backrefs is not necessary if there is no BackReference in Sequence.
+- [x] Cache squash. Added in v1.3.0.
+- [x] Cache loosen. Added in v1.3.0.
 - [x] Add Valgrind to the tests. Added in v1.3.0.
 - [x] New Expression Kind: BackReference. Added in v1.2.0.
 - [x] Add Flag Set/Unset functions. Added in v1.1.0.

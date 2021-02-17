@@ -159,6 +159,9 @@ typedef struct P4_Frame {
     bool                    space;
     /* Whether silencing is applicable to frame & frame dependents. */
     bool                    silent;
+
+    struct P4_Frame*        prev;
+    struct P4_Frame*        next;
 } P4_Frame;
 
 typedef struct P4_Source {

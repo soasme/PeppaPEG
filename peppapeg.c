@@ -204,7 +204,7 @@ P4_CaseCmpInsensitive(P4_String src, P4_String dst, size_t len) {
  */
 P4_PRIVATE(bool)
 P4_NeedLoosen(P4_Source* s, P4_Expression* e) {
-    return s->frames? s->frames->space : false;
+    return s->frame_stack ? s->frame_stack->space : false;
 }
 
 /*
@@ -212,7 +212,7 @@ P4_NeedLoosen(P4_Source* s, P4_Expression* e) {
  */
 P4_PRIVATE(bool)
 P4_NeedSquash(P4_Source* s, P4_Expression* e) {
-    return s->frames? s->frames->silent : false;
+    return s->frame_stack? s->frame_stack->silent : false;
 }
 
 /*
@@ -242,29 +242,6 @@ P4_RaiseError(P4_Source* s, P4_Error err, P4_String errmsg) {
         free(s->errmsg);
 
     s->errmsg = strdup(errmsg);
-    /*
-    size_t len = strlen(errmsg)+10;
-    for (int i=s->frames_len-1; i>=0; i--) {
-        if (s->frames[i]->name) {
-            len += 9;
-        } else {
-            len += strlen(s->frames[i]->name);
-        }
-        len += 2;
-    }
-    s->errmsg = (P4_String) calloc(len, sizeof(char));
-
-    for (int i=s->frames_len-1; i>=0; i--) {
-        if (s->frames[i]->name) {
-            strcat(s->errmsg, s->frames[i]->name);
-        } else {
-            strcat(s->errmsg, "<UNKNOWN>");
-        }
-        strcat(s->errmsg, ": ");
-    }
-
-    strcat(s->errmsg, errmsg);
-    */
 }
 
 
@@ -358,11 +335,11 @@ P4_DeleteToken(P4_Token* token) {
 }
 
 /*
- * Push e into s->frames.
+ * Push e into s->frame_stack.
  */
 P4_PRIVATE(P4_Error)
 P4_PushFrame(P4_Source* s, P4_Expression* e) {
-    if (s->frames_len > (s->grammar->depth)) {
+    if (s->frame_stack_size > (s->grammar->depth)) {
         return P4_StackError;
     }
 
@@ -372,7 +349,7 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
         return P4_MemoryError;
     }
 
-    P4_Frame* top = s->frames;
+    P4_Frame* top = s->frame_stack;
 
     /* Set NeedSquash. */
     frame->silent = false;
@@ -402,11 +379,11 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
         }
     }
 
-    s->frames_len++;
+    s->frame_stack_size++;
     frame->expr = e;
     frame->next = top;
     if (top) top->prev = frame;
-    s->frames = frame;
+    s->frame_stack = frame;
 
     return P4_Ok;
 }
@@ -417,16 +394,13 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
  */
 P4_PRIVATE(P4_Error)
 P4_PopFrame(P4_Source* s, P4_Frame* f) {
-    if (s->frames == NULL)
+    if (s->frame_stack == NULL)
         return P4_MemoryError;
 
-    s->frames_len--;
-
-    P4_Frame* top = s->frames;
-    s->frames = top->next;
-
-    if (top)
-        free(top);
+    P4_Frame* oldtop = s->frame_stack;
+    s->frame_stack = s->frame_stack->next;
+    if (oldtop) free(oldtop);
+    s->frame_stack_size--;
 
     return P4_Ok;
 }
@@ -1354,8 +1328,8 @@ P4_CreateSource(P4_String content, P4_RuleID rule_id) {
     source->err = P4_Ok;
     source->errmsg = NULL;
     source->root = NULL;
-    source->frames = NULL;
-    source->frames_len = 0;
+    source->frame_stack = NULL;
+    source->frame_stack_size = 0;
     source->whitespacing = false;
     return source;
 }
@@ -1365,11 +1339,11 @@ P4_DeleteSource(P4_Source* source) {
     if (source == NULL)
         return;
 
-    P4_Frame* tmp = source->frames;
-    while(source->frames) {
-        tmp = source->frames->next;
-        free(source->frames);
-        source->frames = tmp;
+    P4_Frame* tmp = source->frame_stack;
+    while(source->frame_stack) {
+        tmp = source->frame_stack->next;
+        free(source->frame_stack);
+        source->frame_stack = tmp;
     }
 
     if (source->errmsg)

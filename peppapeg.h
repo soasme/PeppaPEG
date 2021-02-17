@@ -174,8 +174,8 @@ typedef struct P4_Source {
     struct P4_Token*        root;
     bool                    verbose;
     bool                    whitespacing;
-    struct P4_Frame*        frames;
-    uint64_t                frames_len;
+    struct P4_Frame*        frame_stack;
+    size_t                  frame_stack_size;
 } P4_Source;
 
 typedef struct P4_Expression {

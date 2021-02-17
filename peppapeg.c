@@ -38,6 +38,8 @@
 # define                        IS_SQUASHED(e) (((e)->flag & P4_FLAG_SQUASHED) != 0)
 # define                        IS_LIFTED(e) (((e)->flag & P4_FLAG_LIFTED) != 0)
 # define                        IS_RULE(e) ((e)->id != 0)
+# define                        NEED_SILENT(s) ((s)->frame_stack ? (s)->frame_stack->silent : false)
+# define                        NEED_SPACE(s) ((s)->frame_stack ? (s)->frame_stack->space : false)
 # define                        NO_ERROR(s) ((s)->err == P4_Ok)
 # define                        NO_MATCH(s) ((s)->err == P4_MatchError)
 
@@ -99,15 +101,13 @@ P4_PRIVATE(void)                P4_SetPosition(P4_Source*, P4_Position);
 
 P4_PRIVATE(P4_String)    P4_RemainingText(P4_Source*);
 
-P4_PRIVATE(bool)         P4_NeedLoosen(P4_Source*, P4_Expression*);
-P4_PRIVATE(bool)         P4_NeedSquash(P4_Source*, P4_Expression*);
 P4_PRIVATE(bool)         P4_NeedLift(P4_Source*, P4_Expression*);
 
 P4_PRIVATE(void)         P4_RaiseError(P4_Source*, P4_Error, P4_String);
 P4_PRIVATE(void)         P4_RescueError(P4_Source*);
 
 P4_PRIVATE(P4_Error)            P4_PushFrame(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Error)            P4_PopFrame(P4_Source*, P4_Expression**);
+P4_PRIVATE(P4_Error)            P4_PopFrame(P4_Source*, P4_Frame*);
 
 P4_PRIVATE(P4_Expression*)      P4_GetReference(P4_Source*, P4_Expression*);
 
@@ -193,72 +193,6 @@ P4_CaseCmpInsensitive(P4_String src, P4_String dst, size_t len) {
 
 
 /*
- * Determine if the implicit whitespace should be applied.
- *
- * XXX: As long as the state can be cached when the frame is pushed, we
- * don't need to traverse the frame stack to know if loosen is needed.
- *
- */
-P4_PRIVATE(bool)
-P4_NeedLoosen(P4_Source* s, P4_Expression* e) {
-    assert(s != NULL && e != NULL && s->frames_len >= 0);
-
-    // Insert no whitespace
-
-    // (1) when there is no implicit whitespace rule.
-    if (P4_GetWhitespaces(s->grammar) == NULL)
-        return false;
-
-    // (2) when we're already matching whitespace.
-    if (s->whitespacing)
-        return false;
-
-    // Traverse the frame stack from the highest frame,
-    for (int i = s->frames_len-1; i >=0; i--) {
-        // (3) when e is inside a continuance expression and no tightness at all.
-        if (!IS_TIGHT(s->frames[i]) && IS_SCOPED(s->frames[i]))
-            return true;
-    }
-
-    // traversing the frame stack since the inner most,
-    for (int i = 0; i < s->frames_len; i++) {
-        // (3) when e is a tighted expression.
-        if (IS_TIGHT(s->frames[i]))
-            return false;
-    }
-
-    return true;
-}
-
-/*
- * Determine if inner tokens should be generated.
- *
- * XXX: As long as the state can be cached when the frame is pushed, we
- * don't need to traverse the frame stack to know if loosen is needed.
- *
- */
-P4_PRIVATE(bool)
-P4_NeedSquash(P4_Source* s, P4_Expression* e) {
-    // A continuance expr forces no hollowness.
-    if (IS_SCOPED(e))
-        return false;
-
-    // Start from expr's parent.
-    for (int i = s->frames_len-2; i>=0; i--) {
-        // Any of expr's ancestor being continuance forces no hollowness.
-        if (IS_SCOPED(s->frames[i]))
-            return false;
-
-        // Otherwise, being the descendant of hollowness token should be hollowed.
-        // printf("frame %d: id=%lu, %d\n", i, s->frames[i]->id, s->frames[i]->flag);
-        if (IS_SQUASHED(s->frames[i]))
-            return true;
-    }
-
-    return false;
-}
-
-/*
  * Determine if the corresponding token to `e` should be ignored.
  *
  * 1. Intermediate expr.
@@ -268,7 +202,7 @@ P4_NeedSquash(P4_Source* s, P4_Expression* e) {
  */
 P4_PRIVATE(bool)
 P4_NeedLift(P4_Source* s, P4_Expression* e) {
-    return !IS_RULE(e) || IS_LIFTED(e) || P4_NeedSquash(s, e);
+    return !IS_RULE(e) || IS_LIFTED(e) || NEED_SILENT(s);
 }
 
 
@@ -285,29 +219,6 @@ P4_RaiseError(P4_Source* s, P4_Error err, P4_String errmsg) {
         free(s->errmsg);
 
     s->errmsg = strdup(errmsg);
-    /*
-    size_t len = strlen(errmsg)+10;
-    for (int i=s->frames_len-1; i>=0; i--) {
-        if (s->frames[i]->name) {
-            len += 9;
-        } else {
-            len += strlen(s->frames[i]->name);
-        }
-        len += 2;
-    }
-    s->errmsg = (P4_String) calloc(len, sizeof(char));
-
-    for (int i=s->frames_len-1; i>=0; i--) {
-        if (s->frames[i]->name) {
-            strcat(s->errmsg, s->frames[i]->name);
-        } else {
-            strcat(s->errmsg, "<UNKNOWN>");
-        }
-        strcat(s->errmsg, ": ");
-    }
-
-    strcat(s->errmsg, errmsg);
-    */
 }
 
 
@@ -400,54 +311,74 @@ P4_DeleteToken(P4_Token* token) {
     }
 }
 
-
 /*
- * Push e into s->frames.
+ * Push e into s->frame_stack.
  */
 P4_PRIVATE(P4_Error)
 P4_PushFrame(P4_Source* s, P4_Expression* e) {
-    if (s->frames_len > (s->grammar->depth)) {
+    if (s->frame_stack_size > (s->grammar->depth)) {
         return P4_StackError;
     }
 
-    P4_Expression** frames = s->frames;
+    P4_Frame* frame = malloc(sizeof(P4_Frame));
 
-# define DEFAULT_CAP 32
-
-    if (s->frames_cap == 0) {
-        s->frames_cap = DEFAULT_CAP;
-        frames = malloc(sizeof(P4_Expression*) * s->frames_cap);
-    } else if (s->frames_len >= s->frames_cap - 1) {
-        s->frames_cap <<= 1;
-        frames = realloc(s->frames, sizeof(P4_Expression*) * s->frames_cap);
-    }
-    if (frames == NULL)
+    if (frame == NULL) {
         return P4_MemoryError;
+    }
 
-    s->frames = frames;
-    s->frames[s->frames_len] = e;
-    s->frames_len++;
+    P4_Frame* top = s->frame_stack;
+
+    /* Set silent */
+    frame->silent = false;
+
+    if (!IS_SCOPED(e)) {
+        if (
+            (top && IS_SQUASHED(top->expr))
+            || (top && top->silent)
+        )
+            frame->silent = true;
+    }
+
+    /* Set space */
+    frame->space = false;
+
+    if (P4_GetWhitespaces(s->grammar) != NULL
+            && !s->whitespacing) {
+        if (IS_SCOPED(e)) {
+            frame->space = true;
+        } else if (top) {
+            if (!IS_TIGHT(e)) {
+                frame->space = top->space;
+            }
+        } else if (!IS_TIGHT(e)) {
+            frame->space = true;
+        }
+    }
+
+    /* Set expr & next */
+    frame->expr = e;
+    frame->next = top;
+
+    /* Push stack */
+    s->frame_stack_size++;
+    s->frame_stack = frame;
 
     return P4_Ok;
 }
 
 
 /*
- * Pop e from s->frames.
+ * Pop top from s->frames.
  */
 P4_PRIVATE(P4_Error)
-P4_PopFrame(P4_Source* s, P4_Expression** e) {
-    if (s->frames_cap == 0 || s->frames_len == 0)
+P4_PopFrame(P4_Source* s, P4_Frame* f) {
+    if (s->frame_stack == NULL)
         return P4_MemoryError;
 
-    assert(s->frames != NULL);
-
-    s->frames_len--;
-
-    if (e != NULL)
-        *e = s->frames[s->frames_len];
-
-    s->frames[s->frames_len+1] = 0;
+    P4_Frame* oldtop = s->frame_stack;
+    s->frame_stack = s->frame_stack->next;
+    if (oldtop) free(oldtop);
+    s->frame_stack_size--;
 
     return P4_Ok;
 }
@@ -593,7 +524,7 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
         return NULL;
     }
 
-    bool needloosen = P4_NeedLoosen(s, e);
+    bool need_space = NEED_SPACE(s);
 
     P4_MarkPosition(s, startpos);
 
@@ -601,8 +532,7 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
         member = e->members[i];
 
         // Optional `WHITESPACE` and `COMMENT` are inserted between every member.
-        if (needloosen
-                && i > 0) {
+        if (need_space && i > 0) {
             whitespace = P4_MatchSpacedExpressions(s, NULL);
             if (!NO_ERROR(s)) goto finalize;
             P4_AdoptToken(head, tail, whitespace);
@@ -724,7 +654,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     min = e->repeat_min;
     max = e->repeat_max;
 
-    bool needloosen = P4_NeedLoosen(s, e);
+    bool need_space = NEED_SPACE(s);
     P4_Position startpos = P4_GetPosition(s);
     P4_Token *head = NULL, *tail = NULL, *tok = NULL, *whitespace = NULL;
 
@@ -732,8 +662,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         P4_MarkPosition(s, before_implicit);
 
         // SPACED rule expressions are inserted between every repetition.
-        if (needloosen
-                && repeated > 0 ) {
+        if (need_space && repeated > 0 ) {
             whitespace = P4_MatchSpacedExpressions(s, NULL);
             if (!NO_ERROR(s)) goto finalize;
             P4_AdoptToken(head, tail, whitespace);
@@ -745,8 +674,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
             assert(tok == NULL);
 
             // considering the case: MATCH WHITESPACE MATCH WHITESPACE NO_MATCH
-            if (needloosen                     //           ^          ^
-                    && repeated > 0)           //           ^          ^ we are here
+            if (need_space && repeated > 0)//               ^          ^ we are here
                 P4_SetPosition(s, before_implicit);  //           ^ puke extra whitespace
                                                //           ^ now we are here
 
@@ -1375,9 +1303,8 @@ P4_CreateSource(P4_String content, P4_RuleID rule_id) {
     source->err = P4_Ok;
     source->errmsg = NULL;
     source->root = NULL;
-    source->frames = NULL;
-    source->frames_len = 0;
-    source->frames_cap = 0;
+    source->frame_stack = NULL;
+    source->frame_stack_size = 0;
     source->whitespacing = false;
     return source;
 }
@@ -1387,8 +1314,12 @@ P4_DeleteSource(P4_Source* source) {
     if (source == NULL)
         return;
 
-    if (source->frames)
-        free(source->frames);
+    P4_Frame* tmp = source->frame_stack;
+    while(source->frame_stack) {
+        tmp = source->frame_stack->next;
+        free(source->frame_stack);
+        source->frame_stack = tmp;
+    }
 
     if (source->errmsg)
         free(source->errmsg);

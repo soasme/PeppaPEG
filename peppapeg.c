@@ -32,13 +32,6 @@
 
 #include "peppapeg.h"
 
-# define LOOSEN 0x1
-# define SQUASH 0x10
-# define IS_SILENT(f) (((f) & SQUASH) != 0)
-# define SET_SILENT(f) ((f) |= SQUASH)
-# define IS_LOOSEN(f) (((f) & LOOSEN) != 0)
-# define SET_LOOSEN(f) ((f) |= LOOSEN)
-
 # define                        IS_TIGHT(e) (((e)->flag & P4_FLAG_TIGHT) != 0)
 # define                        IS_SCOPED(e) (((e)->flag & P4_FLAG_SCOPED) != 0)
 # define                        IS_SPACED(e) (((e)->flag & P4_FLAG_SPACED) != 0)

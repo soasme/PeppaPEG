@@ -152,6 +152,15 @@ typedef enum {
     P4_StackError           = 10,
 } P4_Error;
 
+typedef struct P4_Frame {
+    /* The current matching expression for the frame. */
+    struct P4_Expression*   expr;
+    /* Whether spacing is applicable to frame & frame dependents. */
+    bool                    space;
+    /* Whether silencing is applicable to frame & frame dependents. */
+    bool                    silent;
+} P4_Frame;
+
 typedef struct P4_Source {
     struct P4_Grammar*      grammar;
     P4_RuleID               rule_id;
@@ -162,7 +171,7 @@ typedef struct P4_Source {
     struct P4_Token*        root;
     bool                    verbose;
     bool                    whitespacing;
-    struct P4_Expression**  frames;
+    struct P4_Frame*        frames;
     uint64_t                frames_len;
     uint64_t                frames_cap;
     uint64_t*               frame_flags;

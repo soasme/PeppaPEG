@@ -38,6 +38,8 @@
 # define                        IS_SQUASHED(e) (((e)->flag & P4_FLAG_SQUASHED) != 0)
 # define                        IS_LIFTED(e) (((e)->flag & P4_FLAG_LIFTED) != 0)
 # define                        IS_RULE(e) ((e)->id != 0)
+# define                        NEED_SILENT(s) ((s)->frame_stack ? (s)->frame_stack->silent : false)
+# define                        NEED_SPACE(s) ((s)->frame_stack ? (s)->frame_stack->space : false)
 # define                        NO_ERROR(s) ((s)->err == P4_Ok)
 # define                        NO_MATCH(s) ((s)->err == P4_MatchError)
 
@@ -99,8 +101,6 @@ P4_PRIVATE(void)                P4_SetPosition(P4_Source*, P4_Position);
 
 P4_PRIVATE(P4_String)    P4_RemainingText(P4_Source*);
 
-P4_PRIVATE(bool)         P4_NeedLoosen(P4_Source*, P4_Expression*);
-P4_PRIVATE(bool)         P4_NeedSquash(P4_Source*, P4_Expression*);
 P4_PRIVATE(bool)         P4_NeedLift(P4_Source*, P4_Expression*);
 
 P4_PRIVATE(void)         P4_RaiseError(P4_Source*, P4_Error, P4_String);
@@ -193,22 +193,6 @@ P4_CaseCmpInsensitive(P4_String src, P4_String dst, size_t len) {
 
 
 /*
- * Determine if the implicit whitespace should be applied.
- */
-P4_PRIVATE(bool)
-P4_NeedLoosen(P4_Source* s, P4_Expression* e) {
-    return s->frame_stack ? s->frame_stack->space : false;
-}
-
-/*
- * Determine if inner tokens should be generated.
- */
-P4_PRIVATE(bool)
-P4_NeedSquash(P4_Source* s, P4_Expression* e) {
-    return s->frame_stack? s->frame_stack->silent : false;
-}
-
-/*
  * Determine if the corresponding token to `e` should be ignored.
  *
  * 1. Intermediate expr.
@@ -218,7 +202,7 @@ P4_NeedSquash(P4_Source* s, P4_Expression* e) {
  */
 P4_PRIVATE(bool)
 P4_NeedLift(P4_Source* s, P4_Expression* e) {
-    return !IS_RULE(e) || IS_LIFTED(e) || P4_NeedSquash(s, e);
+    return !IS_RULE(e) || IS_LIFTED(e) || NEED_SILENT(s);
 }
 
 
@@ -344,7 +328,7 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
 
     P4_Frame* top = s->frame_stack;
 
-    /* Set NeedSquash. */
+    /* Set silent */
     frame->silent = false;
 
     if (!IS_SCOPED(e)) {
@@ -355,8 +339,7 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
             frame->silent = true;
     }
 
-    /* Set NeedLoosen. */
-
+    /* Set space */
     frame->space = false;
 
     if (P4_GetWhitespaces(s->grammar) != NULL
@@ -372,9 +355,12 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
         }
     }
 
-    s->frame_stack_size++;
+    /* Set expr & next */
     frame->expr = e;
     frame->next = top;
+
+    /* Push stack */
+    s->frame_stack_size++;
     s->frame_stack = frame;
 
     return P4_Ok;
@@ -538,7 +524,7 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
         return NULL;
     }
 
-    bool needloosen = P4_NeedLoosen(s, e);
+    bool need_space = NEED_SPACE(s);
 
     P4_MarkPosition(s, startpos);
 
@@ -546,8 +532,7 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
         member = e->members[i];
 
         // Optional `WHITESPACE` and `COMMENT` are inserted between every member.
-        if (needloosen
-                && i > 0) {
+        if (need_space && i > 0) {
             whitespace = P4_MatchSpacedExpressions(s, NULL);
             if (!NO_ERROR(s)) goto finalize;
             P4_AdoptToken(head, tail, whitespace);
@@ -669,7 +654,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     min = e->repeat_min;
     max = e->repeat_max;
 
-    bool needloosen = P4_NeedLoosen(s, e);
+    bool need_space = NEED_SPACE(s);
     P4_Position startpos = P4_GetPosition(s);
     P4_Token *head = NULL, *tail = NULL, *tok = NULL, *whitespace = NULL;
 
@@ -677,8 +662,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         P4_MarkPosition(s, before_implicit);
 
         // SPACED rule expressions are inserted between every repetition.
-        if (needloosen
-                && repeated > 0 ) {
+        if (need_space && repeated > 0 ) {
             whitespace = P4_MatchSpacedExpressions(s, NULL);
             if (!NO_ERROR(s)) goto finalize;
             P4_AdoptToken(head, tail, whitespace);
@@ -690,8 +674,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
             assert(tok == NULL);
 
             // considering the case: MATCH WHITESPACE MATCH WHITESPACE NO_MATCH
-            if (needloosen                     //           ^          ^
-                    && repeated > 0)           //           ^          ^ we are here
+            if (need_space && repeated > 0)//               ^          ^ we are here
                 P4_SetPosition(s, before_implicit);  //           ^ puke extra whitespace
                                                //           ^ now we are here
 

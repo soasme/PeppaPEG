@@ -176,7 +176,6 @@ typedef struct P4_Source {
     bool                    whitespacing;
     struct P4_Frame*        frames;
     uint64_t                frames_len;
-    uint64_t*               frame_flags;
 } P4_Source;
 
 typedef struct P4_Expression {

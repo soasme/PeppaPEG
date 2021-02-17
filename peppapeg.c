@@ -382,7 +382,6 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
     s->frame_stack_size++;
     frame->expr = e;
     frame->next = top;
-    if (top) top->prev = frame;
     s->frame_stack = frame;
 
     return P4_Ok;
@@ -390,7 +389,7 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
 
 
 /*
- * Pop e from s->frames.
+ * Pop top from s->frames.
  */
 P4_PRIVATE(P4_Error)
 P4_PopFrame(P4_Source* s, P4_Frame* f) {

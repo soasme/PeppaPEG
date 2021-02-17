@@ -159,8 +159,7 @@ typedef struct P4_Frame {
     bool                    space;
     /* Whether silencing is applicable to frame & frame dependents. */
     bool                    silent;
-
-    struct P4_Frame*        prev;
+    /* The next frame in the stack. */
     struct P4_Frame*        next;
 } P4_Frame;
 
@@ -174,7 +173,9 @@ typedef struct P4_Source {
     struct P4_Token*        root;
     bool                    verbose;
     bool                    whitespacing;
+    /* The top frame in the stack. */
     struct P4_Frame*        frame_stack;
+    /* The size of frame stack. */
     size_t                  frame_stack_size;
 } P4_Source;
 

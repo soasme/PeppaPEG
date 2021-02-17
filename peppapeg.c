@@ -36,6 +36,8 @@
 # define SQUASH 0x10
 # define IS_SILENT(f) (((f) & SQUASH) != 0)
 # define SET_SILENT(f) ((f) |= SQUASH)
+# define IS_LOOSEN(f) (((f) & LOOSEN) != 0)
+# define SET_LOOSEN(f) ((f) |= LOOSEN)
 
 # define                        IS_TIGHT(e) (((e)->flag & P4_FLAG_TIGHT) != 0)
 # define                        IS_SCOPED(e) (((e)->flag & P4_FLAG_SCOPED) != 0)
@@ -207,6 +209,7 @@ P4_CaseCmpInsensitive(P4_String src, P4_String dst, size_t len) {
 P4_PRIVATE(bool)
 P4_NeedLoosen(P4_Source* s, P4_Expression* e) {
     assert(s != NULL && e != NULL && s->frames_len >= 0);
+    return IS_LOOSEN(s->frame_flags[s->frames_len-1]);
 
     // Insert no whitespace
 
@@ -220,15 +223,11 @@ P4_NeedLoosen(P4_Source* s, P4_Expression* e) {
 
     // Traverse the frame stack from the highest frame,
     for (int i = s->frames_len-1; i >=0; i--) {
-        // (3) when e is inside a continuance expression and no tightness at all.
-        if (!IS_TIGHT(s->frames[i]) && IS_SCOPED(s->frames[i]))
+        // (4) when e is inside a continuance expression and no tightness at all.
+        if (IS_SCOPED(s->frames[i]))
             return true;
-    }
-
-    // traversing the frame stack since the inner most,
-    for (int i = 0; i < s->frames_len; i++) {
-        // (3) when e is a tighted expression.
-        if (IS_TIGHT(s->frames[i]))
+        // (3) when e is a tight expression.
+        else if (IS_TIGHT(s->frames[i]))
             return false;
     }
 
@@ -425,12 +424,29 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
 
     uint64_t frame_flag = 0;
 
+    /* Set NeedSquash. */
+
     if (!IS_SCOPED(e)) {
         if (
             (s->frames_len > 0 && IS_SQUASHED(s->frames[s->frames_len-1]))
             || (s->frames_len > 0 && IS_SILENT(s->frame_flags[s->frames_len-1]))
         )
             SET_SILENT(frame_flag);
+    }
+
+    /* Set NeedLoosen. */
+        /* When having spaced expressions, we may set loosen. */
+        /* When not in whitespacing, we may set loosen. */
+        /* When e has no tight flag, we may set loosen. */
+    if (P4_GetWhitespaces(s->grammar) != NULL
+            && !s->whitespacing) {
+        if (IS_SCOPED(e))
+            SET_LOOSEN(frame_flag);
+        else if (s->frames_len > 0) {
+            if (!IS_TIGHT(e))
+                frame_flag |= (s->frame_flags[s->frames_len-1] & LOOSEN);
+        } else if (!IS_TIGHT(e))
+            SET_LOOSEN(frame_flag);
     }
 
     s->frames = frames;

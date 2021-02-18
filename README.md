@@ -46,8 +46,6 @@ In human words, it's for parsing programming languages.
 
 Peppa PEG is an ultra lightweight PEG parser in ANSI C.
 
-WARNING: Peppa PEG hasn't been benchmarked and has not been widely used. Use at your own risk!
-
 # Usage
 
 ## Copy `peppapeg.h` / `peppapeg.c`

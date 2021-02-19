@@ -376,7 +376,8 @@ class Grammar:
             err = lib.P4_Parse(self._grammar, source)
 
             if err != lib.P4_Ok:
-                raise_error(err=err, errmsg=source.errmsg)
+                pos = lib.P4_GetSourcePosition(source)
+                raise_error(err=err, errmsg=f'pos={pos}, {source.errmsg}')
 
             ast = lib.P4_GetSourceAst(source)
 

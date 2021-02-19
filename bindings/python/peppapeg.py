@@ -207,7 +207,7 @@ def create_repeat_min_max(expr, min, max):
 
 def create_repeat_exact(expr, n):
     return create_expr(
-        lib.P4_CreateRepeatMax,
+        lib.P4_CreateRepeatExact,
         expr,
         int(n)
     )

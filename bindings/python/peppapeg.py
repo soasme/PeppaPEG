@@ -79,16 +79,6 @@ class Expression:
         if self._expr:
             lib.P4_DeleteExpression(self._expr)
 
-class Literal(Expression):
-    """Literal Expression."""
-
-    def __init__(self, literal):
-        self.literal = literal
-        self._expr = lib.P4_CreateLiteral(
-            ffi.new('char[]', literal.encode('utf-8')),
-            True,
-        )
-
 ### Token
 
 class Token:
@@ -103,6 +93,9 @@ class Token:
 
     @classmethod
     def clone(cls, ctoken):
+        if ctoken == ffi.NULL:
+            return
+
         i = ctoken.slice.i
         j = ctoken.slice.j
         _slice = slice(i, j)
@@ -401,19 +394,14 @@ class Grammar:
             raise MemoryError()
 
         try:
-
             err = lib.P4_Parse(self._grammar, source)
 
             if err != lib.P4_Ok:
                 pos = lib.P4_GetSourcePosition(source)
                 raise_error(err=err, errmsg=f'pos={pos}, {source.errmsg}')
 
-            ast = lib.P4_GetSourceAst(source)
-
-            return (
-                None
-                if ast == ffi.NULL
-                else Token.clone(ast)
+            return Token.clone(
+                lib.P4_GetSourceAst(source)
             )
 
         finally:

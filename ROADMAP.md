@@ -19,9 +19,9 @@
 - [ ] Auto generate documentation for functions and defined macros. Example: doxygen.
 - [ ] Python Binding: example: cffi, misaka.
 - [ ] Benchmark: example: json-c. `valgrind --tool=massif --massif-out-file=massif.out ./build/tests/test_example_json && ms_print massif.out ms_print.out`.
-- [ ] Add depth setter.
 - [ ] Cache literal len.
 - [ ] backrefs is not necessary if there is no BackReference in Sequence.
+- [x] Add depth setter. Added in v1.3.0.
 - [x] Cache squash. Added in v1.3.0.
 - [x] Cache loosen. Added in v1.3.0.
 - [x] Add Valgrind to the tests. Added in v1.3.0.

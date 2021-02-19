@@ -844,6 +844,13 @@ P4_Ok
 
 ## Test
 
+Peppa PEG test requires downloading the test framework Unity:
+
+```bash
+$ git submodule init
+$ git submodule update
+```
+
 Assume you have `cmake` and `gcc` installed.
 
 ```bash

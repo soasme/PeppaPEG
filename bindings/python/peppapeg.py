@@ -6,6 +6,9 @@ __VERSION__ = '0.1.0'
 #: The version of peppapeg clib.
 __CLIB_VERSION__ = ffi.string(lib.P4_Version()).decode('utf-8')
 
+## Low Level Interfaces
+
+
 ### Utils
 
 def _to_string(buffer):
@@ -87,6 +90,63 @@ class Token:
 
 ### Grammar
 
+def create_expr(f, *args, **kwargs):
+    """Create an expression using """
+    expr = f(*args, **kwargs)
+
+    if expr == ffi.NULL:
+        raise MemoryError('Failed to create expression.')
+
+    return expr
+
+def add_grammar_rule(grammar, id, expr):
+    err = lib.P4_AddGrammarRule(grammar, int(id), expr)
+
+    if err != lib.P4_Ok:
+        raise_error(err=err, errmsg=f'Failed to add grammar rule for {id}')
+
+def create_literal(literal, sensitive=True):
+    return create_expr(
+        lib.P4_CreateLiteral,
+        literal.encode('utf-8'),
+        bool(sensitive)
+    )
+
+def create_range(lower, upper):
+    return create_expr(
+        lib.P4_CreateRange,
+        ord(lower),
+        ord(upper)
+    )
+
+def set_members(expr, *members):
+    for index, member in enumerate(members):
+        err = lib.P4_SetMember(expr, index, member)
+        if err != lib.P4_Ok:
+            raise_error(err=err, errmsg="Failed to add sequence member.")
+
+def create_sequence(*members):
+    expr = create_expr(
+        lib.P4_CreateSequence,
+        len(members)
+    )
+    set_members(expr, *members)
+    return expr
+
+def create_choice(*members):
+    expr = create_expr(
+        lib.P4_CreateChoice,
+        len(members)
+    )
+    set_members(expr, *members)
+    return expr
+
+def create_reference(id):
+    return create_expr(
+        lib.P4_CreateReference,
+        int(id)
+    )
+
 class Grammar:
 
     def __init__(self):
@@ -96,116 +156,58 @@ class Grammar:
     def __del__(self):
         lib.P4_DeleteGrammar(self._grammar)
 
-    def _resolve_rule_id(self, name):
-        return self.names[name] + 1
-
-    def _push_name(self, name):
-        if name not in self.names:
-            id = len(self.names) + 1
-            self.names[name] = id
-            return id
-        raise P4Error()
-
-    def _pop_name(self, name):
-        del self.names[name]
-
-    def add_literal(self, name, literal, sensitive=True):
-        _id = self._push_name(name)
-        err = lib.P4_AddGrammarRule(self._grammar, _id, self.literal(literal, sensitive))
-
-        if err != lib.P4_Ok:
-            self._pop_name(name)
-            raise_error(err=err, errmsg="Failed to add literal rule {name}")
+    def add_literal(self, id, literal, sensitive=True):
+        add_grammar_rule(
+            self._grammar,
+            int(id),
+            self.literal(literal, sensitive)
+        )
 
     def literal(self, literal, sensitive=True):
-        expr = lib.P4_CreateLiteral(literal.encode('utf-8'), sensitive)
+        return create_literal(literal, sensitive)
 
-        if expr == ffi.NULL:
-            raise_error(err=lib.P4_MemoryError, errmsg="Failed to add literal rule {name}")
-
-        return expr
-
-    def add_range(self, name, lower, upper):
-        _id = self._push_name(name)
-        err = lib.P4_AddGrammarRule(self._grammar, _id, self.range(lower, upper))
-
-        if err != lib.P4_Ok:
-            self._pop_name(name)
-            raise_error(err, "Failed to add range rule {name}")
+    def add_range(self, id, lower, upper):
+        add_grammar_rule(
+            self._grammar,
+            int(id),
+            self.range(lower, upper)
+        )
 
     def range(self, lower, upper):
-        expr = lib.P4_CreateRange(ord(lower), ord(upper))
+        return create_range(lower, upper)
 
-        if expr == ffi.NULL:
-            raise_error(err=lib.P4_MemoryError, errmsg="Failed to add range rule {name}")
-
-        return expr
-
-    def add_sequence(self, name, *members):
-        _id = self._push_name(name)
-        err = lib.P4_AddGrammarRule(self._grammar, _id, self.sequence(*members))
-
-        if err != lib.P4_Ok:
-            self._pop_name(name)
-            raise_error(err=err, errmsg="Failed to add sequence rule for {name}")
+    def add_sequence(self, id, *members):
+        add_grammar_rule(
+            self._grammar,
+            int(id),
+            self.sequence(*members)
+        )
 
     def sequence(self, *members):
-        count = len(members)
-        expr = lib.P4_CreateSequence(count)
+        return create_sequence(*members)
 
-        if expr == ffi.NULL:
-            raise_error(err=P4_MemoryError, errmsg="Failed to add sequence rule for {name}")
-
-        for index, member in enumerate(members):
-            err = lib.P4_SetMember(expr, index, member)
-            if err != lib.P4_Ok:
-                raise_error(err=err, errmsg="Failed to add sequence rule for {name}")
-
-        return expr
-
-    def add_choice(self, name, *members):
-        _id = self._push_name(name)
-        err = lib.P4_AddGrammarRule(self._grammar, _id, self.choice(*members))
-
-        if err != lib.P4_Ok:
-            self._pop_name(name)
-            raise_error(err=err, errmsg="Failed to add sequence rule for {name}")
+    def add_choice(self, id, *members):
+        add_grammar_rule(
+            self._grammar,
+            int(id),
+            self.choice(*members)
+        )
 
     def choice(self, *members):
-        count = len(members)
-        expr = lib.P4_CreateChoice(count)
+        return create_choice(*members)
 
-        if expr == ffi.NULL:
-            raise_error(err=P4_MemoryError, errmsg="Failed to add choice rule for {name}")
+    def add_reference(self, id, ref_id):
+        add_grammar_rule(
+            self._grammar,
+            int(id),
+            self.reference(ref_id)
+        )
 
-        for index, member in enumerate(members):
-            err = lib.P4_SetMember(expr, index, member)
-            if err != lib.P4_Ok:
-                raise_error(err=err, errmsg="Failed to add choice rule for {name}")
-
-        return expr
-
-    def add_reference(self, rule_name, ref_name):
-        _id = self._push_name(rule_name)
-        err = lib.P4_AddGrammarRule(self._grammar, _id, self.reference(ref_name))
-
-        if err != lib.P4_Ok:
-            self._pop_name(rule_name)
-            raise_error(err=err, errmsg="Failed to add reference rule for {rule_name}")
-
-    def reference(self, name):
-        _id = self._resolve_rule_id(name)
-
-        expr = lib.P4_CreateReference(_id)
-
-        if expr == ffi.NULL:
-            raise_error(err=P4_MemoryError, errmsg="Failed to add reference to {name}")
-
-        return expr
-
+    def reference(self, id):
+        return create_reference(id)
 
     def parse(self, input, entry=None):
-        _id = self._resolve_rule_id(entry)
+        _id = int(entry or 1)
         source = lib.P4_CreateSource(input.encode('utf-8'), _id)
 
         if source == ffi.NULL:

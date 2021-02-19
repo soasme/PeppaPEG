@@ -14,6 +14,7 @@ set(
     test_repeat
     test_flags
     test_back_reference
+    test_misc
     test_example_mustache
     test_example_json
 )

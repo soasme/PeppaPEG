@@ -86,6 +86,11 @@ extern "C"
  */
 # define P4_FLAG_SPACED                 ((uint32_t)(0x10000))
 
+/*
+ * The default recursion limit.
+ */
+# define P4_DEFAULT_RECURSION_LIMIT     8192
+
 /* The flag of expression. */
 typedef uint32_t        P4_ExpressionFlag;
 
@@ -250,16 +255,17 @@ typedef struct P4_Token {
 
 
 typedef struct P4_Grammar{
-    /* the rules, e.g. the expressions with IDs. */
+    /* The rules, e.g. the expressions with IDs. */
     struct P4_Expression**  rules;
-    /* the total number of rules. */
+    /* The total number of rules. */
     int                     count;
-    /* the maximum number of rules. */
+    /* The maximum number of rules. */
     int                     cap;
-    /* the total number of spaced rules. */
+    /* The total number of spaced rules. */
     size_t                  spaced_count;
-    /* the repetition rule for spaced rules. */
+    /* The repetition rule for spaced rules. */
     struct P4_Expression*   spaced_rules;
+    /* The recursion limit, or maximum allowed nested rules. */
     size_t                  depth;
 } P4_Grammar;
 
@@ -335,6 +341,8 @@ P4_PUBLIC(P4_Error)       P4_AddRepeatExact(P4_Grammar*, P4_RuleID, P4_Expressio
 P4_PUBLIC(void)           P4_DeleteGrammarRule(P4_Grammar*, P4_RuleID);
 P4_PUBLIC(P4_Expression*) P4_GetGrammarRule(P4_Grammar*, P4_RuleID);
 P4_PUBLIC(P4_Error)       P4_SetGrammarRuleFlag(P4_Grammar*, P4_RuleID, P4_ExpressionFlag);
+P4_PUBLIC(P4_Error)       P4_SetRecursionLimit(P4_Grammar*, size_t limit);
+P4_PUBLIC(size_t)         P4_GetRecursionLimit(P4_Grammar*);
 
 P4_PUBLIC(P4_Source*)     P4_CreateSource(P4_String, P4_RuleID);
 P4_PUBLIC(void)           P4_DeleteSource(P4_Source*);

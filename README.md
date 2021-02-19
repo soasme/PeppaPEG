@@ -35,6 +35,8 @@ Ultra lightweight PEG Parser in ANSI C. ✨ 🐷 ✨.
   * [`P4_FLAG_SCOPED`](#p4_flag_scoped)
   * [`P4_FLAG_SPACED`](#p4_flag_spaced)
   * [`P4_FLAG_TIGHT`](#p4_flag_tight)
+* [Caveats](#caveats)
+  * [Recursion Limit](#recursion-limit)
 * [Peppy Hacking Peppa PEG!](peppy-hacking-peppa-peg)
   * [Test](#test)
   * [Examples](#examples)
@@ -820,6 +822,22 @@ P4_Ok
 >> P4_Source* source = P4_Source("0 0 0", ENTRY);
 >> P4_Parse(grammar, source);
 P4_MatchError
+```
+
+# Caveats
+
+## Recursion Limit
+
+Peppa PEG is a recursion-based parser so it will be crashed if the stack address is exhausted. To prevent that, Peppa PEG set a limit on the recursion depth. By default, it's 8192.
+
+If Peppa PEG should run a very small embedded device, you can adjust it via `P4_SetRecursionLimit`.
+
+```c
+>> P4_SetRecursionLimit(grammar, 1000);
+P4_Ok
+
+>> P4_GetRecursionLimit(grammar);
+1000
 ```
 
 # Peppy Hacking Peppa PEG!

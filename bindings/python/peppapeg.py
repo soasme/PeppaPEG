@@ -147,6 +147,71 @@ def create_reference(id):
         int(id)
     )
 
+def create_back_reference(id):
+    return create_expr(
+        lib.P4_CreateBackReference,
+        int(id)
+    )
+
+def create_positive(expr):
+    return create_expr(
+        lib.P4_CreatePositive,
+        expr
+    )
+
+def create_negative(expr):
+    return create_expr(
+        lib.P4_CreateNegative,
+        expr
+    )
+
+def create_zero_or_more(expr):
+    return create_expr(
+        lib.P4_CreateZeroOrMore,
+        expr
+    )
+
+def create_zero_or_once(expr):
+    return create_expr(
+        lib.P4_CreateZeroOrOnce,
+        expr
+    )
+
+def create_once_or_more(expr):
+    return create_expr(
+        lib.P4_CreateOnceOrMore,
+        expr
+    )
+
+def create_repeat_min(expr, min):
+    return create_expr(
+        lib.P4_CreateRepeatMin,
+        expr,
+        int(min)
+    )
+
+def create_repeat_max(expr, max):
+    return create_expr(
+        lib.P4_CreateRepeatMax,
+        expr,
+        int(max)
+    )
+
+def create_repeat_min_max(expr, min, max):
+    return create_expr(
+        lib.P4_CreateRepeatMinMax,
+        expr,
+        int(min),
+        int(max)
+    )
+
+def create_repeat_exact(expr, n):
+    return create_expr(
+        lib.P4_CreateRepeatMax,
+        expr,
+        int(n)
+    )
+
 class Grammar:
 
     def __init__(self):
@@ -205,6 +270,99 @@ class Grammar:
 
     def reference(self, id):
         return create_reference(id)
+
+    def back_reference(self, id):
+        return create_back_reference(id)
+
+    def add_positive(self, id, expr):
+        add_grammar_rule(
+            self._grammar,
+            int(id),
+            self.positive(expr)
+        )
+
+    def positive(self, expr):
+        return create_positive(expr)
+
+    def add_negative(self, id, expr):
+        add_grammar_rule(
+            self._grammar,
+            int(id),
+            self.negative(expr)
+        )
+
+    def negative(self, expr):
+        return create_negative(expr)
+
+    def add_zero_or_more(self, id, expr):
+        add_grammar_rule(
+            self._grammar,
+            int(id),
+            self.zero_or_more(expr)
+        )
+
+    def zero_or_more(self, expr):
+        return create_zero_or_more(expr)
+
+    def add_zero_or_once(self, id, expr):
+        add_grammar_rule(
+            self._grammar,
+            int(id),
+            self.zero_or_once(expr)
+        )
+
+    def zero_or_once(self, expr):
+        return create_zero_or_once(expr)
+
+    def add_once_or_more(self, id, expr):
+        add_grammar_rule(
+            self._grammar,
+            int(id),
+            self.once_or_more(expr)
+        )
+
+    def once_or_more(self, expr):
+        return create_once_or_more(expr)
+
+    def add_repeat_min(self, id, expr, min):
+        add_grammar_rule(
+            self._grammar,
+            int(id),
+            self.repeat_min(expr, min)
+        )
+
+    def repeat_min(self, expr, min):
+        return create_repeat_min(expr, min)
+
+    def add_repeat_max(self, id, expr, max):
+        add_grammar_rule(
+            self._grammar,
+            int(id),
+            self.repeat_max(expr, max)
+        )
+
+    def repeat_max(self, expr, max):
+        return create_repeat_max(expr, max)
+
+    def add_repeat_min_max(self, id, expr, min, max):
+        add_grammar_rule(
+            self._grammar,
+            int(id),
+            self.repeat_min_max(expr, min, max)
+        )
+
+    def repeat_min_max(self, expr, min, max):
+        return create_repeat_min_max(expr, min, max)
+
+    def add_repeat_exact(self, id, expr, n):
+        add_grammar_rule(
+            self._grammar,
+            int(id),
+            self.repeat_exact(expr, n)
+        )
+
+    def repeat_exact(self, expr, n):
+        return create_repeat_exact(expr, n)
 
     def parse(self, input, entry=None):
         _id = int(entry or 1)

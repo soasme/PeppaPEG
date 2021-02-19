@@ -26,6 +26,11 @@ class P4Error(Exception):
 class MatchError(P4Error):
     pass
 
+class AdvanceError(P4Error):
+    pass
+
+class InternalError(P4Error):
+    pass
 
 def raise_error(source=None, err=0, errmsg=""):
     if source:
@@ -33,10 +38,34 @@ def raise_error(source=None, err=0, errmsg=""):
         errmsg = to_string(lib.P4_GetErrorMessage(source))
 
     if err == lib.P4_MatchError:
-        raise MatchError()
+        raise MatchError(errmsg)
 
     elif err == lib.P4_MemoryError:
-        raise MemoryError()
+        raise MemoryError(errmsg)
+
+    elif err == lib.P4_NameError:
+        raise NameError(errmsg)
+
+    elif err == lib.P4_AdvanceError:
+        raise AdvanceError(errmsg)
+
+    elif err == lib.P4_ValueError:
+        raise ValueError(errmsg)
+
+    elif err == lib.P4_IndexError:
+        raise IndexError(errmsg)
+
+    elif err == lib.P4_KeyError:
+        raise KeyError(errmsg)
+
+    elif err == lib.P4_NullError:
+        raise TypeError(errmsg)
+
+    elif err == lib.P4_StackError:
+        raise RecursionError(errmsg)
+
+    elif err == lib.P4_InternalError:
+        raise InternalError(errmsg)
 
     else:
         raise P4Error(f'err code={err}')

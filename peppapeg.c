@@ -316,7 +316,7 @@ P4_DeleteToken(P4_Token* token) {
  */
 P4_PRIVATE(P4_Error)
 P4_PushFrame(P4_Source* s, P4_Expression* e) {
-    if (s->frame_stack_size > (s->grammar->depth)) {
+    if ((s->frame_stack_size) >= (s->grammar->depth)) {
         return P4_StackError;
     }
 
@@ -1225,7 +1225,7 @@ P4_PUBLIC(P4_Grammar*)    P4_CreateGrammar(void) {
     grammar->cap = 0;
     grammar->spaced_count = -1;
     grammar->spaced_rules = NULL;
-    grammar->depth = 1024*8;
+    grammar->depth = P4_DEFAULT_RECURSION_LIMIT;
     return grammar;
 }
 
@@ -1264,6 +1264,21 @@ P4_SetGrammarRuleFlag(P4_Grammar* grammar, P4_RuleID id, P4_ExpressionFlag flag)
     P4_SetExpressionFlag(expr, flag);
 
     return P4_Ok;
+}
+
+P4_PUBLIC(P4_Error)
+P4_SetRecursionLimit(P4_Grammar* grammar, size_t limit) {
+    if (grammar == NULL)
+        return P4_NullError;
+
+    grammar->depth = limit;
+
+    return P4_Ok;
+}
+
+P4_PUBLIC(size_t)
+P4_GetRecursionLimit(P4_Grammar* grammar) {
+    return grammar == NULL ? 0 : grammar->depth;
 }
 
 P4_PUBLIC(P4_Error)

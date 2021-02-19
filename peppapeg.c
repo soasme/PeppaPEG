@@ -528,7 +528,7 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
 
     P4_MarkPosition(s, startpos);
 
-    for (int i = 0; i < e->count; i++) {
+    for (size_t i = 0; i < e->count; i++) {
         member = e->members[i];
 
         // Optional `WHITESPACE` and `COMMENT` are inserted between every member.
@@ -585,7 +585,7 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
     // A member is attempted if previous yields no match.
     // The oneof match matches successfully immediately if any match passes.
     P4_MarkPosition(s, startpos);
-    for (int i = 0; i < e->count; i++) {
+    for (size_t i = 0; i < e->count; i++) {
         member = e->members[i];
         tok = P4_Match(s, member);
         if (NO_ERROR(s)) break;
@@ -630,7 +630,7 @@ finalize:
  */
 P4_PRIVATE(P4_Token*)
 P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
-    size_t min = -1, max = -1, repeated = 0;
+    size_t min = SIZE_MAX, max = SIZE_MAX, repeated = 0;
 
     assert(e->repeat_min != min || e->repeat_max != max); // need at least one of min/max.
     assert(e->repeat_expr != NULL); // need repeat expression.
@@ -678,7 +678,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
                 P4_SetPosition(s, before_implicit);  //           ^ puke extra whitespace
                                                //           ^ now we are here
 
-            if (min != -1 && repeated < min) {
+            if (min != SIZE_MAX && repeated < min) {
                 P4_RaiseError(s, P4_MatchError, "insufficient repetitions");
                 goto finalize;
             } else {                       // sufficient repetitions.
@@ -698,7 +698,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         repeated++;
         P4_AdoptToken(head, tail, tok);
 
-        if (max != -1 && repeated == max) { // enough attempts
+        if (max != SIZE_MAX && repeated == max) { // enough attempts
             P4_RescueError(s);
             break;
         }
@@ -709,12 +709,12 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     assert(NO_ERROR(s));
 
     // fails when attempts are excessive, e.g. repeated > max.
-    if (max != -1 && repeated > max) {
+    if (max != SIZE_MAX && repeated > max) {
         P4_RaiseError(s, P4_MatchError, "excessive repetitions");
         goto finalize;
     }
 
-    if (min != -1 && repeated < min) {
+    if (min != SIZE_MAX && repeated < min) {
         P4_RaiseError(s, P4_MatchError, "insufficient repetitions");
         goto finalize;
     }
@@ -967,7 +967,7 @@ P4_PrintSourceAst(P4_Token* token, P4_String buf, size_t indent) {
     while (current != NULL) {
         for (size_t i = 0; i < indent; i++) strcat(buf, " ");
         strcat(buf, "- ");
-        sprintf(idstr+1, "%lu", current->expr->id);
+        sprintf(idstr+1, "%u", current->expr->id);
         strcat(buf, idstr);
         if (current->head == NULL) {
             strcat(buf, ": \"");
@@ -1160,12 +1160,12 @@ P4_CreateRepeatMinMax(P4_Expression* repeat, size_t min, size_t max) {
 
 P4_PUBLIC(P4_Expression*)
 P4_CreateRepeatMin(P4_Expression* repeat, size_t min) {
-    return P4_CreateRepeatMinMax(repeat, min, -1);
+    return P4_CreateRepeatMinMax(repeat, min, SIZE_MAX);
 }
 
 P4_PUBLIC(P4_Expression*)
 P4_CreateRepeatMax(P4_Expression* repeat, size_t max) {
-    return P4_CreateRepeatMinMax(repeat, -1, max);
+    return P4_CreateRepeatMinMax(repeat, SIZE_MAX, max);
 }
 
 P4_PUBLIC(P4_Expression*)
@@ -1180,12 +1180,12 @@ P4_CreateZeroOrOnce(P4_Expression* repeat) {
 
 P4_PUBLIC(P4_Expression*)
 P4_CreateZeroOrMore(P4_Expression* repeat) {
-    return P4_CreateRepeatMinMax(repeat, 0, -1);
+    return P4_CreateRepeatMinMax(repeat, 0, SIZE_MAX);
 }
 
 P4_PUBLIC(P4_Expression*)
 P4_CreateOnceOrMore(P4_Expression* repeat) {
-    return P4_CreateRepeatMinMax(repeat, 1, -1);
+    return P4_CreateRepeatMinMax(repeat, 1, SIZE_MAX);
 }
 
 P4_PUBLIC(P4_Expression*)
@@ -1223,7 +1223,7 @@ P4_PUBLIC(P4_Grammar*)    P4_CreateGrammar(void) {
     grammar->rules = NULL;
     grammar->count = 0;
     grammar->cap = 0;
-    grammar->spaced_count = -1;
+    grammar->spaced_count = SIZE_MAX;
     grammar->spaced_rules = NULL;
     grammar->depth = P4_DEFAULT_RECURSION_LIMIT;
     return grammar;
@@ -1460,7 +1460,7 @@ end:
         grammar->spaced_rules = NULL;
     }
 
-    grammar->spaced_count = -1;
+    grammar->spaced_count = SIZE_MAX;
 
     return P4_MemoryError;
 }
@@ -1470,7 +1470,7 @@ P4_GetWhitespaces(P4_Grammar* g) {
     if (g == NULL)
         return NULL;
 
-    if (g->spaced_count == -1)
+    if (g->spaced_count == SIZE_MAX)
         P4_SetWhitespaces(g);
 
     return g->spaced_rules;

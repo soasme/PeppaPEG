@@ -21,13 +21,23 @@ python setup.py install
 A example of how to define a grammar using python-peppapeg:
 
 ```python
+from enum import IntEnum
+
 import peppapeg as P4
 
-grammar = P4.Grammar()
-grammar.add_sequence('entry', 'greeter', grammar.literal(' '), 'target')
-grammar.add_literal('greeter', 'Hello')
-grammar.add_literal('target', 'world')
+class Rule(IntEnum):
+    entry = 1
+    greeter = 2
+    target = 3
 
+grammar = P4.Grammar()
+grammar.add_sequence(Rule.entry,
+    grammar.reference(Rule.greeter),
+    grammar.literal(' '),
+    grammar.reference('target')
+)
+grammar.add_literal(Rule.greeter, 'Hello')
+grammar.add_literal(Rule.target, 'world')
 ```
 
 To parse the text, use method `.parse()`:

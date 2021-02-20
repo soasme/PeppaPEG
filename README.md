@@ -59,7 +59,7 @@ Peppa PEG is an ultra lightweight PEG parser in ANSI C.
 
 ## Copy `peppapeg.h` / `peppapeg.c`
 
-Peppa PEG has a header file and a C file, so you can easily add
+Peppa PEG has a header file and a C file, so you can add
 it to your project by copying files "peppapeg.h" and "peppapeg.c".
 
 Peppa PEG assumes your project is ANSI C (C89, or C90) compatible.
@@ -72,11 +72,10 @@ Once copied, add include macro and start using the library!
 
 ## Basic Usage
 
-All of the data structures and functions provided by Peppa PEG
-start with `P4_`. ;) \
+All of the data structures and functions provided by Peppa PEG start with `P4_`. ;)
 Just count how many `P`s there are in the library name `Peppa PEG`!
 
-In this example, we'll create a grammar with one literal rule matching "Hello World", and let the grammar parse the string "Hello World".
+In this example, we'll create a grammar with one literal rule matching "Hello World", and then parse the string "Hello World".
 
 In Peppa PEG, we always start with the struct `P4_Grammar`, which represents a grammar of many PEG rules.
 We can create such a data structure using `P4_CreateGrammar`.
@@ -94,39 +93,29 @@ P4_Expression* rule = P4_CreateLiteral("Hello World", false);
 Once done, add the rule to the grammar with an integer ID. The ID should be greater than 0.
 
 ```c
-# define HW_ID 1
+# define ENTRY 1
 
-P4_AddGrammarRule(grammar, HW_ID, rule);
+P4_AddGrammarRule(grammar, ENTRY, rule);
 ```
 
-To make our lift easier, `P4_CreateLiteral` and `P4_AddGrammarRule` can be combined into one call `P4_AddLiteral`.
-This trick works for all the other [Rules](#peppa-peg-rules), such as `P4_AddRange`, `P4_AddSequence`, etc.
+To make things easier, `P4_CreateLiteral` and `P4_AddGrammarRule` can be combined into one call `P4_AddLiteral`.
+This trick works for all of the [Expression Kinds](#peppa-peg-rules), such as `P4_AddRange`, `P4_AddSequence`, etc.
 
 ```c
-# define HW_ID 1
-
-P4_AddLiteral(grammar, HW_ID, "Hello World", false);
+P4_AddLiteral(grammar, ENTRY, "Hello World", false);
 ```
 
-You may have seen a similar definition like below in a declarative way.
-
-```
-HW <- i"Hello World"
-```
-
-However, in Peppa PEG, we define rules in an imperative coding style. Yeah, pretty old school. ;)
-
-Next, we need to wrap the source string into a data structure `P4_Source`.
+Next, we wrap the source into a data structure `P4_Source`, which is the handle to the source to parse.
 
 Function `P4_CreateSource` returns a `P4_Source` struct. It needs two parameters: the source string and the entry rule ID.
 
 ```c
-P4_Source*  source = P4_CreateSource("Hello World", HW_ID);
+P4_Source*  source = P4_CreateSource("Hello World", ENTRY);
 ```
 
-Now the stage is setup. All we need to do is to parse the source by calling `P4_Parse`.
-If everything is all right, it gives us a zero error code `P4_Ok`,
-otherwise other `P4_Error`, such as `P4_MatchError`, `P4_MemoryError`, etc.
+Now the stage is setup; call `P4_Parse`.
+If everything is okay, it returns a zero value - `P4_Ok`,
+Otherwise a non-zero value `P4_Error`, such as `P4_MatchError`, `P4_MemoryError`, etc.
 
 ```c
 if (P4_Parse(grammar, source) != P4_Ok) {
@@ -135,14 +124,12 @@ if (P4_Parse(grammar, source) != P4_Ok) {
 }
 ```
 
-Struct `P4_Source` keeps the parsed result as an AST (abstract syntax tree).
+Struct `P4_Source` produces an abstract syntax tree, or AST if successfully.
 Each node in the AST is a `P4_Token` struct.
-
 Function `P4_GetSourceAst` returns the root node of the AST.
 
 ```c
 P4_Token* root = P4_GetSourceAst(source);
-// traverse: root->next, root->head, root->tail
 ```
 
 To traverse the AST,
@@ -178,13 +165,13 @@ P4_DeleteGrammar(grammar);
 
 ## Full Example Code
 
-A more complete code for the [Basic Usage](#basic-usage) example is like below.
+A complete code for the [Basic Usage](#basic-usage) example is like below.
 
 ```c
 #include <stdio.h>
 #include "peppapeg.h"
 
-# define HW_ID 1
+# define ENTRY 1
 
 int main(int argc, char* argv[]) {
     P4_Grammar* grammar = P4_CreateGrammar();
@@ -198,7 +185,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    P4_Source*  source = P4_CreateSource("HelloWorld", HW_ID);
+    P4_Source*  source = P4_CreateSource("HelloWorld", ENTRY);
     if (source == NULL) {
         printf("Error: CreateSource: MemoryError.\n");
         return 1;
@@ -239,8 +226,6 @@ Let's explore more Peppa PEG Rules.
 The Literal rule supports parsing UTF-8 strings.
 
 ```c
-// ENTRY <- "你好, WORLD"
-
 >> P4_AddLiteral(grammar, ENTRY, "你好, WORLD", true);
 P4_Ok
 
@@ -255,31 +240,27 @@ Case Sensitive literal matches the exact same string.
 When adding the literal rule, set `sensitive=true`.
 
 ```c
-// ENTRY <- "Case Sensitive"
-
 //                                              sensitive
 >> P4_AddLiteral(grammar, ENTRY , "Case Sensitive", true);
 P4_Ok
 
->> P4_Source* source = P4_Source("Case Sensitive", ENTRY );
+>> P4_Source* source = P4_Source("Case Sensitive", ENTRY);
 >> P4_Parse(grammar, source);
 P4_Ok
 
->> P4_Source* source = P4_Parse("CASE SENSITIVE", ENTRY );
+>> P4_Source* source = P4_Parse("CASE SENSITIVE", ENTRY);
 >> P4_Parse(grammar, source);
 P4_MatchError
 ```
 
 ## Case Insensitive Literal
 
-Case Insensitive Literal matches the same string but ignoring the cases.
+Case Insensitive Literal matches the same string but ignores the case.
 When adding the literal rule, set `sensitive=false`.
 
 The `sensitive` option only works for ASCII letters (a-z, A-Z).
 
 ```c
-// ENTRY <- i"Case Insensitive"
-
 //                                                    sensitive
 >> P4_AddLiteral(grammar,  ENTRY, "Case Insensitive", false);
 P4_Ok
@@ -311,13 +292,11 @@ P4_Ok
 P4_Ok
 ```
 
-Range supports UTF-8 characters.
+Range supports UTF-8 characters as well.
 
-In this example we match code points from `U+4E00` to `U+9FCC`, e.g. CJK unified ideographs block. ([好](https://zh.m.wiktionary.org/zh/%E5%A5%BD) is `U+597D`.)
+In this example we match the code points starting from `U+4E00` to `U+9FCC`, e.g. CJK unified ideographs block. ([好](https://zh.m.wiktionary.org/zh/%E5%A5%BD) is `U+597D`.)
 
 ```c
-// ENTRY <- [0x4E00-0x9FFF]
-
 //                               lower     upper
 >> P4_AddLiteral(grammar, ENTRY, 0x4E00,   0x9FFF);
 P4_Ok
@@ -348,8 +327,6 @@ If any one of the attempts fails, the Sequence rule fails.
 In this example, we wrap up three literals into a Sequence.
 
 ```c
-// ENTRY <- "HELLO" " " "WORLD"
-
 >> P4_AddSequence(grammar, ENTRY, 3);
 P4_Ok
 >> P4_Expression entry = P4_GetGrammarRule(grammar, ENTRY);
@@ -365,7 +342,7 @@ P4_Ok
 P4_Ok
 ```
 
-It's equivalent to the below version:
+It's equivalent to:
 
 ```c
 >> P4_AddSequenceWithMembers(
@@ -383,7 +360,7 @@ P4_Ok
 P4_Ok
 ```
 
-Match fails when any inner rule not matching successfully.
+The match fails when any inner rule is not matching.
 
 ```c
 >> P4_Source* source = P4_Source("HELLO ", ENTRY);
@@ -391,7 +368,7 @@ Match fails when any inner rule not matching successfully.
 P4_MatchError
 ```
 
-Match fails when not all inner rules matching the input.
+The match fails when not all inner rules is matching.
 
 ```c
 >> P4_Source* source = P4_Source("HELLO WORL", ENTRY);
@@ -438,8 +415,7 @@ Choice is another container of multiple rules.
 When applying the Choice rule to text, the first Choice member is attempted.
 If the attempt fails, the second Choice member is attempted, so on and on.
 If any one of the attempts succeeds, the Choice rule succeeds immediately and the rest of the Choice members will not be attempted.
-
-When multiple rules match, the first matched rule is used.
+If no Choice member matches, the Choice rule fails.
 
 * Function `P4_CreateChoice` creates a choice. Example: `P4_CreateChoice(2)`.
   * Function `P4_SetMember` set the member at the exact location. Example: `P4_SetMember(expr, 1, P4_CreateLiteral("HELLO", true))`.
@@ -450,8 +426,6 @@ When multiple rules match, the first matched rule is used.
 In this example, we wrap up two literals into a Choice.
 
 ```c
-// ENTRY <- "HELLO WORLD" / "你好, 世界"
-
 >> P4_AddChoice(grammar, ENTRY, 3);
 P4_Ok
 >> P4_Expression* entry = P4_GetGrammarRule(grammar, ENTRy);
@@ -459,17 +433,11 @@ P4_Ok
 P4_Ok
 >> P4_SetMember(entry, 1, P4_CreateLiteral("你好, 世界", true));
 P4_Ok
-
->> P4_Source* source = P4_Source("HELLO WORLD", ENTRY);
->> P4_Parse(grammar, source);
-P4_Ok
 ```
 
-It's equivalent to the below version:
+It's equivalent to:
 
 ```c
-// ENTRY <- "HELLO WORLD" / "你好, 世界"
-
 >> P4_AddChoiceWithMembers(
 ..   grammar,
 ..   ENTRY,
@@ -478,7 +446,9 @@ It's equivalent to the below version:
 ..   P4_CreateLiteral("你好, 世界", true)
 .. );
 P4_Ok
+```
 
+```c
 >> P4_Source* source = P4_Source("HELLO WORLD", ENTRY);
 >> P4_Parse(grammar, source);
 P4_Ok
@@ -513,13 +483,10 @@ In this example we create two references inside a sequence rule using `P4_Create
 P4_Ok
 >> P4_AddLiteral(grammar, WORLD, "WORLD", true);
 P4_Ok
->> P4_AddSequence(grammar, ENTRY, 2);
-P4_Ok
->> P4_Expression entry = P4_GetGrammarRule(grammar, ENTRY);
-
->> P4_SetMember(entry, 0, P4_CreateReference(HELLO));
-P4_Ok
->> P4_SetMember(entry, 1, P4_CreateReference(WORLD);
+>> P4_AddSequenceWithMembers(grammar, ENTRY, 2,
+..  P4_CreateReference(HELLO),
+..  P4_CreateReference(WORLD)
+.. );
 P4_Ok
 
 >> P4_Source* source = P4_Source("HELLOWORLD", ENTRY);
@@ -531,13 +498,10 @@ Reference resolves the referenced rule expression in runtime.
 This allows referencing a rule defined later.
 
 ```c
->> P4_AddSequence(grammar, ENTRY, 2);
-P4_Ok
->> P4_Expression entry = P4_GetGrammarRule(grammar, ENTRY);
-
->> P4_SetMember(entry, 0, P4_CreateReference(HELLO));
-P4_Ok
->> P4_SetMember(entry, 1, P4_CreateReference(WORLD);
+>> P4_AddSequenceWithMembers(grammar, ENTRY, 2,
+..  P4_CreateReference(HELLO),
+..  P4_CreateReference(WORLD)
+.. );
 P4_Ok
 
 >> P4_AddLiteral(grammar, HELLO, "HELLO", true);
@@ -553,12 +517,10 @@ P4_Ok
 Match fails when the referenced ID doesn't have a rule expression registered.
 
 ```c
->> P4_AddSequence(grammar, ENTRY, 2);
-P4_Ok
->> P4_Expression entry = P4_GetGrammarRule(grammar, ENTRY);
->> P4_SetMember(entry, 0, P4_CreateReference(HELLO));
-P4_Ok
->> P4_SetMember(entry, 1, P4_CreateReference(WORLD);
+>> P4_AddSequenceWithMembers(grammar, ENTRY, 2,
+..  P4_CreateReference(HELLO),
+..  P4_CreateReference(WORLD)
+.. );
 P4_Ok
 
 >> P4_Source* source = P4_Source("HELLOWORLD", ENTRY);

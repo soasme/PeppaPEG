@@ -167,6 +167,7 @@ P4_Expression* P4_CreateSequence(size_t);
 P4_Expression* P4_CreateChoice(size_t);
 P4_Expression* P4_CreateSequenceWithMembers(size_t, ...);
 P4_Expression* P4_CreateChoiceWithMembers(size_t, ...);
+P4_Expression* P4_CreateRepeatMinMax(P4_Expression*, size_t, size_t);
 P4_Expression* P4_CreateRepeatMin(P4_Expression*, size_t);
 P4_Expression* P4_CreateRepeatMax(P4_Expression*, size_t);
 P4_Expression* P4_CreateRepeatExact(P4_Expression*, size_t);

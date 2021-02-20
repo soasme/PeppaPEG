@@ -258,7 +258,7 @@ typedef struct P4_Grammar{
     /* The rules, e.g. the expressions with IDs. */
     struct P4_Expression**  rules;
     /* The total number of rules. */
-    int                     count;
+    size_t                  count;
     /* The maximum number of rules. */
     int                     cap;
     /* The total number of spaced rules. */

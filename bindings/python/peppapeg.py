@@ -234,6 +234,12 @@ def create_repeat_exact(expr, n):
         int(n)
     )
 
+LIFTED = lib.P4_FLAG_LIFTED
+SQUASHED = lib.P4_FLAG_SQUASHED
+TIGHT = lib.P4_FLAG_TIGHT
+SPACED = lib.P4_FLAG_SPACED
+SCOPED = lib.P4_FLAG_SCOPED
+
 class Grammar:
 
     def __init__(self):
@@ -242,6 +248,11 @@ class Grammar:
 
     def __del__(self):
         lib.P4_DeleteGrammar(self._grammar)
+
+    def set_flag(self, id, flag):
+        err = lib.P4_SetGrammarRuleFlag(self._grammar, int(id), flag)
+        if err != lib.P4_Ok:
+            raise_error(err=err, errmsg=f"failed to set grammar rule flag for {id.name}({id}).")
 
     def add_literal(self, id, literal, sensitive=True):
         add_grammar_rule(

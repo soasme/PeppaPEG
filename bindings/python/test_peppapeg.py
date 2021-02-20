@@ -62,7 +62,10 @@ def test_reference():
     grammar = P4.Grammar()
     grammar.add_literal(Rule.dest, 'world')
     grammar.add_sequence(Rule.entry, grammar.literal('hello '), grammar.reference(Rule.dest))
-    assert grammar.parse("hello world", entry=Rule.entry).slice == slice(0, 11)
+    ast = grammar.parse("hello world", entry=Rule.entry)
+    assert ast.slice == slice(0, 11)
+    assert ast.children
+    assert ast.children[0].slice == slice(6, 11)
 
 def test_back_reference():
     class Rule(IntEnum):
@@ -212,3 +215,38 @@ def test_repeat_exact():
 
     with pytest.raises(P4.MatchError):
         grammar.parse("oo")
+
+def test_lifted():
+    class Rule(IntEnum):
+        entry = 1
+
+    grammar = P4.Grammar()
+    grammar.add_literal(Rule.entry, 'hello world')
+    grammar.set_flag(Rule.entry, P4.LIFTED)
+
+    assert grammar.parse("hello world") is None
+
+def test_squashed():
+    class Rule(IntEnum):
+        entry = 1
+        dest  = 2
+
+    grammar = P4.Grammar()
+    grammar.add_literal(Rule.dest, 'world')
+    grammar.add_sequence(Rule.entry, grammar.literal('hello '), grammar.reference(Rule.dest))
+    grammar.set_flag(Rule.entry, P4.SQUASHED)
+    ast = grammar.parse("hello world", entry=Rule.entry)
+    assert ast.slice == slice(0, 11)
+    assert ast.children == []
+
+def test_spaced():
+    class Rule(IntEnum):
+        entry = 1
+        whitespace = 2
+
+    grammar = P4.Grammar()
+    grammar.add_literal(Rule.whitespace, ' ')
+    grammar.set_flag(Rule.whitespace, P4.SPACED)
+    grammar.add_sequence(Rule.entry, grammar.literal('o'), grammar.literal('x'))
+    ast = grammar.parse("o x", entry=Rule.entry)
+    assert ast.slice == slice(0, 3)

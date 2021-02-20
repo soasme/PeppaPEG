@@ -78,7 +78,6 @@ cleanup_freep (void *p)
                                         goto end;               \
                                     }                           \
                                                                 \
-                                    size_t size = grammar->count + 1; \
                                     if ((err=P4_AddGrammarRule(grammar, id, expr))!=P4_Ok) {\
                                         goto end;               \
                                     }                           \
@@ -117,7 +116,6 @@ P4_PRIVATE(P4_Error)            P4_SetWhitespaces(P4_Grammar*);
 P4_PRIVATE(P4_Expression*)      P4_GetWhitespaces(P4_Grammar*);
 
 P4_PRIVATE(P4_Token*)           P4_Match(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchNumeric(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchLiteral(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchRange(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchReference(P4_Source*, P4_Expression*);
@@ -967,7 +965,7 @@ P4_PrintSourceAst(P4_Token* token, P4_String buf, size_t indent) {
     while (current != NULL) {
         for (size_t i = 0; i < indent; i++) strcat(buf, " ");
         strcat(buf, "- ");
-        sprintf(idstr+1, "%u", current->expr->id);
+        sprintf(idstr+1, "%llu", current->expr->id);
         strcat(buf, idstr);
         if (current->head == NULL) {
             strcat(buf, ": \"");
@@ -1102,7 +1100,7 @@ P4_CreateSequenceWithMembers(size_t count, ...) {
     va_list members;
     va_start (members, count);
 
-    for (int i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         expr->members[i] = va_arg(members, P4_Expression*);
 
         if (expr->members[i] == NULL) {
@@ -1129,7 +1127,7 @@ P4_CreateChoiceWithMembers(size_t count, ...) {
     va_list members;
     va_start (members, count);
 
-    for (int i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         expr->members[i] = va_arg(members, P4_Expression*);
 
         if (expr->members[i] == NULL) {
@@ -1232,7 +1230,7 @@ P4_PUBLIC(P4_Grammar*)    P4_CreateGrammar(void) {
 P4_PUBLIC(void)
 P4_DeleteGrammar(P4_Grammar* grammar) {
     if (grammar) {
-        for (int i = 0; i < grammar->count; i++) {
+        for (size_t i = 0; i < grammar->count; i++) {
             if (grammar->rules[i])
                 P4_DeleteExpression(grammar->rules[i]);
             grammar->rules[i] = NULL;
@@ -1247,7 +1245,7 @@ P4_DeleteGrammar(P4_Grammar* grammar) {
 P4_PUBLIC(P4_Expression*)
 P4_GetGrammarRule(P4_Grammar* grammar, P4_RuleID id) {
     P4_Expression* rule = NULL;
-    for (int i = 0; i < grammar->count; i++) {
+    for (size_t i = 0; i < grammar->count; i++) {
         rule = grammar->rules[i];
         if (rule && rule->id == id)
             return rule;
@@ -1406,7 +1404,7 @@ P4_SetWhitespaces(P4_Grammar* grammar) {
     P4_Expression*  repeat = NULL;
     P4_Expression*  rule = NULL;
 
-    for (int i = 0; i < grammar->count; i++) {
+    for (size_t i = 0; i < grammar->count; i++) {
         rule = grammar->rules[i];
 
         if (IS_SPACED(rule)) {
@@ -1543,7 +1541,7 @@ P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_RuleID id, size_t count, ...) 
     va_list members;
     va_start (members, count);
 
-    for (int i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         expr->members[i] = va_arg(members, P4_Expression*);
 
         if (expr->members[i] == NULL) {
@@ -1576,7 +1574,7 @@ P4_AddChoiceWithMembers(P4_Grammar* grammar, P4_RuleID id, size_t count, ...) {
     va_list members;
     va_start (members, count);
 
-    for (int i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         expr->members[i] = va_arg(members, P4_Expression*);
 
         if (expr->members[i] == NULL) {
@@ -1651,8 +1649,7 @@ P4_GetMember(P4_Expression* expr, size_t offset) {
         return NULL;
     }
 
-    if (expr->kind != P4_Sequence
-            || expr->kind != P4_Choice) {
+    if ((expr->kind != P4_Sequence) && (expr->kind != P4_Choice)) {
         return NULL;
     }
 
@@ -1682,7 +1679,7 @@ P4_DeleteExpression(P4_Expression* expr) {
             break;
         case P4_Sequence:
         case P4_Choice:
-            for (int i = 0; i < expr->count; i++) {
+            for (size_t i = 0; i < expr->count; i++) {
                 if (expr->members[i])
                     P4_DeleteExpression(expr->members[i]);
                 expr->members[i] = NULL;

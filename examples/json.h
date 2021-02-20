@@ -197,25 +197,22 @@ P4_PUBLIC(P4_Grammar*)  P4_CreateJSONGrammar() {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_JSONString, P4_FLAG_TIGHT))
         goto finalize;
 
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_JSONArray, 2,
-        P4_CreateSequenceWithMembers(4,
-            P4_CreateLiteral("[", true),
-            P4_CreateReference(P4_JSONEntry),
-            P4_CreateZeroOrMore(
-                P4_CreateSequenceWithMembers(2,
-                    P4_CreateLiteral(",", true),
-                    P4_CreateReference(P4_JSONEntry)
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONArray, 3,
+        P4_CreateLiteral("[", true),
+        P4_CreateZeroOrOnce(
+            P4_CreateSequenceWithMembers(2,
+                P4_CreateReference(P4_JSONEntry),
+                P4_CreateZeroOrMore(
+                    P4_CreateSequenceWithMembers(2,
+                        P4_CreateLiteral(",", true),
+                        P4_CreateReference(P4_JSONEntry)
+                    )
                 )
-            ),
-            P4_CreateLiteral("]", true)
+            )
         ),
-        P4_CreateSequenceWithMembers(2,
-            P4_CreateLiteral("[", true),
-            P4_CreateLiteral("]", true)
-        )
+        P4_CreateLiteral("]", true)
     ))
         goto finalize;
-
 
     if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONObjectItem, 3,
         P4_CreateReference(P4_JSONString),
@@ -224,22 +221,20 @@ P4_PUBLIC(P4_Grammar*)  P4_CreateJSONGrammar() {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_JSONObject, 2,
-        P4_CreateSequenceWithMembers(4,
-            P4_CreateLiteral("{", true),
-            P4_CreateReference(P4_JSONObjectItem),
-            P4_CreateZeroOrMore(
-                P4_CreateSequenceWithMembers(2,
-                    P4_CreateLiteral(",", true),
-                    P4_CreateReference(P4_JSONObjectItem)
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONObject, 3,
+        P4_CreateLiteral("{", true),
+        P4_CreateZeroOrOnce(
+            P4_CreateSequenceWithMembers(2,
+                P4_CreateReference(P4_JSONObjectItem),
+                P4_CreateZeroOrMore(
+                    P4_CreateSequenceWithMembers(2,
+                        P4_CreateLiteral(",", true),
+                        P4_CreateReference(P4_JSONObjectItem)
+                    )
                 )
-            ),
-            P4_CreateLiteral("}", true)
+            )
         ),
-        P4_CreateSequenceWithMembers(2,
-            P4_CreateLiteral("{", true),
-            P4_CreateLiteral("}", true)
-        )
+        P4_CreateLiteral("}", true)
     ))
         goto finalize;
 

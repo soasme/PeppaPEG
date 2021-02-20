@@ -2,7 +2,14 @@
 
 Ultra lightweight PEG Parser in ANSI C. ✨ 🐷 ✨.
 
-[![Peppy Hacking Peppa PEG!](docs/imgs/peppapeg.jpg)](https://github.com/soasme/PeppaPEG).
+```
+  ____                          ____  _____ ____
+ |  _ \ ___ _ __  _ __   __ _  |  _ \| ____/ ___|
+ | |_) / _ \ '_ \| '_ \ / _` | | |_) |  _|| |  _
+ |  __/  __/ |_) | |_) | (_| | |  __/| |__| |_| |
+ |_|   \___| .__/| .__/ \__,_| |_|   |_____\____|
+           |_|   |_|
+```
 
 # Table of Contents
 

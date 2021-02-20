@@ -12,6 +12,8 @@
 - [ ] New Expression Kind: Complement.
 - [ ] New Expression Kind: Panic.
 - [ ] New Expression Kind: Function.
+- [ ] New Expression Kind: Sub Grammar.
+- [ ] Performance optimization: pre-alloc tokens.
 - [ ] Stop on first error v/s Recover from Panic.
 - [ ] Allow replacing malloc/free functions.
 - [ ] New Source Flag: Support UTF-8 BOM sequence (0xEF 0xBB 0xBF) at the start of source.

@@ -46,6 +46,7 @@ Ultra lightweight PEG Parser in ANSI C. ✨ 🐷 ✨.
   * [Recursion Limit](#recursion-limit)
 * [Peppy Hacking Peppa PEG!](peppy-hacking-peppa-peg)
   * [Test](#test)
+  * [Docs](#docs)
   * [Examples](#examples)
 
 # Hello, There!
@@ -839,6 +840,16 @@ If valgrind is installed, you can also run the test along with memory leak check
 (build) $ cmake -DENABLE_VALGRIND=ON ..
 (build) $ make check
 ```
+
+## Docs
+
+Peppa PEG docs can be built via doxygen:
+
+```bash
+$ doxygen .doxygen.conf
+```
+
+The outputs are stored on `build/docs`.
 
 ## Examples
 

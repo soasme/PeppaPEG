@@ -29,8 +29,8 @@
  *
 */
 
-# ifndef P4_LANG_MUSTACHE_H
-# define P4_LANG_MUSTACHE_H
+# ifndef P4_LANG_JSON_H
+# define P4_LANG_JSON_H
 
 #ifdef __cplusplus
 extern "C"

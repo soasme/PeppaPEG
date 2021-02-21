@@ -88,6 +88,8 @@ extern "C"
 
 /*
  * The default recursion limit.
+ *
+ * It can be adjusted through function `P4_SetRecursionLimit`.
  */
 # define P4_DEFAULT_RECURSION_LIMIT     8192
 
@@ -117,9 +119,8 @@ typedef uint64_t        P4_RuleID;
 /* A range of two runes. */
 typedef P4_Rune P4_RuneRange[2];
 
-/* The expression kind. */
+/* The expression kinds. */
 typedef enum {
-    /* P4_Numeric, */
     P4_Literal,
     P4_Range,
     P4_Reference,
@@ -169,14 +170,38 @@ typedef struct P4_Frame {
 } P4_Frame;
 
 typedef struct P4_Source {
+    /* The grammar used to parse the source. */
     struct P4_Grammar*      grammar;
+    /* The ID of entry rule in the grammar used to parse the source. */
     P4_RuleID               rule_id;
+    /* The content of the source. */
     P4_String               content;
+    /* The position of the consumed input. Min: 0, Max: strlen(content).
+     *
+     * It's possible the pos is less then length of content when the Source
+     * is successfully parsed. It's called a partial parse.
+     *
+     * To avoid that, the rule will need to be wrapped with an EOI and SOI.
+     * An SOI is Positive(Range(1, 0x10ffff))
+     * and An EOI is Negative(Range(1, 0x10ffff)). When the rule is wrapped,
+     * the input is guaranteed to be parsed until all bits are consumed.
+     * */
     P4_Position             pos;
+    /* The error code of the parse. */
     P4_Error                err;
+    /* The error message of the parse. */
     P4_String               errmsg;
+    /* The root of abstract syntax tree. */
     struct P4_Token*        root;
+    /* Reserved: whether to enable DEBUG logs. */
     bool                    verbose;
+    /* The flag for checking if the parse is matching SPACED rules.
+     *
+     * Since we're wrapping SPACED rules into a repetition rule internally,
+     * it's important to prevent matching SPACED rules in P4_MatchRepeat.
+     *
+     * XXX: Maybe there are some better ways to prevent that?
+     */
     bool                    whitespacing;
     /* The top frame in the stack. */
     struct P4_Frame*        frame_stack;
@@ -270,6 +295,11 @@ typedef struct P4_Grammar{
 } P4_Grammar;
 
 
+/**
+ * Provide the version string for the library.
+ *
+ * @return a string like "1.0.0".
+ */
 P4_PUBLIC(P4_String)      P4_Version(void);
 
 

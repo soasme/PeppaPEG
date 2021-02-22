@@ -250,11 +250,11 @@ typedef struct P4_Expression {
     /* The name of expression (only for debugging). */
     /* P4_String            name; */
     /** The id of expression. */
-    P4_RuleID            id;
+    P4_RuleID               id;
     /** The kind of expression. */
-    P4_ExpressionKind     kind;
+    P4_ExpressionKind       kind;
     /** The flag of expression. */
-    P4_ExpressionFlag      flag;
+    P4_ExpressionFlag       flag;
 
     union {
         /** Used by P4_Numeric. */
@@ -318,6 +318,11 @@ typedef struct P4_Token {
 } P4_Token;
 
 /**
+ * The callback after an expression is matched.
+ */
+typedef P4_Error (*P4_CallbackOnMatch)(struct P4_Grammar*, struct P4_Expression*);
+
+/**
  * The grammar object that holds all grammar rules.
  */
 typedef struct P4_Grammar{
@@ -333,6 +338,8 @@ typedef struct P4_Grammar{
     struct P4_Expression*   spaced_rules;
     /** The recursion limit, or maximum allowed nested rules. */
     size_t                  depth;
+    /** The callback after a match for an expression is successful. */
+    P4_CallbackOnMatch      callback;
 } P4_Grammar;
 
 
@@ -643,6 +650,9 @@ P4_PUBLIC P4_Slice*      P4_GetTokenSlice(P4_Token*);
  *      free(str);
  */
 P4_PUBLIC P4_String      P4_CopyTokenString(P4_Token*);
+
+
+P4_PUBLIC P4_Error       P4_SetGrammarCallback(P4_Grammar*, P4_CallbackOnMatch);
 
 #ifdef __cplusplus
 }

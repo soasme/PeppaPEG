@@ -856,6 +856,12 @@ P4_Match(P4_Source* s, P4_Expression* e) {
         return NULL;
     }
 
+    if (s->grammar->callback && (err = (s->grammar->callback)(s->grammar, e)) != P4_Ok) {
+        P4_RaiseError(s, err, "failed to run callback.");
+        P4_DeleteToken(result);
+        return NULL;
+    }
+
     return result;
 }
 
@@ -1226,6 +1232,7 @@ P4_PUBLIC P4_Grammar*    P4_CreateGrammar(void) {
     grammar->spaced_count = SIZE_MAX;
     grammar->spaced_rules = NULL;
     grammar->depth = P4_DEFAULT_RECURSION_LIMIT;
+    grammar->callback = NULL;
     return grammar;
 }
 
@@ -1879,4 +1886,13 @@ P4_SetSpaced(P4_Expression* e) {
 P4_PUBLIC void
 P4_SetScoped(P4_Expression* e) {
     return P4_SetExpressionFlag(e, P4_FLAG_SCOPED);
+}
+
+P4_PUBLIC P4_Error
+P4_SetGrammarCallback(P4_Grammar* grammar, P4_CallbackOnMatch callback) {
+    if (grammar == NULL || callback == NULL)
+        return P4_NullError;
+
+    grammar->callback = callback;
+    return P4_Ok;
 }

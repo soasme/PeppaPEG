@@ -47,7 +47,7 @@ extern "C"
 #include <stdio.h>
 #include <string.h>
 
-# define P4_PUBLIC(type) type
+# define P4_PUBLIC
 # define P4_PRIVATE(type) static type
 
 # define P4_MAJOR_VERSION 1
@@ -155,29 +155,33 @@ typedef enum {
     P4_BackReference,
 } P4_ExpressionKind;
 
+/**
+ * The error code.
+ */
 typedef enum {
-    /* No error is like a bless. */
+    /** No error is like a bless. */
     P4_Ok                   = 0,
-    /* When there is an internal error.
-     * Please raise an issue: https://github.com/soasme/peppapeg/issues. */
+    /** When there is an internal error.
+     * Please raise an issue: https://github.com/soasme/peppapeg/issues.
+     * */
     P4_InternalError        = 1,
-    /* When no text is matched. */
+    /** When no text is matched. */
     P4_MatchError           = 2,
-    /* When no name is resolved. */
+    /** When no name is resolved. */
     P4_NameError            = 3,
-    /* When the parse gets stuck forever or has reached the end. */
+    /** When the parse gets stuck forever or has reached the end. */
     P4_AdvanceError         = 4,
-    /* When out of memory. */
+    /** When out of memory. */
     P4_MemoryError          = 5,
-    /* When the given value is of unexpected type. */
+    /** When the given value is of unexpected type. */
     P4_ValueError           = 6,
-    /* When the index is out of boundary. */
+    /** When the index is out of boundary. */
     P4_IndexError           = 7,
-    /* When the id is out of the table. */
+    /** When the id is out of the table. */
     P4_KeyError             = 8,
-    /* When null is encountered. */
+    /** When null is encountered. */
     P4_NullError            = 9,
-    /* When recursion limit is reached. */
+    /** When recursion limit is reached. */
     P4_StackError           = 10,
 } P4_Error;
 
@@ -323,97 +327,275 @@ typedef struct P4_Grammar{
  *
  * @return a string like "1.0.0".
  */
-P4_PUBLIC(P4_String)      P4_Version(void);
+P4_PUBLIC P4_String      P4_Version(void);
 
 
-/* P4_PUBLIC(P4_Expression*) P4_CreateNumeric(size_t); */
-P4_PUBLIC(P4_Expression*) P4_CreateLiteral(const P4_String, bool sensitive);
-P4_PUBLIC(P4_Expression*) P4_CreateRange(P4_Rune, P4_Rune);
-P4_PUBLIC(P4_Expression*) P4_CreateReference(P4_RuleID);
-P4_PUBLIC(P4_Expression*) P4_CreatePositive(P4_Expression*);
-P4_PUBLIC(P4_Expression*) P4_CreateNegative(P4_Expression*);
-P4_PUBLIC(P4_Expression*) P4_CreateSequence(size_t);
-P4_PUBLIC(P4_Expression*) P4_CreateChoice(size_t);
-P4_PUBLIC(P4_Expression*) P4_CreateSequenceWithMembers(size_t, ...);
-P4_PUBLIC(P4_Expression*) P4_CreateChoiceWithMembers(size_t, ...);
-P4_PUBLIC(P4_Expression*) P4_CreateRepeatMinMax(P4_Expression*, size_t, size_t);
-P4_PUBLIC(P4_Expression*) P4_CreateRepeatMin(P4_Expression*, size_t);
-P4_PUBLIC(P4_Expression*) P4_CreateRepeatMax(P4_Expression*, size_t);
-P4_PUBLIC(P4_Expression*) P4_CreateRepeatExact(P4_Expression*, size_t);
-P4_PUBLIC(P4_Expression*) P4_CreateZeroOrOnce(P4_Expression*);
-P4_PUBLIC(P4_Expression*) P4_CreateZeroOrMore(P4_Expression*);
-P4_PUBLIC(P4_Expression*) P4_CreateOnceOrMore(P4_Expression*);
-P4_PUBLIC(P4_Expression*) P4_CreateBackReference(size_t);
+/* P4_PUBLIC P4_Expression* P4_CreateNumeric(size_t); */
+P4_PUBLIC P4_Expression* P4_CreateLiteral(const P4_String, bool sensitive);
+P4_PUBLIC P4_Expression* P4_CreateRange(P4_Rune, P4_Rune);
+P4_PUBLIC P4_Expression* P4_CreateReference(P4_RuleID);
+P4_PUBLIC P4_Expression* P4_CreatePositive(P4_Expression*);
+P4_PUBLIC P4_Expression* P4_CreateNegative(P4_Expression*);
+P4_PUBLIC P4_Expression* P4_CreateSequence(size_t);
+P4_PUBLIC P4_Expression* P4_CreateChoice(size_t);
+P4_PUBLIC P4_Expression* P4_CreateSequenceWithMembers(size_t, ...);
+P4_PUBLIC P4_Expression* P4_CreateChoiceWithMembers(size_t, ...);
+P4_PUBLIC P4_Expression* P4_CreateRepeatMinMax(P4_Expression*, size_t, size_t);
+P4_PUBLIC P4_Expression* P4_CreateRepeatMin(P4_Expression*, size_t);
+P4_PUBLIC P4_Expression* P4_CreateRepeatMax(P4_Expression*, size_t);
+P4_PUBLIC P4_Expression* P4_CreateRepeatExact(P4_Expression*, size_t);
+P4_PUBLIC P4_Expression* P4_CreateZeroOrOnce(P4_Expression*);
+P4_PUBLIC P4_Expression* P4_CreateZeroOrMore(P4_Expression*);
+P4_PUBLIC P4_Expression* P4_CreateOnceOrMore(P4_Expression*);
+P4_PUBLIC P4_Expression* P4_CreateBackReference(size_t);
 
-P4_PUBLIC(P4_Error)       P4_SetMember(P4_Expression*, size_t, P4_Expression*);
-P4_PUBLIC(P4_Error)       P4_SetReferenceMember(P4_Expression*, size_t, P4_RuleID);
-P4_PUBLIC(size_t)         P4_GetMembersCount(P4_Expression*);
-P4_PUBLIC(P4_Expression*) P4_GetMember(P4_Expression*, size_t);
+P4_PUBLIC P4_Error       P4_SetMember(P4_Expression*, size_t, P4_Expression*);
+P4_PUBLIC P4_Error       P4_SetReferenceMember(P4_Expression*, size_t, P4_RuleID);
+P4_PUBLIC size_t         P4_GetMembersCount(P4_Expression*);
+P4_PUBLIC P4_Expression* P4_GetMember(P4_Expression*, size_t);
 
-P4_PUBLIC(void)           P4_DeleteExpression(P4_Expression*);
+P4_PUBLIC void           P4_DeleteExpression(P4_Expression*);
 
-P4_PUBLIC(P4_String)      P4_PrintExpression(P4_Expression*);
+P4_PUBLIC P4_String      P4_PrintExpression(P4_Expression*);
 
-P4_PUBLIC(P4_Error)       P4_SetRuleID(P4_Expression*, P4_RuleID);
-P4_PUBLIC(bool)           P4_IsRule(P4_Expression*);
+P4_PUBLIC P4_Error       P4_SetRuleID(P4_Expression*, P4_RuleID);
+P4_PUBLIC bool           P4_IsRule(P4_Expression*);
 
-P4_PUBLIC(bool)           P4_IsSquashed(P4_Expression*);
-P4_PUBLIC(bool)           P4_IsLifted(P4_Expression*);
-P4_PUBLIC(bool)           P4_IsTight(P4_Expression*);
-P4_PUBLIC(bool)           P4_IsScoped(P4_Expression*);
-P4_PUBLIC(bool)           P4_IsSpaced(P4_Expression*);
-P4_PUBLIC(void)           P4_SetExpressionFlag(P4_Expression*, P4_ExpressionFlag);
-P4_PUBLIC(void)           P4_SetSquashed(P4_Expression*);
-P4_PUBLIC(void)           P4_SetLifted(P4_Expression*);
-P4_PUBLIC(void)           P4_SetTight(P4_Expression*);
-P4_PUBLIC(void)           P4_SetSpaced(P4_Expression*);
-P4_PUBLIC(void)           P4_SetScoped(P4_Expression*);
+P4_PUBLIC bool           P4_IsSquashed(P4_Expression*);
+P4_PUBLIC bool           P4_IsLifted(P4_Expression*);
+P4_PUBLIC bool           P4_IsTight(P4_Expression*);
+P4_PUBLIC bool           P4_IsScoped(P4_Expression*);
+P4_PUBLIC bool           P4_IsSpaced(P4_Expression*);
+P4_PUBLIC void           P4_SetExpressionFlag(P4_Expression*, P4_ExpressionFlag);
+P4_PUBLIC void           P4_SetSquashed(P4_Expression*);
+P4_PUBLIC void           P4_SetLifted(P4_Expression*);
+P4_PUBLIC void           P4_SetTight(P4_Expression*);
+P4_PUBLIC void           P4_SetSpaced(P4_Expression*);
+P4_PUBLIC void           P4_SetScoped(P4_Expression*);
 
-P4_PUBLIC(P4_Grammar*)    P4_CreateGrammar(void);
-P4_PUBLIC(void)           P4_DeleteGrammar(P4_Grammar*);
+P4_PUBLIC P4_Grammar*    P4_CreateGrammar(void);
+P4_PUBLIC void           P4_DeleteGrammar(P4_Grammar*);
 
-P4_PUBLIC(P4_Error)       P4_AddGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
-P4_PUBLIC(P4_Error)       P4_AddNumeric(P4_Grammar*, P4_RuleID, size_t);
-P4_PUBLIC(P4_Error)       P4_AddLiteral(P4_Grammar*, P4_RuleID, const P4_String, bool sensitive);
-P4_PUBLIC(P4_Error)       P4_AddRange(P4_Grammar*, P4_RuleID, P4_Rune, P4_Rune);
-P4_PUBLIC(P4_Error)       P4_AddReference(P4_Grammar*, P4_RuleID, P4_RuleID);
-P4_PUBLIC(P4_Error)       P4_AddPositive(P4_Grammar*, P4_RuleID, P4_Expression*);
-P4_PUBLIC(P4_Error)       P4_AddNegative(P4_Grammar*, P4_RuleID, P4_Expression*);
-P4_PUBLIC(P4_Error)       P4_AddSequence(P4_Grammar*, P4_RuleID, size_t);
-P4_PUBLIC(P4_Error)       P4_AddSequenceWithMembers(P4_Grammar*, P4_RuleID, size_t, ...);
-P4_PUBLIC(P4_Error)       P4_AddChoice(P4_Grammar*, P4_RuleID, size_t);
-P4_PUBLIC(P4_Error)       P4_AddChoiceWithMembers(P4_Grammar*, P4_RuleID, size_t, ...);
-P4_PUBLIC(P4_Error)       P4_AddZeroOrOnce(P4_Grammar*, P4_RuleID, P4_Expression*);
-P4_PUBLIC(P4_Error)       P4_AddZeroOrMore(P4_Grammar*, P4_RuleID, P4_Expression*);
-P4_PUBLIC(P4_Error)       P4_AddOnceOrMore(P4_Grammar*, P4_RuleID, P4_Expression*);
-P4_PUBLIC(P4_Error)       P4_AddRepeatMin(P4_Grammar*, P4_RuleID, P4_Expression*, size_t);
-P4_PUBLIC(P4_Error)       P4_AddRepeatMax(P4_Grammar*, P4_RuleID, P4_Expression*, size_t);
-P4_PUBLIC(P4_Error)       P4_AddRepeatMinMax(P4_Grammar*, P4_RuleID, P4_Expression*, size_t, size_t);
-P4_PUBLIC(P4_Error)       P4_AddRepeatExact(P4_Grammar*, P4_RuleID, P4_Expression*, size_t);
+P4_PUBLIC P4_Error       P4_AddGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_PUBLIC P4_Error       P4_AddNumeric(P4_Grammar*, P4_RuleID, size_t);
+P4_PUBLIC P4_Error       P4_AddLiteral(P4_Grammar*, P4_RuleID, const P4_String, bool sensitive);
+P4_PUBLIC P4_Error       P4_AddRange(P4_Grammar*, P4_RuleID, P4_Rune, P4_Rune);
+P4_PUBLIC P4_Error       P4_AddReference(P4_Grammar*, P4_RuleID, P4_RuleID);
+P4_PUBLIC P4_Error       P4_AddPositive(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_PUBLIC P4_Error       P4_AddNegative(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_PUBLIC P4_Error       P4_AddSequence(P4_Grammar*, P4_RuleID, size_t);
+P4_PUBLIC P4_Error       P4_AddSequenceWithMembers(P4_Grammar*, P4_RuleID, size_t, ...);
+P4_PUBLIC P4_Error       P4_AddChoice(P4_Grammar*, P4_RuleID, size_t);
+P4_PUBLIC P4_Error       P4_AddChoiceWithMembers(P4_Grammar*, P4_RuleID, size_t, ...);
+P4_PUBLIC P4_Error       P4_AddZeroOrOnce(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_PUBLIC P4_Error       P4_AddZeroOrMore(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_PUBLIC P4_Error       P4_AddOnceOrMore(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_PUBLIC P4_Error       P4_AddRepeatMin(P4_Grammar*, P4_RuleID, P4_Expression*, size_t);
+P4_PUBLIC P4_Error       P4_AddRepeatMax(P4_Grammar*, P4_RuleID, P4_Expression*, size_t);
+P4_PUBLIC P4_Error       P4_AddRepeatMinMax(P4_Grammar*, P4_RuleID, P4_Expression*, size_t, size_t);
+P4_PUBLIC P4_Error       P4_AddRepeatExact(P4_Grammar*, P4_RuleID, P4_Expression*, size_t);
 
-P4_PUBLIC(void)           P4_DeleteGrammarRule(P4_Grammar*, P4_RuleID);
-P4_PUBLIC(P4_Expression*) P4_GetGrammarRule(P4_Grammar*, P4_RuleID);
-P4_PUBLIC(P4_Error)       P4_SetGrammarRuleFlag(P4_Grammar*, P4_RuleID, P4_ExpressionFlag);
-P4_PUBLIC(P4_Error)       P4_SetRecursionLimit(P4_Grammar*, size_t limit);
-P4_PUBLIC(size_t)         P4_GetRecursionLimit(P4_Grammar*);
+P4_PUBLIC void           P4_DeleteGrammarRule(P4_Grammar*, P4_RuleID);
+P4_PUBLIC P4_Expression* P4_GetGrammarRule(P4_Grammar*, P4_RuleID);
+P4_PUBLIC P4_Error       P4_SetGrammarRuleFlag(P4_Grammar*, P4_RuleID, P4_ExpressionFlag);
 
-P4_PUBLIC(P4_Source*)     P4_CreateSource(P4_String, P4_RuleID);
-P4_PUBLIC(void)           P4_DeleteSource(P4_Source*);
+/**
+ * @brief       Set the maximum allowed recursion calls.
+ * @param       grammar     The grammar.
+ * @param       limit       The number of maximum recursion calls.
+ * @return      An error. If successful, return \ref P4_Ok; otherwise, return other \ref P4_Error.
+ *
+ * Example:
+ *
+ *      // on a machine with small memory.
+ *      P4_SetRecursionLimit(grammar, 256);
+ *
+ *      // on a machine with large memory.
+ *      P4_SetRecursionLimit(grammar, 1024*20);
+ */
+P4_PUBLIC P4_Error       P4_SetRecursionLimit(P4_Grammar*, size_t limit);
 
-P4_PUBLIC(P4_Token*)      P4_GetSourceAst(P4_Source*);
-P4_PUBLIC(P4_Position)    P4_GetSourcePosition(P4_Source*);
-P4_PUBLIC(void)           P4_PrintSourceAst(P4_Token*, P4_String, size_t);
+/**
+ * @brief       Get the maximum allowed recursion calls.
+ * @param       grammar     The grammar.
+ * @return      The maximum allowed recursion calls. If something goes wrong, return 0.
+ *
+ * Example:
+ *
+ *      size_t  limit = P4_GetRecursionLimit(grammar);
+ *      printf("limit=%u\n", limit);
+ */
+P4_PUBLIC size_t         P4_GetRecursionLimit(P4_Grammar*);
 
-P4_PUBLIC(P4_Error)       P4_Parse(P4_Grammar*, P4_Source*);
+/**
+ * @brief       Create a \ref P4_Source* object.
+ * @param       content     The content of input.
+ * @param       rule_id     The id of entry grammar rule.
+ * @return      A source object.
+ *
+ * Example:
+ *
+ *      char*       content = ... // read from some files.
+ *      P4_RuleID   rule_id = My_EntryRule;
+ *
+ *      P4_Source*  source  = P4_CreateSource(content, rule_id);
+ *
+ *      // do something...
+ *
+ *      P4_DeleteSource(source);
+ */
+P4_PUBLIC P4_Source*     P4_CreateSource(P4_String, P4_RuleID);
 
-P4_PUBLIC(bool)           P4_HasError(P4_Source*);
-P4_PUBLIC(P4_Error)       P4_GetError(P4_Source*);
-P4_PUBLIC(P4_String)      P4_GetErrorMessage(P4_Source*);
+/**
+ * @brief       Free the allocated memory of a source.
+ *              If the source has been parsed and has an AST, the entire AST will also be free-ed.
+ * @param       source  The source.
+ *
+ * Example:
+ *
+ *      P4_DeleteSource(source);
+ */
+P4_PUBLIC void           P4_DeleteSource(P4_Source*);
 
-P4_PUBLIC(P4_Token*)      P4_CreateToken(P4_String, size_t, size_t, P4_Expression*);
-P4_PUBLIC(void)           P4_DeleteToken(P4_Token*);
-P4_PUBLIC(P4_Slice*)      P4_GetTokenSlice(P4_Token*);
-P4_PUBLIC(P4_String)      P4_CopyTokenString(P4_Token*);
+/**
+ * @brief       Get the root token of abstract syntax tree of the source.
+ * @param       source  The source.
+ * @return      The root token. If the parse is failed or the root token is lifted, return NULL.
+ */
+P4_PUBLIC P4_Token*      P4_GetSourceAst(P4_Source*);
+/**
+ * @brief       Get the last position in the input after a parse.
+ * @param       source  The source.
+ * @return      The position in the input.
+ */
+P4_PUBLIC P4_Position    P4_GetSourcePosition(P4_Source*);
+
+/**
+ * @brief       Print the token tree.
+ * @param       token   The token.
+ * @param       buf     The buffer of output. It should be big enough to hold all of the outputs.
+ * @param       indent  The indentation. Generally, set it to 0.
+ */
+P4_PUBLIC void           P4_PrintSourceAst(P4_Token*, P4_String, size_t);
+
+/**
+ * @brief       Parse the source given a grammar.
+ * @param       grammar     The grammar.
+ * @param       source      The source.
+ * @return      The error code.
+ *              When the parse is successful, return \ref P4_Ok.
+ *              Otherwise, return the other \ref P4_Error, such as \ref P4_MatchError.
+ *
+ * Example:
+ *
+ *      if ((err = P4_Parse(grammar, source)) != P4_Ok) {
+ *          // error handling ...
+ *      }
+ */
+P4_PUBLIC P4_Error       P4_Parse(P4_Grammar*, P4_Source*);
+
+/**
+ * @brief       Determine whether the parse is failed.
+ * @param       source      The source.
+ * @return      Whether the parse is failed.
+ *
+ * Example:
+ *
+ *      if (P4_HasError(source)) {
+ *          printf("err=%u\n", P4_GetError(source));
+ *          printf("msg=%s\n", P4_GetErrorMessage(source));
+ *      }
+ */
+P4_PUBLIC bool           P4_HasError(P4_Source*);
+
+/**
+ * @brief       Get the error code if failed to parse the source.
+ * @param       source      The source.
+ * @return      The error code.
+ *
+ * Example:
+ *
+ *      if (P4_Ok != P4_Parse(grammar, source)) {
+ *          printf("err=%u\n", P4_GetError(source));
+ *      }
+ */
+P4_PUBLIC P4_Error       P4_GetError(P4_Source*);
+
+/**
+ * @brief       Get the error message if failed to parse the source.
+ * @param       source      The source.
+ * @return      The error message.
+ *
+ * Example:
+ *
+ *      if (P4_Ok != P4_Parse(grammar, source)) {
+ *          printf("msg=%s\n", P4_GetErrorMessage(source));
+ *      }
+ */
+P4_PUBLIC P4_String      P4_GetErrorMessage(P4_Source*);
+
+/**
+ * @brief       Create a token.
+ * @param       str     The text.
+ * @param       start   The starting position of the text.
+ * @param       stop    The stopping position of the text.
+ * @param       expr    The expression that matches to the slice of the text.
+ * @return      The token.
+ *
+ * Example:
+ *
+ *      P4_String       str     = "Hello world";
+ *      size_t          start   = 0;
+ *      size_t          stop    = 11;
+ *      P4_Expression*  expr    = P4_GetGrammarRule(grammar, ENTRY);
+ *
+ *      P4_Token* token = P4_CreateToken(text, start, stop, expr);
+ *
+ *      // do something.
+ *
+ *      P4_DeleteToken(token);
+ */
+P4_PUBLIC P4_Token*      P4_CreateToken(P4_String, size_t, size_t, P4_Expression*);
+
+/**
+ * @brief       Delete the token.
+ *              This will free the occupied memory for token.
+ *              The str of the token won't be free-ed since the token only owns not the string but the slice of a string.
+ * @param       token   The token.
+ *
+ * Example:
+ *
+ *      P4_DeleteToken(token);
+ */
+P4_PUBLIC void           P4_DeleteToken(P4_Token*);
+
+/**
+ * @brief       Get the slice that the token covers.
+ *              The slice is owned by the token so don't free it.
+ * @param       token   The token.
+ * @return      The slice.
+ *
+ * Example:
+ *
+ *      P4_Slice* slice = P4_GetTokenSlice(token);
+ *      printf("token slice=[%u..%u]\n", slice->i, slice->j);
+ */
+P4_PUBLIC P4_Slice*      P4_GetTokenSlice(P4_Token*);
+
+/**
+ * @brief       Copy the string that the token covers.
+ *              The caller is responsible for freeing the string.
+ *
+ * @param       token   The token.
+ * @return      The string.
+ *
+ * Example:
+ *
+ *      P4_String* str = P4_CopyTokenString(token);
+ *      printf("token str=%s\n", str);
+ *      free(str);
+ */
+P4_PUBLIC P4_String      P4_CopyTokenString(P4_Token*);
 
 #ifdef __cplusplus
 }

@@ -78,7 +78,7 @@ typedef enum {
  * Exponent = i"E" (Minus / Plus)? [0-9]+
  * Whitespace = " " / "\t" / "\r" / "\n"
  */
-P4_PUBLIC(P4_Grammar*)  P4_CreateJSONGrammar() {
+P4_PUBLIC P4_Grammar*  P4_CreateJSONGrammar() {
     P4_Grammar* grammar = P4_CreateGrammar();
     if (grammar == NULL) {
         return NULL;

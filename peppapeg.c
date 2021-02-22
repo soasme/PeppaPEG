@@ -243,8 +243,8 @@ P4_RescueError(P4_Source* s) {
  */
 P4_Token*
 P4_CreateToken (const P4_String     str,
-                size_t              slice_i,
-                size_t              slice_j,
+                size_t              start,
+                size_t              stop,
                 P4_Expression*      expr) {
     P4_Token* token;
 
@@ -252,8 +252,8 @@ P4_CreateToken (const P4_String     str,
         return NULL;
 
     token->text         = str;
-    token->slice.i      = slice_i;
-    token->slice.j      = slice_j;
+    token->slice.i      = start;
+    token->slice.j      = stop;
     token->expr         = expr;
     token->next         = NULL;
     token->head         = NULL;
@@ -300,7 +300,7 @@ P4_DeleteTokenChildren(P4_Token* token) {
  * Free the token list and all the children nodes of each
  * node in the token list.
  */
-P4_PUBLIC(void)
+P4_PUBLIC void
 P4_DeleteToken(P4_Token* token) {
     P4_Token* tmp = NULL;
     while (token) {
@@ -959,7 +959,7 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, size_t
 }
 
 // Poor performance, refactor me.
-P4_PUBLIC(void)
+P4_PUBLIC void
 P4_PrintSourceAst(P4_Token* token, P4_String buf, size_t indent) {
     P4_Token* current = token;
     char idstr[6];
@@ -988,7 +988,7 @@ P4_PrintSourceAst(P4_Token* token, P4_String buf, size_t indent) {
 /*
  * Get version string.
  */
-P4_PUBLIC(P4_String)
+P4_PUBLIC P4_String
 P4_Version(void) {
     static char version[15];
     sprintf(version, "%i.%i.%i", P4_MAJOR_VERSION, P4_MINOR_VERSION, P4_PATCH_VERSION);
@@ -996,7 +996,7 @@ P4_Version(void) {
 }
 
 /*
-P4_PUBLIC(P4_Expression*)
+P4_PUBLIC P4_Expression*
 P4_CreateNumeric(size_t num) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->kind = P4_Numeric;
@@ -1005,7 +1005,7 @@ P4_CreateNumeric(size_t num) {
 }
 */
 
-P4_PUBLIC(P4_Expression*)
+P4_PUBLIC P4_Expression*
 P4_CreateLiteral(const P4_String literal, bool sensitive) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->id = 0;
@@ -1016,7 +1016,7 @@ P4_CreateLiteral(const P4_String literal, bool sensitive) {
     return expr;
 }
 
-P4_PUBLIC(P4_Expression*)
+P4_PUBLIC P4_Expression*
 P4_CreateRange(P4_Rune lower, P4_Rune upper) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->id = 0;
@@ -1027,7 +1027,7 @@ P4_CreateRange(P4_Rune lower, P4_Rune upper) {
     return expr;
 }
 
-P4_PUBLIC(P4_Expression*)
+P4_PUBLIC P4_Expression*
 P4_CreateReference(P4_RuleID id) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->id = 0;
@@ -1038,7 +1038,7 @@ P4_CreateReference(P4_RuleID id) {
     return expr;
 }
 
-P4_PUBLIC(P4_Expression*)
+P4_PUBLIC P4_Expression*
 P4_CreatePositive(P4_Expression* refexpr) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->id = 0;
@@ -1048,7 +1048,7 @@ P4_CreatePositive(P4_Expression* refexpr) {
     return expr;
 }
 
-P4_PUBLIC(P4_Expression*)
+P4_PUBLIC P4_Expression*
 P4_CreateNegative(P4_Expression* refexpr) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->id = 0;
@@ -1068,7 +1068,7 @@ P4_CreateContainer(size_t count) {
     return expr;
 }
 
-P4_PUBLIC(P4_Expression*)
+P4_PUBLIC P4_Expression*
 P4_CreateSequence(size_t count) {
     P4_Expression* expr = P4_CreateContainer(count);
 
@@ -1080,7 +1080,7 @@ P4_CreateSequence(size_t count) {
     return expr;
 }
 
-P4_PUBLIC(P4_Expression*)
+P4_PUBLIC P4_Expression*
 P4_CreateChoice(size_t count) {
     P4_Expression* expr = P4_CreateContainer(count);
 
@@ -1092,7 +1092,7 @@ P4_CreateChoice(size_t count) {
     return expr;
 }
 
-P4_PUBLIC(P4_Expression*)
+P4_PUBLIC P4_Expression*
 P4_CreateSequenceWithMembers(size_t count, ...) {
     P4_Expression* expr = P4_CreateSequence(count);
 
@@ -1119,7 +1119,7 @@ finalize:
     return NULL;
 }
 
-P4_PUBLIC(P4_Expression*)
+P4_PUBLIC P4_Expression*
 P4_CreateChoiceWithMembers(size_t count, ...) {
     P4_Expression* expr = P4_CreateChoice(count);
 
@@ -1146,7 +1146,7 @@ finalize:
     return NULL;
 }
 
-P4_PUBLIC(P4_Expression*)
+P4_PUBLIC P4_Expression*
 P4_CreateRepeatMinMax(P4_Expression* repeat, size_t min, size_t max) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->id = 0;
@@ -1158,37 +1158,37 @@ P4_CreateRepeatMinMax(P4_Expression* repeat, size_t min, size_t max) {
     return expr;
 }
 
-P4_PUBLIC(P4_Expression*)
+P4_PUBLIC P4_Expression*
 P4_CreateRepeatMin(P4_Expression* repeat, size_t min) {
     return P4_CreateRepeatMinMax(repeat, min, SIZE_MAX);
 }
 
-P4_PUBLIC(P4_Expression*)
+P4_PUBLIC P4_Expression*
 P4_CreateRepeatMax(P4_Expression* repeat, size_t max) {
     return P4_CreateRepeatMinMax(repeat, SIZE_MAX, max);
 }
 
-P4_PUBLIC(P4_Expression*)
+P4_PUBLIC P4_Expression*
 P4_CreateRepeatExact(P4_Expression* repeat, size_t minmax) {
     return P4_CreateRepeatMinMax(repeat, minmax, minmax);
 }
 
-P4_PUBLIC(P4_Expression*)
+P4_PUBLIC P4_Expression*
 P4_CreateZeroOrOnce(P4_Expression* repeat) {
     return P4_CreateRepeatMinMax(repeat, 0, 1);
 }
 
-P4_PUBLIC(P4_Expression*)
+P4_PUBLIC P4_Expression*
 P4_CreateZeroOrMore(P4_Expression* repeat) {
     return P4_CreateRepeatMinMax(repeat, 0, SIZE_MAX);
 }
 
-P4_PUBLIC(P4_Expression*)
+P4_PUBLIC P4_Expression*
 P4_CreateOnceOrMore(P4_Expression* repeat) {
     return P4_CreateRepeatMinMax(repeat, 1, SIZE_MAX);
 }
 
-P4_PUBLIC(P4_Expression*)
+P4_PUBLIC P4_Expression*
 P4_CreateBackReference(size_t index) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->id = 0;
@@ -1198,7 +1198,7 @@ P4_CreateBackReference(size_t index) {
     return expr;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_SetRuleID(P4_Expression* e, P4_RuleID id) {
     if (e == NULL)
         return P4_NullError;
@@ -1210,7 +1210,7 @@ P4_SetRuleID(P4_Expression* e, P4_RuleID id) {
     return P4_Ok;
 }
 
-P4_PUBLIC(bool)
+P4_PUBLIC bool
 P4_IsRule(P4_Expression* e) {
     if (e == NULL)
         return false;
@@ -1218,7 +1218,7 @@ P4_IsRule(P4_Expression* e) {
     return e->id != 0;
 }
 
-P4_PUBLIC(P4_Grammar*)    P4_CreateGrammar(void) {
+P4_PUBLIC P4_Grammar*    P4_CreateGrammar(void) {
     P4_Grammar* grammar = malloc(sizeof(P4_Grammar));
     grammar->rules = NULL;
     grammar->count = 0;
@@ -1229,7 +1229,7 @@ P4_PUBLIC(P4_Grammar*)    P4_CreateGrammar(void) {
     return grammar;
 }
 
-P4_PUBLIC(void)
+P4_PUBLIC void
 P4_DeleteGrammar(P4_Grammar* grammar) {
     if (grammar) {
         for (size_t i = 0; i < grammar->count; i++) {
@@ -1244,7 +1244,7 @@ P4_DeleteGrammar(P4_Grammar* grammar) {
     }
 }
 
-P4_PUBLIC(P4_Expression*)
+P4_PUBLIC P4_Expression*
 P4_GetGrammarRule(P4_Grammar* grammar, P4_RuleID id) {
     P4_Expression* rule = NULL;
     for (size_t i = 0; i < grammar->count; i++) {
@@ -1255,7 +1255,7 @@ P4_GetGrammarRule(P4_Grammar* grammar, P4_RuleID id) {
     return NULL;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_SetGrammarRuleFlag(P4_Grammar* grammar, P4_RuleID id, P4_ExpressionFlag flag) {
     P4_Expression* expr = P4_GetGrammarRule(grammar, id);
     if (expr == NULL)
@@ -1266,7 +1266,7 @@ P4_SetGrammarRuleFlag(P4_Grammar* grammar, P4_RuleID id, P4_ExpressionFlag flag)
     return P4_Ok;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_SetRecursionLimit(P4_Grammar* grammar, size_t limit) {
     if (grammar == NULL)
         return P4_NullError;
@@ -1276,12 +1276,12 @@ P4_SetRecursionLimit(P4_Grammar* grammar, size_t limit) {
     return P4_Ok;
 }
 
-P4_PUBLIC(size_t)
+P4_PUBLIC size_t
 P4_GetRecursionLimit(P4_Grammar* grammar) {
     return grammar == NULL ? 0 : grammar->depth;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_AddGrammarRule(P4_Grammar* grammar, P4_RuleID id, P4_Expression* expr) {
     size_t          cap   = grammar->cap;
     P4_Expression** rules = grammar->rules;
@@ -1309,7 +1309,7 @@ P4_AddGrammarRule(P4_Grammar* grammar, P4_RuleID id, P4_Expression* expr) {
     return P4_Ok;
 }
 
-P4_PUBLIC(P4_Source*)
+P4_PUBLIC P4_Source*
 P4_CreateSource(P4_String content, P4_RuleID rule_id) {
     P4_Source* source = malloc(sizeof(P4_Source));
     source->content = content;
@@ -1324,7 +1324,7 @@ P4_CreateSource(P4_String content, P4_RuleID rule_id) {
     return source;
 }
 
-P4_PUBLIC(void)
+P4_PUBLIC void
 P4_DeleteSource(P4_Source* source) {
     if (source == NULL)
         return;
@@ -1345,17 +1345,17 @@ P4_DeleteSource(P4_Source* source) {
     free(source);
 }
 
-P4_PUBLIC(P4_Token*)
+P4_PUBLIC P4_Token*
 P4_GetSourceAst(P4_Source* source) {
     return source == NULL ? NULL : source->root;
 }
 
-P4_PUBLIC(P4_Position)
+P4_PUBLIC P4_Position
 P4_GetSourcePosition(P4_Source* source) {
     return source == NULL ? 0 : source->pos;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_Parse(P4_Grammar* grammar, P4_Source* source) {
     if (source->err != P4_Ok)
         return source->err;
@@ -1374,7 +1374,7 @@ P4_Parse(P4_Grammar* grammar, P4_Source* source) {
 }
 
 
-P4_PUBLIC(bool)
+P4_PUBLIC bool
 P4_HasError(P4_Source* src) {
     if (src == NULL)
         return false;
@@ -1382,7 +1382,7 @@ P4_HasError(P4_Source* src) {
     return src->err != P4_Ok;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_GetError(P4_Source* source) {
     if (source == NULL)
         return P4_NullError;
@@ -1390,7 +1390,7 @@ P4_GetError(P4_Source* source) {
     return source->err;
 }
 
-P4_PUBLIC(P4_String)
+P4_PUBLIC P4_String
 P4_GetErrorMessage(P4_Source* source) {
     if (source == NULL || source->errmsg == NULL)
         return NULL;
@@ -1476,7 +1476,7 @@ P4_GetWhitespaces(P4_Grammar* g) {
     return g->spaced_rules;
 }
 
-P4_PUBLIC(void)
+P4_PUBLIC void
 P4_SetExpressionFlag(P4_Expression* e, P4_ExpressionFlag f) {
     assert(e != NULL);
     e->flag |= f;
@@ -1500,19 +1500,19 @@ P4_RemainingText(P4_Source* s) {
     return s->content + s->pos;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_AddLiteral(P4_Grammar* grammar, P4_RuleID id, const P4_String literal, bool sensitive) {
     P4_AddSomeGrammarRule(grammar, id, P4_CreateLiteral(literal, sensitive));
     return P4_Ok;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_AddRange(P4_Grammar* grammar, P4_RuleID id, P4_Rune lower, P4_Rune upper) {
     P4_AddSomeGrammarRule(grammar, id, P4_CreateRange(lower, upper));
     return P4_Ok;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_AddPositive(P4_Grammar* grammar, P4_RuleID id, P4_Expression* ref_expr) {
     if (ref_expr == NULL)
         return P4_NullError;
@@ -1520,7 +1520,7 @@ P4_AddPositive(P4_Grammar* grammar, P4_RuleID id, P4_Expression* ref_expr) {
     return P4_Ok;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_AddNegative(P4_Grammar* grammar, P4_RuleID id, P4_Expression* ref_expr) {
     if (ref_expr == NULL)
         return P4_NullError;
@@ -1528,14 +1528,14 @@ P4_AddNegative(P4_Grammar* grammar, P4_RuleID id, P4_Expression* ref_expr) {
     return P4_Ok;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_AddSequence(P4_Grammar* grammar, P4_RuleID id, size_t size) {
     P4_AddSomeGrammarRule(grammar, id, P4_CreateContainer(size));
     P4_GetGrammarRule(grammar, id)->kind = P4_Sequence;
     return P4_Ok;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_RuleID id, size_t count, ...) {
     P4_AddSomeGrammarRule(grammar, id, P4_CreateSequence(count));
     P4_Expression* expr = P4_GetGrammarRule(grammar, id);
@@ -1561,14 +1561,14 @@ finalize:
     return P4_MemoryError;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_AddChoice(P4_Grammar* grammar, P4_RuleID id, size_t size) {
     P4_AddSomeGrammarRule(grammar, id, P4_CreateContainer(size));
     P4_GetGrammarRule(grammar, id)->kind = P4_Choice;
     return P4_Ok;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_AddChoiceWithMembers(P4_Grammar* grammar, P4_RuleID id, size_t count, ...) {
     P4_AddSomeGrammarRule(grammar, id, P4_CreateChoice(count));
     P4_Expression* expr = P4_GetGrammarRule(grammar, id);
@@ -1594,7 +1594,7 @@ finalize:
     return P4_MemoryError;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_SetMember(P4_Expression* expr, size_t offset, P4_Expression* member) {
     if (expr == NULL
             || member == NULL
@@ -1617,7 +1617,7 @@ P4_SetMember(P4_Expression* expr, size_t offset, P4_Expression* member) {
     return P4_Ok;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_SetReferenceMember(P4_Expression* expr, size_t offset, P4_RuleID ref) {
     P4_Expression* ref_expr = P4_CreateReference(ref);
     if (ref_expr == NULL) {
@@ -1633,7 +1633,7 @@ P4_SetReferenceMember(P4_Expression* expr, size_t offset, P4_RuleID ref) {
     return P4_Ok;
 }
 
-P4_PUBLIC(size_t)
+P4_PUBLIC size_t
 P4_GetMembersCount(P4_Expression* expr) {
     if (expr == NULL) {
         return 0;
@@ -1643,7 +1643,7 @@ P4_GetMembersCount(P4_Expression* expr) {
 }
 
 
-P4_PUBLIC(P4_Expression*)
+P4_PUBLIC P4_Expression*
 P4_GetMember(P4_Expression* expr, size_t offset) {
     if (expr == NULL
             || expr->members == NULL
@@ -1663,7 +1663,7 @@ P4_GetMember(P4_Expression* expr, size_t offset) {
     return expr->members[offset];
 }
 
-P4_PUBLIC(void)
+P4_PUBLIC void
 P4_DeleteExpression(P4_Expression* expr) {
     if (expr == NULL)
         return;
@@ -1700,7 +1700,7 @@ P4_DeleteExpression(P4_Expression* expr) {
     free(expr);
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_AddReference(P4_Grammar* grammar, P4_RuleID id, P4_RuleID ref) {
     if (ref == 0) {
         return P4_NullError;
@@ -1710,7 +1710,7 @@ P4_AddReference(P4_Grammar* grammar, P4_RuleID id, P4_RuleID ref) {
     return P4_Ok;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_AddZeroOrOnce(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat) {
     if (repeat == NULL)
         return P4_NullError;
@@ -1719,7 +1719,7 @@ P4_AddZeroOrOnce(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat) {
     return P4_Ok;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_AddZeroOrMore(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat) {
     if (repeat == NULL)
         return P4_NullError;
@@ -1728,7 +1728,7 @@ P4_AddZeroOrMore(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat) {
     return P4_Ok;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_AddOnceOrMore(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat) {
     if (repeat == NULL)
         return P4_NullError;
@@ -1737,7 +1737,7 @@ P4_AddOnceOrMore(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat) {
     return P4_Ok;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_AddRepeatMin(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat, size_t min) {
     if (repeat == NULL)
         return P4_NullError;
@@ -1746,7 +1746,7 @@ P4_AddRepeatMin(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat, size_t
     return P4_Ok;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_AddRepeatMax(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat, size_t max) {
     if (repeat == NULL)
         return P4_NullError;
@@ -1755,7 +1755,7 @@ P4_AddRepeatMax(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat, size_t
     return P4_Ok;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_AddRepeatMinMax(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat, size_t min, size_t max) {
     if (repeat == NULL)
         return P4_NullError;
@@ -1764,7 +1764,7 @@ P4_AddRepeatMinMax(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat, siz
     return P4_Ok;
 }
 
-P4_PUBLIC(P4_Error)
+P4_PUBLIC P4_Error
 P4_AddRepeatExact(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat, size_t num) {
     if (repeat == NULL)
         return P4_NullError;
@@ -1773,7 +1773,7 @@ P4_AddRepeatExact(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat, size
     return P4_Ok;
 }
 
-P4_PUBLIC(P4_Slice*)
+P4_PUBLIC P4_Slice*
 P4_GetTokenSlice(P4_Token* token) {
     if (token == NULL)
         return NULL;
@@ -1793,7 +1793,7 @@ P4_CopySliceString(P4_String s, P4_Slice* slice) {
     return str;
 }
 
-P4_PUBLIC(P4_String)
+P4_PUBLIC P4_String
 P4_CopyTokenString(P4_Token* token) {
     if (token == NULL)
         return NULL;
@@ -1804,7 +1804,7 @@ P4_CopyTokenString(P4_Token* token) {
 /*
  * Determine if expression has flag P4_FLAG_SQUASHED.
  */
-P4_PUBLIC(bool)
+P4_PUBLIC bool
 P4_IsSquashed(P4_Expression* e) {
     return (e->flag & P4_FLAG_SQUASHED) != 0;
 }
@@ -1812,7 +1812,7 @@ P4_IsSquashed(P4_Expression* e) {
 /*
  * Determine if expression has flag P4_FLAG_LIFTED.
  */
-P4_PUBLIC(bool)
+P4_PUBLIC bool
 P4_IsLifted(P4_Expression* e) {
     return (e->flag & P4_FLAG_LIFTED) != 0;
 }
@@ -1820,7 +1820,7 @@ P4_IsLifted(P4_Expression* e) {
 /*
  * Determine if expression has flag P4_FLAG_TIGHT.
  */
-P4_PUBLIC(bool)
+P4_PUBLIC bool
 P4_IsTight(P4_Expression* e) {
     return (e->flag & P4_FLAG_TIGHT) != 0;
 }
@@ -1828,7 +1828,7 @@ P4_IsTight(P4_Expression* e) {
 /*
  * Determine if expression has flag P4_FLAG_SPACED.
  */
-P4_PUBLIC(bool)
+P4_PUBLIC bool
 P4_IsSpaced(P4_Expression* e) {
     return (e->flag & P4_FLAG_SPACED) != 0;
 }
@@ -1836,7 +1836,7 @@ P4_IsSpaced(P4_Expression* e) {
 /*
  * Set expression flag P4_FLAG_SQUASHED.
  */
-P4_PUBLIC(bool)
+P4_PUBLIC bool
 P4_IsScoped(P4_Expression* e) {
     return (e->flag & P4_FLAG_SCOPED) != 0;
 }
@@ -1844,7 +1844,7 @@ P4_IsScoped(P4_Expression* e) {
 /*
  * Set expression flag P4_FLAG_SQUASHED.
  */
-P4_PUBLIC(void)
+P4_PUBLIC void
 P4_SetSquashed(P4_Expression* e) {
     return P4_SetExpressionFlag(e, P4_FLAG_SQUASHED);
 }
@@ -1852,7 +1852,7 @@ P4_SetSquashed(P4_Expression* e) {
 /*
  * Set expression flag P4_FLAG_LIFTED.
  */
-P4_PUBLIC(void)
+P4_PUBLIC void
 P4_SetLifted(P4_Expression* e) {
     return P4_SetExpressionFlag(e, P4_FLAG_LIFTED);
 }
@@ -1860,7 +1860,7 @@ P4_SetLifted(P4_Expression* e) {
 /*
  * Set expression flag P4_FLAG_TIGHT.
  */
-P4_PUBLIC(void)
+P4_PUBLIC void
 P4_SetTight(P4_Expression* e) {
     return P4_SetExpressionFlag(e, P4_FLAG_TIGHT);
 }
@@ -1868,7 +1868,7 @@ P4_SetTight(P4_Expression* e) {
 /*
  * Set expression flag P4_FLAG_SPACED.
  */
-P4_PUBLIC(void)
+P4_PUBLIC void
 P4_SetSpaced(P4_Expression* e) {
     return P4_SetExpressionFlag(e, P4_FLAG_SPACED);
 }
@@ -1876,7 +1876,7 @@ P4_SetSpaced(P4_Expression* e) {
 /*
  * Set expression flag P4_FLAG_SCOPED.
  */
-P4_PUBLIC(void)
+P4_PUBLIC void
 P4_SetScoped(P4_Expression* e) {
     return P4_SetExpressionFlag(e, P4_FLAG_SCOPED);
 }

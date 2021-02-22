@@ -89,7 +89,7 @@ typedef enum {
  * Whitespace = " " / "\t" # FLAG: SPACED | LIFTED
  */
 
-P4_PUBLIC(P4_Grammar*)  P4_CreateMustacheGrammar() {
+P4_PUBLIC P4_Grammar*  P4_CreateMustacheGrammar() {
     P4_Grammar* grammar = P4_CreateGrammar();
     if (grammar == NULL) {
         return NULL;

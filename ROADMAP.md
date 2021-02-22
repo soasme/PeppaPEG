@@ -17,13 +17,14 @@
 - [ ] Stop on first error v/s Recover from Panic.
 - [ ] Allow replacing malloc/free functions.
 - [ ] New Source Flag: Support UTF-8 BOM sequence (0xEF 0xBB 0xBF) at the start of source.
-- [ ] NeedLoosen, NeedSquash, NeedLift should be well-tested.
-- [ ] Auto generate documentation for functions and defined macros. Example: doxygen.
 - [ ] Python Binding: example: cffi, misaka.
 - [ ] Benchmark: example: json-c. `valgrind --tool=massif --massif-out-file=massif.out ./build/tests/test_example_json && ms_print massif.out ms_print.out`.
 - [ ] Cache literal len.
 - [ ] backrefs is not necessary if there is no BackReference in Sequence.
 - [ ] A binary executable for display parsed results in JSON output. The executable can support general programming languages, such as Mustache, Python, JSON, YAML, etc. Some other programs can then takes the input from stdin and do some fancy work. `peppapeg --lang=py38 source.py`
+- [ ] Create docs and push it to gh-pages branch.
+- [x] Auto generate documentation for functions and defined macros. Example: doxygen. Added in v1.4.0.
+- [x] NeedLoosen, NeedSquash, NeedLift should be well-tested.
 - [x] Add depth setter. Added in v1.3.0.
 - [x] Cache squash. Added in v1.3.0.
 - [x] Cache loosen. Added in v1.3.0.

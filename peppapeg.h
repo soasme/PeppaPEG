@@ -392,7 +392,21 @@ P4_PUBLIC void           P4_SetTight(P4_Expression*);
 P4_PUBLIC void           P4_SetSpaced(P4_Expression*);
 P4_PUBLIC void           P4_SetScoped(P4_Expression*);
 
+/**
+ * @brief       Create a \ref P4_Grammar object.
+ * @return      A \ref P4_Grammar object.
+ *
+ * Example:
+ *
+ *      P4_Grammar*     grammar = P4_CreateGrammar();
+ */
 P4_PUBLIC P4_Grammar*    P4_CreateGrammar(void);
+
+/**
+ * @brief       Delete the grammar object.
+ *              It will also free all of the expression rules.
+ * @param       The grammar.
+ */
 P4_PUBLIC void           P4_DeleteGrammar(P4_Grammar*);
 
 P4_PUBLIC P4_Error       P4_AddGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);

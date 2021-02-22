@@ -80,6 +80,7 @@ P4_Error P4_MustacheCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Token*
 
         printf("new delimiter: %s %s\n", opener, closer);
         /* XXX: remove old grammar rules. */
+        /* XXX: traverse the rule tree and refresh all ref_exprs. */
         /* XXX: replace grammar rule to two exact match. */
 
 finalize_set_delimiter:

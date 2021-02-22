@@ -654,6 +654,8 @@ P4_PUBLIC P4_String      P4_CopyTokenString(P4_Token*);
 
 P4_PUBLIC P4_Error       P4_SetGrammarCallback(P4_Grammar*, P4_Callback);
 
+P4_PUBLIC P4_Error       P4_ReplaceGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
+
 #ifdef __cplusplus
 }
 #endif

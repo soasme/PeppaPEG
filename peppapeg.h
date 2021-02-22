@@ -1,4 +1,4 @@
-/*
+/**
  * Peppa PEG -  Ultra lightweight PEG Parser in ANSI C.
  *
  * MIT License
@@ -22,6 +22,14 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
+ *
+ * @file       peppapeg.h
+ * @brief      Peppa PEG header file
+ * @author     Ju
+ * @copyright  MIT
+ * @version    1.4.0
+ * @date       2021
+ * @see        https://github.com/soasme/PeppaPEG
 */
 
 # ifndef P4_H
@@ -96,10 +104,25 @@ extern "C"
 /* The flag of expression. */
 typedef uint32_t        P4_ExpressionFlag;
 
-/* A position in the text. */
+/**
+ * @brief The position of a string.
+ **/
 typedef size_t          P4_Position;
 
-/* A slice in the text. */
+/**
+ * The slice of a string.
+ *
+ * P4_Slice does not hold a pointer to the string.
+ * It only has the start and stop position of the string.
+ *
+ * Example:
+ *
+ *      P4_Slice slice = {
+ *          i=0,
+ *          j=strlen("hello world")
+ *      };
+ *      printf("%u..%u\n", slice.i, slice.j);
+ **/
 typedef struct P4_Slice {
     /* The start position of the slice. */
     P4_Position         i;

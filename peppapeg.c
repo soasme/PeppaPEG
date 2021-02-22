@@ -127,10 +127,12 @@ P4_PRIVATE(P4_Token*)           P4_MatchRepeat(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchSpacedExpressions(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchBackReference(P4_Source*, P4_Expression*, P4_Slice*, size_t);
 
-/*
- * Reads a single UTF-8 code point from the string.
- * Returns the number of bytes of this code point.
- * Returns 0 if read failed.
+/**
+ *
+ * @brief   Reads a single UTF-8 code point from the string.
+ * @param   s   The string in UTF-8 encoding.
+ * @param   c   The pointer to the rune to read.
+ * @return  The size of rune, could be 1,2,3,4. When error occurs, read nothing and returning size is 0.
  *
  * Example::
  *

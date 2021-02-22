@@ -320,7 +320,7 @@ typedef struct P4_Token {
 /**
  * The callback after an expression is matched.
  */
-typedef P4_Error (*P4_CallbackOnMatch)(struct P4_Grammar*, struct P4_Expression*);
+typedef P4_Error (*P4_Callback)(struct P4_Grammar*, struct P4_Expression*, struct P4_Token*);
 
 /**
  * The grammar object that holds all grammar rules.
@@ -339,7 +339,7 @@ typedef struct P4_Grammar{
     /** The recursion limit, or maximum allowed nested rules. */
     size_t                  depth;
     /** The callback after a match for an expression is successful. */
-    P4_CallbackOnMatch      callback;
+    P4_Callback             callback;
 } P4_Grammar;
 
 
@@ -652,7 +652,7 @@ P4_PUBLIC P4_Slice*      P4_GetTokenSlice(P4_Token*);
 P4_PUBLIC P4_String      P4_CopyTokenString(P4_Token*);
 
 
-P4_PUBLIC P4_Error       P4_SetGrammarCallback(P4_Grammar*, P4_CallbackOnMatch);
+P4_PUBLIC P4_Error       P4_SetGrammarCallback(P4_Grammar*, P4_Callback);
 
 #ifdef __cplusplus
 }

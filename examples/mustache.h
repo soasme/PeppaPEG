@@ -66,6 +66,31 @@ typedef enum {
     P4_MustacheWhitespace       = 22,
 } P4_MustacheRuleID;
 
+P4_Error P4_MustacheCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Token* token) {
+    if (rule && rule->id == P4_MustacheSetDelimiter) {
+        P4_String opener = NULL, closer = NULL;
+
+        opener = P4_CopyTokenString(token->head);
+        if (opener == NULL)
+            goto finalize_set_delimiter;
+
+        closer = P4_CopyTokenString(token->tail);
+        if (closer == NULL)
+            goto finalize_set_delimiter;
+
+        printf("new delimiter: %s %s\n", opener, closer);
+        /* XXX: remove old grammar rules. */
+        /* XXX: replace grammar rule to two exact match. */
+
+finalize_set_delimiter:
+        free(opener);
+        free(closer);
+        return P4_MemoryError;
+    }
+
+    return P4_Ok;
+}
+
 /*
  * Entry = SOI Line*
  * Line = (Tag / Text)* (NewLine / EOI) # FLAG: TIGHT, Callback: UpdateIndent, TrimTokens
@@ -290,6 +315,9 @@ P4_PUBLIC P4_Grammar*  P4_CreateMustacheGrammar() {
         P4_CreateReference(P4_MustacheSOI),
         P4_CreateZeroOrMore(P4_CreateReference(P4_MustacheLine))
     ))
+        goto finalize;
+
+    if (P4_Ok != P4_SetGrammarCallback(grammar, &P4_MustacheCallback))
         goto finalize;
 
     return grammar;

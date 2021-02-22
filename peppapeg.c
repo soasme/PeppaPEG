@@ -856,7 +856,7 @@ P4_Match(P4_Source* s, P4_Expression* e) {
         return NULL;
     }
 
-    if (s->grammar->callback && (err = (s->grammar->callback)(s->grammar, e)) != P4_Ok) {
+    if (s->grammar->callback && (err = (s->grammar->callback)(s->grammar, e, result)) != P4_Ok) {
         P4_RaiseError(s, err, "failed to run callback.");
         P4_DeleteToken(result);
         return NULL;
@@ -1889,7 +1889,7 @@ P4_SetScoped(P4_Expression* e) {
 }
 
 P4_PUBLIC P4_Error
-P4_SetGrammarCallback(P4_Grammar* grammar, P4_CallbackOnMatch callback) {
+P4_SetGrammarCallback(P4_Grammar* grammar, P4_Callback callback) {
     if (grammar == NULL || callback == NULL)
         return P4_NullError;
 

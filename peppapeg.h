@@ -47,7 +47,10 @@ extern "C"
 #include <stdio.h>
 #include <string.h>
 
+/** It indicates the function or type is for public use. */
 # define P4_PUBLIC
+
+/** It indicates the function or type is not for public use. */
 # define P4_PRIVATE(type) static type
 
 # define P4_MAJOR_VERSION 1
@@ -56,7 +59,7 @@ extern "C"
 
 # define P4_FLAG_NONE                   ((uint32_t)(0x0))
 
-/*
+/**
  * Let the children tokens disappear!
  *
  * AST:
@@ -66,7 +69,7 @@ extern "C"
  * */
 # define P4_FLAG_SQUASHED               ((uint32_t)(0x1))
 
-/*
+/**
  * Replace the token with the children tokens.
  *
  * AST:
@@ -76,32 +79,32 @@ extern "C"
  * */
 # define P4_FLAG_LIFTED                 ((uint32_t)(0x10))
 
-/*
+/**
  * Apply implicit whitespaces rule.
  * Used by repetition and sequence expressions.
  */
 # define P4_FLAG_TIGHT                ((uint32_t)(0x100))
 
-/*
+/**
  * Apply the expression under a new scope, regardless
  * if the parent expression is lifted/tighted.
  */
 # define P4_FLAG_SCOPED                 ((uint32_t)(0x1000))
 
-/*
+/**
  * Use the space expression in expression of sequence/repeat kind
  * if they're not tight.
  */
 # define P4_FLAG_SPACED                 ((uint32_t)(0x10000))
 
-/*
+/**
  * The default recursion limit.
  *
  * It can be adjusted through function `P4_SetRecursionLimit`.
  */
 # define P4_DEFAULT_RECURSION_LIMIT     8192
 
-/* The flag of expression. */
+/** The flag of expression. */
 typedef uint32_t        P4_ExpressionFlag;
 
 /**
@@ -124,25 +127,25 @@ typedef size_t          P4_Position;
  *      printf("%u..%u\n", slice.i, slice.j);
  **/
 typedef struct P4_Slice {
-    /* The start position of the slice. */
+    /** The start position of the slice. */
     P4_Position         i;
-    /* The stop position of the slice. */
+    /** The stop position of the slice. */
     P4_Position         j;
 }                       P4_Slice;
 
-/* An UTF8 rune */
+/** An UTF8 rune */
 typedef uint32_t        P4_Rune;
 
-/* Shortcut for a string. */
+/** Shortcut for a string. */
 typedef char*           P4_String;
 
-/* The identifier of a rule expression. */
+/** The identifier of a rule expression. */
 typedef uint64_t        P4_RuleID;
 
-/* A range of two runes. */
+/** A range of two runes. */
 typedef P4_Rune P4_RuneRange[2];
 
-/* The expression kinds. */
+/** The expression kinds. */
 typedef enum {
     P4_Literal,
     P4_Range,
@@ -185,25 +188,32 @@ typedef enum {
     P4_StackError           = 10,
 } P4_Error;
 
+/**
+ * The stack frame.
+ */
 typedef struct P4_Frame {
-    /* The current matching expression for the frame. */
+    /** The current matching expression for the frame. */
     struct P4_Expression*   expr;
-    /* Whether spacing is applicable to frame & frame dependents. */
+    /** Whether spacing is applicable to frame & frame dependents. */
     bool                    space;
-    /* Whether silencing is applicable to frame & frame dependents. */
+    /** Whether silencing is applicable to frame & frame dependents. */
     bool                    silent;
-    /* The next frame in the stack. */
+    /** The next frame in the stack. */
     struct P4_Frame*        next;
 } P4_Frame;
 
+/**
+ * The source handle.
+ */
 typedef struct P4_Source {
-    /* The grammar used to parse the source. */
+    /** The grammar used to parse the source. */
     struct P4_Grammar*      grammar;
-    /* The ID of entry rule in the grammar used to parse the source. */
+    /** The ID of entry rule in the grammar used to parse the source. */
     P4_RuleID               rule_id;
-    /* The content of the source. */
+    /** The content of the source. */
     P4_String               content;
-    /* The position of the consumed input. Min: 0, Max: strlen(content).
+    /**
+     * The position of the consumed input. Min: 0, Max: strlen(content).
      *
      * It's possible the pos is less then length of content when the Source
      * is successfully parsed. It's called a partial parse.
@@ -214,15 +224,15 @@ typedef struct P4_Source {
      * the input is guaranteed to be parsed until all bits are consumed.
      * */
     P4_Position             pos;
-    /* The error code of the parse. */
+    /** The error code of the parse. */
     P4_Error                err;
-    /* The error message of the parse. */
+    /** The error message of the parse. */
     P4_String               errmsg;
-    /* The root of abstract syntax tree. */
+    /** The root of abstract syntax tree. */
     struct P4_Token*        root;
     /* Reserved: whether to enable DEBUG logs. */
     bool                    verbose;
-    /* The flag for checking if the parse is matching SPACED rules.
+    /** The flag for checking if the parse is matching SPACED rules.
      *
      * Since we're wrapping SPACED rules into a repetition rule internally,
      * it's important to prevent matching SPACED rules in P4_MatchRepeat.
@@ -230,49 +240,49 @@ typedef struct P4_Source {
      * XXX: Maybe there are some better ways to prevent that?
      */
     bool                    whitespacing;
-    /* The top frame in the stack. */
+    /** The top frame in the stack. */
     struct P4_Frame*        frame_stack;
-    /* The size of frame stack. */
+    /** The size of frame stack. */
     size_t                  frame_stack_size;
 } P4_Source;
 
 typedef struct P4_Expression {
     /* The name of expression (only for debugging). */
     /* P4_String            name; */
-    /* The id of expression. */
+    /** The id of expression. */
     P4_RuleID            id;
-    /* The kind of expression. */
+    /** The kind of expression. */
     P4_ExpressionKind     kind;
-    /* The flag of expression. */
+    /** The flag of expression. */
     P4_ExpressionFlag      flag;
 
     union {
-        /* Used by P4_Numeric. */
+        /** Used by P4_Numeric. */
         size_t                      num;
 
-        /* Used by P4_Literal. */
+        /** Used by P4_Literal. */
         struct {
             P4_String               literal;
             bool                    sensitive;
         };
 
-        /* Used by P4_Reference..P4_Negative. */
+        /** Used by P4_Reference..P4_Negative. */
         struct {
             P4_String               reference;
             P4_RuleID               ref_id;
             struct P4_Expression*   ref_expr;
         };
 
-        /* Used by P4_Range. */
+        /** Used by P4_Range. */
         P4_RuneRange                range;
 
-        /* Used by P4_Sequence..P4_Choice. */
+        /** Used by P4_Sequence..P4_Choice. */
         struct {
             struct P4_Expression**  members;
             size_t                  count;
         };
 
-        /* Used by P4_ZeroOrOnce..P4_RepeatExact.
+        /** Used by P4_ZeroOrOnce..P4_RepeatExact.
          * repeat the expr for n times, n >= min and n <= max. */
         struct {
             struct P4_Expression*   repeat_expr; /* maybe we can merge it with ref_expr? */
@@ -280,44 +290,48 @@ typedef struct P4_Expression {
             size_t                  repeat_max;
         };
 
-        /* Used by P4_BackReference. */
+        /** Used by P4_BackReference. */
         size_t                      backref_index;
     };
 } P4_Expression;
 
-
+/**
+ * The token object of abstract syntax tree.
+ */
 typedef struct P4_Token {
-    /* the full text. */
+    /** the full text. */
     P4_String               text;
-    /* The matched substring.
+    /** The matched substring.
      * slice[0] is the beginning (inclusive), and slice[1] is the end (exclusive).
      */
     P4_Slice                slice;
 
-    /* The matched grammar expression. */
+    /** The matched grammar expression. */
     struct P4_Expression*   expr;
 
-    /* the sibling token. NULL if not exists. */
+    /** the sibling token. NULL if not exists. */
     struct P4_Token*        next;
-    /* the first child of inner tokens. NULL if not exists. */
+    /** the first child of inner tokens. NULL if not exists. */
     struct P4_Token*        head;
-    /* the last child of inner tokens. NULL if not exists. */
+    /** the last child of inner tokens. NULL if not exists. */
     struct P4_Token*        tail;
 } P4_Token;
 
-
+/**
+ * The grammar object that holds all grammar rules.
+ */
 typedef struct P4_Grammar{
-    /* The rules, e.g. the expressions with IDs. */
+    /** The rules, e.g. the expressions with IDs. */
     struct P4_Expression**  rules;
-    /* The total number of rules. */
+    /** The total number of rules. */
     size_t                  count;
-    /* The maximum number of rules. */
+    /** The maximum number of rules. */
     int                     cap;
-    /* The total number of spaced rules. */
+    /** The total number of spaced rules. */
     size_t                  spaced_count;
-    /* The repetition rule for spaced rules. */
+    /** The repetition rule for spaced rules. */
     struct P4_Expression*   spaced_rules;
-    /* The recursion limit, or maximum allowed nested rules. */
+    /** The recursion limit, or maximum allowed nested rules. */
     size_t                  depth;
 } P4_Grammar;
 
@@ -326,6 +340,11 @@ typedef struct P4_Grammar{
  * Provide the version string for the library.
  *
  * @return a string like "1.0.0".
+ *
+ * Example:
+ *
+ *      P4_String   version = P4_Version();
+ *      printf("version=%s\n", version);
  */
 P4_PUBLIC P4_String      P4_Version(void);
 
@@ -397,13 +416,29 @@ P4_PUBLIC P4_Error       P4_AddRepeatExact(P4_Grammar*, P4_RuleID, P4_Expression
 
 P4_PUBLIC void           P4_DeleteGrammarRule(P4_Grammar*, P4_RuleID);
 P4_PUBLIC P4_Expression* P4_GetGrammarRule(P4_Grammar*, P4_RuleID);
+
+/**
+ * @brief       Set the flag of a grammar rule.
+ * @param       grammar     The grammar.
+ * @param       id          The ID.
+ * @param       flag        The bits of \ref P4_ExpressionFlag.
+ * @return      The error code. If successful, return \ref P4_Ok.
+ *
+ * Example:
+ *
+ *      P4_Error err = P4_SetGrammarRuleFlag(grammar, Entry, P4_FLAG_SQUASHED | P4_FLAG_LIFTED | P4_FLAG_TIGHT);
+ *      if (err != P4_Ok) {
+ *          printf("err=%u\n", err);
+ *          exit(1);
+ *      }
+ */
 P4_PUBLIC P4_Error       P4_SetGrammarRuleFlag(P4_Grammar*, P4_RuleID, P4_ExpressionFlag);
 
 /**
  * @brief       Set the maximum allowed recursion calls.
  * @param       grammar     The grammar.
  * @param       limit       The number of maximum recursion calls.
- * @return      An error. If successful, return \ref P4_Ok; otherwise, return other \ref P4_Error.
+ * @return      An error. If successful, return \ref P4_Ok.
  *
  * Example:
  *
@@ -482,9 +517,7 @@ P4_PUBLIC void           P4_PrintSourceAst(P4_Token*, P4_String, size_t);
  * @brief       Parse the source given a grammar.
  * @param       grammar     The grammar.
  * @param       source      The source.
- * @return      The error code.
- *              When the parse is successful, return \ref P4_Ok.
- *              Otherwise, return the other \ref P4_Error, such as \ref P4_MatchError.
+ * @return      The error code. If successful, return \ref P4_Ok.
  *
  * Example:
  *

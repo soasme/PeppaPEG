@@ -115,6 +115,8 @@ P4_PRIVATE(P4_String)           P4_CopySliceString(P4_String, P4_Slice*);
 P4_PRIVATE(P4_Error)            P4_SetWhitespaces(P4_Grammar*);
 P4_PRIVATE(P4_Expression*)      P4_GetWhitespaces(P4_Grammar*);
 
+P4_PRIVATE(P4_Error)            P4_RefreshReference(P4_Expression*, P4_RuleID);
+
 P4_PRIVATE(P4_Token*)           P4_Match(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchLiteral(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchRange(P4_Source*, P4_Expression*);
@@ -1894,5 +1896,64 @@ P4_SetGrammarCallback(P4_Grammar* grammar, P4_Callback callback) {
         return P4_NullError;
 
     grammar->callback = callback;
+    return P4_Ok;
+}
+
+P4_PRIVATE(P4_Error)
+P4_RefreshReference(P4_Expression* expr, P4_RuleID id) {
+    if (expr == NULL || id == 0)
+        return P4_NullError;
+
+    P4_Error err = P4_Ok;
+
+    switch(expr->kind) {
+        case P4_Reference:
+            if (expr->ref_id == id)
+                expr->ref_expr = NULL;
+            break;
+        case P4_Positive:
+        case P4_Negative:
+            err = P4_RefreshReference(expr->ref_expr, id);
+            break;
+        case P4_Sequence:
+        case P4_Choice:
+            for (size_t i = 0; i < expr->count; i++) {
+                err = P4_RefreshReference(expr->members[i], id);
+                if (err != P4_Ok)
+                    break;
+            }
+            break;
+        case P4_Repeat:
+            err = P4_RefreshReference(expr->repeat_expr, id);
+            break;
+        default:
+            break;
+    }
+
+    return err;
+}
+
+P4_PUBLIC P4_Error
+P4_ReplaceGrammarRule(P4_Grammar* grammar, P4_RuleID id, P4_Expression* expr) {
+    if (grammar == NULL || id == 0 || expr == NULL)
+        return P4_NullError;
+
+    P4_Expression* oldexpr = P4_GetGrammarRule(grammar, id);
+    if (oldexpr == NULL)
+        return P4_NameError;
+
+    P4_Error err = P4_Ok;
+
+    for (size_t i = 0; i < grammar->count; i++) {
+        if (grammar->rules[i]->id == id) {
+            P4_DeleteExpression(oldexpr);
+            grammar->rules[i] = expr;
+        } else {
+            err = P4_RefreshReference(grammar->rules[i], id);
+            if (err != P4_Ok)
+                return err;
+        }
+    }
+
     return P4_Ok;
 }

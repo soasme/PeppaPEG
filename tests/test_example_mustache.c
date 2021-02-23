@@ -530,6 +530,34 @@ P4_PRIVATE(void) test_set_delimiter(void) {
     P4_DeleteGrammar(grammar);
 }
 
+P4_PRIVATE(void) test_set_delimiter_altered_grammar(void) {
+    P4_Grammar* grammar = P4_CreateMustacheGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+
+    P4_Source* source;
+
+    source = P4_CreateSource("{{=<% %>=}}<% x %>", P4_MustacheEntry);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_Parse(grammar, source)
+    );
+    TEST_ASSERT_EQUAL(18, P4_GetSourcePosition(source));
+
+    P4_Token* token = P4_GetSourceAst(source);
+
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("{{=<% %>=}}", token);
+
+    TEST_ASSERT_NOT_NULL(token->next);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token->next);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("<% x %>", token->next);
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
+
 P4_PRIVATE(void) test_text_followed_by_newline(void) {
     P4_Grammar* grammar = P4_CreateMustacheGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
@@ -745,6 +773,7 @@ int main(void) {
     RUN_TEST(test_comment);
     RUN_TEST(test_set_delimiter_new_opener);
     RUN_TEST(test_set_delimiter);
+    RUN_TEST(test_set_delimiter_altered_grammar);
     RUN_TEST(test_text_followed_by_newline);
     RUN_TEST(test_text_followed_by_opener);
     RUN_TEST(test_line_only_text);

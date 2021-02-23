@@ -1947,6 +1947,7 @@ P4_ReplaceGrammarRule(P4_Grammar* grammar, P4_RuleID id, P4_Expression* expr) {
     for (size_t i = 0; i < grammar->count; i++) {
         if (grammar->rules[i]->id == id) {
             P4_DeleteExpression(oldexpr);
+            expr->id = id;
             grammar->rules[i] = expr;
         } else {
             err = P4_RefreshReference(grammar->rules[i], id);

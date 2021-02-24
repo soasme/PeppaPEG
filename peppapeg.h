@@ -655,8 +655,24 @@ P4_PUBLIC P4_Slice*      P4_GetTokenSlice(P4_Token*);
 P4_PUBLIC P4_String      P4_CopyTokenString(P4_Token*);
 
 
+/**
+ * @brief       Set callback function.
+ * @param       grammar     The grammar.
+ * @param       matchdb     The callback on a successful match.
+ * @param       errorcb     The callback on a failure match.
+ * @return      The error code.
+ */
 P4_PUBLIC P4_Error       P4_SetGrammarCallback(P4_Grammar*, P4_MatchCallback, P4_ErrorCallback);
 
+/**
+ * @brief       Replace an existing grammar rule.
+ * @param       grammar     The grammar.
+ * @param       id          The rule id.
+ * @param       expr        The rule expression to replace.
+ * @return      The error code.
+ *
+ * The original grammar rule will be deleted.
+ */
 P4_PUBLIC P4_Error       P4_ReplaceGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
 
 #ifdef __cplusplus

@@ -66,6 +66,59 @@ typedef enum {
     P4_MustacheWhitespace       = 22,
 } P4_MustacheRuleID;
 
+P4_Error P4_MustacheCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Token* token) {
+    if (rule
+            && rule->id == P4_MustacheTag
+            && token
+            && token->head
+            && token->head->next
+            && token->head->next->expr->id == P4_MustacheSetDelimiter) {
+        P4_String opener = NULL, closer = NULL;
+        P4_Expression* opener_expr = NULL;
+        P4_Expression* closer_expr = NULL;
+
+        opener = P4_CopyTokenString(token->head->next->head);
+        if (opener == NULL)
+            goto finalize_set_delimiter;
+
+        closer = P4_CopyTokenString(token->head->next->tail);
+        if (closer == NULL)
+            goto finalize_set_delimiter;
+
+        opener_expr = P4_CreateLiteral(opener, true);
+        if (opener_expr == NULL)
+            goto finalize_set_delimiter;
+
+        closer_expr = P4_CreateLiteral(closer, true);
+        if (closer_expr == NULL)
+            goto finalize_set_delimiter;
+
+        P4_Error err = P4_Ok;
+        if ((err = P4_ReplaceGrammarRule(grammar, P4_MustacheOpener, opener_expr)) != P4_Ok)
+            goto finalize_set_delimiter;
+
+        if ((err = P4_ReplaceGrammarRule(grammar, P4_MustacheCloser, closer_expr)) != P4_Ok)
+            goto finalize_set_delimiter;
+
+        token->head->expr = opener_expr;
+        token->tail->expr = closer_expr;
+
+        free(opener);
+        free(closer);
+
+        return P4_Ok;
+
+finalize_set_delimiter:
+        free(opener);
+        free(closer);
+        P4_DeleteExpression(opener_expr);
+        P4_DeleteExpression(closer_expr);
+        return P4_MemoryError;
+    }
+
+    return P4_Ok;
+}
+
 /*
  * Entry = SOI Line*
  * Line = (Tag / Text)* (NewLine / EOI) # FLAG: TIGHT, Callback: UpdateIndent, TrimTokens
@@ -135,6 +188,8 @@ P4_PUBLIC P4_Grammar*  P4_CreateMustacheGrammar() {
     ))
         goto finalize;
 
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_MustacheTag, P4_FLAG_SCOPED))
+        goto finalize;
 
     if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheSetDelimiter, 4,
         P4_CreateLiteral("=", true),
@@ -290,6 +345,12 @@ P4_PUBLIC P4_Grammar*  P4_CreateMustacheGrammar() {
         P4_CreateReference(P4_MustacheSOI),
         P4_CreateZeroOrMore(P4_CreateReference(P4_MustacheLine))
     ))
+        goto finalize;
+
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_MustacheEntry, P4_FLAG_LIFTED))
+        goto finalize;
+
+    if (P4_Ok != P4_SetGrammarCallback(grammar, &P4_MustacheCallback, NULL))
         goto finalize;
 
     return grammar;

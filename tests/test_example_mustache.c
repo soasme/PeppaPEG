@@ -519,12 +519,66 @@ P4_PRIVATE(void) test_set_delimiter(void) {
 
     TEST_ASSERT_NOT_NULL(token->head);
     TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("{{", token->head);
 
     TEST_ASSERT_NOT_NULL(token->head->next);
     TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheSetDelimiter, token->head->next);
 
     TEST_ASSERT_NOT_NULL(token->tail);
     TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("}}", token->tail);
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
+
+P4_PRIVATE(void) test_set_delimiter_altered_grammar(void) {
+    P4_Grammar* grammar = P4_CreateMustacheGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+
+    P4_Source* source;
+
+    source = P4_CreateSource("{{=<% %>=}}<% x %>", P4_MustacheEntry);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_Parse(grammar, source)
+    );
+    TEST_ASSERT_EQUAL(18, P4_GetSourcePosition(source));
+
+    P4_Token* token = P4_GetSourceAst(source);
+
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("{{=<% %>=}}", token);
+
+    TEST_ASSERT_NOT_NULL(token->head);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("{{", token->head);
+
+    TEST_ASSERT_NOT_NULL(token->head->next);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("=<% %>=", token->head->next);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheSetDelimiter, token->head->next);
+
+    TEST_ASSERT_NOT_NULL(token->tail);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("}}", token->tail);
+
+    TEST_ASSERT_NOT_NULL(token->next);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token->next);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("<% x %>", token->next);
+
+    TEST_ASSERT_NOT_NULL(token->next->head);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->next->head);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("<%", token->next->head);
+
+    TEST_ASSERT_NOT_NULL(token->next->head->next);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheVariable, token->next->head->next);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("x", token->next->head->next);
+
+    TEST_ASSERT_NOT_NULL(token->next->tail);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->next->tail);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("%>", token->next->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -745,6 +799,7 @@ int main(void) {
     RUN_TEST(test_comment);
     RUN_TEST(test_set_delimiter_new_opener);
     RUN_TEST(test_set_delimiter);
+    RUN_TEST(test_set_delimiter_altered_grammar);
     RUN_TEST(test_text_followed_by_newline);
     RUN_TEST(test_text_followed_by_opener);
     RUN_TEST(test_line_only_text);

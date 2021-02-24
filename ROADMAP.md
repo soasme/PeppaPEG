@@ -6,7 +6,6 @@
 - [ ] Add traverse functions for Tokens.
 - [ ] Callbacks for P4_Token.
 - [ ] Dynamically change grammar rules.
-- [ ] Example JSON: rfc7159.
 - [ ] New Expression Kind: Numeric.
 - [ ] New Expression Kind: CharacterSet.
 - [ ] New Expression Kind: Complement.
@@ -23,6 +22,7 @@
 - [ ] backrefs is not necessary if there is no BackReference in Sequence.
 - [ ] A binary executable for display parsed results in JSON output. The executable can support general programming languages, such as Mustache, Python, JSON, YAML, etc. Some other programs can then takes the input from stdin and do some fancy work. `peppapeg --lang=py38 source.py`
 - [ ] Create docs and push it to gh-pages branch.
+- [x] Example JSON: rfc7159. Added in v1.4.0.
 - [x] Auto generate documentation for functions and defined macros. Example: doxygen. Added in v1.4.0.
 - [x] NeedLoosen, NeedSquash, NeedLift should be well-tested.
 - [x] Add depth setter. Added in v1.3.0.

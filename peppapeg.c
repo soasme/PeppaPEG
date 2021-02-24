@@ -115,6 +115,8 @@ P4_PRIVATE(P4_String)           P4_CopySliceString(P4_String, P4_Slice*);
 P4_PRIVATE(P4_Error)            P4_SetWhitespaces(P4_Grammar*);
 P4_PRIVATE(P4_Expression*)      P4_GetWhitespaces(P4_Grammar*);
 
+P4_PRIVATE(P4_Error)            P4_RefreshReference(P4_Expression*, P4_RuleID);
+
 P4_PRIVATE(P4_Token*)           P4_Match(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchLiteral(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchRange(P4_Source*, P4_Expression*);
@@ -832,7 +834,7 @@ P4_Match(P4_Source* s, P4_Expression* e) {
     assert(e != NULL);
 
     if (s->err != P4_Ok) {
-        return NULL;
+        goto finalize;
     }
 
     P4_Error     err = P4_Ok;
@@ -840,7 +842,7 @@ P4_Match(P4_Source* s, P4_Expression* e) {
 
     if (IS_RULE(e) && (err = P4_PushFrame(s, e)) != P4_Ok) {
         P4_RaiseError(s, err, "failed to push frame");
-        return NULL;
+        goto finalize;
     }
 
     result = P4_Expression_dispatch(s, e);
@@ -848,15 +850,27 @@ P4_Match(P4_Source* s, P4_Expression* e) {
     if (IS_RULE(e) && (err = P4_PopFrame(s, NULL)) != P4_Ok) {
         P4_RaiseError(s, err, "failed to pop frame");
         P4_DeleteToken(result);
-        return NULL;
+        goto finalize;
     }
 
     if (s->err != P4_Ok) {
         P4_DeleteToken(result);
-        return NULL;
+        goto finalize;
+    }
+
+    if (s->grammar->on_match && (err = (s->grammar->on_match)(s->grammar, e, result)) != P4_Ok) {
+        P4_RaiseError(s, err, "failed to run match callback.");
+        P4_DeleteToken(result);
+        goto finalize;
     }
 
     return result;
+
+finalize:
+    if (s->grammar->on_error && (err = (s->grammar->on_error)(s->grammar, e)) != P4_Ok) {
+        P4_RaiseError(s, err, "failed to run error callback.");
+    }
+    return NULL;
 }
 
 P4_Token*
@@ -1226,6 +1240,8 @@ P4_PUBLIC P4_Grammar*    P4_CreateGrammar(void) {
     grammar->spaced_count = SIZE_MAX;
     grammar->spaced_rules = NULL;
     grammar->depth = P4_DEFAULT_RECURSION_LIMIT;
+    grammar->on_match = NULL;
+    grammar->on_error = NULL;
     return grammar;
 }
 
@@ -1879,4 +1895,83 @@ P4_SetSpaced(P4_Expression* e) {
 P4_PUBLIC void
 P4_SetScoped(P4_Expression* e) {
     return P4_SetExpressionFlag(e, P4_FLAG_SCOPED);
+}
+
+P4_PUBLIC P4_Error
+P4_SetGrammarCallback(P4_Grammar* grammar, P4_MatchCallback matchcb, P4_ErrorCallback errcb) {
+    if (grammar == NULL)
+        return P4_NullError;
+
+    grammar->on_match = matchcb;
+    grammar->on_error = errcb;
+
+    return P4_Ok;
+}
+
+P4_PRIVATE(P4_Error)
+P4_RefreshReference(P4_Expression* expr, P4_RuleID id) {
+    if (expr == NULL || id == 0)
+        return P4_NullError;
+
+    P4_Error err = P4_Ok;
+
+    switch(expr->kind) {
+        case P4_Reference:
+            if (expr->ref_id == id)
+                expr->ref_expr = NULL;
+            break;
+        case P4_Positive:
+        case P4_Negative:
+            err = P4_RefreshReference(expr->ref_expr, id);
+            break;
+        case P4_Sequence:
+        case P4_Choice:
+            for (size_t i = 0; i < expr->count; i++) {
+                err = P4_RefreshReference(expr->members[i], id);
+                if (err != P4_Ok)
+                    break;
+            }
+            break;
+        case P4_Repeat:
+            err = P4_RefreshReference(expr->repeat_expr, id);
+            break;
+        default:
+            break;
+    }
+
+    return err;
+}
+
+P4_PUBLIC P4_Error
+P4_ReplaceGrammarRule(P4_Grammar* grammar, P4_RuleID id, P4_Expression* expr) {
+    if (grammar == NULL || id == 0 || expr == NULL)
+        return P4_NullError;
+
+    P4_Expression* oldexpr = P4_GetGrammarRule(grammar, id);
+    if (oldexpr == NULL)
+        return P4_NameError;
+
+    P4_Error err = P4_Ok;
+
+    for (size_t i = 0; i < grammar->count; i++) {
+        if (grammar->rules[i]->id == id) {
+            P4_DeleteExpression(oldexpr);
+
+            grammar->rules[i] = expr;
+            expr->id = id;
+
+            break;
+        }
+    }
+
+    for (size_t i = 0; i < grammar->count; i++) {
+        if (grammar->rules[i]->id != id) {
+            err = P4_RefreshReference(grammar->rules[i], id);
+
+            if (err != P4_Ok)
+                return err;
+        }
+    }
+
+    return P4_Ok;
 }

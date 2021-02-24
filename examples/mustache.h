@@ -89,11 +89,14 @@ P4_Error P4_MustacheCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Token*
             goto finalize_set_delimiter;
 
         P4_Error err = P4_Ok;
-        if ((err = P4_ReplaceGrammarRule(grammar, P4_MustacheNewOpener, opener_expr)) != P4_Ok)
+        if ((err = P4_ReplaceGrammarRule(grammar, P4_MustacheOpener, opener_expr)) != P4_Ok)
             goto finalize_set_delimiter;
 
-        if ((err = P4_ReplaceGrammarRule(grammar, P4_MustacheNewCloser, closer_expr)) != P4_Ok)
+        if ((err = P4_ReplaceGrammarRule(grammar, P4_MustacheCloser, closer_expr)) != P4_Ok)
             goto finalize_set_delimiter;
+
+        free(opener);
+        free(closer);
 
         return P4_Ok;
 

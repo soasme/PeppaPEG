@@ -1,12 +1,22 @@
 # Change Log
 
+## 1.4.0 (24 Feb, 2021)
+
+Code change: <https://github.com/soasme/PeppaPEG/compare/v1.3.0..v1.4.0>.
+
+* Feature: Added `P4_ReplaceGrammarRule` and `P4_SetGrammarCallback`. [#28](https://github.com/soasme/PeppaPEG/pull/28/).
+* Added some documentation for data structures.
+* Example: Make JSON example RFC7159 compatible. [#25](https://github.com/soasme/PeppaPEG/pull/25).
+* Bugfix: Replace int with `size_t`. [#22](https://github.com/soasme/PeppaPEG/pull/22), [#23](https://github.com/soasme/PeppaPEG/pull/23).
+* Experiment: Add Python Binding. [#20](https://github.com/soasme/PeppaPEG/pull/20), [#24](https://github.com/soasme/PeppaPEG/pull/24).
+
 ## 1.3.0 (19 Feb, 2021)
 
 Code change: <https://github.com/soasme/PeppaPEG/compare/v1.2.0..v1.3.0>.
 
 * Feature: Added P4_GetRecursionLimit and P4_SetRecursionLimit. ([#19](https://github.com/soasme/PeppaPEG/pull/19)).
 * Performance Optimization: the performance is now 10x faster than 1.2.0. ([#15](https://github.com/soasme/PeppaPEG/pull/15), [#16](https://github.com/soasme/PeppaPEG/pull/16), [#17](https://github.com/soasme/PeppaPEG/pull/17), [#18](https://github.com/soasme/PeppaPEG/pull/18)).
-* Bufix: Memory leak fixed. ([#14](https://github.com/soasme/PeppaPEG/pull/14)).
+* Bugfix: Memory leak fixed. ([#14](https://github.com/soasme/PeppaPEG/pull/14)).
 * Example: Write a JSON Parser using Peppa PEG. ([#13](https://github.com/soasme/PeppaPEG/pull/13)).
 * Example: Write a Mustache Parser using Peppa PEG. ([#12](https://github.com/soasme/PeppaPEG/pull/12)).
 * Bugfix: Raise P4_AdvanceError if repeated expression consumes no input. ([#11](https://github.com/soasme/PeppaPEG/pull/11)).

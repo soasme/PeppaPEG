@@ -587,7 +587,8 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
     // A member is attempted if previous yields no match.
     // The oneof match matches successfully immediately if any match passes.
     P4_MarkPosition(s, startpos);
-    for (size_t i = 0; i < e->count; i++) {
+    size_t i;
+    for (i = 0; i < e->count; i++) {
         member = e->members[i];
         tok = P4_Match(s, member);
         if (NO_ERROR(s)) break;
@@ -1947,10 +1948,18 @@ P4_ReplaceGrammarRule(P4_Grammar* grammar, P4_RuleID id, P4_Expression* expr) {
     for (size_t i = 0; i < grammar->count; i++) {
         if (grammar->rules[i]->id == id) {
             P4_DeleteExpression(oldexpr);
-            expr->id = id;
+
             grammar->rules[i] = expr;
-        } else {
+            expr->id = id;
+
+            break;
+        }
+    }
+
+    for (size_t i = 0; i < grammar->count; i++) {
+        if (grammar->rules[i]->id != id) {
             err = P4_RefreshReference(grammar->rules[i], id);
+
             if (err != P4_Ok)
                 return err;
         }

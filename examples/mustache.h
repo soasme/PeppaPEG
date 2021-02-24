@@ -67,16 +67,21 @@ typedef enum {
 } P4_MustacheRuleID;
 
 P4_Error P4_MustacheCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Token* token) {
-    if (rule && rule->id == P4_MustacheSetDelimiter) {
+    if (rule
+            && rule->id == P4_MustacheTag
+            && token
+            && token->head
+            && token->head->next
+            && token->head->next->expr->id == P4_MustacheSetDelimiter) {
         P4_String opener = NULL, closer = NULL;
         P4_Expression* opener_expr = NULL;
         P4_Expression* closer_expr = NULL;
 
-        opener = P4_CopyTokenString(token->head);
+        opener = P4_CopyTokenString(token->head->next->head);
         if (opener == NULL)
             goto finalize_set_delimiter;
 
-        closer = P4_CopyTokenString(token->tail);
+        closer = P4_CopyTokenString(token->head->next->tail);
         if (closer == NULL)
             goto finalize_set_delimiter;
 
@@ -94,6 +99,9 @@ P4_Error P4_MustacheCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Token*
 
         if ((err = P4_ReplaceGrammarRule(grammar, P4_MustacheCloser, closer_expr)) != P4_Ok)
             goto finalize_set_delimiter;
+
+        token->head->expr = opener_expr;
+        token->tail->expr = closer_expr;
 
         free(opener);
         free(closer);
@@ -180,6 +188,8 @@ P4_PUBLIC P4_Grammar*  P4_CreateMustacheGrammar() {
     ))
         goto finalize;
 
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_MustacheTag, P4_FLAG_SCOPED))
+        goto finalize;
 
     if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheSetDelimiter, 4,
         P4_CreateLiteral("=", true),

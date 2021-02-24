@@ -350,7 +350,7 @@ P4_PUBLIC P4_Grammar*  P4_CreateMustacheGrammar() {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_MustacheEntry, P4_FLAG_LIFTED))
         goto finalize;
 
-    if (P4_Ok != P4_SetGrammarCallback(grammar, &P4_MustacheCallback))
+    if (P4_Ok != P4_SetGrammarCallback(grammar, &P4_MustacheCallback, NULL))
         goto finalize;
 
     return grammar;

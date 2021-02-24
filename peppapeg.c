@@ -587,8 +587,7 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
     // A member is attempted if previous yields no match.
     // The oneof match matches successfully immediately if any match passes.
     P4_MarkPosition(s, startpos);
-    size_t i;
-    for (i = 0; i < e->count; i++) {
+    for (size_t i = 0; i < e->count; i++) {
         member = e->members[i];
         tok = P4_Match(s, member);
         if (NO_ERROR(s)) break;
@@ -835,7 +834,7 @@ P4_Match(P4_Source* s, P4_Expression* e) {
     assert(e != NULL);
 
     if (s->err != P4_Ok) {
-        return NULL;
+        goto finalize;
     }
 
     P4_Error     err = P4_Ok;
@@ -843,7 +842,7 @@ P4_Match(P4_Source* s, P4_Expression* e) {
 
     if (IS_RULE(e) && (err = P4_PushFrame(s, e)) != P4_Ok) {
         P4_RaiseError(s, err, "failed to push frame");
-        return NULL;
+        goto finalize;
     }
 
     result = P4_Expression_dispatch(s, e);
@@ -851,21 +850,27 @@ P4_Match(P4_Source* s, P4_Expression* e) {
     if (IS_RULE(e) && (err = P4_PopFrame(s, NULL)) != P4_Ok) {
         P4_RaiseError(s, err, "failed to pop frame");
         P4_DeleteToken(result);
-        return NULL;
+        goto finalize;
     }
 
     if (s->err != P4_Ok) {
         P4_DeleteToken(result);
-        return NULL;
+        goto finalize;
     }
 
-    if (s->grammar->callback && (err = (s->grammar->callback)(s->grammar, e, result)) != P4_Ok) {
-        P4_RaiseError(s, err, "failed to run callback.");
+    if (s->grammar->on_match && (err = (s->grammar->on_match)(s->grammar, e, result)) != P4_Ok) {
+        P4_RaiseError(s, err, "failed to run match callback.");
         P4_DeleteToken(result);
-        return NULL;
+        goto finalize;
     }
 
     return result;
+
+finalize:
+    if (s->grammar->on_error && (err = (s->grammar->on_error)(s->grammar, e)) != P4_Ok) {
+        P4_RaiseError(s, err, "failed to run error callback.");
+    }
+    return NULL;
 }
 
 P4_Token*
@@ -1235,7 +1240,8 @@ P4_PUBLIC P4_Grammar*    P4_CreateGrammar(void) {
     grammar->spaced_count = SIZE_MAX;
     grammar->spaced_rules = NULL;
     grammar->depth = P4_DEFAULT_RECURSION_LIMIT;
-    grammar->callback = NULL;
+    grammar->on_match = NULL;
+    grammar->on_error = NULL;
     return grammar;
 }
 
@@ -1892,11 +1898,13 @@ P4_SetScoped(P4_Expression* e) {
 }
 
 P4_PUBLIC P4_Error
-P4_SetGrammarCallback(P4_Grammar* grammar, P4_Callback callback) {
-    if (grammar == NULL || callback == NULL)
+P4_SetGrammarCallback(P4_Grammar* grammar, P4_MatchCallback matchcb, P4_ErrorCallback errcb) {
+    if (grammar == NULL)
         return P4_NullError;
 
-    grammar->callback = callback;
+    grammar->on_match = matchcb;
+    grammar->on_error = errcb;
+
     return P4_Ok;
 }
 

@@ -32,6 +32,12 @@
 
 #include "peppapeg.h"
 
+/** It indicates the function or type is for public use. */
+# define P4_PUBLIC
+
+/** It indicates the function or type is not for public use. */
+# define P4_PRIVATE(type) static type
+
 # define                        IS_TIGHT(e) (((e)->flag & P4_FLAG_TIGHT) != 0)
 # define                        IS_SCOPED(e) (((e)->flag & P4_FLAG_SCOPED) != 0)
 # define                        IS_SPACED(e) (((e)->flag & P4_FLAG_SPACED) != 0)

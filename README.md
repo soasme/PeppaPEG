@@ -181,7 +181,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    if (P4_AddLiteral(grammar, HW_ID, "HelloWorld", false) != P4_Ok) {
+    if (P4_AddLiteral(grammar, ENTRY, "HelloWorld", false) != P4_Ok) {
         printf("Error: AddLiteral: MemoryError.\n");
         return 1;
     }
@@ -841,12 +841,20 @@ If valgrind is installed, you can also run the test along with memory leak check
 (build) $ make check
 ```
 
+If you feel having a testing environment is hard, try docker:
+
+```bash
+$ docker run --rm -v `pwd`:/app -it ubuntu:latest bash
+# apt-get install gcc gdb valgrind make cmake python3 python3-venv python3-pip doxygen
+# mkdir -p build && cd build && cmake .. && make check
+```
+
 ## Docs
 
 Peppa PEG docs can be built via doxygen:
 
 ```bash
-$ doxygen .doxygen.conf
+$ make docs
 ```
 
 The outputs are stored on `build/docs`.

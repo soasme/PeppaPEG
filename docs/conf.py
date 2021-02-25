@@ -32,6 +32,7 @@ release = '1.4.0'
 # ones.
 extensions = [
     'furo',
+    'breathe',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -54,3 +55,7 @@ html_theme = 'furo'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+# Breathe Configuration
+breathe_projects = { "PeppaPEG": "../build/docs/xml/" }
+breathe_default_project = 'PeppaPEG'

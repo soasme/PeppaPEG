@@ -854,7 +854,8 @@ $ docker run --rm -v `pwd`:/app -it ubuntu:latest bash
 Peppa PEG docs can be built via doxygen:
 
 ```bash
-$ make docs
+(root) $ cd build
+(build) $ rm -rf docs && make docs
 ```
 
 The outputs are stored on `build/docs`.

@@ -118,11 +118,13 @@ extern "C"
 /**
  * The default recursion limit.
  *
- * It can be adjusted via function `P4_SetRecursionLimit`.
+ * It can be adjusted via function P4_SetRecursionLimit.
  */
 # define P4_DEFAULT_RECURSION_LIMIT     8192
 
-/** The flag of expression. */
+/**
+ * @brief The flag of expression.
+ **/
 typedef uint32_t        P4_ExpressionFlag;
 
 /**
@@ -154,26 +156,42 @@ typedef struct P4_Slice {
 /** An UTF8 rune */
 typedef uint32_t        P4_Rune;
 
-/** Shortcut for a string. */
+/** A string, equivalent to char*. */
 typedef char*           P4_String;
 
-/** The identifier of a rule expression. */
+/**
+ * The identifier of a rule expression.
+ *
+ * The rule id must be greater than zero.
+ * */
 typedef uint64_t        P4_RuleID;
 
 /** A range of two runes. */
 typedef P4_Rune P4_RuneRange[2];
 
-/** The expression kinds. */
+/** The expression kind. */
 typedef enum {
+    /** Rule: Case-Sensitive Literal, Case-Insensitive Literal. */
     P4_Literal,
+    /** Rule: Range. */
     P4_Range,
+    /** Rule: Reference. */
     P4_Reference,
+    /** Rule: Positive. */
     P4_Positive,
+    /** Rule: Negative. */
     P4_Negative,
+    /** Rule: Sequence. */
     P4_Sequence,
-    P4_Choice,
-    P4_Repeat,
+    /** Rule: Case-Sensitive BackReference, Case-Insensitive BackReference. */
     P4_BackReference,
+    /** Rule: Choice. */
+    P4_Choice,
+    /**
+     * Rule: RepeatMinMax, RepeatMin, RepeatMax, RepeatExact,
+     * OnceOrMore, ZeroOrMore, ZeroOrOnce.
+     */
+    P4_Repeat,
 } P4_ExpressionKind;
 
 /**
@@ -208,6 +226,9 @@ typedef enum {
 
 /**
  * The stack frame.
+ *
+ * This data structure is used by Peppa PEG internally.
+ * You generally would not use it.
  */
 typedef struct P4_Frame {
     /** The current matching expression for the frame. */
@@ -221,7 +242,7 @@ typedef struct P4_Frame {
 } P4_Frame;
 
 /**
- * The source handle.
+ * The source.
  */
 typedef struct P4_Source {
     /** The grammar used to parse the source. */
@@ -384,7 +405,6 @@ typedef struct P4_Grammar{
 P4_String      P4_Version(void);
 
 
-/* P4_PUBLIC P4_Expression* P4_CreateNumeric(size_t); */
 P4_Expression* P4_CreateLiteral(const P4_String, bool sensitive);
 P4_Expression* P4_CreateRange(P4_Rune, P4_Rune);
 P4_Expression* P4_CreateReference(P4_RuleID);

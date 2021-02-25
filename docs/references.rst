@@ -1,9 +1,6 @@
 References
 ==========
 
-.. doxygenenum:: P4_Error
-.. doxygenenum:: P4_ExpressionKind
-
 .. doxygendefine:: P4_FLAG_SQUASHED
 .. doxygendefine:: P4_FLAG_LIFTED
 .. doxygendefine:: P4_FLAG_TIGHT
@@ -11,6 +8,22 @@ References
 .. doxygendefine:: P4_FLAG_SCOPED
 
 .. doxygendefine:: P4_DEFAULT_RECURSION_LIMIT
+
+.. doxygentypedef:: P4_ExpressionFlag
+.. doxygentypedef:: P4_Position
+.. doxygentypedef:: P4_Rune
+.. doxygentypedef:: P4_String
+.. doxygentypedef:: P4_RuleID
+.. doxygentypedef:: P4_RuneRange
+
+.. doxygenenum:: P4_ExpressionKind
+.. doxygenenum:: P4_Error
+
+.. doxygenstruct:: P4_Slice
+   :members:
+
+.. doxygenstruct:: P4_Frame
+   :members:
 
 .. doxygenstruct:: P4_Grammar
    :members:
@@ -37,3 +50,4 @@ References
 .. doxygenfunction:: P4_Parse
 .. doxygenfunction:: P4_GetSourceAst
 .. doxygenfunction:: P4_CopyTokenString
+.. doxygenfunction:: P4_SetRecursionLimit

@@ -55,47 +55,70 @@ extern "C"
 # define P4_FLAG_NONE                   ((uint32_t)(0x0))
 
 /**
- * Let the children tokens disappear!
+ * When the flag is set, the grammar rule will have squash all
+ * children tokens.
  *
- * AST:
- *     a   ===>  a
- *    b c
- *   d e
- * */
+ * `token->head`, `token->tail` will be NULL.
+ *
+ * For example, rule b has P4_FLAG_SQUASHED. After parsing,
+ * the children tokens d and e are gone:
+ *
+ *          a   ===>   a
+ *        (b) c ===>  b c
+ *        d e
+ *
+ * The flag will impact all of the descendant rules.
+ **/
 # define P4_FLAG_SQUASHED               ((uint32_t)(0x1))
 
 /**
- * Replace the token with the children tokens.
+ * When the flag is set, the grammar rule will replace the
+ * token with its children tokens.
  *
- * AST:
- *     a   ===>   a
- *   (b) c ===> d e c
- *   d e
+ * For example, rule b has P4_FLAG_SQUASHED. After parsing,
+ * the token (b) is gone, and its children d and e become
+ * the children of a:
+ *
+ *          a   ===>   a
+ *        (b) c ===> d e c
+ *        d e
  * */
 # define P4_FLAG_LIFTED                 ((uint32_t)(0x10))
 
 /**
- * Apply implicit whitespaces rule.
- * Used by repetition and sequence expressions.
+ * When the flag is set, the grammar rule will insert
+ * no P4_FLAG_SPACED rules inside the sequences and repetitions
+ *
+ * This flag only works for the repetition and sequence expressions.
  */
 # define P4_FLAG_TIGHT                ((uint32_t)(0x100))
 
 /**
- * Apply the expression under a new scope, regardless
- * if the parent expression is lifted/tighted.
+ * When the flag is set, the effect of SQUASHED and TIGHT
+ * are canceled.
+ *
+ * Regardless if the ancestor expression has SQUASHED or TIGHT
+ * flag, starting from this expression, Peppa PEG will start
+ * creating tokens and apply SPACED rules for sequences and repetitions.
  */
 # define P4_FLAG_SCOPED                 ((uint32_t)(0x1000))
 
 /**
- * Use the space expression in expression of sequence/repeat kind
- * if they're not tight.
+ * When the flag is set, the expression will be inserted
+ * between every token inside the sequences and repetitions
+ *
+ * If there are multiple SPACED expressions, Peppa PEG will
+ * iterate through all SPACED expressions.
+ *
+ * This flag makes the grammar clean and tidy without inserting
+ * whitespace rule everywhere.
  */
 # define P4_FLAG_SPACED                 ((uint32_t)(0x10000))
 
 /**
  * The default recursion limit.
  *
- * It can be adjusted through function `P4_SetRecursionLimit`.
+ * It can be adjusted via function `P4_SetRecursionLimit`.
  */
 # define P4_DEFAULT_RECURSION_LIMIT     8192
 
@@ -225,7 +248,7 @@ typedef struct P4_Source {
     P4_String               errmsg;
     /** The root of abstract syntax tree. */
     struct P4_Token*        root;
-    /* Reserved: whether to enable DEBUG logs. */
+    /** Reserved: whether to enable DEBUG logs. */
     bool                    verbose;
     /** The flag for checking if the parse is matching SPACED rules.
      *
@@ -241,6 +264,9 @@ typedef struct P4_Source {
     size_t                  frame_stack_size;
 } P4_Source;
 
+/**
+ * The grammar rule.
+ */
 typedef struct P4_Expression {
     /* The name of expression (only for debugging). */
     /* P4_String            name; */
@@ -313,9 +339,13 @@ typedef struct P4_Token {
 } P4_Token;
 
 /**
- * The callback after an expression is matched.
+ * The callback for a successful match.
  */
 typedef P4_Error (*P4_MatchCallback)(struct P4_Grammar*, struct P4_Expression*, struct P4_Token*);
+
+/**
+ * The callback for a failure match.
+ */
 typedef P4_Error (*P4_ErrorCallback)(struct P4_Grammar*, struct P4_Expression*);
 
 /**
@@ -409,8 +439,9 @@ P4_Grammar*    P4_CreateGrammar(void);
 
 /**
  * @brief       Delete the grammar object.
- *              It will also free all of the expression rules.
- * @param       The grammar.
+ * @param       grammar     The grammar.
+ *
+ * It will also free all of the expression rules.
  */
 void           P4_DeleteGrammar(P4_Grammar*);
 

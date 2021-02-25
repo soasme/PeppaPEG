@@ -866,6 +866,6 @@ The outputs are stored on `build/docs`.
 * Write a Mustache Parser using Peppa PEG: [mustache.h](examples/mustache.h).
 * Write a JSON Parser using Peppa PEG: [json.h](examples/json.h).
 
-Made with ❤️  by [@soasme](https://github.com/soasme).
+Made with ❤️  by [Ju](https://github.com/soasme).
 
 [PEG]: https://en.wikipedia.org/wiki/Parsing_expression_grammar

@@ -1397,11 +1397,11 @@ P4_Parse(P4_Grammar* grammar, P4_Source* source) {
 
 
 P4_PUBLIC bool
-P4_HasError(P4_Source* src) {
-    if (src == NULL)
+P4_HasError(P4_Source* source) {
+    if (source == NULL)
         return false;
 
-    return src->err != P4_Ok;
+    return source->err != P4_Ok;
 }
 
 P4_PUBLIC P4_Error

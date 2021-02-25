@@ -59,3 +59,4 @@ html_static_path = ['_static']
 # Breathe Configuration
 breathe_projects = { "PeppaPEG": "../build/docs/xml/" }
 breathe_default_project = 'PeppaPEG'
+breathe_domain_by_extension = {"h": "c"}

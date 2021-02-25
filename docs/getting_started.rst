@@ -22,15 +22,15 @@ All of the data structures and functions provided by Peppa PEG start with `P4_`
 
 Let's learn some basic P4 data structures:
 
-* :cpp:struct:`P4_Grammar`: The grammar object that defines all grammar rules.
-* :cpp:struct:`P4_Expression`: The grammar rule object.
-* :cpp:struct:`P4_Source`: The content to parse.
-* :cpp:struct:`P4_Token`. The building block of an AST (abstract syntax tree), e.g. the final parsing result of a grammar given the source.
+* :c:struct:`P4_Grammar`: The grammar object that defines all grammar rules.
+* :c:struct:`P4_Expression`: The grammar rule object.
+* :c:struct:`P4_Source`: The content to parse.
+* :c:struct:`P4_Token`. The building block of an AST (abstract syntax tree), e.g. the final parsing result of a grammar given the source.
 
 Step 1: Create Grammar
 ----------------------
 
-In Peppa PEG, we always start with creating a :cpp:struct:`P4_Grammar`. We create such a data structure using :cpp:func:`P4_CreateGrammar`.
+In Peppa PEG, we always start with creating a :c:struct:`P4_Grammar`. We create such a data structure using :c:func:`P4_CreateGrammar`.
 
 .. code-block:: c
 
@@ -43,7 +43,7 @@ In Peppa PEG, we always start with creating a :cpp:struct:`P4_Grammar`. We creat
 Step 2: Add Grammar Rule
 -------------------------
 
-There are plenty kinds of rules in PEG. In this example, we use the simplest, :cpp:enum:`P4_Literal<P4_ExpressionKind>`. We add such a rule using :cpp:func:`P4_AddLiteral()`.
+There are plenty kinds of rules in PEG. In this example, we use the simplest, :c:enum:`P4_Literal<P4_ExpressionKind>`. We add such a rule using :c:func:`P4_AddLiteral()`.
 
 .. code-block:: c
 
@@ -57,7 +57,7 @@ The second parameter is a numeric ID for the grammar rule. Each rule has its uni
 Step 3: Create Source
 ---------------------
 
-We create a :cpp:struct:`P4_Source` using :cpp:func:`P4_CreateSource()`.
+We create a :c:struct:`P4_Source` using :c:func:`P4_CreateSource()`.
 
 .. code-block:: c
 
@@ -72,7 +72,7 @@ The first parameter is the content of the source. The second parameter is the ID
 Step 4: Parse
 -------------
 
-Now the stage is setup; call :cpp:func:`P4_Parse`. If everything is okay, it returns a zero value - :cpp:enum:`P4_Ok<P4_Error>`.
+Now the stage is setup; call :c:func:`P4_Parse`. If everything is okay, it returns a zero value - :c:enum:`P4_Ok<P4_Error>`.
 
 .. code-block:: c
 
@@ -84,7 +84,7 @@ Now the stage is setup; call :cpp:func:`P4_Parse`. If everything is okay, it ret
 Step 5: Traverse Token Tree
 ---------------------------
 
-P4_Source contains a token tree if parse successfully. We get the root node of such a token tree using :cpp:func:`P4_GetSourceAst()`.
+P4_Source contains a token tree if parse successfully. We get the root node of such a token tree using :c:func:`P4_GetSourceAst()`.
 
 
 .. code-block:: c
@@ -99,7 +99,7 @@ To traverse the AST,
 * `node->next` is the next sibling.
 * `node->slice.i` is the start position in the source string that the token covers.
 * `node->slice.j` is the end position in the source string that the token covers.
-* :cpp:func:`P4_CopyTokenString()` returns the string the AST node covers.
+* :c:func:`P4_CopyTokenString()` returns the string the AST node covers.
 
 .. code-block:: c
 
@@ -116,8 +116,8 @@ Step 6: Clean Up
 
 Last but not least, don't forget to free all the allocated memory.
 
-* :cpp:func:`P4_DeleteSource()` deletes the source along with the entire token tree.
-* :cpp:func:`P4_DeleteGrammar()` deletes the grammar along with all the grammar rules.
+* :c:func:`P4_DeleteSource()` deletes the source along with the entire token tree.
+* :c:func:`P4_DeleteGrammar()` deletes the grammar along with all the grammar rules.
 
 .. code-block:: c
 

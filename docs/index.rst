@@ -13,6 +13,8 @@ Table of Contents
 
    getting_started
    references
+   whatsnew
+
 
 
 Indices and tables

@@ -48,7 +48,7 @@ if (ENABLE_DOCS)
         OUTPUT ${SPHINX_EXECUTABLE}
         DEPENDS venv docs/requirements.txt
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/docs/requirements.txt docs-requirements.txt
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/docs ${CMAKE_CURRENT_BINARY_DIR}docs
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/docs ${CMAKE_CURRENT_BINARY_DIR}/docs
         COMMAND ./venv/bin/python3 -mensurepip
         COMMAND ./venv/bin/python3 -mpip install -r docs-requirements.txt --upgrade
         MAIN_DEPENDENCY ${CMAKE_CURRENT_BINARY_DIR}/venv/bin/python

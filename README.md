@@ -285,7 +285,7 @@ In this example we match an ASCII digit.
 // ENTRY <- [0-9]
 
 //                               lower     upper
->> P4_AddLiteral(grammar, ENTRY, '0',      '9');
+>> P4_AddRange(grammar, ENTRY,   '0',      '9');
 P4_Ok
 
 >> P4_Source* source = P4_Source("0", ENTRY);
@@ -299,7 +299,7 @@ In this example we match the code points starting from `U+4E00` to `U+9FCC`, e.g
 
 ```c
 //                               lower     upper
->> P4_AddLiteral(grammar, ENTRY, 0x4E00,   0x9FFF);
+>> P4_AddRange(grammar, ENTRY,   0x4E00,   0x9FFF);
 P4_Ok
 
 >> P4_Source* source = P4_Source("好", ENTRY);

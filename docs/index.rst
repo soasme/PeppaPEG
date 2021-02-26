@@ -10,11 +10,12 @@ Table of Contents
 
 .. toctree::
    :maxdepth: 2
+   :glob:
 
    getting_started
    references
    whatsnew
-   debug
+   development/*
 
 
 

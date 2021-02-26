@@ -11,7 +11,7 @@
  *   ENTRY:
  *     R1: "HELLO"
  */
-P4_PRIVATE(void) test_match_reference_successfully(void) {
+void test_match_reference_successfully(void) {
 # define ENTRY  1
 # define R1     2
     P4_Grammar* grammar = P4_CreateGrammar();
@@ -58,7 +58,7 @@ P4_PRIVATE(void) test_match_reference_successfully(void) {
  * Output:
  *  NULL
  */
-P4_PRIVATE(void) test_match_reference_not_defined_raise_name_error(void) {
+void test_match_reference_not_defined_raise_name_error(void) {
 # define ENTRY  1
 # define R1     2
     P4_Grammar* grammar = P4_CreateGrammar();

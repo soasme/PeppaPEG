@@ -9,7 +9,7 @@
  * Output:
  *   ENTRY: "你好 WORLD"
  */
-P4_PRIVATE(void) test_match_literal_sequence_successfully(void) {
+void test_match_literal_sequence_successfully(void) {
 # define ENTRY 1
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
@@ -54,7 +54,7 @@ P4_PRIVATE(void) test_match_literal_sequence_successfully(void) {
  * Output:
  *   NULL
  */
-P4_PRIVATE(void) test_match_literal_sequence_partially_raise_match_error(void) {
+void test_match_literal_sequence_partially_raise_match_error(void) {
 # define ENTRY 1
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
@@ -92,7 +92,7 @@ P4_PRIVATE(void) test_match_literal_sequence_partially_raise_match_error(void) {
  * Output:
  *   NULL
  */
-P4_PRIVATE(void) test_match_literal_sequence_having_member_nomatch_raise_match_error(void) {
+void test_match_literal_sequence_having_member_nomatch_raise_match_error(void) {
 # define ENTRY 1
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
@@ -131,7 +131,7 @@ P4_PRIVATE(void) test_match_literal_sequence_having_member_nomatch_raise_match_e
  *     R1: "OLA"
  *     R1: "ola"
  */
-P4_PRIVATE(void) test_match_reference_in_sequence_successfully(void) {
+void test_match_reference_in_sequence_successfully(void) {
 # define ENTRY  1
 # define R1     2
     P4_Grammar* grammar = P4_CreateGrammar();

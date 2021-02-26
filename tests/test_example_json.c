@@ -2,7 +2,7 @@
 #include "common.h"
 #include "../examples/json.h"
 
-P4_PRIVATE(void) test_null(void) {
+void test_null(void) {
     P4_Grammar* grammar = P4_CreateJSONGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -29,7 +29,7 @@ P4_PRIVATE(void) test_null(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_true(void) {
+void test_true(void) {
     P4_Grammar* grammar = P4_CreateJSONGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -56,7 +56,7 @@ P4_PRIVATE(void) test_true(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_false(void) {
+void test_false(void) {
     P4_Grammar* grammar = P4_CreateJSONGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -83,7 +83,7 @@ P4_PRIVATE(void) test_false(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_number_integer_0(void) {
+void test_number_integer_0(void) {
     P4_Grammar* grammar = P4_CreateJSONGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -114,7 +114,7 @@ P4_PRIVATE(void) test_number_integer_0(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_number_integer_1234567890(void) {
+void test_number_integer_1234567890(void) {
     P4_Grammar* grammar = P4_CreateJSONGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -145,7 +145,7 @@ P4_PRIVATE(void) test_number_integer_1234567890(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_number_float(void) {
+void test_number_float(void) {
     P4_Grammar* grammar = P4_CreateJSONGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -178,7 +178,7 @@ P4_PRIVATE(void) test_number_float(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_number_exp(void) {
+void test_number_exp(void) {
     P4_Grammar* grammar = P4_CreateJSONGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -211,7 +211,7 @@ P4_PRIVATE(void) test_number_exp(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_string_xyz(void) {
+void test_string_xyz(void) {
     P4_Grammar* grammar = P4_CreateJSONGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -238,7 +238,7 @@ P4_PRIVATE(void) test_string_xyz(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_string_empty(void) {
+void test_string_empty(void) {
     P4_Grammar* grammar = P4_CreateJSONGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -265,7 +265,7 @@ P4_PRIVATE(void) test_string_empty(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_array_empty(void) {
+void test_array_empty(void) {
     P4_Grammar* grammar = P4_CreateJSONGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -292,7 +292,7 @@ P4_PRIVATE(void) test_array_empty(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_array_one_item(void) {
+void test_array_one_item(void) {
     P4_Grammar* grammar = P4_CreateJSONGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -319,7 +319,7 @@ P4_PRIVATE(void) test_array_one_item(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_array_deep_nesting(void) {
+void test_array_deep_nesting(void) {
     P4_Grammar* grammar = P4_CreateJSONGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -358,7 +358,7 @@ P4_PRIVATE(void) test_array_deep_nesting(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_array_multiple_items(void) {
+void test_array_multiple_items(void) {
     P4_Grammar* grammar = P4_CreateJSONGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -385,7 +385,7 @@ P4_PRIVATE(void) test_array_multiple_items(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_object_empty(void) {
+void test_object_empty(void) {
     P4_Grammar* grammar = P4_CreateJSONGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -412,7 +412,7 @@ P4_PRIVATE(void) test_object_empty(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_object_one_item(void) {
+void test_object_one_item(void) {
     P4_Grammar* grammar = P4_CreateJSONGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -439,7 +439,7 @@ P4_PRIVATE(void) test_object_one_item(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_object_multiple_items(void) {
+void test_object_multiple_items(void) {
     P4_Grammar* grammar = P4_CreateJSONGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -466,7 +466,7 @@ P4_PRIVATE(void) test_object_multiple_items(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_objectitem(void) {
+void test_objectitem(void) {
     P4_Grammar* grammar = P4_CreateJSONGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 

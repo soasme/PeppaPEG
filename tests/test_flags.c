@@ -17,7 +17,7 @@
  * Output:
  *   ENTRY: "HELLO \t\n\t WORLD"
  */
-P4_PRIVATE(void) test_spaced_rule_should_loosen_sequence(void) {
+void test_spaced_rule_should_loosen_sequence(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -60,7 +60,7 @@ P4_PRIVATE(void) test_spaced_rule_should_loosen_sequence(void) {
  * Output:
  *  ENTRY: "HELLOWORLD"
  */
-P4_PRIVATE(void) test_spaced_rule_should_be_ignored_in_sequence(void) {
+void test_spaced_rule_should_be_ignored_in_sequence(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -106,7 +106,7 @@ P4_PRIVATE(void) test_spaced_rule_should_be_ignored_in_sequence(void) {
  * Output:
  *  NULL
  */
-P4_PRIVATE(void) test_spaced_rule_should_be_ignored_in_sequence2(void) {
+void test_spaced_rule_should_be_ignored_in_sequence2(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -146,7 +146,7 @@ P4_PRIVATE(void) test_spaced_rule_should_be_ignored_in_sequence2(void) {
  * Output:
  *   ENTRY: "0 0\t0\n0\t0 0"
  */
-P4_PRIVATE(void) test_spaced_rule_should_be_applied_in_repeat(void) {
+void test_spaced_rule_should_be_applied_in_repeat(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -188,7 +188,7 @@ P4_PRIVATE(void) test_spaced_rule_should_be_applied_in_repeat(void) {
  * Output:
  *  NULL
  */
-P4_PRIVATE(void) test_spaced_rule_should_be_ignored_in_tight_repeat(void) {
+void test_spaced_rule_should_be_ignored_in_tight_repeat(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -222,7 +222,7 @@ P4_PRIVATE(void) test_spaced_rule_should_be_ignored_in_tight_repeat(void) {
  * Output:
  *  ENTRY: "000000"
  */
-P4_PRIVATE(void) test_spaced_rule_should_be_ignored_in_tight_repeat2(void) {
+void test_spaced_rule_should_be_ignored_in_tight_repeat2(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -266,7 +266,7 @@ P4_PRIVATE(void) test_spaced_rule_should_be_ignored_in_tight_repeat2(void) {
  * Output:
  *  ENTRY: "00"
  */
-P4_PRIVATE(void) test_squashed_rule_should_generate_no_children(void) {
+void test_squashed_rule_should_generate_no_children(void) {
 # define Z 3
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
@@ -314,7 +314,7 @@ P4_PRIVATE(void) test_squashed_rule_should_generate_no_children(void) {
  * Output:
  *  ENTRY: "00000"
  */
-P4_PRIVATE(void) test_squashed_repeat_should_generate_no_children(void) {
+void test_squashed_repeat_should_generate_no_children(void) {
 # define Z 3
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
@@ -362,7 +362,7 @@ P4_PRIVATE(void) test_squashed_repeat_should_generate_no_children(void) {
  * Output:
  *  NULL
  */
-P4_PRIVATE(void) test_lifted_literal_should_generate_no_token(void) {
+void test_lifted_literal_should_generate_no_token(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -395,7 +395,7 @@ P4_PRIVATE(void) test_lifted_literal_should_generate_no_token(void) {
  * Output:
  *  NULL
  */
-P4_PRIVATE(void) test_lifted_range_should_generate_no_token(void) {
+void test_lifted_range_should_generate_no_token(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -428,7 +428,7 @@ P4_PRIVATE(void) test_lifted_range_should_generate_no_token(void) {
  * Output:
  *  NULL
  */
-P4_PRIVATE(void) test_lifted_choice_should_generate_no_token(void) {
+void test_lifted_choice_should_generate_no_token(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -460,7 +460,7 @@ P4_PRIVATE(void) test_lifted_choice_should_generate_no_token(void) {
 /* Reference # LIFT */
 
 /* Repeat # LIFT */
-P4_PRIVATE(void) test_lifted_repeat_should_generate_no_token(void) {
+void test_lifted_repeat_should_generate_no_token(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -503,7 +503,7 @@ P4_PRIVATE(void) test_lifted_repeat_should_generate_no_token(void) {
  *   ONE: "1"
  *   ONE: "1"
  */
-P4_PRIVATE(void) test_squashed_sequence_should_not_hide_scoped_literal(void) {
+void test_squashed_sequence_should_not_hide_scoped_literal(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -561,7 +561,7 @@ P4_PRIVATE(void) test_squashed_sequence_should_not_hide_scoped_literal(void) {
  *  ONE: "1"
  *  ONE: "1"
  */
-P4_PRIVATE(void) test_squashed_lifted_sequence_should_not_hide_scoped_literal(void) {
+void test_squashed_lifted_sequence_should_not_hide_scoped_literal(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -616,7 +616,7 @@ P4_PRIVATE(void) test_squashed_lifted_sequence_should_not_hide_scoped_literal(vo
  *   ONE: "1"
  *   ONE: "1"
  */
-P4_PRIVATE(void) test_squashed_repeat_should_not_hide_scoped_literal(void) {
+void test_squashed_repeat_should_not_hide_scoped_literal(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -670,7 +670,7 @@ P4_PRIVATE(void) test_squashed_repeat_should_not_hide_scoped_literal(void) {
  *  R1: "1"
  *  R1: "1"
  */
-P4_PRIVATE(void) test_squashed_lifted_repeat_should_not_hide_scoped_literal(void) {
+void test_squashed_lifted_repeat_should_not_hide_scoped_literal(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(

@@ -9,7 +9,7 @@
  * Output:
  *   R1: "0"
  */
-P4_PRIVATE(void) test_match_ascii_digits_successfully(void) {
+void test_match_ascii_digits_successfully(void) {
 # define R1 1
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
@@ -48,7 +48,7 @@ P4_PRIVATE(void) test_match_ascii_digits_successfully(void) {
  * Output:
  *   R1: "好"
  */
-P4_PRIVATE(void) test_match_utf8_code_point_successfully(void) {
+void test_match_utf8_code_point_successfully(void) {
 # define R1 1
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
@@ -89,7 +89,7 @@ P4_PRIVATE(void) test_match_utf8_code_point_successfully(void) {
  * Output:
  *   NULL
  */
-P4_PRIVATE(void) test_match_code_points_outside_range_cause_match_error(void) {
+void test_match_code_points_outside_range_cause_match_error(void) {
 # define R1 1
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);

@@ -77,11 +77,6 @@ References
 .. doxygenfunction:: P4_IsScoped
 .. doxygenfunction:: P4_IsSpaced
 .. doxygenfunction:: P4_SetExpressionFlag
-.. doxygenfunction:: P4_SetSquashed
-.. doxygenfunction:: P4_SetLifted
-.. doxygenfunction:: P4_SetTight
-.. doxygenfunction:: P4_SetSpaced
-.. doxygenfunction:: P4_SetScoped
 
 .. doxygenfunction:: P4_AddLiteral
 .. doxygenfunction:: P4_AddNumeric

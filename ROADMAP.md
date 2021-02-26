@@ -27,6 +27,7 @@
 - [ ] Add doxygen references in docs.
 - [ ] Add explanations in docs.
 - [ ] Enable AddressSanitizer. Example: cJSON.
+- [ ] Return NullError for CreatePositive/CreateNegative/....
 - [x] Example JSON: rfc7159. Added in v1.4.0.
 - [x] Auto generate documentation for functions and defined macros. Example: doxygen. Added in v1.4.0.
 - [x] NeedLoosen, NeedSquash, NeedLift should be well-tested.

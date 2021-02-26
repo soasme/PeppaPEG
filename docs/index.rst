@@ -14,6 +14,7 @@ Table of Contents
    getting_started
    references
    whatsnew
+   debug
 
 
 

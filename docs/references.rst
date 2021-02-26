@@ -66,7 +66,6 @@ References
 .. doxygenfunction:: P4_GetMember
 
 .. doxygenfunction:: P4_DeleteExpression
-.. doxygenfunction:: P4_PrintExpression
 
 .. doxygenfunction:: P4_SetRuleID
 .. doxygenfunction:: P4_IsRule
@@ -79,7 +78,6 @@ References
 .. doxygenfunction:: P4_SetExpressionFlag
 
 .. doxygenfunction:: P4_AddLiteral
-.. doxygenfunction:: P4_AddNumeric
 .. doxygenfunction:: P4_AddRange
 .. doxygenfunction:: P4_AddReference
 .. doxygenfunction:: P4_AddPositive

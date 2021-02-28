@@ -56,6 +56,8 @@ html_theme = 'furo'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+html_extra_path = ['.nojekyll']
+
 # Breathe Configuration
 breathe_projects = { "PeppaPEG": "../build/docs/xml/" }
 breathe_default_project = 'PeppaPEG'

@@ -26,7 +26,7 @@ if (ENABLE_VALGRIND)
     message("-- Valgrind found: ${VALGRIND}")
 
     if (VALGRIND)
-        set(VALGRIND_OPTIONS --trace-children=yes --leak-check=full --show-leak-kinds=all --error-exitcode=1 -s)
+        set(VALGRIND_OPTIONS --trace-children=yes --leak-check=full --show-leak-kinds=all --error-exitcode=1)
     else()
         message(WARNING "Valgrind not installed.")
         unset(VALGRIND)

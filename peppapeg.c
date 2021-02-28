@@ -51,6 +51,13 @@
 
 # define                        autofree __attribute__ ((cleanup (cleanup_freep)))
 
+char *strdup(const char *src) { /* strdup is not ANSI. Copy source here. */
+    char *dst = malloc(strlen (src) + 1);
+    if (dst == NULL) return NULL;
+    strcpy(dst, src);
+    return dst;
+}
+
 P4_PRIVATE(void)
 cleanup_freep (void *p)
 {
@@ -154,16 +161,16 @@ P4_PRIVATE(size_t)
 P4_ReadRune(P4_String s, P4_Rune* c) {
     *c = 0;
 
-    if ((s[0] & 0b10000000) == 0) { // 1 byte code point, ASCII
+    if ((s[0] & 0b10000000) == 0) { /* 1 byte code point, ASCII */
         *c = (s[0] & 0b01111111);
         return 1;
-    } else if ((s[0] & 0b11100000) == 0b11000000) { // 2 byte code point
+    } else if ((s[0] & 0b11100000) == 0b11000000) { /* 2 byte code point */
         *c = (s[0] & 0b00011111) << 6 | (s[1] & 0b00111111);
         return 2;
-    } else if ((s[0] & 0b11110000) == 0b11100000) { // 3 byte code point
+    } else if ((s[0] & 0b11110000) == 0b11100000) { /* 3 byte code point */
         *c = (s[0] & 0b00001111) << 12 | (s[1] & 0b00111111) << 6 | (s[2] & 0b00111111);
         return 3;
-    } else if ((s[0] & 0b11111000) == 0b11110000) { // 4 byte code point
+    } else if ((s[0] & 0b11111000) == 0b11110000) { /* 4 byte code point */
         *c = (s[0] & 0b00000111) << 18 | (s[1] & 0b00111111) << 12 | (s[2] & 0b00111111) << 6 | (s[3] & 0b00111111);
         return 4;
     } else {
@@ -494,17 +501,17 @@ P4_MatchReference(P4_Source* s, P4_Expression* e) {
     P4_Token* reftok = P4_Match(s, e->ref_expr);
     P4_MarkPosition(s, endpos);
 
-    // Ref matching is terminated when error occurred.
+    /* Ref matching is terminated when error occurred. */
     if (!NO_ERROR(s))
         return NULL;
 
-    // The referenced token is returned when silenced.
+    /* The referenced token is returned when silenced. */
     if (P4_NeedLift(s, e))
         return reftok;
 
-    // A single reference expr can be a rule: `e = { ref }`
-    // In such a case, a token for `e` with single child `ref` is created.
-    //
+    /* A single reference expr can be a rule: `e = { ref }` */
+    /* In such a case, a token for `e` with single child `ref` is created. */
+    /* */
     P4_Token* result = NULL;
 
     if ((result=P4_CreateToken (s->content, startpos, endpos, e)) == NULL) {
@@ -536,10 +543,12 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
 
     P4_MarkPosition(s, startpos);
 
-    for (size_t i = 0; i < e->count; i++) {
+    size_t i = 0;
+
+    for (i = 0; i < e->count; i++) {
         member = e->members[i];
 
-        // Optional `WHITESPACE` and `COMMENT` are inserted between every member.
+        /* Optional `WHITESPACE` and `COMMENT` are inserted between every member. */
         if (need_space && i > 0) {
             whitespace = P4_MatchSpacedExpressions(s, NULL);
             if (!NO_ERROR(s)) goto finalize;
@@ -555,8 +564,8 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
             tok = P4_Match(s, member);
         }
 
-        // If any of the sequence members fails, the entire sequence fails.
-        // Puke the eaten text and free all created tokens.
+        /* If any of the sequence members fails, the entire sequence fails. */
+        /* Puke the eaten text and free all created tokens. */
         if (!NO_ERROR(s)) {
             goto finalize;
         }
@@ -590,19 +599,20 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
     P4_Token* tok = NULL;
     P4_Expression* member = NULL;
 
-    // A member is attempted if previous yields no match.
-    // The oneof match matches successfully immediately if any match passes.
+    /* A member is attempted if previous yields no match. */
+    /* The oneof match matches successfully immediately if any match passes. */
     P4_MarkPosition(s, startpos);
-    for (size_t i = 0; i < e->count; i++) {
+    size_t i;
+    for (i = 0; i < e->count; i++) {
         member = e->members[i];
         tok = P4_Match(s, member);
         if (NO_ERROR(s)) break;
         if (NO_MATCH(s)) {
-            // retry until the last one.
+            /* retry until the last one. */
             if (i < e->count-1) {
                 P4_RescueError(s);
                 P4_SetPosition(s, startpos);
-            // fail when the last one is a no-match.
+            /* fail when the last one is a no-match. */
             } else {
                 P4_RaiseError(s, P4_MatchError, "no match");
                 goto finalize;
@@ -640,18 +650,18 @@ P4_PRIVATE(P4_Token*)
 P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     size_t min = SIZE_MAX, max = SIZE_MAX, repeated = 0;
 
-    assert(e->repeat_min != min || e->repeat_max != max); // need at least one of min/max.
-    assert(e->repeat_expr != NULL); // need repeat expression.
+    assert(e->repeat_min != min || e->repeat_max != max); /* need at least one of min/max. */
+    assert(e->repeat_expr != NULL); /* need repeat expression. */
     assert(NO_ERROR(s));
 
 # define IS_REF(e) ((e)->kind == P4_Reference)
 # define IS_PROGRESSING(k) ((k)==P4_Positive \
                             || (k)==P4_Negative)
 
-    // when expression inside repetition is non-progressing, it repeats indefinitely.
-    // we know negative/positive definitely not progressing,
-    // and so does a reference to a negative/positive rule.
-    // Question: we may never list all the cases in this way. How to deal with it better?
+    /* when expression inside repetition is non-progressing, it repeats indefinitely. */
+    /* we know negative/positive definitely not progressing, */
+    /* and so does a reference to a negative/positive rule. */
+    /* Question: we may never list all the cases in this way. How to deal with it better? */
     if (IS_PROGRESSING(e->repeat_expr->kind) ||
             (IS_REF(e->repeat_expr)
              && IS_PROGRESSING(P4_GetReference(s, e->repeat_expr)->kind))) {
@@ -669,7 +679,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     while (*P4_RemainingText(s) != '\0') {
         P4_MarkPosition(s, before_implicit);
 
-        // SPACED rule expressions are inserted between every repetition.
+        /* SPACED rule expressions are inserted between every repetition. */
         if (need_space && repeated > 0 ) {
             whitespace = P4_MatchSpacedExpressions(s, NULL);
             if (!NO_ERROR(s)) goto finalize;
@@ -681,15 +691,15 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         if (NO_MATCH(s)) {
             assert(tok == NULL);
 
-            // considering the case: MATCH WHITESPACE MATCH WHITESPACE NO_MATCH
-            if (need_space && repeated > 0)//               ^          ^ we are here
-                P4_SetPosition(s, before_implicit);  //           ^ puke extra whitespace
-                                               //           ^ now we are here
+            /* considering the case: MATCH WHITESPACE MATCH WHITESPACE NO_MATCH */
+            if (need_space && repeated > 0)/*               ^          ^ we are here */
+                P4_SetPosition(s, before_implicit);  /*           ^ puke extra whitespace */
+                                               /*           ^ now we are here */
 
             if (min != SIZE_MAX && repeated < min) {
                 P4_RaiseError(s, P4_MatchError, "insufficient repetitions");
                 goto finalize;
-            } else {                       // sufficient repetitions.
+            } else {                       /* sufficient repetitions. */
                 P4_RescueError(s);
                 break;
             }
@@ -706,17 +716,17 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         repeated++;
         P4_AdoptToken(head, tail, tok);
 
-        if (max != SIZE_MAX && repeated == max) { // enough attempts
+        if (max != SIZE_MAX && repeated == max) { /* enough attempts */
             P4_RescueError(s);
             break;
         }
 
     }
 
-    // there should be no error when repetition is successful.
+    /* there should be no error when repetition is successful. */
     assert(NO_ERROR(s));
 
-    // fails when attempts are excessive, e.g. repeated > max.
+    /* fails when attempts are excessive, e.g. repeated > max. */
     if (max != SIZE_MAX && repeated > max) {
         P4_RaiseError(s, P4_MatchError, "excessive repetitions");
         goto finalize;
@@ -727,7 +737,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         goto finalize;
     }
 
-    if (P4_GetPosition(s) == startpos) // success but no token is produced.
+    if (P4_GetPosition(s) == startpos) /* success but no token is produced. */
         goto finalize;
 
 
@@ -743,8 +753,8 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     P4_AdoptToken(repetition->head, repetition->tail, head);
     return repetition;
 
-// cleanup before returning NULL.
-// tokens between head..tail should be freed.
+/* cleanup before returning NULL. */
+/* tokens between head..tail should be freed. */
 finalize:
     P4_SetPosition(s, startpos);
     P4_DeleteToken(head);
@@ -894,8 +904,8 @@ P4_Match_any(P4_Source* s, P4_Expression* e) {
 
 P4_PRIVATE(P4_Token*)
 P4_MatchSpacedExpressions(P4_Source* s, P4_Expression* e) {
-    // implicit whitespace is guaranteed to be an unnamed rule.
-    // state flag is guaranteed to be none.
+    /* implicit whitespace is guaranteed to be an unnamed rule. */
+    /* state flag is guaranteed to be none. */
     assert(NO_ERROR(s));
 
     if (s->grammar == NULL)
@@ -904,16 +914,16 @@ P4_MatchSpacedExpressions(P4_Source* s, P4_Expression* e) {
     P4_Expression* implicit_whitespace = P4_GetWhitespaces(s->grammar);
     assert(implicit_whitespace != NULL);
 
-    // (1) Temporarily set implicit whitespace to empty.
+    /* (1) Temporarily set implicit whitespace to empty. */
     s->whitespacing = true;
 
-    // (2) Perform implicit whitespace checks.
-    //     We won't do implicit whitespace inside an implicit whitespace expr.
+    /* (2) Perform implicit whitespace checks. */
+    /*     We won't do implicit whitespace inside an implicit whitespace expr. */
     P4_Token* result = P4_Match(s, implicit_whitespace);
     if (NO_MATCH(s))
         P4_RescueError(s);
 
-    // (3) Set implicit whitespace back.
+    /* (3) Set implicit whitespace back. */
     s->whitespacing = false;
 
     return result;
@@ -978,16 +988,17 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, size_t
     return tok;
 }
 
-// Poor performance, refactor me.
+/* Poor performance, refactor me. */
 P4_PUBLIC void
 P4_PrintSourceAst(P4_Token* token, P4_String buf, size_t indent) {
     P4_Token* current = token;
     char idstr[6];
+    size_t i;
     idstr[0] = 'R';
     while (current != NULL) {
-        for (size_t i = 0; i < indent; i++) strcat(buf, " ");
+        for (i = 0; i < indent; i++) strcat(buf, " ");
         strcat(buf, "- ");
-        sprintf(idstr+1, "%llu", current->expr->id);
+        sprintf(idstr+1, "%lu", current->expr->id);
         strcat(buf, idstr);
         if (current->head == NULL) {
             strcat(buf, ": \"");
@@ -1120,9 +1131,10 @@ P4_CreateSequenceWithMembers(size_t count, ...) {
         return NULL;
 
     va_list members;
+    size_t i;
     va_start (members, count);
 
-    for (size_t i = 0; i < count; i++) {
+    for (i = 0; i < count; i++) {
         expr->members[i] = va_arg(members, P4_Expression*);
 
         if (expr->members[i] == NULL) {
@@ -1147,9 +1159,10 @@ P4_CreateChoiceWithMembers(size_t count, ...) {
         return NULL;
 
     va_list members;
+    size_t i;
     va_start (members, count);
 
-    for (size_t i = 0; i < count; i++) {
+    for (i = 0; i < count; i++) {
         expr->members[i] = va_arg(members, P4_Expression*);
 
         if (expr->members[i] == NULL) {
@@ -1253,8 +1266,9 @@ P4_PUBLIC P4_Grammar*    P4_CreateGrammar(void) {
 
 P4_PUBLIC void
 P4_DeleteGrammar(P4_Grammar* grammar) {
+    size_t i;
     if (grammar) {
-        for (size_t i = 0; i < grammar->count; i++) {
+        for (i = 0; i < grammar->count; i++) {
             if (grammar->rules[i])
                 P4_DeleteExpression(grammar->rules[i]);
             grammar->rules[i] = NULL;
@@ -1268,8 +1282,9 @@ P4_DeleteGrammar(P4_Grammar* grammar) {
 
 P4_PUBLIC P4_Expression*
 P4_GetGrammarRule(P4_Grammar* grammar, P4_RuleID id) {
+    size_t i;
     P4_Expression* rule = NULL;
-    for (size_t i = 0; i < grammar->count; i++) {
+    for (i = 0; i < grammar->count; i++) {
         rule = grammar->rules[i];
         if (rule && rule->id == id)
             return rule;
@@ -1422,17 +1437,16 @@ P4_GetErrorMessage(P4_Source* source) {
 
 P4_PRIVATE(P4_Error)
 P4_SetWhitespaces(P4_Grammar* grammar) {
+    size_t          i = 0;
     size_t          count = 0;
-    P4_RuleID       ids[2] = {0};
-    P4_Expression*  rules[2] = {0};
+    P4_Expression*  rules[2] = {0, 0};
     P4_Expression*  repeat = NULL;
     P4_Expression*  rule = NULL;
 
-    for (size_t i = 0; i < grammar->count; i++) {
+    for (i = 0; i < grammar->count; i++) {
         rule = grammar->rules[i];
 
         if (IS_SPACED(rule)) {
-            ids[count] = rule->id;
             rules[count] = P4_CreateReference(rule->id);
 
             if (rules[count] == NULL)
@@ -1560,12 +1574,13 @@ P4_AddSequence(P4_Grammar* grammar, P4_RuleID id, size_t size) {
 P4_PUBLIC P4_Error
 P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_RuleID id, size_t count, ...) {
     P4_AddSomeGrammarRule(grammar, id, P4_CreateSequence(count));
+    size_t i = 0;
     P4_Expression* expr = P4_GetGrammarRule(grammar, id);
 
     va_list members;
     va_start (members, count);
 
-    for (size_t i = 0; i < count; i++) {
+    for (i = 0; i < count; i++) {
         expr->members[i] = va_arg(members, P4_Expression*);
 
         if (expr->members[i] == NULL) {
@@ -1594,11 +1609,12 @@ P4_PUBLIC P4_Error
 P4_AddChoiceWithMembers(P4_Grammar* grammar, P4_RuleID id, size_t count, ...) {
     P4_AddSomeGrammarRule(grammar, id, P4_CreateChoice(count));
     P4_Expression* expr = P4_GetGrammarRule(grammar, id);
+    size_t i = 0;
 
     va_list members;
     va_start (members, count);
 
-    for (size_t i = 0; i < count; i++) {
+    for (i = 0; i < count; i++) {
         expr->members[i] = va_arg(members, P4_Expression*);
 
         if (expr->members[i] == NULL) {
@@ -1690,12 +1706,14 @@ P4_DeleteExpression(P4_Expression* expr) {
     if (expr == NULL)
         return;
 
+    size_t i;
+
     switch (expr->kind) {
         case P4_Literal:
             if (expr->literal)
                 free(expr->literal);
             break;
-        // case P4_Reference is quite special - it is not the owner of ref_expr.
+        /* case P4_Reference is quite special - it is not the owner of ref_expr. */
         case P4_Positive:
         case P4_Negative:
             if (expr->ref_expr)
@@ -1703,7 +1721,7 @@ P4_DeleteExpression(P4_Expression* expr) {
             break;
         case P4_Sequence:
         case P4_Choice:
-            for (size_t i = 0; i < expr->count; i++) {
+            for (i = 0; i < expr->count; i++) {
                 if (expr->members[i])
                     P4_DeleteExpression(expr->members[i]);
                 expr->members[i] = NULL;
@@ -1919,6 +1937,7 @@ P4_RefreshReference(P4_Expression* expr, P4_RuleID id) {
     if (expr == NULL || id == 0)
         return P4_NullError;
 
+    size_t i = 0;
     P4_Error err = P4_Ok;
 
     switch(expr->kind) {
@@ -1932,7 +1951,7 @@ P4_RefreshReference(P4_Expression* expr, P4_RuleID id) {
             break;
         case P4_Sequence:
         case P4_Choice:
-            for (size_t i = 0; i < expr->count; i++) {
+            for (i = 0; i < expr->count; i++) {
                 err = P4_RefreshReference(expr->members[i], id);
                 if (err != P4_Ok)
                     break;
@@ -1958,8 +1977,9 @@ P4_ReplaceGrammarRule(P4_Grammar* grammar, P4_RuleID id, P4_Expression* expr) {
         return P4_NameError;
 
     P4_Error err = P4_Ok;
+    size_t i;
 
-    for (size_t i = 0; i < grammar->count; i++) {
+    for (i = 0; i < grammar->count; i++) {
         if (grammar->rules[i]->id == id) {
             P4_DeleteExpression(oldexpr);
 
@@ -1970,7 +1990,7 @@ P4_ReplaceGrammarRule(P4_Grammar* grammar, P4_RuleID id, P4_Expression* expr) {
         }
     }
 
-    for (size_t i = 0; i < grammar->count; i++) {
+    for (i = 0; i < grammar->count; i++) {
         if (grammar->rules[i]->id != id) {
             err = P4_RefreshReference(grammar->rules[i], id);
 

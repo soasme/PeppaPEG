@@ -29,6 +29,8 @@ jobs:
       run: cmake $GITHUB_WORKSPACE -DENABLE_DOCS=$DOCS
 
     - name: Build Docs
+      shell: bash
+      working-directory: ${{github.workspace}}/build
       run: cmake --build . --target docs
 
     - name: Publish Docs

@@ -2,7 +2,7 @@
 #include "common.h"
 #include "../examples/mustache.h"
 
-P4_PRIVATE(void) test_whitespace(void) {
+void test_whitespace(void) {
     P4_Grammar* grammar = P4_CreateMustacheGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -29,7 +29,7 @@ P4_PRIVATE(void) test_whitespace(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_variable(void) {
+void test_variable(void) {
     P4_Grammar* grammar = P4_CreateMustacheGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -83,7 +83,7 @@ P4_PRIVATE(void) test_variable(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_partial(void) {
+void test_partial(void) {
     P4_Grammar* grammar = P4_CreateMustacheGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -137,7 +137,7 @@ P4_PRIVATE(void) test_partial(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_section_open(void) {
+void test_section_open(void) {
     P4_Grammar* grammar = P4_CreateMustacheGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -191,7 +191,7 @@ P4_PRIVATE(void) test_section_open(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_section_open_inverted(void) {
+void test_section_open_inverted(void) {
     P4_Grammar* grammar = P4_CreateMustacheGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -249,7 +249,7 @@ P4_PRIVATE(void) test_section_open_inverted(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_section_close(void) {
+void test_section_close(void) {
     P4_Grammar* grammar = P4_CreateMustacheGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -307,7 +307,7 @@ P4_PRIVATE(void) test_section_close(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_unescaped(void) {
+void test_unescaped(void) {
     P4_Grammar* grammar = P4_CreateMustacheGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -365,7 +365,7 @@ P4_PRIVATE(void) test_unescaped(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_triple_unescaped(void) {
+void test_triple_unescaped(void) {
     P4_Grammar* grammar = P4_CreateMustacheGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -422,7 +422,7 @@ P4_PRIVATE(void) test_triple_unescaped(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_comment(void) {
+void test_comment(void) {
     P4_Grammar* grammar = P4_CreateMustacheGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -480,7 +480,7 @@ P4_PRIVATE(void) test_comment(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_set_delimiter_new_opener(void) {
+void test_set_delimiter_new_opener(void) {
     P4_Grammar* grammar = P4_CreateMustacheGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -498,7 +498,7 @@ P4_PRIVATE(void) test_set_delimiter_new_opener(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_set_delimiter(void) {
+void test_set_delimiter(void) {
     P4_Grammar* grammar = P4_CreateMustacheGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -532,7 +532,7 @@ P4_PRIVATE(void) test_set_delimiter(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_set_delimiter_altered_grammar(void) {
+void test_set_delimiter_altered_grammar(void) {
     P4_Grammar* grammar = P4_CreateMustacheGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -584,7 +584,7 @@ P4_PRIVATE(void) test_set_delimiter_altered_grammar(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_text_followed_by_newline(void) {
+void test_text_followed_by_newline(void) {
     P4_Grammar* grammar = P4_CreateMustacheGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -607,7 +607,7 @@ P4_PRIVATE(void) test_text_followed_by_newline(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_text_followed_by_opener(void) {
+void test_text_followed_by_opener(void) {
     P4_Grammar* grammar = P4_CreateMustacheGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -631,7 +631,7 @@ P4_PRIVATE(void) test_text_followed_by_opener(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_line_only_text(void) {
+void test_line_only_text(void) {
     P4_Grammar* grammar = P4_CreateMustacheGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -654,7 +654,7 @@ P4_PRIVATE(void) test_line_only_text(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_line_only_tag(void) {
+void test_line_only_tag(void) {
     P4_Grammar* grammar = P4_CreateMustacheGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -677,7 +677,7 @@ P4_PRIVATE(void) test_line_only_tag(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_line_mixing_text_and_tag(void) {
+void test_line_mixing_text_and_tag(void) {
     P4_Grammar* grammar = P4_CreateMustacheGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -704,7 +704,7 @@ P4_PRIVATE(void) test_line_mixing_text_and_tag(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_line_mixing_text_and_tag2(void) {
+void test_line_mixing_text_and_tag2(void) {
     P4_Grammar* grammar = P4_CreateMustacheGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -731,7 +731,7 @@ P4_PRIVATE(void) test_line_mixing_text_and_tag2(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_line_followed_by_newline(void) {
+void test_line_followed_by_newline(void) {
     P4_Grammar* grammar = P4_CreateMustacheGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 
@@ -754,7 +754,7 @@ P4_PRIVATE(void) test_line_followed_by_newline(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_entry(void) {
+void test_entry(void) {
     P4_Grammar* grammar = P4_CreateMustacheGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
 

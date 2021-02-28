@@ -17,7 +17,7 @@
  * Output:
  *   NULL
  */
-P4_PRIVATE(void) test_maximum_recursion_limit(void) {
+void test_maximum_recursion_limit(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(P4_Ok,
@@ -53,7 +53,7 @@ P4_PRIVATE(void) test_maximum_recursion_limit(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_replace_grammar_rule(void) {
+void test_replace_grammar_rule(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(P4_Ok, P4_AddLiteral(grammar, ENTRY, "{{", true));
@@ -73,7 +73,7 @@ P4_PRIVATE(void) test_replace_grammar_rule(void) {
     P4_DeleteGrammar(grammar);
 }
 
-P4_PRIVATE(void) test_replace_grammar_rule_refreshing_references(void) {
+void test_replace_grammar_rule_refreshing_references(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(P4_Ok, P4_AddLiteral(grammar, REFERENCE, "{{", true));

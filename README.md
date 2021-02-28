@@ -181,7 +181,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    if (P4_AddLiteral(grammar, HW_ID, "HelloWorld", false) != P4_Ok) {
+    if (P4_AddLiteral(grammar, ENTRY, "HelloWorld", false) != P4_Ok) {
         printf("Error: AddLiteral: MemoryError.\n");
         return 1;
     }
@@ -285,7 +285,7 @@ In this example we match an ASCII digit.
 // ENTRY <- [0-9]
 
 //                               lower     upper
->> P4_AddLiteral(grammar, ENTRY, '0',      '9');
+>> P4_AddRange(grammar, ENTRY,   '0',      '9');
 P4_Ok
 
 >> P4_Source* source = P4_Source("0", ENTRY);
@@ -299,7 +299,7 @@ In this example we match the code points starting from `U+4E00` to `U+9FCC`, e.g
 
 ```c
 //                               lower     upper
->> P4_AddLiteral(grammar, ENTRY, 0x4E00,   0x9FFF);
+>> P4_AddRange(grammar, ENTRY,   0x4E00,   0x9FFF);
 P4_Ok
 
 >> P4_Source* source = P4_Source("好", ENTRY);
@@ -841,12 +841,21 @@ If valgrind is installed, you can also run the test along with memory leak check
 (build) $ make check
 ```
 
+If you feel having a testing environment is hard, try docker:
+
+```bash
+$ docker run --rm -v `pwd`:/app -it ubuntu:latest bash
+# apt-get install gcc gdb valgrind make cmake python3 python3-venv python3-pip doxygen
+# mkdir -p build && cd build && cmake .. && make check
+```
+
 ## Docs
 
 Peppa PEG docs can be built via doxygen:
 
 ```bash
-$ doxygen .doxygen.conf
+(root) $ cd build
+(build) $ rm -rf docs && make docs
 ```
 
 The outputs are stored on `build/docs`.
@@ -857,6 +866,6 @@ The outputs are stored on `build/docs`.
 * Write a Mustache Parser using Peppa PEG: [mustache.h](examples/mustache.h).
 * Write a JSON Parser using Peppa PEG: [json.h](examples/json.h).
 
-Made with ❤️  by [@soasme](https://github.com/soasme).
+Made with ❤️  by [Ju](https://github.com/soasme).
 
 [PEG]: https://en.wikipedia.org/wiki/Parsing_expression_grammar

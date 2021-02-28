@@ -15,7 +15,7 @@
  *    START: "'"
  *    END: "'"
  */
-P4_PRIVATE(void) test_match_back_reference_successfully(void) {
+void test_match_back_reference_successfully(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -74,7 +74,7 @@ P4_PRIVATE(void) test_match_back_reference_successfully(void) {
  * Output:
  *  NULL
  */
-P4_PRIVATE(void) test_match_back_reference_latter_not_match(void) {
+void test_match_back_reference_latter_not_match(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -119,7 +119,7 @@ P4_PRIVATE(void) test_match_back_reference_latter_not_match(void) {
  *    MARKER: "TAG"
  *    MARKER: "tag"
  */
-P4_PRIVATE(void) test_match_back_reference_insensitive_match(void) {
+void test_match_back_reference_insensitive_match(void) {
     TEST_IGNORE_MESSAGE("insensitive backref not implementated");
 }
 

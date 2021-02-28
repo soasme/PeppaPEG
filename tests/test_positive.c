@@ -9,7 +9,7 @@
  * Output:
  *  ENTRY: Hello WORLD
  */
-P4_PRIVATE(void) test_match_positive_successfully(void) {
+void test_match_positive_successfully(void) {
 # define ENTRY  1
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
@@ -59,7 +59,7 @@ P4_PRIVATE(void) test_match_positive_successfully(void) {
  *  ENTRY:
  *    R2: Hello WORLD
  */
-P4_PRIVATE(void) test_match_positive_consumes_no_input(void) {
+void test_match_positive_consumes_no_input(void) {
 # define ENTRY  1
 # define R1     2
 # define R2     3
@@ -123,7 +123,7 @@ P4_PRIVATE(void) test_match_positive_consumes_no_input(void) {
  * Output:
  *  NULL
  */
-P4_PRIVATE(void) test_match_positive_failed(void) {
+void test_match_positive_failed(void) {
 # define ENTRY  1
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);

@@ -32,6 +32,12 @@
 
 #include "peppapeg.h"
 
+/** It indicates the function or type is for public use. */
+# define P4_PUBLIC
+
+/** It indicates the function or type is not for public use. */
+# define P4_PRIVATE(type) static type
+
 # define                        IS_TIGHT(e) (((e)->flag & P4_FLAG_TIGHT) != 0)
 # define                        IS_SCOPED(e) (((e)->flag & P4_FLAG_SCOPED) != 0)
 # define                        IS_SPACED(e) (((e)->flag & P4_FLAG_SPACED) != 0)
@@ -1391,11 +1397,11 @@ P4_Parse(P4_Grammar* grammar, P4_Source* source) {
 
 
 P4_PUBLIC bool
-P4_HasError(P4_Source* src) {
-    if (src == NULL)
+P4_HasError(P4_Source* source) {
+    if (source == NULL)
         return false;
 
-    return src->err != P4_Ok;
+    return source->err != P4_Ok;
 }
 
 P4_PUBLIC P4_Error

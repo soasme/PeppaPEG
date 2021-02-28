@@ -11,7 +11,7 @@
  * Output:
  *  NULL
  */
-P4_PRIVATE(void) test_match_zeroormore_at_least_zero(void) {
+void test_match_zeroormore_at_least_zero(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -42,7 +42,7 @@ P4_PRIVATE(void) test_match_zeroormore_at_least_zero(void) {
  * Output:
  *  ENTRY: "00000"
  */
-P4_PRIVATE(void) test_match_zeroormore_multiple_times(void) {
+void test_match_zeroormore_multiple_times(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -79,7 +79,7 @@ P4_PRIVATE(void) test_match_zeroormore_multiple_times(void) {
  * Output:
  *  ENTRY: "0"
  */
-P4_PRIVATE(void) test_match_onceormore_at_least_once(void) {
+void test_match_onceormore_at_least_once(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -116,7 +116,7 @@ P4_PRIVATE(void) test_match_onceormore_at_least_once(void) {
  * Output:
  *  ENTRY: "00000"
  */
-P4_PRIVATE(void) test_match_onceormore_multiple_times(void) {
+void test_match_onceormore_multiple_times(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -155,7 +155,7 @@ P4_PRIVATE(void) test_match_onceormore_multiple_times(void) {
  * Output:
  *  NULL
  */
-P4_PRIVATE(void) test_match_onceormore_zero_raise_match_error(void) {
+void test_match_onceormore_zero_raise_match_error(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -186,7 +186,7 @@ P4_PRIVATE(void) test_match_onceormore_zero_raise_match_error(void) {
  * Output:
  *  NULL
  */
-P4_PRIVATE(void) test_match_zerooronce_match_empty(void) {
+void test_match_zerooronce_match_empty(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -217,7 +217,7 @@ P4_PRIVATE(void) test_match_zerooronce_match_empty(void) {
  * Output:
  *  ENTRY: "0"
  */
-P4_PRIVATE(void) test_match_zerooronce_exact_once(void) {
+void test_match_zerooronce_exact_once(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -254,7 +254,7 @@ P4_PRIVATE(void) test_match_zerooronce_exact_once(void) {
  * Output:
  *  ENTRY: "0"
  */
-P4_PRIVATE(void) test_match_zerooronce_at_most_once(void) {
+void test_match_zerooronce_at_most_once(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -291,7 +291,7 @@ P4_PRIVATE(void) test_match_zerooronce_at_most_once(void) {
  * Output:
  *  ENTRY: "00000"
  */
-P4_PRIVATE(void) test_match_repeat_exact_successfully(void) {
+void test_match_repeat_exact_successfully(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -330,7 +330,7 @@ P4_PRIVATE(void) test_match_repeat_exact_successfully(void) {
  * Output:
  *  NULL
  */
-P4_PRIVATE(void) test_match_repeat_exact_no_less(void) {
+void test_match_repeat_exact_no_less(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -363,7 +363,7 @@ P4_PRIVATE(void) test_match_repeat_exact_no_less(void) {
  * Output:
  *  NULL
  */
-P4_PRIVATE(void) test_match_repeat_exact_insufficient_attaching_unmatch(void) {
+void test_match_repeat_exact_insufficient_attaching_unmatch(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -394,7 +394,7 @@ P4_PRIVATE(void) test_match_repeat_exact_insufficient_attaching_unmatch(void) {
  * Output:
  *  ENTRY: "00000"
  */
-P4_PRIVATE(void) test_match_repeat_exact_no_more(void) {
+void test_match_repeat_exact_no_more(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(

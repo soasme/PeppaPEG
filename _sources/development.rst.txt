@@ -1,6 +1,50 @@
 Development
 ===========
 
+Build
+-----
+
+Peppa PEG test requires downloading the test framework Unity:
+
+.. code-block:: console
+
+    $ git submodule init
+    $ git submodule update
+
+Assume you have cmake and gcc installed.
+
+.. code-block:: console
+
+    $ cmake -E make_directory ./build
+    $ cd build
+    $ cmake ..
+
+If you have Valgrind installed, you can enable `ENABLE_VALGRIND`.
+
+.. code-block:: console
+
+    $ cmake -DENABLE_VALGRIND ..
+
+If you have doxygen and Python3 installed, you can enable `ENABLE_DOCS`.
+
+.. code-block:: console
+
+    $ cmake -DENABLE_DOCS ..
+
+To build test,
+
+.. code-block:: console
+
+    $ cmake --build . --target check
+
+To build docs,
+
+.. code-block:: console
+
+    $ cmake --build . --target docs
+
+Peppa PEG uses GitHub Actions building docs on pushing changes to main branch. The built static site is pushed to gh-pages branch and published to <https://www.soasme.com/PeppaPEG/>.
+
 Debug
 -----
 

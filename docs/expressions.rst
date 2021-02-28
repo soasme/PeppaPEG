@@ -142,7 +142,7 @@ The index value of a BackReference must not be the index of itself.
         P4_CreateBackReference(2)
     );
 
-:seealso: :c:enum:`P4_BackReference`, :c:func:`P4_CreateBackReference`, :c:func:`P4_AddBackReference`.
+:seealso: :c:enum:`P4_BackReference`, :c:func:`P4_CreateBackReference`.
 
 Choice
 ------
@@ -195,6 +195,8 @@ Reference
 
 Reference **matches a string based on the referenced grammar rule**.
 
+A grammar includes a set of grammar rules.  Each grammar rule is built from :c:struct:`P4_Expression` and is associated with an id.  A grammar rule can then be referenced in other grammar rules.
+
 .. code-block:: c
 
     typedef enum { Entry, Text, ... };
@@ -205,13 +207,7 @@ Reference **matches a string based on the referenced grammar rule**.
 
 The referenced grammar rule must exist before calling :c:func:`P4_Parse`.
 
-.. note::
-
-    A grammar includes a set of grammar rules.
-    Each grammar rule is built from :c:struct:`P4_Expression` and is associated with an id.
-    A grammar rule can then be referenced in other grammar rules.
-
-:seealso: :c:enum:`P4_Reference`, :c:func:`P4_CreateReference`, :c:func`P4_AddReference`.
+:seealso: :c:enum:`P4_Reference`, :c:func:`P4_CreateReference`, :c:func:`P4_AddReference`.
 
 Positive
 --------
@@ -235,9 +231,9 @@ Positive can be useful in limiting the possibilities of the latter member in a S
         P4_CreateLiteral("Hello World", false)
     );
 
-:seealso: :c:enum:`P4_Positive`, :c:enum:`P4_CreatePositive`, :c:enum:`P4_AddPositive`.
+:seealso: :c:enum:`P4_Positive`, :c:func:`P4_CreatePositive`, :c:func:`P4_AddPositive`.
 
-Positive
+Negative
 --------
 
 Negative **tests if the sub-expression does not match**.
@@ -259,7 +255,7 @@ Negative can be useful in limiting the possiblities of the latter member in a Se
         P4_CreateLiteral("Hello World", false)
     );
 
-:seealso: :c:enum:`P4_Negative`, :c:enum:`P4_CreateNegative`, :c:enum:`P4_AddNegative`.
+:seealso: :c:enum:`P4_Negative`, :c:func:`P4_CreateNegative`, :c:func:`P4_AddNegative`.
 
 Repeat
 ------
@@ -302,7 +298,7 @@ The repetition can also be set with designated min or max times.
 
 .. note::
 
-    All Repeat expressions can be rewritten with P4_CreateRepeatMinMax, but using the derived names can improve the readability of the code:
+    All Repeat expressions can be rewritten with P4_CreateRepeatMinMax.
 
     * ZeroOrOnce: P4_CreateRepeatMinMax(expr, 0, 1);
     * ZeroOrMore: P4_CreateRepeatMinMax(expr, 0, SIZE_MAX);
@@ -311,4 +307,6 @@ The repetition can also be set with designated min or max times.
     * RepeatMax: P4_CreateRepeatMinMax(expr, 0, max);
     * RepeatExact: P4_CreateRepeatMinMax(expr, n, n);
 
-:seealso: :c:enum:`P4_Repeat`, :c:enum:`P4_CreateZeroOrOnce`, :c:enum:`P4_CreateZeroOrMore`, :c:enum:`P4_CreateOnceOrMore`, :c:enum:`P4_CreateRepeatMin`, :c:enum:`P4_CreateRepeatMax`, :c:enum:`P4_CreateRepeatMinMax`, :c:enum:`P4_CreateRepeatExact`, :c:enum:`P4_AddZeroOrOnce`, :c:enum:`P4_AddZeroOrMore`, :c:enum:`P4_AddOnceOrMore`, :c:enum:`P4_AddRepeatMin`, :c:enum:`P4_AddRepeatMax`, :c:enum:`P4_AddRepeatMinMax`, :c:enum:`P4_AddRepeatExact`.
+    However, using the derived names can improve the readability of the code.
+
+:seealso: :c:enum:`P4_Repeat`, :c:func:`P4_CreateZeroOrOnce`, :c:func:`P4_CreateZeroOrMore`, :c:func:`P4_CreateOnceOrMore`, :c:func:`P4_CreateRepeatMin`, :c:func:`P4_CreateRepeatMax`, :c:func:`P4_CreateRepeatMinMax`, :c:func:`P4_CreateRepeatExact`, :c:func:`P4_AddZeroOrOnce`, :c:func:`P4_AddZeroOrMore`, :c:func:`P4_AddOnceOrMore`, :c:func:`P4_AddRepeatMin`, :c:func:`P4_AddRepeatMax`, :c:func:`P4_AddRepeatMinMax`, :c:func:`P4_AddRepeatExact`.

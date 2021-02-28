@@ -14,9 +14,10 @@ Table of Contents
 
    getting_started
    expressions
+   flags
    references
    whatsnew
-   development/*
+   development
 
 
 

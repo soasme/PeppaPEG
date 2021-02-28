@@ -140,7 +140,7 @@ P4_PRIVATE(P4_Token*)           P4_MatchSequence(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchChoice(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchRepeat(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchSpacedExpressions(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchBackReference(P4_Source*, P4_Expression*, P4_Slice*, size_t);
+P4_PRIVATE(P4_Token*)           P4_MatchBackReference(P4_Source*, P4_Expression*, P4_Slice*, P4_Expression*);
 
 /**
  *
@@ -558,7 +558,7 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
         P4_MarkPosition(s, member_startpos);
 
         if (member->kind == P4_BackReference) {
-            tok = P4_MatchBackReference(s, e, backrefs, member->backref_index);
+            tok = P4_MatchBackReference(s, e, backrefs, member);
             if (!NO_ERROR(s)) goto finalize;
         } else {
             tok = P4_Match(s, member);
@@ -930,11 +930,13 @@ P4_MatchSpacedExpressions(P4_Source* s, P4_Expression* e) {
 }
 
 P4_PRIVATE(P4_Token*)
-P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, size_t index) {
+P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Expression* backref) {
     if (backrefs == NULL) {
         P4_RaiseError(s, P4_NullError, "");
         return NULL;
     }
+
+    size_t index = backref->backref_index;
 
     if (index > e->count) {
         P4_RaiseError(s, P4_IndexError, "BackReference Index OutOfBound");
@@ -961,7 +963,7 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, size_t
         return NULL;
     }
 
-    P4_Expression* litexpr = P4_CreateLiteral(litstr, true);
+    P4_Expression* litexpr = P4_CreateLiteral(litstr, backref->sensitive);
 
     if (litexpr == NULL) {
         P4_RaiseError(s, P4_MemoryError, "OOM");
@@ -1222,12 +1224,13 @@ P4_CreateOnceOrMore(P4_Expression* repeat) {
 }
 
 P4_PUBLIC P4_Expression*
-P4_CreateBackReference(size_t index) {
+P4_CreateBackReference(size_t index, bool sensitive) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->id = 0;
     expr->kind = P4_BackReference;
     expr->flag = 0;
     expr->backref_index = index;
+    expr->sensitive = sensitive;
     return expr;
 }
 

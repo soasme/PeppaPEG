@@ -4,7 +4,6 @@
 - [ ] Report line num & col.
 - [ ] Run in VERBOSE mode.
 - [ ] Add traverse functions for Tokens.
-- [ ] Callbacks for P4_Token.
 - [ ] Dynamically change grammar rules.
 - [ ] New Expression Kind: Numeric.
 - [ ] New Expression Kind: CharacterSet.
@@ -21,13 +20,15 @@
 - [ ] Cache literal len.
 - [ ] backrefs is not necessary if there is no BackReference in Sequence.
 - [ ] A binary executable for display parsed results in JSON output. The executable can support general programming languages, such as Mustache, Python, JSON, YAML, etc. Some other programs can then takes the input from stdin and do some fancy work. `peppapeg --lang=py38 source.py`
-- [ ] Create docs and push it to gh-pages branch.
 - [ ] Add tutorials (json, mustache, ini) in docs.
 - [ ] Add how-to guides in docs.
-- [ ] Add doxygen references in docs.
 - [ ] Add explanations in docs.
 - [ ] Enable AddressSanitizer. Example: cJSON.
 - [ ] Return NullError for CreatePositive/CreateNegative/....
+- [x] Case insensitive BackReference. Added in v1.5.0.
+- [x] Create docs and push it to gh-pages branch. Added in v1.5.0.
+- [x] Add doxygen references in docs. Added in v1.5.0.
+- [x] Callbacks for P4_Token. Added in v1.4.0.
 - [x] Example JSON: rfc7159. Added in v1.4.0.
 - [x] Auto generate documentation for functions and defined macros. Example: doxygen. Added in v1.4.0.
 - [x] NeedLoosen, NeedSquash, NeedLift should be well-tested.

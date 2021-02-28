@@ -12,6 +12,8 @@ Ultra lightweight PEG Parser in ANSI C. ✨ 🐷 ✨.
 ```
 
 [![Build Status](https://travis-ci.com/soasme/PeppaPEG.svg?branch=main)](https://travis-ci.com/github/soasme/PeppaPEG)
+|
+[![Docs](https://img.shields.io/badge/docs-soasme.com-green)](https://www.soasme.com/PeppaPEG)
 
 # Table of Contents
 
@@ -387,13 +389,15 @@ Sequence expression can have BackReference members. They are useful when verbati
 
 Function `P4_CreateBackReference` creates a back reference with the index of a previous member. The index starts with zero.
 
+BackReference supports case insensitive.
+
 For example, the below grammar can match `'...'` or `"..."`, but cannot match `"...'` or `'..."`.
 
 ```c
 >> P4_AddSequenceWithMembers(grammar, ENTRY, 3,
 ..   P4_CreateReference(MARKER),
 ..   P4_CreateLiteral("...", true),
-..   P4_CreateBackReference(0)
+..   P4_CreateBackReference(0, true)
 .. );
 >> P4_AddChoiceWithMembers(grammar, MARKER, 2,
 ..   P4_CreateLiteral("'", true),

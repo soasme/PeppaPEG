@@ -1,6 +1,9 @@
 name: CMake
 
-on: [push]
+on:
+  push:
+    branches:
+      - 'master'
 
 env:
   DOCS: On

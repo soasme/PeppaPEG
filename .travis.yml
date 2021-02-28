@@ -1,0 +1,23 @@
+dist: trusty
+sudo: false
+language: c
+env:
+  matrix:
+    - VALGRIND=On DOCS=On
+compiler:
+  - gcc
+addons:
+  apt:
+    packages:
+      - valgrind
+      - doxygen
+      - python3
+      - python3-pip
+      - python3-sphinx
+script:
+  - mkdir build
+  - cd build
+  - cmake .. -DENABLE_VALGRIND="${VALGRIND}" -DENABLE_DOCS="${DOCS}"
+  - make
+  - make check
+  - make docs

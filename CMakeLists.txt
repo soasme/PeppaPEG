@@ -35,7 +35,6 @@ if (ENABLE_DOCS)
     )
 
     find_program(PYTHON python3)
-    find_program(PYTHONVENV python3-venv)
 
     set(VIRTUALENV ${PYTHON} "-mvenv")
     set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/docs)

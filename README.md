@@ -11,6 +11,8 @@ Ultra lightweight PEG Parser in ANSI C. ✨ 🐷 ✨.
            |_|   |_|
 ```
 
+[![Build Status](https://travis-ci.com/soasme/PeppaPEG.svg?branch=main)](https://travis-ci.com/github/soasme/PeppaPEG)
+
 # Table of Contents
 
 * [Hello, There](#hello-there)

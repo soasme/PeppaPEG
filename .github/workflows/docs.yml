@@ -11,7 +11,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      submodules: true
+      with:
+        submodules: true
 
     - name: Install Dependencies
       run: sudo apt-get install -y doxygen python3 python3-pip python3-venv

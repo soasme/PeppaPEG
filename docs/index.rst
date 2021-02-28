@@ -13,6 +13,7 @@ Table of Contents
    :glob:
 
    getting_started
+   expressions
    references
    whatsnew
    development/*

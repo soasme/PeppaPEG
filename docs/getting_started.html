@@ -1,0 +1,376 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Expressions" href="expressions.html" /><link rel="prev" title="Peppa PEG’s Documentation" href="index.html" />
+
+    <meta name="generator" content="sphinx-3.5.1, furo 2021.02.27.beta26"/>
+        <title>Getting Started - Peppa PEG 1.4.0 documentation</title>
+      <link rel="stylesheet" href="_static/styles/furo.css?digest=8304b39bb3b7aeb8294a71b3712567f018b3dac4">
+    <link rel="stylesheet" href="_static/pygments.css">
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
+    
+
+
+<style>
+  :root {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+
+  /* For allowing end-user-specific overrides */
+  .override-light {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  .override-dark {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+</style><link rel="stylesheet" href="_static/styles/furo-extensions.css?digest=d391b54134226e4196576da3bdb6dddb7e05ba2b"></head>
+  <body dir="">
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">Peppa PEG 1.4.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">Peppa PEG 1.4.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html">
+  <input class="sidebar-search" placeholder=Search name="q">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="expressions.html">Expressions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flags.html">Expression Flags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="whatsnew.html">What’s New</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <main class="main">
+    <div class="content">
+      <article role="main">
+        <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        </label>
+        <div class="section" id="getting-started">
+<span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="header-file-and-source-file">
+<h2>Header File and Source File<a class="headerlink" href="#header-file-and-source-file" title="Permalink to this headline">¶</a></h2>
+<p>Peppa PEG has a header file and a C file, so you can add it to your project by copying files <cite>peppapeg.h</cite> and <cite>peppapeg.c</cite>.</p>
+<p>Peppa PEG assumes your project is ANSI C (C89, or C90) compatible.</p>
+<p>Once copied, add include macro and start using the library:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#include "peppapeg.h"</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="data-structures">
+<h2>Data Structures<a class="headerlink" href="#data-structures" title="Permalink to this headline">¶</a></h2>
+<p>All of the data structures and functions provided by Peppa PEG start with <cite>P4_</cite>
+(Count the number of character “P” in <strong>P</strong> e <strong>p</strong> <strong>p</strong> a <strong>P</strong> E G).</p>
+<p>Let’s learn some basic P4 data structures:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="references.html#c.P4_Grammar" title="P4_Grammar"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Grammar</span></code></a>: The grammar object that defines all grammar rules.</p></li>
+<li><p><a class="reference internal" href="references.html#c.P4_Expression" title="P4_Expression"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Expression</span></code></a>: The grammar rule object.</p></li>
+<li><p><a class="reference internal" href="references.html#c.P4_Source" title="P4_Source"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Source</span></code></a>: The content to parse.</p></li>
+<li><p><a class="reference internal" href="references.html#c.P4_Token" title="P4_Token"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Token</span></code></a>. The building block of an AST (abstract syntax tree), e.g. the final parsing result of a grammar given the source.</p></li>
+</ul>
+</div>
+<div class="section" id="step-1-create-grammar">
+<h2>Step 1: Create Grammar<a class="headerlink" href="#step-1-create-grammar" title="Permalink to this headline">¶</a></h2>
+<p>In Peppa PEG, we always start with creating a <a class="reference internal" href="references.html#c.P4_Grammar" title="P4_Grammar"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Grammar</span></code></a>. We create such a data structure using <a class="reference internal" href="references.html#c.P4_CreateGrammar" title="P4_CreateGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateGrammar()</span></code></a>.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">grammar</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+     <span class="n">printf</span><span class="p">(</span><span class="s">"Error: CreateGrammar: MemoryError.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+     <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="step-2-add-grammar-rule">
+<h2>Step 2: Add Grammar Rule<a class="headerlink" href="#step-2-add-grammar-rule" title="Permalink to this headline">¶</a></h2>
+<p>There are plenty kinds of rules in PEG. In this example, we use the simplest, <a class="reference internal" href="references.html#c.P4_ExpressionKind" title="P4_ExpressionKind"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_Literal</span></code></a>. We add such a rule using <a class="reference internal" href="references.html#c.P4_AddLiteral" title="P4_AddLiteral"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_AddLiteral()</span></code></a>.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s">"HelloWorld"</span><span class="p">,</span> <span class="nb">false</span><span class="p">)</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"Error: AddLiteral: MemoryError.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The second parameter is a numeric ID for the grammar rule. Each rule has its unique ID. The third parameter is the exact string to match. The fourth parameter determines if the string is case sensitive.</p>
+</div>
+<div class="section" id="step-3-create-source">
+<h2>Step 3: Create Source<a class="headerlink" href="#step-3-create-source" title="Permalink to this headline">¶</a></h2>
+<p>We create a <a class="reference internal" href="references.html#c.P4_Source" title="P4_Source"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Source</span></code></a> using <a class="reference internal" href="references.html#c.P4_CreateSource" title="P4_CreateSource"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateSource()</span></code></a>.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Source</span><span class="o">*</span>  <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s">"HelloWorld"</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">source</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"Error: CreateSource: MemoryError.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The first parameter is the content of the source. The second parameter is the ID of the entry grammar rule.</p>
+</div>
+<div class="section" id="step-4-parse">
+<h2>Step 4: Parse<a class="headerlink" href="#step-4-parse" title="Permalink to this headline">¶</a></h2>
+<p>Now the stage is setup; call <a class="reference internal" href="references.html#c.P4_Parse" title="P4_Parse"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_Parse()</span></code></a>. If everything is okay, it returns a zero value - <a class="reference internal" href="references.html#c.P4_Error" title="P4_Error"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_Ok</span></code></a>.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"Error: Parse failed.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="step-5-traverse-token-tree">
+<h2>Step 5: Traverse Token Tree<a class="headerlink" href="#step-5-traverse-token-tree" title="Permalink to this headline">¶</a></h2>
+<p>P4_Source contains a token tree if parse successfully. We get the root node of such a token tree using <a class="reference internal" href="references.html#c.P4_GetSourceAst" title="P4_GetSourceAst"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_GetSourceAst()</span></code></a>.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Token</span><span class="o">*</span> <span class="n">node</span>   <span class="o">=</span> <span class="n">P4_GetSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
+<span class="kt">char</span><span class="o">*</span>     <span class="n">text</span>   <span class="o">=</span> <span class="n">P4_CopyTokenString</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>To traverse the AST,</p>
+<ul class="simple">
+<li><p><cite>node-&gt;head</cite> is the first children.</p></li>
+<li><p><cite>node-&gt;tail</cite> is the last children.</p></li>
+<li><p><cite>node-&gt;next</cite> is the next sibling.</p></li>
+<li><p><cite>node-&gt;slice.i</cite> is the start position in the source string that the token covers.</p></li>
+<li><p><cite>node-&gt;slice.j</cite> is the end position in the source string that the token covers.</p></li>
+<li><p><a class="reference internal" href="references.html#c.P4_CopyTokenString" title="P4_CopyTokenString"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CopyTokenString()</span></code></a> returns the string the AST node covers.</p></li>
+</ul>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">printf</span><span class="p">(</span><span class="s">"root span: [%lu %lu]</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">slice</span><span class="p">.</span><span class="n">i</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">slice</span><span class="p">.</span><span class="n">j</span><span class="p">);</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">"root next: %p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">);</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">"root head: %p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">);</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">"root tail: %p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">tail</span><span class="p">);</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">"root text: %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">text</span><span class="p">);</span>
+
+<span class="n">free</span><span class="p">(</span><span class="n">text</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="step-6-clean-up">
+<h2>Step 6: Clean Up<a class="headerlink" href="#step-6-clean-up" title="Permalink to this headline">¶</a></h2>
+<p>Last but not least, don’t forget to free all the allocated memory.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="references.html#c.P4_DeleteSource" title="P4_DeleteSource"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_DeleteSource()</span></code></a> deletes the source along with the entire token tree.</p></li>
+<li><p><a class="reference internal" href="references.html#c.P4_DeleteGrammar" title="P4_DeleteGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_DeleteGrammar()</span></code></a> deletes the grammar along with all the grammar rules.</p></li>
+</ul>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_DeleteSource</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
+<span class="n">P4_DeleteGrammar</span><span class="p">(</span><span class="n">grammar</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="full-example-code">
+<h2>Full Example Code<a class="headerlink" href="#full-example-code" title="Permalink to this headline">¶</a></h2>
+<p>The complete code for this example:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">"peppapeg.h"</span><span class="cp"></span>
+
+<span class="cp"># define ENTRY 1</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+    <span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">grammar</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"Error: CreateGrammar: MemoryError.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">ENTRY</span><span class="p">,</span> <span class="s">"HelloWorld"</span><span class="p">,</span> <span class="nb">false</span><span class="p">)</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"Error: AddLiteral: MemoryError.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">P4_Source</span><span class="o">*</span>  <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s">"HelloWorld"</span><span class="p">,</span> <span class="n">ENTRY</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">source</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"Error: CreateSource: MemoryError.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"Error: Parse: ErrCode[%lu] Message[%s]</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
+            <span class="n">P4_GetError</span><span class="p">(</span><span class="n">source</span><span class="p">),</span>
+            <span class="n">P4_GetErrorMessage</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="p">);</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">P4_Token</span><span class="o">*</span>   <span class="n">root</span> <span class="o">=</span> <span class="n">P4_GetSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
+    <span class="kt">char</span><span class="o">*</span>       <span class="n">text</span> <span class="o">=</span> <span class="n">P4_CopyTokenString</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
+
+    <span class="n">printf</span><span class="p">(</span><span class="s">"root span: [%lu %lu]</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="n">slice</span><span class="p">.</span><span class="n">i</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="n">slice</span><span class="p">.</span><span class="n">j</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"root next: %p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"root head: %p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"root tail: %p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="n">tail</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"root text: %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">text</span><span class="p">);</span>
+
+    <span class="n">free</span><span class="p">(</span><span class="n">text</span><span class="p">);</span>
+    <span class="n">P4_DeleteSource</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
+    <span class="n">P4_DeleteGrammar</span><span class="p">(</span><span class="n">grammar</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
+<p>In this tutorial, we walk through the basic data structures and combine them in one example. The example parses nothing but “HelloWorld” to a single token.</p>
+<p>I hope this example can get you a basic understanding of Peppa PEG. Now you can go back to <a class="reference internal" href="index.html#main"><span class="std std-ref">Peppa PEG’s Documentation</span></a> and pick more docs to read!</p>
+</div>
+</div>
+
+      </article>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="expressions.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Expressions</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="index.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Home</div>
+                
+              </div>
+            </a>
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; 2021, Ju
+            |
+            Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+              and
+              <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+              <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+            |
+            <a class="muted-link" href="_sources/getting_started.rst.txt"
+               rel="nofollow">
+              Show Source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Getting Started</a><ul>
+<li><a class="reference internal" href="#header-file-and-source-file">Header File and Source File</a></li>
+<li><a class="reference internal" href="#data-structures">Data Structures</a></li>
+<li><a class="reference internal" href="#step-1-create-grammar">Step 1: Create Grammar</a></li>
+<li><a class="reference internal" href="#step-2-add-grammar-rule">Step 2: Add Grammar Rule</a></li>
+<li><a class="reference internal" href="#step-3-create-source">Step 3: Create Source</a></li>
+<li><a class="reference internal" href="#step-4-parse">Step 4: Parse</a></li>
+<li><a class="reference internal" href="#step-5-traverse-token-tree">Step 5: Traverse Token Tree</a></li>
+<li><a class="reference internal" href="#step-6-clean-up">Step 6: Clean Up</a></li>
+<li><a class="reference internal" href="#full-example-code">Full Example Code</a></li>
+<li><a class="reference internal" href="#conclusion">Conclusion</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </main>
+</div>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+</html>

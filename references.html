@@ -3,9 +3,9 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Change Log" href="whatsnew.html" /><link rel="prev" title="Expression Flags" href="flags.html" />
 
-    <meta name="generator" content="sphinx-3.5.1, furo 2021.02.27.beta26"/>
+    <meta name="generator" content="sphinx-3.5.1, furo 2021.02.28.beta28"/>
         <title>References - Peppa PEG 1.5.0 documentation</title>
-      <link rel="stylesheet" href="_static/styles/furo.css?digest=8304b39bb3b7aeb8294a71b3712567f018b3dac4">
+      <link rel="stylesheet" href="_static/styles/furo.css?digest=be5985a4059b5c2cd56ed0804790452beca62674">
     <link rel="stylesheet" href="_static/pygments.css">
     <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
     
@@ -627,6 +627,27 @@
 <p>The object holds a full copy of the literal. </p>
 </dd></dl>
 <dl class="c function">
+<dt id="c.P4_AddLiteral">
+<span class="target" id="peppapeg_8h_1a3ceb049b409973acf903f30136d292ea"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddLiteral</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <em class="property"><span class="pre">const</span></em> <span class="pre">P4_String</span>, <span class="pre">bool</span> <em><span class="pre">sensitive</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddLiteral" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Add a literal expression as grammar rule.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"let"</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The error code.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">literal</span></code>: The exact string to match. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sensitive</span></code>: Whether the string is case-sensitive. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
 <dt id="c.P4_CreateRange">
 <span class="target" id="peppapeg_8h_1a2b1e7ba4cadd048f2e28218fad8f958b"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateRange</span></code><span class="sig-paren">(</span><span class="pre">P4_Rune</span>, <span class="pre">P4_Rune</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateRange" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Range expression.</p>
@@ -642,6 +663,29 @@
 <dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
 </dd>
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">lower</span></code>: The lower bound of UTF-8 rule to match (inclusive). </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">upper</span></code>: The upper bound of UTF-8 rule to match (inclusive). </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_AddRange">
+<span class="target" id="peppapeg_8h_1a91c7f482081cffe7a1fd878358a7901d"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddRange</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">P4_Rune</span>, <span class="pre">P4_Rune</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddRange" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Add a range expression as grammar rule.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddRange</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'0'</span><span class="p">,</span> <span class="s1">'9'</span><span class="p">);</span>
+
+ <span class="n">P4_AddRange</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mh">0x4E00</span><span class="p">,</span> <span class="mh">0x9FFF</span><span class="p">);</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The error code.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">lower</span></code>: The lower bound of UTF-8 rule to match (inclusive). </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">upper</span></code>: The upper bound of UTF-8 rule to match (inclusive). </p></li>
 </ul>
@@ -668,6 +712,26 @@
 </p>
 </dd></dl>
 <dl class="c function">
+<dt id="c.P4_AddReference">
+<span class="target" id="peppapeg_8h_1ae7bf61c3e305feaf4485735e6bddc623"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddReference</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">P4_RuleID</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddReference" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Add a reference expression as grammar rule.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddReference</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The error code.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ref_id</span></code>: The ID of referenced grammar rule. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
 <dt id="c.P4_CreatePositive">
 <span class="target" id="peppapeg_8h_1ad1ecf3ea8eb8ca643ea80aa5efa2007d"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreatePositive</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreatePositive" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Positive expression.</p>
@@ -680,6 +744,26 @@
 <dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
 </dd>
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">refexpr</span></code>: The positive pattern to check. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_AddPositive">
+<span class="target" id="peppapeg_8h_1ae7c0e21b42dbb220e4ac16aac23ee89c"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddPositive</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddPositive" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Add a positive expression as grammar rule.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddPositive</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"let"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The error code.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">refexpr</span></code>: The positive pattern to check. </p></li>
 </ul>
 </dd>
@@ -706,6 +790,26 @@
 </p>
 </dd></dl>
 <dl class="c function">
+<dt id="c.P4_AddNegative">
+<span class="target" id="peppapeg_8h_1a0e7b92d6ac6c285c55779de054f549b6"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddNegative</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddNegative" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Add a negative expression as grammar rule.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddNegative</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"let"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The error code.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">refexpr</span></code>: The negative pattern to check. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
 <dt id="c.P4_CreateSequence">
 <span class="target" id="peppapeg_8h_1ada3acc9dce62a0c7d839b6393bca8716"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateSequence</span></code><span class="sig-paren">(</span><span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateSequence" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Sequence expression.</p>
@@ -718,26 +822,6 @@
 </dd>
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">count</span></code>: The number of sequence members. </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-<p>Note that such an expression is useless as its members are all empty. Please set members using P4_SetMembers.</p>
-<p>This function can be useful if you need to add members dynamically. </p>
-</dd></dl>
-<dl class="c function">
-<dt id="c.P4_CreateChoice">
-<span class="target" id="peppapeg_8h_1afdbd1b716b6e4a30832398e5e7355bfb"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateChoice</span></code><span class="sig-paren">(</span><span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateChoice" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>Create a P4_Choice expression.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateChoice</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">count</span></code>: The number of choice members. </p></li>
 </ul>
 </dd>
 </dl>
@@ -770,6 +854,73 @@
 </p>
 </dd></dl>
 <dl class="c function">
+<dt id="c.P4_AddSequence">
+<span class="target" id="peppapeg_8h_1a1a1bc7bfb986b831ce422cce87fbe2f8"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddSequence</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddSequence" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Add a sequence expression as grammar rule.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddSequence</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The error code.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">count</span></code>: The number of sequence members. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+<p>Note that such an expression is useless as its members are all empty. Please set members using P4_SetMembers.</p>
+<p>This function can be useful if you need to add members dynamically. </p>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_AddSequenceWithMembers">
+<span class="target" id="peppapeg_8h_1a3c42966162f1dd87a40d037ae6e68451"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddSequenceWithMembers</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">size_t</span>, <span class="pre">...</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddSequenceWithMembers" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Add a sequence expression as grammar rule.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span>
+     <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"{"</span><span class="p">),</span>
+     <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">BODY</span><span class="p">),</span>
+     <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"}"</span><span class="p">)</span>
+ <span class="p">);</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The error code.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">count</span></code>: The number of sequence members. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">...</span></code>: The members. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_CreateChoice">
+<span class="target" id="peppapeg_8h_1afdbd1b716b6e4a30832398e5e7355bfb"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateChoice</span></code><span class="sig-paren">(</span><span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateChoice" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Create a P4_Choice expression.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateChoice</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">count</span></code>: The number of choice members. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+<p>Note that such an expression is useless as its members are all empty. Please set members using P4_SetMembers.</p>
+<p>This function can be useful if you need to add members dynamically. </p>
+</dd></dl>
+<dl class="c function">
 <dt id="c.P4_CreateChoiceWithMembers">
 <span class="target" id="peppapeg_8h_1ab9879a20f50c05e06506d8c13e45a41f"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateChoiceWithMembers</span></code><span class="sig-paren">(</span><span class="pre">size_t</span>, <span class="pre">...</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateChoiceWithMembers" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Choice expression.</p>
@@ -788,6 +939,53 @@
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">count</span></code>: The number of choice members. </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">...</span></code>: The vararg of every choice member. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_AddChoice">
+<span class="target" id="peppapeg_8h_1a174b886be6d0263ad2a20daab7129a80"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddChoice</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddChoice" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Add a choice expression as grammar rule.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddChoice</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The error code.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">count</span></code>: The number of choice members. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+<p>Note that such an expression is useless as its members are all empty. Please set members using P4_SetMembers.</p>
+<p>This function can be useful if you need to add members dynamically. </p>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_AddChoiceWithMembers">
+<span class="target" id="peppapeg_8h_1a89691bbe049dc811b16ef85abb039577"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddChoiceWithMembers</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">size_t</span>, <span class="pre">...</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddChoiceWithMembers" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Add a choice expression as grammar rule.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddChoiceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span>
+     <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">" "</span><span class="p">),</span>
+     <span class="n">P4_CreateReference</span><span class="p">(</span>\<span class="n">t</span><span class="p">),</span>
+     <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+ <span class="p">);</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The error code.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">count</span></code>: The number of choice members. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">...</span></code>: The members. </p></li>
 </ul>
 </dd>
 </dl>
@@ -818,6 +1016,32 @@
 </p>
 </dd></dl>
 <dl class="c function">
+<dt id="c.P4_AddRepeatMinMax">
+<span class="target" id="peppapeg_8h_1a8f62ad561fd83da8fc4e988a6238f9ac"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddRepeatMinMax</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span>, <span class="pre">size_t</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddRepeatMinMax" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Create a P4_Repeat expression minimal min times and maximal max times.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="ow">or</span> <span class="s2">"aaa"</span><span class="o">.</span>
+ <span class="n">P4_AddRepeatMinMax</span><span class="p">(</span>
+     <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span>
+     <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span>
+ <span class="p">);</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The error code.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">min</span></code>: The minimum repeat times. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max</span></code>: The maximum repeat times. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
 <dt id="c.P4_CreateRepeatMin">
 <span class="target" id="peppapeg_8h_1adcd1fde57f4974fcb81b0b94ac6537ef"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateRepeatMin</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateRepeatMin" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Repeat expression minimal min times and maximal SIZE_MAX times.</p>
@@ -837,6 +1061,28 @@
 </dl>
 </p>
 <p>It’s equivalent to P4_CreateRepeatMinMax(expr, min, SIZE_MAX); </p>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_AddRepeatMin">
+<span class="target" id="peppapeg_8h_1a9ea3b03f065249ebf2683736f1534055"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddRepeatMin</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddRepeatMin" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Create a RepeatMin expression as grammar rule.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="s2">"aaa"</span><span class="p">,</span> <span class="o">....</span>
+ <span class="n">P4_AddRepeatMin</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span> <span class="mi">1</span><span class="p">);</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The error code.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">min</span></code>: The minimum repeat times. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateRepeatMax">
@@ -860,6 +1106,28 @@
 <p>It’s equivalent to P4_CreateRepeatMinMax(expr, 0, max); </p>
 </dd></dl>
 <dl class="c function">
+<dt id="c.P4_AddRepeatMax">
+<span class="target" id="peppapeg_8h_1a762544ef6dc1c5fbf6f461dabcc23b1b"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddRepeatMax</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddRepeatMax" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Add a RepeatMax expression as grammar rule.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">""</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="s2">"aaa"</span><span class="o">.</span>
+ <span class="n">P4_AddRepeatMax</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span> <span class="mi">3</span><span class="p">);</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">max</span></code>: The maximum repeat times. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
 <dt id="c.P4_CreateRepeatExact">
 <span class="target" id="peppapeg_8h_1a3e38c0b531c6afa84f2b1045eb9c9005"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateRepeatExact</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateRepeatExact" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Repeat expression exact N times.</p>
@@ -881,6 +1149,28 @@
 <p>It’s equivalent to P4_CreateRepeatMinMax(expr, N, N); </p>
 </dd></dl>
 <dl class="c function">
+<dt id="c.P4_AddRepeatExact">
+<span class="target" id="peppapeg_8h_1a7894b10e3f3abae36d410ad5c25438c6"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddRepeatExact</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddRepeatExact" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Add a RepeatExact expression as grammar rule.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"aaa"</span><span class="o">.</span>
+ <span class="n">P4_AddRepeatExact</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span> <span class="mi">3</span><span class="p">);</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The error code.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">N</span></code>: The repeat times. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
 <dt id="c.P4_CreateZeroOrOnce">
 <span class="target" id="peppapeg_8h_1aeacf775cc7792e5d56eaf5157db02b4b"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateZeroOrOnce</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateZeroOrOnce" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Repeat expression zero or once.</p>
@@ -893,6 +1183,28 @@
 <dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
 </dd>
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+<p>It’s equivalent to P4_CreateRepeatMinMax(expr, 0, 1); </p>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_AddZeroOrOnce">
+<span class="target" id="peppapeg_8h_1a4441acc92e58f5f9f8a06b7c81c13fc1"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddZeroOrOnce</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddZeroOrOnce" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Add a ZeroOrOnce expression as grammar rule.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">""</span> <span class="ow">or</span> <span class="s2">"a"</span><span class="o">.</span>
+ <span class="n">P4_AddZeroOrOnce</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The error code.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
 </ul>
 </dd>
@@ -921,6 +1233,27 @@
 <p>It’s equivalent to P4_CreateRepeatMinMax(expr, 0, SIZE_MAX); </p>
 </dd></dl>
 <dl class="c function">
+<dt id="c.P4_AddZeroOrMore">
+<span class="target" id="peppapeg_8h_1a3352bf0775cd2a01e58e07b5a2e8fd1f"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddZeroOrMore</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddZeroOrMore" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Add a ZeroOrMore expression as grammar rule.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">""</span> <span class="ow">or</span> <span class="s2">"a"</span><span class="o">.</span>
+ <span class="n">P4_AddZeroOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The error code.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
 <dt id="c.P4_CreateOnceOrMore">
 <span class="target" id="peppapeg_8h_1a13e5caca6ee3e7f46cb5104f69796693"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateOnceOrMore</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateOnceOrMore" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Repeat expression once or more times.</p>
@@ -939,6 +1272,27 @@
 </dl>
 </p>
 <p>It’s equivalent to P4_CreateRepeatMinMax(expr, 1, SIZE_MAX); </p>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_AddOnceOrMore">
+<span class="target" id="peppapeg_8h_1a5b3716ec1463a989864b2ef0b8f65a0e"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddOnceOrMore</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddOnceOrMore" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Add an OnceOrMore expression as grammar rule.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="s2">"aaa"</span><span class="p">,</span> <span class="o">....</span>
+ <span class="n">P4_AddOnceOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The error code.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateBackReference">
@@ -1179,360 +1533,6 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">expr</span></code>: The grammar rule expression. </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-<dl class="c function">
-<dt id="c.P4_AddLiteral">
-<span class="target" id="peppapeg_8h_1a3ceb049b409973acf903f30136d292ea"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddLiteral</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <em class="property"><span class="pre">const</span></em> <span class="pre">P4_String</span>, <span class="pre">bool</span> <em><span class="pre">sensitive</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddLiteral" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>Add a literal expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"let"</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">literal</span></code>: The exact string to match. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sensitive</span></code>: Whether the string is case-sensitive. </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-<dl class="c function">
-<dt id="c.P4_AddRange">
-<span class="target" id="peppapeg_8h_1a91c7f482081cffe7a1fd878358a7901d"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddRange</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">P4_Rune</span>, <span class="pre">P4_Rune</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddRange" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>Add a range expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddRange</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'0'</span><span class="p">,</span> <span class="s1">'9'</span><span class="p">);</span>
-
- <span class="n">P4_AddRange</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mh">0x4E00</span><span class="p">,</span> <span class="mh">0x9FFF</span><span class="p">);</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">lower</span></code>: The lower bound of UTF-8 rule to match (inclusive). </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">upper</span></code>: The upper bound of UTF-8 rule to match (inclusive). </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-<dl class="c function">
-<dt id="c.P4_AddReference">
-<span class="target" id="peppapeg_8h_1ae7bf61c3e305feaf4485735e6bddc623"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddReference</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">P4_RuleID</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddReference" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>Add a reference expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddReference</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">ref_id</span></code>: The ID of referenced grammar rule. </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-<dl class="c function">
-<dt id="c.P4_AddPositive">
-<span class="target" id="peppapeg_8h_1ae7c0e21b42dbb220e4ac16aac23ee89c"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddPositive</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddPositive" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>Add a positive expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddPositive</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"let"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">refexpr</span></code>: The positive pattern to check. </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-<dl class="c function">
-<dt id="c.P4_AddNegative">
-<span class="target" id="peppapeg_8h_1a0e7b92d6ac6c285c55779de054f549b6"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddNegative</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddNegative" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>Add a negative expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddNegative</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"let"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">refexpr</span></code>: The negative pattern to check. </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-<dl class="c function">
-<dt id="c.P4_AddSequence">
-<span class="target" id="peppapeg_8h_1a1a1bc7bfb986b831ce422cce87fbe2f8"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddSequence</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddSequence" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>Add a sequence expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddSequence</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">count</span></code>: The number of sequence members. </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-<p>Note that such an expression is useless as its members are all empty. Please set members using P4_SetMembers.</p>
-<p>This function can be useful if you need to add members dynamically. </p>
-</dd></dl>
-<dl class="c function">
-<dt id="c.P4_AddSequenceWithMembers">
-<span class="target" id="peppapeg_8h_1a3c42966162f1dd87a40d037ae6e68451"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddSequenceWithMembers</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">size_t</span>, <span class="pre">...</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddSequenceWithMembers" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>Add a sequence expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span>
-     <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"{"</span><span class="p">),</span>
-     <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">BODY</span><span class="p">),</span>
-     <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"}"</span><span class="p">)</span>
- <span class="p">);</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">count</span></code>: The number of sequence members. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">...</span></code>: The members. </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-<dl class="c function">
-<dt id="c.P4_AddChoice">
-<span class="target" id="peppapeg_8h_1a174b886be6d0263ad2a20daab7129a80"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddChoice</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddChoice" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>Add a choice expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddChoice</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">count</span></code>: The number of choice members. </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-<p>Note that such an expression is useless as its members are all empty. Please set members using P4_SetMembers.</p>
-<p>This function can be useful if you need to add members dynamically. </p>
-</dd></dl>
-<dl class="c function">
-<dt id="c.P4_AddChoiceWithMembers">
-<span class="target" id="peppapeg_8h_1a89691bbe049dc811b16ef85abb039577"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddChoiceWithMembers</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">size_t</span>, <span class="pre">...</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddChoiceWithMembers" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>Add a choice expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddChoiceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span>
-     <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">" "</span><span class="p">),</span>
-     <span class="n">P4_CreateReference</span><span class="p">(</span>\<span class="n">t</span><span class="p">),</span>
-     <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
- <span class="p">);</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">count</span></code>: The number of choice members. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">...</span></code>: The members. </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-<dl class="c function">
-<dt id="c.P4_AddZeroOrOnce">
-<span class="target" id="peppapeg_8h_1a4441acc92e58f5f9f8a06b7c81c13fc1"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddZeroOrOnce</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddZeroOrOnce" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>Add a ZeroOrOnce expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">""</span> <span class="ow">or</span> <span class="s2">"a"</span><span class="o">.</span>
- <span class="n">P4_AddZeroOrOnce</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-<p>It’s equivalent to P4_CreateRepeatMinMax(expr, 0, 1); </p>
-</dd></dl>
-<dl class="c function">
-<dt id="c.P4_AddZeroOrMore">
-<span class="target" id="peppapeg_8h_1a3352bf0775cd2a01e58e07b5a2e8fd1f"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddZeroOrMore</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddZeroOrMore" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>Add a ZeroOrMore expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">""</span> <span class="ow">or</span> <span class="s2">"a"</span><span class="o">.</span>
- <span class="n">P4_AddZeroOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-<dl class="c function">
-<dt id="c.P4_AddOnceOrMore">
-<span class="target" id="peppapeg_8h_1a5b3716ec1463a989864b2ef0b8f65a0e"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddOnceOrMore</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddOnceOrMore" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>Add an OnceOrMore expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="s2">"aaa"</span><span class="p">,</span> <span class="o">....</span>
- <span class="n">P4_AddOnceOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-<dl class="c function">
-<dt id="c.P4_AddRepeatMin">
-<span class="target" id="peppapeg_8h_1a9ea3b03f065249ebf2683736f1534055"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddRepeatMin</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddRepeatMin" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>Create a RepeatMin expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="s2">"aaa"</span><span class="p">,</span> <span class="o">....</span>
- <span class="n">P4_AddRepeatMin</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span> <span class="mi">1</span><span class="p">);</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">min</span></code>: The minimum repeat times. </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-<dl class="c function">
-<dt id="c.P4_AddRepeatMax">
-<span class="target" id="peppapeg_8h_1a762544ef6dc1c5fbf6f461dabcc23b1b"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddRepeatMax</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddRepeatMax" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>Add a RepeatMax expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">""</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="s2">"aaa"</span><span class="o">.</span>
- <span class="n">P4_AddRepeatMax</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span> <span class="mi">3</span><span class="p">);</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">max</span></code>: The maximum repeat times. </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-<dl class="c function">
-<dt id="c.P4_AddRepeatMinMax">
-<span class="target" id="peppapeg_8h_1a8f62ad561fd83da8fc4e988a6238f9ac"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddRepeatMinMax</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span>, <span class="pre">size_t</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddRepeatMinMax" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>Create a P4_Repeat expression minimal min times and maximal max times.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="ow">or</span> <span class="s2">"aaa"</span><span class="o">.</span>
- <span class="n">P4_AddRepeatMinMax</span><span class="p">(</span>
-     <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span>
-     <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span>
- <span class="p">);</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">min</span></code>: The minimum repeat times. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">max</span></code>: The maximum repeat times. </p></li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-<dl class="c function">
-<dt id="c.P4_AddRepeatExact">
-<span class="target" id="peppapeg_8h_1a7894b10e3f3abae36d410ad5c25438c6"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddRepeatExact</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddRepeatExact" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>Add a RepeatExact expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"aaa"</span><span class="o">.</span>
- <span class="n">P4_AddRepeatExact</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span> <span class="mi">3</span><span class="p">);</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">N</span></code>: The repeat times. </p></li>
 </ul>
 </dd>
 </dl>

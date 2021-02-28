@@ -120,7 +120,10 @@ For example, this rule matches "xxx", "x   x         x", etc.
 
 The SPACED expressions are not inserted before or after the Sequence and Repeat, hence "  Hello World  ", "  xxx  " not matching.
 
-Flag `P4_FLAG_TIGHT` takes effects not only on the expression but its all descendant expressions.
+
+.. note::
+
+    Currently, Peppa PEG only supports at maximum two SPACED grammar rules.
 
 `P4_FLAG_TIGHT`
 ----------------
@@ -134,6 +137,8 @@ Given the above `P4_FLAG_SPACED` expression, if we set the grammar rule with fla
     P4_SetGrammarRuleFlag(grammar, Entry, P4_FLAG_TIGHT);
 
 Peppa PEG applies SPACED expressions on every Sequence and Repeat unless a `P4_FLAG_TIGHT` is explicitly specified on a Sequence or Repeat.
+
+Flag `P4_FLAG_TIGHT` takes effects not only on the expression but its all descendant expressions.
 
 `P4_FLAG_SCOPED`
 ----------------

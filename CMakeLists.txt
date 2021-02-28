@@ -8,6 +8,8 @@ set(P4_SOURCES peppapeg.c)
 add_library("${P4_LIB}" SHARED "${P4_HEADERS}" "${P4_SOURCES}")
 # If testing is enabled
 target_compile_options("${P4_LIB}" PRIVATE "-g")
+target_compile_options("${P4_LIB}" PRIVATE "-ansi")
+target_compile_options("${P4_LIB}" PRIVATE "-Wall")
 # target_compile_options("${P4_LIB}" PRIVATE "-fsanitize=address")
 
 add_subdirectory(tests)

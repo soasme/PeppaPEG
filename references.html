@@ -304,11 +304,6 @@
 <span class="target" id="structP4__Expression_1a81b75a470086e17a01b7f94b76fc71f2"></span><span class="pre">P4_RuneRange</span> <code class="sig-name descname"><span class="pre">range</span></code><a class="headerlink" href="#c.P4_Expression.range" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Used by P4_Range. </p>
 </dd></dl>
-<dl class="c var">
-<dt id="c.P4_Expression.backref_index">
-<span class="target" id="structP4__Expression_1a65334a21271d2cd0da4c8e8863984e8f"></span><span class="pre">size_t</span> <code class="sig-name descname"><span class="pre">backref_index</span></code><a class="headerlink" href="#c.P4_Expression.backref_index" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>Used by P4_BackReference. </p>
-</dd></dl>
 </div>
 </dd></dl>
 <dl class="c struct">
@@ -946,14 +941,14 @@
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateBackReference">
-<span class="target" id="peppapeg_8h_1adf80da896e88addf8f0d784bbf46e0bb"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateBackReference</span></code><span class="sig-paren">(</span><span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateBackReference" title="Permalink to this definition">¶</a><br/></dt>
+<span class="target" id="peppapeg_8h_1a30e6218cadafbfd893375f379de9300d"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateBackReference</span></code><span class="sig-paren">(</span><span class="pre">size_t</span>, <span class="pre">bool</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateBackReference" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_BackReference expression.</p>
 <p><p>Example: </p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"EOF MULTILINE EOF"</span> <span class="ow">or</span> <span class="s2">"eof MULTILINE eof"</span><span class="p">,</span> <span class="n">but</span> <span class="ow">not</span> <span class="s2">"EOF MULTILINE eof"</span><span class="o">.</span>
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span>
      <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"EOF"</span><span class="p">,</span> <span class="n">false</span><span class="p">),</span>
      <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">MULTILINE</span><span class="p">),</span>
-     <span class="n">P4_CreateBackReference</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+     <span class="n">P4_CreateBackReference</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">true</span><span class="p">)</span>
  <span class="p">);</span>
 </pre></div>
 </div>
@@ -962,6 +957,7 @@
 </dd>
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">backref_index</span></code>: The index of backref member in the sequence. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sensitive</span></code>: Whether the backref matching is case sensitive. </p></li>
 </ul>
 </dd>
 </dl>

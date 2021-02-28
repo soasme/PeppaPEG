@@ -224,11 +224,19 @@ Sequence: failure!
 </div>
 <div class="section" id="backreference">
 <h2>BackReference<a class="headerlink" href="#backreference" title="Permalink to this headline">¶</a></h2>
-<p>BackReference <strong>matches an exact string previously matched in a Sequence</strong>. BackReference can and only can be used as a Sequence member.</p>
+<p>BackReference <strong>matches an exact string previously matched in a Sequence</strong>. BackReference can and only can be used as a Sequence member. For example, the below snippet matches “a:a”, but not “a:A” or “a:b”.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>
-    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
+    <span class="n">P4_CreateRange</span><span class="p">(</span><span class="sc">'a'</span><span class="p">,</span> <span class="sc">'z'</span><span class="p">);</span>
     <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">":"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
-    <span class="n">P4_CreateBackReference</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">P4_CreateBackReference</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">true</span><span class="p">)</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>The BackReference can be case insensitive, regardless whether the original match was case sensitive. For example, the below snippet matches “a:a” and “a:A”.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">P4_CreateRange</span><span class="p">(</span><span class="sc">'a'</span><span class="p">,</span> <span class="sc">'z'</span><span class="p">);</span>
+    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">":"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
+    <span class="n">P4_CreateBackReference</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">false</span><span class="p">)</span>
 <span class="p">);</span>
 </pre></div>
 </div>
@@ -237,7 +245,7 @@ Sequence: failure!
 <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>
     <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
     <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">":"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
-    <span class="n">P4_CreateBackReference</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">P4_CreateBackReference</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="nb">true</span><span class="p">)</span>
 <span class="p">);</span>
 </pre></div>
 </div>
@@ -246,7 +254,7 @@ Sequence: failure!
 <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>
     <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
     <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">":"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
-    <span class="n">P4_CreateBackReference</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">P4_CreateBackReference</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">true</span><span class="p">)</span>
 <span class="p">);</span>
 </pre></div>
 </div>

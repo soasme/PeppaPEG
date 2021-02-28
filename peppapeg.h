@@ -302,10 +302,11 @@ typedef struct P4_Expression {
         /** Used by P4_Numeric. */
         size_t                      num;
 
-        /** Used by P4_Literal. */
+        /** Used by P4_Literal and P4_BackReference. */
         struct {
             P4_String               literal;
             bool                    sensitive;
+            size_t                  backref_index;
         };
 
         /** Used by P4_Reference..P4_Negative. */
@@ -331,9 +332,6 @@ typedef struct P4_Expression {
             size_t                  repeat_min;
             size_t                  repeat_max;
         };
-
-        /** Used by P4_BackReference. */
-        size_t                      backref_index;
     };
 } P4_Expression;
 
@@ -663,6 +661,7 @@ P4_Expression* P4_CreateOnceOrMore(P4_Expression*);
  * Create a P4_BackReference expression.
  *
  * @param   backref_index   The index of backref member in the sequence.
+ * @param   sensitive       Whether the backref matching is case sensitive.
  * @return  A P4_Expression.
  *
  * Example:
@@ -671,10 +670,10 @@ P4_Expression* P4_CreateOnceOrMore(P4_Expression*);
  *      P4_Expression* expr = P4_CreateSequenceWithMembers(4,
  *          P4_CreateLiteral("EOF", false),
  *          P4_CreateReference(MULTILINE),
- *          P4_CreateBackReference(0)
+ *          P4_CreateBackReference(0, true)
  *      );
  */
-P4_Expression* P4_CreateBackReference(size_t);
+P4_Expression* P4_CreateBackReference(size_t, bool);
 
 /**
  * Set the member of Sequence/Choice at a given index.

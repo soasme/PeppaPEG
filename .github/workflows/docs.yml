@@ -12,11 +12,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Install Dependencies
+      run: sudo apt-get install -y doxygen python3 python3-pip python3-venv
+
     - name: Create Build Environment
       run: cmake -E make_directory ${{github.workspace}}/build
-      
-    - name: Install Dependencies
-      run: apt-get install -y doxygen python3 python3-pip python3-venv
 
     - name: Configure CMake
       shell: bash
@@ -26,27 +26,12 @@ jobs:
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
       # run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
       run: cmake $GITHUB_WORKSPACE -DENABLE_DOCS=$DOCS
-      
+
     - name: Build Docs
-      run: make docs
-      
+      run: cmake --build . --target docs
+
     - name: Publish Docs
       uses: JamesIves/github-pages-deploy-action@4.0.0
       with:
         branch: gh-pages
-        folder: build/docs
-      
-      
-
-    - name: Build
-      working-directory: ${{github.workspace}}/build
-      shell: bash
-      # Execute the build.  You can specify a specific target with "--target <NAME>"
-      run: cmake --build . --config $BUILD_TYPE
-
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      shell: bash
-      # Execute tests defined by the CMake configuration.  
-      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: ctest -C $BUILD_TYPE
+        folder: build/docs/site

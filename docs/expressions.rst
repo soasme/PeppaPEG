@@ -110,14 +110,24 @@ The members can be set after the Sequence is created:
 BackReference
 -------------
 
-BackReference **matches an exact string previously matched in a Sequence**. BackReference can and only can be used as a Sequence member.
+BackReference **matches an exact string previously matched in a Sequence**. BackReference can and only can be used as a Sequence member. For example, the below snippet matches "a:a", but not "a:A" or "a:b".
 
 .. code-block:: c
 
     P4_Expression* expr = P4_CreateSequenceWithMembers(3,
-        P4_CreateLiteral("a", true),
+        P4_CreateRange('a', 'z');
         P4_CreateLiteral(":", true),
-        P4_CreateBackReference(0)
+        P4_CreateBackReference(0, true)
+    );
+
+The BackReference can be case insensitive, regardless whether the original match was case sensitive. For example, the below snippet matches "a:a" and "a:A".
+
+.. code-block:: c
+
+    P4_Expression* expr = P4_CreateSequenceWithMembers(3,
+        P4_CreateRange('a', 'z');
+        P4_CreateLiteral(":", true),
+        P4_CreateBackReference(0, false)
     );
 
 The index value of a BackReference must be less than the total number of members in a Sequence.
@@ -128,7 +138,7 @@ The index value of a BackReference must be less than the total number of members
     P4_Expression* expr = P4_CreateSequenceWithMembers(3,
         P4_CreateLiteral("a", true),
         P4_CreateLiteral(":", true),
-        P4_CreateBackReference(3)
+        P4_CreateBackReference(3, true)
     );
 
 The index value of a BackReference must not be the index of itself.
@@ -139,7 +149,7 @@ The index value of a BackReference must not be the index of itself.
     P4_Expression* expr = P4_CreateSequenceWithMembers(3,
         P4_CreateLiteral("a", true),
         P4_CreateLiteral(":", true),
-        P4_CreateBackReference(2)
+        P4_CreateBackReference(2, true)
     );
 
 :seealso: :c:enum:`P4_BackReference`, :c:func:`P4_CreateBackReference`.

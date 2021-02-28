@@ -41,7 +41,7 @@ if (ENABLE_DOCS)
 
     set(VIRTUALENV ${PYTHON} "-mvenv")
     set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/)
-    set(SPHINX_BUILD ${SITE_OUTPUT_DIR}/site/docs)
+    set(SPHINX_BUILD ${SITE_OUTPUT_DIR}/site)
     set(SPHINX_INDEX_FILE ${SPHINX_BUILD}/index.html)
     set(SPHINX_EXECUTABLE sphinx-build)
 

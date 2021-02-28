@@ -41,23 +41,18 @@ if (ENABLE_DOCS)
     set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/docs)
     set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/docs)
     set(SPHINX_INDEX_FILE ${SPHINX_BUILD}/index.html)
-    set(SPHINX_EXECUTABLE "./venv/bin/sphinx-build")
+    set(SPHINX_EXECUTABLE sphinx-build)
     add_custom_command(
         OUTPUT venv
-        COMMAND ${VIRTUALENV} venv
-    )
-    add_custom_command(
-        OUTPUT ${SPHINX_EXECUTABLE}
-        DEPENDS venv docs/requirements.txt
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/docs/requirements.txt docs-requirements.txt
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/docs ${CMAKE_CURRENT_BINARY_DIR}/docs
+        COMMAND ${VIRTUALENV} venv
         COMMAND ./venv/bin/python3 -mensurepip
         COMMAND ./venv/bin/python3 -mpip install -r docs-requirements.txt --upgrade
-        MAIN_DEPENDENCY ${CMAKE_CURRENT_BINARY_DIR}/venv/bin/python
     )
     add_custom_command(
         OUTPUT ${SPHINX_INDEX_FILE}
-        COMMAND ${SPHINX_EXECUTABLE} -b html ${SPHINX_SOURCE} ${SPHINX_BUILD}
+        COMMAND ./venv/bin/${SPHINX_EXECUTABLE} -b html ${SPHINX_SOURCE} ${SPHINX_BUILD}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         MAIN_DEPENDENCY ${SPHINX_SOURCE}/conf.py
             ${SPHINX_SOURCE}/index.rst
@@ -68,6 +63,6 @@ if (ENABLE_DOCS)
     )
     add_custom_target(
         docs ALL
-        DEPENDS ${SPHINX_EXECUTABLE} ${SPHINX_INDEX_FILE}
+        DEPENDS venv ${SPHINX_INDEX_FILE}
     )
 endif()

@@ -27,7 +27,6 @@
  * @brief      Peppa PEG header file
  * @author     Ju
  * @copyright  MIT
- * @version    1.4.0
  * @date       2021
  * @see        https://github.com/soasme/PeppaPEG
 */
@@ -48,8 +47,13 @@ extern "C"
 #include <string.h>
 
 
+/** Major version number. */
 # define P4_MAJOR_VERSION 1
-# define P4_MINOR_VERSION 4
+
+/** Minor version number. */
+# define P4_MINOR_VERSION 5
+
+/** Patch version number. */
 # define P4_PATCH_VERSION 0
 
 # define P4_FLAG_NONE                   ((uint32_t)(0x0))

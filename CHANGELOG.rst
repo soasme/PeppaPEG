@@ -1,6 +1,14 @@
 Change Log
 ===========
 
+1.5.0 (28 Feb, 2021)
+
+Code change: <https://github.com/soasme/PeppaPEG/compare/v1.4.0..v1.5.0>.
+
+* Added option `sensitive` For BackReference. `#31 <https://github.com/soasme/PeppaPEG/pull/31>`_.
+* Full ANSI C support for peppapeg.c. `#30 <https://github.com/soasme/PeppaPEG/pull/30>`_.
+* Generate Website for Documentation. `#29 <https://github.com/soasme/PeppaPEG/pull/29>`_.
+
 1.4.0 (24 Feb, 2021)
 --------------------
 

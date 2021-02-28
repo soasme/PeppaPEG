@@ -22,8 +22,29 @@ copyright = '2021, Ju'
 author = 'Ju'
 
 # The full version, including alpha/beta/rc tags
-release = '1.4.0'
 
+def get_version(line, type):
+    prefix = f'# define {type} '
+    if line.startswith(prefix):
+        return True, int(line[len(prefix):])
+    return False, 0
+
+_version = [0, 0, 0]
+with open('../peppapeg.h') as f:
+    for line in f.readlines():
+        found, major = get_version(line, 'P4_MAJOR_VERSION')
+        if found:
+            _version[0] = major
+            continue
+        found, minor = get_version(line, 'P4_MINOR_VERSION')
+        if found:
+            _version[1] = minor
+            continue
+        found, patch = get_version(line, 'P4_PATCH_VERSION')
+        if found:
+            _version[2] = patch
+
+release = '.'.join([str(v) for v in _version])
 
 # -- General configuration ---------------------------------------------------
 

@@ -1,0 +1,77 @@
+name: Make Check
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths-ignore:
+      - "**.md"
+      - "**.rst"
+      - LICENSE
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "**.rst"
+      - LICENSE
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'skip check')"
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler:
+          - gcc
+          - clang
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Install Dependencies
+      run: sudo apt-get install -y valgrind
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{github.workspace}}/build
+
+    - name: Configure CMake
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: |
+        export CC=${{ matrix.compiler }}
+        cmake $GITHUB_WORKSPACE -DENABLE_VALGRIND=On
+
+    - name: Build Check
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: cmake --build . --target check
+
+  macos:
+    runs-on: macos-latest
+    if: "!contains(github.event.head_commit.message, 'skip check')"
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler:
+          - gcc
+          - clang
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{github.workspace}}/build
+
+    - name: Configure CMake
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: |
+        export CC=${{ matrix.compiler }}
+        cmake $GITHUB_WORKSPACE -DENABLE_VALGRIND=Off
+
+    - name: Build Check
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: cmake --build . --target check

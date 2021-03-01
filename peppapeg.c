@@ -187,8 +187,8 @@ P4_ReadRune(P4_String s, P4_Rune* c) {
 P4_PRIVATE(int)
 P4_CaseCmpInsensitive(P4_String src, P4_String dst, size_t len) {
     uint32_t srcch = 0x0, dstch = 0x0;
-    size_t srcsz = 0, dstsz = 0;
-    int cmp = 0, remaining = len;
+    size_t srcsz = 0, dstsz = 0, remaining = len;
+    int cmp = 0;
     if (strlen(dst) < len) return -1;
     while (*src != 0x0 && *dst != 0x0) {
         srcsz = P4_ReadRune(src, &srcch);
@@ -1040,6 +1040,9 @@ P4_CreateNumeric(size_t num) {
 
 P4_PUBLIC P4_Expression*
 P4_CreateLiteral(const P4_String literal, bool sensitive) {
+    if (literal == NULL)
+        return NULL;
+
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->id = 0;
     expr->kind = P4_Literal;
@@ -1051,6 +1054,9 @@ P4_CreateLiteral(const P4_String literal, bool sensitive) {
 
 P4_PUBLIC P4_Expression*
 P4_CreateRange(P4_Rune lower, P4_Rune upper) {
+    if (lower > upper || lower > 0x10ffff || upper > 0x10ffff || lower == 0 || upper == 0)
+        return NULL;
+
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->id = 0;
     expr->kind = P4_Range;
@@ -1062,6 +1068,9 @@ P4_CreateRange(P4_Rune lower, P4_Rune upper) {
 
 P4_PUBLIC P4_Expression*
 P4_CreateReference(P4_RuleID id) {
+    if (id == 0)
+        return NULL;
+
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->id = 0;
     expr->kind = P4_Reference;
@@ -1073,6 +1082,9 @@ P4_CreateReference(P4_RuleID id) {
 
 P4_PUBLIC P4_Expression*
 P4_CreatePositive(P4_Expression* refexpr) {
+    if (refexpr == NULL)
+        return NULL;
+
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->id = 0;
     expr->kind = P4_Positive;
@@ -1083,6 +1095,9 @@ P4_CreatePositive(P4_Expression* refexpr) {
 
 P4_PUBLIC P4_Expression*
 P4_CreateNegative(P4_Expression* refexpr) {
+    if (refexpr == NULL)
+        return NULL;
+
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->id = 0;
     expr->kind = P4_Negative;
@@ -1093,6 +1108,9 @@ P4_CreateNegative(P4_Expression* refexpr) {
 
 P4_PRIVATE(P4_Expression*)
 P4_CreateContainer(size_t count) {
+    if (count == 0)
+        return NULL;
+
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->id = 0;
     expr->flag = 0;
@@ -1103,6 +1121,9 @@ P4_CreateContainer(size_t count) {
 
 P4_PUBLIC P4_Expression*
 P4_CreateSequence(size_t count) {
+    if (count == 0)
+        return NULL;
+
     P4_Expression* expr = P4_CreateContainer(count);
 
     if (expr == NULL)
@@ -1115,6 +1136,9 @@ P4_CreateSequence(size_t count) {
 
 P4_PUBLIC P4_Expression*
 P4_CreateChoice(size_t count) {
+    if (count == 0)
+        return NULL;
+
     P4_Expression* expr = P4_CreateContainer(count);
 
     if (expr == NULL)
@@ -1127,6 +1151,9 @@ P4_CreateChoice(size_t count) {
 
 P4_PUBLIC P4_Expression*
 P4_CreateSequenceWithMembers(size_t count, ...) {
+    if (count == 0)
+        return NULL;
+
     P4_Expression* expr = P4_CreateSequence(count);
 
     if (expr == NULL)
@@ -1155,6 +1182,9 @@ finalize:
 
 P4_PUBLIC P4_Expression*
 P4_CreateChoiceWithMembers(size_t count, ...) {
+    if (count == 0)
+        return NULL;
+
     P4_Expression* expr = P4_CreateChoice(count);
 
     if (expr == NULL)
@@ -1183,6 +1213,9 @@ finalize:
 
 P4_PUBLIC P4_Expression*
 P4_CreateRepeatMinMax(P4_Expression* repeat, size_t min, size_t max) {
+    if (repeat == NULL)
+        return NULL;
+
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->id = 0;
     expr->flag = 0;

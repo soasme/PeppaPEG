@@ -60,7 +60,7 @@ jobs:
         submodules: true
 
     - name: Install Dependencies
-      run: sudo apt-get install -y valgrind
+      run: brew install valgrind
 
     - name: Create Build Environment
       run: cmake -E make_directory ${{github.workspace}}/build

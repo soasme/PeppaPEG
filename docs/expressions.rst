@@ -22,6 +22,12 @@ Literal can be in UTF-8 format.
 
     P4_Expression* expr = P4_CreateLiteral("你好, 世界", true);
 
+Literal can include emoji characters.
+
+.. code-block:: c
+
+    P4_Expression* expr = P4_CreateLiteral("Peppa 🐷", false);
+
 Literal cannot be an empty string.
 
 .. code-block:: c

@@ -23,6 +23,7 @@ jobs:
       matrix:
         compiler:
           - gcc
+          - clang
     steps:
     - uses: actions/checkout@v2
       with:
@@ -54,6 +55,7 @@ jobs:
       matrix:
         compiler:
           - gcc
+          - clang
     steps:
     - uses: actions/checkout@v2
       with:

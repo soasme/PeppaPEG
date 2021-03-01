@@ -4,7 +4,6 @@
 - [ ] Report line num & col.
 - [ ] Run in VERBOSE mode.
 - [ ] Add traverse functions for Tokens.
-- [ ] Dynamically change grammar rules.
 - [ ] New Expression Kind: Numeric.
 - [ ] New Expression Kind: CharacterSet.
 - [ ] New Expression Kind: Complement.
@@ -19,12 +18,16 @@
 - [ ] Benchmark: example: json-c. `valgrind --tool=massif --massif-out-file=massif.out ./build/tests/test_example_json && ms_print massif.out ms_print.out`.
 - [ ] Cache literal len.
 - [ ] backrefs is not necessary if there is no BackReference in Sequence.
+- [ ] build & test via github workflow ci.
+- [ ] static lib.
+- [ ] A python grammar.
 - [ ] A binary executable for display parsed results in JSON output. The executable can support general programming languages, such as Mustache, Python, JSON, YAML, etc. Some other programs can then takes the input from stdin and do some fancy work. `peppapeg --lang=py38 source.py`
 - [ ] Add tutorials (json, mustache, ini) in docs.
 - [ ] Add how-to guides in docs.
 - [ ] Add explanations in docs.
 - [ ] Enable AddressSanitizer. Example: cJSON.
 - [ ] Return NullError for CreatePositive/CreateNegative/....
+- [x] Dynamically change grammar rules. Added in v1.3.0 via Callback.
 - [x] Case insensitive BackReference. Added in v1.5.0.
 - [x] Create docs and push it to gh-pages branch. Added in v1.5.0.
 - [x] Add doxygen references in docs. Added in v1.5.0.

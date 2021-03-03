@@ -54,4 +54,16 @@ void TEST_ADD_WHITESPACE(P4_Grammar* grammar, P4_RuleID id) {
     P4_SetExpressionFlag(ws, P4_FLAG_SPACED | P4_FLAG_LIFTED);
 }
 
+char* read_file(const char* path) {
+    FILE* f = fopen (path, "rb");
+    fseek(f, 0, SEEK_END);
+    long length = ftell(f);
+    fseek (f, 0, SEEK_SET);
+    char* buf = calloc(length+2, sizeof(char));
+    TEST_ASSERT_EQUAL(length, fread(buf, sizeof(char), length, f));
+    buf[length] = '\0';
+    fclose(f);
+    return buf;
+}
+
 # endif

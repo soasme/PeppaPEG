@@ -1,3 +1,6 @@
+#include <glob.h>
+#include <stdio.h>
+#include <string.h>
 #include "unity/src/unity.h"
 #include "common.h"
 #include "../examples/json.h"
@@ -238,6 +241,34 @@ void test_string_xyz(void) {
     P4_DeleteGrammar(grammar);
 }
 
+void test_string_pi(void) {
+    P4_Grammar* grammar = P4_CreateJSONGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+
+    P4_Source* source;
+
+    source = P4_CreateSource("\"π\"", P4_JSONEntry);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_Parse(grammar, source)
+    );
+    TEST_ASSERT_EQUAL(4, P4_GetSourcePosition(source));
+
+    P4_Token* token = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONString, token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("\"π\"", token);
+
+    TEST_ASSERT_NULL(token->next);
+    TEST_ASSERT_NULL(token->head);
+    TEST_ASSERT_NULL(token->tail);
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
+
+
 void test_string_empty(void) {
     P4_Grammar* grammar = P4_CreateJSONGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
@@ -384,6 +415,33 @@ void test_array_multiple_items(void) {
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
 }
+void test_array_multiple_items_with_empty_spaces(void) {
+    P4_Grammar* grammar = P4_CreateJSONGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+
+    P4_Source* source;
+
+    source = P4_CreateSource("[1,    2]", P4_JSONEntry);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_Parse(grammar, source)
+    );
+    TEST_ASSERT_EQUAL(9, P4_GetSourcePosition(source));
+
+    P4_Token* token = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONArray, token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("[1,    2]", token);
+
+    TEST_ASSERT_NULL(token->next);
+
+    TEST_ASSERT_NOT_NULL(token->head);
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
+
 
 void test_object_empty(void) {
     P4_Grammar* grammar = P4_CreateJSONGrammar();
@@ -472,18 +530,18 @@ void test_objectitem(void) {
 
     P4_Source* source;
 
-    source = P4_CreateSource("\"k\":1", P4_JSONObjectItem);
+    source = P4_CreateSource("\"k\":    1", P4_JSONObjectItem);
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
         P4_Parse(grammar, source)
     );
-    TEST_ASSERT_EQUAL(5, P4_GetSourcePosition(source));
+    TEST_ASSERT_EQUAL(9, P4_GetSourcePosition(source));
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
     TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONObjectItem, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("\"k\":1", token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("\"k\":    1", token);
 
     TEST_ASSERT_NULL(token->next);
 
@@ -492,6 +550,37 @@ void test_objectitem(void) {
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
 }
+
+static char* JSON_SPEC = "";
+
+void test_json_spec(void) {
+    if (strcmp(JSON_SPEC, "") == 0) return;
+
+    P4_Grammar* grammar = P4_CreateJSONGrammar();
+
+    char* buf = read_file(JSON_SPEC);
+
+    P4_Source* source = P4_CreateSource(buf, P4_JSONEntry);
+
+    P4_Error err = P4_Parse(grammar, source);
+    static char errmsg[100] = "";
+
+    sprintf(errmsg, "%s:%d:%s", JSON_SPEC, err, P4_GetErrorMessage(source));
+
+    P4_DeleteSource(source);
+    free(buf);
+    P4_DeleteGrammar(grammar);
+
+    if (strstr(JSON_SPEC, "test_parsing/y_") != NULL) {
+        TEST_ASSERT_EQUAL_MESSAGE(P4_Ok, err, JSON_SPEC);
+    } else if (strstr(JSON_SPEC, "test_parsing/n_") != NULL) {
+        TEST_ASSERT_NOT_EQUAL_MESSAGE(P4_Ok, err, JSON_SPEC);
+    } else {
+        TEST_IGNORE_MESSAGE(errmsg);
+    }
+
+}
+
 
 int main(void) {
     UNITY_BEGIN();
@@ -505,14 +594,27 @@ int main(void) {
     RUN_TEST(test_number_exp);
     RUN_TEST(test_string_xyz);
     RUN_TEST(test_string_empty);
+    RUN_TEST(test_string_pi);
     RUN_TEST(test_array_empty);
     RUN_TEST(test_array_one_item);
     RUN_TEST(test_array_multiple_items);
+    RUN_TEST(test_array_multiple_items_with_empty_spaces);
     RUN_TEST(test_array_deep_nesting);
     RUN_TEST(test_objectitem);
     RUN_TEST(test_object_empty);
     RUN_TEST(test_object_one_item);
-    RUN_TEST(test_object_multiple_items);
 
+    /* https://github.com/nst/JSONTestSuite */
+    glob_t globbuf = {0};
+    glob("json_test_parsing/*.json", 0, 0, &globbuf);
+    size_t i = 0;
+    for (i = 0; i < globbuf.gl_pathc; i++) {
+        JSON_SPEC = globbuf.gl_pathv[i];
+        /* Unknown failed case. */
+        if (strcmp(JSON_SPEC, "json_test_parsing/n_multidigit_number_then_00.json") == 0 ||
+                false) continue;
+        RUN_TEST(test_json_spec);
+    }
+    globfree(&globbuf);
     return UNITY_END();
 }

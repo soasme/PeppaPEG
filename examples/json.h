@@ -41,6 +41,7 @@ extern "C"
 
 typedef enum {
     P4_JSONEntry        = 1,
+    P4_JSONValue,
     P4_JSONWhitespace,
     P4_JSONObject,
     P4_JSONObjectItem,
@@ -183,10 +184,10 @@ P4_Grammar*  P4_CreateJSONGrammar() {
     if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONString, 3,
         P4_CreateLiteral("\"", true),
         P4_CreateZeroOrMore(
-            P4_CreateChoiceWithMembers(3,
-                P4_CreateRange(0x20, 0x21),
-                /* 0x22: " */
-                P4_CreateRange(0x23, 0x7f),
+            P4_CreateChoiceWithMembers(4,
+                P4_CreateRange(0x20, 0x21), /* Can't be 0x22: double quote " */
+                P4_CreateRange(0x23, 0x5b), /* Can't be 0x5c: escape leading \ */
+                P4_CreateRange(0x5d, 0x10ffff),
                 P4_CreateReference(P4_JSONEscape)
             )
         ),
@@ -201,11 +202,11 @@ P4_Grammar*  P4_CreateJSONGrammar() {
         P4_CreateLiteral("[", true),
         P4_CreateZeroOrOnce(
             P4_CreateSequenceWithMembers(2,
-                P4_CreateReference(P4_JSONEntry),
+                P4_CreateReference(P4_JSONValue),
                 P4_CreateZeroOrMore(
                     P4_CreateSequenceWithMembers(2,
                         P4_CreateLiteral(",", true),
-                        P4_CreateReference(P4_JSONEntry)
+                        P4_CreateReference(P4_JSONValue)
                     )
                 )
             )
@@ -217,7 +218,7 @@ P4_Grammar*  P4_CreateJSONGrammar() {
     if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONObjectItem, 3,
         P4_CreateReference(P4_JSONString),
         P4_CreateLiteral(":", true),
-        P4_CreateReference(P4_JSONEntry)
+        P4_CreateReference(P4_JSONValue)
     ))
         goto finalize;
 
@@ -238,18 +239,28 @@ P4_Grammar*  P4_CreateJSONGrammar() {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONEntry, 3,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONValue, 3,
         P4_CreateZeroOrMore(P4_CreateReference(P4_JSONWhitespace)),
         P4_CreateChoiceWithMembers(7,
             P4_CreateReference(P4_JSONObject),
             P4_CreateReference(P4_JSONArray),
             P4_CreateReference(P4_JSONString),
+            P4_CreateReference(P4_JSONNumber),
             P4_CreateReference(P4_JSONTrue),
             P4_CreateReference(P4_JSONFalse),
-            P4_CreateReference(P4_JSONNull),
-            P4_CreateReference(P4_JSONNumber)
+            P4_CreateReference(P4_JSONNull)
         ),
         P4_CreateZeroOrMore(P4_CreateReference(P4_JSONWhitespace))
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_JSONValue, P4_FLAG_LIFTED))
+        goto finalize;
+
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONEntry, 3,
+        P4_CreatePositive(P4_CreateRange(1, 0x10ffff)),
+        P4_CreateReference(P4_JSONValue),
+        P4_CreateNegative(P4_CreateRange(1, 0x10ffff))
     ))
         goto finalize;
 

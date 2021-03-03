@@ -1498,6 +1498,8 @@ P4_Error       P4_GetError(P4_Source*);
  *      if (P4_Ok != P4_Parse(grammar, source)) {
  *          printf("msg=%s\n", P4_GetErrorMessage(source));
  *      }
+ *
+ * The returned value is a reference to the internal string. Don't free it after use.
  */
 P4_String      P4_GetErrorMessage(P4_Source*);
 

@@ -1468,7 +1468,7 @@ P4_GetErrorMessage(P4_Source* source) {
     if (source == NULL || source->errmsg == NULL)
         return NULL;
 
-    return strdup(source->errmsg);
+    return source->errmsg;
 }
 
 P4_PRIVATE(P4_Error)

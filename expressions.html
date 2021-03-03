@@ -143,6 +143,10 @@
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"你好, 世界"</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
 </pre></div>
 </div>
+<p>Literal can include emoji characters.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Peppa 🐷"</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+</pre></div>
+</div>
 <p>Literal cannot be an empty string.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="c1">// WRONG!</span>
 <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">""</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>

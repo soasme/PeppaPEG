@@ -21,6 +21,7 @@ set(
 
 option(ENABLE_VALGRIND "Enable vagrind memory leak report." OFF)
 
+
 if (ENABLE_VALGRIND)
     find_program(VALGRIND valgrind)
     message("-- Valgrind found: ${VALGRIND}")
@@ -55,6 +56,7 @@ endforeach()
 
 add_custom_target(
     check
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/json_test_parsing ${CMAKE_CURRENT_BINARY_DIR}/json_test_parsing
     COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
     DEPENDS ${unity_testcases}
 )

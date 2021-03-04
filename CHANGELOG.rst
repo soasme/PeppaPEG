@@ -1,6 +1,19 @@
 Change Log
 ===========
 
+1.6.0 (4 Mar, 2021)
+-------------------
+
+Code change: <https://github.com/soasme/PeppaPEG/compare/v1.4.0..v1.5.0>.
+
+* [Enhancement]: Replace `token->expr` with `token->rule_id`. `#40 <https://github.com/soasme/PeppaPEG/pull/40>`_
+* [Bugfix]: Insert no whitespace while spacing is ongoing. `#39 <https://github.com/soasme/PeppaPEG/pull/39>`_
+* [Example]: JSON example parser passes full JSON test suite. `#37 <https://github.com/soasme/PeppaPEG/pull/37>`_
+* [Enhancement]: Support Emoji 🐷 `#36 <https://github.com/soasme/PeppaPEG/pull/36>`_
+* [Bugfix]: Return NULL if CreateExpression receives invalid parameters. `#35 <https://github.com/soasme/PeppaPEG/pull/35>`_
+* [Test]: Build docs & tests using GitHub Actions. `#32 <https://github.com/soasme/PeppaPEG/pull/32>`_, `#34 <https://github.com/soasme/PeppaPEG/pull/34>`_
+
+
 1.5.0 (28 Feb, 2021)
 --------------------
 

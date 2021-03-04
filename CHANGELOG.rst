@@ -4,7 +4,7 @@ Change Log
 1.6.0 (4 Mar, 2021)
 -------------------
 
-Code change: <https://github.com/soasme/PeppaPEG/compare/v1.4.0..v1.5.0>.
+Code change: <https://github.com/soasme/PeppaPEG/compare/v1.5.0..v1.6.0>.
 
 * [Enhancement]: Replace `token->expr` with `token->rule_id`. `#40 <https://github.com/soasme/PeppaPEG/pull/40>`_
 * [Bugfix]: Insert no whitespace while spacing is ongoing. `#39 <https://github.com/soasme/PeppaPEG/pull/39>`_

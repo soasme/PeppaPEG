@@ -28,8 +28,7 @@ void TEST_ASSERT_EQUAL_TOKEN_STRING(P4_String s, P4_Token* token) {
 
 void TEST_ASSERT_EQUAL_TOKEN_RULE(P4_RuleID id, P4_Token* token) {
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_NOT_NULL(token->expr);
-    TEST_ASSERT_EQUAL_UINT(id, token->expr->id);
+    TEST_ASSERT_EQUAL_UINT(id, token->rule_id);
 }
 
 void TEST_ADD_WHITESPACE(P4_Grammar* grammar, P4_RuleID id) {

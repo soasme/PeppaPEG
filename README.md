@@ -12,9 +12,7 @@ Ultra lightweight PEG Parser in ANSI C. ✨ 🐷 ✨.
 ```
 
 [![Test | Build Status](https://github.com/soasme/PeppaPEG/actions/workflows/check.yml/badge.svg?branch=main)](https://github.com/soasme/PeppaPEG/actions/workflows/check.yml)
-
 [![Docs | Build Status](https://github.com/soasme/PeppaPEG/actions/workflows/docs.yml/badge.svg?branch=main)](https://github.com/soasme/PeppaPEG/actions/workflows/docs.yml)
-
 [![Docs](https://img.shields.io/badge/docs-soasme.com-green)](https://www.soasme.com/PeppaPEG)
 
 # Table of Contents

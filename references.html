@@ -321,9 +321,9 @@
 <dd><p>The matched substring. slice[0] is the beginning (inclusive), and slice[1] is the end (exclusive). </p>
 </dd></dl>
 <dl class="c var">
-<dt id="c.P4_Token.expr">
-<span class="target" id="structP4__Token_1abe55be68763b1321627decea43fa6acb"></span><em class="property"><span class="pre">struct</span></em> <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">expr</span></code><a class="headerlink" href="#c.P4_Token.expr" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>The matched grammar expression. </p>
+<dt id="c.P4_Token.rule_id">
+<span class="target" id="structP4__Token_1a8a8f755f64440afa3c6174d35e1b5e8f"></span><span class="pre">P4_RuleID</span> <code class="sig-name descname"><span class="pre">rule_id</span></code><a class="headerlink" href="#c.P4_Token.rule_id" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>The id for matched grammar rule. </p>
 </dd></dl>
 <dl class="c var">
 <dt id="c.P4_Token.next">
@@ -1807,7 +1807,7 @@
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateToken">
-<span class="target" id="peppapeg_8h_1a309a99c9efc7448a6d8ce911728decb8"></span><a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateToken</span></code><span class="sig-paren">(</span><span class="pre">P4_String</span>, <span class="pre">size_t</span>, <span class="pre">size_t</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateToken" title="Permalink to this definition">¶</a><br/></dt>
+<span class="target" id="peppapeg_8h_1a1eb92d02d1a62f97fe513b1be6398217"></span><a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateToken</span></code><span class="sig-paren">(</span><span class="pre">P4_String</span>, <span class="pre">size_t</span>, <span class="pre">size_t</span>, <span class="pre">P4_RuleID</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateToken" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a token. </p>
 <p><p>Example: </p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_String</span>       <span class="nb">str</span>     <span class="o">=</span> <span class="s2">"Hello world"</span><span class="p">;</span>

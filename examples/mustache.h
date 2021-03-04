@@ -72,7 +72,7 @@ P4_Error P4_MustacheCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Token*
             && token
             && token->head
             && token->head->next
-            && token->head->next->expr->id == P4_MustacheSetDelimiter) {
+            && token->head->next->rule_id == P4_MustacheSetDelimiter) {
         P4_String opener = NULL, closer = NULL;
         P4_Expression* opener_expr = NULL;
         P4_Expression* closer_expr = NULL;
@@ -100,8 +100,8 @@ P4_Error P4_MustacheCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Token*
         if ((err = P4_ReplaceGrammarRule(grammar, P4_MustacheCloser, closer_expr)) != P4_Ok)
             goto finalize_set_delimiter;
 
-        token->head->expr = opener_expr;
-        token->tail->expr = closer_expr;
+        token->head->rule_id = opener_expr->id;
+        token->tail->rule_id = closer_expr->id;
 
         free(opener);
         free(closer);

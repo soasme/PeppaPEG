@@ -39,10 +39,8 @@ void test_match_positive_successfully(void) {
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
     TEST_ASSERT_NULL(token->tail);
-    TEST_ASSERT_EQUAL(token->expr, P4_GetGrammarRule(grammar, ENTRY));
-
-    autofree P4_String tokenstr = P4_CopyTokenString(token);
-    TEST_ASSERT_EQUAL_STRING("Hello WORLD", tokenstr);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("Hello WORLD", token);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -96,18 +94,16 @@ void test_match_positive_consumes_no_input(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL(token->expr, P4_GetGrammarRule(grammar, ENTRY));
     TEST_ASSERT_NULL(token->next);
-    autofree P4_String tokenstr = P4_CopyTokenString(token);
-    TEST_ASSERT_EQUAL_STRING("Hello WORLD", tokenstr);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("Hello WORLD", token);
 
     /* R1(Positive) has no token produced. */
 
     TEST_ASSERT_NOT_NULL(token->head);
     TEST_ASSERT_EQUAL(token->head, token->tail);
-    TEST_ASSERT_EQUAL(token->head->expr, P4_GetGrammarRule(grammar, R2));
-    autofree P4_String theadstr = P4_CopyTokenString(token->head);
-    TEST_ASSERT_EQUAL_STRING("Hello WORLD", theadstr);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(R2, token->head);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("Hello WORLD", token->head);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

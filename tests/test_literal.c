@@ -32,10 +32,8 @@ void test_match_same_insensitive_literal_successfully(void) {
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
     TEST_ASSERT_NULL(token->tail);
-    TEST_ASSERT_EQUAL(token->expr, P4_GetGrammarRule(grammar, R1));
-
-    autofree P4_String tokenstr = P4_CopyTokenString(token);
-    TEST_ASSERT_EQUAL_STRING("Hello World", tokenstr);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("Hello World", token);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -71,10 +69,8 @@ void test_match_insensitive_literal_successfully(void) {
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
     TEST_ASSERT_NULL(token->tail);
-    TEST_ASSERT_EQUAL(token->expr, P4_GetGrammarRule(grammar, R1));
-
-    autofree P4_String tokenstr = P4_CopyTokenString(token);
-    TEST_ASSERT_EQUAL_STRING("HeLlO WoRlD", tokenstr);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("HeLlO WoRlD", token);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -144,10 +140,8 @@ void test_match_same_sensitive_literal_successfully(void) {
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
     TEST_ASSERT_NULL(token->tail);
-    TEST_ASSERT_EQUAL(token->expr, P4_GetGrammarRule(grammar, R1));
-
-    autofree P4_String tokenstr = P4_CopyTokenString(token);
-    TEST_ASSERT_EQUAL_STRING("Hello World", tokenstr);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("Hello World", token);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -251,10 +245,8 @@ void test_match_unicode_literal_successfully(void) {
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
     TEST_ASSERT_NULL(token->tail);
-    TEST_ASSERT_EQUAL(token->expr, P4_GetGrammarRule(grammar, R1));
-
-    autofree P4_String tokenstr = P4_CopyTokenString(token);
-    TEST_ASSERT_EQUAL_STRING("你好, WORLD", tokenstr);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("你好, WORLD", token);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

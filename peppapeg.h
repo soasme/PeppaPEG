@@ -392,8 +392,8 @@ typedef struct P4_Token {
      */
     P4_Slice                slice;
 
-    /** The matched grammar expression. */
-    struct P4_Expression*   expr;
+    /** The id for matched grammar rule. */
+    P4_RuleID               rule_id;
 
     /** the sibling token. NULL if not exists. */
     struct P4_Token*        next;
@@ -1524,7 +1524,7 @@ P4_String      P4_GetErrorMessage(P4_Source*);
  *
  *      P4_DeleteToken(token);
  */
-P4_Token*      P4_CreateToken(P4_String, size_t, size_t, P4_Expression*);
+P4_Token*      P4_CreateToken(P4_String, size_t, size_t, P4_RuleID);
 
 /**
  * @brief       Delete the token.

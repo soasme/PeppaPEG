@@ -74,10 +74,8 @@ void test_match_literal_choices_successfully2(void) {
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
     TEST_ASSERT_NULL(token->tail);
-    TEST_ASSERT_EQUAL(token->expr, P4_GetGrammarRule(grammar, R1));
-
-    autofree P4_String tokenstr = P4_CopyTokenString(token);
-    TEST_ASSERT_EQUAL_STRING("HELLO WORLD", tokenstr);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("HELLO WORLD", token);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

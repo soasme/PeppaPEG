@@ -260,7 +260,7 @@ P4_Token*
 P4_CreateToken (const P4_String     str,
                 size_t              start,
                 size_t              stop,
-                P4_Expression*      expr) {
+                P4_RuleID           rule_id) {
     P4_Token* token;
 
     if ((token=malloc(sizeof(P4_Token))) == NULL)
@@ -269,7 +269,7 @@ P4_CreateToken (const P4_String     str,
     token->text         = str;
     token->slice.i      = start;
     token->slice.j      = stop;
-    token->expr         = expr;
+    token->rule_id      = rule_id;
     token->next         = NULL;
     token->head         = NULL;
     token->tail         = NULL;
@@ -427,7 +427,7 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
         return NULL;
 
     P4_Token* result = NULL;
-    if ((result=P4_CreateToken (s->content, startpos, endpos, e)) == NULL) {
+    if ((result=P4_CreateToken (s->content, startpos, endpos, e->id)) == NULL) {
         P4_RaiseError(s, P4_MemoryError, "");
         return NULL;
     }
@@ -464,7 +464,7 @@ P4_MatchRange(P4_Source* s, P4_Expression* e) {
         return NULL;
 
     P4_Token* result = NULL;
-    if ((result=P4_CreateToken (s->content, startpos, endpos, e)) == NULL) {
+    if ((result=P4_CreateToken (s->content, startpos, endpos, e->id)) == NULL) {
         P4_RaiseError(s, P4_MemoryError, "oom");
         return NULL;
     }
@@ -514,7 +514,7 @@ P4_MatchReference(P4_Source* s, P4_Expression* e) {
     /* */
     P4_Token* result = NULL;
 
-    if ((result=P4_CreateToken (s->content, startpos, endpos, e)) == NULL) {
+    if ((result=P4_CreateToken (s->content, startpos, endpos, e->id)) == NULL) {
         P4_RaiseError(s, P4_MemoryError, "oom");
         return NULL;
     }
@@ -578,7 +578,7 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
     if (P4_NeedLift(s, e))
         return head;
 
-    P4_Token* ret = P4_CreateToken (s->content, startpos, P4_GetPosition(s), e);
+    P4_Token* ret = P4_CreateToken (s->content, startpos, P4_GetPosition(s), e->id);
     if (ret == NULL) {
         P4_RaiseError(s, P4_MemoryError, "oom");
         return NULL;
@@ -624,7 +624,7 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
     if (P4_NeedLift(s, e))
         return tok;
 
-    P4_Token* oneof = P4_CreateToken (s->content, startpos, endpos, e);
+    P4_Token* oneof = P4_CreateToken (s->content, startpos, endpos, e->id);
     if (oneof == NULL) {
         P4_RaiseError(s, P4_MemoryError, "oom");
         goto finalize;
@@ -744,7 +744,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     if (P4_NeedLift(s, e))
         return head;
 
-    P4_Token* repetition = P4_CreateToken (s->content, startpos, P4_GetPosition(s), e);
+    P4_Token* repetition = P4_CreateToken (s->content, startpos, P4_GetPosition(s), e->id);
     if (repetition == NULL) {
         P4_RaiseError(s, P4_MemoryError, "oom");
         return NULL;
@@ -971,7 +971,7 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
     }
 
     if (backref_expr->kind == P4_Reference)
-        litexpr->id = backref_expr->ref_expr->id;
+        litexpr->id = backref_expr->ref_id;
     else
         litexpr->id = backref_expr->id;
 
@@ -979,9 +979,9 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
 
     if (tok != NULL) {
         if (backref_expr->kind == P4_Reference) { /* TODO: other cases? */
-            tok->expr = backref_expr->ref_expr;
+            tok->rule_id = backref_expr->ref_id;
         } else {
-            tok->expr = backref_expr;
+            tok->rule_id = backref_expr->id;
         }
     }
 
@@ -1000,7 +1000,7 @@ P4_PrintSourceAst(P4_Token* token, P4_String buf, size_t indent) {
     while (current != NULL) {
         for (i = 0; i < indent; i++) strcat(buf, " ");
         strcat(buf, "- ");
-        sprintf(idstr+1, "%lu", current->expr->id);
+        sprintf(idstr+1, "%lu", current->rule_id);
         strcat(buf, idstr);
         if (current->head == NULL) {
             strcat(buf, ": \"");

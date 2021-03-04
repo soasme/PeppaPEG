@@ -45,7 +45,7 @@
 # define                        IS_LIFTED(e) (((e)->flag & P4_FLAG_LIFTED) != 0)
 # define                        IS_RULE(e) ((e)->id != 0)
 # define                        NEED_SILENT(s) ((s)->frame_stack ? (s)->frame_stack->silent : false)
-# define                        NEED_SPACE(s) ((s)->frame_stack ? (s)->frame_stack->space : false)
+# define                        NEED_SPACE(s) (!(s)->whitespacing && ((s)->frame_stack ? (s)->frame_stack->space : false))
 # define                        NO_ERROR(s) ((s)->err == P4_Ok)
 # define                        NO_MATCH(s) ((s)->err == P4_MatchError)
 

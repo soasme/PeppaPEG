@@ -60,7 +60,7 @@ void test_spaced_rule_should_loosen_sequence(void) {
  * Output:
  *  ENTRY: "HELLOWORLD"
  */
-void test_spaced_rule_should_be_ignored_in_sequence(void) {
+void test_spaced_rule_should_be_ignored_in_tight_sequence(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -97,6 +97,56 @@ void test_spaced_rule_should_be_ignored_in_sequence(void) {
 
 /*
  * Rules:
+ *  ENTRY = R1 ":" R1
+ *  R1 = "1" ~ "2" # TIGHT | SQUASHED
+ *  WHITESPACE = " " | "\t" | "\n" # SPACED, LIFTED
+ * Input:
+ *  12  :  12
+ * Output:
+ *  ENTRY:
+ *    R1: 12
+ *    R1: 12
+ */
+void test_spaced_rule_should_loosen_sequence_despite_member_is_tight(void) {
+    P4_Grammar* grammar = P4_CreateGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddSequenceWithMembers(grammar, ENTRY, 3,
+            P4_CreateReference(R1),
+            P4_CreateLiteral(":", true),
+            P4_CreateReference(R1)
+        )
+    );
+    TEST_ADD_WHITESPACE(grammar, WHITESPACE);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddSequenceWithMembers(grammar, R1, 2,
+            P4_CreateLiteral("1", true),
+            P4_CreateLiteral("2", true)
+        )
+    );
+    TEST_ASSERT_EQUAL(P4_Ok, P4_SetGrammarRuleFlag(grammar, R1, P4_FLAG_TIGHT | P4_FLAG_SQUASHED));
+
+    P4_Source* source = P4_CreateSource("12  :  12", ENTRY);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_Parse(grammar, source)
+    );
+    TEST_ASSERT_EQUAL(9, P4_GetSourcePosition(source));
+
+    P4_Token* token = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("12  :  12", token);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
+
+/*
+ * Rules:
  *  ENTRY = "HELLO" & "WORLD" # TIGHT
  *  WHITESPACE = " " | "\t" | "\n" # SPACED,LIFTED
  * Input:
@@ -106,7 +156,7 @@ void test_spaced_rule_should_be_ignored_in_sequence(void) {
  * Output:
  *  NULL
  */
-void test_spaced_rule_should_be_ignored_in_sequence2(void) {
+void test_spaced_rule_should_be_ignored_in_tight_sequence2(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -713,8 +763,9 @@ int main(void) {
     UNITY_BEGIN();
 
     RUN_TEST(test_spaced_rule_should_loosen_sequence);
-    RUN_TEST(test_spaced_rule_should_be_ignored_in_sequence);
-    RUN_TEST(test_spaced_rule_should_be_ignored_in_sequence2);
+    RUN_TEST(test_spaced_rule_should_be_ignored_in_tight_sequence);
+    RUN_TEST(test_spaced_rule_should_be_ignored_in_tight_sequence2);
+    RUN_TEST(test_spaced_rule_should_loosen_sequence_despite_member_is_tight);
     RUN_TEST(test_spaced_rule_should_be_applied_in_repeat);
     RUN_TEST(test_spaced_rule_should_be_ignored_in_tight_repeat);
     RUN_TEST(test_spaced_rule_should_be_ignored_in_tight_repeat2);

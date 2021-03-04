@@ -239,18 +239,14 @@ P4_Grammar*  P4_CreateJSONGrammar() {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONValue, 3,
-        P4_CreateZeroOrMore(P4_CreateReference(P4_JSONWhitespace)),
-        P4_CreateChoiceWithMembers(7,
-            P4_CreateReference(P4_JSONObject),
-            P4_CreateReference(P4_JSONArray),
-            P4_CreateReference(P4_JSONString),
-            P4_CreateReference(P4_JSONNumber),
-            P4_CreateReference(P4_JSONTrue),
-            P4_CreateReference(P4_JSONFalse),
-            P4_CreateReference(P4_JSONNull)
-        ),
-        P4_CreateZeroOrMore(P4_CreateReference(P4_JSONWhitespace))
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_JSONValue, 7,
+        P4_CreateReference(P4_JSONObject),
+        P4_CreateReference(P4_JSONArray),
+        P4_CreateReference(P4_JSONString),
+        P4_CreateReference(P4_JSONNumber),
+        P4_CreateReference(P4_JSONTrue),
+        P4_CreateReference(P4_JSONFalse),
+        P4_CreateReference(P4_JSONNull)
     ))
         goto finalize;
 

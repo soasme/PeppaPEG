@@ -30,6 +30,7 @@
 - [ ] Add how-to guides in docs.
 - [ ] Add explanations in docs.
 - [ ] Enable AddressSanitizer. Example: cJSON.
+- [x] Range `stride`. Added in v1.7.0.
 - [x] Return NullError for CreatePositive/CreateNegative/... Added in v1.6.0.
 - [x] build & test via github workflow ci. Added in v1.6.0
 - [x] Dynamically change grammar rules. Added in v1.3.0 via Callback.

@@ -522,6 +522,7 @@ P4_Error       P4_AddLiteral(P4_Grammar*, P4_RuleID, const P4_String, bool sensi
  *
  * @param   lower       The lower bound of UTF-8 rule to match (inclusive).
  * @param   upper       The upper bound of UTF-8 rule to match (inclusive).
+ * @param   stride      The stride when iterating the characters in range.
  * @return  A P4_Expression.
  *
  * Example:
@@ -543,6 +544,7 @@ P4_Expression* P4_CreateRange(P4_Rune, P4_Rune, size_t);
  * @param   id          The grammar rule id.
  * @param   lower       The lower bound of UTF-8 rule to match (inclusive).
  * @param   upper       The upper bound of UTF-8 rule to match (inclusive).
+ * @param   stride      The stride when iterating the characters in range.
  * @return  The error code.
  *
  * Example:

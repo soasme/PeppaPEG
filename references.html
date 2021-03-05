@@ -297,11 +297,6 @@
 <span class="target" id="structP4__Expression_1a30571f7712bf3a06e162cf82813ba4d6"></span><span class="pre">size_t</span> <code class="sig-name descname"><span class="pre">num</span></code><a class="headerlink" href="#c.P4_Expression.num" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Used by P4_Numeric. </p>
 </dd></dl>
-<dl class="c var">
-<dt id="c.P4_Expression.range">
-<span class="target" id="structP4__Expression_1a81b75a470086e17a01b7f94b76fc71f2"></span><span class="pre">P4_RuneRange</span> <code class="sig-name descname"><span class="pre">range</span></code><a class="headerlink" href="#c.P4_Expression.range" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>Used by P4_Range. </p>
-</dd></dl>
 </div>
 </dd></dl>
 <dl class="c struct">
@@ -649,14 +644,14 @@
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateRange">
-<span class="target" id="peppapeg_8h_1a2b1e7ba4cadd048f2e28218fad8f958b"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateRange</span></code><span class="sig-paren">(</span><span class="pre">P4_Rune</span>, <span class="pre">P4_Rune</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateRange" title="Permalink to this definition">¶</a><br/></dt>
+<span class="target" id="peppapeg_8h_1a3bcde0b96cf5afe00679346c03c04fed"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateRange</span></code><span class="sig-paren">(</span><span class="pre">P4_Rune</span>, <span class="pre">P4_Rune</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateRange" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Range expression.</p>
 <p><p>Example: </p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mf">9.</span>
- <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRange</span><span class="p">(</span><span class="s1">'0'</span><span class="p">,</span> <span class="s1">'9'</span><span class="p">);</span>
+ <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRange</span><span class="p">(</span><span class="s1">'0'</span><span class="p">,</span> <span class="s1">'9'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 
  <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="nb">any</span> <span class="n">code</span> <span class="n">points</span> <span class="n">starting</span> <span class="kn">from</span> <span class="nn">U</span><span class="o">+</span><span class="mf">4E00</span> <span class="n">to</span> <span class="n">U</span><span class="o">+</span><span class="mi">9</span><span class="n">FCC</span> <span class="p">(</span><span class="n">CJK</span> <span class="n">unified</span> <span class="n">ideographs</span> <span class="n">block</span><span class="p">)</span><span class="o">.</span>
- <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRange</span><span class="p">(</span><span class="mh">0x4E00</span><span class="p">,</span> <span class="mh">0x9FFF</span><span class="p">);</span>
+ <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRange</span><span class="p">(</span><span class="mh">0x4E00</span><span class="p">,</span> <span class="mh">0x9FFF</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
 </div>
 <dl class="simple">
@@ -672,12 +667,12 @@
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_AddRange">
-<span class="target" id="peppapeg_8h_1a91c7f482081cffe7a1fd878358a7901d"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddRange</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">P4_Rune</span>, <span class="pre">P4_Rune</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddRange" title="Permalink to this definition">¶</a><br/></dt>
+<span class="target" id="peppapeg_8h_1a0d9ba26573f0d13e5793e1debd72c2bc"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddRange</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">P4_Rune</span>, <span class="pre">P4_Rune</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddRange" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Add a range expression as grammar rule.</p>
 <p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddRange</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'0'</span><span class="p">,</span> <span class="s1">'9'</span><span class="p">);</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddRange</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'0'</span><span class="p">,</span> <span class="s1">'9'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 
- <span class="n">P4_AddRange</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mh">0x4E00</span><span class="p">,</span> <span class="mh">0x9FFF</span><span class="p">);</span>
+ <span class="n">P4_AddRange</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mh">0x4E00</span><span class="p">,</span> <span class="mh">0x9FFF</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
 </div>
 <dl class="simple">

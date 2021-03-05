@@ -44,26 +44,33 @@ Range **matches a single character in range**.
 
 .. code-block:: c
 
-    P4_Expression* expr = P4_CreateRange('0', '9');
+    P4_Expression* expr = P4_CreateRange('0', '9', 1);
 
 The lower and upper character of range can be ASCII characters or UTF-8 runes.
 
 .. code-block:: c
 
-    P4_Expression* expr = P4_CreateRange(0x4E00, 0x9FFF);
+    P4_Expression* expr = P4_CreateRange(0x4E00, 0x9FFF, 1);
 
 Range can be used to match anything (0, or '\0', or EOF is used for terminating a string in C):
 
 .. code-block:: c
 
-    P4_Expression* expr = P4_CreateRange(1, 0x10ffff);
+    P4_Expression* expr = P4_CreateRange(1, 0x10ffff, 1);
+
+The stride parameter allows larger steps when iterating characters in range.
+
+.. code-block:: c
+
+    // Only match 1, 3, 5, 7, 9.
+    P4_Expression* odd = P4_CreateRange('1', '9', 2);
 
 The value of lower must be less than the upper.
 
 .. code-block:: c
 
     // WRONG!
-    P4_Expression* expr = P4_CreateRange('z', 'a');
+    P4_Expression* expr = P4_CreateRange('z', 'a', 1);
 
 :seealso: :c:enum:`P4_Range`, :c:func:`P4_CreateRange`, :c:func:`P4_AddRange`.
 
@@ -121,7 +128,7 @@ BackReference **matches an exact string previously matched in a Sequence**. Back
 .. code-block:: c
 
     P4_Expression* expr = P4_CreateSequenceWithMembers(3,
-        P4_CreateRange('a', 'z');
+        P4_CreateRange('a', 'z', 1);
         P4_CreateLiteral(":", true),
         P4_CreateBackReference(0, true)
     );
@@ -131,7 +138,7 @@ The BackReference can be case insensitive, regardless whether the original match
 .. code-block:: c
 
     P4_Expression* expr = P4_CreateSequenceWithMembers(3,
-        P4_CreateRange('a', 'z');
+        P4_CreateRange('a', 'z', 1);
         P4_CreateLiteral(":", true),
         P4_CreateBackReference(0, false)
     );

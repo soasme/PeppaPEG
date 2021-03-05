@@ -288,8 +288,8 @@ In this example we match an ASCII digit.
 ```c
 // ENTRY <- [0-9]
 
-//                               lower     upper
->> P4_AddRange(grammar, ENTRY,   '0',      '9');
+//                               lower     upper    stride
+>> P4_AddRange(grammar, ENTRY,   '0',      '9',     1);
 P4_Ok
 
 >> P4_Source* source = P4_Source("0", ENTRY);
@@ -302,8 +302,8 @@ Range supports UTF-8 characters as well.
 In this example we match the code points starting from `U+4E00` to `U+9FCC`, e.g. CJK unified ideographs block. ([好](https://zh.m.wiktionary.org/zh/%E5%A5%BD) is `U+597D`.)
 
 ```c
-//                               lower     upper
->> P4_AddRange(grammar, ENTRY,   0x4E00,   0x9FFF);
+//                               lower     upper    stride
+>> P4_AddRange(grammar, ENTRY,   0x4E00,   0x9FFF,  1);
 P4_Ok
 
 >> P4_Source* source = P4_Source("好", ENTRY);

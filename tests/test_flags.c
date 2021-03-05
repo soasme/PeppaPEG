@@ -450,7 +450,7 @@ void test_lifted_range_should_generate_no_token(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddRange(grammar, ENTRY, '0', '9')
+        P4_AddRange(grammar, ENTRY, '0', '9', 1)
     );
     TEST_ASSERT_EQUAL(P4_Ok, P4_SetGrammarRuleFlag(grammar, ENTRY, P4_FLAG_LIFTED));
 

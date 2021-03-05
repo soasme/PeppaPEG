@@ -2,6 +2,9 @@
 
 - [ ] Print error messages for Human.
 - [ ] Report line num & col.
+- [ ] Support partial source: P4_SetSourceContentSlice(s, i, j).
+- [ ] Reset source so it can be re-parsed.
+- [ ] P4_Inspect(tok, bool (f) (tok)). Example: https://golang.org/pkg/go/ast/#Inspect.
 - [ ] Run in VERBOSE mode.
 - [ ] Add traverse functions for Tokens.
 - [ ] New Expression Kind: Numeric.
@@ -27,6 +30,7 @@
 - [ ] Add how-to guides in docs.
 - [ ] Add explanations in docs.
 - [ ] Enable AddressSanitizer. Example: cJSON.
+- [x] Range `stride`. Added in v1.7.0.
 - [x] Return NullError for CreatePositive/CreateNegative/... Added in v1.6.0.
 - [x] build & test via github workflow ci. Added in v1.6.0
 - [x] Dynamically change grammar rules. Added in v1.3.0 via Callback.

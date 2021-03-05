@@ -94,8 +94,8 @@ P4_Grammar*  P4_CreateJSONGrammar() {
     if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_JSONIntegral, 2,
         P4_CreateLiteral("0", true),
         P4_CreateSequenceWithMembers(2,
-            P4_CreateRange('1', '9'),
-            P4_CreateZeroOrMore(P4_CreateRange('0', '9'))
+            P4_CreateRange('1', '9', 1),
+            P4_CreateZeroOrMore(P4_CreateRange('0', '9', 1))
         )
     ))
         goto finalize;
@@ -105,7 +105,7 @@ P4_Grammar*  P4_CreateJSONGrammar() {
 
     if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONFractional, 2,
         P4_CreateLiteral(".", true),
-        P4_CreateOnceOrMore(P4_CreateRange('0', '9'))
+        P4_CreateOnceOrMore(P4_CreateRange('0', '9', 1))
     ))
         goto finalize;
 
@@ -120,7 +120,7 @@ P4_Grammar*  P4_CreateJSONGrammar() {
                 P4_CreateReference(P4_JSONMinus)
             )
         ),
-        P4_CreateOnceOrMore(P4_CreateRange('0', '9'))
+        P4_CreateOnceOrMore(P4_CreateRange('0', '9', 1))
     ))
         goto finalize;
 
@@ -151,9 +151,9 @@ P4_Grammar*  P4_CreateJSONGrammar() {
         P4_CreateLiteral("u", true),
         P4_CreateRepeatExact(
             P4_CreateChoiceWithMembers(3,
-                P4_CreateRange('0', '9'),
-                P4_CreateRange('a', 'f'),
-                P4_CreateRange('A', 'F')
+                P4_CreateRange('0', '9', 1),
+                P4_CreateRange('a', 'f', 1),
+                P4_CreateRange('A', 'F', 1)
             ), 4
         )
     ))
@@ -185,9 +185,9 @@ P4_Grammar*  P4_CreateJSONGrammar() {
         P4_CreateLiteral("\"", true),
         P4_CreateZeroOrMore(
             P4_CreateChoiceWithMembers(4,
-                P4_CreateRange(0x20, 0x21), /* Can't be 0x22: double quote " */
-                P4_CreateRange(0x23, 0x5b), /* Can't be 0x5c: escape leading \ */
-                P4_CreateRange(0x5d, 0x10ffff),
+                P4_CreateRange(0x20, 0x21, 1), /* Can't be 0x22: double quote " */
+                P4_CreateRange(0x23, 0x5b, 1), /* Can't be 0x5c: escape leading \ */
+                P4_CreateRange(0x5d, 0x10ffff, 1),
                 P4_CreateReference(P4_JSONEscape)
             )
         ),
@@ -254,9 +254,9 @@ P4_Grammar*  P4_CreateJSONGrammar() {
         goto finalize;
 
     if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONEntry, 3,
-        P4_CreatePositive(P4_CreateRange(1, 0x10ffff)),
+        P4_CreatePositive(P4_CreateRange(1, 0x10ffff, 1)),
         P4_CreateReference(P4_JSONValue),
-        P4_CreateNegative(P4_CreateRange(1, 0x10ffff))
+        P4_CreateNegative(P4_CreateRange(1, 0x10ffff, 1))
     ))
         goto finalize;
 

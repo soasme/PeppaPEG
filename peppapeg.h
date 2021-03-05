@@ -236,9 +236,6 @@ typedef char*           P4_String;
  * */
 typedef uint64_t        P4_RuleID;
 
-/** A range of two runes. */
-typedef P4_Rune P4_RuneRange[2];
-
 /*
  *
  * ░██████╗████████╗██████╗░██╗░░░██╗░█████╗░████████╗░██████╗
@@ -363,7 +360,14 @@ typedef struct P4_Expression {
         };
 
         /** Used by P4_Range. */
-        P4_RuneRange                range;
+        struct {
+            /* The lower code point of the range (inclusive). */
+            P4_Rune                 lower;
+            /* The upper code point of the range (inclusive). */
+            P4_Rune                 upper;
+            /* The step to jump inside the range. */
+            size_t                  stride;
+        };
 
         /** Used by P4_Sequence..P4_Choice. */
         struct {
@@ -523,14 +527,14 @@ P4_Error       P4_AddLiteral(P4_Grammar*, P4_RuleID, const P4_String, bool sensi
  * Example:
  *
  *      // It can match 0, 1, 2, 3, 4, 5, 6, 7, 8, 9.
- *      P4_Expression* expr = P4_CreateRange('0', '9');
+ *      P4_Expression* expr = P4_CreateRange('0', '9', 1);
  *
  *      // It can match any code points starting from U+4E00 to U+9FCC (CJK unified ideographs block).
- *      P4_Expression* expr = P4_CreateRange(0x4E00, 0x9FFF);
+ *      P4_Expression* expr = P4_CreateRange(0x4E00, 0x9FFF, 1);
  *
  *
  */
-P4_Expression* P4_CreateRange(P4_Rune, P4_Rune);
+P4_Expression* P4_CreateRange(P4_Rune, P4_Rune, size_t);
 
 /**
  * Add a range expression as grammar rule.
@@ -543,11 +547,11 @@ P4_Expression* P4_CreateRange(P4_Rune, P4_Rune);
  *
  * Example:
  *
- *      P4_AddRange(grammar, 1, '0', '9');
+ *      P4_AddRange(grammar, 1, '0', '9', 1);
  *
- *      P4_AddRange(grammar, 1, 0x4E00, 0x9FFF);
+ *      P4_AddRange(grammar, 1, 0x4E00, 0x9FFF, 1);
  */
-P4_Error       P4_AddRange(P4_Grammar*, P4_RuleID, P4_Rune, P4_Rune);
+P4_Error       P4_AddRange(P4_Grammar*, P4_RuleID, P4_Rune, P4_Rune, size_t);
 
 /*
  * ██████╗░███████╗███████╗███████╗██████╗░███████╗███╗░░██╗░█████╗░███████╗

@@ -450,9 +450,7 @@ P4_MatchRange(P4_Source* s, P4_Expression* e) {
     uint32_t rune = 0x0;
     size_t size = P4_ReadRune(str, &rune);
 
-#define IN_RANGE(e, c) ((c)>=(e)->range[0] && (c)<=(e)->range[1])
-
-    if (!IN_RANGE(e, rune)) {
+    if (rune < e->lower || rune > e->upper || (rune - e->lower) % e->stride != 0) {
         P4_RaiseError(s, P4_MatchError, "not in range");
         return NULL;
     }
@@ -1053,7 +1051,7 @@ P4_CreateLiteral(const P4_String literal, bool sensitive) {
 }
 
 P4_PUBLIC P4_Expression*
-P4_CreateRange(P4_Rune lower, P4_Rune upper) {
+P4_CreateRange(P4_Rune lower, P4_Rune upper, size_t stride) {
     if (lower > upper || lower > 0x10ffff || upper > 0x10ffff || lower == 0 || upper == 0)
         return NULL;
 
@@ -1061,8 +1059,9 @@ P4_CreateRange(P4_Rune lower, P4_Rune upper) {
     expr->id = 0;
     expr->kind = P4_Range;
     expr->flag = 0;
-    expr->range[0] = lower;
-    expr->range[1] = upper;
+    expr->lower = lower;
+    expr->upper = upper;
+    expr->stride = stride;
     return expr;
 }
 
@@ -1579,8 +1578,8 @@ P4_AddLiteral(P4_Grammar* grammar, P4_RuleID id, const P4_String literal, bool s
 }
 
 P4_PUBLIC P4_Error
-P4_AddRange(P4_Grammar* grammar, P4_RuleID id, P4_Rune lower, P4_Rune upper) {
-    P4_AddSomeGrammarRule(grammar, id, P4_CreateRange(lower, upper));
+P4_AddRange(P4_Grammar* grammar, P4_RuleID id, P4_Rune lower, P4_Rune upper, size_t stride) {
+    P4_AddSomeGrammarRule(grammar, id, P4_CreateRange(lower, upper, stride));
     return P4_Ok;
 }
 

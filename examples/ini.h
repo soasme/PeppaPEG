@@ -57,9 +57,9 @@ P4_PUBLIC(P4_Grammar*)  P4_CreateINIGrammar() {
     // Entry = POSITIVE([1-0x10ffff]) Row* NEGATIVE([1-0x10ffff])
 
     if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_INI_Entry, 3,
-        P4_CreatePositive(P4_CreateRange(0x1, 0x10ffff)), // start of input
+        P4_CreatePositive(P4_CreateRange(0x1, 0x10ffff, 1)), // start of input
         P4_CreateZeroOrMore(P4_CreateReference(P4_INI_Row)),
-        P4_CreateNegative(P4_CreateRange(0x1, 0x10ffff)) // end of input
+        P4_CreateNegative(P4_CreateRange(0x1, 0x10ffff, 1)) // end of input
     ))
         goto finalize;
 
@@ -108,9 +108,9 @@ P4_PUBLIC(P4_Grammar*)  P4_CreateINIGrammar() {
     // Char = [a-z] / [A-Z] / [0-9] / " " / "." / ":" / "?" / "_" / "/"
 
     if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_INI_Char, 9,
-        P4_CreateRange('a', 'z'),
-        P4_CreateRange('A', 'Z'),
-        P4_CreateRange('0', '9'),
+        P4_CreateRange('a', 'z', 1),
+        P4_CreateRange('A', 'Z', 1),
+        P4_CreateRange('0', '9', 1),
         P4_CreateLiteral(" ", true),
         P4_CreateLiteral(".", true),
         P4_CreateLiteral(":", true),

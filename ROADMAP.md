@@ -2,6 +2,9 @@
 
 - [ ] Print error messages for Human.
 - [ ] Report line num & col.
+- [ ] Support partial source: P4_SetSourceContentSlice(s, i, j).
+- [ ] Reset source so it can be re-parsed.
+- [ ] P4_Inspect(tok, bool (f) (tok)). Example: https://golang.org/pkg/go/ast/#Inspect.
 - [ ] Run in VERBOSE mode.
 - [ ] Add traverse functions for Tokens.
 - [ ] New Expression Kind: Numeric.

@@ -1221,6 +1221,51 @@ size_t         P4_GetMembersCount(P4_Expression*);
 P4_Expression* P4_GetMember(P4_Expression*, size_t);
 
 /**
+ * Create an Start-Of-Input expression.
+ *
+ * @return  A P4_Expression.
+ *
+ * Example:
+ *
+ *      P4_Expression* expr = P4_CreateStartOfInput();
+ *
+ * Start-Of-Input can be used to insert whitespace before the actual content.
+ *
+ * Example:
+ *
+ *      P4_AddSequenceWithMembers(grammar, 1, 2,
+ *          P4_CreateStartOfInput(),
+ *          P4_CreateLiteral("HELLO", true)
+ *      );
+ *
+ * Start-Of-Input is equivalent to ``P4_CreatePositive(P4_CreateRange(1, 0x10ffff, 1))`.
+ */
+P4_Expression* P4_CreateStartOfInput();
+
+/**
+ * Create an End-Of-Input expression.
+ *
+ * @return  A P4_Expression.
+ *
+ * Example:
+ *
+ *      P4_Expression* expr = P4_CreateEndOfInput();
+ *
+ * End-Of-Input can be used to insert whitespace after the actual content.
+ *
+ * Example:
+ *
+ *      P4_AddSequenceWithMembers(grammar, 1, 2,
+ *          P4_CreateLiteral("HELLO", true),
+ *          P4_CreateEndOfInput()
+ *      );
+ *
+ * Start-Of-Input is equivalent to ``P4_CreateNegative(P4_CreateRange(1, 0x10ffff, 1))`.
+ */
+P4_Expression* P4_CreateEndOfInput();
+
+
+/**
  * Free an expression.
  *
  * @param   expr        The expression.

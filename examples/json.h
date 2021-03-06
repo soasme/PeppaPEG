@@ -254,9 +254,9 @@ P4_Grammar*  P4_CreateJSONGrammar() {
         goto finalize;
 
     if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONEntry, 3,
-        P4_CreatePositive(P4_CreateRange(1, 0x10ffff, 1)),
+        P4_CreateStartOfInput(),
         P4_CreateReference(P4_JSONValue),
-        P4_CreateNegative(P4_CreateRange(1, 0x10ffff, 1))
+        P4_CreateEndOfInput()
     ))
         goto finalize;
 

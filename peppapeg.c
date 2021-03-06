@@ -1736,6 +1736,14 @@ P4_GetMember(P4_Expression* expr, size_t offset) {
     return expr->members[offset];
 }
 
+P4_Expression* P4_CreateStartOfInput() {
+    return P4_CreatePositive(P4_CreateRange(1, 0x10ffff, 1));
+}
+
+P4_Expression* P4_CreateEndOfInput() {
+    return P4_CreateNegative(P4_CreateRange(1, 0x10ffff, 1));
+}
+
 P4_PUBLIC void
 P4_DeleteExpression(P4_Expression* expr) {
     if (expr == NULL)

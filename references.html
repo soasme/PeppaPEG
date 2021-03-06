@@ -1,7 +1,7 @@
 <!doctype html>
 <html class="no-js">
   <head><meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Change Log" href="whatsnew.html" /><link rel="prev" title="Expression Flags" href="flags.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Change Log" href="whatsnew.html" /><link rel="prev" title="Caveats" href="caveats.html" />
 
     <meta name="generator" content="sphinx-3.5.1, furo 2021.02.28.beta28"/>
         <title>References - Peppa PEG 1.6.0 documentation</title>
@@ -110,6 +110,7 @@
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="expressions.html">Expressions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="flags.html">Expression Flags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="caveats.html">Caveats</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">References</a></li>
 <li class="toctree-l1"><a class="reference internal" href="whatsnew.html">Change Log</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
@@ -1400,6 +1401,52 @@
 </p>
 </dd></dl>
 <dl class="c function">
+<dt id="c.P4_CreateStartOfInput">
+<span class="target" id="peppapeg_8h_1ad4cfeca4838a811798dae11f2cad9614"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateStartOfInput</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateStartOfInput" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Create an Start-Of-Input expression.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateStartOfInput</span><span class="p">();</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
+</dl>
+</p>
+<p>Start-Of-Input can be used to insert whitespace before the actual content.</p>
+<p>Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span>
+     <span class="n">P4_CreateStartOfInput</span><span class="p">(),</span>
+     <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"HELLO"</span><span class="p">,</span> <span class="n">true</span><span class="p">)</span>
+ <span class="p">);</span>
+</pre></div>
+</div>
+</p>
+<p>Start-Of-Input is equivalent to `<code class="docutils literal notranslate"><span class="pre">P4_CreatePositive(P4_CreateRange(1,</span> <span class="pre">0x10ffff,</span> <span class="pre">1))</span></code>. </p>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_CreateEndOfInput">
+<span class="target" id="peppapeg_8h_1af4859d1e8f38ce3629b0538e94828c71"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateEndOfInput</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateEndOfInput" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Create an End-Of-Input expression.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateEndOfInput</span><span class="p">();</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
+</dl>
+</p>
+<p>End-Of-Input can be used to insert whitespace after the actual content.</p>
+<p>Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span>
+     <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"HELLO"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span>
+     <span class="n">P4_CreateEndOfInput</span><span class="p">()</span>
+ <span class="p">);</span>
+</pre></div>
+</div>
+</p>
+<p>Start-Of-Input is equivalent to `<code class="docutils literal notranslate"><span class="pre">P4_CreateNegative(P4_CreateRange(1,</span> <span class="pre">0x10ffff,</span> <span class="pre">1))</span></code>. </p>
+</dd></dl>
+<dl class="c function">
 <dt id="c.P4_DeleteExpression">
 <span class="target" id="peppapeg_8h_1a6f0a7f7d6780e5839cb385f167aeab30"></span><span class="pre">void</span> <code class="sig-name descname"><span class="pre">P4_DeleteExpression</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_DeleteExpression" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Free an expression.</p>
@@ -1937,14 +1984,14 @@
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="flags.html">
+          <a class="prev-page" href="caveats.html">
               <svg><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Expression Flags</div>
+                <div class="title">Caveats</div>
                 
               </div>
             </a>

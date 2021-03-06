@@ -15,6 +15,7 @@ Table of Contents
    getting_started
    expressions
    flags
+   caveats
    references
    whatsnew
    development

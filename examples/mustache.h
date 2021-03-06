@@ -335,10 +335,10 @@ P4_Grammar*  P4_CreateMustacheGrammar() {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_MustacheLine, P4_FLAG_TIGHT | P4_FLAG_LIFTED))
         goto finalize;
 
-    if (P4_Ok != P4_AddPositive(grammar, P4_MustacheSOI, P4_CreateRange(1, 0x10ffff, 1)))
+    if (P4_Ok != P4_AddGrammarRule(grammar, P4_MustacheSOI, P4_CreateStartOfInput()))
         goto finalize;
 
-    if (P4_Ok != P4_AddNegative(grammar, P4_MustacheEOI, P4_CreateRange(1, 0x10ffff, 1)))
+    if (P4_Ok != P4_AddGrammarRule(grammar, P4_MustacheEOI, P4_CreateEndOfInput()))
         goto finalize;
 
     if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheEntry, 2,

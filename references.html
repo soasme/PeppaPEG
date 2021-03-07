@@ -1447,6 +1447,50 @@
 <p>Start-Of-Input is equivalent to `<code class="docutils literal notranslate"><span class="pre">P4_CreateNegative(P4_CreateRange(1,</span> <span class="pre">0x10ffff,</span> <span class="pre">1))</span></code>. </p>
 </dd></dl>
 <dl class="c function">
+<dt id="c.P4_AddJoin">
+<span class="target" id="peppapeg_8h_1a28eebc5b7461e4e39a1bd156dc860d2d"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddJoin</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a> <span class="pre">*</span><em><span class="pre">grammar</span></em>, <span class="pre">P4_RuleID</span> <em><span class="pre">id</span></em>, <em class="property"><span class="pre">const</span></em> <span class="pre">P4_String</span> <em><span class="pre">joiner</span></em>, <span class="pre">P4_RuleID</span> <em><span class="pre">rule_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddJoin" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Add a Join expression as grammar rule.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">row</span> <span class="o">=</span> <span class="n">P4_AddJoin</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">","</span><span class="p">,</span> <span class="n">Element</span><span class="p">);</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The error code.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">joiner</span></code>: A joiner literal. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pattern</span></code>: The repeated pattern rule id. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_CreateJoin">
+<span class="target" id="peppapeg_8h_1a2c13269e2785ad1a8ce212d9169ec00b"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateJoin</span></code><span class="sig-paren">(</span><em class="property"><span class="pre">const</span></em> <span class="pre">P4_String</span> <em><span class="pre">joiner</span></em>, <span class="pre">P4_RuleID</span> <em><span class="pre">rule_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateJoin" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Create a Join expression.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">row</span> <span class="o">=</span> <span class="n">P4_CreateJoin</span><span class="p">(</span><span class="s2">","</span><span class="p">,</span> <span class="n">Element</span><span class="p">);</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">joiner</span></code>: A joiner literal. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pattern</span></code>: The repeated pattern rule id. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+<p>Join is a syntax sugar to the below structure: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">Sequence</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">ZeroOrMore</span><span class="p">(</span><span class="n">Sequence</span><span class="p">(</span><span class="n">Literal</span><span class="p">(</span><span class="n">joiner</span><span class="p">),</span> <span class="n">pattern</span><span class="p">)))</span>
+</pre></div>
+</div>
+</p>
+</dd></dl>
+<dl class="c function">
 <dt id="c.P4_DeleteExpression">
 <span class="target" id="peppapeg_8h_1a6f0a7f7d6780e5839cb385f167aeab30"></span><span class="pre">void</span> <code class="sig-name descname"><span class="pre">P4_DeleteExpression</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_DeleteExpression" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Free an expression.</p>

@@ -147,26 +147,49 @@
 <p>The expression of Start-of-Input and End-of-Input match the start and end of the input. They don’t consume text.</p>
 <p>Considering below case,</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
-<span class="n">P4_AddZeroOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span> <span class="nb">true</span><span class="p">));</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span> <span class="o">==</span> <span class="n">P4_AddZeroOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span> <span class="nb">true</span><span class="p">)));</span>
 
 <span class="n">P4_Source</span><span class="o">*</span> <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s">"aaab"</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-<span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">);</span>
+<span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">);</span> <span class="c1">// P4_Ok!</span>
 </pre></div>
 </div>
 <p>Guess what, <a class="reference internal" href="references.html#c.P4_Parse" title="P4_Parse"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_Parse()</span></code></a> returns <a class="reference internal" href="references.html#c.P4_Error.P4_Ok" title="P4_Ok"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_Ok</span></code></a>! Peppa PEG eats 3 “a” characters and ignores the rest of the input.</p>
 <p>To make “aaab” as a whole, we need to add Start-of-Input and End-of-Input before and after the ZeroOrMore rule:</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
-<span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span> <span class="o">==</span> <span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span>
     <span class="n">P4_CreateStartOfInput</span><span class="p">(),</span>
     <span class="n">P4_CreateZeroOrMore</span><span class="p">(</span><span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span> <span class="nb">true</span><span class="p">)),</span>
     <span class="n">P4_CreateEndOfInput</span><span class="p">()</span>
-<span class="p">);</span>
-<span class="n">P4_AddZeroOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span> <span class="nb">true</span><span class="p">));</span>
+<span class="p">));</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span> <span class="o">==</span> <span class="n">P4_AddZeroOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span> <span class="nb">true</span><span class="p">)));</span>
 
 <span class="n">P4_Source</span><span class="o">*</span> <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s">"aaab"</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">);</span> <span class="c1">// P4_MatchError</span>
 </pre></div>
 </div>
+</div>
+<div class="section" id="join">
+<h2>Join<a class="headerlink" href="#join" title="Permalink to this headline">¶</a></h2>
+<p>Joining a rule by a separator is a common use, such as <cite>f(p1, p2, p3)</cite>, <cite>[1, 2, 3]</cite>. Peppa PEG provides a sugar to make it easier to match such a pattern.</p>
+<p>For example, let’s match <cite>1,2,3</cite>:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp"># define ROW 1</span>
+<span class="cp"># define NUM 2</span>
+<span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
+
+<span class="c1">// Or: P4_AddGrammarRule(grammar, ROW, P4_CreateJoin(",", NUM))</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span> <span class="o">==</span> <span class="n">P4_AddJoin</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">ROW</span><span class="p">,</span> <span class="s">","</span><span class="p">,</span> <span class="n">NUM</span><span class="p">));</span>
+
+<span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span> <span class="o">==</span> <span class="n">P4_AddRange</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">NUM</span><span class="p">,</span> <span class="sc">'0'</span><span class="p">,</span> <span class="sc">'9'</span><span class="p">,</span> <span class="mi">1</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>When parsing <cite>1,2,3</cite>, it will produce such a data structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Token</span><span class="p">(</span><span class="mf">0.</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="n">ROW</span><span class="p">):</span>
+    <span class="n">Token</span><span class="p">(</span><span class="mf">0.</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="n">NUM</span><span class="p">)</span>
+    <span class="n">Token</span><span class="p">(</span><span class="mf">2.</span><span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="n">NUM</span><span class="p">)</span>
+    <span class="n">Token</span><span class="p">(</span><span class="mf">4.</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="n">NUM</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The separator will not have its corresponding token, while all joined members have their tokens.</p>
 </div>
 </div>
 
@@ -227,6 +250,7 @@
 <li><a class="reference internal" href="#">Caveats</a><ul>
 <li><a class="reference internal" href="#recursion-limit">Recursion Limit</a></li>
 <li><a class="reference internal" href="#start-of-input-end-of-input">Start-of-Input &amp; End-of-Input</a></li>
+<li><a class="reference internal" href="#join">Join</a></li>
 </ul>
 </li>
 </ul>

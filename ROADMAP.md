@@ -30,6 +30,12 @@
 - [ ] Add how-to guides in docs.
 - [ ] Add explanations in docs.
 - [ ] Enable AddressSanitizer. Example: cJSON.
+- [ ] RequireVersion.
+- [ ] GetErrorString.
+- [ ] Except.
+- [ ] Any.
+- [ ] Until.
+- [ ] Join. Added in v1.7.0.
 - [x] Start-of-Input & End-of-Input. Added in v1.7.0.
 - [x] Range `stride`. Added in v1.7.0.
 - [x] Return NullError for CreatePositive/CreateNegative/... Added in v1.6.0.

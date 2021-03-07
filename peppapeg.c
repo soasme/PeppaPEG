@@ -1744,6 +1744,18 @@ P4_Expression* P4_CreateEndOfInput() {
     return P4_CreateNegative(P4_CreateRange(1, 0x10ffff, 1));
 }
 
+P4_Expression* P4_CreateJoin(const P4_String joiner, P4_RuleID rule_id) {
+    return P4_CreateSequenceWithMembers(2,
+        P4_CreateReference(rule_id),
+        P4_CreateZeroOrMore(
+            P4_CreateSequenceWithMembers(2,
+                P4_CreateLiteral(joiner, true),
+                P4_CreateReference(rule_id)
+            )
+        )
+    );
+}
+
 P4_PUBLIC void
 P4_DeleteExpression(P4_Expression* expr) {
     if (expr == NULL)
@@ -1853,6 +1865,16 @@ P4_AddRepeatExact(P4_Grammar* grammar, P4_RuleID id, P4_Expression* repeat, size
         return P4_NullError;
 
     P4_AddSomeGrammarRule(grammar, id, P4_CreateRepeatExact(repeat, num));
+    return P4_Ok;
+}
+
+P4_PUBLIC P4_Error
+P4_AddJoin(P4_Grammar* grammar, P4_RuleID id, const P4_String joiner, P4_RuleID rule_id) {
+    if (rule_id == 0 || id == rule_id) {
+        return P4_NullError;
+    }
+
+    P4_AddSomeGrammarRule(grammar, id, P4_CreateJoin(joiner, rule_id));
     return P4_Ok;
 }
 

@@ -200,17 +200,7 @@ P4_Grammar*  P4_CreateJSONGrammar() {
 
     if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONArray, 3,
         P4_CreateLiteral("[", true),
-        P4_CreateZeroOrOnce(
-            P4_CreateSequenceWithMembers(2,
-                P4_CreateReference(P4_JSONValue),
-                P4_CreateZeroOrMore(
-                    P4_CreateSequenceWithMembers(2,
-                        P4_CreateLiteral(",", true),
-                        P4_CreateReference(P4_JSONValue)
-                    )
-                )
-            )
-        ),
+        P4_CreateZeroOrOnce(P4_CreateJoin(",", P4_JSONValue)),
         P4_CreateLiteral("]", true)
     ))
         goto finalize;
@@ -224,17 +214,7 @@ P4_Grammar*  P4_CreateJSONGrammar() {
 
     if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONObject, 3,
         P4_CreateLiteral("{", true),
-        P4_CreateZeroOrOnce(
-            P4_CreateSequenceWithMembers(2,
-                P4_CreateReference(P4_JSONObjectItem),
-                P4_CreateZeroOrMore(
-                    P4_CreateSequenceWithMembers(2,
-                        P4_CreateLiteral(",", true),
-                        P4_CreateReference(P4_JSONObjectItem)
-                    )
-                )
-            )
-        ),
+        P4_CreateZeroOrOnce(P4_CreateJoin(",", P4_JSONObjectItem)),
         P4_CreateLiteral("}", true)
     ))
         goto finalize;

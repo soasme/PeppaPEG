@@ -98,12 +98,45 @@ void test_replace_grammar_rule_refreshing_references(void) {
     P4_DeleteGrammar(grammar);
 }
 
+void test_join(void) {
+    P4_Grammar* grammar = P4_CreateGrammar();
+    const int ROW = 1;
+    const int NUM = 2;
+    TEST_ASSERT_EQUAL(P4_Ok, P4_AddJoin(grammar, ROW, ",", NUM));
+    TEST_ASSERT_EQUAL(P4_Ok, P4_AddRange(grammar, NUM, '0', '9', 1));
+
+    P4_Source* source = P4_CreateSource("1,2,3", ROW);
+    TEST_ASSERT_EQUAL(P4_Ok, P4_Parse(grammar, source));
+
+    P4_Token* token = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("1,2,3", token);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(ROW, token);
+
+    TEST_ASSERT_NOT_NULL(token->head);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("1", token->head);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(NUM, token->head);
+
+    TEST_ASSERT_NOT_NULL(token->head->next);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("2", token->head->next);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(NUM, token->head->next);
+
+    TEST_ASSERT_NOT_NULL(token->head->next->next);
+    TEST_ASSERT_EQUAL(token->tail, token->head->next->next);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("3", token->head->next->next);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(NUM, token->head->next->next);
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
+
 int main(void) {
     UNITY_BEGIN();
 
     RUN_TEST(test_maximum_recursion_limit);
     RUN_TEST(test_replace_grammar_rule);
     RUN_TEST(test_replace_grammar_rule_refreshing_references);
+    RUN_TEST(test_join);
 
     return UNITY_END();
 }

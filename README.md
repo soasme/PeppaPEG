@@ -871,6 +871,7 @@ The outputs are stored on `build/docs`.
 * Write an INI Parser using Peppa PEG: [ini.h](examples/ini.h), [ini.c](examples/ini.c).
 * Write a Mustache Parser using Peppa PEG: [mustache.h](examples/mustache.h).
 * Write a JSON Parser using Peppa PEG: [json.h](examples/json.h).
+* Write a Calculator Parser using Peppa PEG: [calc.h](examples/calc.h), [calc.c](examples/calc.c).
 
 Made with ❤️  by [Ju](https://github.com/soasme).
 

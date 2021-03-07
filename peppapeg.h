@@ -1264,6 +1264,38 @@ P4_Expression* P4_CreateStartOfInput();
  */
 P4_Expression* P4_CreateEndOfInput();
 
+/**
+ * Add a Join expression as grammar rule.
+ *
+ * @param   grammar     The grammar.
+ * @param   id          The grammar rule id.
+ * @param   joiner  A joiner literal.
+ * @param   pattern The repeated pattern rule id.
+ * @return  The error code.
+ *
+ * Example:
+ *
+ *      P4_Expression* row = P4_AddJoin(grammar, 1, ",", Element);
+ */
+P4_Error P4_AddJoin(P4_Grammar* grammar, P4_RuleID id, const P4_String joiner, P4_RuleID rule_id);
+
+/**
+ * Create a Join expression.
+ *
+ * @param   joiner  A joiner literal.
+ * @param   pattern The repeated pattern rule id.
+ * @return  A P4_Expression.
+ *
+ * Example:
+ *
+ *      P4_Expression* row = P4_CreateJoin(",", Element);
+ *
+ * Join is a syntax sugar to the below structure:
+ *
+ *      Sequence(pattern, ZeroOrMore(Sequence(Literal(joiner), pattern)))
+ */
+P4_Expression* P4_CreateJoin(const P4_String joiner, P4_RuleID rule_id);
+
 
 /**
  * Free an expression.

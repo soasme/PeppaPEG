@@ -326,6 +326,20 @@ P4_DeleteToken(P4_Token* token) {
     }
 }
 
+P4_PRIVATE(void)
+P4_DeleteTokenUserData(P4_Grammar* grammar, P4_Token* token) {
+    if (grammar->free_func == NULL)
+        return;
+
+    P4_Token* tmp = token;
+    while (tmp != NULL) {
+        if (tmp->userdata != NULL)
+            grammar->free_func(tmp->userdata);
+        P4_DeleteTokenUserData(grammar, tmp->head);
+        tmp = tmp->next;
+    }
+}
+
 /*
  * Push e into s->frame_stack.
  */
@@ -1422,10 +1436,10 @@ P4_DeleteSource(P4_Source* source) {
     if (source->errmsg)
         free(source->errmsg);
 
-    /* XXX: Delete userdata first. */
-
-    if (source->root)
+    if (source->root) {
+        P4_DeleteTokenUserData(source->grammar, source->root);
         P4_DeleteToken(source->root);
+    }
 
     free(source);
 }

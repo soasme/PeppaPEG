@@ -32,10 +32,11 @@
 - [ ] Enable AddressSanitizer. Example: cJSON.
 - [ ] RequireVersion.
 - [ ] GetErrorString.
-- [ ] Except.
+- [ ] Except (Any but).
 - [ ] Any.
 - [ ] Until.
-- [ ] Join. Added in v1.7.0.
+- [x] GetErrorString. Added in v1.7.0.
+- [x] Join. Added in v1.7.0.
 - [x] Start-of-Input & End-of-Input. Added in v1.7.0.
 - [x] Range `stride`. Added in v1.7.0.
 - [x] Return NullError for CreatePositive/CreateNegative/... Added in v1.6.0.

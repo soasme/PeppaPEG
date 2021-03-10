@@ -988,33 +988,24 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
     return tok;
 }
 
-/* Poor performance, refactor me. */
-P4_PUBLIC void
-P4_PrintSourceAst(P4_Token* token, P4_String buf, size_t indent) {
-    P4_Token* current = token;
-    char idstr[6];
-    size_t i;
-    idstr[0] = 'R';
-    while (current != NULL) {
-        for (i = 0; i < indent; i++) strcat(buf, " ");
-        strcat(buf, "- ");
-        sprintf(idstr+1, "%lu", current->rule_id);
-        strcat(buf, idstr);
-        if (current->head == NULL) {
-            strcat(buf, ": \"");
-            size_t substr_len = (current->slice.j - current->slice.i);
-            autofree P4_String substr = malloc( sizeof(char) * (substr_len+1) );
-            memcpy(substr, current->text+current->slice.i, substr_len);
-            substr[substr_len] = '\0';
-            strcat(buf, substr);
-            strcat(buf, "\"\n");
-        } else {
-            strcat(buf, "\n");
-            P4_PrintSourceAst(current->head, buf, indent+2);
+void
+P4_JsonifySourceAst(FILE* stream, P4_Token* token, P4_KindToName namefunc) {
+    fprintf(stream, "[");
+    P4_Token* tmp = token;
+    while (tmp != NULL) {
+        fprintf(stream, "{\"slice\":[%lu,%lu]", tmp->slice.i, tmp->slice.j);
+        fprintf(stream, ",\"type\":\"%s\"", namefunc(tmp->rule_id));
+        if (tmp->head != NULL) {
+            fprintf(stream, ",\"children\":");
+            P4_JsonifySourceAst(stream, tmp->head, namefunc);
         }
-        current = current->next;
+        fprintf(stream, "}");
+        if (tmp->next != NULL) fprintf(stream, ",");
+        tmp = tmp->next;
     }
+    fprintf(stream, "]");
 }
+
 
 /*
  * Get version string.

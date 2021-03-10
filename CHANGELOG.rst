@@ -1,12 +1,22 @@
 Change Log
 ===========
 
+1.7.0 (10 Mar, 2021)
+
+Code change: <https://github.com/soasme/PeppaPEG/compare/v1.6.0..v1.7.0>.
+
+* [Enhancement]: Provided `P4_GetErrorString`. `#44 <https://github.com/soasme/PeppaPEG/pull/44>`_
+* [Feature]: Added Join. `#44 <https://github.com/soasme/PeppaPEG/pull/44>`_
+* [Example]: Wrote an Calculator example in Peppa PEG. `#43 <https://github.com/soasme/PeppaPEG/pull/43>`_
+* [Feature]: Added StartOfInput and EndOfInput. `#42 <https://github.com/soasme/PeppaPEG/pull/42>`_
+* [Feature]: Added parameter `stride` for Range. `#41 <https://github.com/soasme/PeppaPEG/pull/41>`_
+
 1.6.0 (4 Mar, 2021)
 -------------------
 
 Code change: <https://github.com/soasme/PeppaPEG/compare/v1.5.0..v1.6.0>.
 
-* [Enhancement]: Replace `token->expr` with `token->rule_id`. `#40 <https://github.com/soasme/PeppaPEG/pull/40>`_
+* [Enhancement]: Replaced `token->expr` with `token->rule_id`. `#40 <https://github.com/soasme/PeppaPEG/pull/40>`_
 * [Bugfix]: Insert no whitespace while spacing is ongoing. `#39 <https://github.com/soasme/PeppaPEG/pull/39>`_
 * [Example]: JSON example parser passes full JSON test suite. `#37 <https://github.com/soasme/PeppaPEG/pull/37>`_
 * [Enhancement]: Support Emoji 🐷 `#36 <https://github.com/soasme/PeppaPEG/pull/36>`_

@@ -135,7 +135,7 @@ P4_Grammar*  P4_CreateJSONGrammar() {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_JSONNumber, P4_FLAG_TIGHT))
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_JSONNumber, P4_FLAG_TIGHT | P4_FLAG_SQUASHED))
         goto finalize;
 
     if (P4_Ok != P4_AddLiteral(grammar, P4_JSONNull, "null", true))
@@ -259,6 +259,23 @@ P4_Grammar*  P4_CreateJSONGrammar() {
 finalize:
     P4_DeleteGrammar(grammar);
     return NULL;
+}
+
+P4_String P4_JSONKindToName(long unsigned id) {
+    switch(id) {
+        case P4_JSONObject: return "object";
+        case P4_JSONObjectItem: return "member";
+        case P4_JSONArray: return "array";
+        case P4_JSONString: return "string";
+        case P4_JSONTrue: return "true";
+        case P4_JSONFalse: return "false";
+        case P4_JSONNull: return "null";
+        case P4_JSONNumber: return "number";
+        case P4_JSONIntegral: return "integer";
+        case P4_JSONFractional: return "fraction";
+        case P4_JSONExponent: return "exponent";
+        default: return "unknown";
+    }
 }
 
 #ifdef __cplusplus

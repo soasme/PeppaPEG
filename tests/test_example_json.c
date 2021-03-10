@@ -106,12 +106,8 @@ void test_number_integer_0(void) {
     TEST_ASSERT_EQUAL_TOKEN_STRING("0", token);
 
     TEST_ASSERT_NULL(token->next);
-
-    TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONIntegral, token->head);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("0", token->head);
-
-    TEST_ASSERT_EQUAL(token->head, token->tail);
+    TEST_ASSERT_NULL(token->head);
+    TEST_ASSERT_NULL(token->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -137,12 +133,8 @@ void test_number_integer_1234567890(void) {
     TEST_ASSERT_EQUAL_TOKEN_STRING("1234567890", token);
 
     TEST_ASSERT_NULL(token->next);
-
-    TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONIntegral, token->head);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("1234567890", token->head);
-
-    TEST_ASSERT_EQUAL(token->head, token->tail);
+    TEST_ASSERT_NULL(token->head);
+    TEST_ASSERT_NULL(token->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -168,14 +160,8 @@ void test_number_float(void) {
     TEST_ASSERT_EQUAL_TOKEN_STRING("0.1", token);
 
     TEST_ASSERT_NULL(token->next);
-
-    TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONIntegral, token->head);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("0", token->head);
-
-    TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONFractional, token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_STRING(".1", token->tail);
+    TEST_ASSERT_NULL(token->head);
+    TEST_ASSERT_NULL(token->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -201,14 +187,8 @@ void test_number_exp(void) {
     TEST_ASSERT_EQUAL_TOKEN_STRING("1e+1", token);
 
     TEST_ASSERT_NULL(token->next);
-
-    TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONIntegral, token->head);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("1", token->head);
-
-    TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONExponent, token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("e+1", token->tail);
+    TEST_ASSERT_NULL(token->head);
+    TEST_ASSERT_NULL(token->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

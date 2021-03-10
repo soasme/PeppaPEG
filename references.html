@@ -1873,6 +1873,25 @@
 </p>
 </dd></dl>
 <dl class="c function">
+<dt id="c.P4_GetErrorString">
+<span class="target" id="peppapeg_8h_1ac216897279702ed6b077c6a825286c5c"></span><span class="pre">P4_String</span> <code class="sig-name descname"><span class="pre">P4_GetErrorString</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <em><span class="pre">err</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetErrorString" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Get the error string given an error code. </p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_String</span> <span class="n">errstr</span> <span class="o">=</span> <span class="n">P4_GetErrorString</span><span class="p">(</span><span class="n">P4_MatchError</span><span class="p">);</span>
+ <span class="n">printf</span><span class="p">(</span><span class="s2">"</span><span class="si">%s</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">errstr</span><span class="p">);</span> <span class="o">//</span> <span class="s2">"MatchError"</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The error string.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">err</span></code>: The error code. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
 <dt id="c.P4_GetErrorMessage">
 <span class="target" id="peppapeg_8h_1a877cb1cbe4215981b411083626ad74d4"></span><span class="pre">P4_String</span> <code class="sig-name descname"><span class="pre">P4_GetErrorMessage</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Source" title="P4_Source"><span class="pre">P4_Source</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetErrorMessage" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Get the error message if failed to parse the source. </p>

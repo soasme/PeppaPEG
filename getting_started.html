@@ -260,8 +260,9 @@
     <span class="p">}</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">printf</span><span class="p">(</span><span class="s">"Error: Parse: ErrCode[%lu] Message[%s]</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"Error: Parse: ErrCode[%lu] Err[%s] Message[%s]</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
             <span class="n">P4_GetError</span><span class="p">(</span><span class="n">source</span><span class="p">),</span>
+            <span class="n">P4_GetErrorString</span><span class="p">(</span><span class="n">P4_GetError</span><span class="p">(</span><span class="n">source</span><span class="p">)),</span>
             <span class="n">P4_GetErrorMessage</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
         <span class="p">);</span>
         <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>

@@ -1462,6 +1462,36 @@ P4_GetError(P4_Source* source) {
     return source->err;
 }
 
+P4_String
+P4_GetErrorString(P4_Error err) {
+    switch (err) {
+        case P4_Ok:
+            return "";
+        case P4_InternalError:
+            return "InternalError";
+        case P4_MatchError:
+            return "MatchError";
+        case P4_NameError:
+            return "NameError";
+        case P4_AdvanceError:
+            return "AdvanceError";
+        case P4_MemoryError:
+            return "MemoryError";
+        case P4_ValueError:
+            return "ValueError";
+        case P4_IndexError:
+            return "IndexError";
+        case P4_KeyError:
+            return "KeyError";
+        case P4_NullError:
+            return "NullError";
+        case P4_StackError:
+            return "StackError";
+        default:
+            return "UnknownError";
+    }
+}
+
 P4_PUBLIC P4_String
 P4_GetErrorMessage(P4_Source* source) {
     if (source == NULL || source->errmsg == NULL)

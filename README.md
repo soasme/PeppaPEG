@@ -197,8 +197,9 @@ int main(int argc, char* argv[]) {
     }
 
     if (P4_Parse(grammar, source) != P4_Ok) {
-        printf("Error: Parse: ErrCode[%lu] Message[%s]\n",
+        printf("Error: Parse: ErrCode[%lu] Err[%s] Message[%s]\n",
             P4_GetError(source),
+            P4_GetErrorString(P4_GetError(source)),
             P4_GetErrorMessage(source)
         );
         return 1;

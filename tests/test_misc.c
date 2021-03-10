@@ -130,6 +130,19 @@ void test_join(void) {
     P4_DeleteGrammar(grammar);
 }
 
+void test_error_string(void) {
+    TEST_ASSERT_EQUAL_STRING("InternalError", P4_GetErrorString(P4_InternalError));
+    TEST_ASSERT_EQUAL_STRING("MatchError", P4_GetErrorString(P4_MatchError));
+    TEST_ASSERT_EQUAL_STRING("NameError", P4_GetErrorString(P4_NameError));
+    TEST_ASSERT_EQUAL_STRING("AdvanceError", P4_GetErrorString(P4_AdvanceError));
+    TEST_ASSERT_EQUAL_STRING("MemoryError", P4_GetErrorString(P4_MemoryError));
+    TEST_ASSERT_EQUAL_STRING("ValueError", P4_GetErrorString(P4_ValueError));
+    TEST_ASSERT_EQUAL_STRING("KeyError", P4_GetErrorString(P4_KeyError));
+    TEST_ASSERT_EQUAL_STRING("NullError", P4_GetErrorString(P4_NullError));
+    TEST_ASSERT_EQUAL_STRING("StackError", P4_GetErrorString(P4_StackError));
+    TEST_ASSERT_EQUAL_STRING("UnknownError", P4_GetErrorString(999999));
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -137,6 +150,7 @@ int main(void) {
     RUN_TEST(test_replace_grammar_rule);
     RUN_TEST(test_replace_grammar_rule_refreshing_references);
     RUN_TEST(test_join);
+    RUN_TEST(test_error_string);
 
     return UNITY_END();
 }

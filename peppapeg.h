@@ -1572,6 +1572,18 @@ bool           P4_HasError(P4_Source*);
 P4_Error       P4_GetError(P4_Source*);
 
 /**
+ * @brief       Get the error string given an error code.
+ * @param       err     The error code.
+ * @return      The error string.
+ *
+ * Example:
+ *
+ *      P4_String errstr = P4_GetErrorString(P4_MatchError);
+ *      printf("%s\n", errstr); // "MatchError"
+ */
+P4_String      P4_GetErrorString(P4_Error err);
+
+/**
  * @brief       Get the error message if failed to parse the source.
  * @param       source      The source.
  * @return      The error message.

@@ -322,6 +322,11 @@
 <dd><p>The id for matched grammar rule. </p>
 </dd></dl>
 <dl class="c var">
+<dt id="c.P4_Token.userdata">
+<span class="target" id="structP4__Token_1a26fc368f2a1402ab236319ccd9fa6e9f"></span><span class="pre">P4_UserData</span> <code class="sig-name descname"><span class="pre">userdata</span></code><a class="headerlink" href="#c.P4_Token.userdata" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>The user data. </p>
+</dd></dl>
+<dl class="c var">
 <dt id="c.P4_Token.next">
 <span class="target" id="structP4__Token_1a2a78c9f50da1ef7e7e18dd52ef496aa4"></span><em class="property"><span class="pre">struct</span></em> <a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">next</span></code><a class="headerlink" href="#c.P4_Token.next" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>the sibling token. NULL if not exists. </p>
@@ -383,6 +388,11 @@
 <dt id="c.P4_Grammar.on_error">
 <span class="target" id="structP4__Grammar_1a66cf401600b2bf0d766b1aa34678d8c4"></span><span class="pre">P4_ErrorCallback</span> <code class="sig-name descname"><span class="pre">on_error</span></code><a class="headerlink" href="#c.P4_Grammar.on_error" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>The callback after a match for an expression is failed. </p>
+</dd></dl>
+<dl class="c var">
+<dt id="c.P4_Grammar.free_func">
+<span class="target" id="structP4__Grammar_1ac8b39eabecc60e1a7a6bf5b02d2ec1ec"></span><span class="pre">P4_UserDataFreeFunc</span> <code class="sig-name descname"><span class="pre">free_func</span></code><a class="headerlink" href="#c.P4_Grammar.free_func" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>The callback to free user data. </p>
 </dd></dl>
 </div>
 </dd></dl>
@@ -1702,6 +1712,21 @@
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">limit</span></code>: The number of maximum recursion calls. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_SetUserDataFreeFunc">
+<span class="target" id="peppapeg_8h_1a907b32464763c9b5d4f958ddf0e15cbb"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_SetUserDataFreeFunc</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a> <span class="pre">*</span><em><span class="pre">grammar</span></em>, <span class="pre">P4_UserDataFreeFunc</span> <em><span class="pre">free_func</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_SetUserDataFreeFunc" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Set free function for the user data. </p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The error code. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">free_func</span></code>: The free function. </p></li>
 </ul>
 </dd>
 </dl>

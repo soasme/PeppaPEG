@@ -326,6 +326,20 @@ P4_DeleteToken(P4_Token* token) {
     }
 }
 
+P4_PRIVATE(void)
+P4_DeleteTokenUserData(P4_Grammar* grammar, P4_Token* token) {
+    if (grammar->free_func == NULL)
+        return;
+
+    P4_Token* tmp = token;
+    while (tmp != NULL) {
+        if (tmp->userdata != NULL)
+            grammar->free_func(tmp->userdata);
+        P4_DeleteTokenUserData(grammar, tmp->head);
+        tmp = tmp->next;
+    }
+}
+
 /*
  * Push e into s->frame_stack.
  */
@@ -1287,6 +1301,7 @@ P4_PUBLIC P4_Grammar*    P4_CreateGrammar(void) {
     grammar->depth = P4_DEFAULT_RECURSION_LIMIT;
     grammar->on_match = NULL;
     grammar->on_error = NULL;
+    grammar->free_func = NULL;
     return grammar;
 }
 
@@ -1342,6 +1357,16 @@ P4_SetRecursionLimit(P4_Grammar* grammar, size_t limit) {
 P4_PUBLIC size_t
 P4_GetRecursionLimit(P4_Grammar* grammar) {
     return grammar == NULL ? 0 : grammar->depth;
+}
+
+P4_Error
+P4_SetUserDataFreeFunc(P4_Grammar* grammar, P4_UserDataFreeFunc free_func) {
+    if (grammar == NULL)
+        return P4_NullError;
+
+    grammar->free_func = free_func;
+
+    return P4_Ok;
 }
 
 P4_PUBLIC P4_Error
@@ -1402,8 +1427,10 @@ P4_DeleteSource(P4_Source* source) {
     if (source->errmsg)
         free(source->errmsg);
 
-    if (source->root)
+    if (source->root) {
+        P4_DeleteTokenUserData(source->grammar, source->root);
         P4_DeleteToken(source->root);
+    }
 
     free(source);
 }

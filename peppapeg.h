@@ -236,6 +236,17 @@ typedef char*           P4_String;
  * */
 typedef uint64_t        P4_RuleID;
 
+/**
+ * The reference of user data.
+ */
+typedef void*   P4_UserData;
+
+/**
+ * The function to free user data.
+ */
+typedef void    (*P4_UserDataFreeFunc)(P4_UserData);
+
+
 /*
  *
  * ░██████╗████████╗██████╗░██╗░░░██╗░█████╗░████████╗░██████╗
@@ -399,6 +410,9 @@ typedef struct P4_Token {
     /** The id for matched grammar rule. */
     P4_RuleID               rule_id;
 
+    /** The user data. */
+    P4_UserData             userdata;
+
     /** the sibling token. NULL if not exists. */
     struct P4_Token*        next;
     /** the first child of inner tokens. NULL if not exists. */
@@ -437,6 +451,8 @@ typedef struct P4_Grammar{
     P4_MatchCallback        on_match;
     /** The callback after a match for an expression is failed. */
     P4_ErrorCallback        on_error;
+    /** The callback to free user data. */
+    P4_UserDataFreeFunc     free_func;
 } P4_Grammar;
 
 
@@ -1466,6 +1482,14 @@ P4_Error       P4_SetGrammarRuleFlag(P4_Grammar*, P4_RuleID, P4_ExpressionFlag);
  *      P4_SetRecursionLimit(grammar, 1024*20);
  */
 P4_Error       P4_SetRecursionLimit(P4_Grammar*, size_t limit);
+
+/**
+ * @brief       Set free function for the user data.
+ * @param       grammar     The grammar.
+ * @param       free_func   The free function.
+ * @return      The error code.
+ */
+P4_Error       P4_SetUserDataFreeFunc(P4_Grammar* grammar, P4_UserDataFreeFunc free_func);
 
 /**
  * @brief       Get the maximum allowed recursion calls.

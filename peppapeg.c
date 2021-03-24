@@ -103,8 +103,11 @@ cleanup_freep (void *p)
                                     return err;                 \
 } while (0)
 
+P4_PRIVATE(size_t)       P4_GetRuneSize(P4_Rune ch);
+P4_PRIVATE(P4_Rune)      P4_GetRuneLower(P4_Rune ch);
+P4_PRIVATE(P4_Rune)      P4_GetRuneUpper(P4_Rune ch);
 P4_PRIVATE(size_t)       P4_ReadRune(P4_String s, P4_Rune* c);
-P4_PRIVATE(int)          P4_CaseCmpInsensitive(P4_String, P4_String, size_t);
+P4_PRIVATE(int)          P4_CaseCmpInsensitive(const void*, const void*, size_t n);
 
 P4_PRIVATE(P4_Position)  P4_GetPosition(P4_Source*);
 P4_PRIVATE(void)                P4_SetPosition(P4_Source*, P4_Position);
@@ -141,6 +144,19 @@ P4_PRIVATE(P4_Token*)           P4_MatchChoice(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchRepeat(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchSpacedExpressions(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchBackReference(P4_Source*, P4_Expression*, P4_Slice*, P4_Expression*);
+
+size_t
+P4_GetRuneSize(P4_Rune ch) {
+  if (0 == ((P4_Rune)0xffffff80 & ch)) {
+    return 1;
+  } else if (0 == ((P4_Rune)0xfffff800 & ch)) {
+    return 2;
+  } else if (0 == ((P4_Rune)0xffff0000 & ch)) {
+    return 3;
+  } else { /* e.g.  0 == ((int)0xffe00000 & chr)) */
+    return 4;
+  }
+}
 
 /**
  *
@@ -179,33 +195,242 @@ P4_ReadRune(P4_String s, P4_Rune* c) {
     }
 }
 
-/*
- * Compare case-insensitive string src v/s dest.
+
+/**
+ * @brief   Get rune in lower case.
  *
- * Like strcmp, but works for a case insensitive UTF-8 string.
+ * Modified from https://github.com/sheredom/utf8.h
  */
-P4_PRIVATE(int)
-P4_CaseCmpInsensitive(P4_String src, P4_String dst, size_t len) {
-    uint32_t srcch = 0x0, dstch = 0x0;
-    size_t srcsz = 0, dstsz = 0, remaining = len;
-    int cmp = 0;
-    if (strlen(dst) < len) return -1;
-    while (*src != 0x0 && *dst != 0x0) {
-        srcsz = P4_ReadRune(src, &srcch);
-        dstsz = P4_ReadRune(dst, &dstch);
-        if (srcsz < dstsz) return -1;
-        if (srcsz > dstsz) return 1;
-        if (srcsz != 1 && srcch != dstch) return srcch > dstch ? 1 : -1;
-        cmp = tolower(srcch) - tolower(dstch);
-        if (srcsz == 1 && cmp != 0) return cmp;
-        src = src + srcsz;
-        dst = dst + dstsz;
-        remaining--;
-        if (remaining == 0) return 0;
+P4_PRIVATE(P4_Rune)
+P4_GetRuneLower(P4_Rune cp) {
+    if (((0x0041 <= cp) && (0x005a >= cp)) ||
+        ((0x00c0 <= cp) && (0x00d6 >= cp)) ||
+        ((0x00d8 <= cp) && (0x00de >= cp)) ||
+        ((0x0391 <= cp) && (0x03a1 >= cp)) ||
+        ((0x03a3 <= cp) && (0x03ab >= cp)) ||
+        ((0x0410 <= cp) && (0x042f >= cp))) {
+        cp += 32;
+    } else if ((0x0400 <= cp) && (0x040f >= cp)) {
+        cp += 80;
+    } else if (((0x0100 <= cp) && (0x012f >= cp)) ||
+                ((0x0132 <= cp) && (0x0137 >= cp)) ||
+                ((0x014a <= cp) && (0x0177 >= cp)) ||
+                ((0x0182 <= cp) && (0x0185 >= cp)) ||
+                ((0x01a0 <= cp) && (0x01a5 >= cp)) ||
+                ((0x01de <= cp) && (0x01ef >= cp)) ||
+                ((0x01f8 <= cp) && (0x021f >= cp)) ||
+                ((0x0222 <= cp) && (0x0233 >= cp)) ||
+                ((0x0246 <= cp) && (0x024f >= cp)) ||
+                ((0x03d8 <= cp) && (0x03ef >= cp)) ||
+                ((0x0460 <= cp) && (0x0481 >= cp)) ||
+                ((0x048a <= cp) && (0x04ff >= cp))) {
+        cp |= 0x1;
+    } else if (((0x0139 <= cp) && (0x0148 >= cp)) ||
+                ((0x0179 <= cp) && (0x017e >= cp)) ||
+                ((0x01af <= cp) && (0x01b0 >= cp)) ||
+                ((0x01b3 <= cp) && (0x01b6 >= cp)) ||
+                ((0x01cd <= cp) && (0x01dc >= cp))) {
+        cp += 1;
+        cp &= ~0x1;
+    } else {
+        switch (cp) {
+            case 0x0178: cp = 0x00ff; break;
+            case 0x0243: cp = 0x0180; break;
+            case 0x018e: cp = 0x01dd; break;
+            case 0x023d: cp = 0x019a; break;
+            case 0x0220: cp = 0x019e; break;
+            case 0x01b7: cp = 0x0292; break;
+            case 0x01c4: cp = 0x01c6; break;
+            case 0x01c7: cp = 0x01c9; break;
+            case 0x01ca: cp = 0x01cc; break;
+            case 0x01f1: cp = 0x01f3; break;
+            case 0x01f7: cp = 0x01bf; break;
+            case 0x0187: cp = 0x0188; break;
+            case 0x018b: cp = 0x018c; break;
+            case 0x0191: cp = 0x0192; break;
+            case 0x0198: cp = 0x0199; break;
+            case 0x01a7: cp = 0x01a8; break;
+            case 0x01ac: cp = 0x01ad; break;
+            case 0x01af: cp = 0x01b0; break;
+            case 0x01b8: cp = 0x01b9; break;
+            case 0x01bc: cp = 0x01bd; break;
+            case 0x01f4: cp = 0x01f5; break;
+            case 0x023b: cp = 0x023c; break;
+            case 0x0241: cp = 0x0242; break;
+            case 0x03fd: cp = 0x037b; break;
+            case 0x03fe: cp = 0x037c; break;
+            case 0x03ff: cp = 0x037d; break;
+            case 0x037f: cp = 0x03f3; break;
+            case 0x0386: cp = 0x03ac; break;
+            case 0x0388: cp = 0x03ad; break;
+            case 0x0389: cp = 0x03ae; break;
+            case 0x038a: cp = 0x03af; break;
+            case 0x038c: cp = 0x03cc; break;
+            case 0x038e: cp = 0x03cd; break;
+            case 0x038f: cp = 0x03ce; break;
+            case 0x0370: cp = 0x0371; break;
+            case 0x0372: cp = 0x0373; break;
+            case 0x0376: cp = 0x0377; break;
+            case 0x03f4: cp = 0x03b8; break;
+            case 0x03cf: cp = 0x03d7; break;
+            case 0x03f9: cp = 0x03f2; break;
+            case 0x03f7: cp = 0x03f8; break;
+            case 0x03fa: cp = 0x03fb; break;
+            default: break;
+        }
     }
-    return 0;
+
+    return cp;
 }
 
+/**
+ * @brief   Get rune in upper case.
+ *
+ * Modified from https://github.com/sheredom/utf8.h
+ */
+P4_PRIVATE(P4_Rune)
+P4_GetRuneUpper(P4_Rune cp) {
+    if (((0x0061 <= cp) && (0x007a >= cp)) ||
+        ((0x00e0 <= cp) && (0x00f6 >= cp)) ||
+        ((0x00f8 <= cp) && (0x00fe >= cp)) ||
+        ((0x03b1 <= cp) && (0x03c1 >= cp)) ||
+        ((0x03c3 <= cp) && (0x03cb >= cp)) ||
+        ((0x0430 <= cp) && (0x044f >= cp))) {
+        cp -= 32;
+    } else if ((0x0450 <= cp) && (0x045f >= cp)) {
+        cp -= 80;
+    } else if (((0x0100 <= cp) && (0x012f >= cp)) ||
+                ((0x0132 <= cp) && (0x0137 >= cp)) ||
+                ((0x014a <= cp) && (0x0177 >= cp)) ||
+                ((0x0182 <= cp) && (0x0185 >= cp)) ||
+                ((0x01a0 <= cp) && (0x01a5 >= cp)) ||
+                ((0x01de <= cp) && (0x01ef >= cp)) ||
+                ((0x01f8 <= cp) && (0x021f >= cp)) ||
+                ((0x0222 <= cp) && (0x0233 >= cp)) ||
+                ((0x0246 <= cp) && (0x024f >= cp)) ||
+                ((0x03d8 <= cp) && (0x03ef >= cp)) ||
+                ((0x0460 <= cp) && (0x0481 >= cp)) ||
+                ((0x048a <= cp) && (0x04ff >= cp))) {
+        cp &= ~0x1;
+    } else if (((0x0139 <= cp) && (0x0148 >= cp)) ||
+                ((0x0179 <= cp) && (0x017e >= cp)) ||
+                ((0x01af <= cp) && (0x01b0 >= cp)) ||
+                ((0x01b3 <= cp) && (0x01b6 >= cp)) ||
+                ((0x01cd <= cp) && (0x01dc >= cp))) {
+        cp -= 1;
+        cp |= 0x1;
+    } else {
+        switch (cp) {
+            case 0x00ff: cp = 0x0178; break;
+            case 0x0180: cp = 0x0243; break;
+            case 0x01dd: cp = 0x018e; break;
+            case 0x019a: cp = 0x023d; break;
+            case 0x019e: cp = 0x0220; break;
+            case 0x0292: cp = 0x01b7; break;
+            case 0x01c6: cp = 0x01c4; break;
+            case 0x01c9: cp = 0x01c7; break;
+            case 0x01cc: cp = 0x01ca; break;
+            case 0x01f3: cp = 0x01f1; break;
+            case 0x01bf: cp = 0x01f7; break;
+            case 0x0188: cp = 0x0187; break;
+            case 0x018c: cp = 0x018b; break;
+            case 0x0192: cp = 0x0191; break;
+            case 0x0199: cp = 0x0198; break;
+            case 0x01a8: cp = 0x01a7; break;
+            case 0x01ad: cp = 0x01ac; break;
+            case 0x01b0: cp = 0x01af; break;
+            case 0x01b9: cp = 0x01b8; break;
+            case 0x01bd: cp = 0x01bc; break;
+            case 0x01f5: cp = 0x01f4; break;
+            case 0x023c: cp = 0x023b; break;
+            case 0x0242: cp = 0x0241; break;
+            case 0x037b: cp = 0x03fd; break;
+            case 0x037c: cp = 0x03fe; break;
+            case 0x037d: cp = 0x03ff; break;
+            case 0x03f3: cp = 0x037f; break;
+            case 0x03ac: cp = 0x0386; break;
+            case 0x03ad: cp = 0x0388; break;
+            case 0x03ae: cp = 0x0389; break;
+            case 0x03af: cp = 0x038a; break;
+            case 0x03cc: cp = 0x038c; break;
+            case 0x03cd: cp = 0x038e; break;
+            case 0x03ce: cp = 0x038f; break;
+            case 0x0371: cp = 0x0370; break;
+            case 0x0373: cp = 0x0372; break;
+            case 0x0377: cp = 0x0376; break;
+            case 0x03d1: cp = 0x0398; break;
+            case 0x03d7: cp = 0x03cf; break;
+            case 0x03f2: cp = 0x03f9; break;
+            case 0x03f8: cp = 0x03f7; break;
+            case 0x03fb: cp = 0x03fa; break;
+            default: break;
+        }
+    }
+
+    return cp;
+}
+
+/*
+ * Compare case-insensitive string src1 v/s src2.
+ *
+ * Like strcmp, but works for a case insensitive UTF-8 string.
+ * Modified from https://github.com/sheredom/utf8.h
+ */
+P4_PRIVATE(int)
+P4_CaseCmpInsensitive(const void* src1, const void* src2, size_t n) {
+    P4_Rune src1_lwr_cp, src2_lwr_cp, src1_upr_cp, src2_upr_cp, src1_orig_cp, src2_orig_cp;
+
+    do {
+        const unsigned char *const s1 = (const unsigned char *)src1;
+        const unsigned char *const s2 = (const unsigned char *)src2;
+
+        /* check bytes left in n. */
+        if (0 == n) return 0;
+
+        if ((1 == n) && ((0xc0 == (0xe0 & *s1)) || (0xc0 == (0xe0 & *s2)))) {
+            const P4_Rune c1 = (0xe0 & *s1);
+            const P4_Rune c2 = (0xe0 & *s2);
+            if (c1 < c2) return c1 - c2;
+            else return 0;
+        }
+
+        if ((2 >= n) && ((0xe0 == (0xf0 & *s1)) || (0xe0 == (0xf0 & *s2)))) {
+            const P4_Rune c1 = (0xf0 & *s1);
+            const P4_Rune c2 = (0xf0 & *s2);
+
+            if (c1 < c2) return c1 - c2;
+            else return 0;
+        }
+
+        if ((3 >= n) && ((0xf0 == (0xf8 & *s1)) || (0xf0 == (0xf8 & *s2)))) {
+            const P4_Rune c1 = (0xf8 & *s1);
+            const P4_Rune c2 = (0xf8 & *s2);
+            if (c1 < c2) return c1 - c2;
+            else return 0;
+        }
+
+        src1 = src1 + P4_ReadRune((P4_String)src1, &src1_orig_cp);
+        src2 = src2 + P4_ReadRune((P4_String)src2, &src2_orig_cp);
+        n -= P4_GetRuneSize(src1_orig_cp);
+
+        src1_lwr_cp = P4_GetRuneLower(src1_orig_cp);
+        src2_lwr_cp = P4_GetRuneLower(src2_orig_cp);
+
+        src1_upr_cp = P4_GetRuneUpper(src1_orig_cp);
+        src2_upr_cp = P4_GetRuneUpper(src2_orig_cp);
+
+        /* check if the lowered codepoints match */
+        if ((0 == src1_orig_cp) && (0 == src2_orig_cp))
+            return 0;
+        else if ((src1_lwr_cp == src2_lwr_cp) || (src1_upr_cp == src2_upr_cp))
+            continue;
+
+        /* if they don't match, then we return the difference between the characters */
+        return src1_lwr_cp - src2_lwr_cp;
+    } while ( 0 < n );
+
+    return 0; /* match! */
+}
 
 /*
  * Determine if the corresponding token to `e` should be ignored.

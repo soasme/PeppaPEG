@@ -54,6 +54,39 @@ P4_Grammar* P4_CreateP4GenGrammar () {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenNumber, P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
         goto finalize;
 
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_P4GenChar, 4,
+        P4_CreateRange(0x20, 0x21, 1), /* Can't be 0x22: double quote " */
+        P4_CreateRange(0x23, 0x5b, 1), /* Can't be 0x5c: escape leading \ */
+        P4_CreateRange(0x5d, 0x10ffff, 1),
+        P4_CreateSequenceWithMembers(2,
+            P4_CreateLiteral("\\", true),
+            P4_CreateChoiceWithMembers(9,
+                P4_CreateLiteral("\"", true),
+                P4_CreateLiteral("/", true),
+                P4_CreateLiteral("\\", true),
+                P4_CreateLiteral("b", true),
+                P4_CreateLiteral("f", true),
+                P4_CreateLiteral("n", true),
+                P4_CreateLiteral("r", true),
+                P4_CreateLiteral("t", true),
+                P4_CreateSequenceWithMembers(2,
+                    P4_CreateLiteral("u", true),
+                    P4_CreateRepeatExact(
+                        P4_CreateChoiceWithMembers(3,
+                            P4_CreateRange('0', '9', 1),
+                            P4_CreateRange('a', 'f', 1),
+                            P4_CreateRange('A', 'F', 1)
+                        ), 4
+                    )
+                )
+            )
+        )
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenNumber, P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
+        goto finalize;
+
     return grammar;
 
 finalize:
@@ -64,6 +97,7 @@ finalize:
 P4_String   P4_P4GenKindToName(P4_RuleID id) {
     switch (id) {
         case P4_P4GenNumber: return "number";
+        case P4_P4GenChar: return "char";
         default: return "<unknown>";
     }
 }

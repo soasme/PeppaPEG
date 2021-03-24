@@ -290,6 +290,44 @@ void test_match_emoji_literal_successfully(void) {
     P4_DeleteGrammar(grammar);
 }
 
+/*
+ * Rules:
+ *  R1 = INSENSITIVE("Hello Worìd");
+ * Input:
+ *  "HELLO WORÌD"
+ * Output:
+ *   R1: "HELLO WORÌD"
+ */
+void test_case_insensitive_literal_for_nonascii_chars(void) {
+# define R1 1
+    P4_Grammar* grammar = P4_CreateGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddLiteral(grammar, R1, "Hello Worìd", false)
+    );
+
+    P4_Source* source = P4_CreateSource("HELLO WORÌD", R1);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_Parse(grammar, source)
+    );
+    TEST_ASSERT_EQUAL(12, P4_GetSourcePosition(source));
+
+    P4_Token* token = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("HELLO WORÌD", token);
+
+    TEST_ASSERT_NULL(token->next);
+    TEST_ASSERT_NULL(token->head);
+    TEST_ASSERT_NULL(token->tail);
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -303,6 +341,7 @@ int main(void) {
 
     RUN_TEST(test_match_unicode_literal_successfully);
     RUN_TEST(test_match_emoji_literal_successfully);
+    RUN_TEST(test_case_insensitive_literal_for_nonascii_chars);
 
     return UNITY_END();
 }

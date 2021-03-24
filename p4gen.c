@@ -33,7 +33,20 @@ typedef enum {
     P4_PeppaRepeat,
     P4_PeppaNumber,
     P4_PeppaChar,
-};
+} P4_P4GenRuleID;
+
+P4_Grammar* P4_CreateP4GenGrammar ();
+P4_String   P4_P4GenKindToName(P4_RuleID);
+
+P4_Grammar* P4_CreateP4GenGrammar () {
+    P4_Grammar* grammar = P4_CreateGrammar();
+
+    return grammar;
+
+finally:
+    P4_DeleteGrammar(grammar);
+    return NULL;
+}
 
 #ifdef __cplusplus
 }

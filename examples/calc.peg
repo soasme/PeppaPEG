@@ -1,0 +1,94 @@
+/*
+ * Peppa PEG -  Ultra lightweight PEG Parser in ANSI C.
+ *
+ * MIT License
+ *
+ * Copyright (c) 2021 Ju
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ * Example: Write a Calculator Parser using Peppa PEG.
+ *
+ * Compile:
+ *
+ *      $ ls examples/calc.*
+ *      calc.peg
+ *
+ *      $ peppa compile examples/calc.peg
+ *
+ *      $ ls examples/calc.*
+ *      calc.peg calc.c calc.h
+ *
+ *      $ gcc -shared -o examples/calc.o examples/calc.c
+ *
+ *      $ gcc -o examples/calc examples/calc.o examples/calc_main.c
+ *
+ *      $ ./examples/calc
+ *      => 1+1
+ *      2
+ *      => ^D
+ */
+
+P4_CalcStatement = { StartOfInput P4_CalcTerm EndOfInput }
+
+P4_CalcTerm = {
+    P4_CalcFactor
+    ((P4_CalcAddSign | P4_CalcMinusSign) P4_CalcFactor)*
+}
+
+P4_CalcFactor = {
+    P4_CalcUnary
+    ((P4_CalcMulSign | P4_CalcDivSign) P4_CalcUnary)*
+}
+
+P4_CalcUnary = {
+    P4_CalcAddSign P4_CalcUnary
+    | P4_CalcMinusSign P4_CalcUnary
+    | P4_CalcPrimary
+}
+
+@lifted
+P4_CalcPrimary = {
+    P4_CreateReference
+    | "(" P4_CalcTerm ")"
+}
+
+@tight @squashed
+P4_CalcInteger = { '0'..'9'+ }
+
+P4_CalcAddSign = { "+" }
+
+P4_CalcMinusSign = { "-" }
+
+P4_CalcMulSign = { "*" }
+
+P4_CalcDivSign) = { "/" }
+
+@spaced @lifted
+P4_CalcWhitespace = { " " | "\t" }
+
+%% callback
+
+// One can use grammar, rule, token to revise the results
+
+if (rule && rule->id == P4_CalcInteger) {
+    char* s = P4_CopyTokenString(token);
+    token->userdata = (P4_UserData) atol(s);
+    free(s);
+}

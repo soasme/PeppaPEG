@@ -20,7 +20,7 @@ void check_parse(P4_RuleID entry, P4_String input, P4_String output) {
     P4_JsonifySourceAst(f, root, P4_P4GenKindToName);
     fclose(f);
     P4_String s = read_file("check.json");
-    TEST_ASSERT_EQUAL_STRING(s, output);
+    TEST_ASSERT_EQUAL_STRING(output, s);
     free(s);
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -53,12 +53,33 @@ void test_string(void) {
     check_parse(P4_P4GenLiteral, "\"\\u0020\"", "[{\"slice\":[0,8],\"type\":\"literal\"}]");
 }
 
+void test_range(void) {
+    check_parse(P4_P4GenRange, "[a-z]", "\
+[{\"slice\":[0,5],\"type\":\"range\",\"children\":[\
+{\"slice\":[1,2],\"type\":\"char\"},\
+{\"slice\":[3,4],\"type\":\"char\"}]}]");
+    check_parse(P4_P4GenRange, "[1-9]", "\
+[{\"slice\":[0,5],\"type\":\"range\",\"children\":[\
+{\"slice\":[1,2],\"type\":\"char\"},\
+{\"slice\":[3,4],\"type\":\"char\"}]}]");
+    check_parse(P4_P4GenRange, "[\\u0020-\\u0030]", "\
+[{\"slice\":[0,15],\"type\":\"range\",\"children\":[\
+{\"slice\":[1,7],\"type\":\"char\"},\
+{\"slice\":[8,14],\"type\":\"char\"}]}]");
+    check_parse(P4_P4GenRange, "[1-9..2]", "\
+[{\"slice\":[0,8],\"type\":\"range\",\"children\":[\
+{\"slice\":[1,2],\"type\":\"char\"},\
+{\"slice\":[3,4],\"type\":\"char\"},\
+{\"slice\":[6,7],\"type\":\"number\"}]}]");
+}
+
 int main(void) {
     UNITY_BEGIN();
 
     RUN_TEST(test_number);
     RUN_TEST(test_char);
     RUN_TEST(test_string);
+    RUN_TEST(test_range);
 
     return UNITY_END();
 }

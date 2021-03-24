@@ -17,6 +17,7 @@ set(
     test_misc
     test_example_mustache
     test_example_json
+    test_p4gen
 )
 
 option(ENABLE_VALGRIND "Enable vagrind memory leak report." OFF)

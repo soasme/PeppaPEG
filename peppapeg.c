@@ -198,6 +198,8 @@ P4_ReadRune(P4_String s, P4_Rune* c) {
 
 /**
  * @brief   Get rune in lower case.
+ *
+ * Modified from https://github.com/sheredom/utf8.h
  */
 P4_PRIVATE(P4_Rune)
 P4_GetRuneLower(P4_Rune cp) {
@@ -283,6 +285,8 @@ P4_GetRuneLower(P4_Rune cp) {
 
 /**
  * @brief   Get rune in upper case.
+ *
+ * Modified from https://github.com/sheredom/utf8.h
  */
 P4_PRIVATE(P4_Rune)
 P4_GetRuneUpper(P4_Rune cp) {
@@ -367,9 +371,10 @@ P4_GetRuneUpper(P4_Rune cp) {
 }
 
 /*
- * Compare case-insensitive string src v/s dest.
+ * Compare case-insensitive string src1 v/s src2.
  *
  * Like strcmp, but works for a case insensitive UTF-8 string.
+ * Modified from https://github.com/sheredom/utf8.h
  */
 P4_PRIVATE(int)
 P4_CaseCmpInsensitive(const void* src1, const void* src2, size_t n) {

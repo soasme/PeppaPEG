@@ -103,6 +103,7 @@ cleanup_freep (void *p)
                                     return err;                 \
 } while (0)
 
+P4_PRIVATE(size_t)       P4_GetRuneSize(P4_Rune ch) {
 P4_PRIVATE(size_t)       P4_ReadRune(P4_String s, P4_Rune* c);
 P4_PRIVATE(int)          P4_CaseCmpInsensitive(P4_String, P4_String, size_t);
 
@@ -141,6 +142,19 @@ P4_PRIVATE(P4_Token*)           P4_MatchChoice(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchRepeat(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchSpacedExpressions(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchBackReference(P4_Source*, P4_Expression*, P4_Slice*, P4_Expression*);
+
+size_t
+P4_GetRuneSize(P4_Rune ch) {
+  if (0 == ((utf8_int32_t)0xffffff80 & ch)) {
+    return 1;
+  } else if (0 == ((utf8_int32_t)0xfffff800 & ch)) {
+    return 2;
+  } else if (0 == ((utf8_int32_t)0xffff0000 & ch)) {
+    return 3;
+  } else { // e.g.  0 == ((int)0xffe00000 & chr))
+    return 4;
+  }
+}
 
 /**
  *

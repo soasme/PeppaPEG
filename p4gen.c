@@ -84,7 +84,17 @@ P4_Grammar* P4_CreateP4GenGrammar () {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenNumber, P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenChar, P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
+        goto finalize;
+
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenLiteral, 3,
+        P4_CreateLiteral("\"", true),
+        P4_CreateZeroOrMore(P4_CreateReference(P4_P4GenChar)),
+        P4_CreateLiteral("\"", true)
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenLiteral, P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
         goto finalize;
 
     return grammar;
@@ -98,6 +108,7 @@ P4_String   P4_P4GenKindToName(P4_RuleID id) {
     switch (id) {
         case P4_P4GenNumber: return "number";
         case P4_P4GenChar: return "char";
+        case P4_P4GenLiteral: return "literal";
         default: return "<unknown>";
     }
 }

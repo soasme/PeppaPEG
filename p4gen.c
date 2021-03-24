@@ -19,8 +19,6 @@ typedef enum {
     P4_P4GenIdentifier,
     P4_P4GenLiteral,
     P4_P4GenRange,
-    P4_P4GenRangeLower,
-    P4_P4GenRangeUpper,
     P4_P4GenReference,
     P4_P4GenPositive,
     P4_P4GenNegative,

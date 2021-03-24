@@ -45,50 +45,37 @@
  *      => ^D
  */
 
-P4_CalcStatement = { StartOfInput P4_CalcTerm EndOfInput }
+P4_CalcStatement =  StartOfInput P4_CalcTerm EndOfInput 
 
-P4_CalcTerm = {
-    P4_CalcFactor
-    ((P4_CalcAddSign | P4_CalcMinusSign) P4_CalcFactor)*
-}
+P4_CalcTerm = P4_CalcFactor ((P4_CalcAddSign | P4_CalcMinusSign) P4_CalcFactor)*
 
-P4_CalcFactor = {
-    P4_CalcUnary
-    ((P4_CalcMulSign | P4_CalcDivSign) P4_CalcUnary)*
-}
+P4_CalcFactor = P4_CalcUnary ((P4_CalcMulSign | P4_CalcDivSign) P4_CalcUnary)*
 
-P4_CalcUnary = {
-    P4_CalcAddSign P4_CalcUnary
-    | P4_CalcMinusSign P4_CalcUnary
-    | P4_CalcPrimary
-}
+P4_CalcUnary = P4_CalcAddSign P4_CalcUnary | P4_CalcMinusSign P4_CalcUnary | P4_CalcPrimary
 
 @lifted
-P4_CalcPrimary = {
-    P4_CreateReference
-    | "(" P4_CalcTerm ")"
-}
+P4_CalcPrimary = P4_CreateReference | "(" P4_CalcTerm ")"
 
 @tight @squashed
-P4_CalcInteger = { '0'..'9'+ }
+P4_CalcInteger =  [0-9]+
 
-P4_CalcAddSign = { "+" }
+P4_CalcAddSign =  "+"
 
-P4_CalcMinusSign = { "-" }
+P4_CalcMinusSign =  "-"
 
-P4_CalcMulSign = { "*" }
+P4_CalcMulSign =  "*"
 
-P4_CalcDivSign) = { "/" }
+P4_CalcDivSign) =  "/"
 
 @spaced @lifted
-P4_CalcWhitespace = { " " | "\t" }
+P4_CalcWhitespace =  " " | "\t"
 
 %% callback
 
-// One can use grammar, rule, token to revise the results
+/* One can use grammar, rule, token to revise the results */
 
-if (rule && rule->id == P4_CalcInteger) {
+if (rule && rule->id == P4_CalcInteger) 
     char* s = P4_CopyTokenString(token);
     token->userdata = (P4_UserData) atol(s);
     free(s);
-}
+

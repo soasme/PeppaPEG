@@ -35,7 +35,10 @@
 - [ ] Except (Any but).
 - [ ] Any.
 - [ ] Until.
-- [x] print token ast in json format. Added in v1.8.0.
+- [ ] Add a fuzzy testing framework.
+- [x] Allow user setting Userdata for P4_Tokens. Added in v1.8.0.
+- [x] Support non-ascii case insensitive literal matching. Added in v1.8.0.
+- [x] Print token ast in json format. Added in v1.8.0.
 - [x] GetErrorString. Added in v1.7.0.
 - [x] Join. Added in v1.7.0.
 - [x] Start-of-Input & End-of-Input. Added in v1.7.0.

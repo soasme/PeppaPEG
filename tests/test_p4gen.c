@@ -100,6 +100,23 @@ void test_sequence(void) {
     check_parse(P4_P4GenSequence, "\"a\" \"b\"", "[{\"slice\":[0,7],\"type\":\"sequence\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
 }
 
+void test_expression(void) {
+    check_parse(P4_P4GenExpression, "\"a\"", "[{\"slice\":[0,3],\"type\":\"literal\"}]");
+    check_parse(P4_P4GenExpression, "[a-z]", "\
+[{\"slice\":[0,5],\"type\":\"range\",\"children\":[\
+{\"slice\":[1,2],\"type\":\"char\"},\
+{\"slice\":[3,4],\"type\":\"char\"}]}]");
+    check_parse(P4_P4GenExpression, "s1", "[{\"slice\":[0,2],\"type\":\"reference\"}]");
+    check_parse(P4_P4GenExpression, "&\"a\"", "[{\"slice\":[0,4],\"type\":\"positive\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
+    check_parse(P4_P4GenExpression, "!\"a\"", "[{\"slice\":[0,4],\"type\":\"negative\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
+    check_parse(P4_P4GenExpression, "\"a\" / \"b\"", "[{\"slice\":[0,9],\"type\":\"choice\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[6,9],\"type\":\"literal\"}]}]");
+    check_parse(P4_P4GenExpression, "\"a\" \"b\"", "[{\"slice\":[0,7],\"type\":\"sequence\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
+    check_parse(P4_P4GenExpression, "var \"b\"", "[{\"slice\":[0,7],\"type\":\"sequence\",\"children\":[{\"slice\":[0,3],\"type\":\"reference\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
+    check_parse(P4_P4GenExpression, "var name", "[{\"slice\":[0,8],\"type\":\"sequence\",\"children\":[{\"slice\":[0,3],\"type\":\"reference\"},{\"slice\":[4,8],\"type\":\"reference\"}]}]");
+    check_parse(P4_P4GenExpression, "v1 v2 / v3 v4", "[{\"slice\":[0,13],\"type\":\"choice\",\"children\":[{\"slice\":[0,6],\"type\":\"sequence\",\"children\":[{\"slice\":[0,2],\"type\":\"reference\"},{\"slice\":[3,5],\"type\":\"reference\"}]},{\"slice\":[8,13],\"type\":\"sequence\",\"children\":[{\"slice\":[8,10],\"type\":\"reference\"},{\"slice\":[11,13],\"type\":\"reference\"}]}]}]");
+    check_parse(P4_P4GenExpression, "v1 (v2/v3) v4", "[{\"slice\":[0,13],\"type\":\"sequence\",\"children\":[{\"slice\":[0,2],\"type\":\"reference\"},{\"slice\":[4,9],\"type\":\"choice\",\"children\":[{\"slice\":[4,6],\"type\":\"reference\"},{\"slice\":[7,9],\"type\":\"reference\"}]},{\"slice\":[11,13],\"type\":\"reference\"}]}]");
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -112,6 +129,7 @@ int main(void) {
     RUN_TEST(test_negative);
     RUN_TEST(test_choice);
     RUN_TEST(test_sequence);
+    RUN_TEST(test_expression);
 
     return UNITY_END();
 }

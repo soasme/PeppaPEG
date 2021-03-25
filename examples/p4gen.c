@@ -172,6 +172,12 @@ P4_Grammar* P4_CreateP4GenGrammar () {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenPrimary, P4_FLAG_LIFTED))
         goto finalize;
 
+    if (P4_Ok != P4_AddReference(grammar, P4_P4GenExpression, P4_P4GenChoice))
+        goto finalize;
+
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenExpression, P4_FLAG_LIFTED))
+        goto finalize;
+
     if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_P4GenWhitespace, 4,
         P4_CreateLiteral(" ", true),
         P4_CreateLiteral("\t", true),

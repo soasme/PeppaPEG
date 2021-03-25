@@ -228,6 +228,11 @@
 <dd><p>The content of the source. </p>
 </dd></dl>
 <dl class="c var">
+<dt id="c.P4_Source.slice">
+<span class="target" id="structP4__Source_1a68054de181ee38755063cfd1d8d7e51f"></span><a class="reference internal" href="#c.P4_Slice" title="P4_Slice"><span class="pre">P4_Slice</span></a> <code class="sig-name descname"><span class="pre">slice</span></code><a class="headerlink" href="#c.P4_Source.slice" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>The length of the source. </p>
+</dd></dl>
+<dl class="c var">
 <dt id="c.P4_Source.pos">
 <span class="target" id="structP4__Source_1a84cf4e538cc6bf1352452d0f8c4ca4c4"></span><span class="pre">P4_Position</span> <code class="sig-name descname"><span class="pre">pos</span></code><a class="headerlink" href="#c.P4_Source.pos" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>The position of the consumed input. Min: 0, Max: strlen(content).</p>
@@ -1793,6 +1798,29 @@
 <dl class="simple">
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">source</span></code>: The source.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_SetSourceSlice">
+<span class="target" id="peppapeg_8h_1a73cbc2e63b816e1a69a2681de57a4978"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_SetSourceSlice</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Source" title="P4_Source"><span class="pre">P4_Source</span></a> <span class="pre">*</span><em><span class="pre">source</span></em>, <span class="pre">size_t</span> <em><span class="pre">start</span></em>, <span class="pre">size_t</span> <em><span class="pre">stop</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_SetSourceSlice" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Set the buf size of the source content. If not set, strlen(source-&gt;content) is used. </p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_String</span>  <span class="nb">input</span> <span class="o">=</span> <span class="s2">"(a)"</span>
+ <span class="n">P4_Source</span><span class="o">*</span> <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">RuleA</span><span class="p">);</span>
+ <span class="k">if</span> <span class="p">(</span><span class="n">P4_Ok</span> <span class="o">!=</span> <span class="n">P4_SetSourceSlice</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">//</span> <span class="n">only</span> <span class="n">parse</span> <span class="s2">"a"</span>
+     <span class="n">printf</span><span class="p">(</span><span class="s2">"set buf size error</span><span class="se">\n</span><span class="s2">"</span><span class="p">);</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The error code.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">source</span></code>: The source. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">start</span></code>: The start position, inclusive. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">stop</span></code>: The stop position, exclusive. </p></li>
 </ul>
 </dd>
 </dl>

@@ -209,7 +209,7 @@
 </pre></div>
 </div>
 <p>If the grammar rule <cite>Entry</cite> has flag <cite>P4_FLAG_NON_TERMINAL</cite>, the token is lifted and replaced by its single child token:</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Entry</span><span class="p">,</span> <span class="n">P4_FLAG_LIFTED</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Entry</span><span class="p">,</span> <span class="n">P4_FLAG_NON_TERMINAL</span><span class="p">);</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Token</span><span class="p">(</span><span class="mf">1.</span><span class="o">.</span><span class="mi">2</span><span class="p">):</span> <span class="s2">"x"</span>

@@ -36,6 +36,8 @@
 - [ ] Any.
 - [ ] Until.
 - [ ] Add a fuzzy testing framework.
+- [ ] Add p4gen.
+- [x] Allow parsing a subset of source input. Added in v1.9.0.
 - [x] Allow user setting Userdata for P4_Tokens. Added in v1.8.0.
 - [x] Support non-ascii case insensitive literal matching. Added in v1.8.0.
 - [x] Print token ast in json format. Added in v1.8.0.

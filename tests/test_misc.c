@@ -143,6 +143,33 @@ void test_error_string(void) {
     TEST_ASSERT_EQUAL_STRING("UnknownError", P4_GetErrorString(999999));
 }
 
+void test_source_slice(void) {
+    const int R1 = 1;
+
+    P4_Grammar* grammar = P4_CreateGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+    TEST_ASSERT_EQUAL( P4_Ok, P4_AddLiteral(grammar, R1, "XXX", false));
+
+    P4_String input = "YXXXY";
+    P4_Source* source = P4_CreateSource(input, R1);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(P4_Ok, P4_SetSourceSlice(source, 1, 4));
+    TEST_ASSERT_EQUAL(P4_Ok, P4_Parse(grammar, source));
+    TEST_ASSERT_EQUAL(4, P4_GetSourcePosition(source));
+
+    P4_Token* token = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("XXX", token);
+
+    TEST_ASSERT_NULL(token->next);
+    TEST_ASSERT_NULL(token->head);
+    TEST_ASSERT_NULL(token->tail);
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -151,6 +178,7 @@ int main(void) {
     RUN_TEST(test_replace_grammar_rule_refreshing_references);
     RUN_TEST(test_join);
     RUN_TEST(test_error_string);
+    RUN_TEST(test_source_slice);
 
     return UNITY_END();
 }

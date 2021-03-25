@@ -16,6 +16,21 @@ If Peppa PEG should run a very small embedded device, you can adjust it via `P4_
     >> P4_GetRecursionLimit(grammar);
     1000
 
+Source Slice
+------------
+
+Peppa PEG supports parsing a subset of source input. By default, all source content are attempted.
+One can use `P4_SetSourceSlice` to set the start position and stop position in the source input.
+
+In this example, Peppa PEG only parses the substring "YXXXY"[1:4], e.g. "XXX".
+
+.. code-block:: c
+
+    >> P4_Source* source = P4_CreateSource("YXXXY", ENTRY);
+    >> P4_SetSourceSlice(source, 1, 4);
+
+See :c:func:`P4_SetSourceSlice`.
+
 Start-of-Input & End-of-Input
 -----------------------------
 

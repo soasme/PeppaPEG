@@ -309,8 +309,12 @@ typedef struct P4_Source {
     struct P4_Grammar*      grammar;
     /** The ID of entry rule in the grammar used to parse the source. */
     P4_RuleID               rule_id;
+
     /** The content of the source. */
     P4_String               content;
+    /** The length of the source. */
+    P4_Slice                slice;
+
     /**
      * The position of the consumed input. Min: 0, Max: strlen(content).
      *
@@ -323,14 +327,18 @@ typedef struct P4_Source {
      * the input is guaranteed to be parsed until all bits are consumed.
      * */
     P4_Position             pos;
+
     /** The error code of the parse. */
     P4_Error                err;
     /** The error message of the parse. */
     P4_String               errmsg;
+
     /** The root of abstract syntax tree. */
     struct P4_Token*        root;
+
     /** Reserved: whether to enable DEBUG logs. */
     bool                    verbose;
+
     /** The flag for checking if the parse is matching SPACED rules.
      *
      * Since we're wrapping SPACED rules into a repetition rule internally,
@@ -339,6 +347,7 @@ typedef struct P4_Source {
      * XXX: Maybe there are some better ways to prevent that?
      */
     bool                    whitespacing;
+
     /** The top frame in the stack. */
     struct P4_Frame*        frame_stack;
     /** The size of frame stack. */
@@ -1538,6 +1547,23 @@ P4_Source*     P4_CreateSource(P4_String, P4_RuleID);
  *      P4_DeleteSource(source);
  */
 void           P4_DeleteSource(P4_Source*);
+
+/**
+ * @brief       Set the buf size of the source content.
+ *              If not set, strlen(source->content) is used.
+ * @param       source  The source.
+ * @param       start   The start position, inclusive.
+ * @param       stop    The stop position, exclusive.
+ * @return      The error code.
+ *
+ * Example:
+ *
+ *      P4_String  input = "(a)"
+ *      P4_Source* source = P4_CreateSource(input, RuleA);
+ *      if (P4_Ok != P4_SetSourceSlice(source, 1, 2)) // only parse "a"
+ *          printf("set buf size error\n");
+ */
+P4_Error       P4_SetSourceSlice(P4_Source* source, size_t start, size_t stop);
 
 /**
  * @brief       Get the root token of abstract syntax tree of the source.

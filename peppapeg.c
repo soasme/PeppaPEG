@@ -1134,19 +1134,6 @@ finalize:
     return NULL;
 }
 
-P4_Token*
-P4_Match_any(P4_Source* s, P4_Expression* e) {
-    P4_String str = P4_RemainingText(s);
-
-# define UTF8_CHARLEN(b) (( 0xe5000000 >> (( (b) >> 3 ) & 0x1e )) & 3 ) + 1
-
-    P4_MarkPosition(s, startpos);
-    size_t   len = UTF8_CHARLEN(*str);
-    P4_SetPosition(s, startpos+len);
-
-    return NULL;
-}
-
 P4_PRIVATE(P4_Token*)
 P4_MatchSpacedExpressions(P4_Source* s, P4_Expression* e) {
     /* implicit whitespace is guaranteed to be an unnamed rule. */

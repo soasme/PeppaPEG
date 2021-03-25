@@ -91,6 +91,17 @@ void test_negative(void) {
     check_parse(P4_P4GenNegative, "!!\"a\"", "[{\"slice\":[0,5],\"type\":\"negative\",\"children\":[{\"slice\":[1,5],\"type\":\"negative\",\"children\":[{\"slice\":[2,5],\"type\":\"literal\"}]}]}]");
 }
 
+/*
+void test_choice(void) {
+    check_parse(P4_P4GenChoice, "\"a\"/\"b\"", "[{\"slice\":[0,7],\"type\":\"choice\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
+    check_parse(P4_P4GenChoice, "\"a\" / \"b\"", "[{\"slice\":[0,9],\"type\":\"choice\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[6,9],\"type\":\"literal\"}]}]");
+}
+*/
+
+void test_sequence(void) {
+    check_parse(P4_P4GenSequence, "\"a\" \"b\"", "[{\"slice\":[0,7],\"type\":\"sequence\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -101,6 +112,8 @@ int main(void) {
     RUN_TEST(test_reference);
     RUN_TEST(test_positive);
     RUN_TEST(test_negative);
+    /* RUN_TEST(test_choice); */
+    RUN_TEST(test_sequence);
 
     return UNITY_END();
 }

@@ -14,7 +14,7 @@ typedef enum {
     P4_P4GenRuleDecorators  = 3,
     P4_P4GenRuleName        = 4,
     P4_P4GenRuleDefinition  = 5,
-    P4_P4GenRuleExpression,
+    P4_P4GenExpression,
     P4_P4GenPrimary,
     P4_P4GenDecorator,
     P4_P4GenIdentifier,
@@ -29,6 +29,7 @@ typedef enum {
     P4_P4GenRepeat,
     P4_P4GenNumber,
     P4_P4GenChar,
+    P4_P4GenWhitespace,
 } P4_P4GenRuleID;
 
 P4_Grammar* P4_CreateP4GenGrammar ();
@@ -138,16 +139,43 @@ P4_Grammar* P4_CreateP4GenGrammar () {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_P4GenPrimary, 5,
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_P4GenPrimary, 6,
         P4_CreateReference(P4_P4GenLiteral),
         P4_CreateReference(P4_P4GenRange),
-        P4_CreateReference(P4_P4GenReference),
+        P4_CreateSequenceWithMembers(2,
+            P4_CreateReference(P4_P4GenReference),
+            P4_CreateNegative(P4_CreateLiteral("=", true))
+        ),
         P4_CreateReference(P4_P4GenPositive),
-        P4_CreateReference(P4_P4GenNegative)
+        P4_CreateReference(P4_P4GenNegative),
+        P4_CreateSequenceWithMembers(3,
+            P4_CreateLiteral("(", true),
+            P4_CreateReference(P4_P4GenChoice),
+            P4_CreateLiteral(")", true)
+        )
     ))
         goto finalize;
 
+    if (P4_Ok != P4_AddJoin(grammar, P4_P4GenChoice, "/", P4_P4GenSequence))
+        goto finalize;
+
+    if (P4_Ok != P4_AddOnceOrMore(grammar, P4_P4GenSequence,
+                P4_CreateReference(P4_P4GenPrimary)))
+        goto finalize;
+
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenPrimary, P4_FLAG_LIFTED))
+        goto finalize;
+
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_P4GenWhitespace, 4,
+        P4_CreateLiteral(" ", true),
+        P4_CreateLiteral("\t", true),
+        P4_CreateLiteral("\r", true),
+        P4_CreateLiteral("\n", true)
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenWhitespace,
+                P4_FLAG_LIFTED | P4_FLAG_SPACED))
         goto finalize;
 
     return grammar;
@@ -166,6 +194,8 @@ P4_String   P4_P4GenKindToName(P4_RuleID id) {
         case P4_P4GenReference: return "reference";
         case P4_P4GenPositive: return "positive";
         case P4_P4GenNegative: return "negative";
+        case P4_P4GenChoice: return "choice";
+        case P4_P4GenSequence: return "sequence";
         default: return "<unknown>";
     }
 }

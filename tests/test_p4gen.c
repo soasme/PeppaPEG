@@ -81,6 +81,16 @@ void test_reference(void) {
     check_parse_failed(P4_P4GenReference, "4PEG", P4_MatchError);
 }
 
+void test_positive(void) {
+    check_parse(P4_P4GenPositive, "&\"a\"", "[{\"slice\":[0,4],\"type\":\"positive\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
+    check_parse(P4_P4GenPositive, "&&\"a\"", "[{\"slice\":[0,5],\"type\":\"positive\",\"children\":[{\"slice\":[1,5],\"type\":\"positive\",\"children\":[{\"slice\":[2,5],\"type\":\"literal\"}]}]}]");
+}
+
+void test_negative(void) {
+    check_parse(P4_P4GenNegative, "!\"a\"", "[{\"slice\":[0,4],\"type\":\"negative\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
+    check_parse(P4_P4GenNegative, "!!\"a\"", "[{\"slice\":[0,5],\"type\":\"negative\",\"children\":[{\"slice\":[1,5],\"type\":\"negative\",\"children\":[{\"slice\":[2,5],\"type\":\"literal\"}]}]}]");
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -89,6 +99,8 @@ int main(void) {
     RUN_TEST(test_string);
     RUN_TEST(test_range);
     RUN_TEST(test_reference);
+    RUN_TEST(test_positive);
+    RUN_TEST(test_negative);
 
     return UNITY_END();
 }

@@ -1,7 +1,6 @@
 # ROADMAP
 
 - [ ] Print error messages for Human.
-- [ ] Report line num & col.
 - [ ] Support partial source: P4_SetSourceContentSlice(s, i, j).
 - [ ] Reset source so it can be re-parsed.
 - [ ] P4_Inspect(tok, bool (f) (tok)). Example: https://golang.org/pkg/go/ast/#Inspect.
@@ -13,8 +12,8 @@
 - [ ] New Expression Kind: Panic.
 - [ ] New Expression Kind: Function.
 - [ ] New Expression Kind: Sub Grammar.
+- [ ] Custom allocator and destructor. # define P4_MALLOC malloc.
 - [ ] Performance optimization: pre-alloc tokens.
-- [ ] Token only have expr id, no expr.
 - [ ] Register a optional name function to convert rule id to rule names.
 - [ ] Stop on first error v/s Recover from Panic.
 - [ ] Allow replacing malloc/free functions.
@@ -25,7 +24,6 @@
 - [ ] backrefs is not necessary if there is no BackReference in Sequence.
 - [ ] static lib.
 - [ ] A python grammar.
-- [ ] A binary executable for display parsed results in JSON output. The executable can support general programming languages, such as Mustache, Python, JSON, YAML, etc. Some other programs can then takes the input from stdin and do some fancy work. `peppapeg --lang=py38 source.py`
 - [ ] Add tutorials (json, mustache, ini) in docs.
 - [ ] Add how-to guides in docs.
 - [ ] Add explanations in docs.
@@ -36,7 +34,10 @@
 - [ ] Any.
 - [ ] Until.
 - [ ] Add a fuzzy testing framework.
-- [ ] Add p4gen.
+- [ ] Sanitize \u0000 to whitespace for the source input, this happens in creating the source/setting the source size.
+- [ ] A binary executable for compiling peg to a C library: `p4g compile --lang=c calc.peg`.
+- [ ] A binary executable for display parsed results in JSON output. The executable can support general programming languages, such as Mustache, Python, JSON, YAML, etc. Some other programs can then takes the input from stdin and do some fancy work. `p4g parse --lang=py38 source.py`
+- [ ] Report line num & col. Move lineno/lineidx whenever setting pos.
 - [x] Allow parsing a subset of source input. Added in v1.9.0.
 - [x] Allow user setting Userdata for P4_Tokens. Added in v1.8.0.
 - [x] Support non-ascii case insensitive literal matching. Added in v1.8.0.
@@ -45,6 +46,7 @@
 - [x] Join. Added in v1.7.0.
 - [x] Start-of-Input & End-of-Input. Added in v1.7.0.
 - [x] Range `stride`. Added in v1.7.0.
+- [x] Token only have expr id, no expr. Added in v1.6.0.
 - [x] Return NullError for CreatePositive/CreateNegative/... Added in v1.6.0.
 - [x] build & test via github workflow ci. Added in v1.6.0
 - [x] Dynamically change grammar rules. Added in v1.3.0 via Callback.

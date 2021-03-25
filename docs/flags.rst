@@ -107,7 +107,7 @@ If the grammar rule `Entry` has flag `P4_FLAG_NON_TERMINAL`, the token is lifted
 
 .. code-block:: c
 
-    P4_SetGrammarRuleFlag(grammar, Entry, P4_FLAG_LIFTED);
+    P4_SetGrammarRuleFlag(grammar, Entry, P4_FLAG_NON_TERMINAL);
 
 .. code-block::
 

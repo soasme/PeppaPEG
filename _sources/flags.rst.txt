@@ -78,6 +78,45 @@ If the grammar rule `Entry` has flag `P4_FLAG_LIFTED`, the token is lifted and r
     Token(0..1): "X"
     Token(1..2): "x"
 
+`P4_FLAG_NON_TERMINAL`
+-----------------------
+
+`P4_FLAG_NON_TERMINAL` **replaces the token with its single child token or does nothing.**.
+
+For example,
+
+.. code-block:: c
+
+    typedef enum { Entry, Text } MyRuleID;
+
+    P4_AddSequenceWithMembers(grammar, Entry, 2
+        P4_CreateLiteral("(", true),
+        P4_CreateReference(Text),
+        P4_CreateLiteral(")", true)
+    );
+    P4_AddLiteral(grammar, Text, "x", false);
+
+This grammar can match text "(x)" into two tokens:
+
+.. code-block::
+
+    Token(0..3): "(x)"
+      Token(1..2) "x"
+
+If the grammar rule `Entry` has flag `P4_FLAG_NON_TERMINAL`, the token is lifted and replaced by its single child token:
+
+.. code-block:: c
+
+    P4_SetGrammarRuleFlag(grammar, Entry, P4_FLAG_LIFTED);
+
+.. code-block::
+
+    Token(1..2): "x"
+
+This flag only works for Sequence and Repeat expressions.
+
+This flag has no effect if the Sequence or Repeat expressions produces over one token, e.g, the parent token will not be lifted.
+
 `P4_FLAG_SPACED`
 ----------------
 

@@ -189,6 +189,35 @@
 </pre></div>
 </div>
 </div>
+<div class="section" id="p4-flag-non-terminal">
+<h2><cite>P4_FLAG_NON_TERMINAL</cite><a class="headerlink" href="#p4-flag-non-terminal" title="Permalink to this headline">¶</a></h2>
+<p><cite>P4_FLAG_NON_TERMINAL</cite> <strong>replaces the token with its single child token or does nothing.</strong>.</p>
+<p>For example,</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="k">enum</span> <span class="p">{</span> <span class="n">Entry</span><span class="p">,</span> <span class="n">Text</span> <span class="p">}</span> <span class="n">MyRuleID</span><span class="p">;</span>
+
+<span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Entry</span><span class="p">,</span> <span class="mi">2</span>
+    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"("</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
+    <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">Text</span><span class="p">),</span>
+    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">")"</span><span class="p">,</span> <span class="nb">true</span><span class="p">)</span>
+<span class="p">);</span>
+<span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="s">"x"</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This grammar can match text “(x)” into two tokens:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Token</span><span class="p">(</span><span class="mf">0.</span><span class="o">.</span><span class="mi">3</span><span class="p">):</span> <span class="s2">"(x)"</span>
+  <span class="n">Token</span><span class="p">(</span><span class="mf">1.</span><span class="o">.</span><span class="mi">2</span><span class="p">)</span> <span class="s2">"x"</span>
+</pre></div>
+</div>
+<p>If the grammar rule <cite>Entry</cite> has flag <cite>P4_FLAG_NON_TERMINAL</cite>, the token is lifted and replaced by its single child token:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Entry</span><span class="p">,</span> <span class="n">P4_FLAG_LIFTED</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Token</span><span class="p">(</span><span class="mf">1.</span><span class="o">.</span><span class="mi">2</span><span class="p">):</span> <span class="s2">"x"</span>
+</pre></div>
+</div>
+<p>This flag only works for Sequence and Repeat expressions.</p>
+<p>This flag has no effect if the Sequence or Repeat expressions produces over one token, e.g, the parent token will not be lifted.</p>
+</div>
 <div class="section" id="p4-flag-spaced">
 <h2><cite>P4_FLAG_SPACED</cite><a class="headerlink" href="#p4-flag-spaced" title="Permalink to this headline">¶</a></h2>
 <p><cite>P4_FLAG_SPACED</cite> <strong>indicates the expression is for whitespaces</strong>.</p>
@@ -300,6 +329,7 @@
 <li><a class="reference internal" href="#">Expression Flags</a><ul>
 <li><a class="reference internal" href="#p4-flag-squashed"><cite>P4_FLAG_SQUASHED</cite></a></li>
 <li><a class="reference internal" href="#p4-flag-lifted"><cite>P4_FLAG_LIFTED</cite></a></li>
+<li><a class="reference internal" href="#p4-flag-non-terminal"><cite>P4_FLAG_NON_TERMINAL</cite></a></li>
 <li><a class="reference internal" href="#p4-flag-spaced"><cite>P4_FLAG_SPACED</cite></a></li>
 <li><a class="reference internal" href="#p4-flag-tight"><cite>P4_FLAG_TIGHT</cite></a></li>
 <li><a class="reference internal" href="#p4-flag-scoped"><cite>P4_FLAG_SCOPED</cite></a></li>

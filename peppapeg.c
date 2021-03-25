@@ -38,6 +38,7 @@
 /** It indicates the function or type is not for public use. */
 # define P4_PRIVATE(type) static type
 
+# define                        IS_END(s) ((s)->pos >= (s)->bufsize)
 # define                        IS_TIGHT(e) (((e)->flag & P4_FLAG_TIGHT) != 0)
 # define                        IS_SCOPED(e) (((e)->flag & P4_FLAG_SCOPED) != 0)
 # define                        IS_SPACED(e) (((e)->flag & P4_FLAG_SPACED) != 0)
@@ -645,9 +646,7 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
 
     P4_String str = P4_RemainingText(s);
 
-# define EOT(s) (*(s) == 0x0)
-
-    if (EOT(str)) {
+    if (IS_END(s)) {
         P4_RaiseError(s, P4_MatchError, "eof");
         return NULL;
     }
@@ -680,7 +679,7 @@ P4_MatchRange(P4_Source* s, P4_Expression* e) {
     assert(NO_ERROR(s));
 
     P4_String str = P4_RemainingText(s);
-    if (*str == '\0') {
+    if (IS_END(s)) {
         P4_RaiseError(s, P4_MatchError, "eof");
         return NULL;
     }
@@ -918,7 +917,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     P4_Position startpos = P4_GetPosition(s);
     P4_Token *head = NULL, *tail = NULL, *tok = NULL, *whitespace = NULL;
 
-    while (*P4_RemainingText(s) != '\0') {
+    while (!IS_END(s)) {
         P4_MarkPosition(s, before_implicit);
 
         /* SPACED rule expressions are inserted between every repetition. */
@@ -1621,6 +1620,7 @@ P4_PUBLIC P4_Source*
 P4_CreateSource(P4_String content, P4_RuleID rule_id) {
     P4_Source* source = malloc(sizeof(P4_Source));
     source->content = content;
+    source->bufsize = strlen(content);
     source->rule_id = rule_id;
     source->pos = 0;
     source->err = P4_Ok;
@@ -1630,6 +1630,14 @@ P4_CreateSource(P4_String content, P4_RuleID rule_id) {
     source->frame_stack_size = 0;
     source->whitespacing = false;
     return source;
+}
+
+P4_Error
+P4_SetSourceSize(P4_Source* source, size_t size) {
+    if (source == 0 || size == 0)
+        return P4_NullError;
+    source->bufsize = size;
+    return P4_Ok;
 }
 
 P4_PUBLIC void

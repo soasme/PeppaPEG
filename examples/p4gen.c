@@ -159,8 +159,14 @@ P4_Grammar* P4_CreateP4GenGrammar () {
     if (P4_Ok != P4_AddJoin(grammar, P4_P4GenChoice, "/", P4_P4GenSequence))
         goto finalize;
 
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenChoice, P4_FLAG_NON_TERMINAL))
+        goto finalize;
+
     if (P4_Ok != P4_AddOnceOrMore(grammar, P4_P4GenSequence,
                 P4_CreateReference(P4_P4GenPrimary)))
+        goto finalize;
+
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenSequence, P4_FLAG_NON_TERMINAL))
         goto finalize;
 
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenPrimary, P4_FLAG_LIFTED))

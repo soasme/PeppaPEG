@@ -816,8 +816,9 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
     if (P4_NeedLift(s, e))
         return head;
 
-    if (head == tail && head != NULL && IS_NON_TERMINAL(e))
+    if (IS_NON_TERMINAL(e) && head != NULL && head->next == NULL) {
         return head;
+    }
 
     P4_Token* ret = P4_CreateToken (s->content, startpos, P4_GetPosition(s), e->id);
     if (ret == NULL) {
@@ -984,8 +985,9 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     if (P4_NeedLift(s, e))
         return head;
 
-    if (head == tail && head != NULL && IS_NON_TERMINAL(e))
+    if (IS_NON_TERMINAL(e) && head != NULL && head->next == NULL) {
         return head;
+    }
 
     P4_Token* repetition = P4_CreateToken (s->content, startpos, P4_GetPosition(s), e->id);
     if (repetition == NULL) {

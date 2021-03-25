@@ -1,7 +1,7 @@
 #include "unity/examples/unity_config.h"
 #include "unity/src/unity.h"
 #include "common.h"
-#include "../p4gen.c"
+#include "../examples/p4gen.c"
 
 void check_parse_failed(P4_RuleID entry, P4_String input, P4_Error err) {
     P4_Grammar* grammar = P4_CreateP4GenGrammar();

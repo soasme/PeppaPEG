@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-#include "peppapeg.h"
+#include "../peppapeg.h"
 
 typedef enum {
     P4_P4GenEntry           = 1,

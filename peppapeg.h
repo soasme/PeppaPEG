@@ -313,7 +313,7 @@ typedef struct P4_Source {
     /** The content of the source. */
     P4_String               content;
     /** The length of the source. */
-    size_t                  bufsize;
+    P4_Slice                slice;
 
     /**
      * The position of the consumed input. Min: 0, Max: strlen(content).
@@ -1558,11 +1558,11 @@ void           P4_DeleteSource(P4_Source*);
  * Example:
  *
  *      P4_String  input = "(a)"
- *      P4_Source* source = P4_CreateSource(input+1, RuleA);
- *      if (P4_Ok != P4_SetSourceBufSize(source, 1)) // only parse "a"
+ *      P4_Source* source = P4_CreateSource(input, RuleA);
+ *      if (P4_Ok != P4_SetSourceSlice(source, 1, 2)) // only parse "a"
  *          printf("set buf size error\n");
  */
-P4_Error       P4_SetSourceSize(P4_Source* source, size_t size);
+P4_Error       P4_SetSourceSlice(P4_Source* source, size_t start, size_t stop);
 
 /**
  * @brief       Get the root token of abstract syntax tree of the source.

@@ -73,6 +73,14 @@ void test_range(void) {
 {\"slice\":[6,7],\"type\":\"number\"}]}]");
 }
 
+void test_reference(void) {
+    check_parse(P4_P4GenReference, "a", "[{\"slice\":[0,1],\"type\":\"reference\"}]");
+    check_parse(P4_P4GenReference, "JsonEntry", "[{\"slice\":[0,9],\"type\":\"reference\"}]");
+    check_parse(P4_P4GenReference, "P4", "[{\"slice\":[0,2],\"type\":\"reference\"}]");
+    check_parse(P4_P4GenReference, "P4_P4Gen", "[{\"slice\":[0,8],\"type\":\"reference\"}]");
+    check_parse_failed(P4_P4GenReference, "4PEG", P4_MatchError);
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -80,6 +88,7 @@ int main(void) {
     RUN_TEST(test_char);
     RUN_TEST(test_string);
     RUN_TEST(test_range);
+    RUN_TEST(test_reference);
 
     return UNITY_END();
 }

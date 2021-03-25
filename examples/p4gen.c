@@ -27,6 +27,13 @@ typedef enum {
     P4_P4GenChoice,
     P4_P4GenBackReference,
     P4_P4GenRepeat,
+    P4_P4GenRepeatOnceOrMore,
+    P4_P4GenRepeatZeroOrMore,
+    P4_P4GenRepeatZeroOrOnce,
+    P4_P4GenRepeatMin,
+    P4_P4GenRepeatMax,
+    P4_P4GenRepeatExact,
+    P4_P4GenRepeatMinMax,
     P4_P4GenNumber,
     P4_P4GenChar,
     P4_P4GenWhitespace,
@@ -139,6 +146,66 @@ P4_Grammar* P4_CreateP4GenGrammar () {
     ))
         goto finalize;
 
+    if (P4_Ok != P4_AddLiteral(grammar, P4_P4GenRepeatOnceOrMore, "+", true))
+        goto finalize;
+
+    if (P4_Ok != P4_AddLiteral(grammar, P4_P4GenRepeatZeroOrMore, "*", true))
+        goto finalize;
+
+    if (P4_Ok != P4_AddLiteral(grammar, P4_P4GenRepeatZeroOrOnce, "?", true))
+        goto finalize;
+
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenRepeatMin, 4,
+        P4_CreateLiteral("{", true),
+        P4_CreateReference(P4_P4GenNumber),
+        P4_CreateLiteral(",", true),
+        P4_CreateLiteral("}", true)
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenRepeatMax, 4,
+        P4_CreateLiteral("{", true),
+        P4_CreateLiteral(",", true),
+        P4_CreateReference(P4_P4GenNumber),
+        P4_CreateLiteral("}", true)
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenRepeatMinMax, 5,
+        P4_CreateLiteral("{", true),
+        P4_CreateReference(P4_P4GenNumber),
+        P4_CreateLiteral(",", true),
+        P4_CreateReference(P4_P4GenNumber),
+        P4_CreateLiteral("}", true)
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenRepeatExact, 3,
+        P4_CreateLiteral("{", true),
+        P4_CreateReference(P4_P4GenNumber),
+        P4_CreateLiteral("}", true)
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenRepeat, 2,
+        P4_CreateReference(P4_P4GenPrimary),
+        P4_CreateZeroOrOnce(
+            P4_CreateChoiceWithMembers(7,
+                P4_CreateReference(P4_P4GenRepeatOnceOrMore),
+                P4_CreateReference(P4_P4GenRepeatZeroOrMore),
+                P4_CreateReference(P4_P4GenRepeatZeroOrOnce),
+                P4_CreateReference(P4_P4GenRepeatExact),
+                P4_CreateReference(P4_P4GenRepeatMinMax),
+                P4_CreateReference(P4_P4GenRepeatMin),
+                P4_CreateReference(P4_P4GenRepeatMax)
+            )
+        )
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenRepeat, P4_FLAG_NON_TERMINAL))
+        goto finalize;
+
     if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_P4GenPrimary, 6,
         P4_CreateReference(P4_P4GenLiteral),
         P4_CreateReference(P4_P4GenRange),
@@ -156,6 +223,9 @@ P4_Grammar* P4_CreateP4GenGrammar () {
     ))
         goto finalize;
 
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenPrimary, P4_FLAG_LIFTED))
+        goto finalize;
+
     if (P4_Ok != P4_AddJoin(grammar, P4_P4GenChoice, "/", P4_P4GenSequence))
         goto finalize;
 
@@ -163,13 +233,10 @@ P4_Grammar* P4_CreateP4GenGrammar () {
         goto finalize;
 
     if (P4_Ok != P4_AddOnceOrMore(grammar, P4_P4GenSequence,
-                P4_CreateReference(P4_P4GenPrimary)))
+                P4_CreateReference(P4_P4GenRepeat)))
         goto finalize;
 
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenSequence, P4_FLAG_NON_TERMINAL))
-        goto finalize;
-
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenPrimary, P4_FLAG_LIFTED))
         goto finalize;
 
     if (P4_Ok != P4_AddReference(grammar, P4_P4GenExpression, P4_P4GenChoice))
@@ -208,6 +275,14 @@ P4_String   P4_P4GenKindToName(P4_RuleID id) {
         case P4_P4GenNegative: return "negative";
         case P4_P4GenChoice: return "choice";
         case P4_P4GenSequence: return "sequence";
+        case P4_P4GenRepeat: return "repeat";
+        case P4_P4GenRepeatOnceOrMore: return "onceormore";
+        case P4_P4GenRepeatZeroOrMore: return "zeroormore";
+        case P4_P4GenRepeatZeroOrOnce: return "zerooronce";
+        case P4_P4GenRepeatMin: return "repeatmin";
+        case P4_P4GenRepeatMax: return "repeatmax";
+        case P4_P4GenRepeatMinMax: return "repeatminmax";
+        case P4_P4GenRepeatExact: return "repeatexact";
         default: return "<unknown>";
     }
 }

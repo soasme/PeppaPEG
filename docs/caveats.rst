@@ -19,15 +19,17 @@ If Peppa PEG should run a very small embedded device, you can adjust it via `P4_
 Source Slice
 ------------
 
-Peppa PEG supports parsing a portion of source input. By default, all source content are attempted.
+Peppa PEG supports parsing a subset of source input. By default, all source content are attempted.
 One can use `P4_SetSourceSlice` to set the start position and stop position in the source input.
 
-This examples will let Peppa PEG only parse the substring "YXXXY"[1:4], e.g. "XXX".
+In this example, Peppa PEG only parses the substring "YXXXY"[1:4], e.g. "XXX".
 
 .. code-block:: c
 
     >> P4_Source* source = P4_CreateSource("YXXXY", ENTRY);
     >> P4_SetSourceSlice(source, 1, 4);
+
+See :c:func:`P4_SetSourceSlice`.
 
 Start-of-Input & End-of-Input
 -----------------------------

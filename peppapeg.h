@@ -1552,7 +1552,8 @@ void           P4_DeleteSource(P4_Source*);
  * @brief       Set the buf size of the source content.
  *              If not set, strlen(source->content) is used.
  * @param       source  The source.
- * @param       size    The buf size.
+ * @param       start   The start position, inclusive.
+ * @param       stop    The stop position, exclusive.
  * @return      The error code.
  *
  * Example:

@@ -43,6 +43,7 @@
 # define                        IS_SPACED(e) (((e)->flag & P4_FLAG_SPACED) != 0)
 # define                        IS_SQUASHED(e) (((e)->flag & P4_FLAG_SQUASHED) != 0)
 # define                        IS_LIFTED(e) (((e)->flag & P4_FLAG_LIFTED) != 0)
+# define                        IS_NON_TERMINAL(e) (((e)->flag & P4_FLAG_NON_TERMINAL) != 0)
 # define                        IS_RULE(e) ((e)->id != 0)
 # define                        NEED_SILENT(s) ((s)->frame_stack ? (s)->frame_stack->silent : false)
 # define                        NEED_SPACE(s) (!(s)->whitespacing && ((s)->frame_stack ? (s)->frame_stack->space : false))
@@ -815,6 +816,9 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
     if (P4_NeedLift(s, e))
         return head;
 
+    if (head == tail && head != NULL && IS_NON_TERMINAL(e))
+        return head;
+
     P4_Token* ret = P4_CreateToken (s->content, startpos, P4_GetPosition(s), e->id);
     if (ret == NULL) {
         P4_RaiseError(s, P4_MemoryError, "oom");
@@ -977,8 +981,10 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     if (P4_GetPosition(s) == startpos) /* success but no token is produced. */
         goto finalize;
 
-
     if (P4_NeedLift(s, e))
+        return head;
+
+    if (head == tail && head != NULL && IS_NON_TERMINAL(e))
         return head;
 
     P4_Token* repetition = P4_CreateToken (s->content, startpos, P4_GetPosition(s), e->id);

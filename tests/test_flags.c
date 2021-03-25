@@ -759,6 +759,41 @@ void test_squashed_lifted_repeat_should_not_hide_scoped_literal(void) {
     P4_DeleteGrammar(grammar);
 }
 
+void test_lift_repeat_for_single_child(void) {
+    P4_Grammar* grammar = P4_CreateGrammar();
+    TEST_ASSERT_EQUAL(P4_Ok, P4_AddOnceOrMore(grammar, ENTRY, P4_CreateReference(R1)));
+    TEST_ASSERT_EQUAL(P4_Ok, P4_SetGrammarRuleFlag(grammar, ENTRY, P4_FLAG_NON_TERMINAL));
+    TEST_ASSERT_EQUAL(P4_Ok, P4_AddLiteral(grammar, R1, "a", true));
+    P4_Source* source = P4_CreateSource("a", ENTRY);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(P4_Ok, P4_Parse(grammar, source));
+    TEST_ASSERT_EQUAL(1, P4_GetSourcePosition(source));
+    P4_Token* token = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("a", token);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
+
+void test_lift_sequence_for_single_child(void) {
+    P4_Grammar* grammar = P4_CreateGrammar();
+    TEST_ASSERT_EQUAL(P4_Ok, P4_AddSequenceWithMembers(grammar, ENTRY, 3,
+            P4_CreateLiteral("(", true), P4_CreateReference(R1), P4_CreateLiteral(")", true)));
+    TEST_ASSERT_EQUAL(P4_Ok, P4_AddLiteral(grammar, R1, "a", true));
+    TEST_ASSERT_EQUAL(P4_Ok, P4_SetGrammarRuleFlag(grammar, ENTRY, P4_FLAG_NON_TERMINAL));
+    P4_Source* source = P4_CreateSource("(a)", ENTRY);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(P4_Ok, P4_Parse(grammar, source));
+    TEST_ASSERT_EQUAL(3, P4_GetSourcePosition(source));
+    P4_Token* token = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("a", token);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -775,6 +810,8 @@ int main(void) {
     RUN_TEST(test_lifted_range_should_generate_no_token);
     RUN_TEST(test_lifted_choice_should_generate_no_token);
     RUN_TEST(test_lifted_repeat_should_generate_no_token);
+    RUN_TEST(test_lift_repeat_for_single_child);
+    RUN_TEST(test_lift_sequence_for_single_child);
 
     RUN_TEST(test_squashed_lifted_sequence_should_not_hide_scoped_literal);
     RUN_TEST(test_squashed_repeat_should_not_hide_scoped_literal);

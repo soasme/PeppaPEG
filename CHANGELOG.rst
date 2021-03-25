@@ -1,11 +1,21 @@
 Change Log
 ===========
 
+1.8.0 (25 Mar, 2021)
+--------------------
+
+Code change: <https://github.com/soasme/PeppaPEG/compare/v1.7.0..v1.8.0>.
+
+* [Bugfix]: Support non-ASCII case insensitive literal match. `#48 <https://github.com/soasme/PeppaPEG/pull/48>`_ `#49 <https://github.com/soasme/PeppaPEG/pull/49>`_
+* [Feature]: Allow user setting Userdata for P4_Tokens. `#47 <https://github.com/soasme/PeppaPEG/pull/47>`_
+* [Feature]: Print source ast in JSON format. `#46 <https://github.com/soasme/PeppaPEG/pull/46>`_
+
 1.7.0 (10 Mar, 2021)
+--------------------
 
 Code change: <https://github.com/soasme/PeppaPEG/compare/v1.6.0..v1.7.0>.
 
-* [Enhancement]: Provided `P4_GetErrorString`. `#44 <https://github.com/soasme/PeppaPEG/pull/44>`_
+* [Enhancement]: Provided `P4_GetErrorString`. `#45 <https://github.com/soasme/PeppaPEG/pull/45>`_
 * [Feature]: Added Join. `#44 <https://github.com/soasme/PeppaPEG/pull/44>`_
 * [Example]: Wrote an Calculator example in Peppa PEG. `#43 <https://github.com/soasme/PeppaPEG/pull/43>`_
 * [Feature]: Added StartOfInput and EndOfInput. `#42 <https://github.com/soasme/PeppaPEG/pull/42>`_

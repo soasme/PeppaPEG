@@ -61,7 +61,7 @@ extern "C"
 # define P4_MAJOR_VERSION 1
 
 /** Minor version number. */
-# define P4_MINOR_VERSION 7
+# define P4_MINOR_VERSION 8
 
 /** Patch version number. */
 # define P4_PATCH_VERSION 0

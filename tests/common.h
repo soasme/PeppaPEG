@@ -16,8 +16,8 @@ cleanup_freep (void *p)
 }
 
 void TEST_ASSERT_EQUAL_SLICE(P4_Slice* s, size_t i, size_t j) {
-    TEST_ASSERT_EQUAL_UINT(i,   s->i);
-    TEST_ASSERT_EQUAL_UINT(j,   s->j);
+    TEST_ASSERT_EQUAL_UINT(i,   s->start.pos);
+    TEST_ASSERT_EQUAL_UINT(j,   s->start.pos);
 }
 
 void TEST_ASSERT_EQUAL_TOKEN_STRING(P4_String s, P4_Token* token) {

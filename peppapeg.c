@@ -51,7 +51,15 @@
 # define                        NO_ERROR(s) ((s)->err == P4_Ok)
 # define                        NO_MATCH(s) ((s)->err == P4_MatchError)
 # define                        SLICE_LEN(s) ((s)->stop.pos - (s)->start.pos)
-# define                        SLICE_SET(s, a, b) do { (s)->start.pos=(a); (s)->stop.pos=(b); } while (0)
+# define                        P4_SetPosition(s, d) do { \
+    (s)->pos = (d)->pos; \
+    (s)->lineno = (d)->lineno; \
+    (s)->offset = (d)->offset; \
+} while (0);
+# define                        SLICE_SET(s, a, b) do { \
+    (s)->start.pos=(a); \
+    (s)->stop.pos=(b); \
+} while (0)
 
 # define                        autofree __attribute__ ((cleanup (cleanup_freep)))
 
@@ -114,7 +122,6 @@ P4_PRIVATE(size_t)       P4_ReadRune(P4_String s, P4_Rune* c);
 P4_PRIVATE(int)          P4_CaseCmpInsensitive(const void*, const void*, size_t n);
 
 P4_PRIVATE(size_t)       P4_GetPosition(P4_Source*);
-P4_PRIVATE(void)         P4_SetPosition(P4_Source*, P4_Position*);
 P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size_t offset, P4_Position* stop);
 
 # define                 P4_MarkPosition(s, p) \
@@ -967,7 +974,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         if (!NO_ERROR(s))
             goto finalize;
 
-        if (P4_GetPosition(s) == before_implicit) {
+        if (P4_GetPosition(s) == before_implicit_ptr->pos) {
             P4_RaiseError(s, P4_AdvanceError, "Repeated expression consumes no input");
             goto finalize;
         }
@@ -996,7 +1003,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         goto finalize;
     }
 
-    if (P4_GetPosition(s) == startpos) /* success but no token is produced. */
+    if (P4_GetPosition(s) == startpos_ptr->pos) /* success but no token is produced. */
         goto finalize;
 
     if (P4_NeedLift(s, e))
@@ -1860,13 +1867,6 @@ P4_SetExpressionFlag(P4_Expression* e, P4_ExpressionFlag f) {
 P4_PRIVATE(size_t)
 P4_GetPosition(P4_Source* s) {
     return s->pos;
-}
-
-P4_PRIVATE(void)
-P4_SetPosition(P4_Source* s, P4_Position* pos) {
-    s->pos = pos->pos;
-    s->lineno = pos->lineno;
-    s->offset = pos->offset;
 }
 
 P4_PRIVATE(void)

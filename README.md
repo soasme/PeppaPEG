@@ -142,14 +142,16 @@ To traverse the AST,
 * `node->head` is the first children AST node.
 * `node->tail` is the last children AST node.
 * `node->next` is the next sibling AST node.
-* `node->slice.i` is the start position in the source string that the node covers.
-* `node->slice.j` is the end position in the source string that the node covers.
+* `node->slice.start` is the start position in the source string that the node slice covers.
+* `node->slice.stop` is the end position in the source string that the node slice covers.
 * Function `P4_CopyTokenString` returns the string the AST node covers. Note that it's our responsibility to free the string when finished.
 
 ```c
 char*       text = P4_CopyTokenString(root);
 
-printf("root span: [%lu %lu]\n", root->slice.i, root->slice.j);
+printf("root span: [%lu %lu]\n", root->slice.start.pos, root->slice.stop.pos);
+printf("root start: line=%lu offset=%lu\n", root->slice.start.lineno, root->slice.start.offset);
+printf("root stop: line=%lu offset=%lu\n", root->slice.stop.lineno, root->slice.stop.offset);
 printf("root next: %p\n", root->next);
 printf("root head: %p\n", root->head);
 printf("root tail: %p\n", root->tail);
@@ -208,7 +210,9 @@ int main(int argc, char* argv[]) {
     P4_Token*   root = P4_GetSourceAst(source);
     char*       text = P4_CopyTokenString(root);
 
-    printf("root span: [%lu %lu]\n", root->slice.i, root->slice.j);
+    printf("root span: [%lu %lu]\n", root->slice.start.pos, root->slice.stop.pos);
+    printf("root start: line=%lu offset=%lu\n", root->slice.start.lineno, root->slice.start.offset);
+    printf("root stop: line=%lu offset=%lu\n", root->slice.stop.lineno, root->slice.stop.offset);
     printf("root next: %p\n", root->next);
     printf("root head: %p\n", root->head);
     printf("root tail: %p\n", root->tail);

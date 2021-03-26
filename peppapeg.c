@@ -1873,19 +1873,24 @@ P4_GetPosition(P4_Source* s) {
 
 P4_PRIVATE(void)
 P4_DiffPosition(P4_String str, P4_Position* start, size_t offset, P4_Position* stop) {
-    size_t n = start->pos;
     size_t stop_pos = start->pos + offset;
     size_t stop_lineno = start->lineno;
     size_t stop_offset = 0;
 
-    while (n < stop_pos) {
+    size_t n = 0;
+    bool eol = false;
+    for (n = start->pos; n < stop_pos; n++) {
         if (str[n] == '\n') {
-            stop_lineno++;
-            stop_offset = 0;
+            stop_offset++;
+            eol = true;
         } else {
+            if (eol) {
+                stop_lineno++;
+                stop_offset = 0;
+                eol = false;
+            }
             stop_offset++;
         }
-        n++;
     }
 
     stop->pos = stop_pos;

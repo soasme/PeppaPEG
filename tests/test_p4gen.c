@@ -142,6 +142,13 @@ void test_rule_name(void) {
     check_parse_failed(P4_P4GenRuleName, "4PEG", P4_MatchError);
 }
 
+void test_rule(void) {
+    check_parse(P4_P4GenRule, "a = \"1\"", "[{\"slice\":[0,7],\"type\":\"rule\",\"children\":[{\"slice\":[0,1],\"type\":\"name\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
+    check_parse(P4_P4GenRule, "a = [1-9]", "[{\"slice\":[0,9],\"type\":\"rule\",\"children\":[{\"slice\":[0,1],\"type\":\"name\"},{\"slice\":[4,9],\"type\":\"range\",\"children\":[{\"slice\":[5,6],\"type\":\"char\"},{\"slice\":[7,8],\"type\":\"char\"}]}]}]");
+    check_parse(P4_P4GenRule, "a = \"0x\" [1-9]", "[{\"slice\":[0,14],\"type\":\"rule\",\"children\":[{\"slice\":[0,1],\"type\":\"name\"},{\"slice\":[4,14],\"type\":\"sequence\",\"children\":[{\"slice\":[4,8],\"type\":\"literal\"},{\"slice\":[9,14],\"type\":\"range\",\"children\":[{\"slice\":[10,11],\"type\":\"char\"},{\"slice\":[12,13],\"type\":\"char\"}]}]}]}]");
+    check_parse(P4_P4GenRule, "a = \"0x\"/[1-9]", "[{\"slice\":[0,14],\"type\":\"rule\",\"children\":[{\"slice\":[0,1],\"type\":\"name\"},{\"slice\":[4,14],\"type\":\"choice\",\"children\":[{\"slice\":[4,8],\"type\":\"literal\"},{\"slice\":[9,14],\"type\":\"range\",\"children\":[{\"slice\":[10,11],\"type\":\"char\"},{\"slice\":[12,13],\"type\":\"char\"}]}]}]}]");
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -157,6 +164,7 @@ int main(void) {
     RUN_TEST(test_repeat);
     RUN_TEST(test_expression);
     RUN_TEST(test_rule_name);
+    RUN_TEST(test_rule);
 
     return UNITY_END();
 }

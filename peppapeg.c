@@ -56,9 +56,9 @@
     (s)->lineno = (d)->lineno; \
     (s)->offset = (d)->offset; \
 } while (0);
-# define                        SLICE_SET(s, a, b) do { \
-    (s)->start.pos=(a); \
-    (s)->stop.pos=(b); \
+# define                        P4_SetSlicePositions(s, a, b) do { \
+    P4_SetPosition(&((s)->start), (a)); \
+    P4_SetPosition(&((s)->stop), (b)); \
 } while (0)
 
 # define                        autofree __attribute__ ((cleanup (cleanup_freep)))
@@ -515,7 +515,7 @@ P4_CreateToken (const P4_String     str,
     token->head         = NULL;
     token->tail         = NULL;
 
-    SLICE_SET(&token->slice, start->pos, stop->pos);
+    P4_SetSlicePositions(&token->slice, start, stop);
 
     return token;
 }
@@ -830,7 +830,7 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
         P4_AdoptToken(head, tail, tok);
 
         P4_MarkPosition(s, member_endpos);
-        SLICE_SET(&backrefs[i], member_startpos, member_endpos);
+        P4_SetSlicePositions(&backrefs[i], member_startpos_ptr, member_endpos_ptr);
     }
 
     if (P4_NeedLift(s, e))
@@ -1658,7 +1658,7 @@ P4_CreateSource(P4_String content, P4_RuleID rule_id) {
     source->frame_stack_size = 0;
     source->whitespacing = false;
 
-    SLICE_SET(&source->slice, 0, strlen(content));
+    P4_SetSourceSlice(source, 0, strlen(content));
 
     return source;
 }
@@ -1670,7 +1670,11 @@ P4_SetSourceSlice(P4_Source* source, size_t start, size_t stop) {
 
     P4_Position* startpos = &(P4_Position){ .pos=start, .lineno=1, .offset=0 };
     P4_SetPosition(source, startpos);
-    SLICE_SET(&source->slice, start, stop);
+
+    P4_Position* endpos = &(P4_Position){ 0 };
+    P4_DiffPosition(source->content, startpos, stop-start, endpos);
+
+    P4_SetSlicePositions(&source->slice, startpos, endpos);
 
     return P4_Ok;
 }

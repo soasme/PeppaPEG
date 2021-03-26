@@ -1716,7 +1716,7 @@ P4_String      P4_GetErrorMessage(P4_Source*);
  *
  *      P4_DeleteToken(token);
  */
-P4_Token*      P4_CreateToken(P4_String, size_t, size_t, P4_RuleID);
+P4_Token*      P4_CreateToken(P4_String, P4_Position*, P4_Position*, P4_RuleID);
 
 /**
  * @brief       Delete the token.

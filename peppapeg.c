@@ -114,7 +114,6 @@ P4_PRIVATE(size_t)       P4_ReadRune(P4_String s, P4_Rune* c);
 P4_PRIVATE(int)          P4_CaseCmpInsensitive(const void*, const void*, size_t n);
 
 P4_PRIVATE(size_t)       P4_GetPosition(P4_Source*);
-P4_PRIVATE(void)         P4_SetPosition2(P4_Source*, size_t, size_t, size_t);
 P4_PRIVATE(void)         P4_SetPosition(P4_Source*, P4_Position*);
 P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size_t offset, P4_Position* stop);
 
@@ -670,8 +669,9 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
         return NULL;
     }
 
-    P4_SetPosition2(s, startpos+len, startpos_lineno, startpos_offset);
-    P4_MarkPosition(s, endpos);
+    P4_Position* endpos_ptr = &(P4_Position){ 0 };
+    P4_DiffPosition(s->content, startpos_ptr, len, endpos_ptr);
+    P4_SetPosition(s, endpos_ptr);
 
     if (P4_NeedLift(s, e))
         return NULL;
@@ -705,8 +705,9 @@ P4_MatchRange(P4_Source* s, P4_Expression* e) {
         return NULL;
     }
 
-    P4_SetPosition2(s, startpos+size, startpos_lineno, startpos_offset);
-    P4_MarkPosition(s, endpos);
+    P4_Position* endpos_ptr = &(P4_Position){ 0 };
+    P4_DiffPosition(s->content, startpos_ptr, size, endpos_ptr);
+    P4_SetPosition(s, endpos_ptr);
 
     if (P4_NeedLift(s, e))
         return NULL;
@@ -1862,13 +1863,6 @@ P4_GetPosition(P4_Source* s) {
 }
 
 P4_PRIVATE(void)
-P4_SetPosition2(P4_Source* s, size_t pos, size_t lineno, size_t offset) {
-    s->pos = pos;
-    s->lineno = lineno;
-    s->offset = offset;
-}
-
-P4_PRIVATE(void)
 P4_SetPosition(P4_Source* s, P4_Position* pos) {
     s->pos = pos->pos;
     s->lineno = pos->lineno;
@@ -1878,9 +1872,11 @@ P4_SetPosition(P4_Source* s, P4_Position* pos) {
 P4_PRIVATE(void)
 P4_DiffPosition(P4_String str, P4_Position* start, size_t offset, P4_Position* stop) {
     size_t n = start->pos;
+    size_t stop_pos = start->pos + offset;
     size_t stop_lineno = start->lineno;
     size_t stop_offset = 0;
-    while (n < start->pos+offset) {
+
+    while (n < stop_pos) {
         if (str[n] == '\n') {
             stop_lineno++;
             stop_offset = 0;
@@ -1889,7 +1885,8 @@ P4_DiffPosition(P4_String str, P4_Position* start, size_t offset, P4_Position* s
         }
         n++;
     }
-    stop->pos = start->pos + offset;
+
+    stop->pos = stop_pos;
     stop->lineno = stop_lineno;
     stop->offset = stop_offset;
 }

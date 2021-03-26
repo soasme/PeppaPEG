@@ -38,7 +38,7 @@
 /** It indicates the function or type is not for public use. */
 # define P4_PRIVATE(type) static type
 
-# define                        IS_END(s) ((s)->pos >= (s)->slice.j)
+# define                        IS_END(s) ((s)->pos >= (s)->slice.stop.pos)
 # define                        IS_TIGHT(e) (((e)->flag & P4_FLAG_TIGHT) != 0)
 # define                        IS_SCOPED(e) (((e)->flag & P4_FLAG_SCOPED) != 0)
 # define                        IS_SPACED(e) (((e)->flag & P4_FLAG_SPACED) != 0)
@@ -494,8 +494,8 @@ P4_CreateToken (const P4_String     str,
         return NULL;
 
     token->text         = str;
-    token->slice.i      = start;
-    token->slice.j      = stop;
+    token->slice.start.pos = start;
+    token->slice.stop.pos  = stop;
     token->rule_id      = rule_id;
     token->next         = NULL;
     token->head         = NULL;
@@ -808,8 +808,8 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
         }
 
         P4_AdoptToken(head, tail, tok);
-        backrefs[i].i = member_startpos;
-        backrefs[i].j = P4_GetPosition(s);
+        backrefs[i].start.pos = member_startpos;
+        backrefs[i].stop.pos = P4_GetPosition(s);
     }
 
     if (P4_NeedLift(s, e))
@@ -1226,7 +1226,7 @@ P4_JsonifySourceAst(FILE* stream, P4_Token* token, P4_KindToName namefunc) {
     fprintf(stream, "[");
     P4_Token* tmp = token;
     while (tmp != NULL) {
-        fprintf(stream, "{\"slice\":[%lu,%lu]", tmp->slice.i, tmp->slice.j);
+        fprintf(stream, "{\"slice\":[%lu,%lu]", tmp->slice.start.pos, tmp->slice.stop.pos);
         fprintf(stream, ",\"type\":\"%s\"", namefunc(tmp->rule_id));
         if (tmp->head != NULL) {
             fprintf(stream, ",\"children\":");
@@ -1620,8 +1620,8 @@ P4_PUBLIC P4_Source*
 P4_CreateSource(P4_String content, P4_RuleID rule_id) {
     P4_Source* source = malloc(sizeof(P4_Source));
     source->content = content;
-    source->slice.i = 0;
-    source->slice.j = strlen(content);
+    source->slice.start.pos = 0;
+    source->slice.stop.pos = strlen(content);
     source->rule_id = rule_id;
     source->pos = 0;
     source->err = P4_Ok;
@@ -1638,8 +1638,8 @@ P4_SetSourceSlice(P4_Source* source, size_t start, size_t stop) {
     if (source == 0)
         return P4_NullError;
     source->pos = start;
-    source->slice.i = start;
-    source->slice.j = stop;
+    source->slice.start.pos = start;
+    source->slice.stop.pos = stop;
     return P4_Ok;
 }
 
@@ -2167,11 +2167,11 @@ P4_GetTokenSlice(P4_Token* token) {
 
 P4_PRIVATE(P4_String)
 P4_CopySliceString(P4_String s, P4_Slice* slice) {
-    size_t    len = slice->j - slice->i;
+    size_t    len = slice->stop.pos - slice->start.pos;
     assert(len >= 0);
 
     P4_String str = malloc(len+1);
-    strncpy(str, s + slice->i, len);
+    strncpy(str, s + slice->start.pos, len);
     str[len] = '\0';
 
     return str;

@@ -259,6 +259,25 @@ typedef void    (*P4_UserDataFreeFunc)(P4_UserData);
  */
 
 /**
+ * The position.
+ *
+ * P4_Position does not hold a pointer to the string.
+ *
+ * Example:
+ *
+ *      P4_Position pos = { .pos=10, .lineno=1, .offset=2 };
+ *      printf("%u..%u\n", pos.lineno, pos.offset);
+ */
+typedef struct P4_Position {
+    /** The position in the string. */
+    size_t              pos;
+    /** The line number in the string. */
+    size_t              lineno;
+    /** The col offset in the line. */
+    size_t              offset;
+} P4_Position;
+
+/**
  * The slice of a string.
  *
  * P4_Slice does not hold a pointer to the string.
@@ -277,6 +296,10 @@ typedef struct P4_Slice {
     size_t              i;
     /** The stop position of the slice. */
     size_t              j;
+    /** The start position of the slice (v2). */
+    P4_Position         start;
+    /** The stop position of the slice (v2). */
+    P4_Position         stop;
 }                       P4_Slice;
 
 /**
@@ -413,7 +436,7 @@ typedef struct P4_Token {
     /** the full text. */
     P4_String               text;
     /** The matched substring.
-     * slice[0] is the beginning (inclusive), and slice[1] is the end (exclusive).
+     * slice.start is the beginning (inclusive), and slice.stop is the end (exclusive).
      */
     P4_Slice                slice;
 

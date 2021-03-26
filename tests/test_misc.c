@@ -170,6 +170,33 @@ void test_source_slice(void) {
     P4_DeleteGrammar(grammar);
 }
 
+void test_lineno_offset(void) {
+    const int R1 = 1;
+
+    P4_Grammar* grammar = P4_CreateGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+    TEST_ASSERT_EQUAL( P4_Ok, P4_AddLiteral(grammar, R1, "A\nBC\n", false));
+
+    P4_Source* source = P4_CreateSource("A\nBC\n", R1);
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(P4_Ok, P4_Parse(grammar, source));
+    TEST_ASSERT_EQUAL(5, P4_GetSourcePosition(source));
+
+    P4_Token* token = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    TEST_ASSERT_EQUAL_TOKEN_STRING("A\nBC\n", token);
+    TEST_ASSERT_EQUAL_TOKEN_LINE_OFFSET(1, 0, 2, 3, token);
+
+    TEST_ASSERT_NULL(token->next);
+    TEST_ASSERT_NULL(token->head);
+    TEST_ASSERT_NULL(token->tail);
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -179,6 +206,7 @@ int main(void) {
     RUN_TEST(test_join);
     RUN_TEST(test_error_string);
     RUN_TEST(test_source_slice);
+    RUN_TEST(test_lineno_offset);
 
     return UNITY_END();
 }

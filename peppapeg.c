@@ -38,7 +38,7 @@
 /** It indicates the function or type is not for public use. */
 # define P4_PRIVATE(type) static type
 
-# define                        IS_END(s) ((s)->pos >= (s)->slice.j)
+# define                        IS_END(s) ((s)->pos >= (s)->slice.stop.pos)
 # define                        IS_TIGHT(e) (((e)->flag & P4_FLAG_TIGHT) != 0)
 # define                        IS_SCOPED(e) (((e)->flag & P4_FLAG_SCOPED) != 0)
 # define                        IS_SPACED(e) (((e)->flag & P4_FLAG_SPACED) != 0)
@@ -50,6 +50,16 @@
 # define                        NEED_SPACE(s) (!(s)->whitespacing && ((s)->frame_stack ? (s)->frame_stack->space : false))
 # define                        NO_ERROR(s) ((s)->err == P4_Ok)
 # define                        NO_MATCH(s) ((s)->err == P4_MatchError)
+# define                        SLICE_LEN(s) ((s)->stop.pos - (s)->start.pos)
+# define                        P4_SetPosition(s, d) do { \
+    (s)->pos = (d)->pos; \
+    (s)->lineno = (d)->lineno; \
+    (s)->offset = (d)->offset; \
+} while (0);
+# define                        P4_SetSlicePositions(s, a, b) do { \
+    P4_SetPosition(&((s)->start), (a)); \
+    P4_SetPosition(&((s)->stop), (b)); \
+} while (0)
 
 # define                        autofree __attribute__ ((cleanup (cleanup_freep)))
 
@@ -111,10 +121,14 @@ P4_PRIVATE(P4_Rune)      P4_GetRuneUpper(P4_Rune ch);
 P4_PRIVATE(size_t)       P4_ReadRune(P4_String s, P4_Rune* c);
 P4_PRIVATE(int)          P4_CaseCmpInsensitive(const void*, const void*, size_t n);
 
-P4_PRIVATE(P4_Position)  P4_GetPosition(P4_Source*);
-P4_PRIVATE(void)                P4_SetPosition(P4_Source*, P4_Position);
+P4_PRIVATE(size_t)       P4_GetPosition(P4_Source*);
+P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size_t offset, P4_Position* stop);
 
-# define                        P4_MarkPosition(s, p) P4_Position (p) = P4_GetPosition(s);
+# define                 P4_MarkPosition(s, p) P4_Position* p = & (P4_Position) { \
+                             .pos = (s)->pos, \
+                             .lineno = (s)->lineno, \
+                             .offset = (s)->offset \
+                         };
 
 P4_PRIVATE(P4_String)    P4_RemainingText(P4_Source*);
 
@@ -485,8 +499,8 @@ P4_RescueError(P4_Source* s) {
  */
 P4_Token*
 P4_CreateToken (const P4_String     str,
-                size_t              start,
-                size_t              stop,
+                P4_Position*        start,
+                P4_Position*        stop,
                 P4_RuleID           rule_id) {
     P4_Token* token;
 
@@ -494,12 +508,12 @@ P4_CreateToken (const P4_String     str,
         return NULL;
 
     token->text         = str;
-    token->slice.i      = start;
-    token->slice.j      = stop;
     token->rule_id      = rule_id;
     token->next         = NULL;
     token->head         = NULL;
     token->tail         = NULL;
+
+    P4_SetSlicePositions(&token->slice, start, stop);
 
     return token;
 }
@@ -659,8 +673,10 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
         P4_RaiseError(s, P4_MatchError, "expect literal");
         return NULL;
     }
-    P4_SetPosition(s, startpos+len);
-    P4_MarkPosition(s, endpos);
+
+    P4_Position* endpos= &(P4_Position){ 0 };
+    P4_DiffPosition(s->content, startpos, len, endpos);
+    P4_SetPosition(s, endpos);
 
     if (P4_NeedLift(s, e))
         return NULL;
@@ -694,8 +710,9 @@ P4_MatchRange(P4_Source* s, P4_Expression* e) {
         return NULL;
     }
 
-    P4_SetPosition(s, startpos+size);
-    P4_MarkPosition(s, endpos);
+    P4_Position* endpos= &(P4_Position){ 0 };
+    P4_DiffPosition(s->content, startpos, size, endpos);
+    P4_SetPosition(s, endpos);
 
     if (P4_NeedLift(s, e))
         return NULL;
@@ -807,9 +824,11 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
             goto finalize;
         }
 
+
         P4_AdoptToken(head, tail, tok);
-        backrefs[i].i = member_startpos;
-        backrefs[i].j = P4_GetPosition(s);
+
+        P4_MarkPosition(s, member_endpos);
+        P4_SetSlicePositions(&backrefs[i], member_startpos, member_endpos);
     }
 
     if (P4_NeedLift(s, e))
@@ -819,7 +838,9 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
         return head;
     }
 
-    P4_Token* ret = P4_CreateToken (s->content, startpos, P4_GetPosition(s), e->id);
+    P4_MarkPosition(s, endpos);
+
+    P4_Token* ret = P4_CreateToken (s->content, startpos, endpos, e->id);
     if (ret == NULL) {
         P4_RaiseError(s, P4_MemoryError, "oom");
         return NULL;
@@ -914,7 +935,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     max = e->repeat_max;
 
     bool need_space = NEED_SPACE(s);
-    P4_Position startpos = P4_GetPosition(s);
+    P4_MarkPosition(s, startpos);
     P4_Token *head = NULL, *tail = NULL, *tok = NULL, *whitespace = NULL;
 
     while (!IS_END(s)) {
@@ -933,9 +954,11 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
             assert(tok == NULL);
 
             /* considering the case: MATCH WHITESPACE MATCH WHITESPACE NO_MATCH */
-            if (need_space && repeated > 0)/*               ^          ^ we are here */
-                P4_SetPosition(s, before_implicit);  /*           ^ puke extra whitespace */
+            if (need_space && repeated > 0){/*              ^          ^ we are here */
+                                                                  /* ^ puke extra whitespace */
+                P4_SetPosition(s, before_implicit);
                                                /*           ^ now we are here */
+            }
 
             if (min != SIZE_MAX && repeated < min) {
                 P4_RaiseError(s, P4_MatchError, "insufficient repetitions");
@@ -949,7 +972,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         if (!NO_ERROR(s))
             goto finalize;
 
-        if (P4_GetPosition(s) == before_implicit) {
+        if (P4_GetPosition(s) == before_implicit->pos) {
             P4_RaiseError(s, P4_AdvanceError, "Repeated expression consumes no input");
             goto finalize;
         }
@@ -978,7 +1001,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         goto finalize;
     }
 
-    if (P4_GetPosition(s) == startpos) /* success but no token is produced. */
+    if (P4_GetPosition(s) == startpos->pos) /* success but no token is produced. */
         goto finalize;
 
     if (P4_NeedLift(s, e))
@@ -988,7 +1011,9 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         return head;
     }
 
-    P4_Token* repetition = P4_CreateToken (s->content, startpos, P4_GetPosition(s), e->id);
+    P4_MarkPosition(s, endpos);
+
+    P4_Token* repetition = P4_CreateToken (s->content, startpos, endpos, e->id);
     if (repetition == NULL) {
         P4_RaiseError(s, P4_MemoryError, "oom");
         return NULL;
@@ -1226,7 +1251,7 @@ P4_JsonifySourceAst(FILE* stream, P4_Token* token, P4_KindToName namefunc) {
     fprintf(stream, "[");
     P4_Token* tmp = token;
     while (tmp != NULL) {
-        fprintf(stream, "{\"slice\":[%lu,%lu]", tmp->slice.i, tmp->slice.j);
+        fprintf(stream, "{\"slice\":[%lu,%lu]", tmp->slice.start.pos, tmp->slice.stop.pos);
         fprintf(stream, ",\"type\":\"%s\"", namefunc(tmp->rule_id));
         if (tmp->head != NULL) {
             fprintf(stream, ",\"children\":");
@@ -1620,16 +1645,19 @@ P4_PUBLIC P4_Source*
 P4_CreateSource(P4_String content, P4_RuleID rule_id) {
     P4_Source* source = malloc(sizeof(P4_Source));
     source->content = content;
-    source->slice.i = 0;
-    source->slice.j = strlen(content);
     source->rule_id = rule_id;
     source->pos = 0;
+    source->lineno = 0;
+    source->offset = 0;
     source->err = P4_Ok;
     source->errmsg = NULL;
     source->root = NULL;
     source->frame_stack = NULL;
     source->frame_stack_size = 0;
     source->whitespacing = false;
+
+    P4_SetSourceSlice(source, 0, strlen(content));
+
     return source;
 }
 
@@ -1637,9 +1665,16 @@ P4_Error
 P4_SetSourceSlice(P4_Source* source, size_t start, size_t stop) {
     if (source == 0)
         return P4_NullError;
-    source->pos = start;
-    source->slice.i = start;
-    source->slice.j = stop;
+
+    P4_Position* startpos = &(P4_Position){ .pos=0, .lineno=1, .offset=0 };
+    P4_DiffPosition(source->content, startpos, start, startpos);
+    P4_SetPosition(source, startpos);
+
+    P4_Position* endpos = &(P4_Position){ 0 };
+    P4_DiffPosition(source->content, startpos, stop-start, endpos);
+
+    P4_SetSlicePositions(&source->slice, startpos, endpos);
+
     return P4_Ok;
 }
 
@@ -1671,7 +1706,7 @@ P4_GetSourceAst(P4_Source* source) {
     return source == NULL ? NULL : source->root;
 }
 
-P4_PUBLIC P4_Position
+P4_PUBLIC size_t
 P4_GetSourcePosition(P4_Source* source) {
     return source == NULL ? 0 : source->pos;
 }
@@ -1832,14 +1867,37 @@ P4_SetExpressionFlag(P4_Expression* e, P4_ExpressionFlag f) {
     e->flag |= f;
 }
 
-P4_PRIVATE(P4_Position)
+P4_PRIVATE(size_t)
 P4_GetPosition(P4_Source* s) {
     return s->pos;
 }
 
 P4_PRIVATE(void)
-P4_SetPosition(P4_Source* s, P4_Position pos) {
-    s->pos = pos;
+P4_DiffPosition(P4_String str, P4_Position* start, size_t offset, P4_Position* stop) {
+    size_t start_pos = start->pos;
+    size_t stop_pos = start_pos + offset;
+    size_t stop_lineno = start->lineno;
+    size_t stop_offset = 0;
+
+    size_t n = 0;
+    bool eol = false;
+    for (n = start_pos; n < stop_pos; n++) {
+        if (str[n] == '\n') {
+            stop_offset++;
+            eol = true;
+        } else {
+            if (eol) {
+                stop_lineno++;
+                stop_offset = 0;
+                eol = false;
+            }
+            stop_offset++;
+        }
+    }
+
+    stop->pos = stop_pos;
+    stop->lineno = stop_lineno;
+    stop->offset = stop_offset;
 }
 
 /*
@@ -2167,11 +2225,11 @@ P4_GetTokenSlice(P4_Token* token) {
 
 P4_PRIVATE(P4_String)
 P4_CopySliceString(P4_String s, P4_Slice* slice) {
-    size_t    len = slice->j - slice->i;
+    size_t    len = SLICE_LEN(slice);
     assert(len >= 0);
 
     P4_String str = malloc(len+1);
-    strncpy(str, s + slice->i, len);
+    strncpy(str, s + slice->start.pos, len);
     str[len] = '\0';
 
     return str;

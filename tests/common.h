@@ -16,8 +16,8 @@ cleanup_freep (void *p)
 }
 
 void TEST_ASSERT_EQUAL_SLICE(P4_Slice* s, size_t i, size_t j) {
-    TEST_ASSERT_EQUAL_UINT(i,   s->i);
-    TEST_ASSERT_EQUAL_UINT(j,   s->j);
+    TEST_ASSERT_EQUAL_UINT(i,   s->start.pos);
+    TEST_ASSERT_EQUAL_UINT(j,   s->start.pos);
 }
 
 void TEST_ASSERT_EQUAL_TOKEN_STRING(P4_String s, P4_Token* token) {
@@ -29,6 +29,15 @@ void TEST_ASSERT_EQUAL_TOKEN_STRING(P4_String s, P4_Token* token) {
 void TEST_ASSERT_EQUAL_TOKEN_RULE(P4_RuleID id, P4_Token* token) {
     TEST_ASSERT_NOT_NULL(token);
     TEST_ASSERT_EQUAL_UINT(id, token->rule_id);
+}
+
+void TEST_ASSERT_EQUAL_TOKEN_LINE_OFFSET(size_t startline, size_t startoffset,
+        size_t stopline, size_t stopoffset, P4_Token* token) {
+    TEST_ASSERT_NOT_NULL(token);
+    TEST_ASSERT_EQUAL_UINT(startline, token->slice.start.lineno);
+    TEST_ASSERT_EQUAL_UINT(startoffset, token->slice.start.offset);
+    TEST_ASSERT_EQUAL_UINT(stopline, token->slice.stop.lineno);
+    TEST_ASSERT_EQUAL_UINT(stopoffset, token->slice.stop.offset);
 }
 
 void TEST_ADD_WHITESPACE(P4_Grammar* grammar, P4_RuleID id) {

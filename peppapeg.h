@@ -293,12 +293,8 @@ typedef struct P4_Position {
  **/
 typedef struct P4_Slice {
     /** The start position of the slice. */
-    size_t              i;
-    /** The stop position of the slice. */
-    size_t              j;
-    /** The start position of the slice (v2). */
     P4_Position         start;
-    /** The stop position of the slice (v2). */
+    /** The stop position of the slice. */
     P4_Position         stop;
 }                       P4_Slice;
 

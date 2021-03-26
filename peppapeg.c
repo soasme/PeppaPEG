@@ -124,13 +124,11 @@ P4_PRIVATE(int)          P4_CaseCmpInsensitive(const void*, const void*, size_t 
 P4_PRIVATE(size_t)       P4_GetPosition(P4_Source*);
 P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size_t offset, P4_Position* stop);
 
-# define                 P4_MarkPosition(s, p) \
-    size_t (p) = (s)->pos;\
-    size_t p ## _lineno = (s)->lineno;\
-    size_t p ## _offset = (s)->offset; \
-    P4_Position p ## _pos = { .pos = (s)->pos, .lineno = (s)->lineno, .offset = (s)->offset }; \
-    P4_Position* p ## _ptr = & p ## _pos;
-
+# define                 P4_MarkPosition(s, p) P4_Position* p = & (P4_Position) { \
+                             .pos = (s)->pos, \
+                             .lineno = (s)->lineno, \
+                             .offset = (s)->offset \
+                         };
 
 P4_PRIVATE(P4_String)    P4_RemainingText(P4_Source*);
 
@@ -676,15 +674,15 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
         return NULL;
     }
 
-    P4_Position* endpos_ptr = &(P4_Position){ 0 };
-    P4_DiffPosition(s->content, startpos_ptr, len, endpos_ptr);
-    P4_SetPosition(s, endpos_ptr);
+    P4_Position* endpos= &(P4_Position){ 0 };
+    P4_DiffPosition(s->content, startpos, len, endpos);
+    P4_SetPosition(s, endpos);
 
     if (P4_NeedLift(s, e))
         return NULL;
 
     P4_Token* result = NULL;
-    if ((result=P4_CreateToken (s->content, startpos_ptr, endpos_ptr, e->id)) == NULL) {
+    if ((result=P4_CreateToken (s->content, startpos, endpos, e->id)) == NULL) {
         P4_RaiseError(s, P4_MemoryError, "");
         return NULL;
     }
@@ -712,15 +710,15 @@ P4_MatchRange(P4_Source* s, P4_Expression* e) {
         return NULL;
     }
 
-    P4_Position* endpos_ptr = &(P4_Position){ 0 };
-    P4_DiffPosition(s->content, startpos_ptr, size, endpos_ptr);
-    P4_SetPosition(s, endpos_ptr);
+    P4_Position* endpos= &(P4_Position){ 0 };
+    P4_DiffPosition(s->content, startpos, size, endpos);
+    P4_SetPosition(s, endpos);
 
     if (P4_NeedLift(s, e))
         return NULL;
 
     P4_Token* result = NULL;
-    if ((result=P4_CreateToken (s->content, startpos_ptr, endpos_ptr, e->id)) == NULL) {
+    if ((result=P4_CreateToken (s->content, startpos, endpos, e->id)) == NULL) {
         P4_RaiseError(s, P4_MemoryError, "oom");
         return NULL;
     }
@@ -770,7 +768,7 @@ P4_MatchReference(P4_Source* s, P4_Expression* e) {
     /* */
     P4_Token* result = NULL;
 
-    if ((result=P4_CreateToken (s->content, startpos_ptr, endpos_ptr, e->id)) == NULL) {
+    if ((result=P4_CreateToken (s->content, startpos, endpos, e->id)) == NULL) {
         P4_RaiseError(s, P4_MemoryError, "oom");
         return NULL;
     }
@@ -830,7 +828,7 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
         P4_AdoptToken(head, tail, tok);
 
         P4_MarkPosition(s, member_endpos);
-        P4_SetSlicePositions(&backrefs[i], member_startpos_ptr, member_endpos_ptr);
+        P4_SetSlicePositions(&backrefs[i], member_startpos, member_endpos);
     }
 
     if (P4_NeedLift(s, e))
@@ -842,7 +840,7 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
 
     P4_MarkPosition(s, endpos);
 
-    P4_Token* ret = P4_CreateToken (s->content, startpos_ptr, endpos_ptr, e->id);
+    P4_Token* ret = P4_CreateToken (s->content, startpos, endpos, e->id);
     if (ret == NULL) {
         P4_RaiseError(s, P4_MemoryError, "oom");
         return NULL;
@@ -853,7 +851,7 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
     return ret;
 
 finalize:
-    P4_SetPosition(s, startpos_ptr);
+    P4_SetPosition(s, startpos);
     P4_DeleteToken(head);
     return NULL;
 }
@@ -875,7 +873,7 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
             /* retry until the last one. */
             if (i < e->count-1) {
                 P4_RescueError(s);
-                P4_SetPosition(s, startpos_ptr);
+                P4_SetPosition(s, startpos);
             /* fail when the last one is a no-match. */
             } else {
                 P4_RaiseError(s, P4_MatchError, "no match");
@@ -888,7 +886,7 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
     if (P4_NeedLift(s, e))
         return tok;
 
-    P4_Token* oneof = P4_CreateToken (s->content, startpos_ptr, endpos_ptr, e->id);
+    P4_Token* oneof = P4_CreateToken (s->content, startpos, endpos, e->id);
     if (oneof == NULL) {
         P4_RaiseError(s, P4_MemoryError, "oom");
         goto finalize;
@@ -898,7 +896,7 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
     return oneof;
 
 finalize:
-    P4_SetPosition(s, startpos_ptr);
+    P4_SetPosition(s, startpos);
     free(tok);
     return NULL;
 }
@@ -958,7 +956,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
             /* considering the case: MATCH WHITESPACE MATCH WHITESPACE NO_MATCH */
             if (need_space && repeated > 0){/*              ^          ^ we are here */
                                                                   /* ^ puke extra whitespace */
-                P4_SetPosition(s, before_implicit_ptr);
+                P4_SetPosition(s, before_implicit);
                                                /*           ^ now we are here */
             }
 
@@ -974,7 +972,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         if (!NO_ERROR(s))
             goto finalize;
 
-        if (P4_GetPosition(s) == before_implicit_ptr->pos) {
+        if (P4_GetPosition(s) == before_implicit->pos) {
             P4_RaiseError(s, P4_AdvanceError, "Repeated expression consumes no input");
             goto finalize;
         }
@@ -1003,7 +1001,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         goto finalize;
     }
 
-    if (P4_GetPosition(s) == startpos_ptr->pos) /* success but no token is produced. */
+    if (P4_GetPosition(s) == startpos->pos) /* success but no token is produced. */
         goto finalize;
 
     if (P4_NeedLift(s, e))
@@ -1015,7 +1013,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
 
     P4_MarkPosition(s, endpos);
 
-    P4_Token* repetition = P4_CreateToken (s->content, startpos_ptr, endpos_ptr, e->id);
+    P4_Token* repetition = P4_CreateToken (s->content, startpos, endpos, e->id);
     if (repetition == NULL) {
         P4_RaiseError(s, P4_MemoryError, "oom");
         return NULL;
@@ -1027,7 +1025,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
 /* cleanup before returning NULL. */
 /* tokens between head..tail should be freed. */
 finalize:
-    P4_SetPosition(s, startpos_ptr);
+    P4_SetPosition(s, startpos);
     P4_DeleteToken(head);
     return NULL;
 }
@@ -1042,7 +1040,7 @@ P4_MatchPositive(P4_Source* s, P4_Expression* e) {
     if (token != NULL)
         P4_DeleteToken(token);
 
-    P4_SetPosition(s, startpos_ptr);
+    P4_SetPosition(s, startpos);
 
     return NULL;
 }
@@ -1053,7 +1051,7 @@ P4_MatchNegative(P4_Source* s, P4_Expression* e) {
 
     P4_MarkPosition(s, startpos);
     P4_Token* token = P4_Match(s, e->ref_expr);
-    P4_SetPosition(s, startpos_ptr);
+    P4_SetPosition(s, startpos);
 
     if (NO_ERROR(s)) {
         P4_DeleteToken(token);

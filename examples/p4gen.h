@@ -245,6 +245,12 @@ P4_Grammar* P4_CreateP4GenGrammar () {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenExpression, P4_FLAG_LIFTED))
         goto finalize;
 
+    if (P4_Ok != P4_AddReference(grammar, P4_P4GenRuleName, P4_P4GenReference))
+        goto finalize;
+
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenRuleName, P4_FLAG_SQUASHED))
+        goto finalize;
+
     if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_P4GenWhitespace, 4,
         P4_CreateLiteral(" ", true),
         P4_CreateLiteral("\t", true),
@@ -283,6 +289,7 @@ P4_String   P4_P4GenKindToName(P4_RuleID id) {
         case P4_P4GenRepeatMax: return "repeatmax";
         case P4_P4GenRepeatMinMax: return "repeatminmax";
         case P4_P4GenRepeatExact: return "repeatexact";
+        case P4_P4GenRuleName: return "name";
         default: return "<unknown>";
     }
 }

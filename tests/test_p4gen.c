@@ -134,6 +134,14 @@ void test_expression(void) {
     check_parse(P4_P4GenExpression, "\"a\"{1}", "[{\"slice\":[0,6],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,6],\"type\":\"repeatexact\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"}]}]}]");
 }
 
+void test_rule_name(void) {
+    check_parse(P4_P4GenRuleName, "a", "[{\"slice\":[0,1],\"type\":\"name\"}]");
+    check_parse(P4_P4GenRuleName, "JsonEntry", "[{\"slice\":[0,9],\"type\":\"name\"}]");
+    check_parse(P4_P4GenRuleName, "P4", "[{\"slice\":[0,2],\"type\":\"name\"}]");
+    check_parse(P4_P4GenRuleName, "P4_P4Gen", "[{\"slice\":[0,8],\"type\":\"name\"}]");
+    check_parse_failed(P4_P4GenRuleName, "4PEG", P4_MatchError);
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -148,6 +156,7 @@ int main(void) {
     RUN_TEST(test_sequence);
     RUN_TEST(test_repeat);
     RUN_TEST(test_expression);
+    RUN_TEST(test_rule_name);
 
     return UNITY_END();
 }

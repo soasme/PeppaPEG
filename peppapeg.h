@@ -345,6 +345,14 @@ typedef struct P4_Source {
      * the input is guaranteed to be parsed until all bits are consumed.
      * */
     size_t                  pos;
+    /**
+     * The line number of the unconsumed input. Min: 1, Max: countlines(content).
+     */
+    size_t                  lineno;
+    /**
+     * The bytes offset of the line in the unconsumed input.
+     */
+    size_t                  offset;
 
     /** The error code of the parse. */
     P4_Error                err;

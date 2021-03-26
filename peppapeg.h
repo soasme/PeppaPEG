@@ -224,11 +224,6 @@ typedef enum {
  **/
 typedef uint32_t        P4_ExpressionFlag;
 
-/**
- * @brief The position of a string.
- **/
-typedef size_t          P4_Position;
-
 /** An UTF8 rune */
 typedef uint32_t        P4_Rune;
 
@@ -279,9 +274,9 @@ typedef void    (*P4_UserDataFreeFunc)(P4_UserData);
  **/
 typedef struct P4_Slice {
     /** The start position of the slice. */
-    P4_Position         i;
+    size_t              i;
     /** The stop position of the slice. */
-    P4_Position         j;
+    size_t              j;
 }                       P4_Slice;
 
 /**
@@ -326,7 +321,7 @@ typedef struct P4_Source {
      * and An EOI is Negative(Range(1, 0x10ffff)). When the rule is wrapped,
      * the input is guaranteed to be parsed until all bits are consumed.
      * */
-    P4_Position             pos;
+    size_t                  pos;
 
     /** The error code of the parse. */
     P4_Error                err;
@@ -1576,7 +1571,7 @@ P4_Token*      P4_GetSourceAst(P4_Source*);
  * @param       source  The source.
  * @return      The position in the input.
  */
-P4_Position    P4_GetSourcePosition(P4_Source*);
+size_t          P4_GetSourcePosition(P4_Source*);
 
 typedef P4_String (*P4_KindToName)(P4_RuleID id);
 

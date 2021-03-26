@@ -111,10 +111,10 @@ P4_PRIVATE(P4_Rune)      P4_GetRuneUpper(P4_Rune ch);
 P4_PRIVATE(size_t)       P4_ReadRune(P4_String s, P4_Rune* c);
 P4_PRIVATE(int)          P4_CaseCmpInsensitive(const void*, const void*, size_t n);
 
-P4_PRIVATE(P4_Position)  P4_GetPosition(P4_Source*);
-P4_PRIVATE(void)                P4_SetPosition(P4_Source*, P4_Position);
+P4_PRIVATE(size_t)  P4_GetPosition(P4_Source*);
+P4_PRIVATE(void)                P4_SetPosition(P4_Source*, size_t);
 
-# define                        P4_MarkPosition(s, p) P4_Position (p) = P4_GetPosition(s);
+# define                        P4_MarkPosition(s, p) size_t (p) = P4_GetPosition(s);
 
 P4_PRIVATE(P4_String)    P4_RemainingText(P4_Source*);
 
@@ -914,7 +914,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     max = e->repeat_max;
 
     bool need_space = NEED_SPACE(s);
-    P4_Position startpos = P4_GetPosition(s);
+    size_t startpos = P4_GetPosition(s);
     P4_Token *head = NULL, *tail = NULL, *tok = NULL, *whitespace = NULL;
 
     while (!IS_END(s)) {
@@ -1671,7 +1671,7 @@ P4_GetSourceAst(P4_Source* source) {
     return source == NULL ? NULL : source->root;
 }
 
-P4_PUBLIC P4_Position
+P4_PUBLIC size_t
 P4_GetSourcePosition(P4_Source* source) {
     return source == NULL ? 0 : source->pos;
 }
@@ -1832,13 +1832,13 @@ P4_SetExpressionFlag(P4_Expression* e, P4_ExpressionFlag f) {
     e->flag |= f;
 }
 
-P4_PRIVATE(P4_Position)
+P4_PRIVATE(size_t)
 P4_GetPosition(P4_Source* s) {
     return s->pos;
 }
 
 P4_PRIVATE(void)
-P4_SetPosition(P4_Source* s, P4_Position pos) {
+P4_SetPosition(P4_Source* s, size_t pos) {
     s->pos = pos;
 }
 

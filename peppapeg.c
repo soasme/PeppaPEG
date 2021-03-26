@@ -51,6 +51,7 @@
 # define                        NO_ERROR(s) ((s)->err == P4_Ok)
 # define                        NO_MATCH(s) ((s)->err == P4_MatchError)
 # define                        SLICE_LEN(s) ((s)->stop.pos - (s)->start.pos)
+# define                        SLICE_SET(s, a, b) do { (s)->start.pos=(a); (s)->stop.pos=(b); } while (0)
 
 # define                        autofree __attribute__ ((cleanup (cleanup_freep)))
 
@@ -495,12 +496,12 @@ P4_CreateToken (const P4_String     str,
         return NULL;
 
     token->text         = str;
-    token->slice.start.pos = start;
-    token->slice.stop.pos  = stop;
     token->rule_id      = rule_id;
     token->next         = NULL;
     token->head         = NULL;
     token->tail         = NULL;
+
+    SLICE_SET(&token->slice, start, stop);
 
     return token;
 }
@@ -809,8 +810,8 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
         }
 
         P4_AdoptToken(head, tail, tok);
-        backrefs[i].start.pos = member_startpos;
-        backrefs[i].stop.pos = P4_GetPosition(s);
+
+        SLICE_SET(&backrefs[i], member_startpos, P4_GetPosition(s));
     }
 
     if (P4_NeedLift(s, e))
@@ -1621,8 +1622,6 @@ P4_PUBLIC P4_Source*
 P4_CreateSource(P4_String content, P4_RuleID rule_id) {
     P4_Source* source = malloc(sizeof(P4_Source));
     source->content = content;
-    source->slice.start.pos = 0;
-    source->slice.stop.pos = strlen(content);
     source->rule_id = rule_id;
     source->pos = 0;
     source->err = P4_Ok;
@@ -1631,6 +1630,9 @@ P4_CreateSource(P4_String content, P4_RuleID rule_id) {
     source->frame_stack = NULL;
     source->frame_stack_size = 0;
     source->whitespacing = false;
+
+    SLICE_SET(&source->slice, 0, strlen(content));
+
     return source;
 }
 
@@ -1638,9 +1640,10 @@ P4_Error
 P4_SetSourceSlice(P4_Source* source, size_t start, size_t stop) {
     if (source == 0)
         return P4_NullError;
+
     source->pos = start;
-    source->slice.start.pos = start;
-    source->slice.stop.pos = stop;
+    SLICE_SET(&source->slice, start, stop);
+
     return P4_Ok;
 }
 

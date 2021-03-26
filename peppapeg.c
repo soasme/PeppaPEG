@@ -824,7 +824,9 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
         return head;
     }
 
-    P4_Token* ret = P4_CreateToken (s->content, startpos, P4_GetPosition(s), e->id);
+    P4_MarkPosition(s, endpos);
+
+    P4_Token* ret = P4_CreateToken (s->content, startpos, endpos, e->id);
     if (ret == NULL) {
         P4_RaiseError(s, P4_MemoryError, "oom");
         return NULL;
@@ -995,7 +997,9 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         return head;
     }
 
-    P4_Token* repetition = P4_CreateToken (s->content, startpos, P4_GetPosition(s), e->id);
+    P4_MarkPosition(s, endpos);
+
+    P4_Token* repetition = P4_CreateToken (s->content, startpos, endpos, e->id);
     if (repetition == NULL) {
         P4_RaiseError(s, P4_MemoryError, "oom");
         return NULL;

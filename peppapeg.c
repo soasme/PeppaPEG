@@ -119,7 +119,10 @@ P4_PRIVATE(void)         P4_SetPosition(P4_Source*, size_t, size_t, size_t);
 # define                 P4_MarkPosition(s, p) \
     size_t (p) = (s)->pos;\
     size_t p ## _lineno = (s)->lineno;\
-    size_t p ## _offset = (s)->offset;
+    size_t p ## _offset = (s)->offset; \
+    P4_Position p ## _pos = { .pos = (s)->pos, .lineno = (s)->lineno, .offset = (s)->offset }; \
+    P4_Position* p ## _ptr = & p ## _pos;
+
 
 P4_PRIVATE(P4_String)    P4_RemainingText(P4_Source*);
 
@@ -812,9 +815,11 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
             goto finalize;
         }
 
+
         P4_AdoptToken(head, tail, tok);
 
-        SLICE_SET(&backrefs[i], member_startpos, P4_GetPosition(s));
+        P4_MarkPosition(s, member_endpos);
+        SLICE_SET(&backrefs[i], member_startpos, member_endpos);
     }
 
     if (P4_NeedLift(s, e))

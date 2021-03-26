@@ -250,7 +250,26 @@ P4_Grammar* P4_CreateP4GenGrammar () {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenRuleName, P4_FLAG_SQUASHED))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenRule, 3,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenDecorator, 2,
+        P4_CreateLiteral("@", true),
+        P4_CreateChoiceWithMembers(6,
+            P4_CreateLiteral("squashed", true),
+            P4_CreateLiteral("scoped", true),
+            P4_CreateLiteral("spaced", true),
+            P4_CreateLiteral("lifted", true),
+            P4_CreateLiteral("tight", true),
+            P4_CreateLiteral("nonterminal", true)
+        )
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_AddZeroOrMore(grammar, P4_P4GenRuleDecorators,
+            P4_CreateReference(P4_P4GenDecorator)
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenRule, 4,
+        P4_CreateReference(P4_P4GenRuleDecorators),
         P4_CreateReference(P4_P4GenRuleName),
         P4_CreateLiteral("=", true),
         P4_CreateReference(P4_P4GenExpression)
@@ -296,6 +315,8 @@ P4_String   P4_P4GenKindToName(P4_RuleID id) {
         case P4_P4GenRepeatMinMax: return "repeatminmax";
         case P4_P4GenRepeatExact: return "repeatexact";
         case P4_P4GenRuleName: return "name";
+        case P4_P4GenRuleDecorators: return "decorators";
+        case P4_P4GenDecorator: return "decorator";
         case P4_P4GenRule: return "rule";
         default: return "<unknown>";
     }

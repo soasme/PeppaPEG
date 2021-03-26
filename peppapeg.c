@@ -1666,7 +1666,8 @@ P4_SetSourceSlice(P4_Source* source, size_t start, size_t stop) {
     if (source == 0)
         return P4_NullError;
 
-    P4_Position* startpos = &(P4_Position){ .pos=start, .lineno=1, .offset=0 };
+    P4_Position* startpos = &(P4_Position){ .pos=0, .lineno=1, .offset=0 };
+    P4_DiffPosition(source->content, startpos, start, startpos);
     P4_SetPosition(source, startpos);
 
     P4_Position* endpos = &(P4_Position){ 0 };
@@ -1873,13 +1874,14 @@ P4_GetPosition(P4_Source* s) {
 
 P4_PRIVATE(void)
 P4_DiffPosition(P4_String str, P4_Position* start, size_t offset, P4_Position* stop) {
-    size_t stop_pos = start->pos + offset;
+    size_t start_pos = start->pos;
+    size_t stop_pos = start_pos + offset;
     size_t stop_lineno = start->lineno;
     size_t stop_offset = 0;
 
     size_t n = 0;
     bool eol = false;
-    for (n = start->pos; n < stop_pos; n++) {
+    for (n = start_pos; n < stop_pos; n++) {
         if (str[n] == '\n') {
             stop_offset++;
             eol = true;

@@ -669,6 +669,7 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
         P4_RaiseError(s, P4_MatchError, "expect literal");
         return NULL;
     }
+
     P4_SetPosition2(s, startpos+len, startpos_lineno, startpos_offset);
     P4_MarkPosition(s, endpos);
 
@@ -844,7 +845,7 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
     return ret;
 
 finalize:
-    P4_SetPosition2(s, startpos, startpos_lineno, startpos_offset);
+    P4_SetPosition(s, startpos_ptr);
     P4_DeleteToken(head);
     return NULL;
 }
@@ -866,7 +867,7 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
             /* retry until the last one. */
             if (i < e->count-1) {
                 P4_RescueError(s);
-                P4_SetPosition2(s, startpos, startpos_lineno, startpos_offset);
+                P4_SetPosition(s, startpos_ptr);
             /* fail when the last one is a no-match. */
             } else {
                 P4_RaiseError(s, P4_MatchError, "no match");
@@ -889,7 +890,7 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
     return oneof;
 
 finalize:
-    P4_SetPosition2(s, startpos, startpos_lineno, startpos_offset);
+    P4_SetPosition(s, startpos_ptr);
     free(tok);
     return NULL;
 }
@@ -948,8 +949,8 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
 
             /* considering the case: MATCH WHITESPACE MATCH WHITESPACE NO_MATCH */
             if (need_space && repeated > 0){/*              ^          ^ we are here */
-                /* P4_SetPosition(s, before_implicit);               ^ puke extra whitespace */
-                P4_SetPosition2(s, before_implicit, before_implicit_lineno, before_implicit_offset);
+                                                                  /* ^ puke extra whitespace */
+                P4_SetPosition(s, before_implicit_ptr);
                                                /*           ^ now we are here */
             }
 
@@ -1018,7 +1019,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
 /* cleanup before returning NULL. */
 /* tokens between head..tail should be freed. */
 finalize:
-    P4_SetPosition2(s, startpos, startpos_lineno, startpos_offset);
+    P4_SetPosition(s, startpos_ptr);
     P4_DeleteToken(head);
     return NULL;
 }
@@ -1033,7 +1034,7 @@ P4_MatchPositive(P4_Source* s, P4_Expression* e) {
     if (token != NULL)
         P4_DeleteToken(token);
 
-    P4_SetPosition2(s, startpos, startpos_lineno, startpos_offset);
+    P4_SetPosition(s, startpos_ptr);
 
     return NULL;
 }
@@ -1044,7 +1045,7 @@ P4_MatchNegative(P4_Source* s, P4_Expression* e) {
 
     P4_MarkPosition(s, startpos);
     P4_Token* token = P4_Match(s, e->ref_expr);
-    P4_SetPosition2(s, startpos, startpos_lineno, startpos_offset);
+    P4_SetPosition(s, startpos_ptr);
 
     if (NO_ERROR(s)) {
         P4_DeleteToken(token);
@@ -1659,7 +1660,8 @@ P4_SetSourceSlice(P4_Source* source, size_t start, size_t stop) {
     if (source == 0)
         return P4_NullError;
 
-    P4_SetPosition2(source, start, 1, 1);
+    P4_Position* startpos = &(P4_Position){ .pos=start, .lineno=1, .offset=0 };
+    P4_SetPosition(source, startpos);
     SLICE_SET(&source->slice, start, stop);
 
     return P4_Ok;

@@ -166,13 +166,13 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Members</p>
 <dl class="c var">
-<dt id="c.P4_Slice.i">
-<span class="target" id="structP4__Slice_1a6d5962174d8ac6b0e7f0d239a857263d"></span><span class="pre">P4_Position</span> <code class="sig-name descname"><span class="pre">i</span></code><a class="headerlink" href="#c.P4_Slice.i" title="Permalink to this definition">¶</a><br/></dt>
+<dt id="c.P4_Slice.start">
+<span class="target" id="structP4__Slice_1af13047df74c14c0e548f42c40639d3f2"></span><span class="pre">P4_Position</span> <code class="sig-name descname"><span class="pre">start</span></code><a class="headerlink" href="#c.P4_Slice.start" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>The start position of the slice. </p>
 </dd></dl>
 <dl class="c var">
-<dt id="c.P4_Slice.j">
-<span class="target" id="structP4__Slice_1af9aa0a93c01f6bd84bbede607a2a6ca8"></span><span class="pre">P4_Position</span> <code class="sig-name descname"><span class="pre">j</span></code><a class="headerlink" href="#c.P4_Slice.j" title="Permalink to this definition">¶</a><br/></dt>
+<dt id="c.P4_Slice.stop">
+<span class="target" id="structP4__Slice_1ab9209a223510c44de318b2d3feddd113"></span><span class="pre">P4_Position</span> <code class="sig-name descname"><span class="pre">stop</span></code><a class="headerlink" href="#c.P4_Slice.stop" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>The stop position of the slice. </p>
 </dd></dl>
 </div>
@@ -234,10 +234,20 @@
 </dd></dl>
 <dl class="c var">
 <dt id="c.P4_Source.pos">
-<span class="target" id="structP4__Source_1a84cf4e538cc6bf1352452d0f8c4ca4c4"></span><span class="pre">P4_Position</span> <code class="sig-name descname"><span class="pre">pos</span></code><a class="headerlink" href="#c.P4_Source.pos" title="Permalink to this definition">¶</a><br/></dt>
+<span class="target" id="structP4__Source_1a8d04d95f8fe034b682391fbf3565234b"></span><span class="pre">size_t</span> <code class="sig-name descname"><span class="pre">pos</span></code><a class="headerlink" href="#c.P4_Source.pos" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>The position of the consumed input. Min: 0, Max: strlen(content).</p>
 <p>It’s possible the pos is less then length of content when the Source is successfully parsed. It’s called a partial parse.</p>
 <p>To avoid that, the rule will need to be wrapped with an EOI and SOI. An SOI is Positive(Range(1, 0x10ffff)) and An EOI is Negative(Range(1, 0x10ffff)). When the rule is wrapped, the input is guaranteed to be parsed until all bits are consumed. </p>
+</dd></dl>
+<dl class="c var">
+<dt id="c.P4_Source.lineno">
+<span class="target" id="structP4__Source_1a8b5a8f20789ee4f67f9bfccd0c825bf0"></span><span class="pre">size_t</span> <code class="sig-name descname"><span class="pre">lineno</span></code><a class="headerlink" href="#c.P4_Source.lineno" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>The line number of the unconsumed input. Min: 1, Max: countlines(content). </p>
+</dd></dl>
+<dl class="c var">
+<dt id="c.P4_Source.offset">
+<span class="target" id="structP4__Source_1a4c08d30ee60f925156a3fafa2098aab8"></span><span class="pre">size_t</span> <code class="sig-name descname"><span class="pre">offset</span></code><a class="headerlink" href="#c.P4_Source.offset" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>The bytes offset of the line in the unconsumed input. </p>
 </dd></dl>
 <dl class="c var">
 <dt id="c.P4_Source.err">
@@ -320,7 +330,7 @@
 <dl class="c var">
 <dt id="c.P4_Token.slice">
 <span class="target" id="structP4__Token_1a264e41a6b3cc862f05a0025f7041cb74"></span><a class="reference internal" href="#c.P4_Slice" title="P4_Slice"><span class="pre">P4_Slice</span></a> <code class="sig-name descname"><span class="pre">slice</span></code><a class="headerlink" href="#c.P4_Token.slice" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>The matched substring. slice[0] is the beginning (inclusive), and slice[1] is the end (exclusive). </p>
+<dd><p>The matched substring. slice.start is the beginning (inclusive), and slice.stop is the end (exclusive). </p>
 </dd></dl>
 <dl class="c var">
 <dt id="c.P4_Token.rule_id">
@@ -1842,7 +1852,7 @@
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_GetSourcePosition">
-<span class="target" id="peppapeg_8h_1aa319848c49fa68ad5d2e26ccc7b0ff92"></span><span class="pre">P4_Position</span> <code class="sig-name descname"><span class="pre">P4_GetSourcePosition</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Source" title="P4_Source"><span class="pre">P4_Source</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetSourcePosition" title="Permalink to this definition">¶</a><br/></dt>
+<span class="target" id="peppapeg_8h_1a01b4cc3ab1144c1159d561d69261473c"></span><span class="pre">size_t</span> <code class="sig-name descname"><span class="pre">P4_GetSourcePosition</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Source" title="P4_Source"><span class="pre">P4_Source</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetSourcePosition" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Get the last position in the input after a parse. </p>
 <p><dl class="simple">
 <dt><strong>Return</strong></dt><dd><p>The position in the input. </p>
@@ -1985,7 +1995,7 @@
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateToken">
-<span class="target" id="peppapeg_8h_1a1eb92d02d1a62f97fe513b1be6398217"></span><a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateToken</span></code><span class="sig-paren">(</span><span class="pre">P4_String</span>, <span class="pre">size_t</span>, <span class="pre">size_t</span>, <span class="pre">P4_RuleID</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateToken" title="Permalink to this definition">¶</a><br/></dt>
+<span class="target" id="peppapeg_8h_1a2ad57d8617848c080b1f2a311383ce5c"></span><a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateToken</span></code><span class="sig-paren">(</span><span class="pre">P4_String</span>, <span class="pre">P4_Position</span><span class="pre">*</span>, <span class="pre">P4_Position</span><span class="pre">*</span>, <span class="pre">P4_RuleID</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateToken" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a token. </p>
 <p><p>Example: </p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_String</span>       <span class="nb">str</span>     <span class="o">=</span> <span class="s2">"Hello world"</span><span class="p">;</span>

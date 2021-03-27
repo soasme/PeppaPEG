@@ -268,11 +268,12 @@ P4_Grammar* P4_CreateP4GenGrammar () {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenRule, 4,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenRule, 5,
         P4_CreateReference(P4_P4GenRuleDecorators),
         P4_CreateReference(P4_P4GenRuleName),
         P4_CreateLiteral("=", true),
-        P4_CreateReference(P4_P4GenExpression)
+        P4_CreateReference(P4_P4GenExpression),
+        P4_CreateLiteral(";", true)
     ))
         goto finalize;
 

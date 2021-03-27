@@ -200,6 +200,28 @@ void test_rule(void) {
     "]");
 }
 
+void test_grammar(void) {
+    check_parse(P4_P4GenGrammar,
+        "one = \"1\";\n"
+        "entry = one one;",
+        "["
+            "{\"slice\":[0,27],\"type\":\"grammar\",\"children\":["
+                "{\"slice\":[0,10],\"type\":\"rule\",\"children\":["
+                    "{\"slice\":[0,3],\"type\":\"name\"},"
+                    "{\"slice\":[6,9],\"type\":\"literal\"}"
+                "]},"
+                "{\"slice\":[11,27],\"type\":\"rule\",\"children\":["
+                    "{\"slice\":[11,16],\"type\":\"name\"},"
+                    "{\"slice\":[19,26],\"type\":\"sequence\",\"children\":["
+                        "{\"slice\":[19,22],\"type\":\"reference\"},"
+                        "{\"slice\":[23,26],\"type\":\"reference\"}"
+                    "]}"
+                "]}"
+            "]}"
+        "]"
+    );
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -216,6 +238,7 @@ int main(void) {
     RUN_TEST(test_expression);
     RUN_TEST(test_rule_name);
     RUN_TEST(test_rule);
+    RUN_TEST(test_grammar);
 
     return UNITY_END();
 }

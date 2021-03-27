@@ -9,7 +9,7 @@ extern "C"
 #include "../peppapeg.h"
 
 typedef enum {
-    P4_P4GenEntry           = 1,
+    P4_P4GenGrammar         = 1,
     P4_P4GenRule            = 2,
     P4_P4GenRuleDecorators  = 3,
     P4_P4GenRuleName        = 4,
@@ -277,6 +277,9 @@ P4_Grammar* P4_CreateP4GenGrammar () {
     ))
         goto finalize;
 
+    if (P4_Ok != P4_AddOnceOrMore(grammar, P4_P4GenGrammar, P4_CreateReference(P4_P4GenRule)))
+        goto finalize;
+
     if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_P4GenWhitespace, 4,
         P4_CreateLiteral(" ", true),
         P4_CreateLiteral("\t", true),
@@ -319,6 +322,7 @@ P4_String   P4_P4GenKindToName(P4_RuleID id) {
         case P4_P4GenRuleDecorators: return "decorators";
         case P4_P4GenDecorator: return "decorator";
         case P4_P4GenRule: return "rule";
+        case P4_P4GenGrammar: return "grammar";
         default: return "<unknown>";
     }
 }

@@ -329,8 +329,8 @@ P4_String   P4_P4GenKindToName(P4_RuleID id) {
 }
 
 P4_Error P4_P4GenEvalFlag(P4_Token* token, P4_ExpressionFlag *flag) {
-    P4_String token_str = token->text + token->slice.start.pos; // XXX: need slice api.
-    size_t token_len = token->slice.stop.pos-token->slice.start.pos; // XXX: need slice api.
+    P4_String token_str = token->text + token->slice.start.pos; /* XXX: need slice api. */
+    size_t token_len = token->slice.stop.pos-token->slice.start.pos; /* XXX: need slice api. */
 
     if (memcmp("@squashed", token_str, token_len) == 0)
         *flag = P4_FLAG_SQUASHED;

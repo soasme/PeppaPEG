@@ -1,6 +1,14 @@
 Change Log
 ===========
 
+Not Yet Released
+--------------------
+
+* [Feature]: Support specifying a name for a grammar rule. `#53 <https://github.com/soasme/PeppaPEG/pull/53>`_
+* [Feature]: Added Lineno and Col Offset for `P4_Tokens`. `#52 <https://github.com/soasme/PeppaPEG/pull/52>`_
+* [Feature]: Support parsing a subset of source input (`P4_SetSourceSlice`). `#51 <https://github.com/soasme/PeppaPEG/pull/51/>`_
+* [Feature]: Added a new flag: `P4_FLAG_NON_TERMINAL`. `#50 <https://github.com/soasme/PeppaPEG/pull/50>`_
+
 1.8.0 (25 Mar, 2021)
 --------------------
 

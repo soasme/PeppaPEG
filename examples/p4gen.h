@@ -434,6 +434,15 @@ P4_Error P4_P4GenEvalChar(P4_Token* token, P4_Rune* rune) {
     }
 }
 
+P4_Error P4_P4GenEvalLiteral(P4_Token* token, P4_String* lit) {
+    size_t len = SLICE_LEN(&token->slice) - 2; /* remove quotes */
+    if (len < 0) return P4_ValueError;
+    *lit = malloc((len+1) * sizeof(char));
+    memcpy(*lit, token->text + token->slice.start.pos + 1, len);
+    (*lit)[len] = '\0';
+    return P4_Ok;
+}
+
 P4_Error P4_P4GenEval(P4_Token* token, void* result) {
     P4_Error err = P4_Ok;
     switch (token->rule_id) {
@@ -445,6 +454,8 @@ P4_Error P4_P4GenEval(P4_Token* token, void* result) {
             return P4_P4GenEvalNumber(token, result);
         case P4_P4GenChar:
             return P4_P4GenEvalChar(token, result);
+        case P4_P4GenLiteral:
+            return P4_P4GenEvalLiteral(token, result);
         default: return P4_ValueError;
     }
     return P4_Ok;

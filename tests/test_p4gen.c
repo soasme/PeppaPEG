@@ -61,6 +61,7 @@ void test_string(void) {
     check_parse(P4_P4GenLiteral, "\"\\t\"", "[{\"slice\":[0,4],\"type\":\"literal\"}]");
     check_parse(P4_P4GenLiteral, "\"\\\"\"", "[{\"slice\":[0,4],\"type\":\"literal\"}]");
     check_parse(P4_P4GenLiteral, "\"\\u0020\"", "[{\"slice\":[0,8],\"type\":\"literal\"}]");
+    check_parse(P4_P4GenLiteral, "\"hello world\"", "[{\"slice\":[0,13],\"type\":\"literal\"}]");
 }
 
 void test_range(void) {
@@ -291,6 +292,19 @@ void test_eval_char(void) {
     ASSERT_EVAL(P4_P4GenChar, "\\u000A", P4_Rune, '\n');
 }
 
+#define ASSERT_EVAL_STRING(entry, input, expect) do { \
+        SETUP_EVAL((entry), (input)); \
+        P4_String value = 0; \
+        if (root) P4_P4GenEval(root, &value); \
+        TEST_ASSERT_EQUAL_STRING((expect), value); \
+        free(value); TEARDOWN_EVAL(); \
+} while (0);
+
+void test_eval_literal(void) {
+    ASSERT_EVAL_STRING(P4_P4GenLiteral, "\"a\"", "a");
+    ASSERT_EVAL_STRING(P4_P4GenLiteral, "\"hello world\"", "hello world");
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -314,6 +328,7 @@ int main(void) {
     RUN_TEST(test_eval_flags);
     RUN_TEST(test_eval_num);
     RUN_TEST(test_eval_char);
+    RUN_TEST(test_eval_literal);
 
     return UNITY_END();
 }

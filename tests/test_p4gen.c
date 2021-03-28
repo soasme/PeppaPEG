@@ -271,6 +271,24 @@ void test_eval_num(void) {
     ASSERT_EVAL(P4_P4GenNumber, "10000", long, 10000);
 }
 
+void test_eval_char(void) {
+    ASSERT_EVAL(P4_P4GenChar, "a", P4_Rune, 'a');
+    ASSERT_EVAL(P4_P4GenChar, "A", P4_Rune, 'A');
+    ASSERT_EVAL(P4_P4GenChar, "\\b", P4_Rune, '\b');
+    ASSERT_EVAL(P4_P4GenChar, "\\t", P4_Rune, '\t');
+    ASSERT_EVAL(P4_P4GenChar, "\\n", P4_Rune, '\n');
+    ASSERT_EVAL(P4_P4GenChar, "\\f", P4_Rune, '\f');
+    ASSERT_EVAL(P4_P4GenChar, "\\r", P4_Rune, '\r');
+    ASSERT_EVAL(P4_P4GenChar, "\\\\", P4_Rune, '\\');
+    ASSERT_EVAL(P4_P4GenChar, "你", P4_Rune, 0x4f60); /* https://www.compart.com/en/unicode/U+4F60 */
+    ASSERT_EVAL(P4_P4GenChar, "🐷", P4_Rune, 0x1f437); /* https://www.compart.com/en/unicode/U+1F437 */
+    ASSERT_EVAL(P4_P4GenChar, "\\u4f60", P4_Rune, 0x4f60);
+    ASSERT_EVAL(P4_P4GenChar, "\\u0041", P4_Rune, 'A');
+    ASSERT_EVAL(P4_P4GenChar, "\\u0061", P4_Rune, 'a');
+    ASSERT_EVAL(P4_P4GenChar, "\\u000a", P4_Rune, '\n');
+    ASSERT_EVAL(P4_P4GenChar, "\\u000A", P4_Rune, '\n');
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -293,6 +311,7 @@ int main(void) {
     RUN_TEST(test_eval_flag);
     RUN_TEST(test_eval_flags);
     RUN_TEST(test_eval_num);
+    RUN_TEST(test_eval_char);
 
     return UNITY_END();
 }

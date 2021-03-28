@@ -516,6 +516,11 @@ typedef struct P4_Grammar{
  */
 P4_String      P4_Version(void);
 
+/**
+ * Read a single code point (rune) from an UTF-8 string.
+ */
+size_t         P4_ReadRune(P4_String s, P4_Rune* c);
+
 /*
  * ██╗░░░░░██╗████████╗███████╗██████╗░░█████╗░██╗░░░░░
  * ██║░░░░░██║╚══██╔══╝██╔════╝██╔══██╗██╔══██╗██║░░░░░

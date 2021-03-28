@@ -9,6 +9,8 @@ extern "C"
 #include <stdlib.h>
 #include "../peppapeg.h"
 
+# define SLICE_LEN(s) ((s)->stop.pos - (s)->start.pos)
+
 typedef enum {
     P4_P4GenGrammar         = 1,
     P4_P4GenRule            = 2,
@@ -330,7 +332,7 @@ P4_String   P4_P4GenKindToName(P4_RuleID id) {
 
 P4_Error P4_P4GenEvalFlag(P4_Token* token, P4_ExpressionFlag *flag) {
     P4_String token_str = token->text + token->slice.start.pos; /* XXX: need slice api. */
-    size_t token_len = token->slice.stop.pos-token->slice.start.pos; /* XXX: need slice api. */
+    size_t token_len = SLICE_LEN(&token->slice); /* XXX: need slice api. */
 
     if (memcmp("@squashed", token_str, token_len) == 0)
         *flag = P4_FLAG_SQUASHED;
@@ -377,6 +379,58 @@ P4_Error P4_P4GenEvalNumber(P4_Token* token, long* num) {
     return P4_Ok;
 }
 
+
+P4_Error P4_P4GenEvalChar(P4_Token* token, P4_Rune* rune) {
+    size_t len = SLICE_LEN(&token->slice);
+    *rune = 0;
+    switch(len) {
+        case 0:
+            return P4_NullError;
+        case 1: /* single char */
+            *rune = (P4_Rune) token->text[token->slice.start.pos];
+            return P4_Ok;
+        case 2: /* utf-8 rune, escaped char */
+        {
+            if (token->text[token->slice.start.pos] == '\\') {
+                switch(token->text[token->slice.start.pos+1]) {
+                    case 'b': *rune = 0x8; break;
+                    case 't': *rune = 0x9; break;
+                    case 'n': *rune = 0xa; break;
+                    case 'f': *rune = 0xc; break;
+                    case 'r': *rune = 0xd; break;
+                    case '"': *rune = 0x22; break;
+                    case '/': *rune = 0x2f; break;
+                    case '\\': *rune = 0x5c; break;
+                    default: return P4_ValueError;
+                }
+            } else {
+                if (P4_ReadRune(token->text+token->slice.start.pos, rune) != 2)
+                    return P4_ValueError;
+            }
+            return P4_Ok;
+        }
+        case 3: /* utf-8 rune, escaped char */
+            if (P4_ReadRune(token->text+token->slice.start.pos, rune) != 3)
+                return P4_ValueError;
+            return P4_Ok;
+        case 4: /* utf-8 rune, escaped char */
+            if (P4_ReadRune(token->text+token->slice.start.pos, rune) != 4)
+                return P4_ValueError;
+            return P4_Ok;
+        case 6:
+        {
+            if (token->text[token->slice.start.pos] != '\\') return P4_ValueError;
+            if (token->text[token->slice.start.pos+1] != 'u') return P4_ValueError;
+            char cp[5] = {0, 0, 0, 0, 0};
+            memcpy(cp, token->text + token->slice.start.pos + 2, 4);
+            *rune = strtoul(cp, NULL, 16);
+            return P4_Ok;
+        }
+        default:
+            return P4_ValueError;
+    }
+}
+
 P4_Error P4_P4GenEval(P4_Token* token, void* result) {
     P4_Error err = P4_Ok;
     switch (token->rule_id) {
@@ -386,6 +440,8 @@ P4_Error P4_P4GenEval(P4_Token* token, void* result) {
             return P4_P4GenEvalRuleFlags(token, result);
         case P4_P4GenNumber:
             return P4_P4GenEvalNumber(token, result);
+        case P4_P4GenChar:
+            return P4_P4GenEvalChar(token, result);
         default: return P4_ValueError;
     }
     return P4_Ok;

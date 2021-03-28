@@ -118,7 +118,6 @@ cleanup_freep (void *p)
 P4_PRIVATE(size_t)       P4_GetRuneSize(P4_Rune ch);
 P4_PRIVATE(P4_Rune)      P4_GetRuneLower(P4_Rune ch);
 P4_PRIVATE(P4_Rune)      P4_GetRuneUpper(P4_Rune ch);
-P4_PRIVATE(size_t)       P4_ReadRune(P4_String s, P4_Rune* c);
 P4_PRIVATE(int)          P4_CaseCmpInsensitive(const void*, const void*, size_t n);
 
 P4_PRIVATE(size_t)       P4_GetPosition(P4_Source*);
@@ -189,7 +188,7 @@ P4_GetRuneSize(P4_Rune ch) {
  *     > printf("%p %d\n", c, c)
  *     0x4f60 20320
  */
-P4_PRIVATE(size_t)
+size_t
 P4_ReadRune(P4_String s, P4_Rune* c) {
     *c = 0;
 

@@ -1294,6 +1294,7 @@ P4_CreateLiteral(const P4_String literal, bool sensitive) {
     expr->id = 0;
     expr->kind = P4_Literal;
     expr->flag = 0;
+    expr->name = NULL;
     expr->literal = strdup(literal);
     expr->sensitive = sensitive;
     return expr;
@@ -1308,6 +1309,7 @@ P4_CreateRange(P4_Rune lower, P4_Rune upper, size_t stride) {
     expr->id = 0;
     expr->kind = P4_Range;
     expr->flag = 0;
+    expr->name = NULL;
     expr->lower = lower;
     expr->upper = upper;
     expr->stride = stride;
@@ -1323,6 +1325,7 @@ P4_CreateReference(P4_RuleID id) {
     expr->id = 0;
     expr->kind = P4_Reference;
     expr->flag = 0;
+    expr->name = NULL;
     expr->ref_id = id;
     expr->ref_expr = NULL;
     return expr;
@@ -1337,6 +1340,7 @@ P4_CreatePositive(P4_Expression* refexpr) {
     expr->id = 0;
     expr->kind = P4_Positive;
     expr->flag = 0;
+    expr->name = NULL;
     expr->ref_expr = refexpr;
     return expr;
 }
@@ -1350,6 +1354,7 @@ P4_CreateNegative(P4_Expression* refexpr) {
     expr->id = 0;
     expr->kind = P4_Negative;
     expr->flag = 0;
+    expr->name = NULL;
     expr->ref_expr = refexpr;
     return expr;
 }
@@ -1362,6 +1367,7 @@ P4_CreateContainer(size_t count) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->id = 0;
     expr->flag = 0;
+    expr->name = NULL;
     expr->count = count;
     expr->members = malloc(sizeof(P4_Expression*) * count);
     return expr;
@@ -1467,6 +1473,7 @@ P4_CreateRepeatMinMax(P4_Expression* repeat, size_t min, size_t max) {
     P4_Expression* expr = malloc(sizeof(P4_Expression));
     expr->id = 0;
     expr->flag = 0;
+    expr->name = NULL;
     expr->kind = P4_Repeat;
     expr->repeat_expr = repeat;
     expr->repeat_min = min;
@@ -1510,6 +1517,7 @@ P4_CreateBackReference(size_t index, bool sensitive) {
     expr->id = 0;
     expr->kind = P4_BackReference;
     expr->flag = 0;
+    expr->name = NULL;
     expr->backref_index = index;
     expr->sensitive = sensitive;
     return expr;
@@ -1577,6 +1585,18 @@ P4_GetGrammarRule(P4_Grammar* grammar, P4_RuleID id) {
     return NULL;
 }
 
+P4_PUBLIC P4_Expression*
+P4_GetGrammarRuleByName(P4_Grammar* grammar, P4_String name) {
+    size_t i;
+    P4_Expression* rule = NULL;
+    for (i = 0; i < grammar->count; i++) {
+        rule = grammar->rules[i];
+        if (rule && rule->name && strcmp(rule->name, name) == 0)
+            return rule;
+    }
+    return NULL;
+}
+
 P4_PUBLIC P4_Error
 P4_SetGrammarRuleFlag(P4_Grammar* grammar, P4_RuleID id, P4_ExpressionFlag flag) {
     P4_Expression* expr = P4_GetGrammarRule(grammar, id);
@@ -1639,6 +1659,31 @@ P4_AddGrammarRule(P4_Grammar* grammar, P4_RuleID id, P4_Expression* expr) {
     grammar->rules[grammar->count++] = expr;
 
     return P4_Ok;
+}
+
+P4_PUBLIC P4_Error
+P4_SetGrammarRuleName(P4_Grammar* grammar, P4_RuleID id, P4_String name) {
+    P4_Expression* expr = P4_GetGrammarRule(grammar, id);
+
+    if (expr == NULL)
+        return P4_NullError;
+
+    if (expr->name != NULL)
+        free(expr->name);
+
+    expr->name = strdup(name);
+
+    return P4_Ok;
+}
+
+P4_PUBLIC P4_String
+P4_GetGrammarRuleName(P4_Grammar* grammar, P4_RuleID id) {
+    P4_Expression* expr = P4_GetGrammarRule(grammar, id);
+
+    if (expr == NULL)
+        return NULL;
+
+    return expr->name;
 }
 
 P4_PUBLIC P4_Source*
@@ -2128,6 +2173,9 @@ P4_DeleteExpression(P4_Expression* expr) {
         default:
             break;
     }
+
+    if (expr->name)
+        free(expr->name);
 
     free(expr);
 }

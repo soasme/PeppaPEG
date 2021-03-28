@@ -327,6 +327,39 @@ P4_String   P4_P4GenKindToName(P4_RuleID id) {
     }
 }
 
+P4_Error P4_P4GenEvalFlag(P4_Token* token, P4_ExpressionFlag *flag) {
+    P4_String token_str = token->text + token->slice.start.pos; // XXX: need slice api.
+    size_t token_len = token->slice.stop.pos-token->slice.start.pos; // XXX: need slice api.
+
+    if (memcmp("@squashed", token_str, token_len) == 0)
+        *flag = P4_FLAG_SQUASHED;
+    else if (memcmp("@scoped", token_str, token_len) == 0)
+        *flag = P4_FLAG_SCOPED;
+    else if (memcmp("@spaced", token_str, token_len) == 0)
+        *flag = P4_FLAG_SPACED;
+    else if (memcmp("@lifted", token_str, token_len) == 0)
+        *flag = P4_FLAG_LIFTED;
+    else if (memcmp("@tight", token_str, token_len) == 0)
+        *flag = P4_FLAG_TIGHT;
+    else if (memcmp("@nonterminal", token_str, token_len) == 0)
+        *flag = P4_FLAG_NON_TERMINAL;
+    else {
+        *flag = 0; return P4_ValueError;
+    }
+
+    return P4_Ok;
+}
+
+P4_Error P4_P4GenEval(P4_Token* token, void* result) {
+    P4_Error err = P4_Ok;
+    switch (token->rule_id) {
+        case P4_P4GenDecorator:
+            return P4_P4GenEvalFlag(token, result);
+        default: return P4_ValueError;
+    }
+    return P4_Ok;
+}
+
 #ifdef __cplusplus
 }
 #endif

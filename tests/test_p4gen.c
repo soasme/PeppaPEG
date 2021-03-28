@@ -26,6 +26,16 @@ void check_parse(P4_RuleID entry, P4_String input, P4_String output) {
     P4_DeleteGrammar(grammar);
 }
 
+# define SETUP_EVAL(entry, input) \
+    P4_Grammar* grammar = P4_CreateP4GenGrammar(); \
+    P4_Source* source = P4_CreateSource((input), (entry)); \
+    TEST_ASSERT_EQUAL(P4_Ok, P4_Parse(grammar, source)); \
+    P4_Token* root = P4_GetSourceAst(source);
+
+# define TEARDOWN_EVAL() \
+    P4_DeleteSource(source); \
+    P4_DeleteGrammar(grammar);
+
 void test_number(void) {
     check_parse(P4_P4GenNumber, "0", "[{\"slice\":[0,1],\"type\":\"number\"}]");
     check_parse(P4_P4GenNumber, "1", "[{\"slice\":[0,1],\"type\":\"number\"}]");
@@ -142,6 +152,10 @@ void test_rule_name(void) {
     check_parse_failed(P4_P4GenRuleName, "4PEG", P4_MatchError);
 }
 
+void test_rule_flag(void) {
+    check_parse(P4_P4GenDecorator, "@scoped", "[{\"slice\":[0,7],\"type\":\"decorator\"}]");
+}
+
 void test_rule(void) {
     check_parse(P4_P4GenRule, "a = \"1\";", "["
         "{\"slice\":[0,8],\"type\":\"rule\",\"children\":["
@@ -222,6 +236,23 @@ void test_grammar(void) {
     );
 }
 
+void test_eval_flag(void) {
+    size_t i = 0;
+    char inputs[6][12] = {"@squashed", "@scoped", "@spaced", "@lifted", "@tight", "@nonterminal"};
+    P4_ExpressionFlag expects[6] = {P4_FLAG_SQUASHED, P4_FLAG_SCOPED, P4_FLAG_SPACED,
+        P4_FLAG_LIFTED, P4_FLAG_TIGHT, P4_FLAG_NON_TERMINAL};
+
+    for (i = 0; i < 6; i++) {
+        SETUP_EVAL(P4_P4GenDecorator, inputs[i]);
+
+        P4_ExpressionFlag flag = 0;
+        P4_P4GenEval(root, &flag);
+        TEST_ASSERT_EQUAL(expects[i], flag);
+
+        TEARDOWN_EVAL();
+    }
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -237,8 +268,11 @@ int main(void) {
     RUN_TEST(test_repeat);
     RUN_TEST(test_expression);
     RUN_TEST(test_rule_name);
+    RUN_TEST(test_rule_flag);
     RUN_TEST(test_rule);
     RUN_TEST(test_grammar);
+
+    RUN_TEST(test_eval_flag);
 
     return UNITY_END();
 }

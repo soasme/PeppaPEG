@@ -1657,6 +1657,46 @@
 </p>
 </dd></dl>
 <dl class="c function">
+<dt id="c.P4_SetGrammarRuleName">
+<span class="target" id="peppapeg_8h_1a856ccd065faf3cedc80d415700c545cf"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_SetGrammarRuleName</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a> <span class="pre">*</span><em><span class="pre">grammar</span></em>, <span class="pre">P4_RuleID</span> <em><span class="pre">id</span></em>, <span class="pre">P4_String</span> <em><span class="pre">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_SetGrammarRuleName" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Set the name for a grammar rule.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_SetRuleName</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">ENTRY</span><span class="p">,</span> <span class="s2">"entry"</span><span class="p">);</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The error code.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code>: The grammar rule name. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_GetGrammarRuleName">
+<span class="target" id="peppapeg_8h_1a8397481b36ab54ed19f30a77d5d89484"></span><span class="pre">P4_String</span> <code class="sig-name descname"><span class="pre">P4_GetGrammarRuleName</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a> <span class="pre">*</span><em><span class="pre">grammar</span></em>, <span class="pre">P4_RuleID</span> <em><span class="pre">id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetGrammarRuleName" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Get the name for a grammar rule.</p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">P4_GetRuleName</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">ENTRY</span><span class="p">);</span>
+ <span class="n">printf</span><span class="p">(</span><span class="s2">"</span><span class="si">%s</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">name</span><span class="p">);</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The grammar rule name.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
 <dt id="c.P4_DeleteGrammarRule">
 <span class="target" id="peppapeg_8h_1af23454127bbb8cff82596ea1a8b12bf3"></span><span class="pre">void</span> <code class="sig-name descname"><span class="pre">P4_DeleteGrammarRule</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_DeleteGrammarRule" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Delete a grammar rule.</p>
@@ -1685,6 +1725,26 @@
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_GetGrammarRuleByName">
+<span class="target" id="peppapeg_8h_1a8d6421c6ef85fc9040151797555bb6f5"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_GetGrammarRuleByName</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a> <span class="pre">*</span><em><span class="pre">grammar</span></em>, <span class="pre">P4_String</span> <em><span class="pre">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetGrammarRuleByName" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Get a grammar rule by its name.</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The grammar rule expression. Returns NULL if not found. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
+ <span class="n">P4_SetGrammarRuleName</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"rule_a"</span><span class="p">);</span>
+ <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_GetGrammarRule</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s2">"rule_a"</span><span class="p">);</span> <span class="o">//</span> <span class="n">The</span> <span class="n">literal</span> <span class="n">expression</span><span class="o">.</span>
+</pre></div>
+</div>
+</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code>: The grammar rule name. </p></li>
 </ul>
 </dd>
 </dl>

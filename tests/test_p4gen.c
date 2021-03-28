@@ -236,38 +236,31 @@ void test_grammar(void) {
     );
 }
 
-void eval_flag(P4_String input, P4_ExpressionFlag expect) {
-    SETUP_EVAL(P4_P4GenDecorator, input);
-    P4_ExpressionFlag flag = 0;
-    if (root) P4_P4GenEval(root, &flag);
-    TEST_ASSERT_EQUAL(expect, flag);
-    TEARDOWN_EVAL();
-}
+#define ASSERT_EVAL(entry, input, expect_t, expect) do { \
+        SETUP_EVAL((entry), (input)); \
+        expect_t value = 0; \
+        if (root) P4_P4GenEval(root, &value); \
+        TEST_ASSERT_EQUAL((expect), value); \
+        TEARDOWN_EVAL(); \
+} while (0);
 
 void test_eval_flag(void) {
-    eval_flag("@squashed", P4_FLAG_SQUASHED);
-    eval_flag("@scoped", P4_FLAG_SCOPED);
-    eval_flag("@spaced", P4_FLAG_SPACED);
-    eval_flag("@lifted", P4_FLAG_LIFTED);
-    eval_flag("@tight", P4_FLAG_TIGHT);
-    eval_flag("@nonterminal", P4_FLAG_NON_TERMINAL);
-}
-
-void eval_flags(P4_String input, P4_ExpressionFlag expect) {
-        SETUP_EVAL(P4_P4GenRuleDecorators, input);
-        P4_ExpressionFlag flag = 0;
-        if (root) P4_P4GenEval(root, &flag);
-        TEST_ASSERT_EQUAL(expect, flag);
-        TEARDOWN_EVAL();
+    ASSERT_EVAL(P4_P4GenDecorator, "@squashed", P4_ExpressionFlag, P4_FLAG_SQUASHED);
+    ASSERT_EVAL(P4_P4GenDecorator, "@scoped", P4_ExpressionFlag, P4_FLAG_SCOPED);
+    ASSERT_EVAL(P4_P4GenDecorator, "@spaced", P4_ExpressionFlag, P4_FLAG_SPACED);
+    ASSERT_EVAL(P4_P4GenDecorator, "@lifted", P4_ExpressionFlag, P4_FLAG_LIFTED);
+    ASSERT_EVAL(P4_P4GenDecorator, "@tight", P4_ExpressionFlag, P4_FLAG_TIGHT);
+    ASSERT_EVAL(P4_P4GenDecorator, "@nonterminal", P4_ExpressionFlag, P4_FLAG_NON_TERMINAL);
 }
 
 void test_eval_flags(void) {
-    eval_flags("@squashed @lifted", P4_FLAG_SQUASHED | P4_FLAG_LIFTED);
-    eval_flags("@squashed @lifted @squashed", P4_FLAG_SQUASHED | P4_FLAG_LIFTED);
-    eval_flags("@spaced", P4_FLAG_SPACED);
-    eval_flags("@spaced @squashed @lifted", P4_FLAG_SPACED | P4_FLAG_SQUASHED | P4_FLAG_LIFTED);
-    eval_flags("@nonterminal", P4_FLAG_NON_TERMINAL);
-    eval_flags("@whatever", 0);
+    ASSERT_EVAL(P4_P4GenRuleDecorators, "@squashed @lifted", P4_ExpressionFlag, P4_FLAG_SQUASHED | P4_FLAG_LIFTED);
+    ASSERT_EVAL(P4_P4GenRuleDecorators, "@squashed @lifted @squashed", P4_ExpressionFlag, P4_FLAG_SQUASHED | P4_FLAG_LIFTED);
+    ASSERT_EVAL(P4_P4GenRuleDecorators, "@spaced", P4_ExpressionFlag, P4_FLAG_SPACED);
+    ASSERT_EVAL(P4_P4GenRuleDecorators, "@spaced @squashed @lifted", P4_ExpressionFlag,
+            P4_FLAG_SPACED | P4_FLAG_SQUASHED | P4_FLAG_LIFTED);
+    ASSERT_EVAL(P4_P4GenRuleDecorators, "@nonterminal", P4_ExpressionFlag, P4_FLAG_NON_TERMINAL);
+    ASSERT_EVAL(P4_P4GenRuleDecorators, "@whatever", P4_ExpressionFlag, 0);
 }
 
 int main(void) {

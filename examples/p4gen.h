@@ -6,6 +6,7 @@ extern "C"
 {
 #endif
 
+#include <stdlib.h>
 #include "../peppapeg.h"
 
 typedef enum {
@@ -364,6 +365,18 @@ P4_Error P4_P4GenEvalRuleFlags(P4_Token* token, P4_ExpressionFlag* flag) {
     return P4_Ok;
 }
 
+P4_Error P4_P4GenEvalNumber(P4_Token* token, long* num) {
+    P4_String s = P4_CopyTokenString(token);
+
+    if (s == NULL)
+        return P4_MemoryError;
+
+    *num = atol(s);
+    free(s);
+
+    return P4_Ok;
+}
+
 P4_Error P4_P4GenEval(P4_Token* token, void* result) {
     P4_Error err = P4_Ok;
     switch (token->rule_id) {
@@ -371,6 +384,8 @@ P4_Error P4_P4GenEval(P4_Token* token, void* result) {
             return P4_P4GenEvalFlag(token, result);
         case P4_P4GenRuleDecorators:
             return P4_P4GenEvalRuleFlags(token, result);
+        case P4_P4GenNumber:
+            return P4_P4GenEvalNumber(token, result);
         default: return P4_ValueError;
     }
     return P4_Ok;

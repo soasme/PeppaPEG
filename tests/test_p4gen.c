@@ -263,6 +263,14 @@ void test_eval_flags(void) {
     ASSERT_EVAL(P4_P4GenRuleDecorators, "@whatever", P4_ExpressionFlag, 0);
 }
 
+void test_eval_num(void) {
+    ASSERT_EVAL(P4_P4GenNumber, "0", long, 0);
+    ASSERT_EVAL(P4_P4GenNumber, "1", long, 1);
+    ASSERT_EVAL(P4_P4GenNumber, "12", long, 12);
+    ASSERT_EVAL(P4_P4GenNumber, "999", long, 999);
+    ASSERT_EVAL(P4_P4GenNumber, "10000", long, 10000);
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -284,6 +292,7 @@ int main(void) {
 
     RUN_TEST(test_eval_flag);
     RUN_TEST(test_eval_flags);
+    RUN_TEST(test_eval_num);
 
     return UNITY_END();
 }

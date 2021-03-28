@@ -2174,6 +2174,9 @@ P4_DeleteExpression(P4_Expression* expr) {
             break;
     }
 
+    if (expr->name)
+        free(expr->name);
+
     free(expr);
 }
 

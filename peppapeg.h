@@ -380,8 +380,8 @@ typedef struct P4_Source {
  * The grammar rule.
  */
 typedef struct P4_Expression {
-    /* The name of expression (only for debugging). */
-    /* P4_String            name; */
+    /* The name of expression. */
+    P4_String               name;
     /** The id of expression. */
     P4_RuleID               id;
     /** The kind of expression. */
@@ -1458,10 +1458,33 @@ void           P4_DeleteGrammar(P4_Grammar*);
  */
 P4_Error       P4_AddGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
 
+/**
+ * Set the name for a grammar rule.
+ *
+ * @param   grammar     The grammar.
+ * @param   id          The grammar rule id.
+ * @param   name        The grammar rule name.
+ * @return  The error code.
+ *
+ * Example:
+ *
+ *      P4_SetRuleName(grammar, ENTRY, "entry");
+ */
+P4_Error       P4_SetGrammarRuleName(P4_Grammar* grammar, P4_RuleID id, P4_String name);
 
-
-
-
+/**
+ * Get the name for a grammar rule.
+ *
+ * @param   grammar     The grammar.
+ * @param   id          The grammar rule id.
+ * @return  The grammar rule name.
+ *
+ * Example:
+ *
+ *      P4_String name = P4_GetRuleName(grammar, ENTRY);
+ *      printf("%s\n", name);
+ */
+P4_String      P4_GetGrammarRuleName(P4_Grammar* grammar, P4_RuleID id);
 
 /**
  * Delete a grammar rule.
@@ -1486,6 +1509,19 @@ void           P4_DeleteGrammarRule(P4_Grammar*, P4_RuleID);
  *      P4_Expression* expr = P4_GetGrammarRule(grammar, 1); // The literal expression.
  */
 P4_Expression* P4_GetGrammarRule(P4_Grammar*, P4_RuleID);
+
+/**
+ * Get a grammar rule by its name.
+ *
+ * @param   grammar     The grammar.
+ * @param   name        The grammar rule name.
+ * @return  The grammar rule expression. Returns NULL if not found.
+ *
+ *      P4_AddLiteral(grammar, 1, "a", true);
+ *      P4_SetGrammarRuleName(grammar, 1, "rule_a");
+ *      P4_Expression* expr = P4_GetGrammarRule(grammar, "rule_a"); // The literal expression.
+ */
+P4_Expression* P4_GetGrammarRuleByName(P4_Grammar* grammar, P4_String name);
 
 /**
  * @brief       Set the flag of a grammar rule.

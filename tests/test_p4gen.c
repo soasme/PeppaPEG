@@ -236,21 +236,38 @@ void test_grammar(void) {
     );
 }
 
+void eval_flag(P4_String input, P4_ExpressionFlag expect) {
+    SETUP_EVAL(P4_P4GenDecorator, input);
+    P4_ExpressionFlag flag = 0;
+    if (root) P4_P4GenEval(root, &flag);
+    TEST_ASSERT_EQUAL(expect, flag);
+    TEARDOWN_EVAL();
+}
+
 void test_eval_flag(void) {
-    size_t i = 0;
-    char inputs[6][12] = {"@squashed", "@scoped", "@spaced", "@lifted", "@tight", "@nonterminal"};
-    P4_ExpressionFlag expects[6] = {P4_FLAG_SQUASHED, P4_FLAG_SCOPED, P4_FLAG_SPACED,
-        P4_FLAG_LIFTED, P4_FLAG_TIGHT, P4_FLAG_NON_TERMINAL};
+    eval_flag("@squashed", P4_FLAG_SQUASHED);
+    eval_flag("@scoped", P4_FLAG_SCOPED);
+    eval_flag("@spaced", P4_FLAG_SPACED);
+    eval_flag("@lifted", P4_FLAG_LIFTED);
+    eval_flag("@tight", P4_FLAG_TIGHT);
+    eval_flag("@nonterminal", P4_FLAG_NON_TERMINAL);
+}
 
-    for (i = 0; i < 6; i++) {
-        SETUP_EVAL(P4_P4GenDecorator, inputs[i]);
-
+void eval_flags(P4_String input, P4_ExpressionFlag expect) {
+        SETUP_EVAL(P4_P4GenRuleDecorators, input);
         P4_ExpressionFlag flag = 0;
-        P4_P4GenEval(root, &flag);
-        TEST_ASSERT_EQUAL(expects[i], flag);
-
+        if (root) P4_P4GenEval(root, &flag);
+        TEST_ASSERT_EQUAL(expect, flag);
         TEARDOWN_EVAL();
-    }
+}
+
+void test_eval_flags(void) {
+    eval_flags("@squashed @lifted", P4_FLAG_SQUASHED | P4_FLAG_LIFTED);
+    eval_flags("@squashed @lifted @squashed", P4_FLAG_SQUASHED | P4_FLAG_LIFTED);
+    eval_flags("@spaced", P4_FLAG_SPACED);
+    eval_flags("@spaced @squashed @lifted", P4_FLAG_SPACED | P4_FLAG_SQUASHED | P4_FLAG_LIFTED);
+    eval_flags("@nonterminal", P4_FLAG_NON_TERMINAL);
+    eval_flags("@whatever", 0);
 }
 
 int main(void) {
@@ -273,6 +290,7 @@ int main(void) {
     RUN_TEST(test_grammar);
 
     RUN_TEST(test_eval_flag);
+    RUN_TEST(test_eval_flags);
 
     return UNITY_END();
 }

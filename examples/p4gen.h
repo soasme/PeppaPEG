@@ -350,11 +350,27 @@ P4_Error P4_P4GenEvalFlag(P4_Token* token, P4_ExpressionFlag *flag) {
     return P4_Ok;
 }
 
+P4_Error P4_P4GenEvalRuleFlags(P4_Token* token, P4_ExpressionFlag* flag) {
+    P4_Token* child = NULL;
+    P4_ExpressionFlag child_flag = 0;
+    P4_Error err = P4_Ok;
+    for (child = token->head; child != NULL; child = child->next) {
+        if ((err = P4_P4GenEvalFlag(child, &child_flag)) != P4_Ok) {
+            *flag = 0;
+            return err;
+        }
+        *flag |= child_flag;
+    }
+    return P4_Ok;
+}
+
 P4_Error P4_P4GenEval(P4_Token* token, void* result) {
     P4_Error err = P4_Ok;
     switch (token->rule_id) {
         case P4_P4GenDecorator:
             return P4_P4GenEvalFlag(token, result);
+        case P4_P4GenRuleDecorators:
+            return P4_P4GenEvalRuleFlags(token, result);
         default: return P4_ValueError;
     }
     return P4_Ok;

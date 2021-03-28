@@ -404,18 +404,21 @@ P4_Error P4_P4GenEvalChar(P4_Token* token, P4_Rune* rune) {
                     default: return P4_ValueError;
                 }
             } else {
-                if (P4_ReadRune(token->text+token->slice.start.pos, rune) != 2)
+                if (P4_ReadRune(token->text+token->slice.start.pos, rune) != 2) {
                     return P4_ValueError;
+                }
             }
             return P4_Ok;
         }
         case 3: /* utf-8 rune, escaped char */
-            if (P4_ReadRune(token->text+token->slice.start.pos, rune) != 3)
+            if (P4_ReadRune(token->text+token->slice.start.pos, rune) != 3) {
                 return P4_ValueError;
+            }
             return P4_Ok;
         case 4: /* utf-8 rune, escaped char */
-            if (P4_ReadRune(token->text+token->slice.start.pos, rune) != 4)
+            if (P4_ReadRune(token->text+token->slice.start.pos, rune) != 4) {
                 return P4_ValueError;
+            }
             return P4_Ok;
         case 6:
         {

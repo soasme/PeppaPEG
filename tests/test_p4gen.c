@@ -280,6 +280,8 @@ void test_eval_char(void) {
     ASSERT_EVAL(P4_P4GenChar, "\\f", P4_Rune, '\f');
     ASSERT_EVAL(P4_P4GenChar, "\\r", P4_Rune, '\r');
     ASSERT_EVAL(P4_P4GenChar, "\\\\", P4_Rune, '\\');
+    ASSERT_EVAL(P4_P4GenChar, "ç", P4_Rune, 0x00e7);
+    ASSERT_EVAL(P4_P4GenChar, "Ç", P4_Rune, 0x00C7);
     ASSERT_EVAL(P4_P4GenChar, "你", P4_Rune, 0x4f60); /* https://www.compart.com/en/unicode/U+4F60 */
     ASSERT_EVAL(P4_P4GenChar, "🐷", P4_Rune, 0x1f437); /* https://www.compart.com/en/unicode/U+1F437 */
     ASSERT_EVAL(P4_P4GenChar, "\\u4f60", P4_Rune, 0x4f60);

@@ -292,17 +292,26 @@ void test_eval_char(void) {
     ASSERT_EVAL(P4_P4GenChar, "\\u000A", P4_Rune, '\n');
 }
 
-#define ASSERT_EVAL_STRING(entry, input, expect) do { \
+#define ASSERT_EVAL_LITERAL(entry, input, expect_lit, expect_sensitive) do { \
         SETUP_EVAL((entry), (input)); \
-        P4_String value = 0; \
+        P4_Expression* value = 0; \
         if (root) P4_P4GenEval(root, &value); \
-        TEST_ASSERT_EQUAL_STRING((expect), value); \
+        TEST_ASSERT_EQUAL(P4_Literal, (value)->kind); \
+        TEST_ASSERT_EQUAL_STRING(expect_lit, (value)->literal); \
+        TEST_ASSERT_EQUAL(expect_sensitive, (value)->sensitive); \
         free(value); TEARDOWN_EVAL(); \
 } while (0);
 
 void test_eval_literal(void) {
-    ASSERT_EVAL_STRING(P4_P4GenLiteral, "\"a\"", "a");
-    ASSERT_EVAL_STRING(P4_P4GenLiteral, "\"hello world\"", "hello world");
+    ASSERT_EVAL_LITERAL(P4_P4GenLiteral, "\"a\"", "a", true);
+    ASSERT_EVAL_LITERAL(P4_P4GenLiteral, "\"hello world\"", "hello world", true);
+    ASSERT_EVAL_LITERAL(P4_P4GenLiteral, "\"你好, World\"", "你好, World", true);
+    ASSERT_EVAL_LITERAL(P4_P4GenLiteral, "\"Peppa PEG 🐷\"", "Peppa PEG 🐷", true);
+    ASSERT_EVAL_LITERAL(P4_P4GenLiteral, "\"\\u4f60\\u597d, world\"", "你好, world", true);
+    ASSERT_EVAL_LITERAL(P4_P4GenLiteral, "\"\\n\"", "\n", true);
+    ASSERT_EVAL_LITERAL(P4_P4GenLiteral, "\"\\r\"", "\r", true);
+    ASSERT_EVAL_LITERAL(P4_P4GenLiteral, "\"\\t\"", "\t", true);
+    ASSERT_EVAL_LITERAL(P4_P4GenLiteral, "\"   \"", "   ", true);
 }
 
 int main(void) {

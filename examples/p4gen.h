@@ -302,6 +302,48 @@ finalize:
     return NULL;
 }
 
+void* P4_P4GenConcatRune(void *str, P4_Rune chr, size_t n) {
+  char *s = (char *)str;
+
+  if (0 == ((P4_Rune)0xffffff80 & chr)) {
+    /* 1-byte/7-bit ascii (0b0xxxxxxx) */
+    if (n < 1) {
+      return 0;
+    }
+    s[0] = (char)chr;
+    s += 1;
+  } else if (0 == ((P4_Rune)0xfffff800 & chr)) {
+    /* 2-byte/11-bit utf8 code point (0b110xxxxx 0b10xxxxxx) */
+    if (n < 2) {
+      return 0;
+    }
+    s[0] = 0xc0 | (char)((chr >> 6) & 0x1f);
+    s[1] = 0x80 | (char)(chr & 0x3f);
+    s += 2;
+  } else if (0 == ((P4_Rune)0xffff0000 & chr)) {
+    /* 3-byte/16-bit utf8 code point (0b1110xxxx 0b10xxxxxx 0b10xxxxxx) */
+    if (n < 3) {
+      return 0;
+    }
+    s[0] = 0xe0 | (char)((chr >> 12) & 0x0f);
+    s[1] = 0x80 | (char)((chr >> 6) & 0x3f);
+    s[2] = 0x80 | (char)(chr & 0x3f);
+    s += 3;
+  } else { /* if (0 == ((int)0xffe00000 & chr)) { */
+    /* 4-byte/21-bit utf8 code point (0b11110xxx 0b10xxxxxx 0b10xxxxxx 0b10xxxxxx) */
+    if (n < 4) {
+      return 0;
+    }
+    s[0] = 0xf0 | (char)((chr >> 18) & 0x07);
+    s[1] = 0x80 | (char)((chr >> 12) & 0x3f);
+    s[2] = 0x80 | (char)((chr >> 6) & 0x3f);
+    s[3] = 0x80 | (char)(chr & 0x3f);
+    s += 4;
+  }
+
+  return s;
+}
+
 P4_String   P4_P4GenKindToName(P4_RuleID id) {
     switch (id) {
         case P4_P4GenNumber: return "number";
@@ -406,99 +448,11 @@ size_t P4_P4GenCopyRune(P4_String text, size_t start, size_t stop, P4_Rune* rune
 }
 
 P4_Error P4_P4GenEvalChar(P4_Token* token, P4_Rune* rune) {
-    size_t len = SLICE_LEN(&token->slice);
-    *rune = 0;
-    switch(len) {
-        case 0:
-            return P4_NullError;
-        case 1: /* single char */
-            *rune = (P4_Rune) token->text[token->slice.start.pos];
-            return P4_Ok;
-        case 2: /* utf-8 rune, escaped char */
-        {
-            if (token->text[token->slice.start.pos] == '\\') {
-                switch(token->text[token->slice.start.pos+1]) {
-                    case 'b': *rune = 0x8; break;
-                    case 't': *rune = 0x9; break;
-                    case 'n': *rune = 0xa; break;
-                    case 'f': *rune = 0xc; break;
-                    case 'r': *rune = 0xd; break;
-                    case '"': *rune = 0x22; break;
-                    case '/': *rune = 0x2f; break;
-                    case '\\': *rune = 0x5c; break;
-                    default: return P4_ValueError;
-                }
-            } else {
-                if (P4_ReadRune(token->text+token->slice.start.pos, rune) != 2) {
-                    return P4_ValueError;
-                }
-            }
-            return P4_Ok;
-        }
-        case 3: /* utf-8 rune, escaped char */
-            if (P4_ReadRune(token->text+token->slice.start.pos, rune) != 3) {
-                return P4_ValueError;
-            }
-            return P4_Ok;
-        case 4: /* utf-8 rune, escaped char */
-            if (P4_ReadRune(token->text+token->slice.start.pos, rune) != 4) {
-                return P4_ValueError;
-            }
-            return P4_Ok;
-        case 6:
-        {
-            if (token->text[token->slice.start.pos] != '\\') return P4_ValueError;
-            if (token->text[token->slice.start.pos+1] != 'u') return P4_ValueError;
-            char cp[5] = {0, 0, 0, 0, 0};
-            memcpy(cp, token->text + token->slice.start.pos + 2, 4);
-            *rune = strtoul(cp, NULL, 16);
-            return P4_Ok;
-        }
-        default:
-            return P4_ValueError;
-    }
-}
-
-void* P4_P4GenConcatRune(void *str, P4_Rune chr, size_t n) {
-  char *s = (char *)str;
-
-  if (0 == ((P4_Rune)0xffffff80 & chr)) {
-    /* 1-byte/7-bit ascii (0b0xxxxxxx) */
-    if (n < 1) {
-      return 0;
-    }
-    s[0] = (char)chr;
-    s += 1;
-  } else if (0 == ((P4_Rune)0xfffff800 & chr)) {
-    /* 2-byte/11-bit utf8 code point (0b110xxxxx 0b10xxxxxx) */
-    if (n < 2) {
-      return 0;
-    }
-    s[0] = 0xc0 | (char)((chr >> 6) & 0x1f);
-    s[1] = 0x80 | (char)(chr & 0x3f);
-    s += 2;
-  } else if (0 == ((P4_Rune)0xffff0000 & chr)) {
-    /* 3-byte/16-bit utf8 code point (0b1110xxxx 0b10xxxxxx 0b10xxxxxx) */
-    if (n < 3) {
-      return 0;
-    }
-    s[0] = 0xe0 | (char)((chr >> 12) & 0x0f);
-    s[1] = 0x80 | (char)((chr >> 6) & 0x3f);
-    s[2] = 0x80 | (char)(chr & 0x3f);
-    s += 3;
-  } else { /* if (0 == ((int)0xffe00000 & chr)) { */
-    /* 4-byte/21-bit utf8 code point (0b11110xxx 0b10xxxxxx 0b10xxxxxx 0b10xxxxxx) */
-    if (n < 4) {
-      return 0;
-    }
-    s[0] = 0xf0 | (char)((chr >> 18) & 0x07);
-    s[1] = 0x80 | (char)((chr >> 12) & 0x3f);
-    s[2] = 0x80 | (char)((chr >> 6) & 0x3f);
-    s[3] = 0x80 | (char)(chr & 0x3f);
-    s += 4;
-  }
-
-  return s;
+    size_t size = P4_P4GenCopyRune(
+        token->text, token->slice.start.pos, token->slice.stop.pos, rune
+    );
+    if (size == 0) return P4_ValueError;
+    return P4_Ok;
 }
 
 P4_Error P4_P4GenEvalLiteral(P4_Token* token, P4_Expression** expr) {

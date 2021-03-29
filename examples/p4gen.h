@@ -9,6 +9,8 @@ extern "C"
 #include <stdlib.h>
 #include "../peppapeg.h"
 
+P4_Error P4_P4GenEval(P4_Token* token, void* result);
+
 # define SLICE_LEN(s) ((s)->stop.pos - (s)->start.pos)
 
 typedef enum {
@@ -504,6 +506,38 @@ P4_Error P4_P4GenEvalRange(P4_Token* token, P4_Expression** expr) {
     return P4_Ok;
 }
 
+P4_Error P4_P4GenEvalSequence(P4_Token* token, P4_Expression** expr) {
+    P4_Token* child = token->head;
+
+    size_t    child_count = 0;
+    while (child != NULL) {
+        child_count++; child = child->next;
+    }
+
+    P4_Error err = P4_Ok;
+
+    *expr = P4_CreateSequence(child_count);
+    if (*expr == NULL) {
+        err = P4_MemoryError;
+        goto finalize;
+    }
+
+    size_t i = 0;
+    child = token->head;
+    while (child != NULL) {
+        P4_Expression* child_expr = NULL;
+        if ((err = P4_P4GenEval(child, &child_expr)) != P4_Ok)
+            goto finalize;
+        P4_SetMember(*expr, i, child_expr);
+        child = child->next;
+        i++;
+    }
+
+finalize:
+    P4_DeleteExpression(*expr);
+    return err;
+}
+
 P4_Error P4_P4GenEval(P4_Token* token, void* result) {
     P4_Error err = P4_Ok;
     switch (token->rule_id) {
@@ -519,9 +553,36 @@ P4_Error P4_P4GenEval(P4_Token* token, void* result) {
             return P4_P4GenEvalLiteral(token, result);
         case P4_P4GenRange:
             return P4_P4GenEvalRange(token, result);
+        case P4_P4GenSequence:
+            return P4_P4GenEvalSequence(token, result);
         default: return P4_ValueError;
     }
     return P4_Ok;
+}
+
+P4_String P4_P4GenStringifyExpression(P4_Expression* expr) {
+    P4_String result = NULL;
+    switch( expr->kind ) {
+        case P4_Literal:
+        {
+            size_t size = strlen(expr->literal) + 2 + 1;
+            if (expr->sensitive) size++;
+            result = malloc(size * sizeof(char));
+
+            char* start = expr->sensitive ? "i\"" : "\"";
+            char* stop = "\"";
+
+            sprintf(result, "%s%s%s", start, expr->literal, stop);
+            return result;
+        }
+        case P4_Range:
+        {
+            /* TBD */
+        }
+        /* TBD */
+        default:
+            return strdup("<unknown>");
+    }
 }
 
 #ifdef __cplusplus

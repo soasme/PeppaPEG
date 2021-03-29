@@ -484,6 +484,26 @@ finalize:
     return err;
 }
 
+P4_Error P4_P4GenEvalRange(P4_Token* token, P4_Expression** expr) {
+    P4_Error err = P4_Ok;
+    P4_Rune lower = 0, upper = 0;
+
+    if ((err = P4_P4GenEvalChar(token->head, &lower)) != P4_Ok)
+        return err;
+
+    if ((err = P4_P4GenEvalChar(token->tail, &upper)) != P4_Ok)
+        return err;
+
+    if (lower > upper || lower == 0 || upper == 0)
+        return P4_ValueError;
+
+    *expr = P4_CreateRange(lower, upper, 1);
+    if (*expr == NULL)
+        return P4_MemoryError;
+
+    return P4_Ok;
+}
+
 P4_Error P4_P4GenEval(P4_Token* token, void* result) {
     P4_Error err = P4_Ok;
     switch (token->rule_id) {
@@ -497,6 +517,8 @@ P4_Error P4_P4GenEval(P4_Token* token, void* result) {
             return P4_P4GenEvalChar(token, result);
         case P4_P4GenLiteral:
             return P4_P4GenEvalLiteral(token, result);
+        case P4_P4GenRange:
+            return P4_P4GenEvalRange(token, result);
         default: return P4_ValueError;
     }
     return P4_Ok;

@@ -299,7 +299,7 @@ void test_eval_char(void) {
         TEST_ASSERT_EQUAL(P4_Literal, (value)->kind); \
         TEST_ASSERT_EQUAL_STRING(expect_lit, (value)->literal); \
         TEST_ASSERT_EQUAL(expect_sensitive, (value)->sensitive); \
-        free(value); TEARDOWN_EVAL(); \
+        P4_DeleteExpression(value); TEARDOWN_EVAL(); \
 } while (0);
 
 void test_eval_literal(void) {
@@ -312,6 +312,24 @@ void test_eval_literal(void) {
     ASSERT_EVAL_LITERAL(P4_P4GenLiteral, "\"\\r\"", "\r", true);
     ASSERT_EVAL_LITERAL(P4_P4GenLiteral, "\"\\t\"", "\t", true);
     ASSERT_EVAL_LITERAL(P4_P4GenLiteral, "\"   \"", "   ", true);
+}
+
+#define ASSERT_EVAL_RANGE(entry, input, expect_lower, expect_upper) do { \
+        SETUP_EVAL((entry), (input)); \
+        P4_Expression* value = 0; \
+        if (root) P4_P4GenEval(root, &value); \
+        TEST_ASSERT_EQUAL(P4_Range, (value)->kind); \
+        TEST_ASSERT_EQUAL(expect_lower, (value)->lower); \
+        TEST_ASSERT_EQUAL(expect_upper, (value)->upper); \
+        P4_DeleteExpression(value); TEARDOWN_EVAL(); \
+} while (0);
+
+void test_eval_range(void) {
+    ASSERT_EVAL_RANGE(P4_P4GenRange, "[0-9]", '0', '9');
+    ASSERT_EVAL_RANGE(P4_P4GenRange, "[a-z]", 'a', 'z');
+    ASSERT_EVAL_RANGE(P4_P4GenRange, "[A-Z]", 'A', 'Z');
+    ASSERT_EVAL_RANGE(P4_P4GenRange, "[\\u0001-\\uffff]", 0x1, 0xffff);
+    ASSERT_EVAL_RANGE(P4_P4GenRange, "[你-好]", 0x4f60, 0x597d);
 }
 
 int main(void) {
@@ -338,6 +356,7 @@ int main(void) {
     RUN_TEST(test_eval_num);
     RUN_TEST(test_eval_char);
     RUN_TEST(test_eval_literal);
+    RUN_TEST(test_eval_range);
 
     return UNITY_END();
 }

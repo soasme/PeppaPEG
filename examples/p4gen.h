@@ -533,6 +533,8 @@ P4_Error P4_P4GenEvalSequence(P4_Token* token, P4_Expression** expr) {
         i++;
     }
 
+    return P4_Ok;
+
 finalize:
     P4_DeleteExpression(*expr);
     return err;

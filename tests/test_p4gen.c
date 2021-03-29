@@ -332,6 +332,27 @@ void test_eval_range(void) {
     ASSERT_EVAL_RANGE(P4_P4GenRange, "[你-好]", 0x4f60, 0x597d);
 }
 
+#define ASSERT_EVAL_SEQUENCE(entry, input, expect_count) do { \
+    SETUP_EVAL((entry), (input)); \
+    P4_Expression* value = 0; \
+    if (root) P4_P4GenEval(root, &value); \
+    TEST_ASSERT_EQUAL( P4_Sequence, value->kind ); \
+    TEST_ASSERT_EQUAL( (expect_count), value->count ); \
+    TEST_ASSERT_NOT_NULL( value->members ); \
+    size_t i = 0; \
+    for (i = 0; i < value->count; i++) { \
+        P4_Expression* member = P4_GetMember(value, i); \
+        TEST_ASSERT_NOT_NULL( member ); \
+    } \
+    P4_DeleteExpression(value); \
+    TEARDOWN_EVAL(); \
+} while (0);
+
+void test_eval_sequence(void) {
+    ASSERT_EVAL_SEQUENCE(P4_P4GenSequence, "\"a\" \"b\" \"c\"", 3);
+    ASSERT_EVAL_SEQUENCE(P4_P4GenSequence, "\"0x\" [1-9]", 2);
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -357,6 +378,7 @@ int main(void) {
     RUN_TEST(test_eval_char);
     RUN_TEST(test_eval_literal);
     RUN_TEST(test_eval_range);
+    RUN_TEST(test_eval_sequence);
 
     return UNITY_END();
 }

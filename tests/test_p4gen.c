@@ -449,16 +449,57 @@ P4_String test_grammar_rule_to_name(P4_RuleID id) {
 void test_eval_grammar(void) {
     ASSERT_EVAL_GRAMMAR("a = \"1\";", "a", "1", "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR(
-        "a = one; "
-        "one = \"1\";",
+        "R1 = R2; "
+        "R2 = \"1\";",
 
-        "a", "1",
+        "R1", "1",
 
         "["
-        "{\"slice\":[0,1],\"type\":\"R1\",\"children\":["
-            "{\"slice\":[0,1],\"type\":\"R2\"}"
-        "]}"
-    "]");
+            "{\"slice\":[0,1],\"type\":\"R1\",\"children\":["
+                "{\"slice\":[0,1],\"type\":\"R2\"}"
+            "]}"
+        "]"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = R2 R2;"
+        "R2 = [1-1];",
+
+        "R1", "11",
+
+        "["
+            "{\"slice\":[0,2],\"type\":\"R1\",\"children\":["
+                "{\"slice\":[0,1],\"type\":\"R2\"},"
+                "{\"slice\":[1,2],\"type\":\"R2\"}"
+            "]}"
+        "]"
+    );
+
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = R2 / R3;"
+        "R2 = \"1\";"
+        "R3 = \"2\";",
+
+        "R1", "1",
+
+        "["
+            "{\"slice\":[0,1],\"type\":\"R1\",\"children\":["
+                "{\"slice\":[0,1],\"type\":\"R2\"}"
+            "]}"
+        "]"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = R2 / R3;"
+        "R2 = \"1\";"
+        "R3 = \"2\";",
+
+        "R1", "2",
+
+        "["
+            "{\"slice\":[0,1],\"type\":\"R1\",\"children\":["
+                "{\"slice\":[0,1],\"type\":\"R3\"}"
+            "]}"
+        "]"
+    );
 }
 
 int main(void) {

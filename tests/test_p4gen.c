@@ -400,6 +400,51 @@ void test_eval_repeat(void) {
     ASSERT_EVAL_REPEAT(P4_P4GenRepeat, "\"a\"{3}", 3, 3);
 }
 
+#define ASSERT_EVAL_REFERENCE(entry, input, expect_ref_id) do { \
+    SETUP_EVAL((entry), (input)); \
+    P4_Expression* value = 0; \
+    if (root) P4_P4GenEval(root, &value); \
+    TEST_ASSERT_EQUAL( P4_Reference, value->kind ); \
+    TEST_ASSERT_EQUAL_STRING( (input), value->reference ); \
+    TEST_ASSERT_EQUAL( (expect_ref_id), value->ref_id); \
+    P4_DeleteExpression(value); \
+    TEARDOWN_EVAL(); \
+} while (0);
+
+void test_eval_reference(void) {
+    ASSERT_EVAL_REFERENCE(P4_P4GenReference, "a", SIZE_MAX);
+    ASSERT_EVAL_REFERENCE(P4_P4GenReference, "xyz", SIZE_MAX);
+    ASSERT_EVAL_REFERENCE(P4_P4GenReference, "CONST", SIZE_MAX);
+}
+
+#define ASSERT_EVAL_GRAMMAR(peg_rules, entry_name, source_code, ast) do { \
+    SETUP_EVAL((P4_P4GenGrammar), (peg_rules)); \
+    P4_Grammar* peg_grammar = 0; \
+    TEST_ASSERT_NOT_NULL_MESSAGE( root, "peg rule should be correctly parsed"); \
+    TEST_ASSERT_EQUAL_MESSAGE( P4_Ok, P4_P4GenEval(root, &peg_grammar), "peg rule should be correctly evaluated"); \
+    TEST_ASSERT_NOT_NULL_MESSAGE( peg_grammar, "peg grammar should be successfully created" ); \
+    P4_Expression* entry_expr = P4_GetGrammarRuleByName(peg_grammar, (entry_name)); \
+    TEST_ASSERT_NOT_NULL_MESSAGE( entry_expr, "peg grammar entry should be successfully resolved." ); \
+    P4_Source* input_source = P4_CreateSource((source_code), (entry_expr)->id); \
+    TEST_ASSERT_NOT_NULL_MESSAGE( input_source, "source code should be correctly created." ); \
+    TEST_ASSERT_EQUAL_MESSAGE( P4_Ok, P4_Parse(peg_grammar, input_source), "source code should be correctly parsed"); \
+    P4_Token* ast_token = P4_GetSourceAst(input_source); \
+    FILE *f = fopen("check.json","w"); \
+    P4_JsonifySourceAst(f, ast_token, P4_P4GenKindToName); \
+    fclose(f); \
+    P4_String s = read_file("check.json"); \
+    TEST_ASSERT_EQUAL_STRING((ast), s); \
+    free(s); \
+    P4_DeleteSource( input_source ); \
+    P4_DeleteGrammar( peg_grammar ); \
+    TEARDOWN_EVAL(); \
+} while (0);
+
+void test_eval_grammar(void) {
+    ASSERT_EVAL_GRAMMAR("a = \"1\";", "a", "1", "[{\"slice\":[0,1],\"type\":\"grammar\"}]");
+    /* ASSERT_EVAL_GRAMMAR("a = one; one = \"1\";", "one", "1", "[{\"slice\":[0,1],\"type\":\"grammar\"}]"); */
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -430,6 +475,8 @@ int main(void) {
     RUN_TEST(test_eval_positive);
     RUN_TEST(test_eval_negative);
     RUN_TEST(test_eval_repeat);
+    RUN_TEST(test_eval_reference);
+    RUN_TEST(test_eval_grammar);
 
     return UNITY_END();
 }

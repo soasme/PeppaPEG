@@ -1325,6 +1325,7 @@ P4_CreateReference(P4_RuleID id) {
     expr->kind = P4_Reference;
     expr->flag = 0;
     expr->name = NULL;
+    expr->reference = NULL;
     expr->ref_id = id;
     expr->ref_expr = NULL;
     return expr;
@@ -2149,7 +2150,12 @@ P4_DeleteExpression(P4_Expression* expr) {
             if (expr->literal)
                 free(expr->literal);
             break;
-        /* case P4_Reference is quite special - it is not the owner of ref_expr. */
+        case P4_Reference:
+            /* Case P4_Reference is quite special - it is not the owner of ref_expr.
+             * We free the referenced string if exists though. */
+            if (expr->reference != NULL)
+                free(expr->reference);
+            break;
         case P4_Positive:
         case P4_Negative:
             if (expr->ref_expr)

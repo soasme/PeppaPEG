@@ -378,6 +378,28 @@ void test_eval_negative(void) {
     ASSERT_EVAL_LOOKAHEAD(P4_P4GenNegative, "! [0-9]", P4_Negative);
 }
 
+#define ASSERT_EVAL_REPEAT(entry, input, min, max) do { \
+    SETUP_EVAL((entry), (input)); \
+    P4_Expression* value = 0; \
+    if (root) P4_P4GenEval(root, &value); \
+    TEST_ASSERT_EQUAL( P4_Repeat, value->kind ); \
+    TEST_ASSERT_NOT_NULL( value->repeat_expr ); \
+    TEST_ASSERT_EQUAL( (min), value->repeat_min ); \
+    TEST_ASSERT_EQUAL( (max), value->repeat_max ); \
+    P4_DeleteExpression(value); \
+    TEARDOWN_EVAL(); \
+} while (0);
+
+void test_eval_repeat(void) {
+    ASSERT_EVAL_REPEAT(P4_P4GenRepeat, "\"a\"*", 0, SIZE_MAX);
+    ASSERT_EVAL_REPEAT(P4_P4GenRepeat, "\"a\"?", 0, 1);
+    ASSERT_EVAL_REPEAT(P4_P4GenRepeat, "\"a\"+", 1, SIZE_MAX);
+    ASSERT_EVAL_REPEAT(P4_P4GenRepeat, "\"a\"{2,3}", 2, 3);
+    ASSERT_EVAL_REPEAT(P4_P4GenRepeat, "\"a\"{2,}", 2, SIZE_MAX);
+    ASSERT_EVAL_REPEAT(P4_P4GenRepeat, "\"a\"{,3}", 0, 3);
+    ASSERT_EVAL_REPEAT(P4_P4GenRepeat, "\"a\"{3}", 3, 3);
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -407,6 +429,7 @@ int main(void) {
     RUN_TEST(test_eval_choice);
     RUN_TEST(test_eval_positive);
     RUN_TEST(test_eval_negative);
+    RUN_TEST(test_eval_repeat);
 
     return UNITY_END();
 }

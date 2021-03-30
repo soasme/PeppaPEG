@@ -411,7 +411,7 @@ P4_Error P4_P4GenEvalRuleFlags(P4_Token* token, P4_ExpressionFlag* flag) {
     return P4_Ok;
 }
 
-P4_Error P4_P4GenEvalNumber(P4_Token* token, long* num) {
+P4_Error P4_P4GenEvalNumber(P4_Token* token, size_t* num) {
     P4_String s = P4_CopyTokenString(token);
 
     if (s == NULL)
@@ -616,6 +616,65 @@ finalize:
     return err;
 }
 
+P4_Error P4_P4GenEvalRepeat(P4_Token* token, P4_Expression** expr) {
+    P4_Error        err = P4_Ok;
+    P4_Expression*  ref = NULL;
+    size_t          min = 0, max = SIZE_MAX;
+
+    if ((err = P4_P4GenEval(token->head, &ref)) != P4_Ok) {
+        return err;
+    }
+
+    if (ref == NULL)
+        return P4_MemoryError;
+
+    switch (token->head->next->rule_id) {
+        case P4_P4GenRepeatZeroOrMore: min = 0; max = SIZE_MAX; break;
+        case P4_P4GenRepeatZeroOrOnce: min = 0; max = 1; break;
+        case P4_P4GenRepeatOnceOrMore: min = 1; max = SIZE_MAX; break;
+        case P4_P4GenRepeatMin:
+            if ((err = P4_P4GenEvalNumber(token->head->next->head, &min)) != P4_Ok)
+                goto finalize;
+            break;
+        case P4_P4GenRepeatMax:
+            if ((err = P4_P4GenEvalNumber(token->head->next->head, &max)) != P4_Ok)
+                goto finalize;
+            break;
+        case P4_P4GenRepeatMinMax:
+            if ((err = P4_P4GenEvalNumber(token->head->next->head, &min)) != P4_Ok)
+                goto finalize;
+            if ((err = P4_P4GenEvalNumber(token->head->next->tail, &max)) != P4_Ok)
+                goto finalize;
+            break;
+        case P4_P4GenRepeatExact:
+            if ((err = P4_P4GenEvalNumber(token->head->next->head, &min)) != P4_Ok)
+                goto finalize;
+            max = min;
+            break;
+        default:
+            err = P4_ValueError;
+            goto finalize;
+    }
+
+    if (min > max) {
+        err = P4_ValueError;
+        goto finalize;
+    }
+
+
+    if ((*expr = P4_CreateRepeatMinMax(ref, min, max)) == NULL) {
+        err = P4_MemoryError;
+        goto finalize;
+    }
+
+    return P4_Ok;
+
+finalize:
+    P4_DeleteExpression(ref);
+    P4_DeleteExpression(*expr);
+    return err;
+}
+
 P4_Error P4_P4GenEval(P4_Token* token, void* result) {
     P4_Error err = P4_Ok;
     switch (token->rule_id) {
@@ -639,6 +698,8 @@ P4_Error P4_P4GenEval(P4_Token* token, void* result) {
             return P4_P4GenEvalPositive(token, result);
         case P4_P4GenNegative:
             return P4_P4GenEvalNegative(token, result);
+        case P4_P4GenRepeat:
+            return P4_P4GenEvalRepeat(token, result);
         default: return P4_ValueError;
     }
     return P4_Ok;

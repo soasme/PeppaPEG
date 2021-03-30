@@ -568,6 +568,54 @@ finalize:
     return err;
 }
 
+P4_Error P4_P4GenEvalPositive(P4_Token* token, P4_Expression** expr) {
+    P4_Error        err = P4_Ok;
+    P4_Expression*  ref = NULL;
+
+    if ((err = P4_P4GenEval(token->head, &ref)) != P4_Ok) {
+        return err;
+    }
+
+    if (ref == NULL)
+        return P4_MemoryError;
+
+    if ((*expr = P4_CreatePositive(ref)) == NULL) {
+        err = P4_MemoryError;
+        goto finalize;
+    }
+
+    return P4_Ok;
+
+finalize:
+    P4_DeleteExpression(ref);
+    P4_DeleteExpression(*expr);
+    return err;
+}
+
+P4_Error P4_P4GenEvalNegative(P4_Token* token, P4_Expression** expr) {
+    P4_Error        err = P4_Ok;
+    P4_Expression*  ref = NULL;
+
+    if ((err = P4_P4GenEval(token->head, &ref)) != P4_Ok) {
+        return err;
+    }
+
+    if (ref == NULL)
+        return P4_MemoryError;
+
+    if ((*expr = P4_CreateNegative(ref)) == NULL) {
+        err = P4_MemoryError;
+        goto finalize;
+    }
+
+    return P4_Ok;
+
+finalize:
+    P4_DeleteExpression(ref);
+    P4_DeleteExpression(*expr);
+    return err;
+}
+
 P4_Error P4_P4GenEval(P4_Token* token, void* result) {
     P4_Error err = P4_Ok;
     switch (token->rule_id) {
@@ -587,6 +635,10 @@ P4_Error P4_P4GenEval(P4_Token* token, void* result) {
             return P4_P4GenEvalSequence(token, result);
         case P4_P4GenChoice:
             return P4_P4GenEvalChoice(token, result);
+        case P4_P4GenPositive:
+            return P4_P4GenEvalPositive(token, result);
+        case P4_P4GenNegative:
+            return P4_P4GenEvalNegative(token, result);
         default: return P4_ValueError;
     }
     return P4_Ok;

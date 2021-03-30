@@ -358,6 +358,26 @@ void test_eval_choice(void) {
     ASSERT_EVAL_CONTAINER(P4_P4GenChoice, "\"0x\" / [1-9]", P4_Choice, 2);
 }
 
+#define ASSERT_EVAL_LOOKAHEAD(entry, input, expect_kind) do { \
+    SETUP_EVAL((entry), (input)); \
+    P4_Expression* value = 0; \
+    if (root) P4_P4GenEval(root, &value); \
+    TEST_ASSERT_EQUAL( (expect_kind), value->kind ); \
+    TEST_ASSERT_NOT_NULL( value->ref_expr ); \
+    P4_DeleteExpression(value); \
+    TEARDOWN_EVAL(); \
+} while (0);
+
+void test_eval_positive(void) {
+    ASSERT_EVAL_LOOKAHEAD(P4_P4GenPositive, "& \"a\"", P4_Positive);
+    ASSERT_EVAL_LOOKAHEAD(P4_P4GenPositive, "& [0-9]", P4_Positive);
+}
+
+void test_eval_negative(void) {
+    ASSERT_EVAL_LOOKAHEAD(P4_P4GenNegative, "! \"a\"", P4_Negative);
+    ASSERT_EVAL_LOOKAHEAD(P4_P4GenNegative, "! [0-9]", P4_Negative);
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -385,6 +405,8 @@ int main(void) {
     RUN_TEST(test_eval_range);
     RUN_TEST(test_eval_sequence);
     RUN_TEST(test_eval_choice);
+    RUN_TEST(test_eval_positive);
+    RUN_TEST(test_eval_negative);
 
     return UNITY_END();
 }

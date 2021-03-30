@@ -506,7 +506,7 @@ P4_Error P4_P4GenEvalRange(P4_Token* token, P4_Expression** expr) {
     return P4_Ok;
 }
 
-P4_Error P4_P4GenEvalSequence(P4_Token* token, P4_Expression** expr) {
+size_t P4_P4GenGetChildrenCount(P4_Token* token) {
     P4_Token* child = token->head;
 
     size_t    child_count = 0;
@@ -514,24 +514,52 @@ P4_Error P4_P4GenEvalSequence(P4_Token* token, P4_Expression** expr) {
         child_count++; child = child->next;
     }
 
-    P4_Error err = P4_Ok;
+    return child_count;
+}
 
-    *expr = P4_CreateSequence(child_count);
-    if (*expr == NULL) {
+P4_Error P4_P4GenEvalMembers(P4_Token* token, P4_Expression* expr) {
+    size_t i = 0;
+    P4_Token* child = token->head;
+    P4_Error err = P4_Ok;
+    while (child != NULL) {
+        P4_Expression* child_expr = NULL;
+        if ((err = P4_P4GenEval(child, &child_expr)) != P4_Ok)
+            return err;
+        P4_SetMember(expr, i, child_expr);
+        child = child->next;
+        i++;
+    }
+    return P4_Ok;
+}
+
+P4_Error P4_P4GenEvalSequence(P4_Token* token, P4_Expression** expr) {
+    P4_Error  err = P4_Ok;
+
+    if ((*expr = P4_CreateSequence(P4_P4GenGetChildrenCount(token))) == NULL) {
         err = P4_MemoryError;
         goto finalize;
     }
 
-    size_t i = 0;
-    child = token->head;
-    while (child != NULL) {
-        P4_Expression* child_expr = NULL;
-        if ((err = P4_P4GenEval(child, &child_expr)) != P4_Ok)
-            goto finalize;
-        P4_SetMember(*expr, i, child_expr);
-        child = child->next;
-        i++;
+    if ((err = P4_P4GenEvalMembers(token, *expr)) != P4_Ok)
+        goto finalize;
+
+    return P4_Ok;
+
+finalize:
+    P4_DeleteExpression(*expr);
+    return err;
+}
+
+P4_Error P4_P4GenEvalChoice(P4_Token* token, P4_Expression** expr) {
+    P4_Error  err = P4_Ok;
+
+    if ((*expr = P4_CreateChoice(P4_P4GenGetChildrenCount(token))) == NULL) {
+        err = P4_MemoryError;
+        goto finalize;
     }
+
+    if ((err = P4_P4GenEvalMembers(token, *expr)) != P4_Ok)
+        goto finalize;
 
     return P4_Ok;
 
@@ -557,6 +585,8 @@ P4_Error P4_P4GenEval(P4_Token* token, void* result) {
             return P4_P4GenEvalRange(token, result);
         case P4_P4GenSequence:
             return P4_P4GenEvalSequence(token, result);
+        case P4_P4GenChoice:
+            return P4_P4GenEvalChoice(token, result);
         default: return P4_ValueError;
     }
     return P4_Ok;

@@ -1591,8 +1591,9 @@ P4_GetGrammarRuleByName(P4_Grammar* grammar, P4_String name) {
     P4_Expression* rule = NULL;
     for (i = 0; i < grammar->count; i++) {
         rule = grammar->rules[i];
-        if (rule && rule->name && strcmp(rule->name, name) == 0)
+        if (rule && rule->name && strcmp(rule->name, name) == 0) {
             return rule;
+        }
     }
     return NULL;
 }

@@ -417,6 +417,12 @@ void test_eval_reference(void) {
     ASSERT_EVAL_REFERENCE(P4_P4GenReference, "CONST", SIZE_MAX);
 }
 
+P4_String test_grammar_rule_to_name(P4_RuleID id) {
+    static char name[5] = "00000";
+    sprintf(name, "R%lu", (unsigned long)id);
+    return name;
+}
+
 #define ASSERT_EVAL_GRAMMAR(peg_rules, entry_name, source_code, ast) do { \
     SETUP_EVAL((P4_P4GenGrammar), (peg_rules)); \
     P4_Grammar* peg_grammar = 0; \
@@ -430,7 +436,7 @@ void test_eval_reference(void) {
     TEST_ASSERT_EQUAL_MESSAGE( P4_Ok, P4_Parse(peg_grammar, input_source), "source code should be correctly parsed"); \
     P4_Token* ast_token = P4_GetSourceAst(input_source); \
     FILE *f = fopen("check.json","w"); \
-    P4_JsonifySourceAst(f, ast_token, P4_P4GenKindToName); \
+    P4_JsonifySourceAst(f, ast_token, test_grammar_rule_to_name); \
     fclose(f); \
     P4_String s = read_file("check.json"); \
     TEST_ASSERT_EQUAL_STRING((ast), s); \
@@ -441,8 +447,18 @@ void test_eval_reference(void) {
 } while (0);
 
 void test_eval_grammar(void) {
-    ASSERT_EVAL_GRAMMAR("a = \"1\";", "a", "1", "[{\"slice\":[0,1],\"type\":\"grammar\"}]");
-    /* ASSERT_EVAL_GRAMMAR("a = one; one = \"1\";", "one", "1", "[{\"slice\":[0,1],\"type\":\"grammar\"}]"); */
+    ASSERT_EVAL_GRAMMAR("a = \"1\";", "a", "1", "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR(
+        "a = one; "
+        "one = \"1\";",
+
+        "a", "1",
+
+        "["
+        "{\"slice\":[0,1],\"type\":\"R1\",\"children\":["
+            "{\"slice\":[0,1],\"type\":\"R2\"}"
+        "]}"
+    "]");
 }
 
 int main(void) {

@@ -826,7 +826,7 @@ P4_Error P4_P4GenEvalGrammar(P4_Token* token, P4_Grammar** result) {
             goto finalize;
         }
 
-        i++;
+        id++;
     }
 
     for (i = 0; i < (*result)->count; i++) {

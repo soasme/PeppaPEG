@@ -11,20 +11,20 @@ void check_parse_failed(P4_RuleID entry, P4_String input, P4_Error err) {
     P4_DeleteGrammar(grammar);
 }
 
-void check_parse(P4_RuleID entry, P4_String input, P4_String output) {
-    P4_Grammar* grammar = P4_CreatePegGrammar();
-    P4_Source* source = P4_CreateSource(input, entry);
-    TEST_ASSERT_EQUAL(P4_Ok, P4_Parse(grammar, source));
-    P4_Token* root = P4_GetSourceAst(source);
-    FILE *f = fopen("check.json","w");
-    P4_JsonifySourceAst(f, root, P4_PegKindToName);
-    fclose(f);
-    P4_String s = read_file("check.json");
-    TEST_ASSERT_EQUAL_STRING(output, s);
-    free(s);
-    P4_DeleteSource(source);
-    P4_DeleteGrammar(grammar);
-}
+# define check_parse(entry, input, code, output) do { \
+    P4_Grammar* grammar = P4_CreatePegGrammar(); \
+    P4_Source* source = P4_CreateSource((input), (entry)); \
+    TEST_ASSERT_EQUAL_MESSAGE((code), P4_Parse(grammar, source), "unexpected parse grammar return code"); \
+    P4_Token* root = P4_GetSourceAst(source); \
+    FILE *f = fopen("check.json","w"); \
+    P4_JsonifySourceAst(f, root, P4_PegKindToName); \
+    fclose(f); \
+    P4_String s = read_file("check.json"); \
+    TEST_ASSERT_EQUAL_STRING((output), s); \
+    free(s); \
+    P4_DeleteSource(source); \
+    P4_DeleteGrammar(grammar); \
+} while (0);
 
 # define SETUP_EVAL(entry, input) \
     P4_Grammar* grammar = P4_CreatePegGrammar(); \
@@ -37,58 +37,58 @@ void check_parse(P4_RuleID entry, P4_String input, P4_String output) {
     P4_DeleteGrammar(grammar);
 
 void test_number(void) {
-    check_parse(P4_P4GenNumber, "0", "[{\"slice\":[0,1],\"type\":\"number\"}]");
-    check_parse(P4_P4GenNumber, "1", "[{\"slice\":[0,1],\"type\":\"number\"}]");
-    check_parse(P4_P4GenNumber, "123", "[{\"slice\":[0,3],\"type\":\"number\"}]");
+    check_parse(P4_PegRuleNumber, "0", P4_Ok, "[{\"slice\":[0,1],\"type\":\"number\"}]");
+    check_parse(P4_PegRuleNumber, "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"number\"}]");
+    check_parse(P4_PegRuleNumber, "123", P4_Ok, "[{\"slice\":[0,3],\"type\":\"number\"}]");
 }
 
 void test_char(void) {
-    check_parse(P4_P4GenChar, "a", "[{\"slice\":[0,1],\"type\":\"char\"}]");
-    check_parse(P4_P4GenChar, "A", "[{\"slice\":[0,1],\"type\":\"char\"}]");
-    check_parse(P4_P4GenChar, "好", "[{\"slice\":[0,3],\"type\":\"char\"}]");
-    check_parse(P4_P4GenChar, "👌", "[{\"slice\":[0,4],\"type\":\"char\"}]");
-    check_parse(P4_P4GenChar, "\\t", "[{\"slice\":[0,2],\"type\":\"char\"}]");
-    check_parse(P4_P4GenChar, "\\\"", "[{\"slice\":[0,2],\"type\":\"char\"}]");
-    check_parse(P4_P4GenChar, "\\u0020", "[{\"slice\":[0,6],\"type\":\"char\"}]");
-    check_parse_failed(P4_P4GenChar, "\"", P4_MatchError);
+    check_parse(P4_PegRuleChar, "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"char\"}]");
+    check_parse(P4_PegRuleChar, "A", P4_Ok, "[{\"slice\":[0,1],\"type\":\"char\"}]");
+    check_parse(P4_PegRuleChar, "好", P4_Ok, "[{\"slice\":[0,3],\"type\":\"char\"}]");
+    check_parse(P4_PegRuleChar, "👌", P4_Ok, "[{\"slice\":[0,4],\"type\":\"char\"}]");
+    check_parse(P4_PegRuleChar, "\\t", P4_Ok, "[{\"slice\":[0,2],\"type\":\"char\"}]");
+    check_parse(P4_PegRuleChar, "\\\"", P4_Ok, "[{\"slice\":[0,2],\"type\":\"char\"}]");
+    check_parse(P4_PegRuleChar, "\\u0020", P4_Ok, "[{\"slice\":[0,6],\"type\":\"char\"}]");
+    check_parse_failed(P4_PegRuleChar, "\"", P4_MatchError);
 }
 
 void test_literal(void) {
-    check_parse(P4_P4GenLiteral, "\"a\"", "[{\"slice\":[0,3],\"type\":\"literal\"}]");
-    check_parse(P4_P4GenLiteral, "\"A\"", "[{\"slice\":[0,3],\"type\":\"literal\"}]");
-    check_parse(P4_P4GenLiteral, "\"好\"", "[{\"slice\":[0,5],\"type\":\"literal\"}]");
-    check_parse(P4_P4GenLiteral, "\"👌\"", "[{\"slice\":[0,6],\"type\":\"literal\"}]");
-    check_parse(P4_P4GenLiteral, "\"\\t\"", "[{\"slice\":[0,4],\"type\":\"literal\"}]");
-    check_parse(P4_P4GenLiteral, "\"\\\"\"", "[{\"slice\":[0,4],\"type\":\"literal\"}]");
-    check_parse(P4_P4GenLiteral, "\"\\u0020\"", "[{\"slice\":[0,8],\"type\":\"literal\"}]");
-    check_parse(P4_P4GenLiteral, "\"hello world\"", "[{\"slice\":[0,13],\"type\":\"literal\"}]");
+    check_parse(P4_PegRuleLiteral, "\"a\"", P4_Ok, "[{\"slice\":[0,3],\"type\":\"literal\"}]");
+    check_parse(P4_PegRuleLiteral, "\"A\"", P4_Ok, "[{\"slice\":[0,3],\"type\":\"literal\"}]");
+    check_parse(P4_PegRuleLiteral, "\"好\"", P4_Ok, "[{\"slice\":[0,5],\"type\":\"literal\"}]");
+    check_parse(P4_PegRuleLiteral, "\"👌\"", P4_Ok, "[{\"slice\":[0,6],\"type\":\"literal\"}]");
+    check_parse(P4_PegRuleLiteral, "\"\\t\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"literal\"}]");
+    check_parse(P4_PegRuleLiteral, "\"\\\"\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"literal\"}]");
+    check_parse(P4_PegRuleLiteral, "\"\\u0020\"", P4_Ok, "[{\"slice\":[0,8],\"type\":\"literal\"}]");
+    check_parse(P4_PegRuleLiteral, "\"hello world\"", P4_Ok, "[{\"slice\":[0,13],\"type\":\"literal\"}]");
 }
 
 void test_insensitive(void) {
-    check_parse(P4_P4GenInsensitiveLiteral, "i\"a\"", "[{\"slice\":[0,4],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
-    check_parse(P4_P4GenInsensitiveLiteral, "i\"A\"", "[{\"slice\":[0,4],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
-    check_parse(P4_P4GenInsensitiveLiteral, "i\"好\"", "[{\"slice\":[0,6],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,6],\"type\":\"literal\"}]}]");
-    check_parse(P4_P4GenInsensitiveLiteral, "i\"👌\"", "[{\"slice\":[0,7],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,7],\"type\":\"literal\"}]}]");
-    check_parse(P4_P4GenInsensitiveLiteral, "i\"\\t\"", "[{\"slice\":[0,5],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,5],\"type\":\"literal\"}]}]");
-    check_parse(P4_P4GenInsensitiveLiteral, "i\"\\\"\"", "[{\"slice\":[0,5],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,5],\"type\":\"literal\"}]}]");
-    check_parse(P4_P4GenInsensitiveLiteral, "i\"\\u0020\"", "[{\"slice\":[0,9],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,9],\"type\":\"literal\"}]}]");
-    check_parse(P4_P4GenInsensitiveLiteral, "i\"hello world\"", "[{\"slice\":[0,14],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,14],\"type\":\"literal\"}]}]");
+    check_parse(P4_PegRuleInsensitiveLiteral, "i\"a\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
+    check_parse(P4_PegRuleInsensitiveLiteral, "i\"A\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
+    check_parse(P4_PegRuleInsensitiveLiteral, "i\"好\"", P4_Ok, "[{\"slice\":[0,6],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,6],\"type\":\"literal\"}]}]");
+    check_parse(P4_PegRuleInsensitiveLiteral, "i\"👌\"", P4_Ok, "[{\"slice\":[0,7],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,7],\"type\":\"literal\"}]}]");
+    check_parse(P4_PegRuleInsensitiveLiteral, "i\"\\t\"", P4_Ok, "[{\"slice\":[0,5],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,5],\"type\":\"literal\"}]}]");
+    check_parse(P4_PegRuleInsensitiveLiteral, "i\"\\\"\"", P4_Ok, "[{\"slice\":[0,5],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,5],\"type\":\"literal\"}]}]");
+    check_parse(P4_PegRuleInsensitiveLiteral, "i\"\\u0020\"", P4_Ok, "[{\"slice\":[0,9],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,9],\"type\":\"literal\"}]}]");
+    check_parse(P4_PegRuleInsensitiveLiteral, "i\"hello world\"", P4_Ok, "[{\"slice\":[0,14],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,14],\"type\":\"literal\"}]}]");
 }
 
 void test_range(void) {
-    check_parse(P4_P4GenRange, "[a-z]", "\
+    check_parse(P4_PegRuleRange, "[a-z]", P4_Ok, "\
 [{\"slice\":[0,5],\"type\":\"range\",\"children\":[\
 {\"slice\":[1,2],\"type\":\"char\"},\
 {\"slice\":[3,4],\"type\":\"char\"}]}]");
-    check_parse(P4_P4GenRange, "[1-9]", "\
+    check_parse(P4_PegRuleRange, "[1-9]", P4_Ok, "\
 [{\"slice\":[0,5],\"type\":\"range\",\"children\":[\
 {\"slice\":[1,2],\"type\":\"char\"},\
 {\"slice\":[3,4],\"type\":\"char\"}]}]");
-    check_parse(P4_P4GenRange, "[\\u0020-\\u0030]", "\
+    check_parse(P4_PegRuleRange, "[\\u0020-\\u0030]", P4_Ok, "\
 [{\"slice\":[0,15],\"type\":\"range\",\"children\":[\
 {\"slice\":[1,7],\"type\":\"char\"},\
 {\"slice\":[8,14],\"type\":\"char\"}]}]");
-    check_parse(P4_P4GenRange, "[1-9..2]", "\
+    check_parse(P4_PegRuleRange, "[1-9..2]", P4_Ok, "\
 [{\"slice\":[0,8],\"type\":\"range\",\"children\":[\
 {\"slice\":[1,2],\"type\":\"char\"},\
 {\"slice\":[3,4],\"type\":\"char\"},\
@@ -96,86 +96,86 @@ void test_range(void) {
 }
 
 void test_reference(void) {
-    check_parse(P4_P4GenReference, "a", "[{\"slice\":[0,1],\"type\":\"reference\"}]");
-    check_parse(P4_P4GenReference, "JsonEntry", "[{\"slice\":[0,9],\"type\":\"reference\"}]");
-    check_parse(P4_P4GenReference, "P4", "[{\"slice\":[0,2],\"type\":\"reference\"}]");
-    check_parse(P4_P4GenReference, "P4_P4Gen", "[{\"slice\":[0,8],\"type\":\"reference\"}]");
-    check_parse_failed(P4_P4GenReference, "4PEG", P4_MatchError);
+    check_parse(P4_PegRuleReference, "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"reference\"}]");
+    check_parse(P4_PegRuleReference, "JsonEntry", P4_Ok, "[{\"slice\":[0,9],\"type\":\"reference\"}]");
+    check_parse(P4_PegRuleReference, "P4", P4_Ok, "[{\"slice\":[0,2],\"type\":\"reference\"}]");
+    check_parse(P4_PegRuleReference, "P4_PegRule", P4_Ok, "[{\"slice\":[0,10],\"type\":\"reference\"}]");
+    check_parse_failed(P4_PegRuleReference, "4PEG", P4_MatchError);
 }
 
 void test_positive(void) {
-    check_parse(P4_P4GenPositive, "&\"a\"", "[{\"slice\":[0,4],\"type\":\"positive\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
-    check_parse(P4_P4GenPositive, "&&\"a\"", "[{\"slice\":[0,5],\"type\":\"positive\",\"children\":[{\"slice\":[1,5],\"type\":\"positive\",\"children\":[{\"slice\":[2,5],\"type\":\"literal\"}]}]}]");
+    check_parse(P4_PegRulePositive, "&\"a\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"positive\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
+    check_parse(P4_PegRulePositive, "&&\"a\"", P4_Ok, "[{\"slice\":[0,5],\"type\":\"positive\",\"children\":[{\"slice\":[1,5],\"type\":\"positive\",\"children\":[{\"slice\":[2,5],\"type\":\"literal\"}]}]}]");
 }
 
 void test_negative(void) {
-    check_parse(P4_P4GenNegative, "!\"a\"", "[{\"slice\":[0,4],\"type\":\"negative\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
-    check_parse(P4_P4GenNegative, "!!\"a\"", "[{\"slice\":[0,5],\"type\":\"negative\",\"children\":[{\"slice\":[1,5],\"type\":\"negative\",\"children\":[{\"slice\":[2,5],\"type\":\"literal\"}]}]}]");
+    check_parse(P4_PegRuleNegative, "!\"a\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"negative\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
+    check_parse(P4_PegRuleNegative, "!!\"a\"", P4_Ok, "[{\"slice\":[0,5],\"type\":\"negative\",\"children\":[{\"slice\":[1,5],\"type\":\"negative\",\"children\":[{\"slice\":[2,5],\"type\":\"literal\"}]}]}]");
 }
 
 void test_choice(void) {
-    check_parse(P4_P4GenChoice, "\"a\"/\"b\"", "[{\"slice\":[0,7],\"type\":\"choice\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
-    check_parse(P4_P4GenChoice, "\"a\" / \"b\"", "[{\"slice\":[0,9],\"type\":\"choice\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[6,9],\"type\":\"literal\"}]}]");
+    check_parse(P4_PegRuleChoice, "\"a\"/\"b\"", P4_Ok, "[{\"slice\":[0,7],\"type\":\"choice\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
+    check_parse(P4_PegRuleChoice, "\"a\" / \"b\"", P4_Ok, "[{\"slice\":[0,9],\"type\":\"choice\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[6,9],\"type\":\"literal\"}]}]");
 }
 
 void test_sequence(void) {
-    check_parse(P4_P4GenSequence, "\"a\" \"b\"", "[{\"slice\":[0,7],\"type\":\"sequence\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
+    check_parse(P4_PegRuleSequence, "\"a\" \"b\"", P4_Ok, "[{\"slice\":[0,7],\"type\":\"sequence\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
 }
 
 void test_repeat(void) {
-    check_parse(P4_P4GenRepeat, "\"a\"*", "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"zeroormore\"}]}]");
-    check_parse(P4_P4GenRepeat, "\"a\"+", "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"onceormore\"}]}]");
-    check_parse(P4_P4GenRepeat, "\"a\"?", "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"zerooronce\"}]}]");
-    check_parse(P4_P4GenRepeat, "\"a\"{1,}", "[{\"slice\":[0,7],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,7],\"type\":\"repeatmin\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"}]}]}]");
-    check_parse(P4_P4GenRepeat, "\"a\"{,1}", "[{\"slice\":[0,7],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,7],\"type\":\"repeatmax\",\"children\":[{\"slice\":[5,6],\"type\":\"number\"}]}]}]");
-    check_parse(P4_P4GenRepeat, "\"a\"{1,1}", "[{\"slice\":[0,8],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,8],\"type\":\"repeatminmax\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"},{\"slice\":[6,7],\"type\":\"number\"}]}]}]");
-    check_parse(P4_P4GenRepeat, "\"a\"{1}", "[{\"slice\":[0,6],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,6],\"type\":\"repeatexact\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"}]}]}]");
+    check_parse(P4_PegRuleRepeat, "\"a\"*", P4_Ok, "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"zeroormore\"}]}]");
+    check_parse(P4_PegRuleRepeat, "\"a\"+", P4_Ok, "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"onceormore\"}]}]");
+    check_parse(P4_PegRuleRepeat, "\"a\"?", P4_Ok, "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"zerooronce\"}]}]");
+    check_parse(P4_PegRuleRepeat, "\"a\"{1,}", P4_Ok, "[{\"slice\":[0,7],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,7],\"type\":\"repeatmin\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"}]}]}]");
+    check_parse(P4_PegRuleRepeat, "\"a\"{,1}", P4_Ok, "[{\"slice\":[0,7],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,7],\"type\":\"repeatmax\",\"children\":[{\"slice\":[5,6],\"type\":\"number\"}]}]}]");
+    check_parse(P4_PegRuleRepeat, "\"a\"{1,1}", P4_Ok, "[{\"slice\":[0,8],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,8],\"type\":\"repeatminmax\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"},{\"slice\":[6,7],\"type\":\"number\"}]}]}]");
+    check_parse(P4_PegRuleRepeat, "\"a\"{1}", P4_Ok, "[{\"slice\":[0,6],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,6],\"type\":\"repeatexact\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"}]}]}]");
 }
 
 void test_expression(void) {
-    check_parse(P4_P4GenExpression, "\"a\"", "[{\"slice\":[0,3],\"type\":\"literal\"}]");
-    check_parse(P4_P4GenExpression, "[a-z]", "\
+    check_parse(P4_PegRuleExpression, "\"a\"", P4_Ok, "[{\"slice\":[0,3],\"type\":\"literal\"}]");
+    check_parse(P4_PegRuleExpression, "[a-z]", P4_Ok, "\
 [{\"slice\":[0,5],\"type\":\"range\",\"children\":[\
 {\"slice\":[1,2],\"type\":\"char\"},\
 {\"slice\":[3,4],\"type\":\"char\"}]}]");
-    check_parse(P4_P4GenExpression, "s1", "[{\"slice\":[0,2],\"type\":\"reference\"}]");
-    check_parse(P4_P4GenExpression, "&\"a\"", "[{\"slice\":[0,4],\"type\":\"positive\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
-    check_parse(P4_P4GenExpression, "!\"a\"", "[{\"slice\":[0,4],\"type\":\"negative\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
-    check_parse(P4_P4GenExpression, "\"a\" / \"b\"", "[{\"slice\":[0,9],\"type\":\"choice\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[6,9],\"type\":\"literal\"}]}]");
-    check_parse(P4_P4GenExpression, "\"a\" \"b\"", "[{\"slice\":[0,7],\"type\":\"sequence\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
-    check_parse(P4_P4GenExpression, "var \"b\"", "[{\"slice\":[0,7],\"type\":\"sequence\",\"children\":[{\"slice\":[0,3],\"type\":\"reference\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
-    check_parse(P4_P4GenExpression, "var name", "[{\"slice\":[0,8],\"type\":\"sequence\",\"children\":[{\"slice\":[0,3],\"type\":\"reference\"},{\"slice\":[4,8],\"type\":\"reference\"}]}]");
-    check_parse(P4_P4GenExpression, "v1 v2 / v3 v4", "[{\"slice\":[0,13],\"type\":\"choice\",\"children\":[{\"slice\":[0,6],\"type\":\"sequence\",\"children\":[{\"slice\":[0,2],\"type\":\"reference\"},{\"slice\":[3,5],\"type\":\"reference\"}]},{\"slice\":[8,13],\"type\":\"sequence\",\"children\":[{\"slice\":[8,10],\"type\":\"reference\"},{\"slice\":[11,13],\"type\":\"reference\"}]}]}]");
-    check_parse(P4_P4GenExpression, "v1 (v2/v3) v4", "[{\"slice\":[0,13],\"type\":\"sequence\",\"children\":[{\"slice\":[0,2],\"type\":\"reference\"},{\"slice\":[4,9],\"type\":\"choice\",\"children\":[{\"slice\":[4,6],\"type\":\"reference\"},{\"slice\":[7,9],\"type\":\"reference\"}]},{\"slice\":[11,13],\"type\":\"reference\"}]}]");
-    check_parse(P4_P4GenExpression, "\"a\"*", "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"zeroormore\"}]}]");
-    check_parse(P4_P4GenExpression, "\"a\"+", "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"onceormore\"}]}]");
-    check_parse(P4_P4GenExpression, "\"a\"?", "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"zerooronce\"}]}]");
-    check_parse(P4_P4GenExpression, "\"a\"{1,}", "[{\"slice\":[0,7],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,7],\"type\":\"repeatmin\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"}]}]}]");
-    check_parse(P4_P4GenExpression, "\"a\"{,1}", "[{\"slice\":[0,7],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,7],\"type\":\"repeatmax\",\"children\":[{\"slice\":[5,6],\"type\":\"number\"}]}]}]");
-    check_parse(P4_P4GenExpression, "\"a\"{1,1}", "[{\"slice\":[0,8],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,8],\"type\":\"repeatminmax\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"},{\"slice\":[6,7],\"type\":\"number\"}]}]}]");
-    check_parse(P4_P4GenExpression, "\"a\"{1}", "[{\"slice\":[0,6],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,6],\"type\":\"repeatexact\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"}]}]}]");
+    check_parse(P4_PegRuleExpression, "s1", P4_Ok, "[{\"slice\":[0,2],\"type\":\"reference\"}]");
+    check_parse(P4_PegRuleExpression, "&\"a\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"positive\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
+    check_parse(P4_PegRuleExpression, "!\"a\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"negative\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
+    check_parse(P4_PegRuleExpression, "\"a\" / \"b\"", P4_Ok, "[{\"slice\":[0,9],\"type\":\"choice\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[6,9],\"type\":\"literal\"}]}]");
+    check_parse(P4_PegRuleExpression, "\"a\" \"b\"", P4_Ok, "[{\"slice\":[0,7],\"type\":\"sequence\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
+    check_parse(P4_PegRuleExpression, "var \"b\"", P4_Ok, "[{\"slice\":[0,7],\"type\":\"sequence\",\"children\":[{\"slice\":[0,3],\"type\":\"reference\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
+    check_parse(P4_PegRuleExpression, "var name", P4_Ok, "[{\"slice\":[0,8],\"type\":\"sequence\",\"children\":[{\"slice\":[0,3],\"type\":\"reference\"},{\"slice\":[4,8],\"type\":\"reference\"}]}]");
+    check_parse(P4_PegRuleExpression, "v1 v2 / v3 v4", P4_Ok, "[{\"slice\":[0,13],\"type\":\"choice\",\"children\":[{\"slice\":[0,6],\"type\":\"sequence\",\"children\":[{\"slice\":[0,2],\"type\":\"reference\"},{\"slice\":[3,5],\"type\":\"reference\"}]},{\"slice\":[8,13],\"type\":\"sequence\",\"children\":[{\"slice\":[8,10],\"type\":\"reference\"},{\"slice\":[11,13],\"type\":\"reference\"}]}]}]");
+    check_parse(P4_PegRuleExpression, "v1 (v2/v3) v4", P4_Ok, "[{\"slice\":[0,13],\"type\":\"sequence\",\"children\":[{\"slice\":[0,2],\"type\":\"reference\"},{\"slice\":[4,9],\"type\":\"choice\",\"children\":[{\"slice\":[4,6],\"type\":\"reference\"},{\"slice\":[7,9],\"type\":\"reference\"}]},{\"slice\":[11,13],\"type\":\"reference\"}]}]");
+    check_parse(P4_PegRuleExpression, "\"a\"*", P4_Ok, "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"zeroormore\"}]}]");
+    check_parse(P4_PegRuleExpression, "\"a\"+", P4_Ok, "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"onceormore\"}]}]");
+    check_parse(P4_PegRuleExpression, "\"a\"?", P4_Ok, "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"zerooronce\"}]}]");
+    check_parse(P4_PegRuleExpression, "\"a\"{1,}", P4_Ok, "[{\"slice\":[0,7],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,7],\"type\":\"repeatmin\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"}]}]}]");
+    check_parse(P4_PegRuleExpression, "\"a\"{,1}", P4_Ok, "[{\"slice\":[0,7],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,7],\"type\":\"repeatmax\",\"children\":[{\"slice\":[5,6],\"type\":\"number\"}]}]}]");
+    check_parse(P4_PegRuleExpression, "\"a\"{1,1}", P4_Ok, "[{\"slice\":[0,8],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,8],\"type\":\"repeatminmax\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"},{\"slice\":[6,7],\"type\":\"number\"}]}]}]");
+    check_parse(P4_PegRuleExpression, "\"a\"{1}", P4_Ok, "[{\"slice\":[0,6],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,6],\"type\":\"repeatexact\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"}]}]}]");
 }
 
 void test_rule_name(void) {
-    check_parse(P4_P4GenRuleName, "a", "[{\"slice\":[0,1],\"type\":\"name\"}]");
-    check_parse(P4_P4GenRuleName, "JsonEntry", "[{\"slice\":[0,9],\"type\":\"name\"}]");
-    check_parse(P4_P4GenRuleName, "P4", "[{\"slice\":[0,2],\"type\":\"name\"}]");
-    check_parse(P4_P4GenRuleName, "P4_P4Gen", "[{\"slice\":[0,8],\"type\":\"name\"}]");
-    check_parse_failed(P4_P4GenRuleName, "4PEG", P4_MatchError);
+    check_parse(P4_PegRuleRuleName, "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"name\"}]");
+    check_parse(P4_PegRuleRuleName, "JsonEntry", P4_Ok, "[{\"slice\":[0,9],\"type\":\"name\"}]");
+    check_parse(P4_PegRuleRuleName, "P4", P4_Ok, "[{\"slice\":[0,2],\"type\":\"name\"}]");
+    check_parse(P4_PegRuleRuleName, "P4_PegRule", P4_Ok, "[{\"slice\":[0,10],\"type\":\"name\"}]");
+    check_parse_failed(P4_PegRuleRuleName, "4PEG", P4_MatchError);
 }
 
 void test_rule_flag(void) {
-    check_parse(P4_P4GenDecorator, "@scoped", "[{\"slice\":[0,7],\"type\":\"decorator\"}]");
+    check_parse(P4_PegRuleDecorator, "@scoped", P4_Ok, "[{\"slice\":[0,7],\"type\":\"decorator\"}]");
 }
 
 void test_rule(void) {
-    check_parse(P4_P4GenRule, "a = \"1\";", "["
+    check_parse(P4_PegRuleRule, "a = \"1\";", P4_Ok, "["
         "{\"slice\":[0,8],\"type\":\"rule\",\"children\":["
             "{\"slice\":[0,1],\"type\":\"name\"},"
             "{\"slice\":[4,7],\"type\":\"literal\"}"
         "]}"
     "]");
-    check_parse(P4_P4GenRule, "a = [1-9];", "["
+    check_parse(P4_PegRuleRule, "a = [1-9];", P4_Ok, "["
         "{\"slice\":[0,10],\"type\":\"rule\",\"children\":["
             "{\"slice\":[0,1],\"type\":\"name\"},"
             "{\"slice\":[4,9],\"type\":\"range\",\"children\":["
@@ -184,7 +184,7 @@ void test_rule(void) {
         "}]}"
     "]");
 
-    check_parse(P4_P4GenRule, "a = \"0x\" [1-9];", "["
+    check_parse(P4_PegRuleRule, "a = \"0x\" [1-9];", P4_Ok, "["
         "{\"slice\":[0,15],\"type\":\"rule\",\"children\":["
             "{\"slice\":[0,1],\"type\":\"name\"},"
             "{\"slice\":[4,14],\"type\":\"sequence\",\"children\":["
@@ -197,7 +197,7 @@ void test_rule(void) {
         "]}"
     "]");
 
-    check_parse(P4_P4GenRule, "a = \"0x\"/[1-9];", "["
+    check_parse(P4_PegRuleRule, "a = \"0x\"/[1-9];", P4_Ok, "["
         "{\"slice\":[0,15],\"type\":\"rule\",\"children\":["
             "{\"slice\":[0,1],\"type\":\"name\"},"
             "{\"slice\":[4,14],\"type\":\"choice\",\"children\":["
@@ -210,7 +210,7 @@ void test_rule(void) {
         "]}"
     "]");
 
-    check_parse(P4_P4GenRule, "@lifted @squashed @spaced @nonterminal @scoped @tight\na = \"1\";", "["
+    check_parse(P4_PegRuleRule, "@lifted @squashed @spaced @nonterminal @scoped @tight\na = \"1\";", P4_Ok, "["
         "{\"slice\":[0,62],\"type\":\"rule\",\"children\":["
             "{\"slice\":[0,53],\"type\":\"decorators\",\"children\":["
                 "{\"slice\":[0,7],\"type\":\"decorator\"},"
@@ -229,7 +229,7 @@ void test_rule(void) {
 void test_grammar(void) {
     check_parse(P4_PegGrammar,
         "one = \"1\";\n"
-        "entry = one one;",
+        "entry = one one;", P4_Ok,
         "["
             "{\"slice\":[0,27],\"type\":\"grammar\",\"children\":["
                 "{\"slice\":[0,10],\"type\":\"rule\",\"children\":["
@@ -257,50 +257,50 @@ void test_grammar(void) {
 } while (0);
 
 void test_eval_flag(void) {
-    ASSERT_EVAL(P4_P4GenDecorator, "@squashed", P4_ExpressionFlag, P4_FLAG_SQUASHED);
-    ASSERT_EVAL(P4_P4GenDecorator, "@scoped", P4_ExpressionFlag, P4_FLAG_SCOPED);
-    ASSERT_EVAL(P4_P4GenDecorator, "@spaced", P4_ExpressionFlag, P4_FLAG_SPACED);
-    ASSERT_EVAL(P4_P4GenDecorator, "@lifted", P4_ExpressionFlag, P4_FLAG_LIFTED);
-    ASSERT_EVAL(P4_P4GenDecorator, "@tight", P4_ExpressionFlag, P4_FLAG_TIGHT);
-    ASSERT_EVAL(P4_P4GenDecorator, "@nonterminal", P4_ExpressionFlag, P4_FLAG_NON_TERMINAL);
+    ASSERT_EVAL(P4_PegRuleDecorator, "@squashed", P4_ExpressionFlag, P4_FLAG_SQUASHED);
+    ASSERT_EVAL(P4_PegRuleDecorator, "@scoped", P4_ExpressionFlag, P4_FLAG_SCOPED);
+    ASSERT_EVAL(P4_PegRuleDecorator, "@spaced", P4_ExpressionFlag, P4_FLAG_SPACED);
+    ASSERT_EVAL(P4_PegRuleDecorator, "@lifted", P4_ExpressionFlag, P4_FLAG_LIFTED);
+    ASSERT_EVAL(P4_PegRuleDecorator, "@tight", P4_ExpressionFlag, P4_FLAG_TIGHT);
+    ASSERT_EVAL(P4_PegRuleDecorator, "@nonterminal", P4_ExpressionFlag, P4_FLAG_NON_TERMINAL);
 }
 
 void test_eval_flags(void) {
-    ASSERT_EVAL(P4_P4GenRuleDecorators, "@squashed @lifted", P4_ExpressionFlag, P4_FLAG_SQUASHED | P4_FLAG_LIFTED);
-    ASSERT_EVAL(P4_P4GenRuleDecorators, "@squashed @lifted @squashed", P4_ExpressionFlag, P4_FLAG_SQUASHED | P4_FLAG_LIFTED);
-    ASSERT_EVAL(P4_P4GenRuleDecorators, "@spaced", P4_ExpressionFlag, P4_FLAG_SPACED);
-    ASSERT_EVAL(P4_P4GenRuleDecorators, "@spaced @squashed @lifted", P4_ExpressionFlag,
+    ASSERT_EVAL(P4_PegRuleRuleDecorators, "@squashed @lifted", P4_ExpressionFlag, P4_FLAG_SQUASHED | P4_FLAG_LIFTED);
+    ASSERT_EVAL(P4_PegRuleRuleDecorators, "@squashed @lifted @squashed", P4_ExpressionFlag, P4_FLAG_SQUASHED | P4_FLAG_LIFTED);
+    ASSERT_EVAL(P4_PegRuleRuleDecorators, "@spaced", P4_ExpressionFlag, P4_FLAG_SPACED);
+    ASSERT_EVAL(P4_PegRuleRuleDecorators, "@spaced @squashed @lifted", P4_ExpressionFlag,
             P4_FLAG_SPACED | P4_FLAG_SQUASHED | P4_FLAG_LIFTED);
-    ASSERT_EVAL(P4_P4GenRuleDecorators, "@nonterminal", P4_ExpressionFlag, P4_FLAG_NON_TERMINAL);
-    ASSERT_EVAL(P4_P4GenRuleDecorators, "@whatever", P4_ExpressionFlag, 0);
+    ASSERT_EVAL(P4_PegRuleRuleDecorators, "@nonterminal", P4_ExpressionFlag, P4_FLAG_NON_TERMINAL);
+    ASSERT_EVAL(P4_PegRuleRuleDecorators, "@whatever", P4_ExpressionFlag, 0);
 }
 
 void test_eval_num(void) {
-    ASSERT_EVAL(P4_P4GenNumber, "0", long, 0);
-    ASSERT_EVAL(P4_P4GenNumber, "1", long, 1);
-    ASSERT_EVAL(P4_P4GenNumber, "12", long, 12);
-    ASSERT_EVAL(P4_P4GenNumber, "999", long, 999);
-    ASSERT_EVAL(P4_P4GenNumber, "10000", long, 10000);
+    ASSERT_EVAL(P4_PegRuleNumber, "0", long, 0);
+    ASSERT_EVAL(P4_PegRuleNumber, "1", long, 1);
+    ASSERT_EVAL(P4_PegRuleNumber, "12", long, 12);
+    ASSERT_EVAL(P4_PegRuleNumber, "999", long, 999);
+    ASSERT_EVAL(P4_PegRuleNumber, "10000", long, 10000);
 }
 
 void test_eval_char(void) {
-    ASSERT_EVAL(P4_P4GenChar, "a", P4_Rune, 'a');
-    ASSERT_EVAL(P4_P4GenChar, "A", P4_Rune, 'A');
-    ASSERT_EVAL(P4_P4GenChar, "\\b", P4_Rune, '\b');
-    ASSERT_EVAL(P4_P4GenChar, "\\t", P4_Rune, '\t');
-    ASSERT_EVAL(P4_P4GenChar, "\\n", P4_Rune, '\n');
-    ASSERT_EVAL(P4_P4GenChar, "\\f", P4_Rune, '\f');
-    ASSERT_EVAL(P4_P4GenChar, "\\r", P4_Rune, '\r');
-    ASSERT_EVAL(P4_P4GenChar, "\\\\", P4_Rune, '\\');
-    ASSERT_EVAL(P4_P4GenChar, "ç", P4_Rune, 0x00e7);
-    ASSERT_EVAL(P4_P4GenChar, "Ç", P4_Rune, 0x00C7);
-    ASSERT_EVAL(P4_P4GenChar, "你", P4_Rune, 0x4f60); /* https://www.compart.com/en/unicode/U+4F60 */
-    ASSERT_EVAL(P4_P4GenChar, "🐷", P4_Rune, 0x1f437); /* https://www.compart.com/en/unicode/U+1F437 */
-    ASSERT_EVAL(P4_P4GenChar, "\\u4f60", P4_Rune, 0x4f60);
-    ASSERT_EVAL(P4_P4GenChar, "\\u0041", P4_Rune, 'A');
-    ASSERT_EVAL(P4_P4GenChar, "\\u0061", P4_Rune, 'a');
-    ASSERT_EVAL(P4_P4GenChar, "\\u000a", P4_Rune, '\n');
-    ASSERT_EVAL(P4_P4GenChar, "\\u000A", P4_Rune, '\n');
+    ASSERT_EVAL(P4_PegRuleChar, "a", P4_Rune, 'a');
+    ASSERT_EVAL(P4_PegRuleChar, "A", P4_Rune, 'A');
+    ASSERT_EVAL(P4_PegRuleChar, "\\b", P4_Rune, '\b');
+    ASSERT_EVAL(P4_PegRuleChar, "\\t", P4_Rune, '\t');
+    ASSERT_EVAL(P4_PegRuleChar, "\\n", P4_Rune, '\n');
+    ASSERT_EVAL(P4_PegRuleChar, "\\f", P4_Rune, '\f');
+    ASSERT_EVAL(P4_PegRuleChar, "\\r", P4_Rune, '\r');
+    ASSERT_EVAL(P4_PegRuleChar, "\\\\", P4_Rune, '\\');
+    ASSERT_EVAL(P4_PegRuleChar, "ç", P4_Rune, 0x00e7);
+    ASSERT_EVAL(P4_PegRuleChar, "Ç", P4_Rune, 0x00C7);
+    ASSERT_EVAL(P4_PegRuleChar, "你", P4_Rune, 0x4f60); /* https://www.compart.com/en/unicode/U+4F60 */
+    ASSERT_EVAL(P4_PegRuleChar, "🐷", P4_Rune, 0x1f437); /* https://www.compart.com/en/unicode/U+1F437 */
+    ASSERT_EVAL(P4_PegRuleChar, "\\u4f60", P4_Rune, 0x4f60);
+    ASSERT_EVAL(P4_PegRuleChar, "\\u0041", P4_Rune, 'A');
+    ASSERT_EVAL(P4_PegRuleChar, "\\u0061", P4_Rune, 'a');
+    ASSERT_EVAL(P4_PegRuleChar, "\\u000a", P4_Rune, '\n');
+    ASSERT_EVAL(P4_PegRuleChar, "\\u000A", P4_Rune, '\n');
 }
 
 #define ASSERT_EVAL_LITERAL(entry, input, expect_lit, expect_sensitive) do { \
@@ -314,27 +314,27 @@ void test_eval_char(void) {
 } while (0);
 
 void test_eval_literal(void) {
-    ASSERT_EVAL_LITERAL(P4_P4GenLiteral, "\"a\"", "a", true);
-    ASSERT_EVAL_LITERAL(P4_P4GenLiteral, "\"hello world\"", "hello world", true);
-    ASSERT_EVAL_LITERAL(P4_P4GenLiteral, "\"你好, World\"", "你好, World", true);
-    ASSERT_EVAL_LITERAL(P4_P4GenLiteral, "\"Peppa PEG 🐷\"", "Peppa PEG 🐷", true);
-    ASSERT_EVAL_LITERAL(P4_P4GenLiteral, "\"\\u4f60\\u597d, world\"", "你好, world", true);
-    ASSERT_EVAL_LITERAL(P4_P4GenLiteral, "\"\\n\"", "\n", true);
-    ASSERT_EVAL_LITERAL(P4_P4GenLiteral, "\"\\r\"", "\r", true);
-    ASSERT_EVAL_LITERAL(P4_P4GenLiteral, "\"\\t\"", "\t", true);
-    ASSERT_EVAL_LITERAL(P4_P4GenLiteral, "\"   \"", "   ", true);
+    ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"a\"", "a", true);
+    ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"hello world\"", "hello world", true);
+    ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"你好, World\"", "你好, World", true);
+    ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"Peppa PEG 🐷\"", "Peppa PEG 🐷", true);
+    ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"\\u4f60\\u597d, world\"", "你好, world", true);
+    ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"\\n\"", "\n", true);
+    ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"\\r\"", "\r", true);
+    ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"\\t\"", "\t", true);
+    ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"   \"", "   ", true);
 }
 
 void test_eval_insensitive(void) {
-    ASSERT_EVAL_LITERAL(P4_P4GenInsensitiveLiteral, "i\"a\"", "a", false);
-    ASSERT_EVAL_LITERAL(P4_P4GenInsensitiveLiteral, "i\"hello world\"", "hello world", false);
-    ASSERT_EVAL_LITERAL(P4_P4GenInsensitiveLiteral, "i\"你好, World\"", "你好, World", false);
-    ASSERT_EVAL_LITERAL(P4_P4GenInsensitiveLiteral, "i\"Peppa PEG 🐷\"", "Peppa PEG 🐷", false);
-    ASSERT_EVAL_LITERAL(P4_P4GenInsensitiveLiteral, "i\"\\u4f60\\u597d, world\"", "你好, world", false);
-    ASSERT_EVAL_LITERAL(P4_P4GenInsensitiveLiteral, "i\"\\n\"", "\n", false);
-    ASSERT_EVAL_LITERAL(P4_P4GenInsensitiveLiteral, "i\"\\r\"", "\r", false);
-    ASSERT_EVAL_LITERAL(P4_P4GenInsensitiveLiteral, "i\"\\t\"", "\t", false);
-    ASSERT_EVAL_LITERAL(P4_P4GenInsensitiveLiteral, "i\"   \"", "   ", false);
+    ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"a\"", "a", false);
+    ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"hello world\"", "hello world", false);
+    ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"你好, World\"", "你好, World", false);
+    ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"Peppa PEG 🐷\"", "Peppa PEG 🐷", false);
+    ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"\\u4f60\\u597d, world\"", "你好, world", false);
+    ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"\\n\"", "\n", false);
+    ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"\\r\"", "\r", false);
+    ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"\\t\"", "\t", false);
+    ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"   \"", "   ", false);
 }
 
 #define ASSERT_EVAL_RANGE(entry, input, expect_lower, expect_upper) do { \
@@ -348,11 +348,11 @@ void test_eval_insensitive(void) {
 } while (0);
 
 void test_eval_range(void) {
-    ASSERT_EVAL_RANGE(P4_P4GenRange, "[0-9]", '0', '9');
-    ASSERT_EVAL_RANGE(P4_P4GenRange, "[a-z]", 'a', 'z');
-    ASSERT_EVAL_RANGE(P4_P4GenRange, "[A-Z]", 'A', 'Z');
-    ASSERT_EVAL_RANGE(P4_P4GenRange, "[\\u0001-\\uffff]", 0x1, 0xffff);
-    ASSERT_EVAL_RANGE(P4_P4GenRange, "[你-好]", 0x4f60, 0x597d);
+    ASSERT_EVAL_RANGE(P4_PegRuleRange, "[0-9]", '0', '9');
+    ASSERT_EVAL_RANGE(P4_PegRuleRange, "[a-z]", 'a', 'z');
+    ASSERT_EVAL_RANGE(P4_PegRuleRange, "[A-Z]", 'A', 'Z');
+    ASSERT_EVAL_RANGE(P4_PegRuleRange, "[\\u0001-\\uffff]", 0x1, 0xffff);
+    ASSERT_EVAL_RANGE(P4_PegRuleRange, "[你-好]", 0x4f60, 0x597d);
 }
 
 #define ASSERT_EVAL_CONTAINER(entry, input, expect_kind, expect_count) do { \
@@ -372,13 +372,13 @@ void test_eval_range(void) {
 } while (0);
 
 void test_eval_sequence(void) {
-    ASSERT_EVAL_CONTAINER(P4_P4GenSequence, "\"a\" \"b\" \"c\"", P4_Sequence, 3);
-    ASSERT_EVAL_CONTAINER(P4_P4GenSequence, "\"0x\" [1-9]", P4_Sequence, 2);
+    ASSERT_EVAL_CONTAINER(P4_PegRuleSequence, "\"a\" \"b\" \"c\"", P4_Sequence, 3);
+    ASSERT_EVAL_CONTAINER(P4_PegRuleSequence, "\"0x\" [1-9]", P4_Sequence, 2);
 }
 
 void test_eval_choice(void) {
-    ASSERT_EVAL_CONTAINER(P4_P4GenChoice, "\"a\" / \"b\" / \"c\"", P4_Choice, 3);
-    ASSERT_EVAL_CONTAINER(P4_P4GenChoice, "\"0x\" / [1-9]", P4_Choice, 2);
+    ASSERT_EVAL_CONTAINER(P4_PegRuleChoice, "\"a\" / \"b\" / \"c\"", P4_Choice, 3);
+    ASSERT_EVAL_CONTAINER(P4_PegRuleChoice, "\"0x\" / [1-9]", P4_Choice, 2);
 }
 
 #define ASSERT_EVAL_LOOKAHEAD(entry, input, expect_kind) do { \
@@ -392,13 +392,13 @@ void test_eval_choice(void) {
 } while (0);
 
 void test_eval_positive(void) {
-    ASSERT_EVAL_LOOKAHEAD(P4_P4GenPositive, "& \"a\"", P4_Positive);
-    ASSERT_EVAL_LOOKAHEAD(P4_P4GenPositive, "& [0-9]", P4_Positive);
+    ASSERT_EVAL_LOOKAHEAD(P4_PegRulePositive, "& \"a\"", P4_Positive);
+    ASSERT_EVAL_LOOKAHEAD(P4_PegRulePositive, "& [0-9]", P4_Positive);
 }
 
 void test_eval_negative(void) {
-    ASSERT_EVAL_LOOKAHEAD(P4_P4GenNegative, "! \"a\"", P4_Negative);
-    ASSERT_EVAL_LOOKAHEAD(P4_P4GenNegative, "! [0-9]", P4_Negative);
+    ASSERT_EVAL_LOOKAHEAD(P4_PegRuleNegative, "! \"a\"", P4_Negative);
+    ASSERT_EVAL_LOOKAHEAD(P4_PegRuleNegative, "! [0-9]", P4_Negative);
 }
 
 #define ASSERT_EVAL_REPEAT(entry, input, min, max) do { \
@@ -414,13 +414,13 @@ void test_eval_negative(void) {
 } while (0);
 
 void test_eval_repeat(void) {
-    ASSERT_EVAL_REPEAT(P4_P4GenRepeat, "\"a\"*", 0, SIZE_MAX);
-    ASSERT_EVAL_REPEAT(P4_P4GenRepeat, "\"a\"?", 0, 1);
-    ASSERT_EVAL_REPEAT(P4_P4GenRepeat, "\"a\"+", 1, SIZE_MAX);
-    ASSERT_EVAL_REPEAT(P4_P4GenRepeat, "\"a\"{2,3}", 2, 3);
-    ASSERT_EVAL_REPEAT(P4_P4GenRepeat, "\"a\"{2,}", 2, SIZE_MAX);
-    ASSERT_EVAL_REPEAT(P4_P4GenRepeat, "\"a\"{,3}", 0, 3);
-    ASSERT_EVAL_REPEAT(P4_P4GenRepeat, "\"a\"{3}", 3, 3);
+    ASSERT_EVAL_REPEAT(P4_PegRuleRepeat, "\"a\"*", 0, SIZE_MAX);
+    ASSERT_EVAL_REPEAT(P4_PegRuleRepeat, "\"a\"?", 0, 1);
+    ASSERT_EVAL_REPEAT(P4_PegRuleRepeat, "\"a\"+", 1, SIZE_MAX);
+    ASSERT_EVAL_REPEAT(P4_PegRuleRepeat, "\"a\"{2,3}", 2, 3);
+    ASSERT_EVAL_REPEAT(P4_PegRuleRepeat, "\"a\"{2,}", 2, SIZE_MAX);
+    ASSERT_EVAL_REPEAT(P4_PegRuleRepeat, "\"a\"{,3}", 0, 3);
+    ASSERT_EVAL_REPEAT(P4_PegRuleRepeat, "\"a\"{3}", 3, 3);
 }
 
 #define ASSERT_EVAL_REFERENCE(entry, input, expect_ref_id) do { \
@@ -435,9 +435,9 @@ void test_eval_repeat(void) {
 } while (0);
 
 void test_eval_reference(void) {
-    ASSERT_EVAL_REFERENCE(P4_P4GenReference, "a", SIZE_MAX);
-    ASSERT_EVAL_REFERENCE(P4_P4GenReference, "xyz", SIZE_MAX);
-    ASSERT_EVAL_REFERENCE(P4_P4GenReference, "CONST", SIZE_MAX);
+    ASSERT_EVAL_REFERENCE(P4_PegRuleReference, "a", SIZE_MAX);
+    ASSERT_EVAL_REFERENCE(P4_PegRuleReference, "xyz", SIZE_MAX);
+    ASSERT_EVAL_REFERENCE(P4_PegRuleReference, "CONST", SIZE_MAX);
 }
 
 P4_String test_grammar_rule_to_name(P4_RuleID id) {

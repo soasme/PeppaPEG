@@ -15,34 +15,34 @@ P4_Error P4_PegEval(P4_Token* token, void* result);
 
 typedef enum {
     P4_PegGrammar         = 1,
-    P4_P4GenRule            = 2,
-    P4_P4GenRuleDecorators  = 3,
-    P4_P4GenRuleName        = 4,
-    P4_P4GenExpression,
-    P4_P4GenPrimary,
-    P4_P4GenDecorator,
-    P4_P4GenIdentifier,
-    P4_P4GenLiteral,
-    P4_P4GenInsensitiveLiteral,
-    P4_P4GenRange,
-    P4_P4GenReference,
-    P4_P4GenPositive,
-    P4_P4GenNegative,
-    P4_P4GenSequence,
-    P4_P4GenChoice,
-    P4_P4GenBackReference,
-    P4_P4GenRepeat,
-    P4_P4GenRepeatOnceOrMore,
-    P4_P4GenRepeatZeroOrMore,
-    P4_P4GenRepeatZeroOrOnce,
-    P4_P4GenRepeatMin,
-    P4_P4GenRepeatMax,
-    P4_P4GenRepeatExact,
-    P4_P4GenRepeatMinMax,
-    P4_P4GenNumber,
-    P4_P4GenChar,
-    P4_P4GenWhitespace,
-} P4_P4GenRuleID;
+    P4_PegRuleRule            = 2,
+    P4_PegRuleRuleDecorators  = 3,
+    P4_PegRuleRuleName        = 4,
+    P4_PegRuleExpression,
+    P4_PegRulePrimary,
+    P4_PegRuleDecorator,
+    P4_PegRuleIdentifier,
+    P4_PegRuleLiteral,
+    P4_PegRuleInsensitiveLiteral,
+    P4_PegRuleRange,
+    P4_PegRuleReference,
+    P4_PegRulePositive,
+    P4_PegRuleNegative,
+    P4_PegRuleSequence,
+    P4_PegRuleChoice,
+    P4_PegRuleBackReference,
+    P4_PegRuleRepeat,
+    P4_PegRuleRepeatOnceOrMore,
+    P4_PegRuleRepeatZeroOrMore,
+    P4_PegRuleRepeatZeroOrOnce,
+    P4_PegRuleRepeatMin,
+    P4_PegRuleRepeatMax,
+    P4_PegRuleRepeatExact,
+    P4_PegRuleRepeatMinMax,
+    P4_PegRuleNumber,
+    P4_PegRuleChar,
+    P4_PegRuleWhitespace,
+} P4_PegRuleRuleID;
 
 P4_Grammar* P4_CreatePegGrammar ();
 P4_String   P4_PegKindToName(P4_RuleID);
@@ -51,7 +51,7 @@ P4_Grammar* P4_CreatePegGrammar () {
     P4_Grammar* grammar = P4_CreateGrammar();
     P4_Error err = 0;
 
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_P4GenNumber, 2,
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_PegRuleNumber, 2,
         P4_CreateLiteral("0", true),
         P4_CreateSequenceWithMembers(2,
             P4_CreateRange('1', '9', 1),
@@ -60,10 +60,10 @@ P4_Grammar* P4_CreatePegGrammar () {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenNumber, P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_PegRuleNumber, P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
         goto finalize;
 
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_P4GenChar, 4,
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_PegRuleChar, 4,
         P4_CreateRange(0x20, 0x21, 1), /* Can't be 0x22: double quote " */
         P4_CreateRange(0x23, 0x5b, 1), /* Can't be 0x5c: escape leading \ */
         P4_CreateRange(0x5d, 0x10ffff, 1),
@@ -93,33 +93,33 @@ P4_Grammar* P4_CreatePegGrammar () {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenChar, P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_PegRuleChar, P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenLiteral, 3,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleLiteral, 3,
         P4_CreateLiteral("\"", true),
-        P4_CreateZeroOrMore(P4_CreateReference(P4_P4GenChar)),
+        P4_CreateZeroOrMore(P4_CreateReference(P4_PegRuleChar)),
         P4_CreateLiteral("\"", true)
     ))
         goto finalize;
 
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenLiteral, P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_PegRuleLiteral, P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenRange, 6,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleRange, 6,
         P4_CreateLiteral("[", true),
-        P4_CreateReference(P4_P4GenChar),
+        P4_CreateReference(P4_PegRuleChar),
         P4_CreateLiteral("-", true),
-        P4_CreateReference(P4_P4GenChar),
+        P4_CreateReference(P4_PegRuleChar),
         P4_CreateZeroOrOnce(P4_CreateSequenceWithMembers(2,
             P4_CreateLiteral("..", true),
-            P4_CreateReference(P4_P4GenNumber)
+            P4_CreateReference(P4_PegRuleNumber)
         )),
         P4_CreateLiteral("]", true)
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenReference, 2,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleReference, 2,
         P4_CreateChoiceWithMembers(3,
             P4_CreateRange('a', 'z', 1),
             P4_CreateRange('A', 'Z', 1),
@@ -136,137 +136,137 @@ P4_Grammar* P4_CreatePegGrammar () {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenReference, P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_PegRuleReference, P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenPositive, 2,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRulePositive, 2,
         P4_CreateLiteral("&", true),
-        P4_CreateReference(P4_P4GenPrimary)
+        P4_CreateReference(P4_PegRulePrimary)
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenNegative, 2,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleNegative, 2,
         P4_CreateLiteral("!", true),
-        P4_CreateReference(P4_P4GenPrimary)
+        P4_CreateReference(P4_PegRulePrimary)
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddLiteral(grammar, P4_P4GenRepeatOnceOrMore, "+", true))
+    if (P4_Ok != P4_AddLiteral(grammar, P4_PegRuleRepeatOnceOrMore, "+", true))
         goto finalize;
 
-    if (P4_Ok != P4_AddLiteral(grammar, P4_P4GenRepeatZeroOrMore, "*", true))
+    if (P4_Ok != P4_AddLiteral(grammar, P4_PegRuleRepeatZeroOrMore, "*", true))
         goto finalize;
 
-    if (P4_Ok != P4_AddLiteral(grammar, P4_P4GenRepeatZeroOrOnce, "?", true))
+    if (P4_Ok != P4_AddLiteral(grammar, P4_PegRuleRepeatZeroOrOnce, "?", true))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenRepeatMin, 4,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleRepeatMin, 4,
         P4_CreateLiteral("{", true),
-        P4_CreateReference(P4_P4GenNumber),
+        P4_CreateReference(P4_PegRuleNumber),
         P4_CreateLiteral(",", true),
         P4_CreateLiteral("}", true)
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenRepeatMax, 4,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleRepeatMax, 4,
         P4_CreateLiteral("{", true),
         P4_CreateLiteral(",", true),
-        P4_CreateReference(P4_P4GenNumber),
+        P4_CreateReference(P4_PegRuleNumber),
         P4_CreateLiteral("}", true)
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenRepeatMinMax, 5,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleRepeatMinMax, 5,
         P4_CreateLiteral("{", true),
-        P4_CreateReference(P4_P4GenNumber),
+        P4_CreateReference(P4_PegRuleNumber),
         P4_CreateLiteral(",", true),
-        P4_CreateReference(P4_P4GenNumber),
+        P4_CreateReference(P4_PegRuleNumber),
         P4_CreateLiteral("}", true)
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenRepeatExact, 3,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleRepeatExact, 3,
         P4_CreateLiteral("{", true),
-        P4_CreateReference(P4_P4GenNumber),
+        P4_CreateReference(P4_PegRuleNumber),
         P4_CreateLiteral("}", true)
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenRepeat, 2,
-        P4_CreateReference(P4_P4GenPrimary),
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleRepeat, 2,
+        P4_CreateReference(P4_PegRulePrimary),
         P4_CreateZeroOrOnce(
             P4_CreateChoiceWithMembers(7,
-                P4_CreateReference(P4_P4GenRepeatOnceOrMore),
-                P4_CreateReference(P4_P4GenRepeatZeroOrMore),
-                P4_CreateReference(P4_P4GenRepeatZeroOrOnce),
-                P4_CreateReference(P4_P4GenRepeatExact),
-                P4_CreateReference(P4_P4GenRepeatMinMax),
-                P4_CreateReference(P4_P4GenRepeatMin),
-                P4_CreateReference(P4_P4GenRepeatMax)
+                P4_CreateReference(P4_PegRuleRepeatOnceOrMore),
+                P4_CreateReference(P4_PegRuleRepeatZeroOrMore),
+                P4_CreateReference(P4_PegRuleRepeatZeroOrOnce),
+                P4_CreateReference(P4_PegRuleRepeatExact),
+                P4_CreateReference(P4_PegRuleRepeatMinMax),
+                P4_CreateReference(P4_PegRuleRepeatMin),
+                P4_CreateReference(P4_PegRuleRepeatMax)
             )
         )
     ))
         goto finalize;
 
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenRepeat, P4_FLAG_NON_TERMINAL))
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_PegRuleRepeat, P4_FLAG_NON_TERMINAL))
         goto finalize;
 
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_P4GenPrimary, 7,
-        P4_CreateReference(P4_P4GenLiteral),
-        P4_CreateReference(P4_P4GenInsensitiveLiteral),
-        P4_CreateReference(P4_P4GenRange),
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_PegRulePrimary, 7,
+        P4_CreateReference(P4_PegRuleLiteral),
+        P4_CreateReference(P4_PegRuleInsensitiveLiteral),
+        P4_CreateReference(P4_PegRuleRange),
         P4_CreateSequenceWithMembers(2,
-            P4_CreateReference(P4_P4GenReference),
+            P4_CreateReference(P4_PegRuleReference),
             P4_CreateNegative(P4_CreateLiteral("=", true))
         ),
-        P4_CreateReference(P4_P4GenPositive),
-        P4_CreateReference(P4_P4GenNegative),
+        P4_CreateReference(P4_PegRulePositive),
+        P4_CreateReference(P4_PegRuleNegative),
         P4_CreateSequenceWithMembers(3,
             P4_CreateLiteral("(", true),
-            P4_CreateReference(P4_P4GenChoice),
+            P4_CreateReference(P4_PegRuleChoice),
             P4_CreateLiteral(")", true)
         )
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenInsensitiveLiteral, 2,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleInsensitiveLiteral, 2,
         P4_CreateLiteral("i", true),
-        P4_CreateReference(P4_P4GenLiteral)
+        P4_CreateReference(P4_PegRuleLiteral)
     ))
         goto finalize;
 
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenInsensitiveLiteral, P4_FLAG_TIGHT))
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_PegRuleInsensitiveLiteral, P4_FLAG_TIGHT))
         goto finalize;
 
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenPrimary, P4_FLAG_LIFTED))
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_PegRulePrimary, P4_FLAG_LIFTED))
         goto finalize;
 
-    if (P4_Ok != P4_AddJoin(grammar, P4_P4GenChoice, "/", P4_P4GenSequence))
+    if (P4_Ok != P4_AddJoin(grammar, P4_PegRuleChoice, "/", P4_PegRuleSequence))
         goto finalize;
 
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenChoice, P4_FLAG_NON_TERMINAL))
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_PegRuleChoice, P4_FLAG_NON_TERMINAL))
         goto finalize;
 
-    if (P4_Ok != P4_AddOnceOrMore(grammar, P4_P4GenSequence,
-                P4_CreateReference(P4_P4GenRepeat)))
+    if (P4_Ok != P4_AddOnceOrMore(grammar, P4_PegRuleSequence,
+                P4_CreateReference(P4_PegRuleRepeat)))
         goto finalize;
 
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenSequence, P4_FLAG_NON_TERMINAL))
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_PegRuleSequence, P4_FLAG_NON_TERMINAL))
         goto finalize;
 
-    if (P4_Ok != P4_AddReference(grammar, P4_P4GenExpression, P4_P4GenChoice))
+    if (P4_Ok != P4_AddReference(grammar, P4_PegRuleExpression, P4_PegRuleChoice))
         goto finalize;
 
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenExpression, P4_FLAG_LIFTED))
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_PegRuleExpression, P4_FLAG_LIFTED))
         goto finalize;
 
-    if (P4_Ok != P4_AddReference(grammar, P4_P4GenRuleName, P4_P4GenReference))
+    if (P4_Ok != P4_AddReference(grammar, P4_PegRuleRuleName, P4_PegRuleReference))
         goto finalize;
 
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenRuleName, P4_FLAG_SQUASHED))
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_PegRuleRuleName, P4_FLAG_SQUASHED))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenDecorator, 2,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleDecorator, 2,
         P4_CreateLiteral("@", true),
         P4_CreateChoiceWithMembers(6,
             P4_CreateLiteral("squashed", true),
@@ -279,24 +279,24 @@ P4_Grammar* P4_CreatePegGrammar () {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddZeroOrMore(grammar, P4_P4GenRuleDecorators,
-            P4_CreateReference(P4_P4GenDecorator)
+    if (P4_Ok != P4_AddZeroOrMore(grammar, P4_PegRuleRuleDecorators,
+            P4_CreateReference(P4_PegRuleDecorator)
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenRule, 5,
-        P4_CreateReference(P4_P4GenRuleDecorators),
-        P4_CreateReference(P4_P4GenRuleName),
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleRule, 5,
+        P4_CreateReference(P4_PegRuleRuleDecorators),
+        P4_CreateReference(P4_PegRuleRuleName),
         P4_CreateLiteral("=", true),
-        P4_CreateReference(P4_P4GenExpression),
+        P4_CreateReference(P4_PegRuleExpression),
         P4_CreateLiteral(";", true)
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddOnceOrMore(grammar, P4_PegGrammar, P4_CreateReference(P4_P4GenRule)))
+    if (P4_Ok != P4_AddOnceOrMore(grammar, P4_PegGrammar, P4_CreateReference(P4_PegRuleRule)))
         goto finalize;
 
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_P4GenWhitespace, 4,
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_PegRuleWhitespace, 4,
         P4_CreateLiteral(" ", true),
         P4_CreateLiteral("\t", true),
         P4_CreateLiteral("\r", true),
@@ -304,7 +304,7 @@ P4_Grammar* P4_CreatePegGrammar () {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenWhitespace,
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_PegRuleWhitespace,
                 P4_FLAG_LIFTED | P4_FLAG_SPACED))
         goto finalize;
 
@@ -359,28 +359,28 @@ void* P4_ConcatRune(void *str, P4_Rune chr, size_t n) {
 
 P4_String   P4_PegKindToName(P4_RuleID id) {
     switch (id) {
-        case P4_P4GenNumber: return "number";
-        case P4_P4GenChar: return "char";
-        case P4_P4GenLiteral: return "literal";
-        case P4_P4GenInsensitiveLiteral: return "insensitive";
-        case P4_P4GenRange: return "range";
-        case P4_P4GenReference: return "reference";
-        case P4_P4GenPositive: return "positive";
-        case P4_P4GenNegative: return "negative";
-        case P4_P4GenChoice: return "choice";
-        case P4_P4GenSequence: return "sequence";
-        case P4_P4GenRepeat: return "repeat";
-        case P4_P4GenRepeatOnceOrMore: return "onceormore";
-        case P4_P4GenRepeatZeroOrMore: return "zeroormore";
-        case P4_P4GenRepeatZeroOrOnce: return "zerooronce";
-        case P4_P4GenRepeatMin: return "repeatmin";
-        case P4_P4GenRepeatMax: return "repeatmax";
-        case P4_P4GenRepeatMinMax: return "repeatminmax";
-        case P4_P4GenRepeatExact: return "repeatexact";
-        case P4_P4GenRuleName: return "name";
-        case P4_P4GenRuleDecorators: return "decorators";
-        case P4_P4GenDecorator: return "decorator";
-        case P4_P4GenRule: return "rule";
+        case P4_PegRuleNumber: return "number";
+        case P4_PegRuleChar: return "char";
+        case P4_PegRuleLiteral: return "literal";
+        case P4_PegRuleInsensitiveLiteral: return "insensitive";
+        case P4_PegRuleRange: return "range";
+        case P4_PegRuleReference: return "reference";
+        case P4_PegRulePositive: return "positive";
+        case P4_PegRuleNegative: return "negative";
+        case P4_PegRuleChoice: return "choice";
+        case P4_PegRuleSequence: return "sequence";
+        case P4_PegRuleRepeat: return "repeat";
+        case P4_PegRuleRepeatOnceOrMore: return "onceormore";
+        case P4_PegRuleRepeatZeroOrMore: return "zeroormore";
+        case P4_PegRuleRepeatZeroOrOnce: return "zerooronce";
+        case P4_PegRuleRepeatMin: return "repeatmin";
+        case P4_PegRuleRepeatMax: return "repeatmax";
+        case P4_PegRuleRepeatMinMax: return "repeatminmax";
+        case P4_PegRuleRepeatExact: return "repeatexact";
+        case P4_PegRuleRuleName: return "name";
+        case P4_PegRuleRuleDecorators: return "decorators";
+        case P4_PegRuleDecorator: return "decorator";
+        case P4_PegRuleRule: return "rule";
         case P4_PegGrammar: return "grammar";
         default: return "<unknown>";
     }
@@ -655,24 +655,24 @@ P4_Error P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr) {
         return P4_MemoryError;
 
     switch (token->head->next->rule_id) {
-        case P4_P4GenRepeatZeroOrMore: min = 0; max = SIZE_MAX; break;
-        case P4_P4GenRepeatZeroOrOnce: min = 0; max = 1; break;
-        case P4_P4GenRepeatOnceOrMore: min = 1; max = SIZE_MAX; break;
-        case P4_P4GenRepeatMin:
+        case P4_PegRuleRepeatZeroOrMore: min = 0; max = SIZE_MAX; break;
+        case P4_PegRuleRepeatZeroOrOnce: min = 0; max = 1; break;
+        case P4_PegRuleRepeatOnceOrMore: min = 1; max = SIZE_MAX; break;
+        case P4_PegRuleRepeatMin:
             if ((err = P4_PegEvalNumber(token->head->next->head, &min)) != P4_Ok)
                 goto finalize;
             break;
-        case P4_P4GenRepeatMax:
+        case P4_PegRuleRepeatMax:
             if ((err = P4_PegEvalNumber(token->head->next->head, &max)) != P4_Ok)
                 goto finalize;
             break;
-        case P4_P4GenRepeatMinMax:
+        case P4_PegRuleRepeatMinMax:
             if ((err = P4_PegEvalNumber(token->head->next->head, &min)) != P4_Ok)
                 goto finalize;
             if ((err = P4_PegEvalNumber(token->head->next->tail, &max)) != P4_Ok)
                 goto finalize;
             break;
-        case P4_P4GenRepeatExact:
+        case P4_PegRuleRepeatExact:
             if ((err = P4_PegEvalNumber(token->head->next->head, &min)) != P4_Ok)
                 goto finalize;
             max = min;
@@ -759,10 +759,10 @@ P4_Error P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result) {
 
     for (child = token->head; child != NULL; child = child->next) {
         switch (child->rule_id) {
-            case P4_P4GenRuleDecorators:
+            case P4_PegRuleRuleDecorators:
                 err = P4_PegEvalRuleFlags(child, &rule_flag);
                 break;
-            case P4_P4GenRuleName:
+            case P4_PegRuleRuleName:
                 err = P4_PegEvalRuleName(child, &rule_name);
                 break;
             default:
@@ -868,31 +868,31 @@ finalize:
 P4_Error P4_PegEval(P4_Token* token, void* result) {
     P4_Error err = P4_Ok;
     switch (token->rule_id) {
-        case P4_P4GenDecorator:
+        case P4_PegRuleDecorator:
             return P4_PegEvalFlag(token, result);
-        case P4_P4GenRuleDecorators:
+        case P4_PegRuleRuleDecorators:
             return P4_PegEvalRuleFlags(token, result);
-        case P4_P4GenNumber:
+        case P4_PegRuleNumber:
             return P4_PegEvalNumber(token, result);
-        case P4_P4GenChar:
+        case P4_PegRuleChar:
             return P4_PegEvalChar(token, result);
-        case P4_P4GenLiteral:
+        case P4_PegRuleLiteral:
             return P4_PegEvalLiteral(token, result);
-        case P4_P4GenInsensitiveLiteral:
+        case P4_PegRuleInsensitiveLiteral:
             return P4_PegEvalInsensitiveLiteral(token, result);
-        case P4_P4GenRange:
+        case P4_PegRuleRange:
             return P4_PegEvalRange(token, result);
-        case P4_P4GenSequence:
+        case P4_PegRuleSequence:
             return P4_PegEvalSequence(token, result);
-        case P4_P4GenChoice:
+        case P4_PegRuleChoice:
             return P4_PegEvalChoice(token, result);
-        case P4_P4GenPositive:
+        case P4_PegRulePositive:
             return P4_PegEvalPositive(token, result);
-        case P4_P4GenNegative:
+        case P4_PegRuleNegative:
             return P4_PegEvalNegative(token, result);
-        case P4_P4GenRepeat:
+        case P4_PegRuleRepeat:
             return P4_PegEvalRepeat(token, result);
-        case P4_P4GenReference:
+        case P4_PegRuleReference:
             return P4_PegEvalReference(token, result);
         case P4_PegGrammar:
             return P4_PegEvalGrammar(token, result);

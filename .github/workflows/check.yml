@@ -41,12 +41,21 @@ jobs:
     - name: Create Build Environment
       run: cmake -E make_directory ${{github.workspace}}/build
 
-    - name: Configure CMake
+    - name: Configure CMake (CLANG)
       shell: bash
       working-directory: ${{github.workspace}}/build
       run: |
         export CC=${{ matrix.compiler }}
         cmake $GITHUB_WORKSPACE -DENABLE_VALGRIND=Off
+      if: "contains( matrix.compiler, 'clang')"
+
+    - name: Configure CMake (GCC)
+      shell: bash
+      working-directory: ${{github.workspace}}/build
+      run: |
+        export CC=${{ matrix.compiler }}
+        cmake $GITHUB_WORKSPACE -DENABLE_VALGRIND=On
+      if: "contains( matrix.compiler, 'gcc')"
 
     - name: Build Check
       shell: bash

@@ -34,7 +34,7 @@
 - [ ] Any.
 - [ ] Until.
 - [ ] Add a fuzzy testing framework.
-- [ ] Sanitize \u0000 to whitespace for the source input, this happens in creating the source/setting the source size.
+- [ ] Sanitize `\u0000` to whitespace for the source input, this happens in creating the source/setting the source size.
 - [ ] take a look at ohm.
 - [ ] ES5 syntax: https://ohmlang.github.io/editor/#0a9a649c3c630fd0a470ba6cb75393fe
 - [ ] A binary executable for compiling peg to a C library: `p4g compile --lang=c calc.peg`.

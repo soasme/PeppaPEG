@@ -53,7 +53,7 @@ void test_char(void) {
     check_parse_failed(P4_P4GenChar, "\"", P4_MatchError);
 }
 
-void test_string(void) {
+void test_literal(void) {
     check_parse(P4_P4GenLiteral, "\"a\"", "[{\"slice\":[0,3],\"type\":\"literal\"}]");
     check_parse(P4_P4GenLiteral, "\"A\"", "[{\"slice\":[0,3],\"type\":\"literal\"}]");
     check_parse(P4_P4GenLiteral, "\"好\"", "[{\"slice\":[0,5],\"type\":\"literal\"}]");
@@ -62,6 +62,17 @@ void test_string(void) {
     check_parse(P4_P4GenLiteral, "\"\\\"\"", "[{\"slice\":[0,4],\"type\":\"literal\"}]");
     check_parse(P4_P4GenLiteral, "\"\\u0020\"", "[{\"slice\":[0,8],\"type\":\"literal\"}]");
     check_parse(P4_P4GenLiteral, "\"hello world\"", "[{\"slice\":[0,13],\"type\":\"literal\"}]");
+}
+
+void test_insensitive(void) {
+    check_parse(P4_P4GenInsensitiveLiteral, "i\"a\"", "[{\"slice\":[0,4],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
+    check_parse(P4_P4GenInsensitiveLiteral, "i\"A\"", "[{\"slice\":[0,4],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
+    check_parse(P4_P4GenInsensitiveLiteral, "i\"好\"", "[{\"slice\":[0,6],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,6],\"type\":\"literal\"}]}]");
+    check_parse(P4_P4GenInsensitiveLiteral, "i\"👌\"", "[{\"slice\":[0,7],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,7],\"type\":\"literal\"}]}]");
+    check_parse(P4_P4GenInsensitiveLiteral, "i\"\\t\"", "[{\"slice\":[0,5],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,5],\"type\":\"literal\"}]}]");
+    check_parse(P4_P4GenInsensitiveLiteral, "i\"\\\"\"", "[{\"slice\":[0,5],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,5],\"type\":\"literal\"}]}]");
+    check_parse(P4_P4GenInsensitiveLiteral, "i\"\\u0020\"", "[{\"slice\":[0,9],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,9],\"type\":\"literal\"}]}]");
+    check_parse(P4_P4GenInsensitiveLiteral, "i\"hello world\"", "[{\"slice\":[0,14],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,14],\"type\":\"literal\"}]}]");
 }
 
 void test_range(void) {
@@ -314,6 +325,18 @@ void test_eval_literal(void) {
     ASSERT_EVAL_LITERAL(P4_P4GenLiteral, "\"   \"", "   ", true);
 }
 
+void test_eval_insensitive(void) {
+    ASSERT_EVAL_LITERAL(P4_P4GenInsensitiveLiteral, "i\"a\"", "a", false);
+    ASSERT_EVAL_LITERAL(P4_P4GenInsensitiveLiteral, "i\"hello world\"", "hello world", false);
+    ASSERT_EVAL_LITERAL(P4_P4GenInsensitiveLiteral, "i\"你好, World\"", "你好, World", false);
+    ASSERT_EVAL_LITERAL(P4_P4GenInsensitiveLiteral, "i\"Peppa PEG 🐷\"", "Peppa PEG 🐷", false);
+    ASSERT_EVAL_LITERAL(P4_P4GenInsensitiveLiteral, "i\"\\u4f60\\u597d, world\"", "你好, world", false);
+    ASSERT_EVAL_LITERAL(P4_P4GenInsensitiveLiteral, "i\"\\n\"", "\n", false);
+    ASSERT_EVAL_LITERAL(P4_P4GenInsensitiveLiteral, "i\"\\r\"", "\r", false);
+    ASSERT_EVAL_LITERAL(P4_P4GenInsensitiveLiteral, "i\"\\t\"", "\t", false);
+    ASSERT_EVAL_LITERAL(P4_P4GenInsensitiveLiteral, "i\"   \"", "   ", false);
+}
+
 #define ASSERT_EVAL_RANGE(entry, input, expect_lower, expect_upper) do { \
         SETUP_EVAL((entry), (input)); \
         P4_Expression* value = 0; \
@@ -447,10 +470,12 @@ P4_String test_grammar_rule_to_name(P4_RuleID id) {
 } while (0);
 
 void test_eval_grammar(void) {
-    ASSERT_EVAL_GRAMMAR("a = \"1\";", "a", "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"1\";", "R1", "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"こんにちは世界\";", "R1", "こんにちは世界", P4_Ok, "[{\"slice\":[0,21],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"你好，世界\";", "R1", "你好，世界", P4_Ok, "[{\"slice\":[0,15],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"نامهای\";", "R1", "نامهای", P4_Ok, "[{\"slice\":[0,12],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = i\"hello\";", "R1", "hello", P4_Ok, "[{\"slice\":[0,5],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = i\"hello\";", "R1", "HELLO", P4_Ok, "[{\"slice\":[0,5],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = (\"\\n\" / \"\\r\")+;", "R1", "\r\n\r\n", P4_Ok, "[{\"slice\":[0,4],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "1A9F", P4_Ok, "[{\"slice\":[0,4],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "FFFFFF", P4_Ok, "[{\"slice\":[0,6],\"type\":\"R1\"}]");
@@ -460,6 +485,8 @@ void test_eval_grammar(void) {
     ASSERT_EVAL_GRAMMAR("R1 = !\"b\" [a-f];", "R1", "b", P4_MatchError, "[]");
     ASSERT_EVAL_GRAMMAR("R1 = &\"a\" \"apple\";", "R1", "apple", P4_Ok, "[{\"slice\":[0,5],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = &\"b\" \"apple\";", "R1", "beef", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = &\"a\" i\"apple\";", "R1", "aPPLE", P4_Ok, "[{\"slice\":[0,5],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = &\"a\" i\"apple\";", "R1", "APPLE", P4_MatchError, "[]");
 
     ASSERT_EVAL_GRAMMAR(
         "R1 = R2; "
@@ -643,7 +670,8 @@ int main(void) {
 
     RUN_TEST(test_number);
     RUN_TEST(test_char);
-    RUN_TEST(test_string);
+    RUN_TEST(test_literal);
+    RUN_TEST(test_insensitive);
     RUN_TEST(test_range);
     RUN_TEST(test_reference);
     RUN_TEST(test_positive);
@@ -662,6 +690,7 @@ int main(void) {
     RUN_TEST(test_eval_num);
     RUN_TEST(test_eval_char);
     RUN_TEST(test_eval_literal);
+    RUN_TEST(test_eval_insensitive);
     RUN_TEST(test_eval_range);
     RUN_TEST(test_eval_sequence);
     RUN_TEST(test_eval_choice);

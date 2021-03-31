@@ -23,6 +23,7 @@ typedef enum {
     P4_P4GenDecorator,
     P4_P4GenIdentifier,
     P4_P4GenLiteral,
+    P4_P4GenInsensitiveLiteral,
     P4_P4GenRange,
     P4_P4GenReference,
     P4_P4GenPositive,
@@ -210,8 +211,9 @@ P4_Grammar* P4_CreateP4GenGrammar () {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenRepeat, P4_FLAG_NON_TERMINAL))
         goto finalize;
 
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_P4GenPrimary, 6,
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_P4GenPrimary, 7,
         P4_CreateReference(P4_P4GenLiteral),
+        P4_CreateReference(P4_P4GenInsensitiveLiteral),
         P4_CreateReference(P4_P4GenRange),
         P4_CreateSequenceWithMembers(2,
             P4_CreateReference(P4_P4GenReference),
@@ -225,6 +227,15 @@ P4_Grammar* P4_CreateP4GenGrammar () {
             P4_CreateLiteral(")", true)
         )
     ))
+        goto finalize;
+
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_P4GenInsensitiveLiteral, 2,
+        P4_CreateLiteral("i", true),
+        P4_CreateReference(P4_P4GenLiteral)
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenInsensitiveLiteral, P4_FLAG_TIGHT))
         goto finalize;
 
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_P4GenPrimary, P4_FLAG_LIFTED))
@@ -351,6 +362,7 @@ P4_String   P4_P4GenKindToName(P4_RuleID id) {
         case P4_P4GenNumber: return "number";
         case P4_P4GenChar: return "char";
         case P4_P4GenLiteral: return "literal";
+        case P4_P4GenInsensitiveLiteral: return "insensitive";
         case P4_P4GenRange: return "range";
         case P4_P4GenReference: return "reference";
         case P4_P4GenPositive: return "positive";
@@ -487,6 +499,17 @@ P4_Error P4_P4GenEvalLiteral(P4_Token* token, P4_Expression** expr) {
 finalize:
     free(lit);
     return err;
+}
+
+P4_Error P4_P4GenEvalInsensitiveLiteral(P4_Token* token, P4_Expression** expr) {
+    P4_Error err = P4_Ok;
+
+    if ((err = P4_P4GenEvalLiteral(token->head, expr)) != P4_Ok)
+        return err;
+
+    (*expr)->sensitive = false;
+
+    return P4_Ok;
 }
 
 P4_Error P4_P4GenEvalRange(P4_Token* token, P4_Expression** expr) {
@@ -855,6 +878,8 @@ P4_Error P4_P4GenEval(P4_Token* token, void* result) {
             return P4_P4GenEvalChar(token, result);
         case P4_P4GenLiteral:
             return P4_P4GenEvalLiteral(token, result);
+        case P4_P4GenInsensitiveLiteral:
+            return P4_P4GenEvalInsensitiveLiteral(token, result);
         case P4_P4GenRange:
             return P4_P4GenEvalRange(token, result);
         case P4_P4GenSequence:

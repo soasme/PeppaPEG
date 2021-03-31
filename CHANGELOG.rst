@@ -1,10 +1,10 @@
 Change Log
 ===========
 
-Not Yet Released
---------------------
+1.9.0 (1 Apr, 2021)
+-------------------
 
-* [Test]: Support specifying a name for a grammar rule. `#55 <https://github.com/soasme/PeppaPEG/pull/55>`_
+* [Test]: Enable Valgrind for gcc check. `#55 <https://github.com/soasme/PeppaPEG/pull/55>`_
 * [Feature]: Support specifying a name for a grammar rule. `#53 <https://github.com/soasme/PeppaPEG/pull/53>`_
 * [Feature]: Added Lineno and Col Offset for `P4_Tokens`. `#52 <https://github.com/soasme/PeppaPEG/pull/52>`_
 * [Feature]: Support parsing a subset of source input (`P4_SetSourceSlice`). `#51 <https://github.com/soasme/PeppaPEG/pull/51/>`_

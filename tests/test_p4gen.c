@@ -423,7 +423,7 @@ P4_String test_grammar_rule_to_name(P4_RuleID id) {
     return name;
 }
 
-#define ASSERT_EVAL_GRAMMAR(peg_rules, entry_name, source_code, ast) do { \
+#define ASSERT_EVAL_GRAMMAR(peg_rules, entry_name, source_code, parse_code, ast) do { \
     SETUP_EVAL((P4_P4GenGrammar), (peg_rules)); \
     P4_Grammar* peg_grammar = 0; \
     TEST_ASSERT_NOT_NULL_MESSAGE( root, "peg rule should be correctly parsed"); \
@@ -433,7 +433,7 @@ P4_String test_grammar_rule_to_name(P4_RuleID id) {
     TEST_ASSERT_NOT_NULL_MESSAGE( entry_expr, "peg grammar entry should be successfully resolved." ); \
     P4_Source* input_source = P4_CreateSource((source_code), (entry_expr)->id); \
     TEST_ASSERT_NOT_NULL_MESSAGE( input_source, "source code should be correctly created." ); \
-    TEST_ASSERT_EQUAL_MESSAGE( P4_Ok, P4_Parse(peg_grammar, input_source), "source code should be correctly parsed"); \
+    TEST_ASSERT_EQUAL_MESSAGE( (parse_code), P4_Parse(peg_grammar, input_source), "source code should be correctly parsed"); \
     P4_Token* ast_token = P4_GetSourceAst(input_source); \
     FILE *f = fopen("check.json","w"); \
     P4_JsonifySourceAst(f, ast_token, test_grammar_rule_to_name); \
@@ -447,12 +447,25 @@ P4_String test_grammar_rule_to_name(P4_RuleID id) {
 } while (0);
 
 void test_eval_grammar(void) {
-    ASSERT_EVAL_GRAMMAR("a = \"1\";", "a", "1", "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("a = \"1\";", "a", "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"こんにちは世界\";", "R1", "こんにちは世界", P4_Ok, "[{\"slice\":[0,21],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"你好，世界\";", "R1", "你好，世界", P4_Ok, "[{\"slice\":[0,15],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"نامهای\";", "R1", "نامهای", P4_Ok, "[{\"slice\":[0,12],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = (\"\\n\" / \"\\r\")+;", "R1", "\r\n\r\n", P4_Ok, "[{\"slice\":[0,4],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "1A9F", P4_Ok, "[{\"slice\":[0,4],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "FFFFFF", P4_Ok, "[{\"slice\":[0,6],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "HHHH", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = !\"a\" [a-f];", "R1", "b", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = !\"b\" [a-f];", "R1", "b", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = &\"a\" \"apple\";", "R1", "apple", P4_Ok, "[{\"slice\":[0,5],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = &\"b\" \"apple\";", "R1", "beef", P4_MatchError, "[]");
+
     ASSERT_EVAL_GRAMMAR(
         "R1 = R2; "
         "R2 = \"1\";",
 
-        "R1", "1",
+        "R1", "1", P4_Ok,
 
         "["
             "{\"slice\":[0,1],\"type\":\"R1\",\"children\":["
@@ -464,7 +477,7 @@ void test_eval_grammar(void) {
         "R1 = R2 R2;"
         "R2 = [1-1];",
 
-        "R1", "11",
+        "R1", "11", P4_Ok,
 
         "["
             "{\"slice\":[0,2],\"type\":\"R1\",\"children\":["
@@ -479,7 +492,7 @@ void test_eval_grammar(void) {
         "R2 = \"1\";"
         "R3 = \"2\";",
 
-        "R1", "1",
+        "R1", "1", P4_Ok,
 
         "["
             "{\"slice\":[0,1],\"type\":\"R1\",\"children\":["
@@ -492,7 +505,7 @@ void test_eval_grammar(void) {
         "R2 = \"1\";"
         "R3 = \"2\";",
 
-        "R1", "2",
+        "R1", "2", P4_Ok,
 
         "["
             "{\"slice\":[0,1],\"type\":\"R1\",\"children\":["
@@ -500,6 +513,129 @@ void test_eval_grammar(void) {
             "]}"
         "]"
     );
+
+    ASSERT_EVAL_GRAMMAR(
+        "@squashed\n"
+        "R1 = R2 R2;"
+        "R2 = \"X\";",
+
+        "R1", "XX", P4_Ok,
+
+        "["
+            "{\"slice\":[0,2],\"type\":\"R1\"}"
+        "]"
+    );
+
+    ASSERT_EVAL_GRAMMAR(
+        "@lifted\n"
+        "R1 = R2 R2;"
+        "R2 = \"X\";",
+
+        "R1", "XX", P4_Ok,
+
+        "["
+            "{\"slice\":[0,1],\"type\":\"R2\"},"
+            "{\"slice\":[1,2],\"type\":\"R2\"}"
+        "]"
+    );
+
+    ASSERT_EVAL_GRAMMAR(
+        "@nonterminal\n"
+        "R1 = R2+;"
+        "R2 = \"X\";",
+
+        "R1", "X", P4_Ok,
+
+        "["
+            "{\"slice\":[0,1],\"type\":\"R2\"}"
+        "]"
+    );
+
+    ASSERT_EVAL_GRAMMAR(
+        "@nonterminal\n"
+        "R1 = R2+;"
+        "R2 = \"X\";",
+
+        "R1", "XX", P4_Ok,
+
+        "["
+            "{\"slice\":[0,2],\"type\":\"R1\",\"children\":["
+                "{\"slice\":[0,1],\"type\":\"R2\"},"
+                "{\"slice\":[1,2],\"type\":\"R2\"}"
+            "]}"
+        "]"
+    );
+
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = [a-z]+;"
+
+        "@spaced\n"
+        "R2 = \" \" / \"\\t\" / \"\\r\" / \"\\n\";",
+
+        "R1", "xxx", P4_Ok,
+
+        "["
+            "{\"slice\":[0,3],\"type\":\"R1\"}"
+        "]"
+    );
+
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = [a-z]+;"
+
+        "@spaced @lifted\n"
+        "R2 = \" \" / \"\\t\" / \"\\r\" / \"\\n\";",
+
+        "R1", "x   x x\t\t\nx", P4_Ok,
+
+        "["
+            "{\"slice\":[0,11],\"type\":\"R1\"}"
+        "]"
+    );
+
+    ASSERT_EVAL_GRAMMAR(
+        "@tight\n"
+        "R1 = [a-z]{4};"
+
+        "@spaced @lifted\n"
+        "R2 = \" \" / \"\\t\" / \"\\r\" / \"\\n\";",
+
+        "R1", "x   x x\t\t\nx", P4_MatchError, "[]"
+    );
+
+    ASSERT_EVAL_GRAMMAR(
+        "@tight\n"
+        "R1 = R2 R3;"
+        "R2 = [a-z]{2};"
+        "@scoped\n"
+        "R3 = [a-z]{2};"
+        "@spaced @lifted\n"
+        "R4 = \" \" / \"\\t\" / \"\\r\" / \"\\n\";",
+
+        "R1", "xxxx", P4_Ok, "["
+            "{\"slice\":[0,4],\"type\":\"R1\",\"children\":["
+                "{\"slice\":[0,2],\"type\":\"R2\"},"
+                "{\"slice\":[2,4],\"type\":\"R3\"}"
+            "]}"
+        "]"
+    );
+
+    ASSERT_EVAL_GRAMMAR(
+        "@tight\n"
+        "R1 = R2 R3;"
+        "R2 = [a-z]{2};"
+        "@scoped\n"
+        "R3 = [a-z]{2};"
+        "@spaced @lifted\n"
+        "R4 = \" \" / \"\\t\" / \"\\r\" / \"\\n\";",
+
+        "R1", "xxx  x", P4_Ok, "["
+            "{\"slice\":[0,6],\"type\":\"R1\",\"children\":["
+                "{\"slice\":[0,2],\"type\":\"R2\"},"
+                "{\"slice\":[2,6],\"type\":\"R3\"}"
+            "]}"
+        "]"
+    );
+
 }
 
 int main(void) {

@@ -4,7 +4,7 @@
 #include "../examples/p4gen.h"
 
 void check_parse_failed(P4_RuleID entry, P4_String input, P4_Error err) {
-    P4_Grammar* grammar = P4_CreateP4GenGrammar();
+    P4_Grammar* grammar = P4_CreatePegGrammar();
     P4_Source* source = P4_CreateSource(input, entry);
     TEST_ASSERT_EQUAL(err, P4_Parse(grammar, source));
     P4_DeleteSource(source);
@@ -12,12 +12,12 @@ void check_parse_failed(P4_RuleID entry, P4_String input, P4_Error err) {
 }
 
 void check_parse(P4_RuleID entry, P4_String input, P4_String output) {
-    P4_Grammar* grammar = P4_CreateP4GenGrammar();
+    P4_Grammar* grammar = P4_CreatePegGrammar();
     P4_Source* source = P4_CreateSource(input, entry);
     TEST_ASSERT_EQUAL(P4_Ok, P4_Parse(grammar, source));
     P4_Token* root = P4_GetSourceAst(source);
     FILE *f = fopen("check.json","w");
-    P4_JsonifySourceAst(f, root, P4_P4GenKindToName);
+    P4_JsonifySourceAst(f, root, P4_PegKindToName);
     fclose(f);
     P4_String s = read_file("check.json");
     TEST_ASSERT_EQUAL_STRING(output, s);
@@ -27,7 +27,7 @@ void check_parse(P4_RuleID entry, P4_String input, P4_String output) {
 }
 
 # define SETUP_EVAL(entry, input) \
-    P4_Grammar* grammar = P4_CreateP4GenGrammar(); \
+    P4_Grammar* grammar = P4_CreatePegGrammar(); \
     P4_Source* source = P4_CreateSource((input), (entry)); \
     TEST_ASSERT_EQUAL(P4_Ok, P4_Parse(grammar, source)); \
     P4_Token* root = P4_GetSourceAst(source);
@@ -227,7 +227,7 @@ void test_rule(void) {
 }
 
 void test_grammar(void) {
-    check_parse(P4_P4GenGrammar,
+    check_parse(P4_PegGrammar,
         "one = \"1\";\n"
         "entry = one one;",
         "["
@@ -251,7 +251,7 @@ void test_grammar(void) {
 #define ASSERT_EVAL(entry, input, expect_t, expect) do { \
         SETUP_EVAL((entry), (input)); \
         expect_t value = 0; \
-        if (root) P4_P4GenEval(root, &value); \
+        if (root) P4_PegEval(root, &value); \
         TEST_ASSERT_EQUAL((expect), value); \
         TEARDOWN_EVAL(); \
 } while (0);
@@ -306,7 +306,7 @@ void test_eval_char(void) {
 #define ASSERT_EVAL_LITERAL(entry, input, expect_lit, expect_sensitive) do { \
         SETUP_EVAL((entry), (input)); \
         P4_Expression* value = 0; \
-        if (root) P4_P4GenEval(root, &value); \
+        if (root) P4_PegEval(root, &value); \
         TEST_ASSERT_EQUAL(P4_Literal, (value)->kind); \
         TEST_ASSERT_EQUAL_STRING(expect_lit, (value)->literal); \
         TEST_ASSERT_EQUAL(expect_sensitive, (value)->sensitive); \
@@ -340,7 +340,7 @@ void test_eval_insensitive(void) {
 #define ASSERT_EVAL_RANGE(entry, input, expect_lower, expect_upper) do { \
         SETUP_EVAL((entry), (input)); \
         P4_Expression* value = 0; \
-        if (root) P4_P4GenEval(root, &value); \
+        if (root) P4_PegEval(root, &value); \
         TEST_ASSERT_EQUAL(P4_Range, (value)->kind); \
         TEST_ASSERT_EQUAL(expect_lower, (value)->lower); \
         TEST_ASSERT_EQUAL(expect_upper, (value)->upper); \
@@ -358,7 +358,7 @@ void test_eval_range(void) {
 #define ASSERT_EVAL_CONTAINER(entry, input, expect_kind, expect_count) do { \
     SETUP_EVAL((entry), (input)); \
     P4_Expression* value = 0; \
-    if (root) P4_P4GenEval(root, &value); \
+    if (root) P4_PegEval(root, &value); \
     TEST_ASSERT_EQUAL( (expect_kind), value->kind ); \
     TEST_ASSERT_EQUAL( (expect_count), value->count ); \
     TEST_ASSERT_NOT_NULL( value->members ); \
@@ -384,7 +384,7 @@ void test_eval_choice(void) {
 #define ASSERT_EVAL_LOOKAHEAD(entry, input, expect_kind) do { \
     SETUP_EVAL((entry), (input)); \
     P4_Expression* value = 0; \
-    if (root) P4_P4GenEval(root, &value); \
+    if (root) P4_PegEval(root, &value); \
     TEST_ASSERT_EQUAL( (expect_kind), value->kind ); \
     TEST_ASSERT_NOT_NULL( value->ref_expr ); \
     P4_DeleteExpression(value); \
@@ -404,7 +404,7 @@ void test_eval_negative(void) {
 #define ASSERT_EVAL_REPEAT(entry, input, min, max) do { \
     SETUP_EVAL((entry), (input)); \
     P4_Expression* value = 0; \
-    if (root) P4_P4GenEval(root, &value); \
+    if (root) P4_PegEval(root, &value); \
     TEST_ASSERT_EQUAL( P4_Repeat, value->kind ); \
     TEST_ASSERT_NOT_NULL( value->repeat_expr ); \
     TEST_ASSERT_EQUAL( (min), value->repeat_min ); \
@@ -426,7 +426,7 @@ void test_eval_repeat(void) {
 #define ASSERT_EVAL_REFERENCE(entry, input, expect_ref_id) do { \
     SETUP_EVAL((entry), (input)); \
     P4_Expression* value = 0; \
-    if (root) P4_P4GenEval(root, &value); \
+    if (root) P4_PegEval(root, &value); \
     TEST_ASSERT_EQUAL( P4_Reference, value->kind ); \
     TEST_ASSERT_EQUAL_STRING( (input), value->reference ); \
     TEST_ASSERT_EQUAL( (expect_ref_id), value->ref_id); \
@@ -447,10 +447,10 @@ P4_String test_grammar_rule_to_name(P4_RuleID id) {
 }
 
 #define ASSERT_EVAL_GRAMMAR(peg_rules, entry_name, source_code, parse_code, ast) do { \
-    SETUP_EVAL((P4_P4GenGrammar), (peg_rules)); \
+    SETUP_EVAL((P4_PegGrammar), (peg_rules)); \
     P4_Grammar* peg_grammar = 0; \
     TEST_ASSERT_NOT_NULL_MESSAGE( root, "peg rule should be correctly parsed"); \
-    TEST_ASSERT_EQUAL_MESSAGE( P4_Ok, P4_P4GenEval(root, &peg_grammar), "peg rule should be correctly evaluated"); \
+    TEST_ASSERT_EQUAL_MESSAGE( P4_Ok, P4_PegEval(root, &peg_grammar), "peg rule should be correctly evaluated"); \
     TEST_ASSERT_NOT_NULL_MESSAGE( peg_grammar, "peg grammar should be successfully created" ); \
     P4_Expression* entry_expr = P4_GetGrammarRuleByName(peg_grammar, (entry_name)); \
     TEST_ASSERT_NOT_NULL_MESSAGE( entry_expr, "peg grammar entry should be successfully resolved." ); \

@@ -9,12 +9,12 @@ extern "C"
 #include <stdlib.h>
 #include "../peppapeg.h"
 
-P4_Error P4_P4GenEval(P4_Token* token, void* result);
+P4_Error P4_PegEval(P4_Token* token, void* result);
 
 # define SLICE_LEN(s) ((s)->stop.pos - (s)->start.pos)
 
 typedef enum {
-    P4_P4GenGrammar         = 1,
+    P4_PegGrammar         = 1,
     P4_P4GenRule            = 2,
     P4_P4GenRuleDecorators  = 3,
     P4_P4GenRuleName        = 4,
@@ -44,10 +44,10 @@ typedef enum {
     P4_P4GenWhitespace,
 } P4_P4GenRuleID;
 
-P4_Grammar* P4_CreateP4GenGrammar ();
-P4_String   P4_P4GenKindToName(P4_RuleID);
+P4_Grammar* P4_CreatePegGrammar ();
+P4_String   P4_PegKindToName(P4_RuleID);
 
-P4_Grammar* P4_CreateP4GenGrammar () {
+P4_Grammar* P4_CreatePegGrammar () {
     P4_Grammar* grammar = P4_CreateGrammar();
     P4_Error err = 0;
 
@@ -293,7 +293,7 @@ P4_Grammar* P4_CreateP4GenGrammar () {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddOnceOrMore(grammar, P4_P4GenGrammar, P4_CreateReference(P4_P4GenRule)))
+    if (P4_Ok != P4_AddOnceOrMore(grammar, P4_PegGrammar, P4_CreateReference(P4_P4GenRule)))
         goto finalize;
 
     if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_P4GenWhitespace, 4,
@@ -315,7 +315,7 @@ finalize:
     return NULL;
 }
 
-void* P4_P4GenConcatRune(void *str, P4_Rune chr, size_t n) {
+void* P4_ConcatRune(void *str, P4_Rune chr, size_t n) {
   char *s = (char *)str;
 
   if (0 == ((P4_Rune)0xffffff80 & chr)) {
@@ -357,7 +357,7 @@ void* P4_P4GenConcatRune(void *str, P4_Rune chr, size_t n) {
   return s;
 }
 
-P4_String   P4_P4GenKindToName(P4_RuleID id) {
+P4_String   P4_PegKindToName(P4_RuleID id) {
     switch (id) {
         case P4_P4GenNumber: return "number";
         case P4_P4GenChar: return "char";
@@ -381,12 +381,12 @@ P4_String   P4_P4GenKindToName(P4_RuleID id) {
         case P4_P4GenRuleDecorators: return "decorators";
         case P4_P4GenDecorator: return "decorator";
         case P4_P4GenRule: return "rule";
-        case P4_P4GenGrammar: return "grammar";
+        case P4_PegGrammar: return "grammar";
         default: return "<unknown>";
     }
 }
 
-P4_Error P4_P4GenEvalFlag(P4_Token* token, P4_ExpressionFlag *flag) {
+P4_Error P4_PegEvalFlag(P4_Token* token, P4_ExpressionFlag *flag) {
     P4_String token_str = token->text + token->slice.start.pos; /* XXX: need slice api. */
     size_t token_len = SLICE_LEN(&token->slice); /* XXX: need slice api. */
 
@@ -409,12 +409,12 @@ P4_Error P4_P4GenEvalFlag(P4_Token* token, P4_ExpressionFlag *flag) {
     return P4_Ok;
 }
 
-P4_Error P4_P4GenEvalRuleFlags(P4_Token* token, P4_ExpressionFlag* flag) {
+P4_Error P4_PegEvalRuleFlags(P4_Token* token, P4_ExpressionFlag* flag) {
     P4_Token* child = NULL;
     P4_ExpressionFlag child_flag = 0;
     P4_Error err = P4_Ok;
     for (child = token->head; child != NULL; child = child->next) {
-        if ((err = P4_P4GenEvalFlag(child, &child_flag)) != P4_Ok) {
+        if ((err = P4_PegEvalFlag(child, &child_flag)) != P4_Ok) {
             *flag = 0;
             return err;
         }
@@ -423,7 +423,7 @@ P4_Error P4_P4GenEvalRuleFlags(P4_Token* token, P4_ExpressionFlag* flag) {
     return P4_Ok;
 }
 
-P4_Error P4_P4GenEvalNumber(P4_Token* token, size_t* num) {
+P4_Error P4_PegEvalNumber(P4_Token* token, size_t* num) {
     P4_String s = P4_CopyTokenString(token);
 
     if (s == NULL)
@@ -435,7 +435,7 @@ P4_Error P4_P4GenEvalNumber(P4_Token* token, size_t* num) {
     return P4_Ok;
 }
 
-size_t P4_P4GenCopyRune(P4_String text, size_t start, size_t stop, P4_Rune* rune) {
+size_t P4_CopyRune(P4_String text, size_t start, size_t stop, P4_Rune* rune) {
     char ch0 = text[start];
     if (ch0 == '\\') {
         char ch1 = text[start+1];
@@ -461,15 +461,15 @@ size_t P4_P4GenCopyRune(P4_String text, size_t start, size_t stop, P4_Rune* rune
     }
 }
 
-P4_Error P4_P4GenEvalChar(P4_Token* token, P4_Rune* rune) {
-    size_t size = P4_P4GenCopyRune(
+P4_Error P4_PegEvalChar(P4_Token* token, P4_Rune* rune) {
+    size_t size = P4_CopyRune(
         token->text, token->slice.start.pos, token->slice.stop.pos, rune
     );
     if (size == 0) return P4_ValueError;
     return P4_Ok;
 }
 
-P4_Error P4_P4GenEvalLiteral(P4_Token* token, P4_Expression** expr) {
+P4_Error P4_PegEvalLiteral(P4_Token* token, P4_Expression** expr) {
     size_t len = SLICE_LEN(&token->slice) - 2; /* remove quotes */
     if (len < 0)
         return P4_ValueError;
@@ -485,12 +485,12 @@ P4_Error P4_P4GenEvalLiteral(P4_Token* token, P4_Expression** expr) {
         return P4_MemoryError;
 
     for (i = token->slice.start.pos+1; i < token->slice.stop.pos-1; i += size) {
-        size = P4_P4GenCopyRune(token->text, i, token->slice.stop.pos-1, &rune);
+        size = P4_CopyRune(token->text, i, token->slice.stop.pos-1, &rune);
         if (size == 0) {
             err = P4_ValueError;
             goto finalize;
         }
-        cur = P4_P4GenConcatRune(cur, rune, size);
+        cur = P4_ConcatRune(cur, rune, size);
     }
     *cur = '\0';
 
@@ -501,10 +501,10 @@ finalize:
     return err;
 }
 
-P4_Error P4_P4GenEvalInsensitiveLiteral(P4_Token* token, P4_Expression** expr) {
+P4_Error P4_PegEvalInsensitiveLiteral(P4_Token* token, P4_Expression** expr) {
     P4_Error err = P4_Ok;
 
-    if ((err = P4_P4GenEvalLiteral(token->head, expr)) != P4_Ok)
+    if ((err = P4_PegEvalLiteral(token->head, expr)) != P4_Ok)
         return err;
 
     (*expr)->sensitive = false;
@@ -512,14 +512,14 @@ P4_Error P4_P4GenEvalInsensitiveLiteral(P4_Token* token, P4_Expression** expr) {
     return P4_Ok;
 }
 
-P4_Error P4_P4GenEvalRange(P4_Token* token, P4_Expression** expr) {
+P4_Error P4_PegEvalRange(P4_Token* token, P4_Expression** expr) {
     P4_Error err = P4_Ok;
     P4_Rune lower = 0, upper = 0;
 
-    if ((err = P4_P4GenEvalChar(token->head, &lower)) != P4_Ok)
+    if ((err = P4_PegEvalChar(token->head, &lower)) != P4_Ok)
         return err;
 
-    if ((err = P4_P4GenEvalChar(token->tail, &upper)) != P4_Ok)
+    if ((err = P4_PegEvalChar(token->tail, &upper)) != P4_Ok)
         return err;
 
     if (lower > upper || lower == 0 || upper == 0)
@@ -532,7 +532,7 @@ P4_Error P4_P4GenEvalRange(P4_Token* token, P4_Expression** expr) {
     return P4_Ok;
 }
 
-size_t P4_P4GenGetChildrenCount(P4_Token* token) {
+size_t P4_GetChildrenCount(P4_Token* token) {
     P4_Token* child = token->head;
 
     size_t    child_count = 0;
@@ -543,13 +543,13 @@ size_t P4_P4GenGetChildrenCount(P4_Token* token) {
     return child_count;
 }
 
-P4_Error P4_P4GenEvalMembers(P4_Token* token, P4_Expression* expr) {
+P4_Error P4_PegEvalMembers(P4_Token* token, P4_Expression* expr) {
     size_t i = 0;
     P4_Token* child = token->head;
     P4_Error err = P4_Ok;
     while (child != NULL) {
         P4_Expression* child_expr = NULL;
-        if ((err = P4_P4GenEval(child, &child_expr)) != P4_Ok)
+        if ((err = P4_PegEval(child, &child_expr)) != P4_Ok)
             return err;
         P4_SetMember(expr, i, child_expr);
         child = child->next;
@@ -558,15 +558,15 @@ P4_Error P4_P4GenEvalMembers(P4_Token* token, P4_Expression* expr) {
     return P4_Ok;
 }
 
-P4_Error P4_P4GenEvalSequence(P4_Token* token, P4_Expression** expr) {
+P4_Error P4_PegEvalSequence(P4_Token* token, P4_Expression** expr) {
     P4_Error  err = P4_Ok;
 
-    if ((*expr = P4_CreateSequence(P4_P4GenGetChildrenCount(token))) == NULL) {
+    if ((*expr = P4_CreateSequence(P4_GetChildrenCount(token))) == NULL) {
         err = P4_MemoryError;
         goto finalize;
     }
 
-    if ((err = P4_P4GenEvalMembers(token, *expr)) != P4_Ok)
+    if ((err = P4_PegEvalMembers(token, *expr)) != P4_Ok)
         goto finalize;
 
     return P4_Ok;
@@ -576,15 +576,15 @@ finalize:
     return err;
 }
 
-P4_Error P4_P4GenEvalChoice(P4_Token* token, P4_Expression** expr) {
+P4_Error P4_PegEvalChoice(P4_Token* token, P4_Expression** expr) {
     P4_Error  err = P4_Ok;
 
-    if ((*expr = P4_CreateChoice(P4_P4GenGetChildrenCount(token))) == NULL) {
+    if ((*expr = P4_CreateChoice(P4_GetChildrenCount(token))) == NULL) {
         err = P4_MemoryError;
         goto finalize;
     }
 
-    if ((err = P4_P4GenEvalMembers(token, *expr)) != P4_Ok)
+    if ((err = P4_PegEvalMembers(token, *expr)) != P4_Ok)
         goto finalize;
 
     return P4_Ok;
@@ -594,11 +594,11 @@ finalize:
     return err;
 }
 
-P4_Error P4_P4GenEvalPositive(P4_Token* token, P4_Expression** expr) {
+P4_Error P4_PegEvalPositive(P4_Token* token, P4_Expression** expr) {
     P4_Error        err = P4_Ok;
     P4_Expression*  ref = NULL;
 
-    if ((err = P4_P4GenEval(token->head, &ref)) != P4_Ok) {
+    if ((err = P4_PegEval(token->head, &ref)) != P4_Ok) {
         return err;
     }
 
@@ -618,11 +618,11 @@ finalize:
     return err;
 }
 
-P4_Error P4_P4GenEvalNegative(P4_Token* token, P4_Expression** expr) {
+P4_Error P4_PegEvalNegative(P4_Token* token, P4_Expression** expr) {
     P4_Error        err = P4_Ok;
     P4_Expression*  ref = NULL;
 
-    if ((err = P4_P4GenEval(token->head, &ref)) != P4_Ok) {
+    if ((err = P4_PegEval(token->head, &ref)) != P4_Ok) {
         return err;
     }
 
@@ -642,12 +642,12 @@ finalize:
     return err;
 }
 
-P4_Error P4_P4GenEvalRepeat(P4_Token* token, P4_Expression** expr) {
+P4_Error P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr) {
     P4_Error        err = P4_Ok;
     P4_Expression*  ref = NULL;
     size_t          min = 0, max = SIZE_MAX;
 
-    if ((err = P4_P4GenEval(token->head, &ref)) != P4_Ok) {
+    if ((err = P4_PegEval(token->head, &ref)) != P4_Ok) {
         return err;
     }
 
@@ -659,21 +659,21 @@ P4_Error P4_P4GenEvalRepeat(P4_Token* token, P4_Expression** expr) {
         case P4_P4GenRepeatZeroOrOnce: min = 0; max = 1; break;
         case P4_P4GenRepeatOnceOrMore: min = 1; max = SIZE_MAX; break;
         case P4_P4GenRepeatMin:
-            if ((err = P4_P4GenEvalNumber(token->head->next->head, &min)) != P4_Ok)
+            if ((err = P4_PegEvalNumber(token->head->next->head, &min)) != P4_Ok)
                 goto finalize;
             break;
         case P4_P4GenRepeatMax:
-            if ((err = P4_P4GenEvalNumber(token->head->next->head, &max)) != P4_Ok)
+            if ((err = P4_PegEvalNumber(token->head->next->head, &max)) != P4_Ok)
                 goto finalize;
             break;
         case P4_P4GenRepeatMinMax:
-            if ((err = P4_P4GenEvalNumber(token->head->next->head, &min)) != P4_Ok)
+            if ((err = P4_PegEvalNumber(token->head->next->head, &min)) != P4_Ok)
                 goto finalize;
-            if ((err = P4_P4GenEvalNumber(token->head->next->tail, &max)) != P4_Ok)
+            if ((err = P4_PegEvalNumber(token->head->next->tail, &max)) != P4_Ok)
                 goto finalize;
             break;
         case P4_P4GenRepeatExact:
-            if ((err = P4_P4GenEvalNumber(token->head->next->head, &min)) != P4_Ok)
+            if ((err = P4_PegEvalNumber(token->head->next->head, &min)) != P4_Ok)
                 goto finalize;
             max = min;
             break;
@@ -701,7 +701,7 @@ finalize:
     return err;
 }
 
-P4_Error P4_P4GenEvalRuleName(P4_Token* token, P4_String* result) {
+P4_Error P4_PegEvalRuleName(P4_Token* token, P4_String* result) {
     size_t i = 0;
     size_t len = SLICE_LEN(&token->slice); /* remove quotes */
     if (len <= 0)
@@ -717,11 +717,11 @@ P4_Error P4_P4GenEvalRuleName(P4_Token* token, P4_String* result) {
     return P4_Ok;
 }
 
-P4_Error P4_P4GenEvalReference(P4_Token* token, P4_Expression** result) {
+P4_Error P4_PegEvalReference(P4_Token* token, P4_Expression** result) {
     P4_Error err = P4_Ok;
     P4_String reference = NULL;
 
-    if ((err = P4_P4GenEvalRuleName(token, &reference)) != P4_Ok)
+    if ((err = P4_PegEvalRuleName(token, &reference)) != P4_Ok)
         return err;
 
     if (reference == NULL)
@@ -749,7 +749,7 @@ finalize:
     return err;
 }
 
-P4_Error P4_P4GenEvalGrammarRule(P4_Token* token, P4_Expression** result) {
+P4_Error P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result) {
     P4_String           rule_name = NULL;
     P4_ExpressionFlag   rule_flag = 0;
     P4_Token*           child     = NULL;
@@ -760,13 +760,13 @@ P4_Error P4_P4GenEvalGrammarRule(P4_Token* token, P4_Expression** result) {
     for (child = token->head; child != NULL; child = child->next) {
         switch (child->rule_id) {
             case P4_P4GenRuleDecorators:
-                err = P4_P4GenEvalRuleFlags(child, &rule_flag);
+                err = P4_PegEvalRuleFlags(child, &rule_flag);
                 break;
             case P4_P4GenRuleName:
-                err = P4_P4GenEvalRuleName(child, &rule_name);
+                err = P4_PegEvalRuleName(child, &rule_name);
                 break;
             default:
-                err = P4_P4GenEval(child, result);
+                err = P4_PegEval(child, result);
                 break;
         }
         if (err != P4_Ok)
@@ -784,7 +784,7 @@ finalize:
     return err;
 }
 
-P4_Error P4_P4GenSetReferenceIDs(P4_Grammar* grammar, P4_Expression* expr) {
+P4_Error P4_PegSetReferences(P4_Grammar* grammar, P4_Expression* expr) {
     if (expr == NULL)
         return P4_NullError;
 
@@ -794,18 +794,18 @@ P4_Error P4_P4GenSetReferenceIDs(P4_Grammar* grammar, P4_Expression* expr) {
         case P4_Positive:
         case P4_Negative:
             if (expr->ref_expr)
-                err = P4_P4GenSetReferenceIDs(grammar, expr->ref_expr);
+                err = P4_PegSetReferences(grammar, expr->ref_expr);
             break;
         case P4_Sequence:
         case P4_Choice:
             for (i = 0; i < expr->count; i++)
                 if (expr->members[i])
-                    if ((err = P4_P4GenSetReferenceIDs(grammar, expr->members[i])) != P4_Ok)
+                    if ((err = P4_PegSetReferences(grammar, expr->members[i])) != P4_Ok)
                         return err;
             break;
         case P4_Repeat:
             if (expr->repeat_expr)
-                err = P4_P4GenSetReferenceIDs(grammar, expr->repeat_expr);
+                err = P4_PegSetReferences(grammar, expr->repeat_expr);
             break;
         case P4_Reference:
         {
@@ -826,10 +826,10 @@ P4_Error P4_P4GenSetReferenceIDs(P4_Grammar* grammar, P4_Expression* expr) {
     return err;
 }
 
-P4_Error P4_P4GenEvalGrammar(P4_Token* token, P4_Grammar** result) {
+P4_Error P4_PegEvalGrammar(P4_Token* token, P4_Grammar** result) {
     P4_Error    err = P4_Ok;
     size_t      i = 0;
-    size_t      count = P4_P4GenGetChildrenCount(token);
+    size_t      count = P4_GetChildrenCount(token);
 
     if ((*result = P4_CreateGrammar()) == NULL) {
         err = P4_MemoryError;
@@ -841,7 +841,7 @@ P4_Error P4_P4GenEvalGrammar(P4_Token* token, P4_Grammar** result) {
     for (child = token->head; child != NULL; child = child->next) {
         P4_Expression* rule = NULL;
 
-        if ((err = P4_P4GenEvalGrammarRule(child, &rule)) != P4_Ok) {
+        if ((err = P4_PegEvalGrammarRule(child, &rule)) != P4_Ok) {
             goto finalize;
         }
 
@@ -853,7 +853,7 @@ P4_Error P4_P4GenEvalGrammar(P4_Token* token, P4_Grammar** result) {
     }
 
     for (i = 0; i < (*result)->count; i++) {
-        if ((err = P4_P4GenSetReferenceIDs(*result, (*result)->rules[i])) != P4_Ok) {
+        if ((err = P4_PegSetReferences(*result, (*result)->rules[i])) != P4_Ok) {
             goto finalize;
         }
     }
@@ -865,65 +865,40 @@ finalize:
     return err;
 }
 
-P4_Error P4_P4GenEval(P4_Token* token, void* result) {
+P4_Error P4_PegEval(P4_Token* token, void* result) {
     P4_Error err = P4_Ok;
     switch (token->rule_id) {
         case P4_P4GenDecorator:
-            return P4_P4GenEvalFlag(token, result);
+            return P4_PegEvalFlag(token, result);
         case P4_P4GenRuleDecorators:
-            return P4_P4GenEvalRuleFlags(token, result);
+            return P4_PegEvalRuleFlags(token, result);
         case P4_P4GenNumber:
-            return P4_P4GenEvalNumber(token, result);
+            return P4_PegEvalNumber(token, result);
         case P4_P4GenChar:
-            return P4_P4GenEvalChar(token, result);
+            return P4_PegEvalChar(token, result);
         case P4_P4GenLiteral:
-            return P4_P4GenEvalLiteral(token, result);
+            return P4_PegEvalLiteral(token, result);
         case P4_P4GenInsensitiveLiteral:
-            return P4_P4GenEvalInsensitiveLiteral(token, result);
+            return P4_PegEvalInsensitiveLiteral(token, result);
         case P4_P4GenRange:
-            return P4_P4GenEvalRange(token, result);
+            return P4_PegEvalRange(token, result);
         case P4_P4GenSequence:
-            return P4_P4GenEvalSequence(token, result);
+            return P4_PegEvalSequence(token, result);
         case P4_P4GenChoice:
-            return P4_P4GenEvalChoice(token, result);
+            return P4_PegEvalChoice(token, result);
         case P4_P4GenPositive:
-            return P4_P4GenEvalPositive(token, result);
+            return P4_PegEvalPositive(token, result);
         case P4_P4GenNegative:
-            return P4_P4GenEvalNegative(token, result);
+            return P4_PegEvalNegative(token, result);
         case P4_P4GenRepeat:
-            return P4_P4GenEvalRepeat(token, result);
+            return P4_PegEvalRepeat(token, result);
         case P4_P4GenReference:
-            return P4_P4GenEvalReference(token, result);
-        case P4_P4GenGrammar:
-            return P4_P4GenEvalGrammar(token, result);
+            return P4_PegEvalReference(token, result);
+        case P4_PegGrammar:
+            return P4_PegEvalGrammar(token, result);
         default: return P4_ValueError;
     }
     return P4_Ok;
-}
-
-P4_String P4_P4GenStringifyExpression(P4_Expression* expr) {
-    P4_String result = NULL;
-    switch( expr->kind ) {
-        case P4_Literal:
-        {
-            size_t size = strlen(expr->literal) + 2 + 1;
-            if (expr->sensitive) size++;
-            result = malloc(size * sizeof(char));
-
-            char* start = expr->sensitive ? "i\"" : "\"";
-            char* stop = "\"";
-
-            sprintf(result, "%s%s%s", start, expr->literal, stop);
-            return result;
-        }
-        case P4_Range:
-        {
-            /* TBD */
-        }
-        /* TBD */
-        default:
-            return strdup("<unknown>");
-    }
 }
 
 #ifdef __cplusplus

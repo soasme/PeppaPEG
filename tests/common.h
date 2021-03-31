@@ -2,6 +2,7 @@
 # define P4_TEST_COMMON
 
 #include "unity/src/unity.h"
+#include "unity/src/unity_internals.h"
 
 #include "../peppapeg.h"
 
@@ -72,6 +73,19 @@ char* read_file(const char* path) {
     buf[length] = '\0';
     fclose(f);
     return buf;
+}
+
+#define RUN_TEST_ARGS(TestFunc, ...) \
+{ \
+    UNITY_NEW_TEST(#TestFunc) \
+    if (TEST_PROTECT()) \
+    { \
+        setUp(); \
+        TestFunc(__VA_ARGS__); \
+    } \
+    if (TEST_PROTECT() && (!TEST_IS_IGNORED)) \
+        tearDown(); \
+    UnityConcludeTest(); \
 }
 
 # endif

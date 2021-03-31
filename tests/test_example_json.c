@@ -531,30 +531,28 @@ void test_objectitem(void) {
     P4_DeleteGrammar(grammar);
 }
 
-static char* JSON_SPEC = "";
-
-void test_json_spec(void) {
-    if (strcmp(JSON_SPEC, "") == 0) return;
+void test_json_spec(char* json_spec) {
+    if (strcmp(json_spec, "") == 0) return;
 
     P4_Grammar* grammar = P4_CreateJSONGrammar();
 
-    char* buf = read_file(JSON_SPEC);
+    char* buf = read_file(json_spec);
 
     P4_Source* source = P4_CreateSource(buf, P4_JSONEntry);
 
     P4_Error err = P4_Parse(grammar, source);
     static char errmsg[100] = "";
 
-    sprintf(errmsg, "%s:%d:%s", JSON_SPEC, err, P4_GetErrorMessage(source));
+    sprintf(errmsg, "%s:%d:%s", json_spec, err, P4_GetErrorMessage(source));
 
     P4_DeleteSource(source);
     free(buf);
     P4_DeleteGrammar(grammar);
 
-    if (strstr(JSON_SPEC, "test_parsing/y_") != NULL) {
-        TEST_ASSERT_EQUAL_MESSAGE(P4_Ok, err, JSON_SPEC);
-    } else if (strstr(JSON_SPEC, "test_parsing/n_") != NULL) {
-        TEST_ASSERT_NOT_EQUAL_MESSAGE(P4_Ok, err, JSON_SPEC);
+    if (strstr(json_spec, "test_parsing/y_") != NULL) {
+        TEST_ASSERT_EQUAL_MESSAGE(P4_Ok, err, json_spec);
+    } else if (strstr(json_spec, "test_parsing/n_") != NULL) {
+        TEST_ASSERT_NOT_EQUAL_MESSAGE(P4_Ok, err, json_spec);
     } else {
         TEST_IGNORE_MESSAGE(errmsg);
     }
@@ -589,11 +587,11 @@ int main(void) {
     glob("json_test_parsing/*.json", 0, 0, &globbuf);
     size_t i = 0;
     for (i = 0; i < globbuf.gl_pathc; i++) {
-        JSON_SPEC = globbuf.gl_pathv[i];
+        char* json_spec = globbuf.gl_pathv[i];
         /* Unknown failed case. */
-        if (strcmp(JSON_SPEC, "json_test_parsing/n_multidigit_number_then_00.json") == 0 ||
+        if (strcmp(json_spec, "json_test_parsing/n_multidigit_number_then_00.json") == 0 ||
                 false) continue;
-        RUN_TEST(test_json_spec);
+        RUN_TEST_ARGS(test_json_spec, json_spec);
     }
     globfree(&globbuf);
     return UNITY_END();

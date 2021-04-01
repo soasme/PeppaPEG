@@ -50,7 +50,7 @@
 # define                        NEED_SPACE(s) (!(s)->whitespacing && ((s)->frame_stack ? (s)->frame_stack->space : false))
 # define                        NO_ERROR(s) ((s)->err == P4_Ok)
 # define                        NO_MATCH(s) ((s)->err == P4_MatchError)
-# define                        SLICE_LEN(s) ((s)->stop.pos - (s)->start.pos)
+# define                        P4_GetSliceSize(s) ((s)->stop.pos - (s)->start.pos)
 # define                        P4_SetPosition(s, d) do { \
     (s)->pos = (d)->pos; \
     (s)->lineno = (d)->lineno; \
@@ -2279,7 +2279,7 @@ P4_GetTokenSlice(P4_Token* token) {
 
 P4_PRIVATE(P4_String)
 P4_CopySliceString(P4_String s, P4_Slice* slice) {
-    size_t    len = SLICE_LEN(slice);
+    size_t    len = P4_GetSliceSize(slice);
     assert(len >= 0);
 
     P4_String str = malloc(len+1);

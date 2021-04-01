@@ -18,7 +18,7 @@
 - [ ] Stop on first error v/s Recover from Panic.
 - [ ] Allow replacing malloc/free functions.
 - [ ] New Source Flag: Support UTF-8 BOM sequence (0xEF 0xBB 0xBF) at the start of source.
-- [ ] Python Binding: example: cffi, misaka.
+- [ ] Python Binding: example: cffi, misaka, parsimonious (api). <https://tomassetti.me/parsing-in-python/>.
 - [ ] Benchmark: example: json-c. `valgrind --tool=massif --massif-out-file=massif.out ./build/tests/test_example_json && ms_print massif.out ms_print.out`.
 - [ ] Cache literal len.
 - [ ] backrefs is not necessary if there is no BackReference in Sequence.
@@ -37,9 +37,14 @@
 - [ ] Sanitize `\u0000` to whitespace for the source input, this happens in creating the source/setting the source size.
 - [ ] take a look at ohm.
 - [ ] ES5 syntax: https://ohmlang.github.io/editor/#0a9a649c3c630fd0a470ba6cb75393fe
+- [ ] zig syntax: https://ziglang.org/documentation/master/#Grammar
+- [ ] read [A parsing machine for PEGs](http://www.inf.puc-rio.br/~roberto/docs/ry08-4.pdf).
+- [ ] `P4_AcquireSourceAst(source, &ast)`: set ast, reset source. It's useful when we needs the parsed result but not caring the parsing context, e.g. source. Token tree should now owned by ast and shall then be free by the caller.
 - [ ] A binary executable for compiling peg to a C library: `p4g compile --lang=c calc.peg`.
 - [ ] A binary executable for display parsed results in JSON output. The executable can support general programming languages, such as Mustache, Python, JSON, YAML, etc. Some other programs can then takes the input from stdin and do some fancy work. `p4g parse --lang=py38 source.py`
 - [ ] api to operate slice comparison, copy and length.
+- [ ] build via wasm.
+- [ ] landing page for the project doc site.
 - [x] Report line num & col. Added in v1.9.0.
 - [x] Allow parsing a subset of source input. Added in v1.9.0.
 - [x] Allow user setting Userdata for P4_Tokens. Added in v1.8.0.

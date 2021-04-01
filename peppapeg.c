@@ -2810,3 +2810,32 @@ finalize:
     return NULL;
 }
 
+P4_String   P4_StringifyPegGrammarRuleID(P4_RuleID id) {
+    switch (id) {
+        case P4_PegRuleNumber: return "number";
+        case P4_PegRuleChar: return "char";
+        case P4_PegRuleLiteral: return "literal";
+        case P4_PegRuleInsensitiveLiteral: return "insensitive";
+        case P4_PegRuleRange: return "range";
+        case P4_PegRuleReference: return "reference";
+        case P4_PegRulePositive: return "positive";
+        case P4_PegRuleNegative: return "negative";
+        case P4_PegRuleChoice: return "choice";
+        case P4_PegRuleSequence: return "sequence";
+        case P4_PegRuleRepeat: return "repeat";
+        case P4_PegRuleRepeatOnceOrMore: return "onceormore";
+        case P4_PegRuleRepeatZeroOrMore: return "zeroormore";
+        case P4_PegRuleRepeatZeroOrOnce: return "zerooronce";
+        case P4_PegRuleRepeatMin: return "repeatmin";
+        case P4_PegRuleRepeatMax: return "repeatmax";
+        case P4_PegRuleRepeatMinMax: return "repeatminmax";
+        case P4_PegRuleRepeatExact: return "repeatexact";
+        case P4_PegRuleRuleName: return "name";
+        case P4_PegRuleRuleDecorators: return "decorators";
+        case P4_PegRuleDecorator: return "decorator";
+        case P4_PegRuleRule: return "rule";
+        case P4_PegGrammar: return "grammar";
+        default: return "<unknown>";
+    }
+}
+

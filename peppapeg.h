@@ -1897,6 +1897,14 @@ P4_Error       P4_ReplaceGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
  */
 P4_Grammar*    P4_CreatePegGrammar ();
 
+/**
+ * @brief       Get the corresponding rule name for a peg grammar rule id.
+ * @param       id      A P4_PegRuleID.
+ * @return      The name.
+ *
+ *      printf("%s\n", P4_StringifyPegGrammarRuleID(P4_PegRuleRule));
+ */
+P4_String      P4_StringifyPegGrammarRuleID(P4_RuleID id);
 
 #ifdef __cplusplus
 }

@@ -1,0 +1,297 @@
+PEG Syntax
+==========
+
+Use Peg API
+------------
+
+Peppa PEG provides an imperative way to define a new grammar.
+Function :c:func:`P4_LoadPegGrammar` can load a grammar from a string.
+
+.. code-block:: c
+
+    const char* grammar_rules =
+        "add = int + int;"
+
+        "@squashed @tight "
+        "int = [0-9]+;"
+
+        "@spaced @lifted "
+        "ws  = \" \";";
+
+    P4_Grammar* grammar = P4_LoadPegGrammar(grammar_rules);
+
+The two lines of code is somewhat equivalent to the below code written in low-level C API:
+
+.. code-block:: c
+
+    P4_Grammar* grammar = P4_CreateGrammar();
+
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, RuleAdd, 3,
+        P4_CreateReference(RuleInt),
+        P4_CreateLiteral("+", true),
+        P4_CreateReference(RuleInt)
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_AddOnceOrMore(grammar, RuleInt, P4_CreateRange('0', '9', 1)))
+        goto finalize;
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, RuleInt, P4_FLAG_SQUASHED|P4_FLAG_TIGHT))
+        goto finalize;
+
+    if (P4_Ok != P4_AddLiteral(grammar, RuleWs, " ", true))
+        goto finalize;
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, RuleWs, P4_FLAG_SPACED|P4_FLAG_LIFTED))
+        goto finalize;
+
+Grammar Rules
+-------------
+
+The grammar is simply a list of rules with names. Rules are defined like this:
+
+.. code-block:: c
+
+    rule_1 = ... ;
+    rule_2 = ... ;
+    rule_3 = ... ;
+    (more rules)
+
+On the left hand side, they are rule names.
+
+One the right hand side, they are rule expressions, which we will cover in this rest of the document.
+
+In the middle, they are equal signs (`=`).
+
+They should end with colons (`;`).
+
+The first grammar rule will be assigned with rule id 1.
+The ids for the rest increase one by one.
+
+The grammar rule names must start with an alphabet or underscore,
+followed by a sequence of either alphabets or digits or underscores `_`.
+
+Literal
+-------
+
+The literal matches an exact same string surrounded by double quotes.
+
+For example,
+
+.. code-block:: c
+
+    greeting = "hello world";
+
+To ignore the case, insert `i` to the left quote:
+
+.. code-block:: c
+
+    greeting = i"hello world";
+
+The case insensitive literal applies to not only ASCII chars, but also extended ASCII chars, such as ì / Ì.
+
+    greeting = i"hello worìd";
+
+UTF-8 is supported:
+
+.. code-block:: c
+
+    greeting = "你好，世界";
+
+Emoji is supported:
+
+.. code-block:: c
+
+    greeting = "Peppa 🐷";
+
+You can encode UTF-8 code points via `\u` followed by four hex digits.
+
+.. code-block:: c
+
+    greeting = "\u{4f60}\u{597D}, world";
+
+Range
+------
+
+Range **matches a single character in range**.
+
+For example, any characters between `'0'` to `'9'` can match.
+
+.. code-block:: c
+
+    digits = [0-9];
+
+The lower and upper character of range can be ASCII characters or UTF-8 runes.
+
+.. code-block::
+
+    digits = [\u{4e00}-\u{9fff}];
+
+A small trick to match any character is to specify the range from \u{1} to \u{10ffff},
+which are the minimum and the maximum code point in UTF-8 encoding.
+
+.. code-block::
+
+    any = [\u{1}-\u{10ffff}];
+
+The value of lower must be less or equal than the upper.
+
+.. code-block::
+
+    // INVALID
+    any = [\u{10ffff}-\u{1}];
+
+Sequence
+--------
+
+Sequence **matches a sequence of sub-expressions in order**.
+
+When parsing, the first sequence member is attempted. If succeeds, the second is attempted, so on and on.
+If any one of the attempts fails, the match fails.
+
+For example:
+
+.. code-block:: c
+
+    greeter = "Hello" " " "world";
+
+
+Choice
+-------
+
+Choice **matches one of the sub-expression.**
+
+When parsing, the first sequence member is attempted. If fails, the second is attempted, so on and on.
+If any one of the attempts succeeds, the match succeeds. If all attempts fail, the match fails.
+
+For example:
+
+.. code-block:: c
+
+   greeter = "Hello World" / "你好，世界" / "Kia Ora";
+
+Reference
+---------
+
+Reference **matches a string based on the referenced grammar rule**.
+
+For example, `greeter` is just a reference rule in `greeting`. When matching `greeting`, it will use the referenced grammar rule `greeter` first, e.g. `"Hello" / "你好"`, then match " world".
+
+.. code-block:: c
+
+    greeting = greeter " world";
+    greeter  = "Hello" / "你好";
+
+The order of defining a rule does not matter.
+
+.. code-block:: c
+
+    greeter  = "Hello" / "你好";
+    greeting = greeter " world";
+
+One should ensure all references must have corresponding rule defined, otherwise, the parse will fail with :c:enum:`P4_MatchError`.
+
+Positive
+--------
+
+Positive **tests if the sub-expression matches**.
+
+Positive attempts to match the sub-expression. If succeeds, the test passes. Positive does not "consume" any text.
+
+Positive can be useful in limiting the possibilities of the latter member in a Sequence. In this example, the Sequence expression must start with "Hello", e.g. "Hello World", "Hello WORLD", "Hello world", etc, will match but "HELLO WORLD" will not match.
+
+.. code-block:: c
+
+    greeting = &"Hello" i"hello world";
+
+Negative
+--------
+
+Negative **tests if the sub-expression does not match**.
+
+Negative expects the sub-expression doesn't match. If fails, the test passes. Negative does not "consume" any text.
+
+Negative can be useful in limiting the possiblities of the latter member in a Sequence. In this example, the Sequence expression must not start with "Hello", e.g. "HELLO World", "hello WORLD", "hello world", etc, will match but "Hello World" will not match.
+
+.. code-block:: c
+
+    greeting = !"Hello" i"hello world";
+
+Repeat
+------
+
+Repeat **matches the sub-expression several times**.
+
+`+` match string one or more times.
+
+.. code-block:: c
+
+    number = [0-9]+;
+
+`*` match string zero or more times.
+
+.. code-block:: c
+
+    number = [0-9] [1-9]*;
+
+`?` match string one or more times.
+
+.. code-block:: c
+
+    number = [0-9] "."?;
+
+`{min,}` match string minimum `min` times.
+
+.. code-block:: c
+
+    above_hundred = [1-9] [1-9]{2,};
+
+`{,max}` match string maximum `max` times.
+
+.. code-block:: c
+
+   below_thousand = [0-9]{,3};
+
+`{min,max}` match string minimum `min` times, maximum `max` times.
+
+.. code-block:: c
+
+   hex = "\u{" ([0-9] / [a-z] / [A-Z]){1,6} "}";
+
+Grammar Rule Flags
+------------------
+
+The grammar rule allows setting flags by inserting some `@decorator` (s) before the names.
+The supported decorators include: `@spaced`, `@squashed`, `@scoped`, `@tight`, `@lifted` and `@nonterminal`.
+For example,
+
+.. code-block::
+
+    @spaced @lifted
+    ws = " " / "\t" / "\n";
+
+:seealso: :c:enum:`P4_FLAG_SPACED`, :c:enum:`P4_FLAG_SQUASHED`, :c:enum:`P4_FLAG_SCOPED`, :c:enum:`P4_FLAG_TIGHT`, :c:enum:`P4_FLAG_LIFTED`, :c:enum:`P4_FLAG_NON_TERMINAL`.
+
+@spaced
+```````
+
+If a rule has `@spaced` decorator, it will be auto-inserted in between every element of sequences and repetitions.
+
+@tight
+```````
+
+If a sequence or repetition rule has `@tight` decorator, no `@spaced` rules will be applied.
+
+@lifted
+```````
+
+If a rule has `@lifted` decorator, its children tokens will replace the parent token.
+
+@nonterminal
+````````````
+
+If a rule has `nonterminal` decorator, and it has only one single child token, the child token will replace the parent token.
+If it produces multiple children tokens, this decorator has no effect.
+
+@squashed
+`````````
+
+If a rule has `@squashed` decorator, its children tokens will be trimmed.

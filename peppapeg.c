@@ -61,21 +61,11 @@
     P4_SetPosition(&((s)->stop), (b)); \
 } while (0)
 
-# define                        autofree __attribute__ ((cleanup (cleanup_freep)))
-
 char *strdup(const char *src) { /* strdup is not ANSI. Copy source here. */
     char *dst = malloc(strlen (src) + 1);
     if (dst == NULL) return NULL;
     strcpy(dst, src);
     return dst;
-}
-
-P4_PRIVATE(void)
-cleanup_freep (void *p)
-{
-  void **pp = (void **) p;
-  if (*pp)
-    free (*pp);
 }
 
 # define                        P4_AdoptToken(head, tail, list) do { \

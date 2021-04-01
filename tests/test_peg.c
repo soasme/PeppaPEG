@@ -40,7 +40,9 @@ void test_char(void) {
     ASSERT_PEG_PARSE(P4_PegRuleChar, "👌", P4_Ok, "[{\"slice\":[0,4],\"type\":\"char\"}]");
     ASSERT_PEG_PARSE(P4_PegRuleChar, "\\t", P4_Ok, "[{\"slice\":[0,2],\"type\":\"char\"}]");
     ASSERT_PEG_PARSE(P4_PegRuleChar, "\\\"", P4_Ok, "[{\"slice\":[0,2],\"type\":\"char\"}]");
-    ASSERT_PEG_PARSE(P4_PegRuleChar, "\\u0020", P4_Ok, "[{\"slice\":[0,6],\"type\":\"char\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleChar, "\\u{20}", P4_Ok, "[{\"slice\":[0,6],\"type\":\"char\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleChar, "\\u{0020}", P4_Ok, "[{\"slice\":[0,8],\"type\":\"char\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleChar, "\\u{10ffff}", P4_Ok, "[{\"slice\":[0,10],\"type\":\"char\"}]");
     ASSERT_PEG_PARSE(P4_PegRuleChar, "\"", P4_MatchError, "[]");
 }
 
@@ -51,7 +53,9 @@ void test_literal(void) {
     ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"👌\"", P4_Ok, "[{\"slice\":[0,6],\"type\":\"literal\"}]");
     ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"\\t\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"literal\"}]");
     ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"\\\"\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"literal\"}]");
-    ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"\\u0020\"", P4_Ok, "[{\"slice\":[0,8],\"type\":\"literal\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"\\u{20}\"", P4_Ok, "[{\"slice\":[0,8],\"type\":\"literal\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"\\u{0020}\"", P4_Ok, "[{\"slice\":[0,10],\"type\":\"literal\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"\\u{10ffff}\"", P4_Ok, "[{\"slice\":[0,12],\"type\":\"literal\"}]");
     ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"hello world\"", P4_Ok, "[{\"slice\":[0,13],\"type\":\"literal\"}]");
 }
 
@@ -62,7 +66,7 @@ void test_insensitive(void) {
     ASSERT_PEG_PARSE(P4_PegRuleInsensitiveLiteral, "i\"👌\"", P4_Ok, "[{\"slice\":[0,7],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,7],\"type\":\"literal\"}]}]");
     ASSERT_PEG_PARSE(P4_PegRuleInsensitiveLiteral, "i\"\\t\"", P4_Ok, "[{\"slice\":[0,5],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,5],\"type\":\"literal\"}]}]");
     ASSERT_PEG_PARSE(P4_PegRuleInsensitiveLiteral, "i\"\\\"\"", P4_Ok, "[{\"slice\":[0,5],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,5],\"type\":\"literal\"}]}]");
-    ASSERT_PEG_PARSE(P4_PegRuleInsensitiveLiteral, "i\"\\u0020\"", P4_Ok, "[{\"slice\":[0,9],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,9],\"type\":\"literal\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleInsensitiveLiteral, "i\"\\u{0020}\"", P4_Ok, "[{\"slice\":[0,11],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,11],\"type\":\"literal\"}]}]");
     ASSERT_PEG_PARSE(P4_PegRuleInsensitiveLiteral, "i\"hello world\"", P4_Ok, "[{\"slice\":[0,14],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,14],\"type\":\"literal\"}]}]");
 }
 
@@ -75,10 +79,10 @@ void test_range(void) {
 [{\"slice\":[0,5],\"type\":\"range\",\"children\":[\
 {\"slice\":[1,2],\"type\":\"char\"},\
 {\"slice\":[3,4],\"type\":\"char\"}]}]");
-    ASSERT_PEG_PARSE(P4_PegRuleRange, "[\\u0020-\\u0030]", P4_Ok, "\
-[{\"slice\":[0,15],\"type\":\"range\",\"children\":[\
-{\"slice\":[1,7],\"type\":\"char\"},\
-{\"slice\":[8,14],\"type\":\"char\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleRange, "[\\u{0020}-\\u{0030}]", P4_Ok, "\
+[{\"slice\":[0,19],\"type\":\"range\",\"children\":[\
+{\"slice\":[1,9],\"type\":\"char\"},\
+{\"slice\":[10,18],\"type\":\"char\"}]}]");
     ASSERT_PEG_PARSE(P4_PegRuleRange, "[1-9..2]", P4_Ok, "\
 [{\"slice\":[0,8],\"type\":\"range\",\"children\":[\
 {\"slice\":[1,2],\"type\":\"char\"},\
@@ -287,11 +291,16 @@ void test_eval_char(void) {
     ASSERT_EVAL(P4_PegRuleChar, "Ç", P4_Rune, 0x00C7);
     ASSERT_EVAL(P4_PegRuleChar, "你", P4_Rune, 0x4f60); /* https://www.compart.com/en/unicode/U+4F60 */
     ASSERT_EVAL(P4_PegRuleChar, "🐷", P4_Rune, 0x1f437); /* https://www.compart.com/en/unicode/U+1F437 */
-    ASSERT_EVAL(P4_PegRuleChar, "\\u4f60", P4_Rune, 0x4f60);
-    ASSERT_EVAL(P4_PegRuleChar, "\\u0041", P4_Rune, 'A');
-    ASSERT_EVAL(P4_PegRuleChar, "\\u0061", P4_Rune, 'a');
-    ASSERT_EVAL(P4_PegRuleChar, "\\u000a", P4_Rune, '\n');
-    ASSERT_EVAL(P4_PegRuleChar, "\\u000A", P4_Rune, '\n');
+    ASSERT_EVAL(P4_PegRuleChar, "\\u{4f60}", P4_Rune, 0x4f60);
+    ASSERT_EVAL(P4_PegRuleChar, "\\u{a}", P4_Rune, '\n');
+    ASSERT_EVAL(P4_PegRuleChar, "\\u{A}", P4_Rune, '\n');
+    ASSERT_EVAL(P4_PegRuleChar, "\\u{41}", P4_Rune, 'A');
+    ASSERT_EVAL(P4_PegRuleChar, "\\u{61}", P4_Rune, 'a');
+    ASSERT_EVAL(P4_PegRuleChar, "\\u{0041}", P4_Rune, 'A');
+    ASSERT_EVAL(P4_PegRuleChar, "\\u{0061}", P4_Rune, 'a');
+    ASSERT_EVAL(P4_PegRuleChar, "\\u{000a}", P4_Rune, '\n');
+    ASSERT_EVAL(P4_PegRuleChar, "\\u{000A}", P4_Rune, '\n');
+    ASSERT_EVAL(P4_PegRuleChar, "\\u{10ffff}", P4_Rune, 0x10ffff);
 }
 
 #define ASSERT_EVAL_LITERAL(entry, input, expect_lit, expect_sensitive) do { \
@@ -309,7 +318,7 @@ void test_eval_literal(void) {
     ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"hello world\"", "hello world", true);
     ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"你好, World\"", "你好, World", true);
     ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"Peppa PEG 🐷\"", "Peppa PEG 🐷", true);
-    ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"\\u4f60\\u597d, world\"", "你好, world", true);
+    ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"\\u{4f60}\\u{597d}, world\"", "你好, world", true);
     ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"\\n\"", "\n", true);
     ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"\\r\"", "\r", true);
     ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"\\t\"", "\t", true);
@@ -321,7 +330,7 @@ void test_eval_insensitive(void) {
     ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"hello world\"", "hello world", false);
     ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"你好, World\"", "你好, World", false);
     ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"Peppa PEG 🐷\"", "Peppa PEG 🐷", false);
-    ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"\\u4f60\\u597d, world\"", "你好, world", false);
+    ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"\\u{4f60}\\u{597d}, world\"", "你好, world", false);
     ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"\\n\"", "\n", false);
     ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"\\r\"", "\r", false);
     ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"\\t\"", "\t", false);
@@ -342,7 +351,7 @@ void test_eval_range(void) {
     ASSERT_EVAL_RANGE(P4_PegRuleRange, "[0-9]", '0', '9');
     ASSERT_EVAL_RANGE(P4_PegRuleRange, "[a-z]", 'a', 'z');
     ASSERT_EVAL_RANGE(P4_PegRuleRange, "[A-Z]", 'A', 'Z');
-    ASSERT_EVAL_RANGE(P4_PegRuleRange, "[\\u0001-\\uffff]", 0x1, 0xffff);
+    ASSERT_EVAL_RANGE(P4_PegRuleRange, "[\\u{0001}-\\u{10ffff}]", 0x1, 0x10ffff);
     ASSERT_EVAL_RANGE(P4_PegRuleRange, "[你-好]", 0x4f60, 0x597d);
 }
 

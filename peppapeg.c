@@ -210,6 +210,79 @@ P4_ReadRune(P4_String s, P4_Rune* c) {
     }
 }
 
+void* P4_ConcatRune(void *str, P4_Rune chr, size_t n) {
+  char *s = (char *)str;
+
+  if (0 == ((P4_Rune)0xffffff80 & chr)) {
+    /* 1-byte/7-bit ascii (0b0xxxxxxx) */
+    if (n < 1) {
+      return 0;
+    }
+    s[0] = (char)chr;
+    s += 1;
+  } else if (0 == ((P4_Rune)0xfffff800 & chr)) {
+    /* 2-byte/11-bit utf8 code point (0b110xxxxx 0b10xxxxxx) */
+    if (n < 2) {
+      return 0;
+    }
+    s[0] = 0xc0 | (char)((chr >> 6) & 0x1f);
+    s[1] = 0x80 | (char)(chr & 0x3f);
+    s += 2;
+  } else if (0 == ((P4_Rune)0xffff0000 & chr)) {
+    /* 3-byte/16-bit utf8 code point (0b1110xxxx 0b10xxxxxx 0b10xxxxxx) */
+    if (n < 3) {
+      return 0;
+    }
+    s[0] = 0xe0 | (char)((chr >> 12) & 0x0f);
+    s[1] = 0x80 | (char)((chr >> 6) & 0x3f);
+    s[2] = 0x80 | (char)(chr & 0x3f);
+    s += 3;
+  } else { /* if (0 == ((int)0xffe00000 & chr)) { */
+    /* 4-byte/21-bit utf8 code point (0b11110xxx 0b10xxxxxx 0b10xxxxxx 0b10xxxxxx) */
+    if (n < 4) {
+      return 0;
+    }
+    s[0] = 0xf0 | (char)((chr >> 18) & 0x07);
+    s[1] = 0x80 | (char)((chr >> 12) & 0x3f);
+    s[2] = 0x80 | (char)((chr >> 6) & 0x3f);
+    s[3] = 0x80 | (char)(chr & 0x3f);
+    s += 4;
+  }
+
+  return s;
+}
+
+size_t P4_ReadEscapedRune(char* text, P4_Rune* rune) {
+    char ch0 = *text;
+
+    if (ch0 == '\0') {
+        *rune = 0;
+        return 0;
+    }
+
+    if (ch0 != '\\')
+        return P4_ReadRune(text, rune);
+
+    char ch1 = text[1];
+
+    switch (ch1) {
+        case 'b': *rune = 0x8; return 2;
+        case 't': *rune = 0x9; return 2;
+        case 'n': *rune = 0xa; return 2;
+        case 'f': *rune = 0xc; return 2;
+        case 'r': *rune = 0xd; return 2;
+        case '"': *rune = 0x22; return 2;
+        case '/': *rune = 0x2f; return 2;
+        case '\\': *rune = 0x5c; return 2;
+        case 'u': { /* TODO: may not have enough chars. */
+            char chs[5] = {0, 0, 0, 0, 0};
+            memcpy(chs, text + 2, 4);
+            *rune = strtoul(chs, NULL, 16);
+            return 6;
+        }
+        default: return 0;
+    }
+}
 
 /**
  * @brief   Get rune in lower case.

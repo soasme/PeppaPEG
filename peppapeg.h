@@ -521,6 +521,30 @@ P4_String      P4_Version(void);
  */
 size_t         P4_ReadRune(P4_String s, P4_Rune* c);
 
+/**
+ * Read an escaped single code point (rune) from an UTF-8 string.
+ *
+ * @param       text        The text.
+ * @param       rune        The rune.
+ * @return      The size of rune.
+ *
+ * For example:
+ *
+ *      P4_Rune rune;
+ *      P4_ReadEscapedRune("\\u000D", rune); // 0xd
+ */
+size_t         P4_ReadEscapedRune(char* text, P4_Rune* rune);
+
+/**
+ * Append a rune to str (in-place).
+ *
+ * @param       str     The string to be appended.
+ * @param       chr     The rune.
+ * @param       n       The size of rune. Should be 1, 2, 3, 4.
+ * @return      The string starting from appended rune.
+ */
+void*          P4_ConcatRune(void* str, P4_Rune chr, size_t n);
+
 /*
  * ██╗░░░░░██╗████████╗███████╗██████╗░░█████╗░██╗░░░░░
  * ██║░░░░░██║╚══██╔══╝██╔════╝██╔══██╗██╔══██╗██║░░░░░

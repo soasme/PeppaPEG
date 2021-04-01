@@ -15,9 +15,9 @@ set(
     test_flags
     test_back_reference
     test_misc
+    test_peg
     test_example_mustache
     test_example_json
-    test_p4gen
 )
 
 option(ENABLE_VALGRIND "Enable vagrind memory leak report." OFF)

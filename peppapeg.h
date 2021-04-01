@@ -1836,6 +1836,20 @@ void           P4_DeleteToken(P4_Token*);
  */
 P4_Slice*      P4_GetTokenSlice(P4_Token*);
 
+
+/**
+ * @brief       Get the total number of token children.
+ * @param       token   The token.
+ * @return      The total number of token children.
+ *
+ * Example:
+ *
+ *      P4_Token* root = P4_GetSourceAst(source);
+ *      size_t count = P4_GetTokenChildrenCount(root);
+ *      printf("There are %lu children for root node\n", count);
+ */
+size_t         P4_GetTokenChildrenCount(P4_Token* token);
+
 /**
  * @brief       Copy the string that the token covers.
  *              The caller is responsible for freeing the string.
@@ -1872,7 +1886,16 @@ P4_Error       P4_SetGrammarCallback(P4_Grammar*, P4_MatchCallback, P4_ErrorCall
  */
 P4_Error       P4_ReplaceGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
 
-
+/**
+ * @brief       Create a grammar that can parse other grammars written in PEG syntax.
+ * @return      The grammar object.
+ *
+ * Example:
+ *
+ *      P4_Grammar* peg = P4_CreatePegGrammar();
+ *      P4_DeleteGrammar(peg);
+ */
+P4_Grammar*    P4_CreatePegGrammar ();
 
 
 #ifdef __cplusplus

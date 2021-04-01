@@ -207,7 +207,39 @@ typedef enum {
     P4_StackError           = 10,
 } P4_Error;
 
-
+/**
+ * The RuleID for Peppa PEG grammar.
+ */
+typedef enum {
+    P4_PegGrammar                   = 1,
+    P4_PegRuleRule                  = 2,
+    P4_PegRuleRuleDecorators        = 3,
+    P4_PegRuleRuleName              = 4,
+    P4_PegRuleExpression            = 5,
+    P4_PegRulePrimary               = 6,
+    P4_PegRuleDecorator             = 7,
+    P4_PegRuleIdentifier            = 8,
+    P4_PegRuleLiteral               = 9,
+    P4_PegRuleInsensitiveLiteral    = 10,
+    P4_PegRuleRange                 = 11,
+    P4_PegRuleReference             = 12,
+    P4_PegRulePositive              = 13,
+    P4_PegRuleNegative              = 14,
+    P4_PegRuleSequence              = 15,
+    P4_PegRuleChoice                = 16,
+    P4_PegRuleBackReference         = 17,
+    P4_PegRuleRepeat                = 18,
+    P4_PegRuleRepeatOnceOrMore      = 19,
+    P4_PegRuleRepeatZeroOrMore      = 20,
+    P4_PegRuleRepeatZeroOrOnce      = 21,
+    P4_PegRuleRepeatMin             = 22,
+    P4_PegRuleRepeatMax             = 23,
+    P4_PegRuleRepeatExact           = 24,
+    P4_PegRuleRepeatMinMax          = 25,
+    P4_PegRuleNumber                = 26,
+    P4_PegRuleChar                  = 27,
+    P4_PegRuleWhitespace            = 28,
+} P4_PegRuleID;
 
 /*
  *
@@ -1839,6 +1871,9 @@ P4_Error       P4_SetGrammarCallback(P4_Grammar*, P4_MatchCallback, P4_ErrorCall
  * The original grammar rule will be deleted.
  */
 P4_Error       P4_ReplaceGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
+
+
+
 
 #ifdef __cplusplus
 }

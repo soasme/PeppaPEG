@@ -132,43 +132,6 @@
         </label>
         <section id="peg-syntax">
 <h1>PEG Syntax<a class="headerlink" href="#peg-syntax" title="Permalink to this headline">¶</a></h1>
-<section id="use-peg-api">
-<h2>Use Peg API<a class="headerlink" href="#use-peg-api" title="Permalink to this headline">¶</a></h2>
-<p>Peppa PEG provides an imperative way to define a new grammar.
-Function <a class="reference internal" href="references.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a> can load a grammar from a string.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_LoadGrammar</span><span class="p">(</span>
-    <span class="s2">"add = int + int;"</span>
-
-    <span class="s2">"@squashed @tight "</span>
-    <span class="s2">"int = [0-9]+;"</span>
-
-    <span class="s2">"@spaced @lifted "</span>
-    <span class="s2">"ws  = </span><span class="se">\"</span><span class="s2"> </span><span class="se">\"</span><span class="s2">;"</span><span class="p">;</span>
-<span class="p">);</span>
-</pre></div>
-</div>
-<p>The one-statement code is somewhat equivalent to the below code written in low-level C API:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
-
-<span class="k">if</span> <span class="p">(</span><span class="n">P4_Ok</span> <span class="o">!=</span> <span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">RuleAdd</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span>
-    <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">RuleInt</span><span class="p">),</span>
-    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"+"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span>
-    <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">RuleInt</span><span class="p">)</span>
-<span class="p">))</span>
-    <span class="n">goto</span> <span class="n">finalize</span><span class="p">;</span>
-
-<span class="k">if</span> <span class="p">(</span><span class="n">P4_Ok</span> <span class="o">!=</span> <span class="n">P4_AddOnceOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">RuleInt</span><span class="p">,</span> <span class="n">P4_CreateRange</span><span class="p">(</span><span class="s1">'0'</span><span class="p">,</span> <span class="s1">'9'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
-    <span class="n">goto</span> <span class="n">finalize</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">P4_Ok</span> <span class="o">!=</span> <span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">RuleInt</span><span class="p">,</span> <span class="n">P4_FLAG_SQUASHED</span><span class="o">|</span><span class="n">P4_FLAG_TIGHT</span><span class="p">))</span>
-    <span class="n">goto</span> <span class="n">finalize</span><span class="p">;</span>
-
-<span class="k">if</span> <span class="p">(</span><span class="n">P4_Ok</span> <span class="o">!=</span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">RuleWs</span><span class="p">,</span> <span class="s2">" "</span><span class="p">,</span> <span class="n">true</span><span class="p">))</span>
-    <span class="n">goto</span> <span class="n">finalize</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">P4_Ok</span> <span class="o">!=</span> <span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">RuleWs</span><span class="p">,</span> <span class="n">P4_FLAG_SPACED</span><span class="o">|</span><span class="n">P4_FLAG_LIFTED</span><span class="p">))</span>
-    <span class="n">goto</span> <span class="n">finalize</span><span class="p">;</span>
-</pre></div>
-</div>
-</section>
 <section id="grammar-rules">
 <h2>Grammar Rules<a class="headerlink" href="#grammar-rules" title="Permalink to this headline">¶</a></h2>
 <p>The grammar is simply a list of rules with names. Rules are defined like this:</p>
@@ -340,24 +303,106 @@ For example,</p>
 <section id="spaced">
 <h3>@spaced<a class="headerlink" href="#spaced" title="Permalink to this headline">¶</a></h3>
 <p>If a rule has <cite>@spaced</cite> decorator, it will be auto-inserted in between every element of sequences and repetitions.</p>
+<p>For example, my sequence can match “helloworld”, “hello world”, “hello  t  n world”, etc.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">my_sequence</span> <span class="o">=</span> <span class="s2">"hello"</span> <span class="s2">"world"</span><span class="p">;</span>
+
+<span class="nd">@spaced</span>
+<span class="n">ws</span> <span class="o">=</span> <span class="s2">" "</span> <span class="o">/</span> <span class="s2">"</span><span class="se">\t</span><span class="s2">"</span> <span class="o">/</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+</pre></div>
+</div>
 </section>
 <section id="tight">
 <h3>@tight<a class="headerlink" href="#tight" title="Permalink to this headline">¶</a></h3>
 <p>If a sequence or repetition rule has <cite>@tight</cite> decorator, no <cite>@spaced</cite> rules will be applied.</p>
+<p>For example, my_another_sequence can only match “helloworld”.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">my_another_sequence</span> <span class="o">=</span> <span class="s2">"hello"</span> <span class="s2">"world"</span><span class="p">;</span>
+
+<span class="nd">@spaced</span>
+<span class="n">ws</span> <span class="o">=</span> <span class="s2">" "</span> <span class="o">/</span> <span class="s2">"</span><span class="se">\t</span><span class="s2">"</span> <span class="o">/</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+</pre></div>
+</div>
 </section>
 <section id="lifted">
 <h3>@lifted<a class="headerlink" href="#lifted" title="Permalink to this headline">¶</a></h3>
 <p>If a rule has <cite>@lifted</cite> decorator, its children tokens will replace the parent token.</p>
+<p>In this example, the parsed token tree has no token mapping to primary rule, but rather either digit or char.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@lifted</span>
+<span class="n">primary</span> <span class="o">=</span> <span class="n">digit</span> <span class="o">/</span> <span class="n">char</span><span class="p">;</span>
+
+<span class="n">number</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">];</span>
+<span class="n">char</span>   <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">-</span><span class="n">z</span><span class="p">]</span> <span class="o">/</span> <span class="p">[</span><span class="n">A</span><span class="o">-</span><span class="n">Z</span><span class="p">];</span>
+</pre></div>
+</div>
 </section>
 <section id="nonterminal">
 <h3>@nonterminal<a class="headerlink" href="#nonterminal" title="Permalink to this headline">¶</a></h3>
-<p>If a rule has <cite>nonterminal</cite> decorator, and it has only one single child token, the child token will replace the parent token.
-If it produces multiple children tokens, this decorator has no effect.</p>
+<p>If a rule has <cite>nonterminal</cite> decorator, and it has only one single child token, the child token will replace the parent token.</p>
+<p>If it produces multiple children tokens, this decorator has no effect.</p>
+<p>In this example,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>@lifted
+add = number ("+" number)?;
+
+number = [0-9];
+</pre></div>
+</div>
+<p>If we feed the input “1”, the token tree is like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Number</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If we feed the input “1+1”, the token tree is like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Add</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">Number</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">Number</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
 </section>
 <section id="squashed">
 <h3>@squashed<a class="headerlink" href="#squashed" title="Permalink to this headline">¶</a></h3>
 <p>If a rule has <cite>@squashed</cite> decorator, its children tokens will be trimmed.</p>
+<p>In this example, the rule <cite>float</cite> will drop all <cite>number</cite> tokens, leaving only one single node in the ast.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>@squashed
+float = number ("." number)?;
+
+number = [0-9];
+</pre></div>
+</div>
 </section>
+</section>
+<section id="use-peg-api">
+<h2>Use Peg API<a class="headerlink" href="#use-peg-api" title="Permalink to this headline">¶</a></h2>
+<p>Function <a class="reference internal" href="references.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a> can load a grammar from a string.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_LoadGrammar</span><span class="p">(</span>
+    <span class="s2">"add = int + int;"</span>
+
+    <span class="s2">"@squashed @tight "</span>
+    <span class="s2">"int = [0-9]+;"</span>
+
+    <span class="s2">"@spaced @lifted "</span>
+    <span class="s2">"ws  = </span><span class="se">\"</span><span class="s2"> </span><span class="se">\"</span><span class="s2">;"</span><span class="p">;</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>The one-statement code is somewhat equivalent to the below code written in low-level C API:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">P4_Ok</span> <span class="o">!=</span> <span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">RuleAdd</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">RuleInt</span><span class="p">),</span>
+    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"+"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span>
+    <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">RuleInt</span><span class="p">)</span>
+<span class="p">))</span>
+    <span class="n">goto</span> <span class="n">finalize</span><span class="p">;</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">P4_Ok</span> <span class="o">!=</span> <span class="n">P4_AddOnceOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">RuleInt</span><span class="p">,</span> <span class="n">P4_CreateRange</span><span class="p">(</span><span class="s1">'0'</span><span class="p">,</span> <span class="s1">'9'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
+    <span class="n">goto</span> <span class="n">finalize</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">P4_Ok</span> <span class="o">!=</span> <span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">RuleInt</span><span class="p">,</span> <span class="n">P4_FLAG_SQUASHED</span><span class="o">|</span><span class="n">P4_FLAG_TIGHT</span><span class="p">))</span>
+    <span class="n">goto</span> <span class="n">finalize</span><span class="p">;</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">P4_Ok</span> <span class="o">!=</span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">RuleWs</span><span class="p">,</span> <span class="s2">" "</span><span class="p">,</span> <span class="n">true</span><span class="p">))</span>
+    <span class="n">goto</span> <span class="n">finalize</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">P4_Ok</span> <span class="o">!=</span> <span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">RuleWs</span><span class="p">,</span> <span class="n">P4_FLAG_SPACED</span><span class="o">|</span><span class="n">P4_FLAG_LIFTED</span><span class="p">))</span>
+    <span class="n">goto</span> <span class="n">finalize</span><span class="p">;</span>
+</pre></div>
+</div>
 </section>
 </section>
 
@@ -416,7 +461,6 @@ If it produces multiple children tokens, this decorator has no effect.</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">PEG Syntax</a><ul>
-<li><a class="reference internal" href="#use-peg-api">Use Peg API</a></li>
 <li><a class="reference internal" href="#grammar-rules">Grammar Rules</a></li>
 <li><a class="reference internal" href="#literal">Literal</a></li>
 <li><a class="reference internal" href="#range">Range</a></li>
@@ -434,6 +478,7 @@ If it produces multiple children tokens, this decorator has no effect.</p>
 <li><a class="reference internal" href="#squashed">&#64;squashed</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#use-peg-api">Use Peg API</a></li>
 </ul>
 </li>
 </ul>

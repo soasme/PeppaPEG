@@ -1,47 +1,6 @@
 PEG Syntax
 ==========
 
-Use Peg API
-------------
-
-Peppa PEG provides an imperative way to define a new grammar.
-Function :c:func:`P4_LoadGrammar` can load a grammar from a string.
-
-.. code-block::
-
-    P4_Grammar* grammar = P4_LoadGrammar(
-        "add = int + int;"
-
-        "@squashed @tight "
-        "int = [0-9]+;"
-
-        "@spaced @lifted "
-        "ws  = \" \";";
-    );
-
-The one-statement code is somewhat equivalent to the below code written in low-level C API:
-
-.. code-block::
-
-    P4_Grammar* grammar = P4_CreateGrammar();
-
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, RuleAdd, 3,
-        P4_CreateReference(RuleInt),
-        P4_CreateLiteral("+", true),
-        P4_CreateReference(RuleInt)
-    ))
-        goto finalize;
-
-    if (P4_Ok != P4_AddOnceOrMore(grammar, RuleInt, P4_CreateRange('0', '9', 1)))
-        goto finalize;
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, RuleInt, P4_FLAG_SQUASHED|P4_FLAG_TIGHT))
-        goto finalize;
-
-    if (P4_Ok != P4_AddLiteral(grammar, RuleWs, " ", true))
-        goto finalize;
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, RuleWs, P4_FLAG_SPACED|P4_FLAG_LIFTED))
-        goto finalize;
-
 Grammar Rules
 -------------
 
@@ -283,23 +242,125 @@ For example,
 
 If a rule has `@spaced` decorator, it will be auto-inserted in between every element of sequences and repetitions.
 
+For example, my sequence can match "helloworld", "hello world", "hello  \t  \n world", etc.
+
+.. code-block::
+
+    my_sequence = "hello" "world";
+
+    @spaced
+    ws = " " / "\t" / "\n";
+
 @tight
 ```````
 
 If a sequence or repetition rule has `@tight` decorator, no `@spaced` rules will be applied.
+
+For example, my_another_sequence can only match "helloworld".
+
+.. code-block::
+
+    my_another_sequence = "hello" "world";
+
+    @spaced
+    ws = " " / "\t" / "\n";
 
 @lifted
 ```````
 
 If a rule has `@lifted` decorator, its children tokens will replace the parent token.
 
+In this example, the parsed token tree has no token mapping to primary rule, but rather either digit or char.
+
+.. code-block::
+
+    @lifted
+    primary = digit / char;
+
+    number = [0-9];
+    char   = [a-z] / [A-Z];
+
 @nonterminal
 ````````````
 
 If a rule has `nonterminal` decorator, and it has only one single child token, the child token will replace the parent token.
+
 If it produces multiple children tokens, this decorator has no effect.
+
+In this example,
+
+.. code-block::
+
+    @lifted
+    add = number ("+" number)?;
+
+    number = [0-9];
+
+If we feed the input "1", the token tree is like:
+
+.. code-block::
+
+    Number(0,1)
+
+If we feed the input "1+1", the token tree is like:
+
+.. code-block::
+
+    Add(0,3)
+        Number(0,1)
+        Number(1,3)
 
 @squashed
 `````````
 
 If a rule has `@squashed` decorator, its children tokens will be trimmed.
+
+In this example, the rule `float` will drop all `number` tokens, leaving only one single node in the ast.
+
+.. code-block::
+
+    @squashed
+    float = number ("." number)?;
+
+    number = [0-9];
+
+
+Use Peg API
+------------
+
+Function :c:func:`P4_LoadGrammar` can load a grammar from a string.
+
+.. code-block::
+
+    P4_Grammar* grammar = P4_LoadGrammar(
+        "add = int + int;"
+
+        "@squashed @tight "
+        "int = [0-9]+;"
+
+        "@spaced @lifted "
+        "ws  = \" \";";
+    );
+
+The one-statement code is somewhat equivalent to the below code written in low-level C API:
+
+.. code-block::
+
+    P4_Grammar* grammar = P4_CreateGrammar();
+
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, RuleAdd, 3,
+        P4_CreateReference(RuleInt),
+        P4_CreateLiteral("+", true),
+        P4_CreateReference(RuleInt)
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_AddOnceOrMore(grammar, RuleInt, P4_CreateRange('0', '9', 1)))
+        goto finalize;
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, RuleInt, P4_FLAG_SQUASHED|P4_FLAG_TIGHT))
+        goto finalize;
+
+    if (P4_Ok != P4_AddLiteral(grammar, RuleWs, " ", true))
+        goto finalize;
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, RuleWs, P4_FLAG_SPACED|P4_FLAG_LIFTED))
+        goto finalize;

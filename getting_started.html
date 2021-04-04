@@ -2,7 +2,8 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Expressions" href="expressions.html" /><link rel="prev" title="Peppa PEG’s Documentation" href="index.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Expressions" href="expressions.html" /><link rel="prev" title="Peppa PEG’s Documentation" href="index.html" />
 
     <meta name="generator" content="sphinx-3.5.3, furo 2021.03.20.beta30"/>
         <title>Getting Started - Peppa PEG 1.9.0 documentation</title>
@@ -111,6 +112,7 @@
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="expressions.html">Expressions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="flags.html">Expression Flags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="peg.html">PEG Syntax</a></li>
 <li class="toctree-l1"><a class="reference internal" href="caveats.html">Caveats</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 <li class="toctree-l1"><a class="reference internal" href="whatsnew.html">Change Log</a></li>
@@ -129,9 +131,9 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <div class="section" id="getting-started">
+        <section id="getting-started">
 <span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="header-file-and-source-file">
+<section id="header-file-and-source-file">
 <h2>Header File and Source File<a class="headerlink" href="#header-file-and-source-file" title="Permalink to this headline">¶</a></h2>
 <p>Peppa PEG has a header file and a C file, so you can add it to your project by copying files <cite>peppapeg.h</cite> and <cite>peppapeg.c</cite>.</p>
 <p>Peppa PEG assumes your project is ANSI C (C89, or C90) compatible.</p>
@@ -139,8 +141,8 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#include "peppapeg.h"</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="data-structures">
+</section>
+<section id="data-structures">
 <h2>Data Structures<a class="headerlink" href="#data-structures" title="Permalink to this headline">¶</a></h2>
 <p>All of the data structures and functions provided by Peppa PEG start with <cite>P4_</cite>
 (Count the number of character “P” in <strong>P</strong> e <strong>p</strong> <strong>p</strong> a <strong>P</strong> E G).</p>
@@ -151,8 +153,8 @@
 <li><p><a class="reference internal" href="references.html#c.P4_Source" title="P4_Source"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Source</span></code></a>: The content to parse.</p></li>
 <li><p><a class="reference internal" href="references.html#c.P4_Token" title="P4_Token"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Token</span></code></a>. The building block of an AST (abstract syntax tree), e.g. the final parsing result of a grammar given the source.</p></li>
 </ul>
-</div>
-<div class="section" id="step-1-create-grammar">
+</section>
+<section id="step-1-create-grammar">
 <h2>Step 1: Create Grammar<a class="headerlink" href="#step-1-create-grammar" title="Permalink to this headline">¶</a></h2>
 <p>In Peppa PEG, we always start with creating a <a class="reference internal" href="references.html#c.P4_Grammar" title="P4_Grammar"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Grammar</span></code></a>. We create such a data structure using <a class="reference internal" href="references.html#c.P4_CreateGrammar" title="P4_CreateGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateGrammar()</span></code></a>.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
@@ -162,8 +164,8 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="step-2-add-grammar-rule">
+</section>
+<section id="step-2-add-grammar-rule">
 <h2>Step 2: Add Grammar Rule<a class="headerlink" href="#step-2-add-grammar-rule" title="Permalink to this headline">¶</a></h2>
 <p>There are plenty kinds of rules in PEG. In this example, we use the simplest, <a class="reference internal" href="references.html#c.P4_ExpressionKind" title="P4_ExpressionKind"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_Literal</span></code></a>. We add such a rule using <a class="reference internal" href="references.html#c.P4_AddLiteral" title="P4_AddLiteral"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_AddLiteral()</span></code></a>.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s">"HelloWorld"</span><span class="p">,</span> <span class="nb">false</span><span class="p">)</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="p">{</span>
@@ -173,8 +175,8 @@
 </pre></div>
 </div>
 <p>The second parameter is a numeric ID for the grammar rule. Each rule has its unique ID. The third parameter is the exact string to match. The fourth parameter determines if the string is case sensitive.</p>
-</div>
-<div class="section" id="step-3-create-source">
+</section>
+<section id="step-3-create-source">
 <h2>Step 3: Create Source<a class="headerlink" href="#step-3-create-source" title="Permalink to this headline">¶</a></h2>
 <p>We create a <a class="reference internal" href="references.html#c.P4_Source" title="P4_Source"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Source</span></code></a> using <a class="reference internal" href="references.html#c.P4_CreateSource" title="P4_CreateSource"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateSource()</span></code></a>.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Source</span><span class="o">*</span>  <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s">"HelloWorld"</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
@@ -185,8 +187,8 @@
 </pre></div>
 </div>
 <p>The first parameter is the content of the source. The second parameter is the ID of the entry grammar rule.</p>
-</div>
-<div class="section" id="step-4-parse">
+</section>
+<section id="step-4-parse">
 <h2>Step 4: Parse<a class="headerlink" href="#step-4-parse" title="Permalink to this headline">¶</a></h2>
 <p>Now the stage is setup; call <a class="reference internal" href="references.html#c.P4_Parse" title="P4_Parse"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_Parse()</span></code></a>. If everything is okay, it returns a zero value - <a class="reference internal" href="references.html#c.P4_Error" title="P4_Error"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_Ok</span></code></a>.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="p">{</span>
@@ -195,8 +197,8 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="step-5-traverse-token-tree">
+</section>
+<section id="step-5-traverse-token-tree">
 <h2>Step 5: Traverse Token Tree<a class="headerlink" href="#step-5-traverse-token-tree" title="Permalink to this headline">¶</a></h2>
 <p>P4_Source contains a token tree if parse successfully. We get the root node of such a token tree using <a class="reference internal" href="references.html#c.P4_GetSourceAst" title="P4_GetSourceAst"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_GetSourceAst()</span></code></a>.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Token</span><span class="o">*</span> <span class="n">node</span>   <span class="o">=</span> <span class="n">P4_GetSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
@@ -223,8 +225,8 @@
 <span class="n">free</span><span class="p">(</span><span class="n">text</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="step-6-clean-up">
+</section>
+<section id="step-6-clean-up">
 <h2>Step 6: Clean Up<a class="headerlink" href="#step-6-clean-up" title="Permalink to this headline">¶</a></h2>
 <p>Last but not least, don’t forget to free all the allocated memory.</p>
 <ul class="simple">
@@ -235,8 +237,8 @@
 <span class="n">P4_DeleteGrammar</span><span class="p">(</span><span class="n">grammar</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="full-example-code">
+</section>
+<section id="full-example-code">
 <h2>Full Example Code<a class="headerlink" href="#full-example-code" title="Permalink to this headline">¶</a></h2>
 <p>The complete code for this example:</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
@@ -290,13 +292,13 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="conclusion">
+</section>
+<section id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
 <p>In this tutorial, we walk through the basic data structures and combine them in one example. The example parses nothing but “HelloWorld” to a single token.</p>
 <p>I hope this example can get you a basic understanding of Peppa PEG. Now you can go back to <a class="reference internal" href="index.html#main"><span class="std std-ref">Peppa PEG’s Documentation</span></a> and pick more docs to read!</p>
-</div>
-</div>
+</section>
+</section>
 
       </article>
       <footer>

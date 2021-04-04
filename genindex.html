@@ -110,6 +110,7 @@
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="expressions.html">Expressions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="flags.html">Expression Flags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="peg.html">PEG Syntax</a></li>
 <li class="toctree-l1"><a class="reference internal" href="caveats.html">Caveats</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 <li class="toctree-l1"><a class="reference internal" href="whatsnew.html">Change Log</a></li>
@@ -175,6 +176,8 @@
 </li>
         <li><a href="references.html#c.P4_AddZeroOrOnce">P4_AddZeroOrOnce (C function)</a>
 </li>
+        <li><a href="references.html#c.P4_ConcatRune">P4_ConcatRune (C function)</a>
+</li>
         <li><a href="references.html#c.P4_CopyTokenString">P4_CopyTokenString (C function)</a>
 </li>
         <li><a href="references.html#c.P4_CreateBackReference">P4_CreateBackReference (C function)</a>
@@ -194,6 +197,8 @@
         <li><a href="references.html#c.P4_CreateNegative">P4_CreateNegative (C function)</a>
 </li>
         <li><a href="references.html#c.P4_CreateOnceOrMore">P4_CreateOnceOrMore (C function)</a>
+</li>
+        <li><a href="references.html#c.P4_CreatePegGrammar">P4_CreatePegGrammar (C function)</a>
 </li>
         <li><a href="references.html#c.P4_CreatePositive">P4_CreatePositive (C function)</a>
 </li>
@@ -299,8 +304,6 @@
 </li>
         <li><a href="references.html#c.P4_FLAG_SPACED">P4_FLAG_SPACED (C macro)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="references.html#c.P4_FLAG_SQUASHED">P4_FLAG_SQUASHED (C macro)</a>
 </li>
         <li><a href="references.html#c.P4_FLAG_TIGHT">P4_FLAG_TIGHT (C macro)</a>
@@ -333,9 +336,13 @@
 </li>
         <li><a href="references.html#c.P4_GetRecursionLimit">P4_GetRecursionLimit (C function)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="references.html#c.P4_GetSourceAst">P4_GetSourceAst (C function)</a>
 </li>
         <li><a href="references.html#c.P4_GetSourcePosition">P4_GetSourcePosition (C function)</a>
+</li>
+        <li><a href="references.html#c.P4_GetTokenChildrenCount">P4_GetTokenChildrenCount (C function)</a>
 </li>
         <li><a href="references.html#c.P4_GetTokenSlice">P4_GetTokenSlice (C function)</a>
 </li>
@@ -375,6 +382,8 @@
 </li>
         <li><a href="references.html#c.P4_JsonifySourceAst">P4_JsonifySourceAst (C function)</a>
 </li>
+        <li><a href="references.html#c.P4_LoadGrammar">P4_LoadGrammar (C function)</a>
+</li>
         <li><a href="references.html#c.P4_MAJOR_VERSION">P4_MAJOR_VERSION (C macro)</a>
 </li>
         <li><a href="references.html#c.P4_MINOR_VERSION">P4_MINOR_VERSION (C macro)</a>
@@ -382,6 +391,68 @@
         <li><a href="references.html#c.P4_Parse">P4_Parse (C function)</a>
 </li>
         <li><a href="references.html#c.P4_PATCH_VERSION">P4_PATCH_VERSION (C macro)</a>
+</li>
+        <li><a href="references.html#c.P4_PegEval">P4_PegEval (C function)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID">P4_PegRuleID (C enum)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegGrammar">P4_PegRuleID.P4_PegGrammar (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleBackReference">P4_PegRuleID.P4_PegRuleBackReference (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleChar">P4_PegRuleID.P4_PegRuleChar (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleChoice">P4_PegRuleID.P4_PegRuleChoice (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleDecorator">P4_PegRuleID.P4_PegRuleDecorator (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleExpression">P4_PegRuleID.P4_PegRuleExpression (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleIdentifier">P4_PegRuleID.P4_PegRuleIdentifier (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleInsensitiveLiteral">P4_PegRuleID.P4_PegRuleInsensitiveLiteral (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleLiteral">P4_PegRuleID.P4_PegRuleLiteral (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleNegative">P4_PegRuleID.P4_PegRuleNegative (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleNumber">P4_PegRuleID.P4_PegRuleNumber (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRulePositive">P4_PegRuleID.P4_PegRulePositive (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRulePrimary">P4_PegRuleID.P4_PegRulePrimary (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleRange">P4_PegRuleID.P4_PegRuleRange (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleReference">P4_PegRuleID.P4_PegRuleReference (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleRepeat">P4_PegRuleID.P4_PegRuleRepeat (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleRepeatExact">P4_PegRuleID.P4_PegRuleRepeatExact (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleRepeatMax">P4_PegRuleID.P4_PegRuleRepeatMax (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleRepeatMin">P4_PegRuleID.P4_PegRuleRepeatMin (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleRepeatMinMax">P4_PegRuleID.P4_PegRuleRepeatMinMax (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleRepeatOnceOrMore">P4_PegRuleID.P4_PegRuleRepeatOnceOrMore (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleRepeatZeroOrMore">P4_PegRuleID.P4_PegRuleRepeatZeroOrMore (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleRepeatZeroOrOnce">P4_PegRuleID.P4_PegRuleRepeatZeroOrOnce (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleRule">P4_PegRuleID.P4_PegRuleRule (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleRuleDecorators">P4_PegRuleID.P4_PegRuleRuleDecorators (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleRuleName">P4_PegRuleID.P4_PegRuleRuleName (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleSequence">P4_PegRuleID.P4_PegRuleSequence (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_PegRuleID.P4_PegRuleWhitespace">P4_PegRuleID.P4_PegRuleWhitespace (C enumerator)</a>
+</li>
+        <li><a href="references.html#c.P4_ReadEscapedRune">P4_ReadEscapedRune (C function)</a>
 </li>
         <li><a href="references.html#c.P4_ReadRune">P4_ReadRune (C function)</a>
 </li>
@@ -442,6 +513,8 @@
         <li><a href="references.html#c.P4_Source.verbose">P4_Source.verbose (C var)</a>
 </li>
         <li><a href="references.html#c.P4_Source.whitespacing">P4_Source.whitespacing (C var)</a>
+</li>
+        <li><a href="references.html#c.P4_StringifyPegGrammarRuleID">P4_StringifyPegGrammarRuleID (C function)</a>
 </li>
         <li><a href="references.html#c.P4_Token">P4_Token (C struct)</a>
 </li>

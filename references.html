@@ -2,7 +2,8 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Change Log" href="whatsnew.html" /><link rel="prev" title="Caveats" href="caveats.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Change Log" href="whatsnew.html" /><link rel="prev" title="Caveats" href="caveats.html" />
 
     <meta name="generator" content="sphinx-3.5.3, furo 2021.03.20.beta30"/>
         <title>References - Peppa PEG 1.9.0 documentation</title>
@@ -111,6 +112,7 @@
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="expressions.html">Expressions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="flags.html">Expression Flags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="peg.html">PEG Syntax</a></li>
 <li class="toctree-l1"><a class="reference internal" href="caveats.html">Caveats</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">References</a></li>
 <li class="toctree-l1"><a class="reference internal" href="whatsnew.html">Change Log</a></li>
@@ -129,7 +131,7 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <div class="section" id="references">
+        <section id="references">
 <h1>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h1>
 <p>Peppa PEG - Ultra lightweight PEG Parser in ANSI C.</p>
 <p>MIT License</p>
@@ -148,7 +150,7 @@
 </dd>
 </dl>
 </p>
-<div class="section" id="structs">
+<section id="structs">
 <h2>STRUCTS<a class="headerlink" href="#structs" title="Permalink to this headline">¶</a></h2>
 <dl class="c struct">
 <dt id="c.P4_Slice">
@@ -412,8 +414,8 @@
 </dd></dl>
 </div>
 </dd></dl>
-</div>
-<div class="section" id="defines">
+</section>
+<section id="defines">
 <h2>DEFINES<a class="headerlink" href="#defines" title="Permalink to this headline">¶</a></h2>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
@@ -490,8 +492,8 @@
 <p>It can be adjusted via function P4_SetRecursionLimit. </p>
 </dd></dl>
 </div>
-</div>
-<div class="section" id="enums">
+</section>
+<section id="enums">
 <h2>ENUMS<a class="headerlink" href="#enums" title="Permalink to this headline">¶</a></h2>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-enums">Enums</p>
@@ -607,9 +609,127 @@
 <dd><p>When recursion limit is reached. </p>
 </dd></dl>
 </dd></dl>
+<dl class="c enum">
+<dt id="c.P4_PegRuleID">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10"></span><em class="property"><span class="pre">enum</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleID</span></code><a class="headerlink" href="#c.P4_PegRuleID" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>The RuleID for Peppa PEG grammar. </p>
+<p><em>Values:</em></p>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegGrammar">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10a94406f078e381ea8bc9c94be74299355"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegGrammar</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegGrammar" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleRule">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10a9992fa0d63eb49623fcf55b5b6d7a0e5"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleRule</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleRule" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleRuleDecorators">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10add7b2c042c06c05e93e7da446b3512d2"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleRuleDecorators</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleRuleDecorators" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleRuleName">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10aaf8ce463da54915dec7e061415c010ba"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleRuleName</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleRuleName" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleExpression">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10ab87245af71a4d70e044e49fc4e17a6c2"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleExpression</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleExpression" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRulePrimary">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10a5d92ba734372325e067a2af7b2bd9011"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRulePrimary</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRulePrimary" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleDecorator">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10a058ac7397d8d8b60c4fcbcc507f22998"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleDecorator</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleDecorator" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleIdentifier">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10ab771923102c3755a7c57dd68f244be34"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleIdentifier</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleIdentifier" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleLiteral">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10afa8cf7f24091235ffbafc612e5411e26"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleLiteral</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleLiteral" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleInsensitiveLiteral">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10aaeea91e679045313d94c02a43d807ebb"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleInsensitiveLiteral</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleInsensitiveLiteral" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleRange">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10a88d70862fb139fef921da6c58e9e7f55"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleRange</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleRange" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleReference">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10a7a8d126cd401a4fe20996cbd952bfd16"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleReference</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleReference" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRulePositive">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10a91afa86fb7bceaf1ad6249cb767e7b35"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRulePositive</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRulePositive" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleNegative">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10ac78d3d9b070909494c297537cd62648a"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleNegative</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleNegative" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleSequence">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10a9235e6338c9024975884a021d5f42674"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleSequence</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleSequence" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleChoice">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10a5fea7192cbbf9bdb359aec1b860107db"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleChoice</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleChoice" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleBackReference">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10aea03d5cd6abe1d766fa96c3e13b17714"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleBackReference</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleBackReference" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleRepeat">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10adba30ec3c6e977e742c295d5e2eb084a"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleRepeat</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleRepeat" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleRepeatOnceOrMore">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10a9285d7d0e1bc9685bea8e5b359ffbdcf"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleRepeatOnceOrMore</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleRepeatOnceOrMore" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleRepeatZeroOrMore">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10a879bae43bdaed38c3332fadc110eeb04"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleRepeatZeroOrMore</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleRepeatZeroOrMore" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleRepeatZeroOrOnce">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10a92251687431fcfedeb701ad6e2dd6f53"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleRepeatZeroOrOnce</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleRepeatZeroOrOnce" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleRepeatMin">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10a596c02b220f414590125014d9f1873b7"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleRepeatMin</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleRepeatMin" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleRepeatMax">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10a0b82b57ca10239000ac965851d90da4e"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleRepeatMax</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleRepeatMax" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleRepeatExact">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10a9d1438f34f531979fc9d5959ea4ca900"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleRepeatExact</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleRepeatExact" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleRepeatMinMax">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10a0c349bc0c134d04ef708bbe50eb3cf37"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleRepeatMinMax</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleRepeatMinMax" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleNumber">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10ab146634cfd561b718118595126521bd0"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleNumber</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleNumber" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleChar">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10aa5b2885851dcc034423f9539cd065b90"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleChar</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleChar" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleWhitespace">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10a18caf913b7ebe95c351109910698a8f2"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleWhitespace</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleWhitespace" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
+</dd></dl>
 </div>
-</div>
-<div class="section" id="functions">
+</section>
+<section id="functions">
 <h2>FUNCTIONS<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
@@ -647,6 +767,42 @@
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">s</span></code>: The string in UTF-8 encoding. </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">c</span></code>: The pointer to the rune to read. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_ReadEscapedRune">
+<span class="target" id="peppapeg_8h_1a556692f6f9e171f48d6051b4ec45757e"></span><span class="pre">size_t</span> <code class="sig-name descname"><span class="pre">P4_ReadEscapedRune</span></code><span class="sig-paren">(</span><span class="pre">char</span> <span class="pre">*</span><em><span class="pre">text</span></em>, <span class="pre">P4_Rune</span> <span class="pre">*</span><em><span class="pre">rune</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_ReadEscapedRune" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Read an escaped single code point (rune) from an UTF-8 string.</p>
+<p><p>For example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Rune</span> <span class="n">rune</span><span class="p">;</span>
+ <span class="n">P4_ReadEscapedRune</span><span class="p">(</span><span class="s2">"</span><span class="se">\\</span><span class="s2">u000D"</span><span class="p">,</span> <span class="n">rune</span><span class="p">);</span> <span class="o">//</span> <span class="mh">0xd</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The size of rune.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">text</span></code>: The text. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rune</span></code>: The rune. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_ConcatRune">
+<span class="target" id="peppapeg_8h_1a52a6e4c90fc0e1be5fad6ebd3f6852b8"></span><span class="pre">void</span> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_ConcatRune</span></code><span class="sig-paren">(</span><span class="pre">void</span> <span class="pre">*</span><em><span class="pre">str</span></em>, <span class="pre">P4_Rune</span> <em><span class="pre">chr</span></em>, <span class="pre">size_t</span> <em><span class="pre">n</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_ConcatRune" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Append a rune to str (in-place).</p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The string starting from appended rune. </p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">str</span></code>: The string to be appended. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">chr</span></code>: The rune. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n</span></code>: The size of rune. Should be 1, 2, 3, 4. </p></li>
 </ul>
 </dd>
 </dl>
@@ -2143,6 +2299,26 @@
 </p>
 </dd></dl>
 <dl class="c function">
+<dt id="c.P4_GetTokenChildrenCount">
+<span class="target" id="peppapeg_8h_1a86b5402714fde51c27cb00fab100401c"></span><span class="pre">size_t</span> <code class="sig-name descname"><span class="pre">P4_GetTokenChildrenCount</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a> <span class="pre">*</span><em><span class="pre">token</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetTokenChildrenCount" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Get the total number of token children. </p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Token</span><span class="o">*</span> <span class="n">root</span> <span class="o">=</span> <span class="n">P4_GetSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
+ <span class="n">size_t</span> <span class="n">count</span> <span class="o">=</span> <span class="n">P4_GetTokenChildrenCount</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
+ <span class="n">printf</span><span class="p">(</span><span class="s2">"There are </span><span class="si">%lu</span><span class="s2"> children for root node</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">count</span><span class="p">);</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The total number of token children.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">token</span></code>: The token. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
 <dt id="c.P4_CopyTokenString">
 <span class="target" id="peppapeg_8h_1ad3758cb6df8cbd4811c47c64b0e075bf"></span><span class="pre">P4_String</span> <code class="sig-name descname"><span class="pre">P4_CopyTokenString</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CopyTokenString" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Copy the string that the token covers. The caller is responsible for freeing the string. </p>
@@ -2195,9 +2371,94 @@
 </dl>
 </p>
 </dd></dl>
+<dl class="c function">
+<dt id="c.P4_CreatePegGrammar">
+<span class="target" id="peppapeg_8h_1af39ce66014ef60f9a8c0534000f9426c"></span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreatePegGrammar</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreatePegGrammar" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Create a grammar that can parse other grammars written in PEG syntax. </p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">peg</span> <span class="o">=</span> <span class="n">P4_CreatePegGrammar</span><span class="p">();</span>
+ <span class="n">P4_DeleteGrammar</span><span class="p">(</span><span class="n">peg</span><span class="p">);</span>
+</pre></div>
 </div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The grammar object.</p>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_PegEval">
+<span class="target" id="peppapeg_8h_1a0a47d15c8bbf3c5e091873ff23c96d2c"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_PegEval</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a> <span class="pre">*</span><em><span class="pre">token</span></em>, <span class="pre">void</span> <span class="pre">*</span><em><span class="pre">result</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_PegEval" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Evaluate the token ast parsed by P4_CreatePegGrammar. </p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">peg</span>     <span class="o">=</span> <span class="n">P4_CreatePegGrammar</span><span class="p">();</span>
+ <span class="n">P4_Source</span><span class="o">*</span>  <span class="n">peggram</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s2">"my_grammar = </span><span class="se">\"</span><span class="s2">abc</span><span class="se">\"</span><span class="s2">;"</span><span class="p">,</span> <span class="n">P4_PegGrammar</span><span class="p">);</span>
+ <span class="n">P4_Parse</span><span class="p">(</span><span class="n">peg</span><span class="p">,</span> <span class="n">peggram</span><span class="p">);</span>
+
+ <span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">my_grammar</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
+
+ <span class="k">if</span> <span class="p">(</span><span class="n">P4_Ok</span> <span class="o">!=</span> <span class="n">P4_PegEval</span><span class="p">(</span><span class="n">P4_GetSourceAst</span><span class="p">(</span><span class="n">peggram</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">my_grammar</span><span class="p">))</span>
+     <span class="n">printf</span><span class="p">(</span><span class="s2">"invalid token tree.</span><span class="se">\n</span><span class="s2">"</span><span class="p">);</span>
+
+ <span class="n">P4_DeleteGrammar</span><span class="p">(</span><span class="n">my_grammar</span><span class="p">);</span>
+ <span class="n">P4_DeleteSource</span><span class="p">(</span><span class="n">peggram</span><span class="p">);</span>
+ <span class="n">P4_DeleteGrammar</span><span class="p">(</span><span class="n">peg</span><span class="p">);</span>
+</pre></div>
 </div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The error code.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">token</span></code>: The token tree. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">result</span></code>: Can be a reference several value kinds, such as size_t, <a class="reference internal" href="#structP4__Grammar"><span class="std std-ref">P4_Grammar</span></a>, <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>, etc. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_StringifyPegGrammarRuleID">
+<span class="target" id="peppapeg_8h_1a8a2b1bbbc4e23deec5bfcace896bd921"></span><span class="pre">P4_String</span> <code class="sig-name descname"><span class="pre">P4_StringifyPegGrammarRuleID</span></code><span class="sig-paren">(</span><span class="pre">P4_RuleID</span> <em><span class="pre">id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_StringifyPegGrammarRuleID" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Get the corresponding rule name for a peg grammar rule id. </p>
+<p><dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">printf</span><span class="p">(</span><span class="s2">"</span><span class="si">%s</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">P4_StringifyPegGrammarRuleID</span><span class="p">(</span><span class="n">P4_PegRuleRule</span><span class="p">));</span>
+</pre></div>
 </div>
+</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: A P4_PegRuleID. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_LoadGrammar">
+<span class="target" id="peppapeg_8h_1a41844d9c4c94c072c60cde6d7b06b37c"></span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_LoadGrammar</span></code><span class="sig-paren">(</span><span class="pre">P4_String</span> <em><span class="pre">rules</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_LoadGrammar" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Load peg grammar from a string. </p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_LoadGrammar</span><span class="p">(</span>
+     <span class="s2">"entry = one one;</span><span class="se">\n</span><span class="s2">"</span>
+     <span class="s2">"one   = </span><span class="se">\"</span><span class="s2">1</span><span class="se">\"</span><span class="s2">;</span><span class="se">\n</span><span class="s2">"</span>
+ <span class="p">);</span>
+ <span class="n">P4_Source</span><span class="o">*</span> <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s2">"11"</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+ <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">);</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Return</strong></dt><dd><p>The grammar object.</p>
+</dd>
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rules</span></code>: The rules string. </p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+</div>
+</section>
+</section>
 
       </article>
       <footer>

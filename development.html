@@ -2,7 +2,8 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="Change Log" href="whatsnew.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="Change Log" href="whatsnew.html" />
 
     <meta name="generator" content="sphinx-3.5.3, furo 2021.03.20.beta30"/>
         <title>Development - Peppa PEG 1.9.0 documentation</title>
@@ -111,6 +112,7 @@
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="expressions.html">Expressions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="flags.html">Expression Flags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="peg.html">PEG Syntax</a></li>
 <li class="toctree-l1"><a class="reference internal" href="caveats.html">Caveats</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 <li class="toctree-l1"><a class="reference internal" href="whatsnew.html">Change Log</a></li>
@@ -129,9 +131,9 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <div class="section" id="development">
+        <section id="development">
 <h1>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="build">
+<section id="build">
 <h2>Build<a class="headerlink" href="#build" title="Permalink to this headline">¶</a></h2>
 <p>If you have a difficulty having a complete development environment for Peppa PEG, try Docker:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>docker run --rm -v <span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>:/app -it ubuntu:latest bash
@@ -168,12 +170,12 @@
 </div>
 <p>Peppa PEG uses GitHub Actions building docs whenever a change is pushed to the main branch.</p>
 <p>The docs site is pushed to gh-pages branch and published to &lt;<a class="reference external" href="https://www.soasme.com/PeppaPEG/">https://www.soasme.com/PeppaPEG/</a>&gt;.</p>
-</div>
-<div class="section" id="debug">
+</section>
+<section id="debug">
 <h2>Debug<a class="headerlink" href="#debug" title="Permalink to this headline">¶</a></h2>
 <p>If you encounter segfaults or memory leaks, please check with your grammar implementation.
 If you believe the issue origins from Peppa PEG and want to debug it, this document can be helpful.</p>
-<div class="section" id="checking-segfaults">
+<section id="checking-segfaults">
 <h3>Checking Segfaults<a class="headerlink" href="#checking-segfaults" title="Permalink to this headline">¶</a></h3>
 <p>Assuming your operation system has gdb or lldb installed. Depending on your toolchain, use gdb if using gcc, use lldb if using llvm. After installing a debugger, you can create a simple program that recurs the segfault problem.</p>
 <p>For example,</p>
@@ -205,8 +207,8 @@ If you believe the issue origins from Peppa PEG and want to debug it, this docum
 </pre></div>
 </div>
 <p>In this case, it’s <cite>0x0</cite> so a segfault occurred. To fix it, create the grammar using <cite>P4_CreateGrammar()</cite>.</p>
-</div>
-<div class="section" id="checking-memory-leaks">
+</section>
+<section id="checking-memory-leaks">
 <h3>Checking Memory Leaks<a class="headerlink" href="#checking-memory-leaks" title="Permalink to this headline">¶</a></h3>
 <p>Assuming your operation system has gdb or lldb installed. Depending on your toolchain, use gdb if using gcc, use lldb if using llvm. After installing a debugger, you can create a simple program that recurs the segfault problem.</p>
 <p>For example,</p>
@@ -238,14 +240,14 @@ If you believe the issue origins from Peppa PEG and want to debug it, this docum
 </pre></div>
 </div>
 <p>In this case, it’s <cite>0x0</cite> so a segfault occurred. To fix it, create the grammar using <cite>P4_CreateGrammar()</cite>.</p>
-</div>
-<div class="section" id="conclusion">
+</section>
+<section id="conclusion">
 <h3>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h3>
 <p>Programs are not always correct as human makes mistakes.
 By crafting the debugging skills using tools like gdb/lldb/valgrind, we will follow the trace, pin point the problem, and fix the bug 🐛.</p>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
       </article>
       <footer>

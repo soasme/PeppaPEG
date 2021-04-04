@@ -2,7 +2,8 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Caveats" href="caveats.html" /><link rel="prev" title="Expressions" href="expressions.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="PEG Syntax" href="peg.html" /><link rel="prev" title="Expressions" href="expressions.html" />
 
     <meta name="generator" content="sphinx-3.5.3, furo 2021.03.20.beta30"/>
         <title>Expression Flags - Peppa PEG 1.9.0 documentation</title>
@@ -111,6 +112,7 @@
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="expressions.html">Expressions</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Expression Flags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="peg.html">PEG Syntax</a></li>
 <li class="toctree-l1"><a class="reference internal" href="caveats.html">Caveats</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 <li class="toctree-l1"><a class="reference internal" href="whatsnew.html">Change Log</a></li>
@@ -129,11 +131,11 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <div class="section" id="expression-flags">
+        <section id="expression-flags">
 <h1>Expression Flags<a class="headerlink" href="#expression-flags" title="Permalink to this headline">¶</a></h1>
 <p>Flags can only be used in the grammar rule expression itself. It can not be used in any sub-expression of the grammar rule expression.</p>
 <p>Usually, a grammar rule creates a token. The expression flags modify the behavior of the token generation.</p>
-<div class="section" id="p4-flag-squashed">
+<section id="p4-flag-squashed">
 <h2><cite>P4_FLAG_SQUASHED</cite><a class="headerlink" href="#p4-flag-squashed" title="Permalink to this headline">¶</a></h2>
 <p>Flag <cite>P4_FLAG_SQUASHED</cite> <strong>prevents generating children tokens</strong>.</p>
 <p>For example,</p>
@@ -160,8 +162,8 @@
 </pre></div>
 </div>
 <p>Flag <cite>P4_FLAG_SQUASHED</cite> takes effects not only on the expression but its all descendant expressions.</p>
-</div>
-<div class="section" id="p4-flag-lifted">
+</section>
+<section id="p4-flag-lifted">
 <h2><cite>P4_FLAG_LIFTED</cite><a class="headerlink" href="#p4-flag-lifted" title="Permalink to this headline">¶</a></h2>
 <p><cite>P4_FLAG_LIFTED</cite> <strong>replaces the token with its children tokens</strong>.</p>
 <p>For example,</p>
@@ -188,8 +190,8 @@
 <span class="n">Token</span><span class="p">(</span><span class="mf">1.</span><span class="o">.</span><span class="mi">2</span><span class="p">):</span> <span class="s2">"x"</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="p4-flag-non-terminal">
+</section>
+<section id="p4-flag-non-terminal">
 <h2><cite>P4_FLAG_NON_TERMINAL</cite><a class="headerlink" href="#p4-flag-non-terminal" title="Permalink to this headline">¶</a></h2>
 <p><cite>P4_FLAG_NON_TERMINAL</cite> <strong>replaces the token with its single child token or does nothing.</strong>.</p>
 <p>For example,</p>
@@ -217,8 +219,8 @@
 </div>
 <p>This flag only works for Sequence and Repeat expressions.</p>
 <p>This flag has no effect if the Sequence or Repeat expressions produces over one token, e.g, the parent token will not be lifted.</p>
-</div>
-<div class="section" id="p4-flag-spaced">
+</section>
+<section id="p4-flag-spaced">
 <h2><cite>P4_FLAG_SPACED</cite><a class="headerlink" href="#p4-flag-spaced" title="Permalink to this headline">¶</a></h2>
 <p><cite>P4_FLAG_SPACED</cite> <strong>indicates the expression is for whitespaces</strong>.</p>
 <p>For example,</p>
@@ -251,8 +253,8 @@
 <p class="admonition-title">Note</p>
 <p>Currently, Peppa PEG only supports at maximum two SPACED grammar rules.</p>
 </div>
-</div>
-<div class="section" id="p4-flag-tight">
+</section>
+<section id="p4-flag-tight">
 <h2><cite>P4_FLAG_TIGHT</cite><a class="headerlink" href="#p4-flag-tight" title="Permalink to this headline">¶</a></h2>
 <p><cite>P4_FLAG_TIGHT</cite> <strong>prevents inserting the `P4_FLAG_SPACED` expressions</strong>. This tag only works for Sequence and Repeat.</p>
 <p>Given the above <cite>P4_FLAG_SPACED</cite> expression, if we set the grammar rule with flag <cite>P4_FLAG_TIGHT</cite>, the SPACED expressions are not inserted.</p>
@@ -261,27 +263,27 @@
 </div>
 <p>Peppa PEG applies SPACED expressions on every Sequence and Repeat unless a <cite>P4_FLAG_TIGHT</cite> is explicitly specified on a Sequence or Repeat.</p>
 <p>Flag <cite>P4_FLAG_TIGHT</cite> takes effects not only on the expression but its all descendant expressions.</p>
-</div>
-<div class="section" id="p4-flag-scoped">
+</section>
+<section id="p4-flag-scoped">
 <h2><cite>P4_FLAG_SCOPED</cite><a class="headerlink" href="#p4-flag-scoped" title="Permalink to this headline">¶</a></h2>
 <p><cite>P4_FLAG_SCOPED</cite> <strong>prevents the effect of `P4_FLAG_SQUASHED` and `P4_FLAG_SPACED`</strong>.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Entry</span><span class="p">,</span> <span class="n">P4_FLAG_SCOPED</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>Starting from the SCOPED grammar rule, the token are not squashed; the implicit whitespaces are enabled as well.</p>
-</div>
-</div>
+</section>
+</section>
 
       </article>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="caveats.html">
+          <a class="next-page" href="peg.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Caveats</div>
+                <div class="title">PEG Syntax</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>

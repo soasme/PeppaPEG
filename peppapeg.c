@@ -2980,17 +2980,22 @@ P4_PRIVATE(P4_Error)
 P4_PegEvalRange(P4_Token* token, P4_Expression** expr) {
     P4_Error err = P4_Ok;
     P4_Rune lower = 0, upper = 0;
+    size_t stride = 1;
 
     if ((err = P4_PegEvalChar(token->head, &lower)) != P4_Ok)
         return err;
 
-    if ((err = P4_PegEvalChar(token->tail, &upper)) != P4_Ok)
+    if ((err = P4_PegEvalChar(token->head->next, &upper)) != P4_Ok)
         return err;
 
-    if (lower > upper || lower == 0 || upper == 0)
+    if (token->head->next->next != NULL)
+        if ((err = P4_PegEvalNumber(token->head->next->next, &stride)) != P4_Ok)
+            return err;
+
+    if (lower > upper || lower == 0 || upper == 0 || stride == 0)
         return P4_ValueError;
 
-    *expr = P4_CreateRange(lower, upper, 1);
+    *expr = P4_CreateRange(lower, upper, stride);
     if (*expr == NULL)
         return P4_MemoryError;
 

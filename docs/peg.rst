@@ -5,11 +5,11 @@ Use Peg API
 ------------
 
 Peppa PEG provides an imperative way to define a new grammar.
-Function :c:func:`P4_LoadPegGrammar` can load a grammar from a string.
+Function :c:func:`P4_LoadGrammar` can load a grammar from a string.
 
-.. code-block:: c
+.. code-block::
 
-    const char* grammar_rules =
+    P4_Grammar* grammar = P4_LoadGrammar(
         "add = int + int;"
 
         "@squashed @tight "
@@ -17,12 +17,11 @@ Function :c:func:`P4_LoadPegGrammar` can load a grammar from a string.
 
         "@spaced @lifted "
         "ws  = \" \";";
+    );
 
-    P4_Grammar* grammar = P4_LoadPegGrammar(grammar_rules);
+The one-statement code is somewhat equivalent to the below code written in low-level C API:
 
-The two lines of code is somewhat equivalent to the below code written in low-level C API:
-
-.. code-block:: c
+.. code-block::
 
     P4_Grammar* grammar = P4_CreateGrammar();
 
@@ -48,7 +47,7 @@ Grammar Rules
 
 The grammar is simply a list of rules with names. Rules are defined like this:
 
-.. code-block:: c
+.. code-block::
 
     rule_1 = ... ;
     rule_2 = ... ;
@@ -76,56 +75,58 @@ The literal matches an exact same string surrounded by double quotes.
 
 For example,
 
-.. code-block:: c
+.. code-block::
 
     greeting = "hello world";
 
 To ignore the case, insert `i` to the left quote:
 
-.. code-block:: c
+.. code-block::
 
     greeting = i"hello world";
 
 The case insensitive literal applies to not only ASCII chars, but also extended ASCII chars, such as ì / Ì.
 
+.. code-block::
+
     greeting = i"hello worìd";
 
 UTF-8 is supported:
 
-.. code-block:: c
+.. code-block::
 
     greeting = "你好，世界";
 
 Emoji is supported:
 
-.. code-block:: c
+.. code-block::
 
     greeting = "Peppa 🐷";
 
-You can encode UTF-8 code points via `\u` followed by four hex digits.
+You can encode UTF-8 code points via `\u` followed by hex digits.
 
-.. code-block:: c
+.. code-block::
 
-    greeting = "\u{4f60}\u{597D}, world";
+    greeting = "\u{4f60}\u{597D}, world\u{0c}";
 
 Range
 ------
 
 Range **matches a single character in range**.
 
-For example, any characters between `'0'` to `'9'` can match.
+In this example, any character between `'0'` to `'9'` can match.
 
-.. code-block:: c
+.. code-block::
 
     digits = [0-9];
 
-The lower and upper character of range can be ASCII characters or UTF-8 runes.
+The lower and upper character of the range can be not only ASCII characters but also UTF-8 code points.
 
 .. code-block::
 
     digits = [\u{4e00}-\u{9fff}];
 
-A small trick to match any character is to specify the range from \u{1} to \u{10ffff},
+A small trick to match any character is to specify the range from `\u{1}` to `\u{10ffff}`,
 which are the minimum and the maximum code point in UTF-8 encoding.
 
 .. code-block::
@@ -139,6 +140,13 @@ The value of lower must be less or equal than the upper.
     // INVALID
     any = [\u{10ffff}-\u{1}];
 
+Range supports an optional `stride` to skip certain amount of characters in the range.
+In this example, only odd number between `'0'` to `'9'` can match.
+
+.. code-block::
+
+    digits = [0-9..2];
+
 Sequence
 --------
 
@@ -149,7 +157,7 @@ If any one of the attempts fails, the match fails.
 
 For example:
 
-.. code-block:: c
+.. code-block::
 
     greeter = "Hello" " " "world";
 
@@ -164,7 +172,7 @@ If any one of the attempts succeeds, the match succeeds. If all attempts fail, t
 
 For example:
 
-.. code-block:: c
+.. code-block::
 
    greeter = "Hello World" / "你好，世界" / "Kia Ora";
 
@@ -175,14 +183,14 @@ Reference **matches a string based on the referenced grammar rule**.
 
 For example, `greeter` is just a reference rule in `greeting`. When matching `greeting`, it will use the referenced grammar rule `greeter` first, e.g. `"Hello" / "你好"`, then match " world".
 
-.. code-block:: c
+.. code-block::
 
     greeting = greeter " world";
     greeter  = "Hello" / "你好";
 
 The order of defining a rule does not matter.
 
-.. code-block:: c
+.. code-block::
 
     greeter  = "Hello" / "你好";
     greeting = greeter " world";
@@ -198,7 +206,7 @@ Positive attempts to match the sub-expression. If succeeds, the test passes. Pos
 
 Positive can be useful in limiting the possibilities of the latter member in a Sequence. In this example, the Sequence expression must start with "Hello", e.g. "Hello World", "Hello WORLD", "Hello world", etc, will match but "HELLO WORLD" will not match.
 
-.. code-block:: c
+.. code-block::
 
     greeting = &"Hello" i"hello world";
 
@@ -211,7 +219,7 @@ Negative expects the sub-expression doesn't match. If fails, the test passes. Ne
 
 Negative can be useful in limiting the possiblities of the latter member in a Sequence. In this example, the Sequence expression must not start with "Hello", e.g. "HELLO World", "hello WORLD", "hello world", etc, will match but "Hello World" will not match.
 
-.. code-block:: c
+.. code-block::
 
     greeting = !"Hello" i"hello world";
 
@@ -222,37 +230,37 @@ Repeat **matches the sub-expression several times**.
 
 `+` match string one or more times.
 
-.. code-block:: c
+.. code-block::
 
     number = [0-9]+;
 
 `*` match string zero or more times.
 
-.. code-block:: c
+.. code-block::
 
     number = [0-9] [1-9]*;
 
 `?` match string one or more times.
 
-.. code-block:: c
+.. code-block::
 
     number = [0-9] "."?;
 
 `{min,}` match string minimum `min` times.
 
-.. code-block:: c
+.. code-block::
 
     above_hundred = [1-9] [1-9]{2,};
 
 `{,max}` match string maximum `max` times.
 
-.. code-block:: c
+.. code-block::
 
    below_thousand = [0-9]{,3};
 
 `{min,max}` match string minimum `min` times, maximum `max` times.
 
-.. code-block:: c
+.. code-block::
 
    hex = "\u{" ([0-9] / [a-z] / [A-Z]){1,6} "}";
 

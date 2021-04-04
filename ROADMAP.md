@@ -39,7 +39,7 @@
 - [ ] ES5 syntax: https://ohmlang.github.io/editor/#0a9a649c3c630fd0a470ba6cb75393fe
 - [ ] zig syntax: https://ziglang.org/documentation/master/#Grammar
 - [ ] read [A parsing machine for PEGs](http://www.inf.puc-rio.br/~roberto/docs/ry08-4.pdf).
-- [ ] `P4_AcquireSourceAst(source, &ast)`: set ast, reset source. It's useful when we needs the parsed result but not caring the parsing context, e.g. source. Token tree should now owned by ast and shall then be free by the caller.
+- [ ] `P4_AcquireSourceAst(source, &ast)`: set ast, reset source. It's useful when we need the parsed result but not care about source itself. Token tree should now owned by ast and shall then be free by the caller.
 - [ ] A binary executable for compiling peg to a C library: `p4g compile --lang=c calc.peg`.
 - [ ] A binary executable for display parsed results in JSON output. The executable can support general programming languages, such as Mustache, Python, JSON, YAML, etc. Some other programs can then takes the input from stdin and do some fancy work. `p4g parse --lang=py38 source.py`
 - [ ] api to operate slice comparison, copy and length.

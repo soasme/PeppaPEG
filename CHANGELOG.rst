@@ -1,8 +1,17 @@
 Change Log
 ===========
 
+Not Yet Released
+----------------
+
+Code change: <https://github.com/soasme/PeppaPEG/compare/v1.9.0..HEAD>.
+
+* [Feature]: Added function: `P4_LoadGrammar`. `#56t  <https://github.com/soasme/PeppaPEG/pull/56>`_
+
 1.9.0 (1 Apr, 2021)
 -------------------
+
+Code change: <https://github.com/soasme/PeppaPEG/compare/v1.8.0..v1.9.0>.
 
 * [Test]: Enable Valgrind for gcc check. `#55 <https://github.com/soasme/PeppaPEG/pull/55>`_
 * [Feature]: Support specifying a name for a grammar rule. `#53 <https://github.com/soasme/PeppaPEG/pull/53>`_

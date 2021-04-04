@@ -447,26 +447,21 @@ P4_String test_grammar_rule_to_name(P4_RuleID id) {
 }
 
 #define ASSERT_EVAL_GRAMMAR(peg_rules, entry_name, source_code, parse_code, ast) do { \
-    SETUP_EVAL((P4_PegGrammar), (peg_rules)); \
-    P4_Grammar* peg_grammar = 0; \
-    TEST_ASSERT_NOT_NULL_MESSAGE( root, "peg rule should be correctly parsed"); \
-    TEST_ASSERT_EQUAL_MESSAGE( P4_Ok, P4_PegEval(root, &peg_grammar), "peg rule should be correctly evaluated"); \
-    TEST_ASSERT_NOT_NULL_MESSAGE( peg_grammar, "peg grammar should be successfully created" ); \
-    P4_Expression* entry_expr = P4_GetGrammarRuleByName(peg_grammar, (entry_name)); \
-    TEST_ASSERT_NOT_NULL_MESSAGE( entry_expr, "peg grammar entry should be successfully resolved." ); \
-    P4_Source* input_source = P4_CreateSource((source_code), (entry_expr)->id); \
-    TEST_ASSERT_NOT_NULL_MESSAGE( input_source, "source code should be correctly created." ); \
-    TEST_ASSERT_EQUAL_MESSAGE( (parse_code), P4_Parse(peg_grammar, input_source), "source code should be correctly parsed"); \
-    P4_Token* ast_token = P4_GetSourceAst(input_source); \
+    P4_Grammar*     grammar = P4_LoadGrammar((peg_rules)); \
+    TEST_ASSERT_NOT_NULL_MESSAGE(grammar, "peg rule should be valid peg code."); \
+    P4_Expression*  entry = P4_GetGrammarRuleByName(grammar, (entry_name)); \
+    TEST_ASSERT_NOT_NULL_MESSAGE(entry, "peg entry rule should created."); \
+    P4_Source*      source  = P4_CreateSource((source_code), entry->id); \
+    TEST_ASSERT_EQUAL_MESSAGE( \
+            (parse_code), P4_Parse(grammar, source), \
+            "source code should be correctly parsed"); \
+    P4_Token*       ast_token = P4_GetSourceAst(source); \
     FILE *f = fopen("check.json","w"); \
     P4_JsonifySourceAst(f, ast_token, test_grammar_rule_to_name); \
     fclose(f); \
-    P4_String s = read_file("check.json"); \
-    TEST_ASSERT_EQUAL_STRING((ast), s); \
-    free(s); \
-    P4_DeleteSource( input_source ); \
-    P4_DeleteGrammar( peg_grammar ); \
-    TEARDOWN_EVAL(); \
+    P4_String s = read_file("check.json"); TEST_ASSERT_EQUAL_STRING((ast), s); free(s); \
+    P4_DeleteSource(source); \
+    P4_DeleteGrammar(grammar); \
 } while (0);
 
 void test_eval_grammar(void) {

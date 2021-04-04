@@ -1929,6 +1929,23 @@ P4_Error       P4_PegEval(P4_Token* token, void* result);
  */
 P4_String      P4_StringifyPegGrammarRuleID(P4_RuleID id);
 
+
+/**
+ * @brief       Load peg grammar from a string.
+ * @param       rules   The rules string.
+ * @return      The grammar object.
+ *
+ * Example:
+ *
+ *      P4_Grammar* grammar = P4_LoadGrammar(
+ *          "entry = one one;\n"
+ *          "one   = \"1\";\n"
+ *      );
+ *      P4_Source* source = P4_CreateSource("11", 1);
+ *      P4_Parse(grammar, source);
+ */
+P4_Grammar*    P4_LoadGrammar(P4_String rules);
+
 #ifdef __cplusplus
 }
 #endif

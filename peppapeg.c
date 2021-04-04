@@ -3368,3 +3368,38 @@ P4_PegEval(P4_Token* token, void* result) {
     }
     return P4_Ok;
 }
+
+P4_PUBLIC P4_Grammar*
+P4_LoadGrammar(P4_String rules) {
+    P4_Grammar* bootstrap = NULL;
+    P4_Grammar* grammar   = NULL;
+    P4_Source*  rules_src = NULL;
+    P4_Token*   rules_tok = NULL;
+
+    bootstrap = P4_CreatePegGrammar();
+    if (bootstrap == NULL)
+        goto finalize;
+
+    rules_src = P4_CreateSource(rules, P4_PegGrammar);
+    if (rules_src == NULL)
+        goto finalize;
+
+    if (P4_Ok != P4_Parse(bootstrap, rules_src))
+        goto finalize;
+
+    rules_tok = P4_GetSourceAst(rules_src);
+    if (rules_tok == NULL)
+        goto finalize;
+
+    if (P4_Ok != P4_PegEval(rules_tok, &grammar))
+        goto finalize;
+
+finalize:
+    if (rules_src)
+        P4_DeleteSource(rules_src);
+
+    if (bootstrap)
+        P4_DeleteGrammar(bootstrap);
+
+    return grammar;
+}

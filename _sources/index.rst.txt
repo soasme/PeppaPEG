@@ -13,9 +13,8 @@ Table of Contents
    :glob:
 
    getting_started
-   expressions
-   flags
    peg
+   lowlevel
    caveats
    references
    whatsnew

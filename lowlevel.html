@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Expression Flags" href="flags.html" /><link rel="prev" title="Getting Started" href="getting_started.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Caveats" href="caveats.html" /><link rel="prev" title="PEG Syntax" href="peg.html" />
 
     <meta name="generator" content="sphinx-3.5.3, furo 2021.03.20.beta30"/>
-        <title>Expressions - Peppa PEG 1.9.0 documentation</title>
+        <title>Low Level APIs - Peppa PEG 1.9.0 documentation</title>
       <link rel="stylesheet" href="_static/styles/furo.css?digest=978e1795dfe158b585dda6a8417f6411828bf3ed">
     <link rel="stylesheet" href="_static/pygments.css">
     <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
@@ -110,9 +110,8 @@
 </form><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Expressions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="flags.html">Expression Flags</a></li>
 <li class="toctree-l1"><a class="reference internal" href="peg.html">PEG Syntax</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Low Level APIs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="caveats.html">Caveats</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 <li class="toctree-l1"><a class="reference internal" href="whatsnew.html">Change Log</a></li>
@@ -131,10 +130,12 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <section id="expressions">
-<h1>Expressions<a class="headerlink" href="#expressions" title="Permalink to this headline">¶</a></h1>
+        <section id="low-level-apis">
+<h1>Low Level APIs<a class="headerlink" href="#low-level-apis" title="Permalink to this headline">¶</a></h1>
+<section id="expressions">
+<h2>Expressions<a class="headerlink" href="#expressions" title="Permalink to this headline">¶</a></h2>
 <section id="literal">
-<h2>Literal<a class="headerlink" href="#literal" title="Permalink to this headline">¶</a></h2>
+<h3>Literal<a class="headerlink" href="#literal" title="Permalink to this headline">¶</a></h3>
 <p>Literal <strong>matches an exact string</strong>.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello world"</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
 </pre></div>
@@ -163,7 +164,7 @@
 </dl>
 </section>
 <section id="range">
-<h2>Range<a class="headerlink" href="#range" title="Permalink to this headline">¶</a></h2>
+<h3>Range<a class="headerlink" href="#range" title="Permalink to this headline">¶</a></h3>
 <p>Range <strong>matches a single character in range</strong>.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRange</span><span class="p">(</span><span class="sc">'0'</span><span class="p">,</span> <span class="sc">'9'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
@@ -193,7 +194,7 @@
 </dl>
 </section>
 <section id="sequence">
-<h2>Sequence<a class="headerlink" href="#sequence" title="Permalink to this headline">¶</a></h2>
+<h3>Sequence<a class="headerlink" href="#sequence" title="Permalink to this headline">¶</a></h3>
 <p>Sequence <strong>matches a sequence of sub-expressions in order</strong>.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>
     <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
@@ -236,7 +237,7 @@ Sequence: failure!
 </dl>
 </section>
 <section id="backreference">
-<h2>BackReference<a class="headerlink" href="#backreference" title="Permalink to this headline">¶</a></h2>
+<h3>BackReference<a class="headerlink" href="#backreference" title="Permalink to this headline">¶</a></h3>
 <p>BackReference <strong>matches an exact string previously matched in a Sequence</strong>. BackReference can and only can be used as a Sequence member. For example, the below snippet matches “a:a”, but not “a:A” or “a:b”.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>
     <span class="n">P4_CreateRange</span><span class="p">(</span><span class="sc">'a'</span><span class="p">,</span> <span class="sc">'z'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
@@ -278,7 +279,7 @@ Sequence: failure!
 </dl>
 </section>
 <section id="choice">
-<h2>Choice<a class="headerlink" href="#choice" title="Permalink to this headline">¶</a></h2>
+<h3>Choice<a class="headerlink" href="#choice" title="Permalink to this headline">¶</a></h3>
 <p>Choice <strong>matches one of the sub-expression.</strong></p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateChoiceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>
     <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
@@ -321,7 +322,7 @@ Choice: failure!
 </dl>
 </section>
 <section id="reference">
-<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<h3>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h3>
 <p>Reference <strong>matches a string based on the referenced grammar rule</strong>.</p>
 <p>A grammar includes a set of grammar rules.  Each grammar rule is built from <a class="reference internal" href="references.html#c.P4_Expression" title="P4_Expression"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Expression</span></code></a> and is associated with an id.  A grammar rule can then be referenced in other grammar rules.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="k">enum</span> <span class="p">{</span> <span class="n">Entry</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="p">...</span> <span class="p">};</span>
@@ -339,7 +340,7 @@ Choice: failure!
 </dl>
 </section>
 <section id="positive">
-<h2>Positive<a class="headerlink" href="#positive" title="Permalink to this headline">¶</a></h2>
+<h3>Positive<a class="headerlink" href="#positive" title="Permalink to this headline">¶</a></h3>
 <p>Positive <strong>tests if the sub-expression matches</strong>.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreatePositive</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span> <span class="nb">true</span><span class="p">));</span>
 </pre></div>
@@ -361,7 +362,7 @@ Choice: failure!
 </dl>
 </section>
 <section id="negative">
-<h2>Negative<a class="headerlink" href="#negative" title="Permalink to this headline">¶</a></h2>
+<h3>Negative<a class="headerlink" href="#negative" title="Permalink to this headline">¶</a></h3>
 <p>Negative <strong>tests if the sub-expression does not match</strong>.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateNegative</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span> <span class="nb">true</span><span class="p">));</span>
 </pre></div>
@@ -383,7 +384,7 @@ Choice: failure!
 </dl>
 </section>
 <section id="repeat">
-<h2>Repeat<a class="headerlink" href="#repeat" title="Permalink to this headline">¶</a></h2>
+<h3>Repeat<a class="headerlink" href="#repeat" title="Permalink to this headline">¶</a></h3>
 <p>Repeat <strong>matches the sub-expression several times</strong>.</p>
 <p>ZeroOrOnce, ZeroOrMore, OnceOrMore consume zero or one , zero or more, or one or more consecutive repetitions of their sub-expression.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateZeroOrOnce</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span> <span class="nb">true</span><span class="p">));</span>
@@ -429,28 +430,171 @@ Choice: failure!
 </dl>
 </section>
 </section>
+<section id="expression-flags">
+<h2>Expression Flags<a class="headerlink" href="#expression-flags" title="Permalink to this headline">¶</a></h2>
+<p>Flags can only be used in the grammar rule expression itself. It can not be used in any sub-expression of the grammar rule expression.</p>
+<p>Usually, a grammar rule creates a token. The expression flags modify the behavior of the token generation.</p>
+<section id="p4-flag-squashed">
+<h3><cite>P4_FLAG_SQUASHED</cite><a class="headerlink" href="#p4-flag-squashed" title="Permalink to this headline">¶</a></h3>
+<p>Flag <cite>P4_FLAG_SQUASHED</cite> <strong>prevents generating children tokens</strong>.</p>
+<p>For example,</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="k">enum</span> <span class="p">{</span> <span class="n">Entry</span><span class="p">,</span> <span class="n">Text</span> <span class="p">}</span> <span class="n">MyRuleID</span><span class="p">;</span>
+
+<span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Entry</span><span class="p">,</span> <span class="mi">2</span>
+    <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">Text</span><span class="p">),</span>
+    <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
+<span class="p">);</span>
+<span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="s">"x"</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This grammar parses the text “xx” into three tokens:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Token</span><span class="p">(</span><span class="mf">0.</span><span class="o">.</span><span class="mi">2</span><span class="p">):</span> <span class="s2">"Xx"</span>
+  <span class="n">Token</span><span class="p">(</span><span class="mf">0.</span><span class="o">.</span><span class="mi">1</span><span class="p">)</span> <span class="s2">"X"</span>
+  <span class="n">Token</span><span class="p">(</span><span class="mf">1.</span><span class="o">.</span><span class="mi">2</span><span class="p">)</span> <span class="s2">"x"</span>
+</pre></div>
+</div>
+<p>If the grammar rule <cite>Entry</cite> has flag <cite>P4_FLAG_SQUASHED</cite>, the children tokens disappear:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Entry</span><span class="p">,</span> <span class="n">P4_FLAG_SQUASHED</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Token</span><span class="p">(</span><span class="mf">0.</span><span class="o">.</span><span class="mi">2</span><span class="p">):</span> <span class="s2">"Xx"</span>
+</pre></div>
+</div>
+<p>Flag <cite>P4_FLAG_SQUASHED</cite> takes effects not only on the expression but its all descendant expressions.</p>
+</section>
+<section id="p4-flag-lifted">
+<h3><cite>P4_FLAG_LIFTED</cite><a class="headerlink" href="#p4-flag-lifted" title="Permalink to this headline">¶</a></h3>
+<p><cite>P4_FLAG_LIFTED</cite> <strong>replaces the token with its children tokens</strong>.</p>
+<p>For example,</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="k">enum</span> <span class="p">{</span> <span class="n">Entry</span><span class="p">,</span> <span class="n">Text</span> <span class="p">}</span> <span class="n">MyRuleID</span><span class="p">;</span>
+
+<span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Entry</span><span class="p">,</span> <span class="mi">2</span>
+    <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">Text</span><span class="p">),</span>
+    <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
+<span class="p">);</span>
+<span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="s">"x"</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This grammar can match text “xx” into three tokens:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Token</span><span class="p">(</span><span class="mf">0.</span><span class="o">.</span><span class="mi">2</span><span class="p">):</span> <span class="s2">"Xx"</span>
+  <span class="n">Token</span><span class="p">(</span><span class="mf">0.</span><span class="o">.</span><span class="mi">1</span><span class="p">)</span> <span class="s2">"X"</span>
+  <span class="n">Token</span><span class="p">(</span><span class="mf">1.</span><span class="o">.</span><span class="mi">2</span><span class="p">)</span> <span class="s2">"x"</span>
+</pre></div>
+</div>
+<p>If the grammar rule <cite>Entry</cite> has flag <cite>P4_FLAG_LIFTED</cite>, the token is lifted and replaced by its children:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Entry</span><span class="p">,</span> <span class="n">P4_FLAG_LIFTED</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Token</span><span class="p">(</span><span class="mf">0.</span><span class="o">.</span><span class="mi">1</span><span class="p">):</span> <span class="s2">"X"</span>
+<span class="n">Token</span><span class="p">(</span><span class="mf">1.</span><span class="o">.</span><span class="mi">2</span><span class="p">):</span> <span class="s2">"x"</span>
+</pre></div>
+</div>
+</section>
+<section id="p4-flag-non-terminal">
+<h3><cite>P4_FLAG_NON_TERMINAL</cite><a class="headerlink" href="#p4-flag-non-terminal" title="Permalink to this headline">¶</a></h3>
+<p><cite>P4_FLAG_NON_TERMINAL</cite> <strong>replaces the token with its single child token or does nothing.</strong>.</p>
+<p>For example,</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="k">enum</span> <span class="p">{</span> <span class="n">Entry</span><span class="p">,</span> <span class="n">Text</span> <span class="p">}</span> <span class="n">MyRuleID</span><span class="p">;</span>
+
+<span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Entry</span><span class="p">,</span> <span class="mi">2</span>
+    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"("</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
+    <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">Text</span><span class="p">),</span>
+    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">")"</span><span class="p">,</span> <span class="nb">true</span><span class="p">)</span>
+<span class="p">);</span>
+<span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="s">"x"</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This grammar can match text “(x)” into two tokens:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Token</span><span class="p">(</span><span class="mf">0.</span><span class="o">.</span><span class="mi">3</span><span class="p">):</span> <span class="s2">"(x)"</span>
+  <span class="n">Token</span><span class="p">(</span><span class="mf">1.</span><span class="o">.</span><span class="mi">2</span><span class="p">)</span> <span class="s2">"x"</span>
+</pre></div>
+</div>
+<p>If the grammar rule <cite>Entry</cite> has flag <cite>P4_FLAG_NON_TERMINAL</cite>, the token is lifted and replaced by its single child token:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Entry</span><span class="p">,</span> <span class="n">P4_FLAG_NON_TERMINAL</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Token</span><span class="p">(</span><span class="mf">1.</span><span class="o">.</span><span class="mi">2</span><span class="p">):</span> <span class="s2">"x"</span>
+</pre></div>
+</div>
+<p>This flag only works for Sequence and Repeat expressions.</p>
+<p>This flag has no effect if the Sequence or Repeat expressions produces over one token, e.g, the parent token will not be lifted.</p>
+</section>
+<section id="p4-flag-spaced">
+<h3><cite>P4_FLAG_SPACED</cite><a class="headerlink" href="#p4-flag-spaced" title="Permalink to this headline">¶</a></h3>
+<p><cite>P4_FLAG_SPACED</cite> <strong>indicates the expression is for whitespaces</strong>.</p>
+<p>For example,</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="k">enum</span> <span class="p">{</span> <span class="n">Entry</span><span class="p">,</span> <span class="n">Whitespace</span> <span class="p">}</span> <span class="n">MyRuleID</span><span class="p">;</span>
+
+<span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Whitespace</span><span class="p">,</span> <span class="s">" "</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+
+<span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Whitespace</span><span class="p">,</span> <span class="n">P4_FLAG_SPACED</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Often, we don’t want the whitespace having tokens, so it’s usually combined with <cite>P4_FLAG_LIFTED</cite>.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Whitespace</span><span class="p">,</span> <span class="n">P4_FLAG_SPACED</span> <span class="o">|</span> <span class="n">P4_FLAG_LIFTED</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This flag does not work on its own. It takes effect on Sequence or Repeat.</p>
+<p>When parsing Sequence and Repeat, the grammar will match as many whitespaces as possible between every sequence member or every repetition sub-expression.</p>
+<p>For example, this rule matches “HelloWorld”, “Hello World”, “Hello       World”, etc.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Entry</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
+    <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"World"</span><span class="p">,</span> <span class="nb">true</span><span class="p">)</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>For example, this rule matches “xxx”, “x   x         x”, etc.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_AddOnceOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Entry</span><span class="p">,</span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"x"</span><span class="p">,</span> <span class="nb">true</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>The SPACED expressions are not inserted before or after the Sequence and Repeat, hence ”  Hello World  “, ”  xxx  ” not matching.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Currently, Peppa PEG only supports at maximum two SPACED grammar rules.</p>
+</div>
+</section>
+<section id="p4-flag-tight">
+<h3><cite>P4_FLAG_TIGHT</cite><a class="headerlink" href="#p4-flag-tight" title="Permalink to this headline">¶</a></h3>
+<p><cite>P4_FLAG_TIGHT</cite> <strong>prevents inserting the `P4_FLAG_SPACED` expressions</strong>. This tag only works for Sequence and Repeat.</p>
+<p>Given the above <cite>P4_FLAG_SPACED</cite> expression, if we set the grammar rule with flag <cite>P4_FLAG_TIGHT</cite>, the SPACED expressions are not inserted.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Entry</span><span class="p">,</span> <span class="n">P4_FLAG_TIGHT</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Peppa PEG applies SPACED expressions on every Sequence and Repeat unless a <cite>P4_FLAG_TIGHT</cite> is explicitly specified on a Sequence or Repeat.</p>
+<p>Flag <cite>P4_FLAG_TIGHT</cite> takes effects not only on the expression but its all descendant expressions.</p>
+</section>
+<section id="p4-flag-scoped">
+<h3><cite>P4_FLAG_SCOPED</cite><a class="headerlink" href="#p4-flag-scoped" title="Permalink to this headline">¶</a></h3>
+<p><cite>P4_FLAG_SCOPED</cite> <strong>prevents the effect of `P4_FLAG_SQUASHED` and `P4_FLAG_SPACED`</strong>.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Entry</span><span class="p">,</span> <span class="n">P4_FLAG_SCOPED</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Starting from the SCOPED grammar rule, the token are not squashed; the implicit whitespaces are enabled as well.</p>
+</section>
+</section>
+</section>
 
       </article>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="flags.html">
+          <a class="next-page" href="caveats.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Expression Flags</div>
+                <div class="title">Caveats</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="getting_started.html">
+          <a class="prev-page" href="peg.html">
               <svg><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Getting Started</div>
+                <div class="title">PEG Syntax</div>
                 
               </div>
             </a>
@@ -464,7 +608,7 @@ Choice: failure!
               <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
               <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
             |
-            <a class="muted-link" href="_sources/expressions.rst.txt"
+            <a class="muted-link" href="_sources/lowlevel.rst.txt"
                rel="nofollow">
               Show Source
             </a>
@@ -484,7 +628,8 @@ Choice: failure!
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Expressions</a><ul>
+<li><a class="reference internal" href="#">Low Level APIs</a><ul>
+<li><a class="reference internal" href="#expressions">Expressions</a><ul>
 <li><a class="reference internal" href="#literal">Literal</a></li>
 <li><a class="reference internal" href="#range">Range</a></li>
 <li><a class="reference internal" href="#sequence">Sequence</a></li>
@@ -494,6 +639,17 @@ Choice: failure!
 <li><a class="reference internal" href="#positive">Positive</a></li>
 <li><a class="reference internal" href="#negative">Negative</a></li>
 <li><a class="reference internal" href="#repeat">Repeat</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#expression-flags">Expression Flags</a><ul>
+<li><a class="reference internal" href="#p4-flag-squashed"><cite>P4_FLAG_SQUASHED</cite></a></li>
+<li><a class="reference internal" href="#p4-flag-lifted"><cite>P4_FLAG_LIFTED</cite></a></li>
+<li><a class="reference internal" href="#p4-flag-non-terminal"><cite>P4_FLAG_NON_TERMINAL</cite></a></li>
+<li><a class="reference internal" href="#p4-flag-spaced"><cite>P4_FLAG_SPACED</cite></a></li>
+<li><a class="reference internal" href="#p4-flag-tight"><cite>P4_FLAG_TIGHT</cite></a></li>
+<li><a class="reference internal" href="#p4-flag-scoped"><cite>P4_FLAG_SCOPED</cite></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

@@ -1,23 +1,14 @@
 #include "unity/examples/unity_config.h"
 #include "unity/src/unity.h"
 #include "common.h"
-#include "../examples/p4gen.h"
 
-void check_parse_failed(P4_RuleID entry, P4_String input, P4_Error err) {
-    P4_Grammar* grammar = P4_CreatePegGrammar();
-    P4_Source* source = P4_CreateSource(input, entry);
-    TEST_ASSERT_EQUAL(err, P4_Parse(grammar, source));
-    P4_DeleteSource(source);
-    P4_DeleteGrammar(grammar);
-}
-
-# define check_parse(entry, input, code, output) do { \
+# define ASSERT_PEG_PARSE(entry, input, code, output) do { \
     P4_Grammar* grammar = P4_CreatePegGrammar(); \
     P4_Source* source = P4_CreateSource((input), (entry)); \
     TEST_ASSERT_EQUAL_MESSAGE((code), P4_Parse(grammar, source), "unexpected parse grammar return code"); \
     P4_Token* root = P4_GetSourceAst(source); \
     FILE *f = fopen("check.json","w"); \
-    P4_JsonifySourceAst(f, root, P4_PegKindToName); \
+    P4_JsonifySourceAst(f, root, P4_StringifyPegGrammarRuleID); \
     fclose(f); \
     P4_String s = read_file("check.json"); \
     TEST_ASSERT_EQUAL_STRING((output), s); \
@@ -37,58 +28,62 @@ void check_parse_failed(P4_RuleID entry, P4_String input, P4_Error err) {
     P4_DeleteGrammar(grammar);
 
 void test_number(void) {
-    check_parse(P4_PegRuleNumber, "0", P4_Ok, "[{\"slice\":[0,1],\"type\":\"number\"}]");
-    check_parse(P4_PegRuleNumber, "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"number\"}]");
-    check_parse(P4_PegRuleNumber, "123", P4_Ok, "[{\"slice\":[0,3],\"type\":\"number\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleNumber, "0", P4_Ok, "[{\"slice\":[0,1],\"type\":\"number\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleNumber, "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"number\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleNumber, "123", P4_Ok, "[{\"slice\":[0,3],\"type\":\"number\"}]");
 }
 
 void test_char(void) {
-    check_parse(P4_PegRuleChar, "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"char\"}]");
-    check_parse(P4_PegRuleChar, "A", P4_Ok, "[{\"slice\":[0,1],\"type\":\"char\"}]");
-    check_parse(P4_PegRuleChar, "好", P4_Ok, "[{\"slice\":[0,3],\"type\":\"char\"}]");
-    check_parse(P4_PegRuleChar, "👌", P4_Ok, "[{\"slice\":[0,4],\"type\":\"char\"}]");
-    check_parse(P4_PegRuleChar, "\\t", P4_Ok, "[{\"slice\":[0,2],\"type\":\"char\"}]");
-    check_parse(P4_PegRuleChar, "\\\"", P4_Ok, "[{\"slice\":[0,2],\"type\":\"char\"}]");
-    check_parse(P4_PegRuleChar, "\\u0020", P4_Ok, "[{\"slice\":[0,6],\"type\":\"char\"}]");
-    check_parse_failed(P4_PegRuleChar, "\"", P4_MatchError);
+    ASSERT_PEG_PARSE(P4_PegRuleChar, "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"char\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleChar, "A", P4_Ok, "[{\"slice\":[0,1],\"type\":\"char\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleChar, "好", P4_Ok, "[{\"slice\":[0,3],\"type\":\"char\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleChar, "👌", P4_Ok, "[{\"slice\":[0,4],\"type\":\"char\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleChar, "\\t", P4_Ok, "[{\"slice\":[0,2],\"type\":\"char\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleChar, "\\\"", P4_Ok, "[{\"slice\":[0,2],\"type\":\"char\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleChar, "\\u{20}", P4_Ok, "[{\"slice\":[0,6],\"type\":\"char\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleChar, "\\u{0020}", P4_Ok, "[{\"slice\":[0,8],\"type\":\"char\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleChar, "\\u{10ffff}", P4_Ok, "[{\"slice\":[0,10],\"type\":\"char\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleChar, "\"", P4_MatchError, "[]");
 }
 
 void test_literal(void) {
-    check_parse(P4_PegRuleLiteral, "\"a\"", P4_Ok, "[{\"slice\":[0,3],\"type\":\"literal\"}]");
-    check_parse(P4_PegRuleLiteral, "\"A\"", P4_Ok, "[{\"slice\":[0,3],\"type\":\"literal\"}]");
-    check_parse(P4_PegRuleLiteral, "\"好\"", P4_Ok, "[{\"slice\":[0,5],\"type\":\"literal\"}]");
-    check_parse(P4_PegRuleLiteral, "\"👌\"", P4_Ok, "[{\"slice\":[0,6],\"type\":\"literal\"}]");
-    check_parse(P4_PegRuleLiteral, "\"\\t\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"literal\"}]");
-    check_parse(P4_PegRuleLiteral, "\"\\\"\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"literal\"}]");
-    check_parse(P4_PegRuleLiteral, "\"\\u0020\"", P4_Ok, "[{\"slice\":[0,8],\"type\":\"literal\"}]");
-    check_parse(P4_PegRuleLiteral, "\"hello world\"", P4_Ok, "[{\"slice\":[0,13],\"type\":\"literal\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"a\"", P4_Ok, "[{\"slice\":[0,3],\"type\":\"literal\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"A\"", P4_Ok, "[{\"slice\":[0,3],\"type\":\"literal\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"好\"", P4_Ok, "[{\"slice\":[0,5],\"type\":\"literal\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"👌\"", P4_Ok, "[{\"slice\":[0,6],\"type\":\"literal\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"\\t\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"literal\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"\\\"\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"literal\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"\\u{20}\"", P4_Ok, "[{\"slice\":[0,8],\"type\":\"literal\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"\\u{0020}\"", P4_Ok, "[{\"slice\":[0,10],\"type\":\"literal\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"\\u{10ffff}\"", P4_Ok, "[{\"slice\":[0,12],\"type\":\"literal\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"hello world\"", P4_Ok, "[{\"slice\":[0,13],\"type\":\"literal\"}]");
 }
 
 void test_insensitive(void) {
-    check_parse(P4_PegRuleInsensitiveLiteral, "i\"a\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
-    check_parse(P4_PegRuleInsensitiveLiteral, "i\"A\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
-    check_parse(P4_PegRuleInsensitiveLiteral, "i\"好\"", P4_Ok, "[{\"slice\":[0,6],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,6],\"type\":\"literal\"}]}]");
-    check_parse(P4_PegRuleInsensitiveLiteral, "i\"👌\"", P4_Ok, "[{\"slice\":[0,7],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,7],\"type\":\"literal\"}]}]");
-    check_parse(P4_PegRuleInsensitiveLiteral, "i\"\\t\"", P4_Ok, "[{\"slice\":[0,5],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,5],\"type\":\"literal\"}]}]");
-    check_parse(P4_PegRuleInsensitiveLiteral, "i\"\\\"\"", P4_Ok, "[{\"slice\":[0,5],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,5],\"type\":\"literal\"}]}]");
-    check_parse(P4_PegRuleInsensitiveLiteral, "i\"\\u0020\"", P4_Ok, "[{\"slice\":[0,9],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,9],\"type\":\"literal\"}]}]");
-    check_parse(P4_PegRuleInsensitiveLiteral, "i\"hello world\"", P4_Ok, "[{\"slice\":[0,14],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,14],\"type\":\"literal\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleInsensitiveLiteral, "i\"a\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleInsensitiveLiteral, "i\"A\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleInsensitiveLiteral, "i\"好\"", P4_Ok, "[{\"slice\":[0,6],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,6],\"type\":\"literal\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleInsensitiveLiteral, "i\"👌\"", P4_Ok, "[{\"slice\":[0,7],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,7],\"type\":\"literal\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleInsensitiveLiteral, "i\"\\t\"", P4_Ok, "[{\"slice\":[0,5],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,5],\"type\":\"literal\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleInsensitiveLiteral, "i\"\\\"\"", P4_Ok, "[{\"slice\":[0,5],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,5],\"type\":\"literal\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleInsensitiveLiteral, "i\"\\u{0020}\"", P4_Ok, "[{\"slice\":[0,11],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,11],\"type\":\"literal\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleInsensitiveLiteral, "i\"hello world\"", P4_Ok, "[{\"slice\":[0,14],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,14],\"type\":\"literal\"}]}]");
 }
 
 void test_range(void) {
-    check_parse(P4_PegRuleRange, "[a-z]", P4_Ok, "\
+    ASSERT_PEG_PARSE(P4_PegRuleRange, "[a-z]", P4_Ok, "\
 [{\"slice\":[0,5],\"type\":\"range\",\"children\":[\
 {\"slice\":[1,2],\"type\":\"char\"},\
 {\"slice\":[3,4],\"type\":\"char\"}]}]");
-    check_parse(P4_PegRuleRange, "[1-9]", P4_Ok, "\
+    ASSERT_PEG_PARSE(P4_PegRuleRange, "[1-9]", P4_Ok, "\
 [{\"slice\":[0,5],\"type\":\"range\",\"children\":[\
 {\"slice\":[1,2],\"type\":\"char\"},\
 {\"slice\":[3,4],\"type\":\"char\"}]}]");
-    check_parse(P4_PegRuleRange, "[\\u0020-\\u0030]", P4_Ok, "\
-[{\"slice\":[0,15],\"type\":\"range\",\"children\":[\
-{\"slice\":[1,7],\"type\":\"char\"},\
-{\"slice\":[8,14],\"type\":\"char\"}]}]");
-    check_parse(P4_PegRuleRange, "[1-9..2]", P4_Ok, "\
+    ASSERT_PEG_PARSE(P4_PegRuleRange, "[\\u{0020}-\\u{0030}]", P4_Ok, "\
+[{\"slice\":[0,19],\"type\":\"range\",\"children\":[\
+{\"slice\":[1,9],\"type\":\"char\"},\
+{\"slice\":[10,18],\"type\":\"char\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleRange, "[1-9..2]", P4_Ok, "\
 [{\"slice\":[0,8],\"type\":\"range\",\"children\":[\
 {\"slice\":[1,2],\"type\":\"char\"},\
 {\"slice\":[3,4],\"type\":\"char\"},\
@@ -96,86 +91,86 @@ void test_range(void) {
 }
 
 void test_reference(void) {
-    check_parse(P4_PegRuleReference, "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"reference\"}]");
-    check_parse(P4_PegRuleReference, "JsonEntry", P4_Ok, "[{\"slice\":[0,9],\"type\":\"reference\"}]");
-    check_parse(P4_PegRuleReference, "P4", P4_Ok, "[{\"slice\":[0,2],\"type\":\"reference\"}]");
-    check_parse(P4_PegRuleReference, "P4_PegRule", P4_Ok, "[{\"slice\":[0,10],\"type\":\"reference\"}]");
-    check_parse_failed(P4_PegRuleReference, "4PEG", P4_MatchError);
+    ASSERT_PEG_PARSE(P4_PegRuleReference, "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"reference\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleReference, "JsonEntry", P4_Ok, "[{\"slice\":[0,9],\"type\":\"reference\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleReference, "P4", P4_Ok, "[{\"slice\":[0,2],\"type\":\"reference\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleReference, "P4_PegRule", P4_Ok, "[{\"slice\":[0,10],\"type\":\"reference\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleReference, "4PEG", P4_MatchError, "[]");
 }
 
 void test_positive(void) {
-    check_parse(P4_PegRulePositive, "&\"a\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"positive\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
-    check_parse(P4_PegRulePositive, "&&\"a\"", P4_Ok, "[{\"slice\":[0,5],\"type\":\"positive\",\"children\":[{\"slice\":[1,5],\"type\":\"positive\",\"children\":[{\"slice\":[2,5],\"type\":\"literal\"}]}]}]");
+    ASSERT_PEG_PARSE(P4_PegRulePositive, "&\"a\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"positive\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRulePositive, "&&\"a\"", P4_Ok, "[{\"slice\":[0,5],\"type\":\"positive\",\"children\":[{\"slice\":[1,5],\"type\":\"positive\",\"children\":[{\"slice\":[2,5],\"type\":\"literal\"}]}]}]");
 }
 
 void test_negative(void) {
-    check_parse(P4_PegRuleNegative, "!\"a\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"negative\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
-    check_parse(P4_PegRuleNegative, "!!\"a\"", P4_Ok, "[{\"slice\":[0,5],\"type\":\"negative\",\"children\":[{\"slice\":[1,5],\"type\":\"negative\",\"children\":[{\"slice\":[2,5],\"type\":\"literal\"}]}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleNegative, "!\"a\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"negative\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleNegative, "!!\"a\"", P4_Ok, "[{\"slice\":[0,5],\"type\":\"negative\",\"children\":[{\"slice\":[1,5],\"type\":\"negative\",\"children\":[{\"slice\":[2,5],\"type\":\"literal\"}]}]}]");
 }
 
 void test_choice(void) {
-    check_parse(P4_PegRuleChoice, "\"a\"/\"b\"", P4_Ok, "[{\"slice\":[0,7],\"type\":\"choice\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
-    check_parse(P4_PegRuleChoice, "\"a\" / \"b\"", P4_Ok, "[{\"slice\":[0,9],\"type\":\"choice\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[6,9],\"type\":\"literal\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleChoice, "\"a\"/\"b\"", P4_Ok, "[{\"slice\":[0,7],\"type\":\"choice\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleChoice, "\"a\" / \"b\"", P4_Ok, "[{\"slice\":[0,9],\"type\":\"choice\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[6,9],\"type\":\"literal\"}]}]");
 }
 
 void test_sequence(void) {
-    check_parse(P4_PegRuleSequence, "\"a\" \"b\"", P4_Ok, "[{\"slice\":[0,7],\"type\":\"sequence\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleSequence, "\"a\" \"b\"", P4_Ok, "[{\"slice\":[0,7],\"type\":\"sequence\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
 }
 
 void test_repeat(void) {
-    check_parse(P4_PegRuleRepeat, "\"a\"*", P4_Ok, "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"zeroormore\"}]}]");
-    check_parse(P4_PegRuleRepeat, "\"a\"+", P4_Ok, "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"onceormore\"}]}]");
-    check_parse(P4_PegRuleRepeat, "\"a\"?", P4_Ok, "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"zerooronce\"}]}]");
-    check_parse(P4_PegRuleRepeat, "\"a\"{1,}", P4_Ok, "[{\"slice\":[0,7],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,7],\"type\":\"repeatmin\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"}]}]}]");
-    check_parse(P4_PegRuleRepeat, "\"a\"{,1}", P4_Ok, "[{\"slice\":[0,7],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,7],\"type\":\"repeatmax\",\"children\":[{\"slice\":[5,6],\"type\":\"number\"}]}]}]");
-    check_parse(P4_PegRuleRepeat, "\"a\"{1,1}", P4_Ok, "[{\"slice\":[0,8],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,8],\"type\":\"repeatminmax\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"},{\"slice\":[6,7],\"type\":\"number\"}]}]}]");
-    check_parse(P4_PegRuleRepeat, "\"a\"{1}", P4_Ok, "[{\"slice\":[0,6],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,6],\"type\":\"repeatexact\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"}]}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleRepeat, "\"a\"*", P4_Ok, "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"zeroormore\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleRepeat, "\"a\"+", P4_Ok, "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"onceormore\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleRepeat, "\"a\"?", P4_Ok, "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"zerooronce\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleRepeat, "\"a\"{1,}", P4_Ok, "[{\"slice\":[0,7],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,7],\"type\":\"repeatmin\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"}]}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleRepeat, "\"a\"{,1}", P4_Ok, "[{\"slice\":[0,7],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,7],\"type\":\"repeatmax\",\"children\":[{\"slice\":[5,6],\"type\":\"number\"}]}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleRepeat, "\"a\"{1,1}", P4_Ok, "[{\"slice\":[0,8],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,8],\"type\":\"repeatminmax\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"},{\"slice\":[6,7],\"type\":\"number\"}]}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleRepeat, "\"a\"{1}", P4_Ok, "[{\"slice\":[0,6],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,6],\"type\":\"repeatexact\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"}]}]}]");
 }
 
 void test_expression(void) {
-    check_parse(P4_PegRuleExpression, "\"a\"", P4_Ok, "[{\"slice\":[0,3],\"type\":\"literal\"}]");
-    check_parse(P4_PegRuleExpression, "[a-z]", P4_Ok, "\
+    ASSERT_PEG_PARSE(P4_PegRuleExpression, "\"a\"", P4_Ok, "[{\"slice\":[0,3],\"type\":\"literal\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleExpression, "[a-z]", P4_Ok, "\
 [{\"slice\":[0,5],\"type\":\"range\",\"children\":[\
 {\"slice\":[1,2],\"type\":\"char\"},\
 {\"slice\":[3,4],\"type\":\"char\"}]}]");
-    check_parse(P4_PegRuleExpression, "s1", P4_Ok, "[{\"slice\":[0,2],\"type\":\"reference\"}]");
-    check_parse(P4_PegRuleExpression, "&\"a\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"positive\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
-    check_parse(P4_PegRuleExpression, "!\"a\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"negative\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
-    check_parse(P4_PegRuleExpression, "\"a\" / \"b\"", P4_Ok, "[{\"slice\":[0,9],\"type\":\"choice\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[6,9],\"type\":\"literal\"}]}]");
-    check_parse(P4_PegRuleExpression, "\"a\" \"b\"", P4_Ok, "[{\"slice\":[0,7],\"type\":\"sequence\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
-    check_parse(P4_PegRuleExpression, "var \"b\"", P4_Ok, "[{\"slice\":[0,7],\"type\":\"sequence\",\"children\":[{\"slice\":[0,3],\"type\":\"reference\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
-    check_parse(P4_PegRuleExpression, "var name", P4_Ok, "[{\"slice\":[0,8],\"type\":\"sequence\",\"children\":[{\"slice\":[0,3],\"type\":\"reference\"},{\"slice\":[4,8],\"type\":\"reference\"}]}]");
-    check_parse(P4_PegRuleExpression, "v1 v2 / v3 v4", P4_Ok, "[{\"slice\":[0,13],\"type\":\"choice\",\"children\":[{\"slice\":[0,6],\"type\":\"sequence\",\"children\":[{\"slice\":[0,2],\"type\":\"reference\"},{\"slice\":[3,5],\"type\":\"reference\"}]},{\"slice\":[8,13],\"type\":\"sequence\",\"children\":[{\"slice\":[8,10],\"type\":\"reference\"},{\"slice\":[11,13],\"type\":\"reference\"}]}]}]");
-    check_parse(P4_PegRuleExpression, "v1 (v2/v3) v4", P4_Ok, "[{\"slice\":[0,13],\"type\":\"sequence\",\"children\":[{\"slice\":[0,2],\"type\":\"reference\"},{\"slice\":[4,9],\"type\":\"choice\",\"children\":[{\"slice\":[4,6],\"type\":\"reference\"},{\"slice\":[7,9],\"type\":\"reference\"}]},{\"slice\":[11,13],\"type\":\"reference\"}]}]");
-    check_parse(P4_PegRuleExpression, "\"a\"*", P4_Ok, "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"zeroormore\"}]}]");
-    check_parse(P4_PegRuleExpression, "\"a\"+", P4_Ok, "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"onceormore\"}]}]");
-    check_parse(P4_PegRuleExpression, "\"a\"?", P4_Ok, "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"zerooronce\"}]}]");
-    check_parse(P4_PegRuleExpression, "\"a\"{1,}", P4_Ok, "[{\"slice\":[0,7],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,7],\"type\":\"repeatmin\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"}]}]}]");
-    check_parse(P4_PegRuleExpression, "\"a\"{,1}", P4_Ok, "[{\"slice\":[0,7],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,7],\"type\":\"repeatmax\",\"children\":[{\"slice\":[5,6],\"type\":\"number\"}]}]}]");
-    check_parse(P4_PegRuleExpression, "\"a\"{1,1}", P4_Ok, "[{\"slice\":[0,8],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,8],\"type\":\"repeatminmax\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"},{\"slice\":[6,7],\"type\":\"number\"}]}]}]");
-    check_parse(P4_PegRuleExpression, "\"a\"{1}", P4_Ok, "[{\"slice\":[0,6],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,6],\"type\":\"repeatexact\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"}]}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleExpression, "s1", P4_Ok, "[{\"slice\":[0,2],\"type\":\"reference\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleExpression, "&\"a\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"positive\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleExpression, "!\"a\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"negative\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleExpression, "\"a\" / \"b\"", P4_Ok, "[{\"slice\":[0,9],\"type\":\"choice\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[6,9],\"type\":\"literal\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleExpression, "\"a\" \"b\"", P4_Ok, "[{\"slice\":[0,7],\"type\":\"sequence\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleExpression, "var \"b\"", P4_Ok, "[{\"slice\":[0,7],\"type\":\"sequence\",\"children\":[{\"slice\":[0,3],\"type\":\"reference\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleExpression, "var name", P4_Ok, "[{\"slice\":[0,8],\"type\":\"sequence\",\"children\":[{\"slice\":[0,3],\"type\":\"reference\"},{\"slice\":[4,8],\"type\":\"reference\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleExpression, "v1 v2 / v3 v4", P4_Ok, "[{\"slice\":[0,13],\"type\":\"choice\",\"children\":[{\"slice\":[0,6],\"type\":\"sequence\",\"children\":[{\"slice\":[0,2],\"type\":\"reference\"},{\"slice\":[3,5],\"type\":\"reference\"}]},{\"slice\":[8,13],\"type\":\"sequence\",\"children\":[{\"slice\":[8,10],\"type\":\"reference\"},{\"slice\":[11,13],\"type\":\"reference\"}]}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleExpression, "v1 (v2/v3) v4", P4_Ok, "[{\"slice\":[0,13],\"type\":\"sequence\",\"children\":[{\"slice\":[0,2],\"type\":\"reference\"},{\"slice\":[4,9],\"type\":\"choice\",\"children\":[{\"slice\":[4,6],\"type\":\"reference\"},{\"slice\":[7,9],\"type\":\"reference\"}]},{\"slice\":[11,13],\"type\":\"reference\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleExpression, "\"a\"*", P4_Ok, "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"zeroormore\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleExpression, "\"a\"+", P4_Ok, "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"onceormore\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleExpression, "\"a\"?", P4_Ok, "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"zerooronce\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleExpression, "\"a\"{1,}", P4_Ok, "[{\"slice\":[0,7],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,7],\"type\":\"repeatmin\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"}]}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleExpression, "\"a\"{,1}", P4_Ok, "[{\"slice\":[0,7],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,7],\"type\":\"repeatmax\",\"children\":[{\"slice\":[5,6],\"type\":\"number\"}]}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleExpression, "\"a\"{1,1}", P4_Ok, "[{\"slice\":[0,8],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,8],\"type\":\"repeatminmax\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"},{\"slice\":[6,7],\"type\":\"number\"}]}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleExpression, "\"a\"{1}", P4_Ok, "[{\"slice\":[0,6],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,6],\"type\":\"repeatexact\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"}]}]}]");
 }
 
 void test_rule_name(void) {
-    check_parse(P4_PegRuleRuleName, "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"name\"}]");
-    check_parse(P4_PegRuleRuleName, "JsonEntry", P4_Ok, "[{\"slice\":[0,9],\"type\":\"name\"}]");
-    check_parse(P4_PegRuleRuleName, "P4", P4_Ok, "[{\"slice\":[0,2],\"type\":\"name\"}]");
-    check_parse(P4_PegRuleRuleName, "P4_PegRule", P4_Ok, "[{\"slice\":[0,10],\"type\":\"name\"}]");
-    check_parse_failed(P4_PegRuleRuleName, "4PEG", P4_MatchError);
+    ASSERT_PEG_PARSE(P4_PegRuleRuleName, "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"name\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleRuleName, "JsonEntry", P4_Ok, "[{\"slice\":[0,9],\"type\":\"name\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleRuleName, "P4", P4_Ok, "[{\"slice\":[0,2],\"type\":\"name\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleRuleName, "P4_PegRule", P4_Ok, "[{\"slice\":[0,10],\"type\":\"name\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleRuleName, "4PEG", P4_MatchError, "[]");
 }
 
 void test_rule_flag(void) {
-    check_parse(P4_PegRuleDecorator, "@scoped", P4_Ok, "[{\"slice\":[0,7],\"type\":\"decorator\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleDecorator, "@scoped", P4_Ok, "[{\"slice\":[0,7],\"type\":\"decorator\"}]");
 }
 
 void test_rule(void) {
-    check_parse(P4_PegRuleRule, "a = \"1\";", P4_Ok, "["
+    ASSERT_PEG_PARSE(P4_PegRuleRule, "a = \"1\";", P4_Ok, "["
         "{\"slice\":[0,8],\"type\":\"rule\",\"children\":["
             "{\"slice\":[0,1],\"type\":\"name\"},"
             "{\"slice\":[4,7],\"type\":\"literal\"}"
         "]}"
     "]");
-    check_parse(P4_PegRuleRule, "a = [1-9];", P4_Ok, "["
+    ASSERT_PEG_PARSE(P4_PegRuleRule, "a = [1-9];", P4_Ok, "["
         "{\"slice\":[0,10],\"type\":\"rule\",\"children\":["
             "{\"slice\":[0,1],\"type\":\"name\"},"
             "{\"slice\":[4,9],\"type\":\"range\",\"children\":["
@@ -184,7 +179,7 @@ void test_rule(void) {
         "}]}"
     "]");
 
-    check_parse(P4_PegRuleRule, "a = \"0x\" [1-9];", P4_Ok, "["
+    ASSERT_PEG_PARSE(P4_PegRuleRule, "a = \"0x\" [1-9];", P4_Ok, "["
         "{\"slice\":[0,15],\"type\":\"rule\",\"children\":["
             "{\"slice\":[0,1],\"type\":\"name\"},"
             "{\"slice\":[4,14],\"type\":\"sequence\",\"children\":["
@@ -197,7 +192,7 @@ void test_rule(void) {
         "]}"
     "]");
 
-    check_parse(P4_PegRuleRule, "a = \"0x\"/[1-9];", P4_Ok, "["
+    ASSERT_PEG_PARSE(P4_PegRuleRule, "a = \"0x\"/[1-9];", P4_Ok, "["
         "{\"slice\":[0,15],\"type\":\"rule\",\"children\":["
             "{\"slice\":[0,1],\"type\":\"name\"},"
             "{\"slice\":[4,14],\"type\":\"choice\",\"children\":["
@@ -210,7 +205,7 @@ void test_rule(void) {
         "]}"
     "]");
 
-    check_parse(P4_PegRuleRule, "@lifted @squashed @spaced @nonterminal @scoped @tight\na = \"1\";", P4_Ok, "["
+    ASSERT_PEG_PARSE(P4_PegRuleRule, "@lifted @squashed @spaced @nonterminal @scoped @tight\na = \"1\";", P4_Ok, "["
         "{\"slice\":[0,62],\"type\":\"rule\",\"children\":["
             "{\"slice\":[0,53],\"type\":\"decorators\",\"children\":["
                 "{\"slice\":[0,7],\"type\":\"decorator\"},"
@@ -227,7 +222,7 @@ void test_rule(void) {
 }
 
 void test_grammar(void) {
-    check_parse(P4_PegGrammar,
+    ASSERT_PEG_PARSE(P4_PegGrammar,
         "one = \"1\";\n"
         "entry = one one;", P4_Ok,
         "["
@@ -296,11 +291,16 @@ void test_eval_char(void) {
     ASSERT_EVAL(P4_PegRuleChar, "Ç", P4_Rune, 0x00C7);
     ASSERT_EVAL(P4_PegRuleChar, "你", P4_Rune, 0x4f60); /* https://www.compart.com/en/unicode/U+4F60 */
     ASSERT_EVAL(P4_PegRuleChar, "🐷", P4_Rune, 0x1f437); /* https://www.compart.com/en/unicode/U+1F437 */
-    ASSERT_EVAL(P4_PegRuleChar, "\\u4f60", P4_Rune, 0x4f60);
-    ASSERT_EVAL(P4_PegRuleChar, "\\u0041", P4_Rune, 'A');
-    ASSERT_EVAL(P4_PegRuleChar, "\\u0061", P4_Rune, 'a');
-    ASSERT_EVAL(P4_PegRuleChar, "\\u000a", P4_Rune, '\n');
-    ASSERT_EVAL(P4_PegRuleChar, "\\u000A", P4_Rune, '\n');
+    ASSERT_EVAL(P4_PegRuleChar, "\\u{4f60}", P4_Rune, 0x4f60);
+    ASSERT_EVAL(P4_PegRuleChar, "\\u{a}", P4_Rune, '\n');
+    ASSERT_EVAL(P4_PegRuleChar, "\\u{A}", P4_Rune, '\n');
+    ASSERT_EVAL(P4_PegRuleChar, "\\u{41}", P4_Rune, 'A');
+    ASSERT_EVAL(P4_PegRuleChar, "\\u{61}", P4_Rune, 'a');
+    ASSERT_EVAL(P4_PegRuleChar, "\\u{0041}", P4_Rune, 'A');
+    ASSERT_EVAL(P4_PegRuleChar, "\\u{0061}", P4_Rune, 'a');
+    ASSERT_EVAL(P4_PegRuleChar, "\\u{000a}", P4_Rune, '\n');
+    ASSERT_EVAL(P4_PegRuleChar, "\\u{000A}", P4_Rune, '\n');
+    ASSERT_EVAL(P4_PegRuleChar, "\\u{10ffff}", P4_Rune, 0x10ffff);
 }
 
 #define ASSERT_EVAL_LITERAL(entry, input, expect_lit, expect_sensitive) do { \
@@ -318,7 +318,7 @@ void test_eval_literal(void) {
     ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"hello world\"", "hello world", true);
     ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"你好, World\"", "你好, World", true);
     ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"Peppa PEG 🐷\"", "Peppa PEG 🐷", true);
-    ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"\\u4f60\\u597d, world\"", "你好, world", true);
+    ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"\\u{4f60}\\u{597d}, world\"", "你好, world", true);
     ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"\\n\"", "\n", true);
     ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"\\r\"", "\r", true);
     ASSERT_EVAL_LITERAL(P4_PegRuleLiteral, "\"\\t\"", "\t", true);
@@ -330,7 +330,7 @@ void test_eval_insensitive(void) {
     ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"hello world\"", "hello world", false);
     ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"你好, World\"", "你好, World", false);
     ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"Peppa PEG 🐷\"", "Peppa PEG 🐷", false);
-    ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"\\u4f60\\u597d, world\"", "你好, world", false);
+    ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"\\u{4f60}\\u{597d}, world\"", "你好, world", false);
     ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"\\n\"", "\n", false);
     ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"\\r\"", "\r", false);
     ASSERT_EVAL_LITERAL(P4_PegRuleInsensitiveLiteral, "i\"\\t\"", "\t", false);
@@ -351,7 +351,7 @@ void test_eval_range(void) {
     ASSERT_EVAL_RANGE(P4_PegRuleRange, "[0-9]", '0', '9');
     ASSERT_EVAL_RANGE(P4_PegRuleRange, "[a-z]", 'a', 'z');
     ASSERT_EVAL_RANGE(P4_PegRuleRange, "[A-Z]", 'A', 'Z');
-    ASSERT_EVAL_RANGE(P4_PegRuleRange, "[\\u0001-\\uffff]", 0x1, 0xffff);
+    ASSERT_EVAL_RANGE(P4_PegRuleRange, "[\\u{0001}-\\u{10ffff}]", 0x1, 0x10ffff);
     ASSERT_EVAL_RANGE(P4_PegRuleRange, "[你-好]", 0x4f60, 0x597d);
 }
 
@@ -447,26 +447,21 @@ P4_String test_grammar_rule_to_name(P4_RuleID id) {
 }
 
 #define ASSERT_EVAL_GRAMMAR(peg_rules, entry_name, source_code, parse_code, ast) do { \
-    SETUP_EVAL((P4_PegGrammar), (peg_rules)); \
-    P4_Grammar* peg_grammar = 0; \
-    TEST_ASSERT_NOT_NULL_MESSAGE( root, "peg rule should be correctly parsed"); \
-    TEST_ASSERT_EQUAL_MESSAGE( P4_Ok, P4_PegEval(root, &peg_grammar), "peg rule should be correctly evaluated"); \
-    TEST_ASSERT_NOT_NULL_MESSAGE( peg_grammar, "peg grammar should be successfully created" ); \
-    P4_Expression* entry_expr = P4_GetGrammarRuleByName(peg_grammar, (entry_name)); \
-    TEST_ASSERT_NOT_NULL_MESSAGE( entry_expr, "peg grammar entry should be successfully resolved." ); \
-    P4_Source* input_source = P4_CreateSource((source_code), (entry_expr)->id); \
-    TEST_ASSERT_NOT_NULL_MESSAGE( input_source, "source code should be correctly created." ); \
-    TEST_ASSERT_EQUAL_MESSAGE( (parse_code), P4_Parse(peg_grammar, input_source), "source code should be correctly parsed"); \
-    P4_Token* ast_token = P4_GetSourceAst(input_source); \
+    P4_Grammar*     grammar = P4_LoadGrammar((peg_rules)); \
+    TEST_ASSERT_NOT_NULL_MESSAGE(grammar, "peg rule should be valid peg code."); \
+    P4_Expression*  entry = P4_GetGrammarRuleByName(grammar, (entry_name)); \
+    TEST_ASSERT_NOT_NULL_MESSAGE(entry, "peg entry rule should created."); \
+    P4_Source*      source  = P4_CreateSource((source_code), entry->id); \
+    TEST_ASSERT_EQUAL_MESSAGE( \
+            (parse_code), P4_Parse(grammar, source), \
+            "source code should be correctly parsed"); \
+    P4_Token*       ast_token = P4_GetSourceAst(source); \
     FILE *f = fopen("check.json","w"); \
     P4_JsonifySourceAst(f, ast_token, test_grammar_rule_to_name); \
     fclose(f); \
-    P4_String s = read_file("check.json"); \
-    TEST_ASSERT_EQUAL_STRING((ast), s); \
-    free(s); \
-    P4_DeleteSource( input_source ); \
-    P4_DeleteGrammar( peg_grammar ); \
-    TEARDOWN_EVAL(); \
+    P4_String s = read_file("check.json"); TEST_ASSERT_EQUAL_STRING((ast), s); free(s); \
+    P4_DeleteSource(source); \
+    P4_DeleteGrammar(grammar); \
 } while (0);
 
 void test_eval_grammar(void) {
@@ -476,6 +471,10 @@ void test_eval_grammar(void) {
     ASSERT_EVAL_GRAMMAR("R1 = \"نامهای\";", "R1", "نامهای", P4_Ok, "[{\"slice\":[0,12],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = i\"hello\";", "R1", "hello", P4_Ok, "[{\"slice\":[0,5],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = i\"hello\";", "R1", "HELLO", P4_Ok, "[{\"slice\":[0,5],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = [1-9..2];", "R1", "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = [1-9..2];", "R1", "2", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = [1-9..2];", "R1", "3", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = [1-9..2];", "R1", "4", P4_MatchError, "[]");
     ASSERT_EVAL_GRAMMAR("R1 = (\"\\n\" / \"\\r\")+;", "R1", "\r\n\r\n", P4_Ok, "[{\"slice\":[0,4],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "1A9F", P4_Ok, "[{\"slice\":[0,4],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "FFFFFF", P4_Ok, "[{\"slice\":[0,6],\"type\":\"R1\"}]");

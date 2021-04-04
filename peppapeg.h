@@ -207,7 +207,39 @@ typedef enum {
     P4_StackError           = 10,
 } P4_Error;
 
-
+/**
+ * The RuleID for Peppa PEG grammar.
+ */
+typedef enum {
+    P4_PegGrammar                   = 1,
+    P4_PegRuleRule                  = 2,
+    P4_PegRuleRuleDecorators        = 3,
+    P4_PegRuleRuleName              = 4,
+    P4_PegRuleExpression            = 5,
+    P4_PegRulePrimary               = 6,
+    P4_PegRuleDecorator             = 7,
+    P4_PegRuleIdentifier            = 8,
+    P4_PegRuleLiteral               = 9,
+    P4_PegRuleInsensitiveLiteral    = 10,
+    P4_PegRuleRange                 = 11,
+    P4_PegRuleReference             = 12,
+    P4_PegRulePositive              = 13,
+    P4_PegRuleNegative              = 14,
+    P4_PegRuleSequence              = 15,
+    P4_PegRuleChoice                = 16,
+    P4_PegRuleBackReference         = 17,
+    P4_PegRuleRepeat                = 18,
+    P4_PegRuleRepeatOnceOrMore      = 19,
+    P4_PegRuleRepeatZeroOrMore      = 20,
+    P4_PegRuleRepeatZeroOrOnce      = 21,
+    P4_PegRuleRepeatMin             = 22,
+    P4_PegRuleRepeatMax             = 23,
+    P4_PegRuleRepeatExact           = 24,
+    P4_PegRuleRepeatMinMax          = 25,
+    P4_PegRuleNumber                = 26,
+    P4_PegRuleChar                  = 27,
+    P4_PegRuleWhitespace            = 28,
+} P4_PegRuleID;
 
 /*
  *
@@ -520,6 +552,30 @@ P4_String      P4_Version(void);
  * Read a single code point (rune) from an UTF-8 string.
  */
 size_t         P4_ReadRune(P4_String s, P4_Rune* c);
+
+/**
+ * Read an escaped single code point (rune) from an UTF-8 string.
+ *
+ * @param       text        The text.
+ * @param       rune        The rune.
+ * @return      The size of rune.
+ *
+ * For example:
+ *
+ *      P4_Rune rune;
+ *      P4_ReadEscapedRune("\\u000D", rune); // 0xd
+ */
+size_t         P4_ReadEscapedRune(char* text, P4_Rune* rune);
+
+/**
+ * Append a rune to str (in-place).
+ *
+ * @param       str     The string to be appended.
+ * @param       chr     The rune.
+ * @param       n       The size of rune. Should be 1, 2, 3, 4.
+ * @return      The string starting from appended rune.
+ */
+void*          P4_ConcatRune(void* str, P4_Rune chr, size_t n);
 
 /*
  * ██╗░░░░░██╗████████╗███████╗██████╗░░█████╗░██╗░░░░░
@@ -1780,6 +1836,20 @@ void           P4_DeleteToken(P4_Token*);
  */
 P4_Slice*      P4_GetTokenSlice(P4_Token*);
 
+
+/**
+ * @brief       Get the total number of token children.
+ * @param       token   The token.
+ * @return      The total number of token children.
+ *
+ * Example:
+ *
+ *      P4_Token* root = P4_GetSourceAst(source);
+ *      size_t count = P4_GetTokenChildrenCount(root);
+ *      printf("There are %lu children for root node\n", count);
+ */
+size_t         P4_GetTokenChildrenCount(P4_Token* token);
+
 /**
  * @brief       Copy the string that the token covers.
  *              The caller is responsible for freeing the string.
@@ -1815,6 +1885,66 @@ P4_Error       P4_SetGrammarCallback(P4_Grammar*, P4_MatchCallback, P4_ErrorCall
  * The original grammar rule will be deleted.
  */
 P4_Error       P4_ReplaceGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
+
+/**
+ * @brief       Create a grammar that can parse other grammars written in PEG syntax.
+ * @return      The grammar object.
+ *
+ * Example:
+ *
+ *      P4_Grammar* peg = P4_CreatePegGrammar();
+ *      P4_DeleteGrammar(peg);
+ */
+P4_Grammar*    P4_CreatePegGrammar ();
+
+/**
+ * @brief       Evaluate the token ast parsed by P4_CreatePegGrammar.
+ * @param       token   The token tree.
+ * @param       result  Can be a reference several value kinds, such as size_t, P4_Grammar, P4_Expression, etc.
+ * @return      The error code.
+ *
+ * Example:
+ *
+ *      P4_Grammar* peg     = P4_CreatePegGrammar();
+ *      P4_Source*  peggram = P4_CreateSource("my_grammar = \"abc\";", P4_PegGrammar);
+ *      P4_Parse(peg, peggram);
+ *
+ *      P4_Grammar* my_grammar = NULL;
+ *
+ *      if (P4_Ok != P4_PegEval(P4_GetSourceAst(peggram), &my_grammar))
+ *          printf("invalid token tree.\n");
+ *
+ *      P4_DeleteGrammar(my_grammar);
+ *      P4_DeleteSource(peggram);
+ *      P4_DeleteGrammar(peg);
+ */
+P4_Error       P4_PegEval(P4_Token* token, void* result);
+
+/**
+ * @brief       Get the corresponding rule name for a peg grammar rule id.
+ * @param       id      A P4_PegRuleID.
+ * @return      The name.
+ *
+ *      printf("%s\n", P4_StringifyPegGrammarRuleID(P4_PegRuleRule));
+ */
+P4_String      P4_StringifyPegGrammarRuleID(P4_RuleID id);
+
+
+/**
+ * @brief       Load peg grammar from a string.
+ * @param       rules   The rules string.
+ * @return      The grammar object.
+ *
+ * Example:
+ *
+ *      P4_Grammar* grammar = P4_LoadGrammar(
+ *          "entry = one one;\n"
+ *          "one   = \"1\";\n"
+ *      );
+ *      P4_Source* source = P4_CreateSource("11", 1);
+ *      P4_Parse(grammar, source);
+ */
+P4_Grammar*    P4_LoadGrammar(P4_String rules);
 
 #ifdef __cplusplus
 }

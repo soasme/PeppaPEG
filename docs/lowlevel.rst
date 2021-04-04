@@ -1,8 +1,11 @@
+Low Level APIs
+==============
+
 Expressions
-===========
+-----------
 
 Literal
--------
+```````
 
 Literal **matches an exact string**.
 
@@ -38,7 +41,7 @@ Literal cannot be an empty string.
 :seealso: :c:enum:`P4_Literal`, :c:func:`P4_CreateLiteral`, :c:func:`P4_AddLiteral`.
 
 Range
------
+`````
 
 Range **matches a single character in range**.
 
@@ -75,7 +78,7 @@ The value of lower must be less than the upper.
 :seealso: :c:enum:`P4_Range`, :c:func:`P4_CreateRange`, :c:func:`P4_AddRange`.
 
 Sequence
---------
+````````
 
 Sequence **matches a sequence of sub-expressions in order**.
 
@@ -121,7 +124,7 @@ The members can be set after the Sequence is created:
 :seealso: :c:enum:`P4_Sequence`, :c:func:`P4_CreateSequence`, :c:func:`P4_CreateSequenceWithMembers`, :c:func:`P4_AddSequence`, :c:func:`P4_AddSequenceWithMembers`, :c:func:`P4_SetMember`.
 
 BackReference
--------------
+`````````````
 
 BackReference **matches an exact string previously matched in a Sequence**. BackReference can and only can be used as a Sequence member. For example, the below snippet matches "a:a", but not "a:A" or "a:b".
 
@@ -168,7 +171,7 @@ The index value of a BackReference must not be the index of itself.
 :seealso: :c:enum:`P4_BackReference`, :c:func:`P4_CreateBackReference`.
 
 Choice
-------
+```````
 
 Choice **matches one of the sub-expression.**
 
@@ -214,7 +217,7 @@ Similar to Sequence, the members can be set after the Choice is created.
 :seealso: :c:enum:`P4_Choice`, :c:func:`P4_CreateChoice`, :c:func:`P4_CreateChoiceWithMembers`, :c:func:`P4_AddChoice`, :c:func:`P4_AddChoiceWithMembers`, :c:func:`P4_SetMember`.
 
 Reference
----------
+`````````
 
 Reference **matches a string based on the referenced grammar rule**.
 
@@ -233,7 +236,7 @@ The referenced grammar rule must exist before calling :c:func:`P4_Parse`.
 :seealso: :c:enum:`P4_Reference`, :c:func:`P4_CreateReference`, :c:func:`P4_AddReference`.
 
 Positive
---------
+````````
 
 Positive **tests if the sub-expression matches**.
 
@@ -257,7 +260,7 @@ Positive can be useful in limiting the possibilities of the latter member in a S
 :seealso: :c:enum:`P4_Positive`, :c:func:`P4_CreatePositive`, :c:func:`P4_AddPositive`.
 
 Negative
---------
+````````
 
 Negative **tests if the sub-expression does not match**.
 
@@ -281,7 +284,7 @@ Negative can be useful in limiting the possiblities of the latter member in a Se
 :seealso: :c:enum:`P4_Negative`, :c:func:`P4_CreateNegative`, :c:func:`P4_AddNegative`.
 
 Repeat
-------
+`````````
 
 Repeat **matches the sub-expression several times**.
 
@@ -333,3 +336,195 @@ The repetition can also be set with designated min or max times.
     However, using the derived names can improve the readability of the code.
 
 :seealso: :c:enum:`P4_Repeat`, :c:func:`P4_CreateZeroOrOnce`, :c:func:`P4_CreateZeroOrMore`, :c:func:`P4_CreateOnceOrMore`, :c:func:`P4_CreateRepeatMin`, :c:func:`P4_CreateRepeatMax`, :c:func:`P4_CreateRepeatMinMax`, :c:func:`P4_CreateRepeatExact`, :c:func:`P4_AddZeroOrOnce`, :c:func:`P4_AddZeroOrMore`, :c:func:`P4_AddOnceOrMore`, :c:func:`P4_AddRepeatMin`, :c:func:`P4_AddRepeatMax`, :c:func:`P4_AddRepeatMinMax`, :c:func:`P4_AddRepeatExact`.
+
+Expression Flags
+----------------
+
+Flags can only be used in the grammar rule expression itself. It can not be used in any sub-expression of the grammar rule expression.
+
+Usually, a grammar rule creates a token. The expression flags modify the behavior of the token generation.
+
+`P4_FLAG_SQUASHED`
+``````````````````
+
+Flag `P4_FLAG_SQUASHED` **prevents generating children tokens**.
+
+For example,
+
+.. code-block:: c
+
+    typedef enum { Entry, Text } MyRuleID;
+
+    P4_AddSequenceWithMembers(grammar, Entry, 2
+        P4_CreateReference(Text),
+        P4_CreateReference(Text)
+    );
+    P4_AddLiteral(grammar, Text, "x", false);
+
+This grammar parses the text "xx" into three tokens:
+
+.. code-block::
+
+    Token(0..2): "Xx"
+      Token(0..1) "X"
+      Token(1..2) "x"
+
+If the grammar rule `Entry` has flag `P4_FLAG_SQUASHED`, the children tokens disappear:
+
+.. code-block:: c
+
+    P4_SetGrammarRuleFlag(grammar, Entry, P4_FLAG_SQUASHED);
+
+.. code-block::
+
+    Token(0..2): "Xx"
+
+Flag `P4_FLAG_SQUASHED` takes effects not only on the expression but its all descendant expressions.
+
+`P4_FLAG_LIFTED`
+``````````````````
+
+`P4_FLAG_LIFTED` **replaces the token with its children tokens**.
+
+For example,
+
+.. code-block:: c
+
+    typedef enum { Entry, Text } MyRuleID;
+
+    P4_AddSequenceWithMembers(grammar, Entry, 2
+        P4_CreateReference(Text),
+        P4_CreateReference(Text)
+    );
+    P4_AddLiteral(grammar, Text, "x", false);
+
+This grammar can match text "xx" into three tokens:
+
+.. code-block::
+
+    Token(0..2): "Xx"
+      Token(0..1) "X"
+      Token(1..2) "x"
+
+If the grammar rule `Entry` has flag `P4_FLAG_LIFTED`, the token is lifted and replaced by its children:
+
+.. code-block:: c
+
+    P4_SetGrammarRuleFlag(grammar, Entry, P4_FLAG_LIFTED);
+
+.. code-block::
+
+    Token(0..1): "X"
+    Token(1..2): "x"
+
+`P4_FLAG_NON_TERMINAL`
+``````````````````````
+
+`P4_FLAG_NON_TERMINAL` **replaces the token with its single child token or does nothing.**.
+
+For example,
+
+.. code-block:: c
+
+    typedef enum { Entry, Text } MyRuleID;
+
+    P4_AddSequenceWithMembers(grammar, Entry, 2
+        P4_CreateLiteral("(", true),
+        P4_CreateReference(Text),
+        P4_CreateLiteral(")", true)
+    );
+    P4_AddLiteral(grammar, Text, "x", false);
+
+This grammar can match text "(x)" into two tokens:
+
+.. code-block::
+
+    Token(0..3): "(x)"
+      Token(1..2) "x"
+
+If the grammar rule `Entry` has flag `P4_FLAG_NON_TERMINAL`, the token is lifted and replaced by its single child token:
+
+.. code-block:: c
+
+    P4_SetGrammarRuleFlag(grammar, Entry, P4_FLAG_NON_TERMINAL);
+
+.. code-block::
+
+    Token(1..2): "x"
+
+This flag only works for Sequence and Repeat expressions.
+
+This flag has no effect if the Sequence or Repeat expressions produces over one token, e.g, the parent token will not be lifted.
+
+`P4_FLAG_SPACED`
+``````````````````````
+
+`P4_FLAG_SPACED` **indicates the expression is for whitespaces**.
+
+For example,
+
+.. code-block:: c
+
+    typedef enum { Entry, Whitespace } MyRuleID;
+
+    P4_AddLiteral(grammar, Whitespace, " ", false);
+
+    P4_SetGrammarRuleFlag(grammar, Whitespace, P4_FLAG_SPACED);
+
+Often, we don't want the whitespace having tokens, so it's usually combined with `P4_FLAG_LIFTED`.
+
+.. code-block:: c
+
+    P4_SetGrammarRuleFlag(grammar, Whitespace, P4_FLAG_SPACED | P4_FLAG_LIFTED);
+
+This flag does not work on its own. It takes effect on Sequence or Repeat.
+
+When parsing Sequence and Repeat, the grammar will match as many whitespaces as possible between every sequence member or every repetition sub-expression.
+
+For example, this rule matches "HelloWorld", "Hello World", "Hello       World", etc.
+
+.. code-block:: c
+
+    P4_AddSequenceWithMembers(grammar, Entry, 2,
+        P4_AddLiteral("Hello", true),
+        P4_AddLiteral("World", true)
+    );
+
+For example, this rule matches "xxx", "x   x         x", etc.
+
+.. code-block:: c
+
+    P4_AddOnceOrMore(grammar, Entry, P4_AddLiteral("x", true));
+
+The SPACED expressions are not inserted before or after the Sequence and Repeat, hence "  Hello World  ", "  xxx  " not matching.
+
+
+.. note::
+
+    Currently, Peppa PEG only supports at maximum two SPACED grammar rules.
+
+`P4_FLAG_TIGHT`
+``````````````````````
+
+`P4_FLAG_TIGHT` **prevents inserting the `P4_FLAG_SPACED` expressions**. This tag only works for Sequence and Repeat.
+
+Given the above `P4_FLAG_SPACED` expression, if we set the grammar rule with flag `P4_FLAG_TIGHT`, the SPACED expressions are not inserted.
+
+.. code-block:: c
+
+    P4_SetGrammarRuleFlag(grammar, Entry, P4_FLAG_TIGHT);
+
+Peppa PEG applies SPACED expressions on every Sequence and Repeat unless a `P4_FLAG_TIGHT` is explicitly specified on a Sequence or Repeat.
+
+Flag `P4_FLAG_TIGHT` takes effects not only on the expression but its all descendant expressions.
+
+`P4_FLAG_SCOPED`
+``````````````````````
+
+`P4_FLAG_SCOPED` **prevents the effect of `P4_FLAG_SQUASHED` and `P4_FLAG_SPACED`**.
+
+.. code-block:: c
+
+    P4_SetGrammarRuleFlag(grammar, Entry, P4_FLAG_SCOPED);
+
+Starting from the SCOPED grammar rule, the token are not squashed; the implicit whitespaces are enabled as well.

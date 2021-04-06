@@ -1,14 +1,14 @@
 from enum import IntEnum
 import pytest
 import peppapeg as P4
+from peppapeg import Grammar
 
 def test_literal():
-    class Rule(IntEnum):
-        entry = 1
+    grammar = Grammar("""
+        entry = "hello";
+    """)
 
-    grammar = P4.Grammar()
-    grammar.add_literal(Rule.entry, 'hello world')
-    assert grammar.parse("hello world").slice == slice(0, 11)
+    assert grammar.parse("hello").slice == slice(0, 11)
 
     with pytest.raises(P4.MatchError):
         assert grammar.parse("hello,world")

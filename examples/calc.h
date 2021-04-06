@@ -161,23 +161,6 @@ P4_Grammar*  P4_CreateCalcGrammar() {
     )) != P4_Ok)
         goto finalize;
 
-    /* // WRONG: will end up with P4_StackError on parsing.
-    if ((err = P4_AddChoiceWithMembers(grammar, P4_CalcTerm, 3,
-        P4_CreateSequenceWithMembers(3,
-            P4_CreateReference(P4_CalcTerm),
-            P4_CreateReference(P4_CalcAddSign),
-            P4_CreateReference(P4_CalcFactor)
-        ),
-        P4_CreateSequenceWithMembers(3,
-            P4_CreateReference(P4_CalcTerm),
-            P4_CreateReference(P4_CalcMinusSign),
-            P4_CreateReference(P4_CalcFactor)
-        ),
-        P4_CreateReference(P4_CalcFactor)
-    )) != P4_Ok)
-        goto finalize;
-    */
-
     if ((err = P4_AddSequenceWithMembers(grammar, P4_CalcFactor, 2,
         P4_CreateReference(P4_CalcUnary),
         P4_CreateZeroOrMore(
@@ -191,23 +174,6 @@ P4_Grammar*  P4_CreateCalcGrammar() {
         )
     )) != P4_Ok)
         goto finalize;
-
-    /* // WRONG: will end up with P4_StackError on parsing.
-    if ((err = P4_AddChoiceWithMembers(grammar, P4_CalcFactor, 3,
-        P4_CreateSequenceWithMembers(3,
-            P4_CreateReference(P4_CalcFactor),
-            P4_CreateReference(P4_CalcMulSign),
-            P4_CreateReference(P4_CalcUnary)
-        ),
-        P4_CreateSequenceWithMembers(3,
-            P4_CreateReference(P4_CalcFactor),
-            P4_CreateReference(P4_CalcDivSign),
-            P4_CreateReference(P4_CalcUnary)
-        ),
-        P4_CreateReference(P4_CalcUnary)
-    )) != P4_Ok)
-        goto finalize;
-    */
 
     if ((err = P4_AddChoiceWithMembers(grammar, P4_CalcUnary, 3,
         P4_CreateSequenceWithMembers(2, P4_CreateReference(P4_CalcAddSign), P4_CreateReference(P4_CalcUnary)),

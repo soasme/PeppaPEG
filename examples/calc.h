@@ -133,6 +133,37 @@ P4_Error P4_CalcEval(P4_Token* token, long* result) {
 }
 
 P4_Grammar*  P4_CreateCalcGrammar() {
+    return P4_LoadGrammar(
+        "statement = term eol;\n"
+
+        "@nonterminal\n"
+        "term = factor ((add / minus) factor)*;\n"
+
+        "@nonterminal\n"
+        "factor = unary ((mul / div) unary)*;\n"
+
+        "@nonterminal\n"
+        "unary = add unary / minus unary / primary;\n"
+
+        "@lifted\n"
+        "primary = integer / \"(\" term \")\";\n"
+
+        "@squashed @tight\n"
+        "integer = [0-9]+;\n"
+
+        "add = \"+\";\n"
+        "minus = \"-\";\n"
+        "mul = \"*\";\n"
+        "div = \"/\";\n"
+
+        "@spaced @lifted\n"
+        "whitespace = \" \" / \"\\t\";\n"
+
+        "eol = \";\";\n"
+    );
+}
+
+P4_Grammar*  P4_CreateCalcGrammarLowLevel() {
     P4_Grammar* grammar = P4_CreateGrammar();
     if (grammar == NULL) {
         return NULL;

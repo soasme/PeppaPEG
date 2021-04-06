@@ -7,14 +7,16 @@ int main() {
     long        result  = 0;
     char        line[256];
 
+    printf("Type statement to continue. Type ^C to quit.\n");
+
     while (fgets(line, sizeof(line), stdin)) {
-        source = P4_CreateSource(line, P4_CalcTerm);
+        source = P4_CreateSource(line, P4_CalcStatement);
         if ((error = P4_Parse(grammar, source)) != P4_Ok) {
-            printf("Parse Error=%d\n", error);
+            printf("error: parse: %d\n", error);
         } else if ((error = P4_CalcEval(P4_GetSourceAst(source), &result)) != P4_Ok){
-            printf("Eval Error=%d\n", error);
+            printf("error: eval: %d\n", error);
         } else {
-            printf("%d\n", result);
+            printf("[Out] %ld\n\n", result);
         }
         P4_DeleteSource(source);
     }

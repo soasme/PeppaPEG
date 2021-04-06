@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="References" href="references.html" /><link rel="prev" title="Caveats" href="caveats.html" />
 
     <meta name="generator" content="sphinx-3.5.3, furo 2021.03.20.beta30"/>
         <title>Tutorial: Calculator - Peppa PEG 1.9.0 documentation</title>
@@ -108,11 +108,12 @@
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form><div class="sidebar-scroll"><div class="sidebar-tree">
-  <ul>
+  <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="peg.html">PEG Syntax</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lowlevel.html">Low Level APIs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="caveats.html">Caveats</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Tutorial: Calculator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 <li class="toctree-l1"><a class="reference internal" href="whatsnew.html">Change Log</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
@@ -131,11 +132,25 @@
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
         <section id="tutorial-calculator">
-<h1>Tutorial: Calculator<a class="headerlink" href="#tutorial-calculator" title="Permalink to this headline">¶</a></h1>
+<span id="tutcalc"></span><h1>Tutorial: Calculator<a class="headerlink" href="#tutorial-calculator" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial, we will write a calculator. It supports</p>
+<ul class="simple">
+<li><p>Positive integers.</p></li>
+<li><p>Negative integers.</p></li>
+<li><p>Addition operator (+).</p></li>
+<li><p>Subtraction operator (-).</p></li>
+<li><p>Multiplication operator (*).</p></li>
+<li><p>Division operator (/).</p></li>
+</ul>
+<p>The calculator can take arbitrary valid string calc expressions and yield the result.</p>
 <section id="step-1-define-ruleids">
 <h2>Step 1: Define RuleIDs<a class="headerlink" href="#step-1-define-ruleids" title="Permalink to this headline">¶</a></h2>
 <p>Let’s create a new file “calc.h” and define some enums as RuleIDs:</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="k">enum</span> <span class="p">{</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">"peppapeg.h"</span><span class="cp"></span>
+
+<span class="k">typedef</span> <span class="k">enum</span> <span class="p">{</span>
     <span class="n">P4_CalcStatement</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">P4_CalcTerm</span>         <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
     <span class="n">P4_CalcFactor</span>       <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
@@ -154,7 +169,7 @@
 </section>
 <section id="step-2-create-grammar">
 <h2>Step 2: Create Grammar<a class="headerlink" href="#step-2-create-grammar" title="Permalink to this headline">¶</a></h2>
-<p>We’ll use <a class="reference internal" href="references.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a> create a grammar.</p>
+<p>We’ll create the grammar using <a class="reference internal" href="references.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a>.</p>
 <p>The order of rules must be same with <cite>P4_CalcRuleID</cite>.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span>  <span class="nf">P4_CreateCalcGrammar</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="n">P4_LoadGrammar</span><span class="p">(</span>
@@ -191,7 +206,7 @@
 </section>
 <section id="step-3-eval-ast">
 <h2>Step 3: Eval Ast<a class="headerlink" href="#step-3-eval-ast" title="Permalink to this headline">¶</a></h2>
-<p>Now, let’s evaluate the token tree. We traverse the AST and calculate the result.</p>
+<p>Next, let’s evaluate the token tree. We traverse the AST and calculate the result.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Error</span> <span class="nf">P4_CalcEval</span><span class="p">(</span><span class="n">P4_Token</span><span class="o">*</span> <span class="n">token</span><span class="p">,</span> <span class="kt">long</span><span class="o">*</span> <span class="n">result</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">P4_Error</span> <span class="n">err</span> <span class="o">=</span> <span class="n">P4_Ok</span><span class="p">;</span>
     <span class="n">P4_Token</span><span class="o">*</span> <span class="n">tmp</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
@@ -298,6 +313,20 @@
 <span class="p">}</span>
 </pre></div>
 </div>
+<p>Run:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gcc -o calc calc.c peppapeg.c <span class="o">&amp;&amp;</span> ./calc
+<span class="go">Type statement to continue. Type ^C to quit.</span>
+
+<span class="go">1+2*3;</span>
+<span class="go">[Out] 7</span>
+
+<span class="go">-1 + 4/2*3 - 1;</span>
+<span class="go">[Out] 4</span>
+
+<span class="go">5/0;</span>
+<span class="go">error: eval: 6</span>
+</pre></div>
+</div>
 </section>
 </section>
 
@@ -305,8 +334,26 @@
       <footer>
         
         <div class="related-pages">
-          
-          
+          <a class="next-page" href="references.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">References</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="caveats.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Caveats</div>
+                
+              </div>
+            </a>
         </div>
 
         <div class="related-information">

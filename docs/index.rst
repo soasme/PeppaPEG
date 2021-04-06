@@ -16,6 +16,7 @@ Table of Contents
    peg
    lowlevel
    caveats
+   tutcalc
    references
    whatsnew
    development

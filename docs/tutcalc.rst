@@ -1,5 +1,18 @@
+.. _tutcalc:
+
 Tutorial: Calculator
 ====================
+
+In this tutorial, we will write a calculator. It supports
+
+* Positive integers.
+* Negative integers.
+* Addition operator (+).
+* Subtraction operator (-).
+* Multiplication operator (*).
+* Division operator (/).
+
+The calculator can take arbitrary valid string calc expressions and yield the result.
 
 Step 1: Define RuleIDs
 ----------------------
@@ -7,6 +20,10 @@ Step 1: Define RuleIDs
 Let's create a new file "calc.h" and define some enums as RuleIDs:
 
 .. code-block:: c
+
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include "peppapeg.h"
 
     typedef enum {
         P4_CalcStatement    = 1,
@@ -26,7 +43,7 @@ Let's create a new file "calc.h" and define some enums as RuleIDs:
 Step 2: Create Grammar
 ----------------------
 
-We'll use :c:func:`P4_LoadGrammar` create a grammar.
+We'll create the grammar using :c:func:`P4_LoadGrammar`.
 
 The order of rules must be same with `P4_CalcRuleID`.
 
@@ -66,7 +83,7 @@ The order of rules must be same with `P4_CalcRuleID`.
 Step 3: Eval Ast
 ----------------
 
-Now, let's evaluate the token tree. We traverse the AST and calculate the result.
+Next, let's evaluate the token tree. We traverse the AST and calculate the result.
 
 .. code-block:: c
 
@@ -175,3 +192,19 @@ The main function calls all the above:
 
         P4_DeleteSource(source);
     }
+
+Run:
+
+.. code-block:: console
+
+    $ gcc -o calc calc.c peppapeg.c && ./calc
+    Type statement to continue. Type ^C to quit.
+
+    1+2*3;
+    [Out] 7
+
+    -1 + 4/2*3 - 1;
+    [Out] 4
+
+    5/0;
+    error: eval: 6

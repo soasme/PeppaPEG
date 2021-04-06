@@ -190,7 +190,7 @@ The main function calls all the above:
             P4_DeleteSource(source);
         }
 
-        P4_DeleteSource(source);
+        P4_DeleteGrammar(grammar);
     }
 
 Run:

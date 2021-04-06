@@ -21,5 +21,5 @@ int main() {
         P4_DeleteSource(source);
     }
 
-    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
 }

@@ -145,7 +145,7 @@
 <p>The calculator can take arbitrary valid string calc expressions and yield the result.</p>
 <section id="step-1-define-ruleids">
 <h2>Step 1: Define RuleIDs<a class="headerlink" href="#step-1-define-ruleids" title="Permalink to this headline">¶</a></h2>
-<p>Let’s create a new file “calc.h” and define some enums as RuleIDs:</p>
+<p>Let’s create a new file “calc.h” and define some enums as RuleIDs.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
 <span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp"></span>
 <span class="cp">#include</span> <span class="cpf">"peppapeg.h"</span><span class="cp"></span>
@@ -203,6 +203,16 @@
 <span class="p">}</span>
 </pre></div>
 </div>
+<p>To extend a little bit,</p>
+<ul class="simple">
+<li><p>Rule <cite>statement</cite> is the entry.</p></li>
+<li><p>Rule <cite>term</cite> can parse inputs like <cite>a + b - c + d …</cite> or <cite>a</cite>.</p></li>
+<li><p>Rule <cite>factor</cite> can parse inputs like <cite>a * b / c * d …</cite> or <cite>a</cite>.</p></li>
+<li><p>Rule <cite>unary</cite> can parse inputs like <cite>+a</cite>, <cite>++a</cite>, <cite>-a</cite>, <cite>a</cite>, etc.</p></li>
+<li><p>Rule <cite>primary</cite> will have no corresponding token in the ast.</p></li>
+<li><p>Rule <cite>integer</cite> are some squashed digits, which avoids creating tokens for each digit.</p></li>
+<li><p>Rule <cite>whitespace</cite> allows arbitrary number of whitespace or tab in between expressions.</p></li>
+</ul>
 </section>
 <section id="step-3-eval-ast">
 <h2>Step 3: Eval Ast<a class="headerlink" href="#step-3-eval-ast" title="Permalink to this headline">¶</a></h2>

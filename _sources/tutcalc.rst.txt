@@ -17,7 +17,7 @@ The calculator can take arbitrary valid string calc expressions and yield the re
 Step 1: Define RuleIDs
 ----------------------
 
-Let's create a new file "calc.h" and define some enums as RuleIDs:
+Let's create a new file "calc.h" and define some enums as RuleIDs.
 
 .. code-block:: c
 
@@ -79,6 +79,16 @@ The order of rules must be same with `P4_CalcRuleID`.
             "eol = \";\";\n"
         );
     }
+
+To extend a little bit,
+
+* Rule `statement` is the entry.
+* Rule `term` can parse inputs like `a + b - c + d ...` or `a`.
+* Rule `factor` can parse inputs like `a * b / c * d ...` or `a`.
+* Rule `unary` can parse inputs like `+a`, `++a`, `-a`, `a`, etc.
+* Rule `primary` will have no corresponding token in the ast.
+* Rule `integer` are some squashed digits, which avoids creating tokens for each digit.
+* Rule `whitespace` allows arbitrary number of whitespace or tab in between expressions.
 
 Step 3: Eval Ast
 ----------------

@@ -13,8 +13,8 @@ Table of Contents
    :glob:
 
    getting_started
+   tutorials
    howto
-   tutcalc
    references
    whatsnew
    development

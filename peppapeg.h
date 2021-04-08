@@ -1705,16 +1705,8 @@ size_t          P4_GetSourcePosition(P4_Source*);
  *
  * Example:
  *
- *      P4_String MyIdToName(P4_RuleID id) {
- *          switch (id) {
- *              case ENTRY: return "entry";
- *              case RULE: return "rule";
- *              default: return "unknown";
- *          }
- *      }
- *
  *      P4_Token* root = P4_GetSourceAst(source);
- *      P4_JsonifySourceAst(stdout, root, MyIdToName);
+ *      P4_JsonifySourceAst(grammar, stdout, root);
  */
 void           P4_JsonifySourceAst(P4_Grammar* grammar, FILE* stream, P4_Token* token);
 

@@ -21,8 +21,8 @@ void test_null(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONNull, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("null", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_JSONNull, token);
+    ASSERT_EQUAL_TOKEN_STRING("null", token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -48,8 +48,8 @@ void test_true(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONTrue, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("true", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_JSONTrue, token);
+    ASSERT_EQUAL_TOKEN_STRING("true", token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -75,8 +75,8 @@ void test_false(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONFalse, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("false", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_JSONFalse, token);
+    ASSERT_EQUAL_TOKEN_STRING("false", token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -102,8 +102,8 @@ void test_number_integer_0(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONNumber, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("0", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_JSONNumber, token);
+    ASSERT_EQUAL_TOKEN_STRING("0", token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -129,8 +129,8 @@ void test_number_integer_1234567890(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONNumber, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("1234567890", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_JSONNumber, token);
+    ASSERT_EQUAL_TOKEN_STRING("1234567890", token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -156,8 +156,8 @@ void test_number_float(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONNumber, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("0.1", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_JSONNumber, token);
+    ASSERT_EQUAL_TOKEN_STRING("0.1", token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -183,8 +183,8 @@ void test_number_exp(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONNumber, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("1e+1", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_JSONNumber, token);
+    ASSERT_EQUAL_TOKEN_STRING("1e+1", token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -210,8 +210,8 @@ void test_string_xyz(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONString, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("\"xyz\"", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_JSONString, token);
+    ASSERT_EQUAL_TOKEN_STRING("\"xyz\"", token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -237,8 +237,8 @@ void test_string_pi(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONString, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("\"π\"", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_JSONString, token);
+    ASSERT_EQUAL_TOKEN_STRING("\"π\"", token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -265,8 +265,8 @@ void test_string_empty(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONString, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("\"\"", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_JSONString, token);
+    ASSERT_EQUAL_TOKEN_STRING("\"\"", token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -292,8 +292,8 @@ void test_array_empty(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONArray, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("[ ]", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_JSONArray, token);
+    ASSERT_EQUAL_TOKEN_STRING("[ ]", token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -319,8 +319,8 @@ void test_array_one_item(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONArray, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("[ 1 ]", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_JSONArray, token);
+    ASSERT_EQUAL_TOKEN_STRING("[ 1 ]", token);
 
     TEST_ASSERT_NULL(token->next);
 
@@ -357,8 +357,8 @@ void test_array_deep_nesting(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONArray, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING(input, token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_JSONArray, token);
+    ASSERT_EQUAL_TOKEN_STRING(input, token);
 
     TEST_ASSERT_NULL(token->next);
 
@@ -385,8 +385,8 @@ void test_array_multiple_items(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONArray, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("[1,2]", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_JSONArray, token);
+    ASSERT_EQUAL_TOKEN_STRING("[1,2]", token);
 
     TEST_ASSERT_NULL(token->next);
 
@@ -411,8 +411,8 @@ void test_array_multiple_items_with_empty_spaces(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONArray, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("[1,    2]", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_JSONArray, token);
+    ASSERT_EQUAL_TOKEN_STRING("[1,    2]", token);
 
     TEST_ASSERT_NULL(token->next);
 
@@ -439,8 +439,8 @@ void test_object_empty(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONObject, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("{ }", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_JSONObject, token);
+    ASSERT_EQUAL_TOKEN_STRING("{ }", token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -466,8 +466,8 @@ void test_object_one_item(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONObject, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("{\"k\":1}", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_JSONObject, token);
+    ASSERT_EQUAL_TOKEN_STRING("{\"k\":1}", token);
 
     TEST_ASSERT_NULL(token->next);
 
@@ -493,8 +493,8 @@ void test_object_multiple_items(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONObject, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("{\"k\":1,\"v\":2}", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_JSONObject, token);
+    ASSERT_EQUAL_TOKEN_STRING("{\"k\":1,\"v\":2}", token);
 
     TEST_ASSERT_NULL(token->next);
 
@@ -520,8 +520,8 @@ void test_objectitem(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_JSONObjectItem, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("\"k\":    1", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_JSONObjectItem, token);
+    ASSERT_EQUAL_TOKEN_STRING("\"k\":    1", token);
 
     TEST_ASSERT_NULL(token->next);
 

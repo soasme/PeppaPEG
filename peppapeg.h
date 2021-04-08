@@ -238,7 +238,8 @@ typedef enum {
     P4_PegRuleRepeatMinMax          = 25,
     P4_PegRuleNumber                = 26,
     P4_PegRuleChar                  = 27,
-    P4_PegRuleWhitespace            = 28,
+    P4_PegRuleDot                   = 28,
+    P4_PegRuleWhitespace            = 29,
 } P4_PegRuleID;
 
 /*

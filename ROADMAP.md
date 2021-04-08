@@ -2,7 +2,6 @@
 
 - [ ] Print error messages for Human.
 - [ ] Reset source so it can be re-parsed.
-- [ ] P4_Inspect(tok, bool (f) (tok)). Example: https://golang.org/pkg/go/ast/#Inspect.
 - [ ] Run in VERBOSE mode.
 - [ ] Add traverse functions for Tokens.
 - [ ] New Expression Kind: Numeric.
@@ -40,6 +39,7 @@
 - [ ] api to operate slice comparison, copy and length.
 - [ ] build via wasm.
 - [ ] landing page for the project doc site.
+- [x] P4_InspectSourceAst(tok, bool (f) (tok)). Example: https://golang.org/pkg/go/ast/#Inspect. Added in v1.11.0.
 - [x] Allow replacing malloc/free functions. Added in v1.11.0.
 - [x] Custom allocator and destructor. # define P4_MALLOC malloc. Added in v1.11.0.
 - [x] Add tutorials (json, mustache, ini) in docs.

@@ -6,6 +6,8 @@ Not Yet Released
 
 Code change: <https://github.com/soasme/PeppaPEG/compare/v1.10.0..HEAD>.
 
+* [Feature]: Customize malloc/free/realloc. `#60 <https://github.com/soasme/PeppaPEG/pull/60>`_
+
 1.10.0 (8 Apr, 2021)
 ---------------------
 

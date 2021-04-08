@@ -1713,7 +1713,7 @@ size_t          P4_GetSourcePosition(P4_Source*);
  * @brief       Print the token tree.
  * @param       grammar     The grammar.
  * @param       stream      The output stream.
- * @param       token       The token.
+ * @param       token       The root node of source ast.
  *
  * Example:
  *
@@ -1721,6 +1721,23 @@ size_t          P4_GetSourcePosition(P4_Source*);
  *      P4_JsonifySourceAst(grammar, stdout, root);
  */
 void           P4_JsonifySourceAst(P4_Grammar* grammar, FILE* stream, P4_Token* token);
+
+/**
+ * @brief       Inspect the token tree.
+ * @param       token       The root node of source ast.
+ * @param       userdata    Any additional information you want to pass in.
+ * @param       inspector   The inspecting function. It should return P4_Ok for a successful inspection.
+ *
+ * Example:
+ *
+ *      void MyInspector(P4_Token* token, void* userdata) {
+ *          printf("%lu\t%lu\t%p\n", token->slice.start.pos, token->rule_id, userdata);
+ *          return P4_Ok;
+ *      }
+ *
+ *      P4_Error err = P4_InspectSourceAst(root, NULL, MyInspector);
+ */
+P4_Error       P4_InspectSourceAst(P4_Token* token, void* userdata, P4_Error (*inspector)(P4_Token*, void*));
 
 /**
  * @brief       Parse the source given a grammar.

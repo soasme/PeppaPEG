@@ -1365,6 +1365,26 @@ P4_JsonifySourceAst(P4_Grammar* grammar, FILE* stream, P4_Token* token) {
 }
 
 
+P4_PUBLIC P4_Error
+P4_InspectSourceAst(P4_Token* token, void* userdata, P4_Error (*inspector)(P4_Token*, void*)) {
+    P4_Token* tmp = token;
+    P4_Error err = P4_Ok;
+
+    while (tmp != NULL) {
+        if ((err = inspector(tmp, userdata)) != P4_Ok)
+            return err;
+
+        if (tmp->head != NULL)
+            if ((err = P4_InspectSourceAst(tmp->head, userdata, inspector)) != P4_Ok)
+                return err;
+
+        tmp = tmp->next;
+    }
+
+    return err;
+}
+
+
 /*
  * Get version string.
  */

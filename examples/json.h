@@ -42,7 +42,6 @@ extern "C"
 typedef enum {
     P4_JSONEntry        = 1,
     P4_JSONValue,
-    P4_JSONWhitespace,
     P4_JSONObject,
     P4_JSONObjectItem,
     P4_JSONArray,
@@ -58,224 +57,53 @@ typedef enum {
     P4_JSONIntegral,
     P4_JSONFractional,
     P4_JSONExponent,
+    P4_JSONWhitespace,
 } P4_JSONRuleID;
 
-/*
- * Entry = Whitespace* (Object / Array / String / True / False / Null / Number) Whitespace* # LIFTED
- * Array = "[" Entry ("," Entry)* "]" / "[" "]"
- * Object = "{" ObjectItem ("," ObjectItem)* "}" / "{" "}"
- * ObjectItem = String ":" Entry
- * String = "\"" ([0x20-0x21] / [0x23-0x7f] / Escape)* "\""
- * Escape = "\\" ("\"" / "/" / "\\" / "b" / "f" / "n" / "r" / "t" / UnicodeEscape)
- * UnicodeEscape = "u" ([0-9][a-f][A-F]){4}
- * True = "true"
- * False = "false"
- * Null = "null"
- * Number = Minus? Integral Fractional? Exponent?
- * Minus = "-"
- * Plus = "+"
- * Integral = "0" / [1-9] [0-9]+
- * Fractional = "." [0-9]+
- * Exponent = i"E" (Minus / Plus)? [0-9]+
- * Whitespace = " " / "\t" / "\r" / "\n"
- */
 P4_Grammar*  P4_CreateJSONGrammar() {
-    P4_Grammar* grammar = P4_CreateGrammar();
-    if (grammar == NULL) {
-        return NULL;
-    }
+    return P4_LoadGrammar(
+        "@lifted\n"
+        "entry = &[\\u{1}-\\u{10ffff}] value ![\\u{1}-\\u{10ffff}];\n"
 
-    if (P4_Ok != P4_AddLiteral(grammar, P4_JSONMinus, "-", true))
-        goto finalize;
+        "@lifted\n"
+        "value = object / array / string / number / true / false / null;\n"
 
-    if (P4_Ok != P4_AddLiteral(grammar, P4_JSONPlus, "+", true))
-        goto finalize;
+        "object = \"{\" (item (\",\" item)*)? \"}\";\n"
+        "item = string \":\" value;\n"
 
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_JSONIntegral, 2,
-        P4_CreateLiteral("0", true),
-        P4_CreateSequenceWithMembers(2,
-            P4_CreateRange('1', '9', 1),
-            P4_CreateZeroOrMore(P4_CreateRange('0', '9', 1))
-        )
-    ))
-        goto finalize;
+        "array = \"[\" (value (\",\" value)*)? \"]\";\n"
 
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_JSONIntegral, P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
-        goto finalize;
+        "@tight\n"
+        "string = \"\\\"\" ([\\u{20}-\\u{21}] / [\\u{23}-\\u{5b}] / [\\u{5d}-\\u{10ffff}] / escape )* \"\\\"\";\n"
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONFractional, 2,
-        P4_CreateLiteral(".", true),
-        P4_CreateOnceOrMore(P4_CreateRange('0', '9', 1))
-    ))
-        goto finalize;
+        "true = \"true\";\n"
+        "false = \"false\";\n"
+        "null = \"null\";\n"
 
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_JSONFractional, P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
-        goto finalize;
+        "@tight @squashed\n"
+        "number = minus? integral fractional? exponent?;\n"
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONExponent, 3,
-        P4_CreateLiteral("e", false),
-        P4_CreateZeroOrOnce(
-            P4_CreateChoiceWithMembers(2,
-                P4_CreateReference(P4_JSONPlus),
-                P4_CreateReference(P4_JSONMinus)
-            )
-        ),
-        P4_CreateOnceOrMore(P4_CreateRange('0', '9', 1))
-    ))
-        goto finalize;
+        "@tight @squashed @lifted\n"
+        "escape = \"\\\\\" (\"\\\"\" / \"/\" / \"\\\\\" / \"b\" / \"f\" / \"n\" / \"r\" / \"t\" / unicode);\n"
 
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_JSONExponent, P4_FLAG_TIGHT))
-        goto finalize;
+        "@tight @squashed"
+        "unicode = \"u\" ([0-9] / [a-f] / [A-F]){4};\n"
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONNumber, 4,
-        P4_CreateZeroOrOnce(P4_CreateReference(P4_JSONMinus)),
-        P4_CreateReference(P4_JSONIntegral),
-        P4_CreateZeroOrOnce(P4_CreateReference(P4_JSONFractional)),
-        P4_CreateZeroOrOnce(P4_CreateReference(P4_JSONExponent))
-    ))
-        goto finalize;
+        "minus = \"-\";\n"
+        "plus = \"+\";\n"
 
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_JSONNumber, P4_FLAG_TIGHT | P4_FLAG_SQUASHED))
-        goto finalize;
+        "@squashed @tight\n"
+        "integral = \"0\" / [1-9] [0-9]*;\n"
 
-    if (P4_Ok != P4_AddLiteral(grammar, P4_JSONNull, "null", true))
-        goto finalize;
+        "@squashed @tight\n"
+        "fractional = \".\" [0-9]+;\n"
 
-    if (P4_Ok != P4_AddLiteral(grammar, P4_JSONFalse, "false", true))
-        goto finalize;
+        "@tight"
+        "exponent = i\"e\" (plus / minus)? [0-9]+;\n"
 
-    if (P4_Ok != P4_AddLiteral(grammar, P4_JSONTrue, "true", true))
-        goto finalize;
-
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONUnicodeEscape, 2,
-        P4_CreateLiteral("u", true),
-        P4_CreateRepeatExact(
-            P4_CreateChoiceWithMembers(3,
-                P4_CreateRange('0', '9', 1),
-                P4_CreateRange('a', 'f', 1),
-                P4_CreateRange('A', 'F', 1)
-            ), 4
-        )
-    ))
-        goto finalize;
-
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_JSONUnicodeEscape, P4_FLAG_TIGHT | P4_FLAG_SQUASHED))
-        goto finalize;
-
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONEscape, 2,
-        P4_CreateLiteral("\\", true),
-        P4_CreateChoiceWithMembers(9,
-            P4_CreateLiteral("\"", true),
-            P4_CreateLiteral("/", true),
-            P4_CreateLiteral("\\", true),
-            P4_CreateLiteral("b", true),
-            P4_CreateLiteral("f", true),
-            P4_CreateLiteral("n", true),
-            P4_CreateLiteral("r", true),
-            P4_CreateLiteral("t", true),
-            P4_CreateReference(P4_JSONUnicodeEscape)
-        )
-    ))
-        goto finalize;
-
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_JSONUnicodeEscape, P4_FLAG_TIGHT | P4_FLAG_SQUASHED | P4_FLAG_LIFTED))
-        goto finalize;
-
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONString, 3,
-        P4_CreateLiteral("\"", true),
-        P4_CreateZeroOrMore(
-            P4_CreateChoiceWithMembers(4,
-                P4_CreateRange(0x20, 0x21, 1), /* Can't be 0x22: double quote " */
-                P4_CreateRange(0x23, 0x5b, 1), /* Can't be 0x5c: escape leading \ */
-                P4_CreateRange(0x5d, 0x10ffff, 1),
-                P4_CreateReference(P4_JSONEscape)
-            )
-        ),
-        P4_CreateLiteral("\"", true)
-    ))
-        goto finalize;
-
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_JSONString, P4_FLAG_TIGHT))
-        goto finalize;
-
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONArray, 3,
-        P4_CreateLiteral("[", true),
-        P4_CreateZeroOrOnce(P4_CreateJoin(",", P4_JSONValue)),
-        P4_CreateLiteral("]", true)
-    ))
-        goto finalize;
-
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONObjectItem, 3,
-        P4_CreateReference(P4_JSONString),
-        P4_CreateLiteral(":", true),
-        P4_CreateReference(P4_JSONValue)
-    ))
-        goto finalize;
-
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONObject, 3,
-        P4_CreateLiteral("{", true),
-        P4_CreateZeroOrOnce(P4_CreateJoin(",", P4_JSONObjectItem)),
-        P4_CreateLiteral("}", true)
-    ))
-        goto finalize;
-
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_JSONValue, 7,
-        P4_CreateReference(P4_JSONObject),
-        P4_CreateReference(P4_JSONArray),
-        P4_CreateReference(P4_JSONString),
-        P4_CreateReference(P4_JSONNumber),
-        P4_CreateReference(P4_JSONTrue),
-        P4_CreateReference(P4_JSONFalse),
-        P4_CreateReference(P4_JSONNull)
-    ))
-        goto finalize;
-
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_JSONValue, P4_FLAG_LIFTED))
-        goto finalize;
-
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_JSONEntry, 3,
-        P4_CreateStartOfInput(),
-        P4_CreateReference(P4_JSONValue),
-        P4_CreateEndOfInput()
-    ))
-        goto finalize;
-
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_JSONEntry, P4_FLAG_LIFTED))
-        goto finalize;
-
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_JSONWhitespace, 4,
-        P4_CreateLiteral(" ", true),
-        P4_CreateLiteral("\r", true),
-        P4_CreateLiteral("\n", true),
-        P4_CreateLiteral("\t", true)
-    ))
-        goto finalize;
-
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_JSONWhitespace, P4_FLAG_SPACED | P4_FLAG_LIFTED))
-        goto finalize;
-
-    return grammar;
-
-finalize:
-    P4_DeleteGrammar(grammar);
-    return NULL;
-}
-
-P4_String P4_JSONKindToName(long unsigned id) {
-    switch(id) {
-        case P4_JSONObject: return "object";
-        case P4_JSONObjectItem: return "member";
-        case P4_JSONArray: return "array";
-        case P4_JSONString: return "string";
-        case P4_JSONTrue: return "true";
-        case P4_JSONFalse: return "false";
-        case P4_JSONNull: return "null";
-        case P4_JSONNumber: return "number";
-        case P4_JSONIntegral: return "integer";
-        case P4_JSONFractional: return "fraction";
-        case P4_JSONExponent: return "exponent";
-        default: return "unknown";
-    }
+        "@spaced @lifted\n"
+        "whitespace = \" \" / \"\\r\" / \"\\n\" / \"\\t\";\n"
+    );
 }
 
 #ifdef __cplusplus

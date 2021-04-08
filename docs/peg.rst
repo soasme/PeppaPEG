@@ -106,6 +106,15 @@ In this example, only odd number between `'0'` to `'9'` can match.
 
     digits = [0-9..2];
 
+Dot
+---
+
+Single dot `.` can match any UTF-8 code point. It's a syntax sugar for `[\u{1}-\u{10ffff}]`.
+
+.. code-block::
+
+    any = .;
+
 Sequence
 --------
 

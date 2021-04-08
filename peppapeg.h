@@ -1697,13 +1697,11 @@ P4_Token*      P4_GetSourceAst(P4_Source*);
  */
 size_t          P4_GetSourcePosition(P4_Source*);
 
-typedef P4_String (*P4_KindToName)(P4_RuleID id);
-
 /**
  * @brief       Print the token tree.
+ * @param       grammar     The grammar.
  * @param       stream      The output stream.
  * @param       token       The token.
- * @param       namefunc    A function to convert id to a name.
  *
  * Example:
  *
@@ -1718,7 +1716,7 @@ typedef P4_String (*P4_KindToName)(P4_RuleID id);
  *      P4_Token* root = P4_GetSourceAst(source);
  *      P4_JsonifySourceAst(stdout, root, MyIdToName);
  */
-void           P4_JsonifySourceAst(FILE* stream, P4_Token* token, P4_KindToName namefunc);
+void           P4_JsonifySourceAst(P4_Grammar* grammar, FILE* stream, P4_Token* token);
 
 /**
  * @brief       Parse the source given a grammar.

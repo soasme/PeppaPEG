@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Tutorial: Calculator" href="tutcalc.html" /><link rel="prev" title="Low Level APIs" href="lowlevel.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="References" href="references.html" /><link rel="prev" title="Tutorial: Calculator" href="tutcalc.html" />
 
     <meta name="generator" content="sphinx-3.5.3, furo 2021.03.20.beta30"/>
-        <title>Caveats - Peppa PEG 1.9.0 documentation</title>
+        <title>How-To Guides - Peppa PEG 1.9.0 documentation</title>
       <link rel="stylesheet" href="_static/styles/furo.css?digest=978e1795dfe158b585dda6a8417f6411828bf3ed">
     <link rel="stylesheet" href="_static/pygments.css">
     <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
@@ -112,8 +112,8 @@
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="peg.html">PEG Syntax</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lowlevel.html">Low Level APIs</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Caveats</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutcalc.html">Tutorial: Calculator</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">How-To Guides</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 <li class="toctree-l1"><a class="reference internal" href="whatsnew.html">Change Log</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
@@ -131,12 +131,12 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <section id="caveats">
-<h1>Caveats<a class="headerlink" href="#caveats" title="Permalink to this headline">¶</a></h1>
-<section id="recursion-limit">
-<h2>Recursion Limit<a class="headerlink" href="#recursion-limit" title="Permalink to this headline">¶</a></h2>
-<p>Peppa PEG is a recursion-based parser so it will be crashed if the stack address is exhausted. To prevent that, Peppa PEG set a limit on the recursion depth. By default, it’s 8192.</p>
-<p>If Peppa PEG should run a very small embedded device, you can adjust it via <cite>P4_SetRecursionLimit</cite>.</p>
+        <section id="how-to-guides">
+<h1>How-To Guides<a class="headerlink" href="#how-to-guides" title="Permalink to this headline">¶</a></h1>
+<section id="how-to-prevent-stackerror">
+<h2>How to Prevent StackError?<a class="headerlink" href="#how-to-prevent-stackerror" title="Permalink to this headline">¶</a></h2>
+<p>Considering a json nested array: <cite>[[[[…]]]]</cite>. If the depth is too deep, Peppa PEG may end up with a StackError. This is due to Peppa PEG is a recursion-based parser. To prevent the stack address exhausts, one can set a limit on the recursion depth. By default, the depth is 8192.</p>
+<p>If you need to adjust the depth, try <a class="reference internal" href="references.html#c.P4_SetRecursionLimit" title="P4_SetRecursionLimit"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_SetRecursionLimit()</span></code></a>.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">P4_SetRecursionLimit</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1000</span><span class="p">);</span>
 <span class="n">P4_Ok</span>
 
@@ -144,21 +144,32 @@
 <span class="mi">1000</span>
 </pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">seealso</dt>
+<dd class="field-odd"><p><a class="reference internal" href="references.html#c.P4_SetRecursionLimit" title="P4_SetRecursionLimit"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_SetRecursionLimit()</span></code></a>.</p>
+</dd>
+</dl>
 </section>
-<section id="source-slice">
-<h2>Source Slice<a class="headerlink" href="#source-slice" title="Permalink to this headline">¶</a></h2>
-<p>Peppa PEG supports parsing a subset of source input. By default, all source content are attempted.
-One can use <cite>P4_SetSourceSlice</cite> to set the start position and stop position in the source input.</p>
+<section id="how-to-parse-substring">
+<h2>How to Parse Substring?<a class="headerlink" href="#how-to-parse-substring" title="Permalink to this headline">¶</a></h2>
+<p>Peppa PEG supports parsing a subset of source input. By default, all source content are attempted.</p>
+<p>One can use <cite>P4_SetSourceSlice</cite> to set the start position and stop position in the source input.</p>
 <p>In this example, Peppa PEG only parses the substring “YXXXY”[1:4], e.g. “XXX”.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">P4_Source</span><span class="o">*</span> <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s">"YXXXY"</span><span class="p">,</span> <span class="n">ENTRY</span><span class="p">);</span>
 <span class="o">&gt;&gt;</span> <span class="n">P4_SetSourceSlice</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+<span class="n">P4_Ok</span>
+<span class="o">&gt;&gt;</span> <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">);</span>
+<span class="n">P4_Ok</span>
 </pre></div>
 </div>
-<p>See <a class="reference internal" href="references.html#c.P4_SetSourceSlice" title="P4_SetSourceSlice"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_SetSourceSlice()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">seealso</dt>
+<dd class="field-odd"><p><a class="reference internal" href="references.html#c.P4_SetSourceSlice" title="P4_SetSourceSlice"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_SetSourceSlice()</span></code></a>.</p>
+</dd>
+</dl>
 </section>
-<section id="start-of-input-end-of-input">
-<h2>Start-of-Input &amp; End-of-Input<a class="headerlink" href="#start-of-input-end-of-input" title="Permalink to this headline">¶</a></h2>
-<p>The expression of Start-of-Input and End-of-Input match the start and end of the input. They don’t consume text.</p>
+<section id="how-to-prevent-partial-parse">
+<h2>How to Prevent Partial Parse?<a class="headerlink" href="#how-to-prevent-partial-parse" title="Permalink to this headline">¶</a></h2>
 <p>Considering below case,</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span> <span class="o">==</span> <span class="n">P4_AddZeroOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span> <span class="nb">true</span><span class="p">)));</span>
@@ -168,6 +179,7 @@ One can use <cite>P4_SetSourceSlice</cite> to set the start position and stop po
 </pre></div>
 </div>
 <p>Guess what, <a class="reference internal" href="references.html#c.P4_Parse" title="P4_Parse"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_Parse()</span></code></a> returns <a class="reference internal" href="references.html#c.P4_Error.P4_Ok" title="P4_Ok"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_Ok</span></code></a>! Peppa PEG eats 3 “a” characters and ignores the rest of the input.</p>
+<p>The expression of Start-of-Input and End-of-Input match the start and end of the input. They don’t consume text.</p>
 <p>To make “aaab” as a whole, we need to add Start-of-Input and End-of-Input before and after the ZeroOrMore rule:</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span> <span class="o">==</span> <span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span>
@@ -182,8 +194,8 @@ One can use <cite>P4_SetSourceSlice</cite> to set the start position and stop po
 </pre></div>
 </div>
 </section>
-<section id="join">
-<h2>Join<a class="headerlink" href="#join" title="Permalink to this headline">¶</a></h2>
+<section id="how-to-join-expressions-by-separators">
+<h2>How to Join Expressions by Separators?<a class="headerlink" href="#how-to-join-expressions-by-separators" title="Permalink to this headline">¶</a></h2>
 <p>Joining a rule by a separator is a common use, such as <cite>f(p1, p2, p3)</cite>, <cite>[1, 2, 3]</cite>. Peppa PEG provides a sugar to make it easier to match such a pattern.</p>
 <p>For example, let’s match <cite>1,2,3</cite>:</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp"># define ROW 1</span>
@@ -211,23 +223,23 @@ One can use <cite>P4_SetSourceSlice</cite> to set the start position and stop po
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="tutcalc.html">
+          <a class="next-page" href="references.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Tutorial: Calculator</div>
+                <div class="title">References</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="lowlevel.html">
+          <a class="prev-page" href="tutcalc.html">
               <svg><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Low Level APIs</div>
+                <div class="title">Tutorial: Calculator</div>
                 
               </div>
             </a>
@@ -241,7 +253,7 @@ One can use <cite>P4_SetSourceSlice</cite> to set the start position and stop po
               <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
               <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
             |
-            <a class="muted-link" href="_sources/caveats.rst.txt"
+            <a class="muted-link" href="_sources/howto.rst.txt"
                rel="nofollow">
               Show Source
             </a>
@@ -261,11 +273,11 @@ One can use <cite>P4_SetSourceSlice</cite> to set the start position and stop po
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Caveats</a><ul>
-<li><a class="reference internal" href="#recursion-limit">Recursion Limit</a></li>
-<li><a class="reference internal" href="#source-slice">Source Slice</a></li>
-<li><a class="reference internal" href="#start-of-input-end-of-input">Start-of-Input &amp; End-of-Input</a></li>
-<li><a class="reference internal" href="#join">Join</a></li>
+<li><a class="reference internal" href="#">How-To Guides</a><ul>
+<li><a class="reference internal" href="#how-to-prevent-stackerror">How to Prevent StackError?</a></li>
+<li><a class="reference internal" href="#how-to-parse-substring">How to Parse Substring?</a></li>
+<li><a class="reference internal" href="#how-to-prevent-partial-parse">How to Prevent Partial Parse?</a></li>
+<li><a class="reference internal" href="#how-to-join-expressions-by-separators">How to Join Expressions by Separators?</a></li>
 </ul>
 </li>
 </ul>

@@ -188,6 +188,12 @@
 <p>Guess what, <a class="reference internal" href="api.html#c.P4_Parse" title="P4_Parse"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_Parse()</span></code></a> returns <a class="reference internal" href="api.html#c.P4_Error.P4_Ok" title="P4_Ok"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_Ok</span></code></a>! Peppa PEG eats 3 “a” characters and ignores the rest of the input.</p>
 <p>The expression of Start-of-Input and End-of-Input match the start and end of the input. They don’t consume text.</p>
 <p>To make “aaab” as a whole, we need to add Start-of-Input and End-of-Input before and after the ZeroOrMore rule:</p>
+<p>If you use using PEG API, use <cite>&amp;.</cite> and <cite>!.</cite>:
+.. code-block:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>grammar = &amp;. a*  !. ;
+</pre></div>
+</div>
+<p>If you are using low level API, use <a class="reference internal" href="api.html#c.P4_CreateStartOfInput" title="P4_CreateStartOfInput"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateStartOfInput()</span></code></a> and <a class="reference internal" href="api.html#c.P4_CreateEndOfInput" title="P4_CreateEndOfInput"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateEndOfInput()</span></code></a>.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
 <span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span> <span class="o">==</span> <span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span>
     <span class="n">P4_CreateStartOfInput</span><span class="p">(),</span>
@@ -200,6 +206,11 @@
 <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">);</span> <span class="c1">// P4_MatchError</span>
 </pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">seealso</dt>
+<dd class="field-odd"><p><a class="reference internal" href="api.html#c.P4_CreateStartOfInput" title="P4_CreateStartOfInput"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateStartOfInput()</span></code></a>, <a class="reference internal" href="api.html#c.P4_CreateEndOfInput" title="P4_CreateEndOfInput"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateEndOfInput()</span></code></a>.</p>
+</dd>
+</dl>
 </section>
 <section id="how-to-join-expressions-by-separators">
 <h2>How to Join Expressions by Separators?<a class="headerlink" href="#how-to-join-expressions-by-separators" title="Permalink to this headline">¶</a></h2>

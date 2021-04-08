@@ -213,6 +213,13 @@ In this example, only odd number between <cite>‘0’</cite> to <cite>‘9’</
 </pre></div>
 </div>
 </section>
+<section id="dot">
+<h2>Dot<a class="headerlink" href="#dot" title="Permalink to this headline">¶</a></h2>
+<p>Single dot <cite>.</cite> can match any UTF-8 code point. It’s a syntax sugar for <cite>[u{1}-u{10ffff}]</cite>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">any</span> <span class="o">=</span> <span class="o">.</span><span class="p">;</span>
+</pre></div>
+</div>
+</section>
 <section id="sequence">
 <h2>Sequence<a class="headerlink" href="#sequence" title="Permalink to this headline">¶</a></h2>
 <p>Sequence <strong>matches a sequence of sub-expressions in order</strong>.</p>
@@ -472,6 +479,7 @@ number = [0-9];
 <li><a class="reference internal" href="#grammar-rules">Grammar Rules</a></li>
 <li><a class="reference internal" href="#literal">Literal</a></li>
 <li><a class="reference internal" href="#range">Range</a></li>
+<li><a class="reference internal" href="#dot">Dot</a></li>
 <li><a class="reference internal" href="#sequence">Sequence</a></li>
 <li><a class="reference internal" href="#choice">Choice</a></li>
 <li><a class="reference internal" href="#reference">Reference</a></li>

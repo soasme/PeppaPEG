@@ -56,6 +56,13 @@ The expression of Start-of-Input and End-of-Input match the start and end of the
 
 To make "aaab" as a whole, we need to add Start-of-Input and End-of-Input before and after the ZeroOrMore rule:
 
+If you use using PEG API, use `&.` and `!.`:
+.. code-block::
+
+    grammar = &. a*  !. ;
+
+If you are using low level API, use :c:func:`P4_CreateStartOfInput` and :c:func:`P4_CreateEndOfInput`.
+
 .. code-block:: c
 
     P4_Grammar* grammar = P4_CreateGrammar();
@@ -68,6 +75,8 @@ To make "aaab" as a whole, we need to add Start-of-Input and End-of-Input before
 
     P4_Source* source = P4_CreateSource("aaab", 1);
     P4_Parse(grammar, source); // P4_MatchError
+
+:seealso: :c:func:`P4_CreateStartOfInput`, :c:func:`P4_CreateEndOfInput`.
 
 How to Join Expressions by Separators?
 --------------------------------------

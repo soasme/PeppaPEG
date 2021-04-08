@@ -46,6 +46,17 @@ extern "C"
 #include <stdio.h>
 #include <string.h>
 
+# ifndef P4_MALLOC
+# define P4_MALLOC malloc
+# endif
+
+# ifndef P4_FREE
+# define P4_FREE free
+# endif
+
+# ifndef P4_REALLOC
+# define P4_REALLOC realloc
+# endif
 
 /*
  *

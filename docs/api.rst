@@ -1,5 +1,5 @@
-API & References
-================
+All APIs & References
+======================
 
 .. doxygenfile:: peppapeg.h
    :sections: detaileddescription

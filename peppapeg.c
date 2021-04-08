@@ -1846,7 +1846,7 @@ P4_SetSourceSlice(P4_Source* source, size_t start, size_t stop) {
 }
 
 P4_PUBLIC void
-P4_DeleteSource(P4_Source* source) {
+P4_ResetSource(P4_Source* source) {
     if (source == NULL)
         return;
 
@@ -1865,6 +1865,11 @@ P4_DeleteSource(P4_Source* source) {
         P4_DeleteToken(source->root);
     }
 
+}
+
+P4_PUBLIC void
+P4_DeleteSource(P4_Source* source) {
+    P4_ResetSource(source);
     P4_FREE(source);
 }
 

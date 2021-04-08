@@ -1,10 +1,8 @@
-References
+Tutorials
 ==========
 
 .. toctree::
    :maxdepth: 2
    :glob:
 
-   peg
-   lowlevel
-   api
+   tutcalc

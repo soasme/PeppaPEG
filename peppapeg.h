@@ -129,7 +129,7 @@ extern "C"
  */
 # define P4_FLAG_SPACED                 ((uint32_t)(0x10000))
 
-/*
+/**
  * When the flag is set and a sequence/repetition token tree
  * has only one child, the child token will replace the parent.
  */

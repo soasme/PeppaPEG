@@ -30,67 +30,36 @@ Let's learn some basic P4 data structures:
 Step 1: Create Grammar
 ----------------------
 
-In Peppa PEG, we always start with creating a :c:struct:`P4_Grammar`. We create such a data structure using :c:func:`P4_CreateGrammar`.
+In Peppa PEG, we always start with creating a :c:struct:`P4_Grammar`. We create such a data structure using :c:func:`P4_LoadGrammar`.
 
-.. code-block:: c
+.. literalinclude:: ../example.c
+   :lines: 7-11
 
-   P4_Grammar* grammar = P4_CreateGrammar();
-   if (grammar == NULL) {
-        printf("Error: CreateGrammar: MemoryError.\n");
-        return 1;
-   }
-
-Step 2: Add Grammar Rule
--------------------------
-
-There are plenty kinds of rules in PEG. In this example, we use the simplest, :c:enum:`P4_Literal<P4_ExpressionKind>`. We add such a rule using :c:func:`P4_AddLiteral()`.
-
-.. code-block:: c
-
-    if (P4_AddLiteral(grammar, 1, "HelloWorld", false) != P4_Ok) {
-        printf("Error: AddLiteral: MemoryError.\n");
-        return 1;
-    }
-
-The second parameter is a numeric ID for the grammar rule. Each rule has its unique ID. The third parameter is the exact string to match. The fourth parameter determines if the string is case sensitive.
-
-Step 3: Create Source
+Step 2: Create Source
 ---------------------
 
 We create a :c:struct:`P4_Source` using :c:func:`P4_CreateSource()`.
 
-.. code-block:: c
+.. literalinclude:: ../example.c
+   :lines: 13-17
 
-    P4_Source*  source = P4_CreateSource("HelloWorld", 1);
-    if (source == NULL) {
-        printf("Error: CreateSource: MemoryError.\n");
-        return 1;
-    }
+The first parameter is the content of the source.
+The second parameter is the ID of the entry grammar rule, e.g. the numeric index of the rule in the loaded grammar (1-based).
 
-The first parameter is the content of the source. The second parameter is the ID of the entry grammar rule.
+In this example, we have only single rule `entry`, so the ID is 1.
 
-Step 4: Parse
+Step 3: Parse
 -------------
 
 Now the stage is setup; call :c:func:`P4_Parse`. If everything is okay, it returns a zero value - :c:enum:`P4_Ok<P4_Error>`.
 
-.. code-block:: c
+.. literalinclude:: ../example.c
+   :lines: 19-26
 
-    if (P4_Parse(grammar, source) != P4_Ok) {
-        printf("Error: Parse failed.\n");
-        exit(1);
-    }
-
-Step 5: Traverse Token Tree
+Step 4: Traverse AST
 ---------------------------
 
 P4_Source contains a token tree if parse successfully. We get the root node of such a token tree using :c:func:`P4_GetSourceAst()`.
-
-
-.. code-block:: c
-
-    P4_Token* node   = P4_GetSourceAst(source);
-    char*     text   = P4_CopyTokenString(node);
 
 To traverse the AST,
 
@@ -101,19 +70,15 @@ To traverse the AST,
 * `node->slice.stop` is the end position in the source string that the token slice covers.
 * :c:func:`P4_CopyTokenString()` returns the string the AST node covers.
 
-.. code-block:: c
+.. literalinclude:: ../example.c
+   :lines: 28-39
 
-    printf("root span: [%lu %lu]\n", node->slice.start.pos, node->slice.stop.pos);
-    printf("root start: line=%lu offset=%lu\n", node->slice.start.lineno, node->slice.start.offset);
-    printf("root stop: line=%lu offset=%lu\n", node->slice.stop.lineno, node->slice.stop.offset);
-    printf("root next: %p\n", node->next);
-    printf("root head: %p\n", node->head);
-    printf("root tail: %p\n", node->tail);
-    printf("root text: %s\n", text);
+It may be helpful to output the source AST in JSON format:
 
-    free(text);
+.. literalinclude:: ../example.c
+   :lines: 41
 
-Step 6: Clean Up
+Step 5: Clean Up
 ----------------
 
 Last but not least, don't forget to free all the allocated memory.
@@ -121,72 +86,36 @@ Last but not least, don't forget to free all the allocated memory.
 * :c:func:`P4_DeleteSource()` deletes the source along with the entire token tree.
 * :c:func:`P4_DeleteGrammar()` deletes the grammar along with all the grammar rules.
 
-.. code-block:: c
-
-    P4_DeleteSource(source);
-    P4_DeleteGrammar(grammar);
-
+.. literalinclude:: ../example.c
+   :language: c
+   :lines: 40-41
 
 Full Example Code
 -----------------
 
 The complete code for this example:
 
-.. code-block:: c
+.. literalinclude:: ../example.c
 
-    #include <stdio.h>
-    #include "peppapeg.h"
+The output of the example looks like:
 
-    # define ENTRY 1
+.. code-block::
 
-    int main(int argc, char* argv[]) {
-        P4_Grammar* grammar = P4_CreateGrammar();
-        if (grammar == NULL) {
-            printf("Error: CreateGrammar: MemoryError.\n");
-            return 1;
-        }
-
-        if (P4_AddLiteral(grammar, ENTRY, "HelloWorld", false) != P4_Ok) {
-            printf("Error: AddLiteral: MemoryError.\n");
-            return 1;
-        }
-
-        P4_Source*  source = P4_CreateSource("HelloWorld", ENTRY);
-        if (source == NULL) {
-            printf("Error: CreateSource: MemoryError.\n");
-            return 1;
-        }
-
-        if (P4_Parse(grammar, source) != P4_Ok) {
-            printf("Error: Parse: ErrCode[%lu] Err[%s] Message[%s]\n",
-                P4_GetError(source),
-                P4_GetErrorString(P4_GetError(source)),
-                P4_GetErrorMessage(source)
-            );
-            return 1;
-        }
-
-        P4_Token*   root = P4_GetSourceAst(source);
-        char*       text = P4_CopyTokenString(root);
-
-        printf("root span: [%lu %lu]\n", root->slice.start, root->slice.stop);
-        printf("root start: line=%lu offset=%lu\n", root->slice.start.lineno, root->slice.start.offset);
-        printf("root stop: line=%lu offset=%lu\n", root->slice.stop.lineno, root->slice.stop.offset);
-        printf("root next: %p\n", root->next);
-        printf("root head: %p\n", root->head);
-        printf("root tail: %p\n", root->tail);
-        printf("root text: %s\n", text);
-
-        free(text);
-        P4_DeleteSource(source);
-        P4_DeleteGrammar(grammar);
-
-        return 1;
-    }
+    $ gcc -o example ../example.c ../peppapeg.c
+    $ ./example
+    root span: [0 11]
+    root start: line=1 offset=0
+    root stop: line=2 offset=5
+    root next: (nil)
+    root head: (nil)
+    root tail: (nil)
+    root text: Hello
+    WORLD
+    [{"slice":[0,11],"type":"entry"}]
 
 Conclusion
 ----------
 
-In this tutorial, we walk through the basic data structures and combine them in one example. The example parses nothing but "HelloWorld" to a single token.
+In this tutorial, we walk through the basic data structures and combine them in one example. The example parses nothing but "Hello World" to a single token.
 
 I hope this example can get you a basic understanding of Peppa PEG. Now you can go back to :ref:`main` and pick more docs to read!

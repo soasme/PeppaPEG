@@ -1,7 +1,6 @@
 # ROADMAP
 
 - [ ] Print error messages for Human.
-- [ ] Support partial source: P4_SetSourceContentSlice(s, i, j).
 - [ ] Reset source so it can be re-parsed.
 - [ ] P4_Inspect(tok, bool (f) (tok)). Example: https://golang.org/pkg/go/ast/#Inspect.
 - [ ] Run in VERBOSE mode.
@@ -24,8 +23,6 @@
 - [ ] backrefs is not necessary if there is no BackReference in Sequence.
 - [ ] static lib.
 - [ ] A python grammar.
-- [ ] Add tutorials (json, mustache, ini) in docs.
-- [ ] Add how-to guides in docs.
 - [ ] Add explanations in docs.
 - [ ] Enable AddressSanitizer. Example: cJSON.
 - [ ] RequireVersion.
@@ -45,9 +42,11 @@
 - [ ] api to operate slice comparison, copy and length.
 - [ ] build via wasm.
 - [ ] landing page for the project doc site.
-- [ ] any: `.`
+- [x] Add tutorials (json, mustache, ini) in docs.
+- [x] Add how-to guides in docs.
+- [x] any: `.`. Added in v1.9.0.
 - [x] Report line num & col. Added in v1.9.0.
-- [x] Allow parsing a subset of source input. Added in v1.9.0.
+- [x] Support partial source: P4_SetSourceContentSlice(s, i, j). Added v1.9.0.
 - [x] Allow user setting Userdata for P4_Tokens. Added in v1.8.0.
 - [x] Support non-ascii case insensitive literal matching. Added in v1.8.0.
 - [x] Print token ast in json format. Added in v1.8.0.

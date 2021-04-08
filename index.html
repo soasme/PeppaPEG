@@ -110,17 +110,17 @@
 </form><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="tutorials.html">Tutorials</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutcalc.html">Tutorial: Calculator</a></li>
 </ul>
-</li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutcalc.html">Tutorial: Calculator</a></li>
+</ul>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="howto.html">How-To Guides</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="references.html">References</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label for="toctree-checkbox-2"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="peg.html">PEG Syntax</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lowlevel.html">Low Level APIs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html">API &amp; References</a></li>
 </ul>
-</li>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="peg.html">PEG Syntax</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lowlevel.html">Low Level APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API &amp; References</a></li>
 <li class="toctree-l1"><a class="reference internal" href="whatsnew.html">Change Log</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
 </ul>
@@ -140,8 +140,8 @@
         <section id="peppa-peg-s-documentation">
 <span id="main"></span><h1>Peppa PEG’s Documentation<a class="headerlink" href="#peppa-peg-s-documentation" title="Permalink to this headline">¶</a></h1>
 <p>Welcome to Peppa PEG’s documentation!  Peppa PEG is an ultra lightweight PEG parser in ANSI C.</p>
-<section id="table-of-contents">
-<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this headline">¶</a></h2>
+<section id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
@@ -157,10 +157,27 @@
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#conclusion">Conclusion</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tutcalc.html">Tutorial: Calculator</a></li>
+</ul>
+</div>
+</section>
+<section id="tutorials">
+<h2>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutcalc.html">Tutorial: Calculator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutcalc.html#step-1-define-ruleids">Step 1: Define RuleIDs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutcalc.html#step-2-create-grammar">Step 2: Create Grammar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutcalc.html#step-3-eval-ast">Step 3: Eval Ast</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutcalc.html#step-4-parse">Step 4: Parse</a></li>
 </ul>
 </li>
+</ul>
+</div>
+</section>
+<section id="how-to-guides">
+<h2>How-To Guides<a class="headerlink" href="#how-to-guides" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="howto.html">How-To Guides</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#how-to-prevent-stackerror">How to Prevent StackError?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="howto.html#how-to-parse-substring">How to Parse Substring?</a></li>
@@ -168,10 +185,37 @@
 <li class="toctree-l2"><a class="reference internal" href="howto.html#how-to-join-expressions-by-separators">How to Join Expressions by Separators?</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="references.html">References</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="peg.html">PEG Syntax</a></li>
-<li class="toctree-l2"><a class="reference internal" href="lowlevel.html">Low Level APIs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html">API &amp; References</a></li>
+</ul>
+</div>
+</section>
+<section id="api-references">
+<h2>API &amp; References<a class="headerlink" href="#api-references" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="peg.html">PEG Syntax</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="peg.html#grammar-rules">Grammar Rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="peg.html#literal">Literal</a></li>
+<li class="toctree-l2"><a class="reference internal" href="peg.html#range">Range</a></li>
+<li class="toctree-l2"><a class="reference internal" href="peg.html#sequence">Sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="peg.html#choice">Choice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="peg.html#reference">Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="peg.html#positive">Positive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="peg.html#negative">Negative</a></li>
+<li class="toctree-l2"><a class="reference internal" href="peg.html#repeat">Repeat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="peg.html#grammar-rule-flags">Grammar Rule Flags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="peg.html#use-peg-api">Use Peg API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="lowlevel.html">Low Level APIs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lowlevel.html#expressions">Expressions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lowlevel.html#expression-flags">Expression Flags</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API &amp; References</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#structs">STRUCTS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#defines">DEFINES</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#enums">ENUMS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#functions">FUNCTIONS</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="whatsnew.html">Change Log</a><ul>
@@ -251,7 +295,10 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Peppa PEG’s Documentation</a><ul>
-<li><a class="reference internal" href="#table-of-contents">Table of Contents</a></li>
+<li><a class="reference internal" href="#getting-started">Getting Started</a></li>
+<li><a class="reference internal" href="#tutorials">Tutorials</a></li>
+<li><a class="reference internal" href="#how-to-guides">How-To Guides</a></li>
+<li><a class="reference internal" href="#api-references">API &amp; References</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 </li>

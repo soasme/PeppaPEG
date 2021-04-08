@@ -5,7 +5,7 @@ Peppa PEG's Documentation
 
 Welcome to Peppa PEG's documentation!  Peppa PEG is an ultra lightweight PEG parser in ANSI C.
 
-Table of Contents
+Getting Started
 -----------------
 
 .. toctree::
@@ -13,12 +13,37 @@ Table of Contents
    :glob:
 
    getting_started
-   tutorials
+
+Tutorials
+---------
+
+.. toctree::
+   :maxdepth: 2
+   :glob:
+
+   tutcalc
+
+How-To Guides
+-------------
+
+.. toctree::
+   :maxdepth: 2
+   :glob:
+
    howto
-   references
+
+API & References
+----------------
+
+.. toctree::
+   :maxdepth: 2
+   :glob:
+
+   peg
+   lowlevel
+   api
    whatsnew
    development
-
 
 
 Indices and tables

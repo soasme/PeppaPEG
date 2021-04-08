@@ -106,3 +106,20 @@ When parsing `1,2,3`, it will produce such a data structure:
         Token(4..5, NUM)
 
 The separator will not have its corresponding token, while all joined members have their tokens.
+
+How to Replace Malloc/Free/Realloc?
+-----------------------------------
+
+You may choose your own memory management solution by replacing macros `P4_MALLOC`, `P4_FREE` and `P4_REALLOC`.
+
+Say you want to replace stdlib malloc/free/realloc with bdwgc `GC_*`, you can define the above macros before including "peppapeg.h":
+
+.. code-block::
+
+    # include "gc.h"
+
+    # define P4_MALLOC GC_MALLOC
+    # define P4_FREE
+    # define P4_REALLOC GC_REALLOC
+
+    # define "peppapeg.h"

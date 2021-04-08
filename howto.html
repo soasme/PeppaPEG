@@ -235,6 +235,20 @@
 </div>
 <p>The separator will not have its corresponding token, while all joined members have their tokens.</p>
 </section>
+<section id="how-to-replace-malloc-free-realloc">
+<h2>How to Replace Malloc/Free/Realloc?<a class="headerlink" href="#how-to-replace-malloc-free-realloc" title="Permalink to this headline">¶</a></h2>
+<p>You may choose your own memory management solution by replacing macros <cite>P4_MALLOC</cite>, <cite>P4_FREE</cite> and <cite>P4_REALLOC</cite>.</p>
+<p>Say you want to replace stdlib malloc/free/realloc with bdwgc <cite>GC_*</cite>, you can define the above macros before including “peppapeg.h”:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># include "gc.h"</span>
+
+<span class="c1"># define P4_MALLOC GC_MALLOC</span>
+<span class="c1"># define P4_FREE</span>
+<span class="c1"># define P4_REALLOC GC_REALLOC</span>
+
+<span class="c1"># define "peppapeg.h"</span>
+</pre></div>
+</div>
+</section>
 </section>
 
       </article>
@@ -296,6 +310,7 @@
 <li><a class="reference internal" href="#how-to-parse-substring">How to Parse Substring?</a></li>
 <li><a class="reference internal" href="#how-to-prevent-partial-parse">How to Prevent Partial Parse?</a></li>
 <li><a class="reference internal" href="#how-to-join-expressions-by-separators">How to Join Expressions by Separators?</a></li>
+<li><a class="reference internal" href="#how-to-replace-malloc-free-realloc">How to Replace Malloc/Free/Realloc?</a></li>
 </ul>
 </li>
 </ul>

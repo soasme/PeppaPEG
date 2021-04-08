@@ -1,68 +1,11 @@
-Development
-===========
-
-Build
------
-
-If you have a difficulty having a complete development environment for Peppa PEG, try Docker:
-
-.. code-block:: console
-
-    $ docker run --rm -v `pwd`:/app -it ubuntu:latest bash
-    # apt-get install git gcc gdb valgrind make cmake python3 python3-venv python3-pip doxygen
-    # // yes, you have all the dev-dependencies.
-
-Testing Peppa PEG requires downloading the test framework `Unity`:
-
-.. code-block:: console
-
-    $ git submodule init
-    $ git submodule update
-
-Assume you have cmake and gcc installed.
-
-.. code-block:: console
-
-    $ cmake -E make_directory ./build
-    $ cd build
-    $ cmake ..
-
-If you have Valgrind installed, you can enable `ENABLE_VALGRIND`.
-
-.. code-block:: console
-
-    $ cmake -DENABLE_VALGRIND=On ..
-
-If you have doxygen and Python3 installed, you can enable `ENABLE_DOCS`.
-
-.. code-block:: console
-
-    $ cmake -DENABLE_DOCS=On ..
-
-To build test,
-
-.. code-block:: console
-
-    $ cmake --build . --target check
-
-To build docs,
-
-.. code-block:: console
-
-    $ cmake --build . --target docs
-
-Peppa PEG uses GitHub Actions building docs whenever a change is pushed to the main branch.
-
-The docs site is pushed to gh-pages branch and published to <https://www.soasme.com/PeppaPEG/>.
-
 Debug
------
+=====
 
 If you encounter segfaults or memory leaks, please check with your grammar implementation.
 If you believe the issue origins from Peppa PEG and want to debug it, this document can be helpful.
 
 Checking Segfaults
-``````````````````
+-------------------
 
 Assuming your operation system has gdb or lldb installed. Depending on your toolchain, use gdb if using gcc, use lldb if using llvm. After installing a debugger, you can create a simple program that recurs the segfault problem.
 
@@ -104,7 +47,7 @@ Run the program with a debugger. Gdb directive `run` can run the program, `where
 In this case, it's `0x0` so a segfault occurred. To fix it, create the grammar using `P4_CreateGrammar()`.
 
 Checking Memory Leaks
-`````````````````````
+---------------------
 
 Assuming your operation system has gdb or lldb installed. Depending on your toolchain, use gdb if using gcc, use lldb if using llvm. After installing a debugger, you can create a simple program that recurs the segfault problem.
 
@@ -146,7 +89,7 @@ Run the program with a debugger. Gdb directive `run` can run the program, `where
 In this case, it's `0x0` so a segfault occurred. To fix it, create the grammar using `P4_CreateGrammar()`.
 
 Conclusion
-``````````
+-------------
 
 Programs are not always correct as human makes mistakes.
 By crafting the debugging skills using tools like gdb/lldb/valgrind, we will follow the trace, pin point the problem, and fix the bug 🐛.

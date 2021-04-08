@@ -4,8 +4,15 @@ Change Log
 Not Yet Released
 ----------------
 
-Code change: <https://github.com/soasme/PeppaPEG/compare/v1.9.0..HEAD>.
+Code change: <https://github.com/soasme/PeppaPEG/compare/v1.10.0..HEAD>.
 
+1.10.0 (8 Apr, 2021)
+-------------------
+
+Code change: <https://github.com/soasme/PeppaPEG/compare/v1.9.0..v1.10.0>.
+
+* [Feature]: Support `.` (maps to [\u{1}-\u{10ffff}]). `#59 <https://github.com/soasme/PeppaPEG/pull/59>`_
+* [Example]: Refactor the JSON example to use PEG API. `#58 <https://github.com/soasme/PeppaPEG/pull/58>`_
 * [Feature]: Jsonify token AST using grammar rule name. `#57 <https://github.com/soasme/PeppaPEG/pull/57>`_
 * [Feature]: Added function: `P4_LoadGrammar`. `#56 <https://github.com/soasme/PeppaPEG/pull/56>`_
 

@@ -1,4 +1,4 @@
-PEG Syntax
+PEG APIs
 ==========
 
 Grammar Rules

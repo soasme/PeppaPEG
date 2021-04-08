@@ -7,7 +7,7 @@ Not Yet Released
 Code change: <https://github.com/soasme/PeppaPEG/compare/v1.10.0..HEAD>.
 
 1.10.0 (8 Apr, 2021)
--------------------
+---------------------
 
 Code change: <https://github.com/soasme/PeppaPEG/compare/v1.9.0..v1.10.0>.
 

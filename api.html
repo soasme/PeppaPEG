@@ -2116,16 +2116,8 @@
 <span class="target" id="peppapeg_8h_1a030ba0b31fccc93444a2ebc77873bc35"></span><span class="pre">void</span> <code class="sig-name descname"><span class="pre">P4_JsonifySourceAst</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a> <span class="pre">*</span><em><span class="pre">grammar</span></em>, <span class="pre">FILE</span> <span class="pre">*</span><em><span class="pre">stream</span></em>, <a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a> <span class="pre">*</span><em><span class="pre">token</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_JsonifySourceAst" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Print the token tree. </p>
 <p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_String</span> <span class="n">MyIdToName</span><span class="p">(</span><span class="n">P4_RuleID</span> <span class="nb">id</span><span class="p">)</span> <span class="p">{</span>
-     <span class="n">switch</span> <span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="p">{</span>
-         <span class="n">case</span> <span class="n">ENTRY</span><span class="p">:</span> <span class="k">return</span> <span class="s2">"entry"</span><span class="p">;</span>
-         <span class="n">case</span> <span class="n">RULE</span><span class="p">:</span> <span class="k">return</span> <span class="s2">"rule"</span><span class="p">;</span>
-         <span class="n">default</span><span class="p">:</span> <span class="k">return</span> <span class="s2">"unknown"</span><span class="p">;</span>
-     <span class="p">}</span>
- <span class="p">}</span>
-
- <span class="n">P4_Token</span><span class="o">*</span> <span class="n">root</span> <span class="o">=</span> <span class="n">P4_GetSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
- <span class="n">P4_JsonifySourceAst</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">MyIdToName</span><span class="p">);</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Token</span><span class="o">*</span> <span class="n">root</span> <span class="o">=</span> <span class="n">P4_GetSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
+ <span class="n">P4_JsonifySourceAst</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">root</span><span class="p">);</span>
 </pre></div>
 </div>
 <dl class="simple">

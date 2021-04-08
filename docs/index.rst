@@ -42,9 +42,9 @@ API & References
    peg
    lowlevel
    api
+   build
+   debug
    whatsnew
-   development
-
 
 Indices and tables
 ------------------

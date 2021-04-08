@@ -163,55 +163,46 @@
 </section>
 <section id="step-1-create-grammar">
 <h2>Step 1: Create Grammar<a class="headerlink" href="#step-1-create-grammar" title="Permalink to this headline">¶</a></h2>
-<p>In Peppa PEG, we always start with creating a <a class="reference internal" href="api.html#c.P4_Grammar" title="P4_Grammar"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Grammar</span></code></a>. We create such a data structure using <a class="reference internal" href="api.html#c.P4_CreateGrammar" title="P4_CreateGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateGrammar()</span></code></a>.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">grammar</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-     <span class="n">printf</span><span class="p">(</span><span class="s">"Error: CreateGrammar: MemoryError.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
-     <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
-<span class="p">}</span>
+<p>In Peppa PEG, we always start with creating a <a class="reference internal" href="api.html#c.P4_Grammar" title="P4_Grammar"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Grammar</span></code></a>. We create such a data structure using <a class="reference internal" href="api.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_LoadGrammar</span><span class="p">(</span><span class="s2">"entry = i</span><span class="se">\"</span><span class="s2">hello</span><span class="se">\\</span><span class="s2">nworld</span><span class="se">\"</span><span class="s2">;"</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">grammar</span> <span class="o">==</span> <span class="n">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s2">"Error: CreateGrammar: Error.</span><span class="se">\n</span><span class="s2">"</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
 </pre></div>
 </div>
 </section>
-<section id="step-2-add-grammar-rule">
-<h2>Step 2: Add Grammar Rule<a class="headerlink" href="#step-2-add-grammar-rule" title="Permalink to this headline">¶</a></h2>
-<p>There are plenty kinds of rules in PEG. In this example, we use the simplest, <a class="reference internal" href="api.html#c.P4_ExpressionKind" title="P4_ExpressionKind"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_Literal</span></code></a>. We add such a rule using <a class="reference internal" href="api.html#c.P4_AddLiteral" title="P4_AddLiteral"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_AddLiteral()</span></code></a>.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s">"HelloWorld"</span><span class="p">,</span> <span class="nb">false</span><span class="p">)</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">"Error: AddLiteral: MemoryError.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
-    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The second parameter is a numeric ID for the grammar rule. Each rule has its unique ID. The third parameter is the exact string to match. The fourth parameter determines if the string is case sensitive.</p>
-</section>
-<section id="step-3-create-source">
-<h2>Step 3: Create Source<a class="headerlink" href="#step-3-create-source" title="Permalink to this headline">¶</a></h2>
+<section id="step-2-create-source">
+<h2>Step 2: Create Source<a class="headerlink" href="#step-2-create-source" title="Permalink to this headline">¶</a></h2>
 <p>We create a <a class="reference internal" href="api.html#c.P4_Source" title="P4_Source"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Source</span></code></a> using <a class="reference internal" href="api.html#c.P4_CreateSource" title="P4_CreateSource"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateSource()</span></code></a>.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Source</span><span class="o">*</span>  <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s">"HelloWorld"</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">source</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">"Error: CreateSource: MemoryError.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
-    <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
-<span class="p">}</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">P4_Source</span><span class="o">*</span>  <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s2">"Hello</span><span class="se">\n</span><span class="s2">WORLD"</span><span class="p">,</span> <span class="n">ENTRY</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">source</span> <span class="o">==</span> <span class="n">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s2">"Error: CreateSource: MemoryError.</span><span class="se">\n</span><span class="s2">"</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
 </pre></div>
 </div>
-<p>The first parameter is the content of the source. The second parameter is the ID of the entry grammar rule.</p>
+<p>The first parameter is the content of the source.
+The second parameter is the ID of the entry grammar rule, e.g. the numeric index of the rule in the loaded grammar (1-based).</p>
+<p>In this example, we have only single rule <cite>entry</cite>, so the ID is 1.</p>
 </section>
-<section id="step-4-parse">
-<h2>Step 4: Parse<a class="headerlink" href="#step-4-parse" title="Permalink to this headline">¶</a></h2>
+<section id="step-3-parse">
+<h2>Step 3: Parse<a class="headerlink" href="#step-3-parse" title="Permalink to this headline">¶</a></h2>
 <p>Now the stage is setup; call <a class="reference internal" href="api.html#c.P4_Parse" title="P4_Parse"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_Parse()</span></code></a>. If everything is okay, it returns a zero value - <a class="reference internal" href="api.html#c.P4_Error" title="P4_Error"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_Ok</span></code></a>.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">"Error: Parse failed.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
-    <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-<span class="p">}</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="k">if</span> <span class="p">(</span><span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s2">"Error: Parse: ErrCode[</span><span class="si">%u</span><span class="s2">] Err[</span><span class="si">%s</span><span class="s2">] Message[</span><span class="si">%s</span><span class="s2">]</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span>
+            <span class="n">P4_GetError</span><span class="p">(</span><span class="n">source</span><span class="p">),</span>
+            <span class="n">P4_GetErrorString</span><span class="p">(</span><span class="n">P4_GetError</span><span class="p">(</span><span class="n">source</span><span class="p">)),</span>
+            <span class="n">P4_GetErrorMessage</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="p">);</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
 </pre></div>
 </div>
 </section>
-<section id="step-5-traverse-token-tree">
-<h2>Step 5: Traverse Token Tree<a class="headerlink" href="#step-5-traverse-token-tree" title="Permalink to this headline">¶</a></h2>
+<section id="step-4-traverse-ast">
+<h2>Step 4: Traverse AST<a class="headerlink" href="#step-4-traverse-ast" title="Permalink to this headline">¶</a></h2>
 <p>P4_Source contains a token tree if parse successfully. We get the root node of such a token tree using <a class="reference internal" href="api.html#c.P4_GetSourceAst" title="P4_GetSourceAst"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_GetSourceAst()</span></code></a>.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Token</span><span class="o">*</span> <span class="n">node</span>   <span class="o">=</span> <span class="n">P4_GetSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
-<span class="kt">char</span><span class="o">*</span>     <span class="n">text</span>   <span class="o">=</span> <span class="n">P4_CopyTokenString</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
-</pre></div>
-</div>
 <p>To traverse the AST,</p>
 <ul class="simple">
 <li><p><cite>node-&gt;head</cite> is the first children.</p></li>
@@ -221,58 +212,60 @@
 <li><p><cite>node-&gt;slice.stop</cite> is the end position in the source string that the token slice covers.</p></li>
 <li><p><a class="reference internal" href="api.html#c.P4_CopyTokenString" title="P4_CopyTokenString"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CopyTokenString()</span></code></a> returns the string the AST node covers.</p></li>
 </ul>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">printf</span><span class="p">(</span><span class="s">"root span: [%lu %lu]</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">slice</span><span class="p">.</span><span class="n">start</span><span class="p">.</span><span class="n">pos</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">slice</span><span class="p">.</span><span class="n">stop</span><span class="p">.</span><span class="n">pos</span><span class="p">);</span>
-<span class="n">printf</span><span class="p">(</span><span class="s">"root start: line=%lu offset=%lu</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">slice</span><span class="p">.</span><span class="n">start</span><span class="p">.</span><span class="n">lineno</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">slice</span><span class="p">.</span><span class="n">start</span><span class="p">.</span><span class="n">offset</span><span class="p">);</span>
-<span class="n">printf</span><span class="p">(</span><span class="s">"root stop: line=%lu offset=%lu</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">slice</span><span class="p">.</span><span class="n">stop</span><span class="p">.</span><span class="n">lineno</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">slice</span><span class="p">.</span><span class="n">stop</span><span class="p">.</span><span class="n">offset</span><span class="p">);</span>
-<span class="n">printf</span><span class="p">(</span><span class="s">"root next: %p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">);</span>
-<span class="n">printf</span><span class="p">(</span><span class="s">"root head: %p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">);</span>
-<span class="n">printf</span><span class="p">(</span><span class="s">"root tail: %p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">tail</span><span class="p">);</span>
-<span class="n">printf</span><span class="p">(</span><span class="s">"root text: %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">text</span><span class="p">);</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">P4_Token</span><span class="o">*</span>   <span class="n">root</span> <span class="o">=</span> <span class="n">P4_GetSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
+    <span class="n">char</span><span class="o">*</span>       <span class="n">text</span> <span class="o">=</span> <span class="n">P4_CopyTokenString</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
 
-<span class="n">free</span><span class="p">(</span><span class="n">text</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s2">"root span: [</span><span class="si">%lu</span><span class="s2"> </span><span class="si">%lu</span><span class="s2">]</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="nb">slice</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">pos</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="nb">slice</span><span class="o">.</span><span class="n">stop</span><span class="o">.</span><span class="n">pos</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s2">"root start: line=</span><span class="si">%lu</span><span class="s2"> offset=</span><span class="si">%lu</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="nb">slice</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">lineno</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="nb">slice</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">offset</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s2">"root stop: line=</span><span class="si">%lu</span><span class="s2"> offset=</span><span class="si">%lu</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="nb">slice</span><span class="o">.</span><span class="n">stop</span><span class="o">.</span><span class="n">lineno</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="nb">slice</span><span class="o">.</span><span class="n">stop</span><span class="o">.</span><span class="n">offset</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s2">"root next: %p</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="nb">next</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s2">"root head: %p</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s2">"root tail: %p</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="n">tail</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s2">"root text: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">text</span><span class="p">);</span>
+
+    <span class="n">free</span><span class="p">(</span><span class="n">text</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>It may be helpful to output the source AST in JSON format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">P4_JsonifySourceAst</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">root</span><span class="p">);</span>
 </pre></div>
 </div>
 </section>
-<section id="step-6-clean-up">
-<h2>Step 6: Clean Up<a class="headerlink" href="#step-6-clean-up" title="Permalink to this headline">¶</a></h2>
+<section id="step-5-clean-up">
+<h2>Step 5: Clean Up<a class="headerlink" href="#step-5-clean-up" title="Permalink to this headline">¶</a></h2>
 <p>Last but not least, don’t forget to free all the allocated memory.</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="api.html#c.P4_DeleteSource" title="P4_DeleteSource"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_DeleteSource()</span></code></a> deletes the source along with the entire token tree.</p></li>
 <li><p><a class="reference internal" href="api.html#c.P4_DeleteGrammar" title="P4_DeleteGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_DeleteGrammar()</span></code></a> deletes the grammar along with all the grammar rules.</p></li>
 </ul>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_DeleteSource</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
-<span class="n">P4_DeleteGrammar</span><span class="p">(</span><span class="n">grammar</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span>
+    <span class="n">P4_JsonifySourceAst</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">root</span><span class="p">);</span>
 </pre></div>
 </div>
 </section>
 <section id="full-example-code">
 <h2>Full Example Code<a class="headerlink" href="#full-example-code" title="Permalink to this headline">¶</a></h2>
 <p>The complete code for this example:</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
-<span class="cp">#include</span> <span class="cpf">"peppapeg.h"</span><span class="cp"></span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#include &lt;stdio.h&gt;</span>
+<span class="c1">#include "peppapeg.h"</span>
 
-<span class="cp"># define ENTRY 1</span>
+<span class="c1"># define ENTRY 1</span>
 
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-    <span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">grammar</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">printf</span><span class="p">(</span><span class="s">"Error: CreateGrammar: MemoryError.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<span class="nb">int</span> <span class="n">main</span><span class="p">(</span><span class="nb">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+    <span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_LoadGrammar</span><span class="p">(</span><span class="s2">"entry = i</span><span class="se">\"</span><span class="s2">hello</span><span class="se">\\</span><span class="s2">nworld</span><span class="se">\"</span><span class="s2">;"</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">grammar</span> <span class="o">==</span> <span class="n">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s2">"Error: CreateGrammar: Error.</span><span class="se">\n</span><span class="s2">"</span><span class="p">);</span>
         <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
     <span class="p">}</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">ENTRY</span><span class="p">,</span> <span class="s">"HelloWorld"</span><span class="p">,</span> <span class="nb">false</span><span class="p">)</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">printf</span><span class="p">(</span><span class="s">"Error: AddLiteral: MemoryError.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
-        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="n">P4_Source</span><span class="o">*</span>  <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s">"HelloWorld"</span><span class="p">,</span> <span class="n">ENTRY</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">source</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">printf</span><span class="p">(</span><span class="s">"Error: CreateSource: MemoryError.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="n">P4_Source</span><span class="o">*</span>  <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s2">"Hello</span><span class="se">\n</span><span class="s2">WORLD"</span><span class="p">,</span> <span class="n">ENTRY</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">source</span> <span class="o">==</span> <span class="n">NULL</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s2">"Error: CreateSource: MemoryError.</span><span class="se">\n</span><span class="s2">"</span><span class="p">);</span>
         <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
     <span class="p">}</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">printf</span><span class="p">(</span><span class="s">"Error: Parse: ErrCode[%lu] Err[%s] Message[%s]</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s2">"Error: Parse: ErrCode[</span><span class="si">%u</span><span class="s2">] Err[</span><span class="si">%s</span><span class="s2">] Message[</span><span class="si">%s</span><span class="s2">]</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span>
             <span class="n">P4_GetError</span><span class="p">(</span><span class="n">source</span><span class="p">),</span>
             <span class="n">P4_GetErrorString</span><span class="p">(</span><span class="n">P4_GetError</span><span class="p">(</span><span class="n">source</span><span class="p">)),</span>
             <span class="n">P4_GetErrorMessage</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
@@ -281,17 +274,20 @@
     <span class="p">}</span>
 
     <span class="n">P4_Token</span><span class="o">*</span>   <span class="n">root</span> <span class="o">=</span> <span class="n">P4_GetSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
-    <span class="kt">char</span><span class="o">*</span>       <span class="n">text</span> <span class="o">=</span> <span class="n">P4_CopyTokenString</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
+    <span class="n">char</span><span class="o">*</span>       <span class="n">text</span> <span class="o">=</span> <span class="n">P4_CopyTokenString</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
 
-    <span class="n">printf</span><span class="p">(</span><span class="s">"root span: [%lu %lu]</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="n">slice</span><span class="p">.</span><span class="n">start</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="n">slice</span><span class="p">.</span><span class="n">stop</span><span class="p">);</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">"root start: line=%lu offset=%lu</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="n">slice</span><span class="p">.</span><span class="n">start</span><span class="p">.</span><span class="n">lineno</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="n">slice</span><span class="p">.</span><span class="n">start</span><span class="p">.</span><span class="n">offset</span><span class="p">);</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">"root stop: line=%lu offset=%lu</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="n">slice</span><span class="p">.</span><span class="n">stop</span><span class="p">.</span><span class="n">lineno</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="n">slice</span><span class="p">.</span><span class="n">stop</span><span class="p">.</span><span class="n">offset</span><span class="p">);</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">"root next: %p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">);</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">"root head: %p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">);</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">"root tail: %p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="n">tail</span><span class="p">);</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">"root text: %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">text</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s2">"root span: [</span><span class="si">%lu</span><span class="s2"> </span><span class="si">%lu</span><span class="s2">]</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="nb">slice</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">pos</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="nb">slice</span><span class="o">.</span><span class="n">stop</span><span class="o">.</span><span class="n">pos</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s2">"root start: line=</span><span class="si">%lu</span><span class="s2"> offset=</span><span class="si">%lu</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="nb">slice</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">lineno</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="nb">slice</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">offset</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s2">"root stop: line=</span><span class="si">%lu</span><span class="s2"> offset=</span><span class="si">%lu</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="nb">slice</span><span class="o">.</span><span class="n">stop</span><span class="o">.</span><span class="n">lineno</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="nb">slice</span><span class="o">.</span><span class="n">stop</span><span class="o">.</span><span class="n">offset</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s2">"root next: %p</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="nb">next</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s2">"root head: %p</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s2">"root tail: %p</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">root</span><span class="o">-&gt;</span><span class="n">tail</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s2">"root text: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">text</span><span class="p">);</span>
 
     <span class="n">free</span><span class="p">(</span><span class="n">text</span><span class="p">);</span>
+
+    <span class="n">P4_JsonifySourceAst</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">root</span><span class="p">);</span>
+
     <span class="n">P4_DeleteSource</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
     <span class="n">P4_DeleteGrammar</span><span class="p">(</span><span class="n">grammar</span><span class="p">);</span>
 
@@ -299,10 +295,24 @@
 <span class="p">}</span>
 </pre></div>
 </div>
+<p>The output of the example looks like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ gcc -o example ../example.c ../peppapeg.c
+$ ./example
+root span: [0 11]
+root start: line=1 offset=0
+root stop: line=2 offset=5
+root next: (nil)
+root head: (nil)
+root tail: (nil)
+root text: Hello
+WORLD
+[{"slice":[0,11],"type":"entry"}]
+</pre></div>
+</div>
 </section>
 <section id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
-<p>In this tutorial, we walk through the basic data structures and combine them in one example. The example parses nothing but “HelloWorld” to a single token.</p>
+<p>In this tutorial, we walk through the basic data structures and combine them in one example. The example parses nothing but “Hello World” to a single token.</p>
 <p>I hope this example can get you a basic understanding of Peppa PEG. Now you can go back to <a class="reference internal" href="index.html#main"><span class="std std-ref">Peppa PEG’s Documentation</span></a> and pick more docs to read!</p>
 </section>
 </section>
@@ -365,11 +375,10 @@
 <li><a class="reference internal" href="#header-file-and-source-file">Header File and Source File</a></li>
 <li><a class="reference internal" href="#data-structures">Data Structures</a></li>
 <li><a class="reference internal" href="#step-1-create-grammar">Step 1: Create Grammar</a></li>
-<li><a class="reference internal" href="#step-2-add-grammar-rule">Step 2: Add Grammar Rule</a></li>
-<li><a class="reference internal" href="#step-3-create-source">Step 3: Create Source</a></li>
-<li><a class="reference internal" href="#step-4-parse">Step 4: Parse</a></li>
-<li><a class="reference internal" href="#step-5-traverse-token-tree">Step 5: Traverse Token Tree</a></li>
-<li><a class="reference internal" href="#step-6-clean-up">Step 6: Clean Up</a></li>
+<li><a class="reference internal" href="#step-2-create-source">Step 2: Create Source</a></li>
+<li><a class="reference internal" href="#step-3-parse">Step 3: Parse</a></li>
+<li><a class="reference internal" href="#step-4-traverse-ast">Step 4: Traverse AST</a></li>
+<li><a class="reference internal" href="#step-5-clean-up">Step 5: Clean Up</a></li>
 <li><a class="reference internal" href="#full-example-code">Full Example Code</a></li>
 <li><a class="reference internal" href="#conclusion">Conclusion</a></li>
 </ul>

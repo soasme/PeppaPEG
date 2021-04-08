@@ -11,11 +11,9 @@
 - [ ] New Expression Kind: Panic.
 - [ ] New Expression Kind: Function.
 - [ ] New Expression Kind: Sub Grammar.
-- [ ] Custom allocator and destructor. # define P4_MALLOC malloc.
 - [ ] Performance optimization: pre-alloc tokens.
 - [ ] Register a optional name function to convert rule id to rule names.
 - [ ] Stop on first error v/s Recover from Panic.
-- [ ] Allow replacing malloc/free functions.
 - [ ] New Source Flag: Support UTF-8 BOM sequence (0xEF 0xBB 0xBF) at the start of source.
 - [ ] Python Binding: example: cffi, misaka, parsimonious (api). <https://tomassetti.me/parsing-in-python/>.
 - [ ] Benchmark: example: json-c. `valgrind --tool=massif --massif-out-file=massif.out ./build/tests/test_example_json && ms_print massif.out ms_print.out`.
@@ -42,6 +40,8 @@
 - [ ] api to operate slice comparison, copy and length.
 - [ ] build via wasm.
 - [ ] landing page for the project doc site.
+- [x] Allow replacing malloc/free functions. Added in v1.11.0.
+- [x] Custom allocator and destructor. # define P4_MALLOC malloc. Added in v1.11.0.
 - [x] Add tutorials (json, mustache, ini) in docs.
 - [x] Add how-to guides in docs.
 - [x] any: `.`. Added in v1.9.0.

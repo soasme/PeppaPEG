@@ -1,42 +1,13 @@
 References
 ==========
 
-.. doxygenfile:: peppapeg.h
-   :sections: detaileddescription
+Table of Contents
+-----------------
 
-STRUCTS
--------
-.. doxygenstruct:: P4_Slice
-   :members:
+.. toctree::
+   :maxdepth: 2
+   :glob:
 
-.. doxygenstruct:: P4_Frame
-   :members:
-
-.. doxygenstruct:: P4_Source
-   :members:
-
-.. doxygenstruct:: P4_Expression
-   :members:
-
-.. doxygenstruct:: P4_Token
-   :members:
-
-.. doxygenstruct:: P4_Grammar
-   :members:
-
-DEFINES
--------
-.. doxygenfile:: peppapeg.h
-   :sections: define
-
-ENUMS
----------
-.. doxygenfile:: peppapeg.h
-   :sections: enum
-
-FUNCTIONS
----------
-.. doxygenfile:: peppapeg.h
-   :sections: func
-
-
+   peg
+   lowlevel
+   api

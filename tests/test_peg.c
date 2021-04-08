@@ -8,7 +8,7 @@
     TEST_ASSERT_EQUAL_MESSAGE((code), P4_Parse(grammar, source), "unexpected parse grammar return code"); \
     P4_Token* root = P4_GetSourceAst(source); \
     FILE *f = fopen("check.json","w"); \
-    P4_JsonifySourceAst(f, root, P4_StringifyPegGrammarRuleID); \
+    P4_JsonifySourceAst(grammar, f, root); \
     fclose(f); \
     P4_String s = read_file("check.json"); \
     TEST_ASSERT_EQUAL_STRING((output), s); \
@@ -440,12 +440,6 @@ void test_eval_reference(void) {
     ASSERT_EVAL_REFERENCE(P4_PegRuleReference, "CONST", SIZE_MAX);
 }
 
-P4_String test_grammar_rule_to_name(P4_RuleID id) {
-    static char name[5] = "00000";
-    sprintf(name, "R%lu", (unsigned long)id);
-    return name;
-}
-
 #define ASSERT_EVAL_GRAMMAR(peg_rules, entry_name, source_code, parse_code, ast) do { \
     P4_Grammar*     grammar = P4_LoadGrammar((peg_rules)); \
     TEST_ASSERT_NOT_NULL_MESSAGE(grammar, "peg rule should be valid peg code."); \
@@ -457,7 +451,7 @@ P4_String test_grammar_rule_to_name(P4_RuleID id) {
             "source code should be correctly parsed"); \
     P4_Token*       ast_token = P4_GetSourceAst(source); \
     FILE *f = fopen("check.json","w"); \
-    P4_JsonifySourceAst(f, ast_token, test_grammar_rule_to_name); \
+    P4_JsonifySourceAst(grammar, f, ast_token); \
     fclose(f); \
     P4_String s = read_file("check.json"); TEST_ASSERT_EQUAL_STRING((ast), s); free(s); \
     P4_DeleteSource(source); \

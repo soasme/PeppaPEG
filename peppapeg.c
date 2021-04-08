@@ -64,7 +64,7 @@
 # define                        autofree __attribute__ ((cleanup (cleanup_freep)))
 
 char *strdup(const char *src) { /* strdup is not ANSI. Copy source here. */
-    char *dst = malloc(strlen (src) + 1);
+    char *dst = P4_MALLOC(strlen (src) + 1);
     if (dst == NULL) return NULL;
     strcpy(dst, src);
     return dst;
@@ -75,7 +75,7 @@ cleanup_freep (void *p)
 {
   void **pp = (void **) p;
   if (*pp)
-    free (*pp);
+    P4_FREE(*pp);
 }
 
 # define                        P4_AdoptToken(head, tail, list) do { \
@@ -566,7 +566,7 @@ P4_RaiseError(P4_Source* s, P4_Error err, P4_String errmsg) {
     s->err = err;
 
     if (s->errmsg != NULL)
-        free(s->errmsg);
+        P4_FREE(s->errmsg);
 
     s->errmsg = strdup(errmsg);
 }
@@ -581,7 +581,7 @@ P4_PRIVATE(void)
 P4_RescueError(P4_Source* s) {
     s->err = P4_Ok;
     if (s->errmsg != NULL) {
-        free(s->errmsg);
+        P4_FREE(s->errmsg);
         s->errmsg = NULL;
         s->errmsg = strdup("");
     }
@@ -598,7 +598,7 @@ P4_CreateToken (const P4_String     str,
                 P4_RuleID           rule_id) {
     P4_Token* token;
 
-    if ((token=malloc(sizeof(P4_Token))) == NULL)
+    if ((token=P4_MALLOC(sizeof(P4_Token))) == NULL)
         return NULL;
 
     token->text         = str;
@@ -623,7 +623,7 @@ P4_PRIVATE(void)
 P4_DeleteTokenNode(P4_Token* token) {
     assert(token != NULL);
     if (token)
-        free(token);
+        P4_FREE(token);
 }
 
 
@@ -684,7 +684,7 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
         return P4_StackError;
     }
 
-    P4_Frame* frame = malloc(sizeof(P4_Frame));
+    P4_Frame* frame = P4_MALLOC(sizeof(P4_Frame));
 
     if (frame == NULL) {
         return P4_MemoryError;
@@ -741,7 +741,7 @@ P4_PopFrame(P4_Source* s, P4_Frame* f) {
 
     P4_Frame* oldtop = s->frame_stack;
     s->frame_stack = s->frame_stack->next;
-    if (oldtop) free(oldtop);
+    if (oldtop) P4_FREE(oldtop);
     s->frame_stack_size--;
 
     return P4_Ok;
@@ -881,7 +881,7 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
              *tok = NULL,
              *whitespace = NULL;
 
-    autofree P4_Slice* backrefs = malloc(sizeof(P4_Slice) * e->count);
+    autofree P4_Slice* backrefs = P4_MALLOC(sizeof(P4_Slice) * e->count);
     if (backrefs == NULL) {
         P4_RaiseError(s, P4_MemoryError, "OOM");
         return NULL;
@@ -991,7 +991,7 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
 
 finalize:
     P4_SetPosition(s, startpos);
-    free(tok);
+    P4_FREE(tok);
     return NULL;
 }
 
@@ -1378,7 +1378,7 @@ P4_Version(void) {
 /*
 P4_PUBLIC P4_Expression*
 P4_CreateNumeric(size_t num) {
-    P4_Expression* expr = malloc(sizeof(P4_Expression));
+    P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
     expr->kind = P4_Numeric;
     expr->num = num;
     return expr;
@@ -1390,7 +1390,7 @@ P4_CreateLiteral(const P4_String literal, bool sensitive) {
     if (literal == NULL)
         return NULL;
 
-    P4_Expression* expr = malloc(sizeof(P4_Expression));
+    P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
     expr->id = 0;
     expr->kind = P4_Literal;
     expr->flag = 0;
@@ -1405,7 +1405,7 @@ P4_CreateRange(P4_Rune lower, P4_Rune upper, size_t stride) {
     if (lower > upper || lower > 0x10ffff || upper > 0x10ffff || lower == 0 || upper == 0)
         return NULL;
 
-    P4_Expression* expr = malloc(sizeof(P4_Expression));
+    P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
     expr->id = 0;
     expr->kind = P4_Range;
     expr->flag = 0;
@@ -1421,7 +1421,7 @@ P4_CreateReference(P4_RuleID id) {
     if (id == 0)
         return NULL;
 
-    P4_Expression* expr = malloc(sizeof(P4_Expression));
+    P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
     expr->id = 0;
     expr->kind = P4_Reference;
     expr->flag = 0;
@@ -1437,7 +1437,7 @@ P4_CreatePositive(P4_Expression* refexpr) {
     if (refexpr == NULL)
         return NULL;
 
-    P4_Expression* expr = malloc(sizeof(P4_Expression));
+    P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
     expr->id = 0;
     expr->kind = P4_Positive;
     expr->flag = 0;
@@ -1451,7 +1451,7 @@ P4_CreateNegative(P4_Expression* refexpr) {
     if (refexpr == NULL)
         return NULL;
 
-    P4_Expression* expr = malloc(sizeof(P4_Expression));
+    P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
     expr->id = 0;
     expr->kind = P4_Negative;
     expr->flag = 0;
@@ -1465,12 +1465,12 @@ P4_CreateContainer(size_t count) {
     if (count == 0)
         return NULL;
 
-    P4_Expression* expr = malloc(sizeof(P4_Expression));
+    P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
     expr->id = 0;
     expr->flag = 0;
     expr->name = NULL;
     expr->count = count;
-    expr->members = malloc(sizeof(P4_Expression*) * count);
+    expr->members = P4_MALLOC(sizeof(P4_Expression*) * count);
     return expr;
 }
 
@@ -1571,7 +1571,7 @@ P4_CreateRepeatMinMax(P4_Expression* repeat, size_t min, size_t max) {
     if (repeat == NULL)
         return NULL;
 
-    P4_Expression* expr = malloc(sizeof(P4_Expression));
+    P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
     expr->id = 0;
     expr->flag = 0;
     expr->name = NULL;
@@ -1614,7 +1614,7 @@ P4_CreateOnceOrMore(P4_Expression* repeat) {
 
 P4_PUBLIC P4_Expression*
 P4_CreateBackReference(size_t index, bool sensitive) {
-    P4_Expression* expr = malloc(sizeof(P4_Expression));
+    P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
     expr->id = 0;
     expr->kind = P4_BackReference;
     expr->flag = 0;
@@ -1645,7 +1645,7 @@ P4_IsRule(P4_Expression* e) {
 }
 
 P4_PUBLIC P4_Grammar*    P4_CreateGrammar(void) {
-    P4_Grammar* grammar = malloc(sizeof(P4_Grammar));
+    P4_Grammar* grammar = P4_MALLOC(sizeof(P4_Grammar));
     grammar->rules = NULL;
     grammar->count = 0;
     grammar->cap = 0;
@@ -1669,8 +1669,8 @@ P4_DeleteGrammar(P4_Grammar* grammar) {
         }
         if (grammar->spaced_rules)
             P4_DeleteExpression(grammar->spaced_rules);
-        free(grammar->rules);
-        free(grammar);
+        P4_FREE(grammar->rules);
+        P4_FREE(grammar);
     }
 }
 
@@ -1745,10 +1745,10 @@ P4_AddGrammarRule(P4_Grammar* grammar, P4_RuleID id, P4_Expression* expr) {
 
     if (cap == 0) {
         cap = 32;
-        rules = malloc(sizeof(P4_Expression*) * cap);
+        rules = P4_MALLOC(sizeof(P4_Expression*) * cap);
     } else if (grammar->count >= cap) {
         cap <<= 1;
-        rules = realloc(rules, sizeof(P4_Expression*) * cap);
+        rules = P4_REALLOC(rules, sizeof(P4_Expression*) * cap);
     }
 
     if (rules == NULL)
@@ -1771,7 +1771,7 @@ P4_SetGrammarRuleName(P4_Grammar* grammar, P4_RuleID id, P4_String name) {
         return P4_NullError;
 
     if (expr->name != NULL)
-        free(expr->name);
+        P4_FREE(expr->name);
 
     expr->name = strdup(name);
 
@@ -1790,7 +1790,7 @@ P4_GetGrammarRuleName(P4_Grammar* grammar, P4_RuleID id) {
 
 P4_PUBLIC P4_Source*
 P4_CreateSource(P4_String content, P4_RuleID rule_id) {
-    P4_Source* source = malloc(sizeof(P4_Source));
+    P4_Source* source = P4_MALLOC(sizeof(P4_Source));
     source->content = content;
     source->rule_id = rule_id;
     source->pos = 0;
@@ -1833,19 +1833,19 @@ P4_DeleteSource(P4_Source* source) {
     P4_Frame* tmp = source->frame_stack;
     while(source->frame_stack) {
         tmp = source->frame_stack->next;
-        free(source->frame_stack);
+        P4_FREE(source->frame_stack);
         source->frame_stack = tmp;
     }
 
     if (source->errmsg)
-        free(source->errmsg);
+        P4_FREE(source->errmsg);
 
     if (source->root) {
         P4_DeleteTokenUserData(source->grammar, source->root);
         P4_DeleteToken(source->root);
     }
 
-    free(source);
+    P4_FREE(source);
 }
 
 P4_PUBLIC P4_Token*
@@ -2250,13 +2250,13 @@ P4_DeleteExpression(P4_Expression* expr) {
     switch (expr->kind) {
         case P4_Literal:
             if (expr->literal)
-                free(expr->literal);
+                P4_FREE(expr->literal);
             break;
         case P4_Reference:
             /* Case P4_Reference is quite special - it is not the owner of ref_expr.
              * We free the referenced string if exists though. */
             if (expr->reference != NULL)
-                free(expr->reference);
+                P4_FREE(expr->reference);
             break;
         case P4_Positive:
         case P4_Negative:
@@ -2270,7 +2270,7 @@ P4_DeleteExpression(P4_Expression* expr) {
                     P4_DeleteExpression(expr->members[i]);
                 expr->members[i] = NULL;
             }
-            free(expr->members);
+            P4_FREE(expr->members);
             expr->members = NULL;
             break;
         case P4_Repeat:
@@ -2282,9 +2282,9 @@ P4_DeleteExpression(P4_Expression* expr) {
     }
 
     if (expr->name)
-        free(expr->name);
+        P4_FREE(expr->name);
 
-    free(expr);
+    P4_FREE(expr);
 }
 
 P4_PUBLIC P4_Error
@@ -2395,7 +2395,7 @@ P4_CopySliceString(P4_String s, P4_Slice* slice) {
     size_t    len = P4_GetSliceSize(slice);
     assert(len >= 0);
 
-    P4_String str = malloc(len+1);
+    P4_String str = P4_MALLOC(len+1);
     strncpy(str, s + slice->start.pos, len);
     str[len] = '\0';
 
@@ -2992,7 +2992,7 @@ P4_PegEvalNumber(P4_Token* token, size_t* num) {
         return P4_MemoryError;
 
     *num = atol(s);
-    free(s);
+    P4_FREE(s);
 
     return P4_Ok;
 }
@@ -3020,7 +3020,7 @@ P4_PegEvalLiteral(P4_Token* token, P4_Expression** expr) {
            size = 0;
     P4_Error err = 0;
     P4_Rune rune = 0;
-    P4_String lit = malloc((len+1) * sizeof(char)),
+    P4_String lit = P4_MALLOC((len+1) * sizeof(char)),
               cur = lit;
 
     if (lit == NULL)
@@ -3043,7 +3043,7 @@ P4_PegEvalLiteral(P4_Token* token, P4_Expression** expr) {
     *expr = P4_CreateLiteral(lit, true);
 
 finalize:
-    free(lit);
+    P4_FREE(lit);
     return err;
 }
 
@@ -3263,7 +3263,7 @@ P4_PegEvalRuleName(P4_Token* token, P4_String* result) {
     if (len <= 0)
         return P4_ValueError;
 
-    *result = malloc((len+1) * sizeof(char));
+    *result = P4_MALLOC((len+1) * sizeof(char));
     if (*result == NULL)
         return P4_MemoryError;
 
@@ -3301,7 +3301,7 @@ P4_PegEvalReference(P4_Token* token, P4_Expression** result) {
 
 finalize:
     if (reference)
-        free(reference);
+        P4_FREE(reference);
 
     return err;
 }
@@ -3337,7 +3337,7 @@ P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result) {
     return P4_Ok;
 
 finalize:
-    if (rule_name) free(rule_name);
+    if (rule_name) P4_FREE(rule_name);
     if (*result) P4_DeleteExpression(*result);
     return err;
 }

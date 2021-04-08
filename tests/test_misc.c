@@ -212,6 +212,28 @@ void test_name(void) {
     P4_DeleteGrammar(grammar);
 }
 
+static int my_inspect_refcnt = 0;
+P4_Error my_inspect(P4_Token* token, void* userdata) {
+    my_inspect_refcnt++;
+    return P4_Ok;
+}
+
+void test_inspect(void) {
+    P4_Grammar* grammar = P4_LoadGrammar("entry = any any; any = .;");
+    TEST_ASSERT_NOT_NULL(grammar);
+
+    P4_Source* source = P4_CreateSource("XX", 1);
+    TEST_ASSERT_NOT_NULL(source);
+
+    TEST_ASSERT_EQUAL( P4_Ok, P4_Parse(grammar, source));
+
+    TEST_ASSERT_EQUAL( P4_Ok, P4_InspectSourceAst(P4_GetSourceAst(source), NULL, my_inspect));
+    TEST_ASSERT_EQUAL( 3, my_inspect_refcnt); /* one for parent, two for children. */
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -223,6 +245,7 @@ int main(void) {
     RUN_TEST(test_source_slice);
     RUN_TEST(test_lineno_offset);
     RUN_TEST(test_name);
+    RUN_TEST(test_inspect);
 
     return UNITY_END();
 }

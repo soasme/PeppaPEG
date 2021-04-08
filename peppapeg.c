@@ -173,6 +173,7 @@ P4_PRIVATE(P4_Error)            P4_PegEvalChoice(P4_Token* token, P4_Expression*
 P4_PRIVATE(P4_Error)            P4_PegEvalPositive(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalNegative(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr);
+P4_PRIVATE(P4_Error)            P4_PegEvalDot(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalRuleName(P4_Token* token, P4_String* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalReference(P4_Token* token, P4_Expression** result);
 P4_PRIVATE(P4_Error)            P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result);
@@ -2780,7 +2781,13 @@ P4_Grammar* P4_CreatePegGrammar () {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_PegRuleRepeat, P4_FLAG_NON_TERMINAL))
         goto finalize;
 
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_PegRulePrimary, 7,
+    if (P4_Ok != P4_AddLiteral(grammar, P4_PegRuleDot, ".", true))
+        goto finalize;
+
+    if (P4_Ok != P4_SetGrammarRuleName(grammar, P4_PegRuleDot, "dot"))
+        goto finalize;
+
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_PegRulePrimary, 8,
         P4_CreateReference(P4_PegRuleLiteral),
         P4_CreateReference(P4_PegRuleInsensitiveLiteral),
         P4_CreateReference(P4_PegRuleRange),
@@ -2794,7 +2801,8 @@ P4_Grammar* P4_CreatePegGrammar () {
             P4_CreateLiteral("(", true),
             P4_CreateReference(P4_PegRuleChoice),
             P4_CreateLiteral(")", true)
-        )
+        ),
+        P4_CreateReference(P4_PegRuleDot)
     ))
         goto finalize;
 
@@ -3242,6 +3250,14 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
+P4_PegEvalDot(P4_Token* token, P4_Expression** expr) {
+    if ((*expr = P4_CreateRange(0x1, 0x10ffff, 1)) == NULL) {
+        return P4_MemoryError;
+    }
+    return P4_Ok;
+}
+
+P4_PRIVATE(P4_Error)
 P4_PegEvalRuleName(P4_Token* token, P4_String* result) {
     size_t len = P4_GetSliceSize(&token->slice); /* remove quotes */
     if (len <= 0)
@@ -3435,6 +3451,8 @@ P4_PegEval(P4_Token* token, void* result) {
             return P4_PegEvalNegative(token, result);
         case P4_PegRuleRepeat:
             return P4_PegEvalRepeat(token, result);
+        case P4_PegRuleDot:
+            return P4_PegEvalDot(token, result);
         case P4_PegRuleReference:
             return P4_PegEvalReference(token, result);
         case P4_PegGrammar:

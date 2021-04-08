@@ -127,6 +127,10 @@ void test_repeat(void) {
     ASSERT_PEG_PARSE(P4_PegRuleRepeat, "\"a\"{1}", P4_Ok, "[{\"slice\":[0,6],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,6],\"type\":\"repeatexact\",\"children\":[{\"slice\":[4,5],\"type\":\"number\"}]}]}]");
 }
 
+void test_dot(void) {
+    ASSERT_PEG_PARSE(P4_PegRuleDot, ".", P4_Ok, "[{\"slice\":[0,1],\"type\":\"dot\"}]");
+}
+
 void test_expression(void) {
     ASSERT_PEG_PARSE(P4_PegRuleExpression, "\"a\"", P4_Ok, "[{\"slice\":[0,3],\"type\":\"literal\"}]");
     ASSERT_PEG_PARSE(P4_PegRuleExpression, "[a-z]", P4_Ok, "\
@@ -480,6 +484,9 @@ void test_eval_grammar(void) {
     ASSERT_EVAL_GRAMMAR("R1 = &\"b\" \"apple\";", "R1", "beef", P4_MatchError, "[]");
     ASSERT_EVAL_GRAMMAR("R1 = &\"a\" i\"apple\";", "R1", "aPPLE", P4_Ok, "[{\"slice\":[0,5],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = &\"a\" i\"apple\";", "R1", "APPLE", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = .;", "R1", "好", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"* !.;", "R1", "aaab", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"*;", "R1", "aaab", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
 
     ASSERT_EVAL_GRAMMAR(
         "R1 = R2; "
@@ -672,6 +679,7 @@ int main(void) {
     RUN_TEST(test_choice);
     RUN_TEST(test_sequence);
     RUN_TEST(test_repeat);
+    RUN_TEST(test_dot);
     RUN_TEST(test_expression);
     RUN_TEST(test_rule_name);
     RUN_TEST(test_rule_flag);

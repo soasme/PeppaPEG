@@ -2141,7 +2141,30 @@
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">stream</span></code>: The output stream. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">token</span></code>: The token.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">token</span></code>: The root node of source ast.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_InspectSourceAst">
+<span class="target" id="peppapeg_8h_1aa31f6e8df5e9c2ca01da942072367ee9"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_InspectSourceAst</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a> <span class="pre">*</span><em><span class="pre">token</span></em>, <span class="pre">void</span> <span class="pre">*</span><em><span class="pre">userdata</span></em>, <a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <span class="pre">(</span><span class="pre">*</span><em><span class="pre">inspector</span></em><span class="pre">)</span><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a><span class="pre">*</span>, <span class="pre">void</span><span class="pre">*</span><span class="sig-paren">)</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_InspectSourceAst" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Inspect the token tree. </p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">void</span> <span class="n">MyInspector</span><span class="p">(</span><span class="n">P4_Token</span><span class="o">*</span> <span class="n">token</span><span class="p">,</span> <span class="n">void</span><span class="o">*</span> <span class="n">userdata</span><span class="p">)</span> <span class="p">{</span>
+     <span class="n">printf</span><span class="p">(</span><span class="s2">"</span><span class="si">%lu</span><span class="se">\t</span><span class="si">%lu</span><span class="se">\t</span><span class="s2">%p</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">token</span><span class="o">-&gt;</span><span class="nb">slice</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">pos</span><span class="p">,</span> <span class="n">token</span><span class="o">-&gt;</span><span class="n">rule_id</span><span class="p">,</span> <span class="n">userdata</span><span class="p">);</span>
+     <span class="k">return</span> <span class="n">P4_Ok</span><span class="p">;</span>
+ <span class="p">}</span>
+
+ <span class="n">P4_Error</span> <span class="n">err</span> <span class="o">=</span> <span class="n">P4_InspectSourceAst</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">NULL</span><span class="p">,</span> <span class="n">MyInspector</span><span class="p">);</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">token</span></code>: The root node of source ast. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">userdata</span></code>: Any additional information you want to pass in. </p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">inspector</span></code>: The inspecting function. It should return P4_Ok for a successful inspection.</p></li>
 </ul>
 </dd>
 </dl>

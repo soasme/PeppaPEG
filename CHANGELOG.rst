@@ -6,7 +6,8 @@ Not Yet Released
 
 Code change: <https://github.com/soasme/PeppaPEG/compare/v1.9.0..HEAD>.
 
-* [Feature]: Added function: `P4_LoadGrammar`. `#56t  <https://github.com/soasme/PeppaPEG/pull/56>`_
+* [Feature]: Jsonify token AST using grammar rule name. `#57 <https://github.com/soasme/PeppaPEG/pull/57>`_
+* [Feature]: Added function: `P4_LoadGrammar`. `#56 <https://github.com/soasme/PeppaPEG/pull/56>`_
 
 1.9.0 (1 Apr, 2021)
 -------------------

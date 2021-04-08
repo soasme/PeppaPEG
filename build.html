@@ -90,7 +90,7 @@
       <a href="index.html"><div class="brand">Peppa PEG 1.9.0 documentation</div></a>
     </div>
     <div class="header-right">
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
     </div>
@@ -135,26 +135,32 @@
   <main class="main">
     <div class="content">
       <article role="main">
-        <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+        <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
         <section id="build">
 <h1>Build<a class="headerlink" href="#build" title="Permalink to this headline">¶</a></h1>
+<section id="build-peppa-peg">
+<h2>Build Peppa PEG<a class="headerlink" href="#build-peppa-peg" title="Permalink to this headline">¶</a></h2>
+<p>Assume you have cmake and gcc installed.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>cmake -E make_directory ./build
+<span class="gp">$ </span><span class="nb">cd</span> build
+<span class="gp">$ </span>cmake ..
+<span class="gp">$ </span>make
+</pre></div>
+</div>
+</section>
+<section id="development">
+<h2>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
 <p>If you have a difficulty having a complete development environment for Peppa PEG, try Docker:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>docker run --rm -v <span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>:/app -it ubuntu:latest bash
 <span class="gp"># </span>apt-get install git gcc gdb valgrind make cmake python3 python3-venv python3-pip doxygen
-<span class="gp"># </span>// yes, you have all the dev-dependencies.
+<span class="gp"># </span>// you have all the dev-dependencies now.
 </pre></div>
 </div>
 <p>Testing Peppa PEG requires downloading the test framework <cite>Unity</cite>:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git submodule init
 <span class="gp">$ </span>git submodule update
-</pre></div>
-</div>
-<p>Assume you have cmake and gcc installed.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>cmake -E make_directory ./build
-<span class="gp">$ </span><span class="nb">cd</span> build
-<span class="gp">$ </span>cmake ..
 </pre></div>
 </div>
 <p>If you have Valgrind installed, you can enable <cite>ENABLE_VALGRIND</cite>.</p>
@@ -173,8 +179,12 @@
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>cmake --build . --target docs
 </pre></div>
 </div>
+</section>
+<section id="github-actions">
+<h2>GitHub Actions<a class="headerlink" href="#github-actions" title="Permalink to this headline">¶</a></h2>
 <p>Peppa PEG uses GitHub Actions building docs whenever a change is pushed to the main branch.</p>
 <p>The docs site is pushed to gh-pages branch and published to &lt;<a class="reference external" href="https://www.soasme.com/PeppaPEG/">https://www.soasme.com/PeppaPEG/</a>&gt;.</p>
+</section>
 </section>
 
       </article>
@@ -219,8 +229,29 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Build</a><ul>
+<li><a class="reference internal" href="#build-peppa-peg">Build Peppa PEG</a></li>
+<li><a class="reference internal" href="#development">Development</a></li>
+<li><a class="reference internal" href="#github-actions">GitHub Actions</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

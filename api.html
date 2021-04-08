@@ -2113,7 +2113,7 @@
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_JsonifySourceAst">
-<span class="target" id="peppapeg_8h_1a36008badf4bce8e09b9f8efbc53551df"></span><span class="pre">void</span> <code class="sig-name descname"><span class="pre">P4_JsonifySourceAst</span></code><span class="sig-paren">(</span><span class="pre">FILE</span> <span class="pre">*</span><em><span class="pre">stream</span></em>, <a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a> <span class="pre">*</span><em><span class="pre">token</span></em>, <span class="pre">P4_KindToName</span> <em><span class="pre">namefunc</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_JsonifySourceAst" title="Permalink to this definition">¶</a><br/></dt>
+<span class="target" id="peppapeg_8h_1a030ba0b31fccc93444a2ebc77873bc35"></span><span class="pre">void</span> <code class="sig-name descname"><span class="pre">P4_JsonifySourceAst</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a> <span class="pre">*</span><em><span class="pre">grammar</span></em>, <span class="pre">FILE</span> <span class="pre">*</span><em><span class="pre">stream</span></em>, <a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a> <span class="pre">*</span><em><span class="pre">token</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_JsonifySourceAst" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Print the token tree. </p>
 <p><p>Example: </p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_String</span> <span class="n">MyIdToName</span><span class="p">(</span><span class="n">P4_RuleID</span> <span class="nb">id</span><span class="p">)</span> <span class="p">{</span>
@@ -2130,9 +2130,9 @@
 </div>
 <dl class="simple">
 <dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">stream</span></code>: The output stream. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">token</span></code>: The token. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">namefunc</span></code>: A function to convert id to a name.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">token</span></code>: The token.</p></li>
 </ul>
 </dd>
 </dl>

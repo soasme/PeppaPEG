@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="References" href="references.html" /><link rel="prev" title="Tutorial: Calculator" href="tutcalc.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Tutorial: Calculator" href="tutcalc.html" /><link rel="prev" title="Getting Started" href="getting_started.html" />
 
     <meta name="generator" content="sphinx-3.5.3, furo 2021.03.20.beta30"/>
         <title>How-To Guides - Peppa PEG 1.9.0 documentation</title>
@@ -110,11 +110,14 @@
 </form><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="peg.html">PEG Syntax</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lowlevel.html">Low Level APIs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutcalc.html">Tutorial: Calculator</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">How-To Guides</a></li>
-<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutcalc.html">Tutorial: Calculator</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="references.html">References</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="peg.html">PEG Syntax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lowlevel.html">Low Level APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html">API &amp; References</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="whatsnew.html">Change Log</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
 </ul>
@@ -136,7 +139,7 @@
 <section id="how-to-prevent-stackerror">
 <h2>How to Prevent StackError?<a class="headerlink" href="#how-to-prevent-stackerror" title="Permalink to this headline">¶</a></h2>
 <p>Considering a json nested array: <cite>[[[[…]]]]</cite>. If the depth is too deep, Peppa PEG may end up with a StackError. This is due to Peppa PEG is a recursion-based parser. To prevent the stack address exhausts, one can set a limit on the recursion depth. By default, the depth is 8192.</p>
-<p>If you need to adjust the depth, try <a class="reference internal" href="references.html#c.P4_SetRecursionLimit" title="P4_SetRecursionLimit"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_SetRecursionLimit()</span></code></a>.</p>
+<p>If you need to adjust the depth, try <a class="reference internal" href="api.html#c.P4_SetRecursionLimit" title="P4_SetRecursionLimit"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_SetRecursionLimit()</span></code></a>.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">P4_SetRecursionLimit</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1000</span><span class="p">);</span>
 <span class="n">P4_Ok</span>
 
@@ -146,7 +149,7 @@
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">seealso</dt>
-<dd class="field-odd"><p><a class="reference internal" href="references.html#c.P4_SetRecursionLimit" title="P4_SetRecursionLimit"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_SetRecursionLimit()</span></code></a>.</p>
+<dd class="field-odd"><p><a class="reference internal" href="api.html#c.P4_SetRecursionLimit" title="P4_SetRecursionLimit"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_SetRecursionLimit()</span></code></a>.</p>
 </dd>
 </dl>
 </section>
@@ -164,7 +167,7 @@
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">seealso</dt>
-<dd class="field-odd"><p><a class="reference internal" href="references.html#c.P4_SetSourceSlice" title="P4_SetSourceSlice"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_SetSourceSlice()</span></code></a>.</p>
+<dd class="field-odd"><p><a class="reference internal" href="api.html#c.P4_SetSourceSlice" title="P4_SetSourceSlice"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_SetSourceSlice()</span></code></a>.</p>
 </dd>
 </dl>
 </section>
@@ -178,7 +181,7 @@
 <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">);</span> <span class="c1">// P4_Ok!</span>
 </pre></div>
 </div>
-<p>Guess what, <a class="reference internal" href="references.html#c.P4_Parse" title="P4_Parse"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_Parse()</span></code></a> returns <a class="reference internal" href="references.html#c.P4_Error.P4_Ok" title="P4_Ok"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_Ok</span></code></a>! Peppa PEG eats 3 “a” characters and ignores the rest of the input.</p>
+<p>Guess what, <a class="reference internal" href="api.html#c.P4_Parse" title="P4_Parse"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_Parse()</span></code></a> returns <a class="reference internal" href="api.html#c.P4_Error.P4_Ok" title="P4_Ok"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_Ok</span></code></a>! Peppa PEG eats 3 “a” characters and ignores the rest of the input.</p>
 <p>The expression of Start-of-Input and End-of-Input match the start and end of the input. They don’t consume text.</p>
 <p>To make “aaab” as a whole, we need to add Start-of-Input and End-of-Input before and after the ZeroOrMore rule:</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
@@ -223,23 +226,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="references.html">
+          <a class="next-page" href="tutcalc.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">References</div>
+                <div class="title">Tutorial: Calculator</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="tutcalc.html">
+          <a class="prev-page" href="getting_started.html">
               <svg><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Tutorial: Calculator</div>
+                <div class="title">Getting Started</div>
                 
               </div>
             </a>

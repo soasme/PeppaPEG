@@ -13,10 +13,8 @@ Table of Contents
    :glob:
 
    getting_started
-   peg
-   lowlevel
-   tutcalc
    howto
+   tutcalc
    references
    whatsnew
    development

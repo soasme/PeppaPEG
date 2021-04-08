@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Low Level APIs" href="lowlevel.html" /><link rel="prev" title="Getting Started" href="getting_started.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Low Level APIs" href="lowlevel.html" /><link rel="prev" title="References" href="references.html" />
 
     <meta name="generator" content="sphinx-3.5.3, furo 2021.03.20.beta30"/>
         <title>PEG Syntax - Peppa PEG 1.9.0 documentation</title>
@@ -110,11 +110,14 @@
 </form><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">PEG Syntax</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lowlevel.html">Low Level APIs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutcalc.html">Tutorial: Calculator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="howto.html">How-To Guides</a></li>
-<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutcalc.html">Tutorial: Calculator</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="references.html">References</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">PEG Syntax</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lowlevel.html">Low Level APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html">API &amp; References</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="whatsnew.html">Change Log</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
 </ul>
@@ -239,7 +242,7 @@ If any one of the attempts succeeds, the match succeeds. If all attempts fail, t
 <span class="n">greeting</span> <span class="o">=</span> <span class="n">greeter</span> <span class="s2">" world"</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>One should ensure all references must have corresponding rule defined, otherwise, the parse will fail with <a class="reference internal" href="references.html#c.P4_Error.P4_MatchError" title="P4_MatchError"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_MatchError</span></code></a>.</p>
+<p>One should ensure all references must have corresponding rule defined, otherwise, the parse will fail with <a class="reference internal" href="api.html#c.P4_Error.P4_MatchError" title="P4_MatchError"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_MatchError</span></code></a>.</p>
 </section>
 <section id="positive">
 <h2>Positive<a class="headerlink" href="#positive" title="Permalink to this headline">¶</a></h2>
@@ -298,7 +301,7 @@ For example,</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">seealso</dt>
-<dd class="field-odd"><p><a class="reference internal" href="references.html#c.P4_FLAG_SPACED" title="P4_FLAG_SPACED"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_FLAG_SPACED</span></code></a>, <a class="reference internal" href="references.html#c.P4_FLAG_SQUASHED" title="P4_FLAG_SQUASHED"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_FLAG_SQUASHED</span></code></a>, <a class="reference internal" href="references.html#c.P4_FLAG_SCOPED" title="P4_FLAG_SCOPED"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_FLAG_SCOPED</span></code></a>, <a class="reference internal" href="references.html#c.P4_FLAG_TIGHT" title="P4_FLAG_TIGHT"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_FLAG_TIGHT</span></code></a>, <a class="reference internal" href="references.html#c.P4_FLAG_LIFTED" title="P4_FLAG_LIFTED"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_FLAG_LIFTED</span></code></a>, <a class="reference internal" href="references.html#c.P4_FLAG_NON_TERMINAL" title="P4_FLAG_NON_TERMINAL"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_FLAG_NON_TERMINAL</span></code></a>.</p>
+<dd class="field-odd"><p><a class="reference internal" href="api.html#c.P4_FLAG_SPACED" title="P4_FLAG_SPACED"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_FLAG_SPACED</span></code></a>, <a class="reference internal" href="api.html#c.P4_FLAG_SQUASHED" title="P4_FLAG_SQUASHED"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_FLAG_SQUASHED</span></code></a>, <a class="reference internal" href="api.html#c.P4_FLAG_SCOPED" title="P4_FLAG_SCOPED"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_FLAG_SCOPED</span></code></a>, <a class="reference internal" href="api.html#c.P4_FLAG_TIGHT" title="P4_FLAG_TIGHT"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_FLAG_TIGHT</span></code></a>, <a class="reference internal" href="api.html#c.P4_FLAG_LIFTED" title="P4_FLAG_LIFTED"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_FLAG_LIFTED</span></code></a>, <a class="reference internal" href="api.html#c.P4_FLAG_NON_TERMINAL" title="P4_FLAG_NON_TERMINAL"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_FLAG_NON_TERMINAL</span></code></a>.</p>
 </dd>
 </dl>
 <section id="spaced">
@@ -371,7 +374,7 @@ number = [0-9];
 </section>
 <section id="use-peg-api">
 <h2>Use Peg API<a class="headerlink" href="#use-peg-api" title="Permalink to this headline">¶</a></h2>
-<p>Function <a class="reference internal" href="references.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a> can load a grammar from a string.</p>
+<p>Function <a class="reference internal" href="api.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a> can load a grammar from a string.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_LoadGrammar</span><span class="p">(</span>
     <span class="s2">"add = int + int;"</span>
 
@@ -420,14 +423,14 @@ number = [0-9];
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="getting_started.html">
+          <a class="prev-page" href="references.html">
               <svg><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Getting Started</div>
+                <div class="title">References</div>
                 
               </div>
             </a>

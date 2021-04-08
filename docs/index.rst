@@ -15,8 +15,8 @@ Table of Contents
    getting_started
    peg
    lowlevel
-   caveats
    tutcalc
+   howto
    references
    whatsnew
    development

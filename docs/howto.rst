@@ -1,12 +1,12 @@
-Caveats
-=======
+How-To Guides
+=============
 
-Recursion Limit
----------------
+How to Prevent StackError?
+--------------------------
 
-Peppa PEG is a recursion-based parser so it will be crashed if the stack address is exhausted. To prevent that, Peppa PEG set a limit on the recursion depth. By default, it's 8192.
+Considering a json nested array: `[[[[...]]]]`. If the depth is too deep, Peppa PEG may end up with a StackError. This is due to Peppa PEG is a recursion-based parser. To prevent the stack address exhausts, one can set a limit on the recursion depth. By default, the depth is 8192.
 
-If Peppa PEG should run a very small embedded device, you can adjust it via `P4_SetRecursionLimit`.
+If you need to adjust the depth, try :c:func:`P4_SetRecursionLimit`.
 
 .. code-block:: c
 
@@ -16,10 +16,13 @@ If Peppa PEG should run a very small embedded device, you can adjust it via `P4_
     >> P4_GetRecursionLimit(grammar);
     1000
 
-Source Slice
-------------
+:seealso: :c:func:`P4_SetRecursionLimit`.
+
+How to Parse Substring?
+-----------------------
 
 Peppa PEG supports parsing a subset of source input. By default, all source content are attempted.
+
 One can use `P4_SetSourceSlice` to set the start position and stop position in the source input.
 
 In this example, Peppa PEG only parses the substring "YXXXY"[1:4], e.g. "XXX".
@@ -28,13 +31,14 @@ In this example, Peppa PEG only parses the substring "YXXXY"[1:4], e.g. "XXX".
 
     >> P4_Source* source = P4_CreateSource("YXXXY", ENTRY);
     >> P4_SetSourceSlice(source, 1, 4);
+    P4_Ok
+    >> P4_Parse(grammar, source);
+    P4_Ok
 
-See :c:func:`P4_SetSourceSlice`.
+:seealso: :c:func:`P4_SetSourceSlice`.
 
-Start-of-Input & End-of-Input
+How to Prevent Partial Parse?
 -----------------------------
-
-The expression of Start-of-Input and End-of-Input match the start and end of the input. They don't consume text.
 
 Considering below case,
 
@@ -47,6 +51,8 @@ Considering below case,
     P4_Parse(grammar, source); // P4_Ok!
 
 Guess what, :c:func:`P4_Parse` returns :c:enum:`P4_Ok`! Peppa PEG eats 3 "a" characters and ignores the rest of the input.
+
+The expression of Start-of-Input and End-of-Input match the start and end of the input. They don't consume text.
 
 To make "aaab" as a whole, we need to add Start-of-Input and End-of-Input before and after the ZeroOrMore rule:
 
@@ -63,8 +69,8 @@ To make "aaab" as a whole, we need to add Start-of-Input and End-of-Input before
     P4_Source* source = P4_CreateSource("aaab", 1);
     P4_Parse(grammar, source); // P4_MatchError
 
-Join
------
+How to Join Expressions by Separators?
+--------------------------------------
 
 Joining a rule by a separator is a common use, such as `f(p1, p2, p3)`, `[1, 2, 3]`. Peppa PEG provides a sugar to make it easier to match such a pattern.
 

@@ -1857,6 +1857,8 @@ P4_ResetSource(P4_Source* source) {
         source->frame_stack = tmp;
     }
 
+    source->err = P4_Ok;
+
     if (source->errmsg)
         P4_FREE(source->errmsg);
 

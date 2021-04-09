@@ -18,8 +18,8 @@
 - [ ] Benchmark: example: json-c. `valgrind --tool=massif --massif-out-file=massif.out ./build/tests/test_example_json && ms_print massif.out ms_print.out`.
 - [ ] Cache literal len.
 - [ ] backrefs is not necessary if there is no BackReference in Sequence.
+- [ ] save backreference in source stack so it can be used outside a sequence.
 - [ ] static lib.
-- [ ] A python grammar.
 - [ ] Add explanations in docs.
 - [ ] Enable AddressSanitizer. Example: cJSON.
 - [ ] RequireVersion.
@@ -28,6 +28,7 @@
 - [ ] Add a fuzzy testing framework.
 - [ ] Sanitize `\u0000` to whitespace for the source input, this happens in creating the source/setting the source size.
 - [ ] take a look at ohm.
+- [ ] A python grammar.
 - [ ] ES5 syntax: https://ohmlang.github.io/editor/#0a9a649c3c630fd0a470ba6cb75393fe
 - [ ] zig syntax: https://ziglang.org/documentation/master/#Grammar
 - [ ] read [A parsing machine for PEGs](http://www.inf.puc-rio.br/~roberto/docs/ry08-4.pdf).

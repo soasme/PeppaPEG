@@ -21,6 +21,10 @@
 - [ ] perf: Cache literal len.
 - [ ] perf: backrefs is not necessary if there is no BackReference in Sequence.
 - [ ] peg: Stop on first error v/s Recover from Panic.
+- [ ] peg: built-in rules: letters.
+- [ ] peg: built-in rules: unicode letters.
+- [ ] peg: built-in rules: digits.
+- [ ] peg: built-in rules: unicode digits.
 - [ ] binding: python: example: cffi, misaka, parsimonious (api). <https://tomassetti.me/parsing-in-python/>.
 - [ ] tests: benchmark: example: json-c. `valgrind --tool=massif --massif-out-file=massif.out ./build/tests/test_example_json && ms_print massif.out ms_print.out`.
 - [ ] build: static lib.

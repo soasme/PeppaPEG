@@ -373,3 +373,60 @@ The one-statement code is somewhat equivalent to the below code written in low-l
         goto finalize;
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, RuleWs, P4_FLAG_SPACED|P4_FLAG_LIFTED))
         goto finalize;
+
+Cheatsheet
+----------
+
+.. list-table:: Cheatsheet
+   :header-rows: 1
+
+   * - Syntax
+     - Meaning
+   * - `foo = ...;`
+     - grammar rule
+   * - `@lifted foo = ...;`
+     - drop token
+   * - `@spaced foo = ...;`
+     - mark as space
+   * - `@squashed foo = ...;`
+     - ignore children tokens
+   * - `@tight foo = ...;`
+     - ignore spaced rules
+   * - `@non_terminal foo = ...;`
+     - ignore single child token
+   * - `@scoped foo = ...;`
+     - cancle effects
+   * - `"literal"`
+     - exact match
+   * - `i"literal"`
+     - case-insensitive match
+   * - `[a-z]`
+     - range
+   * - `[0-9..2]`
+     - range with stride
+   * - `[\u{1}-\u{10ffff}]`
+     - range using unicode runes
+   * - `.`
+     - any character
+   * - `foo bar`
+     - sequence
+   * - `foo / bar`
+     - choice
+   * - `&foo`
+     - positive
+   * - `!foo`
+     - negative
+   * - `foo*`
+     - zero or more
+   * - `foo+`
+     - once or more
+   * - `foo?`
+     - optional
+   * - `foo{m,}`
+     - repeat at least m times
+   * - `foo{,n}`
+     - repeat at most n times
+   * - `foo{m,n}`
+     - repeat between m-n times
+   * - `foo{m}`
+     - repeat exact n times

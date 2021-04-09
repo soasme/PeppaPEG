@@ -46,16 +46,16 @@ void test_variable(void) {
     token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
 
     TEST_ASSERT_NOT_NULL(token->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheVariable, token->head->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheVariable, token->head->next);
 
     TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
     P4_DeleteSource(source);
 
     source = P4_CreateSource("{{ xyz }}", P4_MustacheTag);
@@ -68,16 +68,16 @@ void test_variable(void) {
     token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
 
     TEST_ASSERT_NOT_NULL(token->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheVariable, token->head->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheVariable, token->head->next);
 
     TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
     P4_DeleteSource(source);
 
     P4_DeleteGrammar(grammar);
@@ -100,16 +100,16 @@ void test_partial(void) {
     token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
 
     TEST_ASSERT_NOT_NULL(token->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustachePartial, token->head->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustachePartial, token->head->next);
 
     TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
     P4_DeleteSource(source);
 
     source = P4_CreateSource("{{> xyz }}", P4_MustacheTag);
@@ -122,16 +122,16 @@ void test_partial(void) {
     token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
 
     TEST_ASSERT_NOT_NULL(token->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustachePartial, token->head->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustachePartial, token->head->next);
 
     TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
     P4_DeleteSource(source);
 
     P4_DeleteGrammar(grammar);
@@ -154,16 +154,16 @@ void test_section_open(void) {
     token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
 
     TEST_ASSERT_NOT_NULL(token->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheSectionOpen, token->head->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheSectionOpen, token->head->next);
 
     TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
     P4_DeleteSource(source);
 
     source = P4_CreateSource("{{# xyz }}", P4_MustacheTag);
@@ -176,16 +176,16 @@ void test_section_open(void) {
     token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
 
     TEST_ASSERT_NOT_NULL(token->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheSectionOpen, token->head->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheSectionOpen, token->head->next);
 
     TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
     P4_DeleteSource(source);
 
     P4_DeleteGrammar(grammar);
@@ -209,16 +209,16 @@ void test_section_open_inverted(void) {
     token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
 
     TEST_ASSERT_NOT_NULL(token->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheSectionOpen, token->head->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheSectionOpen, token->head->next);
 
     TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
 
     P4_DeleteSource(source);
 
@@ -233,16 +233,16 @@ void test_section_open_inverted(void) {
     token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
 
     TEST_ASSERT_NOT_NULL(token->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheSectionOpen, token->head->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheSectionOpen, token->head->next);
 
     TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
 
     P4_DeleteSource(source);
 
@@ -267,16 +267,16 @@ void test_section_close(void) {
     token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
 
     TEST_ASSERT_NOT_NULL(token->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheSectionClose, token->head->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheSectionClose, token->head->next);
 
     TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
 
     P4_DeleteSource(source);
 
@@ -291,16 +291,16 @@ void test_section_close(void) {
     token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
 
     TEST_ASSERT_NOT_NULL(token->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheSectionClose, token->head->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheSectionClose, token->head->next);
 
     TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
 
     P4_DeleteSource(source);
 
@@ -325,16 +325,16 @@ void test_unescaped(void) {
     token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
 
     TEST_ASSERT_NOT_NULL(token->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheUnescaped, token->head->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheUnescaped, token->head->next);
 
     TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
 
     P4_DeleteSource(source);
 
@@ -349,16 +349,16 @@ void test_unescaped(void) {
     token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
 
     TEST_ASSERT_NOT_NULL(token->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheUnescaped, token->head->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheUnescaped, token->head->next);
 
     TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
 
     P4_DeleteSource(source);
 
@@ -383,16 +383,16 @@ void test_triple_unescaped(void) {
     token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
 
     TEST_ASSERT_NOT_NULL(token->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTripleUnescaped, token->head->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTripleUnescaped, token->head->next);
 
     TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
     P4_DeleteSource(source);
 
     source = P4_CreateSource("{{{ xyz }}}", P4_MustacheTag);
@@ -406,16 +406,16 @@ void test_triple_unescaped(void) {
     token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
 
     TEST_ASSERT_NOT_NULL(token->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTripleUnescaped, token->head->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTripleUnescaped, token->head->next);
 
     TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
 
     P4_DeleteSource(source);
 
@@ -440,16 +440,16 @@ void test_comment(void) {
     token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
 
     TEST_ASSERT_NOT_NULL(token->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheComment, token->head->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheComment, token->head->next);
 
     TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
 
     P4_DeleteSource(source);
 
@@ -464,16 +464,16 @@ void test_comment(void) {
     token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
 
     TEST_ASSERT_NOT_NULL(token->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheComment, token->head->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheComment, token->head->next);
 
     TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
 
     P4_DeleteSource(source);
 
@@ -515,18 +515,18 @@ void test_set_delimiter(void) {
     P4_Token* token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("{{", token->head);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
+    ASSERT_EQUAL_TOKEN_STRING("{{", token->head);
 
     TEST_ASSERT_NOT_NULL(token->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheSetDelimiter, token->head->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheSetDelimiter, token->head->next);
 
     TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("}}", token->tail);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
+    ASSERT_EQUAL_TOKEN_STRING("}}", token->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -549,36 +549,36 @@ void test_set_delimiter_altered_grammar(void) {
     P4_Token* token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("{{=<% %>=}}", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
+    ASSERT_EQUAL_TOKEN_STRING("{{=<% %>=}}", token);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("{{", token->head);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->head);
+    ASSERT_EQUAL_TOKEN_STRING("{{", token->head);
 
     TEST_ASSERT_NOT_NULL(token->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("=<% %>=", token->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheSetDelimiter, token->head->next);
+    ASSERT_EQUAL_TOKEN_STRING("=<% %>=", token->head->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheSetDelimiter, token->head->next);
 
     TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("}}", token->tail);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->tail);
+    ASSERT_EQUAL_TOKEN_STRING("}}", token->tail);
 
     TEST_ASSERT_NOT_NULL(token->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token->next);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("<% x %>", token->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token->next);
+    ASSERT_EQUAL_TOKEN_STRING("<% x %>", token->next);
 
     TEST_ASSERT_NOT_NULL(token->next->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->next->head);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("<%", token->next->head);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheOpener, token->next->head);
+    ASSERT_EQUAL_TOKEN_STRING("<%", token->next->head);
 
     TEST_ASSERT_NOT_NULL(token->next->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheVariable, token->next->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("x", token->next->head->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheVariable, token->next->head->next);
+    ASSERT_EQUAL_TOKEN_STRING("x", token->next->head->next);
 
     TEST_ASSERT_NOT_NULL(token->next->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->next->tail);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("%>", token->next->tail);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheCloser, token->next->tail);
+    ASSERT_EQUAL_TOKEN_STRING("%>", token->next->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -601,7 +601,7 @@ void test_text_followed_by_newline(void) {
     P4_Token* token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheText, token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheText, token);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -624,8 +624,8 @@ void test_text_followed_by_opener(void) {
     P4_Token* token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheText, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("xyz", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheText, token);
+    ASSERT_EQUAL_TOKEN_STRING("xyz", token);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -647,8 +647,8 @@ void test_line_only_text(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheText, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("xyz", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheText, token);
+    ASSERT_EQUAL_TOKEN_STRING("xyz", token);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -670,8 +670,8 @@ void test_line_only_tag(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("{{xyz}}", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
+    ASSERT_EQUAL_TOKEN_STRING("{{xyz}}", token);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -693,12 +693,12 @@ void test_line_mixing_text_and_tag(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheText, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("abc", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheText, token);
+    ASSERT_EQUAL_TOKEN_STRING("abc", token);
 
     TEST_ASSERT_NOT_NULL(token->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token->next);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("{{xyz}}", token->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token->next);
+    ASSERT_EQUAL_TOKEN_STRING("{{xyz}}", token->next);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -720,12 +720,12 @@ void test_line_mixing_text_and_tag2(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("{{xyz}}", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token);
+    ASSERT_EQUAL_TOKEN_STRING("{{xyz}}", token);
 
     TEST_ASSERT_NOT_NULL(token->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheText, token->next);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("abc", token->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheText, token->next);
+    ASSERT_EQUAL_TOKEN_STRING("abc", token->next);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -747,8 +747,8 @@ void test_line_followed_by_newline(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheText, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("abc\n", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheText, token);
+    ASSERT_EQUAL_TOKEN_STRING("abc\n", token);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -770,16 +770,16 @@ void test_entry(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheText, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("abc\n", token);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheText, token);
+    ASSERT_EQUAL_TOKEN_STRING("abc\n", token);
 
     TEST_ASSERT_NOT_NULL(token->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token->next);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("{{xyz}}", token->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheTag, token->next);
+    ASSERT_EQUAL_TOKEN_STRING("{{xyz}}", token->next);
 
     TEST_ASSERT_NOT_NULL(token->next->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(P4_MustacheText, token->next->next);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("\n", token->next->next);
+    ASSERT_EQUAL_TOKEN_RULE(P4_MustacheText, token->next->next);
+    ASSERT_EQUAL_TOKEN_STRING("\n", token->next->next);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

@@ -36,13 +36,13 @@ void test_match_reference_successfully(void) {
     P4_Token* token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("HELLO", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("HELLO", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
 
     TEST_ASSERT_NOT_NULL(token->head);
     TEST_ASSERT_EQUAL(token->head, token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("HELLO", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token->head);
+    ASSERT_EQUAL_TOKEN_STRING("HELLO", token);
+    ASSERT_EQUAL_TOKEN_RULE(R1, token->head);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

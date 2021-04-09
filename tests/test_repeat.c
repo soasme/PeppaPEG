@@ -60,8 +60,8 @@ void test_match_zeroormore_multiple_times(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("00000", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("00000", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -97,8 +97,8 @@ void test_match_onceormore_at_least_once(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("0", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("0", token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -134,8 +134,8 @@ void test_match_onceormore_multiple_times(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("00000", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("00000", token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -235,8 +235,8 @@ void test_match_zerooronce_exact_once(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("0", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("0", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -272,8 +272,8 @@ void test_match_zerooronce_at_most_once(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("0", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("0", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -309,8 +309,8 @@ void test_match_repeat_exact_successfully(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("00000", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("00000", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -412,8 +412,8 @@ void test_match_repeat_exact_no_more(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("00000", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("00000", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);

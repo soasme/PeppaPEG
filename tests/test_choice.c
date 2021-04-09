@@ -34,8 +34,8 @@ void test_match_literal_choices_successfully(void) {
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
     TEST_ASSERT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("你好, 世界", token);
+    ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    ASSERT_EQUAL_TOKEN_STRING("你好, 世界", token);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -74,8 +74,8 @@ void test_match_literal_choices_successfully2(void) {
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
     TEST_ASSERT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("HELLO WORLD", token);
+    ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    ASSERT_EQUAL_TOKEN_STRING("HELLO WORLD", token);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

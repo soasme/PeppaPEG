@@ -35,8 +35,8 @@ void test_match_literal_sequence_successfully(void) {
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
     TEST_ASSERT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("你好 WORLD", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("你好 WORLD", token);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -157,16 +157,16 @@ void test_match_reference_in_sequence_successfully(void) {
     P4_Token* token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("OLAola", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("OLAola", token);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token->head);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("OLA", token->head);
+    ASSERT_EQUAL_TOKEN_RULE(R1, token->head);
+    ASSERT_EQUAL_TOKEN_STRING("OLA", token->head);
 
     TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("ola", token->tail);
+    ASSERT_EQUAL_TOKEN_RULE(R1, token->tail);
+    ASSERT_EQUAL_TOKEN_STRING("ola", token->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

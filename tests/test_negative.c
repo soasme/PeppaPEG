@@ -40,8 +40,8 @@ void test_match_negative_successfully(void) {
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
     TEST_ASSERT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("HELLO WORLD", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("HELLO WORLD", token);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -96,8 +96,8 @@ void test_match_negative_consumes_no_input(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("HELLO WORLD", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("HELLO WORLD", token);
 
     TEST_ASSERT_NULL(token->next);
 
@@ -105,8 +105,8 @@ void test_match_negative_consumes_no_input(void) {
 
     TEST_ASSERT_NOT_NULL(token->head);
     TEST_ASSERT_EQUAL(token->head, token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(R2, token->head);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("HELLO WORLD", token->head);
+    ASSERT_EQUAL_TOKEN_RULE(R2, token->head);
+    ASSERT_EQUAL_TOKEN_STRING("HELLO WORLD", token->head);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

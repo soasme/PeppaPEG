@@ -67,7 +67,7 @@ void test_replace_grammar_rule(void) {
     TEST_ASSERT_EQUAL(2, P4_GetSourcePosition(source));
     P4_Token* root = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(root);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("<%", root);
+    ASSERT_EQUAL_TOKEN_STRING("<%", root);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -89,7 +89,7 @@ void test_replace_grammar_rule_refreshing_references(void) {
 
     P4_Token* root = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(root);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("<%", root);
+    ASSERT_EQUAL_TOKEN_STRING("<%", root);
 
     P4_Expression* ref = P4_GetGrammarRule(grammar, ENTRY);
     TEST_ASSERT_EQUAL(ref->ref_expr, P4_GetGrammarRule(grammar, REFERENCE));
@@ -110,21 +110,21 @@ void test_join(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("1,2,3", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ROW, token);
+    ASSERT_EQUAL_TOKEN_STRING("1,2,3", token);
+    ASSERT_EQUAL_TOKEN_RULE(ROW, token);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("1", token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(NUM, token->head);
+    ASSERT_EQUAL_TOKEN_STRING("1", token->head);
+    ASSERT_EQUAL_TOKEN_RULE(NUM, token->head);
 
     TEST_ASSERT_NOT_NULL(token->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("2", token->head->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(NUM, token->head->next);
+    ASSERT_EQUAL_TOKEN_STRING("2", token->head->next);
+    ASSERT_EQUAL_TOKEN_RULE(NUM, token->head->next);
 
     TEST_ASSERT_NOT_NULL(token->head->next->next);
     TEST_ASSERT_EQUAL(token->tail, token->head->next->next);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("3", token->head->next->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(NUM, token->head->next->next);
+    ASSERT_EQUAL_TOKEN_STRING("3", token->head->next->next);
+    ASSERT_EQUAL_TOKEN_RULE(NUM, token->head->next->next);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -159,8 +159,8 @@ void test_source_slice(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("XXX", token);
+    ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    ASSERT_EQUAL_TOKEN_STRING("XXX", token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -184,9 +184,9 @@ void test_lineno_offset(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("A\nBC\n", token);
-    TEST_ASSERT_EQUAL_TOKEN_LINE_OFFSET(1, 0, 2, 3, token);
+    ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    ASSERT_EQUAL_TOKEN_STRING("A\nBC\n", token);
+    ASSERT_EQUAL_TOKEN_LINE_OFFSET(1, 0, 2, 3, token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);

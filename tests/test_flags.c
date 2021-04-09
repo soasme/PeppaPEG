@@ -39,8 +39,8 @@ void test_spaced_rule_should_loosen_sequence(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("HELLO \t\n\t WORLD", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("HELLO \t\n\t WORLD", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -84,8 +84,8 @@ void test_spaced_rule_should_be_ignored_in_tight_sequence(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("HELLOWORLD", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("HELLOWORLD", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -138,8 +138,8 @@ void test_spaced_rule_should_loosen_sequence_despite_member_is_tight(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("12  :  12", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("12  :  12", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -215,8 +215,8 @@ void test_spaced_rule_should_be_applied_in_repeat(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("0 0\t0\n0\t0 0", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("0 0\t0\n0\t0 0", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -292,8 +292,8 @@ void test_spaced_rule_should_be_ignored_in_tight_repeat2(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("000000", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("000000", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -343,8 +343,8 @@ void test_squashed_rule_should_generate_no_children(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("00", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("00", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -388,8 +388,8 @@ void test_squashed_repeat_should_generate_no_children(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("000000", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("000000", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
@@ -582,18 +582,18 @@ void test_squashed_sequence_should_not_hide_scoped_literal(void) {
     P4_Token* token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("11", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("11", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("1", token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token->head);
+    ASSERT_EQUAL_TOKEN_STRING("1", token->head);
+    ASSERT_EQUAL_TOKEN_RULE(R1, token->head);
 
     TEST_ASSERT_EQUAL(token->head->next, token->tail);
 
     TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("1", token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token->tail);
+    ASSERT_EQUAL_TOKEN_STRING("1", token->tail);
+    ASSERT_EQUAL_TOKEN_RULE(R1, token->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -639,12 +639,12 @@ void test_squashed_lifted_sequence_should_not_hide_scoped_literal(void) {
     P4_Token* token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("1", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    ASSERT_EQUAL_TOKEN_STRING("1", token);
+    ASSERT_EQUAL_TOKEN_RULE(R1, token);
 
     TEST_ASSERT_NOT_NULL(token->next);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("1", token->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token->next);
+    ASSERT_EQUAL_TOKEN_STRING("1", token->next);
+    ASSERT_EQUAL_TOKEN_RULE(R1, token->next);
 
     TEST_ASSERT_NULL(token->head);
     TEST_ASSERT_NULL(token->tail);
@@ -691,18 +691,18 @@ void test_squashed_repeat_should_not_hide_scoped_literal(void) {
     P4_Token* token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("11", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("11", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
 
     TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("1", token->head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token->head);
+    ASSERT_EQUAL_TOKEN_STRING("1", token->head);
+    ASSERT_EQUAL_TOKEN_RULE(R1, token->head);
 
     TEST_ASSERT_EQUAL(token->head->next, token->tail);
 
     TEST_ASSERT_NOT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("1", token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token->tail);
+    ASSERT_EQUAL_TOKEN_STRING("1", token->tail);
+    ASSERT_EQUAL_TOKEN_RULE(R1, token->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -745,12 +745,12 @@ void test_squashed_lifted_repeat_should_not_hide_scoped_literal(void) {
     P4_Token* token = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("1", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    ASSERT_EQUAL_TOKEN_STRING("1", token);
+    ASSERT_EQUAL_TOKEN_RULE(R1, token);
 
     TEST_ASSERT_NOT_NULL(token->next);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("1", token->next);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token->next);
+    ASSERT_EQUAL_TOKEN_STRING("1", token->next);
+    ASSERT_EQUAL_TOKEN_RULE(R1, token->next);
 
     TEST_ASSERT_NULL(token->head);
     TEST_ASSERT_NULL(token->tail);
@@ -770,8 +770,8 @@ void test_lift_repeat_for_single_child(void) {
     TEST_ASSERT_EQUAL(1, P4_GetSourcePosition(source));
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("a", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    ASSERT_EQUAL_TOKEN_STRING("a", token);
+    ASSERT_EQUAL_TOKEN_RULE(R1, token);
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
 }
@@ -788,8 +788,8 @@ void test_lift_sequence_for_single_child(void) {
     TEST_ASSERT_EQUAL(3, P4_GetSourcePosition(source));
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("a", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    ASSERT_EQUAL_TOKEN_STRING("a", token);
+    ASSERT_EQUAL_TOKEN_RULE(R1, token);
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
 }

@@ -16,21 +16,10 @@ cleanup_freep (void *p)
     free (*pp);
 }
 
-void TEST_ASSERT_EQUAL_SLICE(P4_Slice* s, size_t i, size_t j) {
-    TEST_ASSERT_EQUAL_UINT(i,   s->start.pos);
-    TEST_ASSERT_EQUAL_UINT(j,   s->start.pos);
-}
-
 # define ASSERT_EQUAL_SLICE(s, i, j) do { \
     TEST_ASSERT_EQUAL_UINT_MESSAGE((i),   (s)->start.pos, "unexpected slice start"); \
     TEST_ASSERT_EQUAL_UINT_MESSAGE((j),   (s)->start.pos, "unexpected slice stop"); \
 } while (0);
-
-void TEST_ASSERT_EQUAL_TOKEN_STRING(P4_String s, P4_Token* token) {
-    TEST_ASSERT_NOT_NULL(token);
-    autofree P4_String tokenstr = P4_CopyTokenString(token);
-    TEST_ASSERT_EQUAL_STRING(s, tokenstr);
-}
 
 # define ASSERT_EQUAL_TOKEN_STRING(s, token) do { \
     TEST_ASSERT_NOT_NULL((token)); \
@@ -38,25 +27,18 @@ void TEST_ASSERT_EQUAL_TOKEN_STRING(P4_String s, P4_Token* token) {
     TEST_ASSERT_EQUAL_STRING((s), tokenstr); \
 } while (0);
 
-void TEST_ASSERT_EQUAL_TOKEN_RULE(P4_RuleID id, P4_Token* token) {
-    TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_UINT(id, token->rule_id);
-}
-
 # define ASSERT_EQUAL_TOKEN_RULE(id, token) do { \
     TEST_ASSERT_NOT_NULL((token)); \
     TEST_ASSERT_EQUAL_UINT_MESSAGE((id), (token)->rule_id, "invalid token rule"); \
 } while (0);
 
-
-void TEST_ASSERT_EQUAL_TOKEN_LINE_OFFSET(size_t startline, size_t startoffset,
-        size_t stopline, size_t stopoffset, P4_Token* token) {
-    TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_UINT(startline, token->slice.start.lineno);
-    TEST_ASSERT_EQUAL_UINT(startoffset, token->slice.start.offset);
-    TEST_ASSERT_EQUAL_UINT(stopline, token->slice.stop.lineno);
-    TEST_ASSERT_EQUAL_UINT(stopoffset, token->slice.stop.offset);
-}
+# define ASSERT_EQUAL_TOKEN_LINE_OFFSET(startline, startoffset, stopline, stopoffset, token) do { \
+    TEST_ASSERT_NOT_NULL(token); \
+    TEST_ASSERT_EQUAL_UINT(startline, token->slice.start.lineno); \
+    TEST_ASSERT_EQUAL_UINT(startoffset, token->slice.start.offset); \
+    TEST_ASSERT_EQUAL_UINT(stopline, token->slice.stop.lineno); \
+    TEST_ASSERT_EQUAL_UINT(stopoffset, token->slice.stop.offset); \
+} while (0);
 
 void TEST_ADD_WHITESPACE(P4_Grammar* grammar, P4_RuleID id) {
     TEST_ASSERT_EQUAL(

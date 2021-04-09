@@ -45,19 +45,19 @@ void test_match_back_reference_successfully(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("'...'", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("'...'", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
 
     P4_Token* head = token->head;
     TEST_ASSERT_NOT_NULL(head);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("'", head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(MARKER, head);
+    ASSERT_EQUAL_TOKEN_STRING("'", head);
+    ASSERT_EQUAL_TOKEN_RULE(MARKER, head);
 
     P4_Token* tail = token->tail;
     TEST_ASSERT_NOT_NULL(tail);
     TEST_ASSERT_NOT_EQUAL(head, tail);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("'", tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(MARKER, tail);
+    ASSERT_EQUAL_TOKEN_STRING("'", tail);
+    ASSERT_EQUAL_TOKEN_RULE(MARKER, tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -146,19 +146,19 @@ void test_match_back_reference_insensitive_match(void) {
 
     P4_Token* token = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("TAG...tag", token);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    ASSERT_EQUAL_TOKEN_STRING("TAG...tag", token);
+    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
 
     P4_Token* head = token->head;
     TEST_ASSERT_NOT_NULL(head);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("TAG", head);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(MARKER, head);
+    ASSERT_EQUAL_TOKEN_STRING("TAG", head);
+    ASSERT_EQUAL_TOKEN_RULE(MARKER, head);
 
     P4_Token* tail = token->tail;
     TEST_ASSERT_NOT_NULL(tail);
     TEST_ASSERT_NOT_EQUAL(head, tail);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("tag", tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(MARKER, tail);
+    ASSERT_EQUAL_TOKEN_STRING("tag", tail);
+    ASSERT_EQUAL_TOKEN_RULE(MARKER, tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

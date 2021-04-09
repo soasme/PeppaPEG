@@ -31,8 +31,8 @@ void test_match_ascii_digits_successfully(void) {
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
     TEST_ASSERT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("0", token);
+    ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    ASSERT_EQUAL_TOKEN_STRING("0", token);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -68,8 +68,8 @@ void test_match_utf8_code_point_successfully(void) {
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);
     TEST_ASSERT_NULL(token->tail);
-    TEST_ASSERT_EQUAL_TOKEN_RULE(R1, token);
-    TEST_ASSERT_EQUAL_TOKEN_STRING("好", token);
+    ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    ASSERT_EQUAL_TOKEN_STRING("好", token);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

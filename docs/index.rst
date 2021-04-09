@@ -22,6 +22,7 @@ Tutorials
    :glob:
 
    tutcalc
+   tutjson
 
 How-To Guides
 -------------

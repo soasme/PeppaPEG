@@ -180,7 +180,7 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span>  <span class="n">P4_CreateJSONGrammar</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="n">P4_LoadGrammar</span><span class="p">(</span>
         <span class="s2">"@lifted</span><span class="se">\n</span><span class="s2">"</span>
-        <span class="s2">"entry = &amp;[</span><span class="se">\\</span><span class="s2">u</span><span class="si">{1}</span><span class="s2">-</span><span class="se">\\</span><span class="s2">u</span><span class="si">{10ffff}</span><span class="s2">] value ![</span><span class="se">\\</span><span class="s2">u</span><span class="si">{1}</span><span class="s2">-</span><span class="se">\\</span><span class="s2">u</span><span class="si">{10ffff}</span><span class="s2">];</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"entry = &amp;. value !.;</span><span class="se">\n</span><span class="s2">"</span>
 
         <span class="s2">"@lifted</span><span class="se">\n</span><span class="s2">"</span>
         <span class="s2">"value = object / array / string / number / true / false / null;</span><span class="se">\n</span><span class="s2">"</span>

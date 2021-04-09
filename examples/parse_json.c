@@ -3,12 +3,7 @@
 #include "../peppapeg.h"
 #include "json.h"
 
-FILE* out = NULL;
-
-
 int main(int argc, char* argv[]) {
-    out = stdout;
-
     P4_Grammar* grammar = P4_CreateJSONGrammar();
     const P4_String input = "[1,2.0,3e1,true,false,null,\"xyz\",{},[]]";
     P4_Source* source = P4_CreateSource(input, P4_JSONEntry);
@@ -17,8 +12,5 @@ int main(int argc, char* argv[]) {
     P4_JsonifySourceAst(grammar, stdout, root);
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
-
     return 0;
 }
-
-

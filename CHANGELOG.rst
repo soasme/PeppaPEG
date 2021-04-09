@@ -6,6 +6,8 @@ Not Yet Released
 
 Code change: <https://github.com/soasme/PeppaPEG/compare/v1.10.0..HEAD>.
 
+* [Feature]: Add P4_ResetSource. `#62 <https://github.com/soasme/PeppaPEG/pull/62>`_
+* [Feature]: Add P4_InspectSourceAst. `#61 <https://github.com/soasme/PeppaPEG/pull/61>`_
 * [Feature]: Customize malloc/free/realloc. `#60 <https://github.com/soasme/PeppaPEG/pull/60>`_
 
 1.10.0 (8 Apr, 2021)

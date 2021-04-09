@@ -1,7 +1,7 @@
 # ROADMAP
 
+- [ ] GetErrorString.
 - [ ] Print error messages for Human.
-- [ ] Reset source so it can be re-parsed.
 - [ ] Run in VERBOSE mode.
 - [ ] Add traverse functions for Tokens.
 - [ ] New Expression Kind: Numeric.
@@ -23,9 +23,7 @@
 - [ ] Add explanations in docs.
 - [ ] Enable AddressSanitizer. Example: cJSON.
 - [ ] RequireVersion.
-- [ ] GetErrorString.
 - [ ] Except (Any but).
-- [ ] Any.
 - [ ] Until.
 - [ ] Add a fuzzy testing framework.
 - [ ] Sanitize `\u0000` to whitespace for the source input, this happens in creating the source/setting the source size.
@@ -39,6 +37,7 @@
 - [ ] api to operate slice comparison, copy and length.
 - [ ] build via wasm.
 - [ ] landing page for the project doc site.
+- [x] Reset source so it can be re-parsed. Added in v1.11.0.
 - [x] P4_InspectSourceAst(tok, bool (f) (tok)). Example: https://golang.org/pkg/go/ast/#Inspect. Added in v1.11.0.
 - [x] Allow replacing malloc/free functions. Added in v1.11.0.
 - [x] Custom allocator and destructor. # define P4_MALLOC malloc. Added in v1.11.0.

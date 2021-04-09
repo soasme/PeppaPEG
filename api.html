@@ -2063,10 +2063,33 @@
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_DeleteSource">
-<span class="target" id="peppapeg_8h_1a4f7da1c1676327385c3d4d6ed103d0e9"></span><span class="pre">void</span> <code class="sig-name descname"><span class="pre">P4_DeleteSource</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Source" title="P4_Source"><span class="pre">P4_Source</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_DeleteSource" title="Permalink to this definition">¶</a><br/></dt>
+<span class="target" id="peppapeg_8h_1a4e2cdb2466206eaa3f935d9e1c556af1"></span><span class="pre">void</span> <code class="sig-name descname"><span class="pre">P4_DeleteSource</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Source" title="P4_Source"><span class="pre">P4_Source</span></a> <span class="pre">*</span><em><span class="pre">source</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_DeleteSource" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Free the allocated memory of a source. If the source has been parsed and has an AST, the entire AST will also be free-ed. </p>
 <p><p>Example: </p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_DeleteSource</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">source</span></code>: The source.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_ResetSource">
+<span class="target" id="peppapeg_8h_1a22abb6b0c1590a3a732dc7f3e5603013"></span><span class="pre">void</span> <code class="sig-name descname"><span class="pre">P4_ResetSource</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Source" title="P4_Source"><span class="pre">P4_Source</span></a> <span class="pre">*</span><em><span class="pre">source</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_ResetSource" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Reset the source so it can be called with P4_Parse again. All of its internal states are cleared. </p>
+<p><p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">parse</span> <span class="n">full</span> <span class="n">text</span><span class="o">.</span>
+ <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">);</span>
+
+ <span class="n">P4_ResetSource</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
+ <span class="n">P4_SetSourceSlice</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+
+ <span class="o">//</span> <span class="n">parse</span> <span class="n">text</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span><span class="o">.</span>
+ <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">);</span>
 </pre></div>
 </div>
 <dl class="simple">

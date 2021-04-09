@@ -1677,7 +1677,25 @@ P4_Source*     P4_CreateSource(P4_String, P4_RuleID);
  *
  *      P4_DeleteSource(source);
  */
-void           P4_DeleteSource(P4_Source*);
+void           P4_DeleteSource(P4_Source* source);
+
+/**
+ * @brief       Reset the source so it can be called with P4_Parse again.
+ *              All of its internal states are cleared.
+ * @param       source  The source.
+ *
+ * Example:
+ *
+ *      // parse full text.
+ *      P4_Parse(grammar, source);
+ *
+ *      P4_ResetSource(source);
+ *      P4_SetSourceSlice(source, 1, 10);
+ *
+ *      // parse text[1:10].
+ *      P4_Parse(grammar, source);
+ */
+void           P4_ResetSource(P4_Source* source);
 
 /**
  * @brief       Set the buf size of the source content.

@@ -1,43 +1,40 @@
 # ROADMAP
 
-- [ ] GetErrorString.
-- [ ] Print error messages for Human.
-- [ ] Run in VERBOSE mode.
-- [ ] Add traverse functions for Tokens.
+- [ ] api: add api to operate slice comparison, copy and length.
+- [ ] api: print error messages for Human.
+- [ ] api: Run in VERBOSE mode.
+- [ ] api: Add traverse functions for Tokens.
+- [ ] api: save backreference in source stack so it can be used outside a sequence.
+- [ ] api: Except (Any but).
+- [ ] api: Until.
+- [ ] api: take a look at ohm.
+- [ ] api: Sanitize `\u0000` to whitespace for the source input, this happens in creating the source/setting the source size.
+- [ ] api: `P4_AcquireSourceAst(source, &ast)`: set ast, reset source. It's useful when we need the parsed result but not care about source itself. Token tree should now owned by ast and shall then be free by the caller.
 - [ ] New Expression Kind: Numeric.
 - [ ] New Expression Kind: CharacterSet.
 - [ ] New Expression Kind: Complement.
 - [ ] New Expression Kind: Panic.
 - [ ] New Expression Kind: Function.
 - [ ] New Expression Kind: Sub Grammar.
-- [ ] Performance optimization: pre-alloc tokens.
-- [ ] Register a optional name function to convert rule id to rule names.
-- [ ] Stop on first error v/s Recover from Panic.
 - [ ] New Source Flag: Support UTF-8 BOM sequence (0xEF 0xBB 0xBF) at the start of source.
-- [ ] Python Binding: example: cffi, misaka, parsimonious (api). <https://tomassetti.me/parsing-in-python/>.
-- [ ] Benchmark: example: json-c. `valgrind --tool=massif --massif-out-file=massif.out ./build/tests/test_example_json && ms_print massif.out ms_print.out`.
-- [ ] Cache literal len.
-- [ ] backrefs is not necessary if there is no BackReference in Sequence.
-- [ ] save backreference in source stack so it can be used outside a sequence.
-- [ ] static lib.
-- [ ] Add explanations in docs.
-- [ ] Enable AddressSanitizer. Example: cJSON.
-- [ ] RequireVersion.
-- [ ] Except (Any but).
-- [ ] Until.
-- [ ] Add a fuzzy testing framework.
-- [ ] Sanitize `\u0000` to whitespace for the source input, this happens in creating the source/setting the source size.
-- [ ] take a look at ohm.
-- [ ] A python grammar.
-- [ ] ES5 syntax: https://ohmlang.github.io/editor/#0a9a649c3c630fd0a470ba6cb75393fe
-- [ ] zig syntax: https://ziglang.org/documentation/master/#Grammar
-- [ ] read [A parsing machine for PEGs](http://www.inf.puc-rio.br/~roberto/docs/ry08-4.pdf).
-- [ ] `P4_AcquireSourceAst(source, &ast)`: set ast, reset source. It's useful when we need the parsed result but not care about source itself. Token tree should now owned by ast and shall then be free by the caller.
-- [ ] A binary executable for compiling peg to a C library: `p4g compile --lang=c calc.peg`.
-- [ ] A binary executable for display parsed results in JSON output. The executable can support general programming languages, such as Mustache, Python, JSON, YAML, etc. Some other programs can then takes the input from stdin and do some fancy work. `p4g parse --lang=py38 source.py`
-- [ ] api to operate slice comparison, copy and length.
-- [ ] build via wasm.
-- [ ] landing page for the project doc site.
+- [ ] perf: pre-alloc tokens.
+- [ ] perf: Cache literal len.
+- [ ] perf: backrefs is not necessary if there is no BackReference in Sequence.
+- [ ] peg: Stop on first error v/s Recover from Panic.
+- [ ] binding: python: example: cffi, misaka, parsimonious (api). <https://tomassetti.me/parsing-in-python/>.
+- [ ] tests: benchmark: example: json-c. `valgrind --tool=massif --massif-out-file=massif.out ./build/tests/test_example_json && ms_print massif.out ms_print.out`.
+- [ ] build: static lib.
+- [ ] build: wasm.
+- [ ] tests: Enable AddressSanitizer. Example: cJSON.
+- [ ] tests: Add a fuzzy testing framework.
+- [ ] docs: add explanations.
+- [ ] docs: read [A parsing machine for PEGs](http://www.inf.puc-rio.br/~roberto/docs/ry08-4.pdf).
+- [ ] docs: landing page for the project doc site.
+- [ ] lang: python grammar.
+- [ ] lang: ES5 grammar: https://ohmlang.github.io/editor/#0a9a649c3c630fd0a470ba6cb75393fe
+- [ ] lang: zig grammar: https://ziglang.org/documentation/master/#Grammar
+- [ ] lang: A binary executable for display parsed results in JSON output. The executable can support general programming languages, such as Mustache, Python, JSON, YAML, etc. Some other programs can then takes the input from stdin and do some fancy work. `p4 parse --lang=py38 source.py`
+- [x] GetErrorString.
 - [x] Reset source so it can be re-parsed. Added in v1.11.0.
 - [x] P4_InspectSourceAst(tok, bool (f) (tok)). Example: https://golang.org/pkg/go/ast/#Inspect. Added in v1.11.0.
 - [x] Allow replacing malloc/free functions. Added in v1.11.0.

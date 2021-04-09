@@ -63,7 +63,7 @@ typedef enum {
 P4_Grammar*  P4_CreateJSONGrammar() {
     return P4_LoadGrammar(
         "@lifted\n"
-        "entry = &[\\u{1}-\\u{10ffff}] value ![\\u{1}-\\u{10ffff}];\n"
+        "entry = &. value !.;\n"
 
         "@lifted\n"
         "value = object / array / string / number / true / false / null;\n"

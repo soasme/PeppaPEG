@@ -22,6 +22,12 @@ In human words, it's for parsing programming languages.
 
 Peppa PEG is an ultra lightweight PEG parser in ANSI C.
 
+References:
+
+* [GitHub](https://github.com/soasme/PeppaPEG)
+* [Project Home Page](https://www.soasme.com/PeppaPEG/landing.html).
+* [Project Documentation Pages](https://www.soasme.com/PeppaPEG/).
+
 # Usage
 
 ## Copy `peppapeg.h` / `peppapeg.c`

@@ -31,7 +31,7 @@ The order of rules must be same with `P4_CalcRuleID`.
 .. literalinclude:: ../examples/json.h
    :lines: 63-107
 
-The rule is similar to the one described on page `json.org <https://www.json.org/json-en.html>`_.
+The rule is similar to the one described on page json.org.
 
 Step 3: Parse
 -------------

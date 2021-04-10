@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Peppa PEG - Ultra lightweight PEG parser in ANSI C</title>
+    <meta charSet="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"/>
+    <meta property="og:title" content="Peppa PEG"/>
+    <meta property="og:description" content="Ultra lightweight PEG Parser in ANSI C."/>
+    <meta property="og:site_name" content="Peppa PEG"/>
+    <meta property="og:url" content="https://www.soasme.com/PeppaPEG/"/>
+    <meta property="og:type" content="Parser"/>
+    <meta property="og:image" content="/ogcover.png"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta property="twitter:image" content="https://www.soasme.com/twitter-cover-2.png"/>
+    <meta name="description" content="Peppa PEG - Ultra lightweight PEG parser in ANSI C"/>
+    <style>
+:root{
+--color-fg: black;
+--color-fg-rgb: 0,0,0;
+--body-bg:white;
+--h1-fg:#0F192E;
+--h2-fg:#8B90AB;
+--footer-fg:#8B90AB;
+--btn-hover-bg-color:#293363;
+--btn-text-hover-color:#405CEE;
+}
+
+html, body { height: 100%; color: var(--color-fg) }
+body{
+font: 16px -apple-system,BlinkMacSystemFont,sans-serif;
+background: var(--body-bg); margin: 0 auto; max-width:1200px;
+display: flex; flex-direction: column;
+}
+a {text-decoration: none; color: var(--color-fg)}
+ol {padding-left: 1.5em}
+li { margin: 1em 0 }
+p { line-height: 150% }
+
+.icon { margin-top: 1em; }
+header { align-items:center; display: inline-block; vertical-align: top }
+h1 { font-size:76px; color:var(--h1-fg); display: inline-block; margin: 0; }
+h2 { font-weight:600; font-size:42px; color:var(--h2-fg); margin: 20px 0;}
+
+.wrapper { margin: auto 0; padding: 1em 0; }
+main { align-items: center; margin: 2em; }
+.home-page main { display: flex; justify-content: space-between; min-height: 60vh }
+
+.hero { text-align: center; }
+
+section { text-align: left; max-width: 1000px; margin: 0 auto 2em; }
+figure img { max-width: 100% }
+section h2 { font-weight:600; font-size:40px; color:var(--h2-fg); margin: 20px 0;}
+
+header, aside { margin-left: 2rem }
+footer {
+  text-align: right; padding: 1em;
+}
+footer a:not(:last-child):after { content: ' · ' }
+footer a:hover { opacity: .8; }
+
+hr { margin: 2em 0; border: none; border-top: 1px solid rgba(var(--color-fg-rgb), .3) }
+
+/* footer {font-size:16px; text-align:center; color:var(--footer-fg); margin: auto 2em 2em; padding: 1em 0 0; }
+footer span { color: rgba(255, 255, 255, .9); } */
+
+.pricing {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 2em;
+}
+.pricing a { padding-right: 2em; margin-right: 2em; border-right: 1px solid rgba(var(--color-fg-rgb),0.3); min-width: 200px; position: relative; }
+.pricing a:hover p { color: var(--h1-fg); }
+.pricing p { text-align: right; position: absolute; right: 1em; bottom: 16px; font-size: 24px; margin: 0; color:var(--h2-fg) }
+.pricing h3, .pricing h4 { font-weight: normal; color:var(--h2-fg) }
+.pricing h3 span { font-size: 25px; color:var(--h1-fg); }
+
+.invite {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 4px 0;
+}
+.code {
+  display: block;
+  font-family:monospace; border: 0; outline: 0; background: none; resize: none; color: var(--color-fg);
+  overflow: auto;
+  height: 1em;
+}
+.code.used {
+  text-decoration: line-through;
+  opacity: .5;
+}
+.button {
+display: flex;
+align-items: center;
+justify-content: center;
+background:white;
+color:black;
+border:1px solid black;
+position: relative;
+box-sizing:border-box;
+outline: 0;
+transition: .3s all;
+border-radius:8px;
+padding: 0 1em;
+height: 30px;
+}
+.button.big {
+  font-weight:600;
+  font-size:24px;
+  border-radius:16px;
+  height: 60px;
+}
+.button:hover{ top: -2px; opacity: .9; }
+.button:active{ top: 1px }
+dt { margin: 0 0; font-weight: 500 }
+dd { margin: .5em 1em 1.5em }
+@media (prefers-color-scheme:dark) {
+:root{
+--color-fg:white;
+--color-fg-rgb: 255,255,255;
+--body-bg:#0F192E;
+--h1-fg:white;
+--h2-fg:#9BB1DE;
+--footer-fg:#9BB1DE;
+}
+.light-mode-only { display: none!important }
+.dark-mode-only { display: block!important }
+}
+
+@media (max-width: 500px) {
+header { display: block; margin:0; }
+body:not(.home-page) h1 { font-size:50px;}
+.waitlist-signup input { width: 100% }
+.waitlist-signup input,.waitlist-signup button { font-size: 18px!important }
+}
+@media (max-width: 900px) {
+.big-icon { display:none }
+}
+    </style>
+  </head>
+  <body class="home-page">
+    <div class="wrapper">
+      <main>
+        <div>
+          <header>
+            <h1>Peppa PEG 🐷</h1>
+            <h2>Ultra Lightweight PEG Parser<br/>In ANSI C.</h2>
+            <a class="button big" href="https://github.com/soasme/PeppaPEG" style="margin-top:32px">GitHub</a>
+          </header>
+        </div>
+      </main>
+      <aside>
+        <figure class="hero">
+          <img src="_static/landing-code.png" alt="Tutorial: calculator" width="680">
+        </figure>
+        <section>
+          <h2>Single Header File, Single C File</h2>
+          <p>Peppa PEG is a small library in about 2k LOC. Want to use it? Copy peppapeg.h and peppapeg.c to the root directory of your project!</p>
+        </section>
+        <section>
+          <h2>Full PEG Implementation</h2>
+          <p>You can enjoy the full PEG elements, such as literal, range, positive, negative, reference, sequence, choice, repetition, etc. In addition, Peppa PEG provides some extensions for altering the generated AST, such as flags, callbacks, etc.</p>
+        </section>
+        <section>
+          <h2>Easy to Use PEG & Low-Level APIs</h2>
+          <p>Keep it simple, stupid! The API of Peppa PEG is aimed to be as simple as possible. Read the documentation here: <a href="https://www.soasme.com/PeppaPEG/">Documentation</a>.</p>
+        </section>
+      </aside>
+      <footer>
+        <a href="https://github.com/soasme/PeppaPEG">GitHub</a>
+        <a href="https://www.soasme.com/PeppaPEG/">Docs</a>
+        <a href="https://github.com/soasme/PeppaPEG/issues">Report Issues</a>
+        <a href="https://github.com/soasme">Made with ❤️  &nbsp; by Ju</a>
+      </footer>
+    </div>
+  </body>
+</html>

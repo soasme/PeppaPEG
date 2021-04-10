@@ -25,6 +25,8 @@
 - [ ] peg: built-in rules: unicode letters.
 - [ ] peg: built-in rules: digits.
 - [ ] peg: built-in rules: unicode digits.
+- [ ] peg: left recursive: https://tratt.net/laurie/research/pubs/html/tratt__direct_left_recursive_parsing_expression_grammars/
+      https://github.com/orlandohill/peg-left-recursion
 - [ ] binding: python: example: cffi, misaka, parsimonious (api). <https://tomassetti.me/parsing-in-python/>.
 - [ ] tests: benchmark: example: json-c. `valgrind --tool=massif --massif-out-file=massif.out ./build/tests/test_example_json && ms_print massif.out ms_print.out`.
 - [ ] build: static lib.
@@ -34,10 +36,12 @@
 - [ ] docs: add explanations.
 - [ ] docs: read [A parsing machine for PEGs](http://www.inf.puc-rio.br/~roberto/docs/ry08-4.pdf).
 - [ ] docs: landing page for the project doc site.
+- [ ] docs: example: brainfuck https://en.wikipedia.org/wiki/Brainfuck
 - [ ] lang: python grammar.
 - [ ] lang: ES5 grammar: https://ohmlang.github.io/editor/#0a9a649c3c630fd0a470ba6cb75393fe
 - [ ] lang: zig grammar: https://ziglang.org/documentation/master/#Grammar
 - [ ] lang: A binary executable for display parsed results in JSON output. The executable can support general programming languages, such as Mustache, Python, JSON, YAML, etc. Some other programs can then takes the input from stdin and do some fancy work. `p4 parse --lang=py38 source.py`
+- [ ] Pratt parser: https://en.wikipedia.org/wiki/Operator-precedence_parser
 - [x] GetErrorString.
 - [x] Reset source so it can be re-parsed. Added in v1.11.0.
 - [x] P4_InspectSourceAst(tok, bool (f) (tok)). Example: https://golang.org/pkg/go/ast/#Inspect. Added in v1.11.0.

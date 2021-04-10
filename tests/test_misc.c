@@ -257,6 +257,24 @@ void test_inspect2(void) {
     P4_DeleteGrammar(grammar);
 }
 
+void test_acquire_source_ast(void) {
+    P4_Grammar* grammar = P4_LoadGrammar("entry = .;");
+    TEST_ASSERT_NOT_NULL(grammar);
+
+    P4_Source* source = P4_CreateSource("X", 1);
+    TEST_ASSERT_NOT_NULL(source);
+
+    TEST_ASSERT_EQUAL( P4_Ok, P4_Parse(grammar, source));
+
+    P4_Token* root = P4_AcquireSourceAst(source);
+    TEST_ASSERT_NOT_NULL(root);
+    TEST_ASSERT_NULL(P4_GetSourceAst(source));
+
+    P4_DeleteToken(root);
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -270,6 +288,7 @@ int main(void) {
     RUN_TEST(test_name);
     RUN_TEST(test_inspect);
     RUN_TEST(test_inspect2);
+    RUN_TEST(test_acquire_source_ast);
 
     return UNITY_END();
 }

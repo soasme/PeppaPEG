@@ -767,11 +767,12 @@
  <span class="n">printf</span><span class="p">(</span><span class="s2">"version=</span><span class="si">%s</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">version</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>a string like “1.0.0”.</p>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a string like “1.0.0”.</p>
 </dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_ReadRune">
@@ -786,16 +787,18 @@
 <span class="mh">0x4f60</span> <span class="mi">20320</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The size of rune, could be 1,2,3,4. When error occurs, read nothing and returning size is 0.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">s</span></code>: The string in UTF-8 encoding. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">c</span></code>: The pointer to the rune to read. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> – The string in UTF-8 encoding. </p></li>
+<li><p><strong>c</strong> – The pointer to the rune to read. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The size of rune, could be 1,2,3,4. When error occurs, read nothing and returning size is 0.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_ReadEscapedRune">
@@ -806,32 +809,35 @@
  <span class="n">P4_ReadEscapedRune</span><span class="p">(</span><span class="s2">"</span><span class="se">\\</span><span class="s2">u000D"</span><span class="p">,</span> <span class="n">rune</span><span class="p">);</span> <span class="o">//</span> <span class="mh">0xd</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The size of rune.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">text</span></code>: The text. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rune</span></code>: The rune. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> – The text. </p></li>
+<li><p><strong>rune</strong> – The rune. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The size of rune.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_ConcatRune">
 <span class="target" id="peppapeg_8h_1a52a6e4c90fc0e1be5fad6ebd3f6852b8"></span><span class="pre">void</span> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_ConcatRune</span></code><span class="sig-paren">(</span><span class="pre">void</span> <span class="pre">*</span><em><span class="pre">str</span></em>, <span class="pre">P4_Rune</span> <em><span class="pre">chr</span></em>, <span class="pre">size_t</span> <em><span class="pre">n</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_ConcatRune" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Append a rune to str (in-place).</p>
-<p><dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The string starting from appended rune. </p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">str</span></code>: The string to be appended. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">chr</span></code>: The rune. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">n</span></code>: The size of rune. Should be 1, 2, 3, 4. </p></li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>str</strong> – The string to be appended. </p></li>
+<li><p><strong>chr</strong> – The rune. </p></li>
+<li><p><strong>n</strong> – The size of rune. Should be 1, 2, 3, 4. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The string starting from appended rune. </p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateLiteral">
@@ -845,17 +851,19 @@
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"let"</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">literal</span></code>: The exact string to match. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sensitive</span></code>: Whether the string is case-sensitive. </p></li>
-</ul>
-</dd>
-</dl>
 </p>
 <p>The object holds a full copy of the literal. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>literal</strong> – The exact string to match. </p></li>
+<li><p><strong>sensitive</strong> – Whether the string is case-sensitive. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_AddLiteral">
@@ -865,18 +873,20 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"let"</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">literal</span></code>: The exact string to match. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sensitive</span></code>: Whether the string is case-sensitive. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id. </p></li>
+<li><p><strong>literal</strong> – The exact string to match. </p></li>
+<li><p><strong>sensitive</strong> – Whether the string is case-sensitive. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateRange">
@@ -890,17 +900,19 @@
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRange</span><span class="p">(</span><span class="mh">0x4E00</span><span class="p">,</span> <span class="mh">0x9FFF</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">lower</span></code>: The lower bound of UTF-8 rule to match (inclusive). </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">upper</span></code>: The upper bound of UTF-8 rule to match (inclusive). </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">stride</span></code>: The stride when iterating the characters in range. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lower</strong> – The lower bound of UTF-8 rule to match (inclusive). </p></li>
+<li><p><strong>upper</strong> – The upper bound of UTF-8 rule to match (inclusive). </p></li>
+<li><p><strong>stride</strong> – The stride when iterating the characters in range. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_AddRange">
@@ -912,19 +924,21 @@
  <span class="n">P4_AddRange</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mh">0x4E00</span><span class="p">,</span> <span class="mh">0x9FFF</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">lower</span></code>: The lower bound of UTF-8 rule to match (inclusive). </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">upper</span></code>: The upper bound of UTF-8 rule to match (inclusive). </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">stride</span></code>: The stride when iterating the characters in range. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id. </p></li>
+<li><p><strong>lower</strong> – The lower bound of UTF-8 rule to match (inclusive). </p></li>
+<li><p><strong>upper</strong> – The upper bound of UTF-8 rule to match (inclusive). </p></li>
+<li><p><strong>stride</strong> – The stride when iterating the characters in range. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateReference">
@@ -934,15 +948,17 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateReference</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">ref_id</span></code>: The ID of referenced grammar rule. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref_id</strong> – The ID of referenced grammar rule. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_AddReference">
@@ -952,17 +968,19 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddReference</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">ref_id</span></code>: The ID of referenced grammar rule. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id. </p></li>
+<li><p><strong>ref_id</strong> – The ID of referenced grammar rule. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreatePositive">
@@ -973,15 +991,17 @@
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreatePositive</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"let"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">refexpr</span></code>: The positive pattern to check. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>refexpr</strong> – The positive pattern to check. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_AddPositive">
@@ -991,17 +1011,19 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddPositive</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"let"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">refexpr</span></code>: The positive pattern to check. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id. </p></li>
+<li><p><strong>refexpr</strong> – The positive pattern to check. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateNegative">
@@ -1012,15 +1034,17 @@
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateNegative</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"let"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">refexpr</span></code>: The negative pattern to check. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>refexpr</strong> – The negative pattern to check. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_AddNegative">
@@ -1030,17 +1054,19 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddNegative</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"let"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">refexpr</span></code>: The negative pattern to check. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id. </p></li>
+<li><p><strong>refexpr</strong> – The negative pattern to check. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateSequence">
@@ -1050,17 +1076,19 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequence</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">count</span></code>: The number of sequence members. </p></li>
-</ul>
-</dd>
-</dl>
 </p>
 <p>Note that such an expression is useless as its members are all empty. Please set members using P4_SetMembers.</p>
 <p>This function can be useful if you need to add members dynamically. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>count</strong> – The number of sequence members. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateSequenceWithMembers">
@@ -1075,16 +1103,18 @@
  <span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">count</span></code>: The number of sequence members. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">...</span></code>: The vararg of every sequence member. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>count</strong> – The number of sequence members. </p></li>
+<li><p><strong>...</strong> – The vararg of every sequence member. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_AddSequence">
@@ -1094,19 +1124,21 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddSequence</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">count</span></code>: The number of sequence members. </p></li>
-</ul>
-</dd>
-</dl>
 </p>
 <p>Note that such an expression is useless as its members are all empty. Please set members using P4_SetMembers.</p>
 <p>This function can be useful if you need to add members dynamically. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id. </p></li>
+<li><p><strong>count</strong> – The number of sequence members. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_AddSequenceWithMembers">
@@ -1120,18 +1152,20 @@
  <span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">count</span></code>: The number of sequence members. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">...</span></code>: The members. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id. </p></li>
+<li><p><strong>count</strong> – The number of sequence members. </p></li>
+<li><p><strong>...</strong> – The members. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateChoice">
@@ -1141,17 +1175,19 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateChoice</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">count</span></code>: The number of choice members. </p></li>
-</ul>
-</dd>
-</dl>
 </p>
 <p>Note that such an expression is useless as its members are all empty. Please set members using P4_SetMembers.</p>
 <p>This function can be useful if you need to add members dynamically. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>count</strong> – The number of choice members. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateChoiceWithMembers">
@@ -1166,16 +1202,18 @@
  <span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">count</span></code>: The number of choice members. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">...</span></code>: The vararg of every choice member. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>count</strong> – The number of choice members. </p></li>
+<li><p><strong>...</strong> – The vararg of every choice member. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_AddChoice">
@@ -1185,19 +1223,21 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddChoice</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">count</span></code>: The number of choice members. </p></li>
-</ul>
-</dd>
-</dl>
 </p>
 <p>Note that such an expression is useless as its members are all empty. Please set members using P4_SetMembers.</p>
 <p>This function can be useful if you need to add members dynamically. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id. </p></li>
+<li><p><strong>count</strong> – The number of choice members. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_AddChoiceWithMembers">
@@ -1211,18 +1251,20 @@
  <span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">count</span></code>: The number of choice members. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">...</span></code>: The members. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id. </p></li>
+<li><p><strong>count</strong> – The number of choice members. </p></li>
+<li><p><strong>...</strong> – The members. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateRepeatMinMax">
@@ -1236,17 +1278,19 @@
  <span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">min</span></code>: The minimum repeat times. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">max</span></code>: The maximum repeat times. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>repeat_expr</strong> – The repeated expression. </p></li>
+<li><p><strong>min</strong> – The minimum repeat times. </p></li>
+<li><p><strong>max</strong> – The maximum repeat times. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_AddRepeatMinMax">
@@ -1260,19 +1304,21 @@
  <span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">min</span></code>: The minimum repeat times. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">max</span></code>: The maximum repeat times. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id. </p></li>
+<li><p><strong>repeat_expr</strong> – The repeated expression. </p></li>
+<li><p><strong>min</strong> – The minimum repeat times. </p></li>
+<li><p><strong>max</strong> – The maximum repeat times. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateRepeatMin">
@@ -1283,17 +1329,19 @@
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRepeatMin</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">min</span></code>: The minimum repeat times. </p></li>
-</ul>
-</dd>
-</dl>
 </p>
 <p>It’s equivalent to P4_CreateRepeatMinMax(expr, min, SIZE_MAX); </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>repeat_expr</strong> – The repeated expression. </p></li>
+<li><p><strong>min</strong> – The minimum repeat times. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_AddRepeatMin">
@@ -1304,18 +1352,20 @@
  <span class="n">P4_AddRepeatMin</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">min</span></code>: The minimum repeat times. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id. </p></li>
+<li><p><strong>repeat_expr</strong> – The repeated expression. </p></li>
+<li><p><strong>min</strong> – The minimum repeat times. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateRepeatMax">
@@ -1326,17 +1376,19 @@
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRepeatMax</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span> <span class="mi">3</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">max</span></code>: The maximum repeat times. </p></li>
-</ul>
-</dd>
-</dl>
 </p>
 <p>It’s equivalent to P4_CreateRepeatMinMax(expr, 0, max); </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>repeat_expr</strong> – The repeated expression. </p></li>
+<li><p><strong>max</strong> – The maximum repeat times. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_AddRepeatMax">
@@ -1347,18 +1399,20 @@
  <span class="n">P4_AddRepeatMax</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span> <span class="mi">3</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">max</span></code>: The maximum repeat times. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id. </p></li>
+<li><p><strong>repeat_expr</strong> – The repeated expression. </p></li>
+<li><p><strong>max</strong> – The maximum repeat times. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateRepeatExact">
@@ -1369,17 +1423,19 @@
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRepeatExact</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span> <span class="mi">3</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">N</span></code>: The repeat times. </p></li>
-</ul>
-</dd>
-</dl>
 </p>
 <p>It’s equivalent to P4_CreateRepeatMinMax(expr, N, N); </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>repeat_expr</strong> – The repeated expression. </p></li>
+<li><p><strong>N</strong> – The repeat times. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_AddRepeatExact">
@@ -1390,18 +1446,20 @@
  <span class="n">P4_AddRepeatExact</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span> <span class="mi">3</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">N</span></code>: The repeat times. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id. </p></li>
+<li><p><strong>repeat_expr</strong> – The repeated expression. </p></li>
+<li><p><strong>N</strong> – The repeat times. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateZeroOrOnce">
@@ -1412,16 +1470,18 @@
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateZeroOrOnce</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
-</ul>
-</dd>
-</dl>
 </p>
 <p>It’s equivalent to P4_CreateRepeatMinMax(expr, 0, 1); </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>repeat_expr</strong> – The repeated expression. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_AddZeroOrOnce">
@@ -1432,18 +1492,20 @@
  <span class="n">P4_AddZeroOrOnce</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
-</ul>
-</dd>
-</dl>
 </p>
 <p>It’s equivalent to P4_CreateRepeatMinMax(expr, 0, 1); </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id. </p></li>
+<li><p><strong>repeat_expr</strong> – The repeated expression. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateZeroOrMore">
@@ -1454,16 +1516,18 @@
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateZeroOrMore</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
-</ul>
-</dd>
-</dl>
 </p>
 <p>It’s equivalent to P4_CreateRepeatMinMax(expr, 0, SIZE_MAX); </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>repeat_expr</strong> – The repeated expression. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_AddZeroOrMore">
@@ -1474,17 +1538,19 @@
  <span class="n">P4_AddZeroOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id. </p></li>
+<li><p><strong>repeat_expr</strong> – The repeated expression. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateOnceOrMore">
@@ -1495,16 +1561,18 @@
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateOnceOrMore</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
-</ul>
-</dd>
-</dl>
 </p>
 <p>It’s equivalent to P4_CreateRepeatMinMax(expr, 1, SIZE_MAX); </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>repeat_expr</strong> – The repeated expression. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_AddOnceOrMore">
@@ -1515,17 +1583,19 @@
  <span class="n">P4_AddOnceOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">repeat_expr</span></code>: The repeated expression. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id. </p></li>
+<li><p><strong>repeat_expr</strong> – The repeated expression. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateBackReference">
@@ -1540,16 +1610,18 @@
  <span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">backref_index</span></code>: The index of backref member in the sequence. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sensitive</span></code>: Whether the backref matching is case sensitive. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>backref_index</strong> – The index of backref member in the sequence. </p></li>
+<li><p><strong>sensitive</strong> – Whether the backref matching is case sensitive. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_SetMember">
@@ -1566,17 +1638,19 @@
  <span class="p">}</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">expr</span></code>: The sequence/choice expression. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">index</span></code>: The index of member. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">member</span></code>: The member expression. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>expr</strong> – The sequence/choice expression. </p></li>
+<li><p><strong>index</strong> – The index of member. </p></li>
+<li><p><strong>member</strong> – The member expression. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_SetReferenceMember">
@@ -1586,35 +1660,38 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_SetMember</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">member_rule_id</span><span class="p">));</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">expr</span></code>: The sequence/choice expression. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">index</span></code>: The index of member. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">member_rule_id</span></code>: The rule id of member. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>expr</strong> – The sequence/choice expression. </p></li>
+<li><p><strong>index</strong> – The index of member. </p></li>
+<li><p><strong>member_rule_id</strong> – The rule id of member. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_GetMembersCount">
 <span class="target" id="peppapeg_8h_1aa31832798315303950992df4e16a35d5"></span><span class="pre">size_t</span> <code class="sig-name descname"><span class="pre">P4_GetMembersCount</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetMembersCount" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Get the total number members for sequence/choice.</p>
-<p><dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The number. If something goes wrong, it returns 0. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequence</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>expr</strong> – The sequence/choice expression. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The number. If something goes wrong, it returns 0. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequence</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
  <span class="n">size_t</span>  <span class="n">count</span> <span class="o">=</span> <span class="n">P4_GetMembers</span><span class="p">(</span><span class="n">expr</span><span class="p">);</span> <span class="o">//</span> <span class="mi">3</span>
 </pre></div>
 </div>
 </p>
 </dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">expr</span></code>: The sequence/choice expression. </p></li>
-</ul>
-</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_GetMember">
@@ -1624,16 +1701,18 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">member</span> <span class="o">=</span> <span class="n">P4_GetMember</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a> object of a member.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">expr</span></code>: The sequence/choice expression. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">index</span></code>: The index of a member. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>expr</strong> – The sequence/choice expression. </p></li>
+<li><p><strong>index</strong> – The index of a member. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a> object of a member.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateStartOfInput">
@@ -1643,10 +1722,6 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateStartOfInput</span><span class="p">();</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-</dl>
 </p>
 <p>Start-Of-Input can be used to insert whitespace before the actual content.</p>
 <p>Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span>
@@ -1657,6 +1732,11 @@
 </div>
 </p>
 <p>Start-Of-Input is equivalent to `<code class="docutils literal notranslate"><span class="pre">P4_CreatePositive(P4_CreateRange(1,</span> <span class="pre">0x10ffff,</span> <span class="pre">1))</span></code>. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateEndOfInput">
@@ -1666,10 +1746,6 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateEndOfInput</span><span class="p">();</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-</dl>
 </p>
 <p>End-Of-Input can be used to insert whitespace after the actual content.</p>
 <p>Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span>
@@ -1680,6 +1756,11 @@
 </div>
 </p>
 <p>Start-Of-Input is equivalent to `<code class="docutils literal notranslate"><span class="pre">P4_CreateNegative(P4_CreateRange(1,</span> <span class="pre">0x10ffff,</span> <span class="pre">1))</span></code>. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_AddJoin">
@@ -1689,18 +1770,20 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">row</span> <span class="o">=</span> <span class="n">P4_AddJoin</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">","</span><span class="p">,</span> <span class="n">Element</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">joiner</span></code>: A joiner literal. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pattern</span></code>: The repeated pattern rule id. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id. </p></li>
+<li><p><strong>joiner</strong> – A joiner literal. </p></li>
+<li><p><strong>pattern</strong> – The repeated pattern rule id. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateJoin">
@@ -1710,20 +1793,22 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">row</span> <span class="o">=</span> <span class="n">P4_CreateJoin</span><span class="p">(</span><span class="s2">","</span><span class="p">,</span> <span class="n">Element</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">joiner</span></code>: A joiner literal. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">pattern</span></code>: The repeated pattern rule id. </p></li>
-</ul>
-</dd>
-</dl>
 </p>
 <p>Join is a syntax sugar to the below structure: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">Sequence</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">ZeroOrMore</span><span class="p">(</span><span class="n">Sequence</span><span class="p">(</span><span class="n">Literal</span><span class="p">(</span><span class="n">joiner</span><span class="p">),</span> <span class="n">pattern</span><span class="p">)))</span>
 </pre></div>
 </div>
 </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>joiner</strong> – A joiner literal. </p></li>
+<li><p><strong>pattern</strong> – The repeated pattern rule id. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_DeleteExpression">
@@ -1734,15 +1819,16 @@
  <span class="n">P4_DeleteExpression</span><span class="p">(</span><span class="n">expr</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">expr</span></code>: The expression.</p></li>
-</ul>
-</dd>
-</dl>
 </p>
 <p>The members of a sequence/choice expression will be deleted. The ref_expr of a positive/negative expression will be deleted.</p>
 <p>P4_Reference only hold a reference so the referenced expression won’t be freed. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>expr</strong> – The expression.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_SetRuleID">
@@ -1753,35 +1839,38 @@
  <span class="n">P4_SetRuleID</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">expr</span></code>: The expression. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rule_id</span></code>: The rule id to set. </p></li>
-</ul>
-</dd>
-</dl>
 </p>
 <p>Note that <code class="docutils literal notranslate"><span class="pre">P4_SetRuleID</span></code> only changes the <code class="docutils literal notranslate"><span class="pre">expr-&gt;id</span></code> field. It does not add expr to the <a class="reference internal" href="#structP4__Grammar"><span class="std std-ref">P4_Grammar</span></a> object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>expr</strong> – The expression. </p></li>
+<li><p><strong>rule_id</strong> – The rule id to set. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_IsRule">
 <span class="target" id="peppapeg_8h_1a55d3c3accb0e7813d2ea38b3ea6083e6"></span><span class="pre">bool</span> <code class="sig-name descname"><span class="pre">P4_IsRule</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_IsRule" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Check if an expression is a grammar rule.</p>
-<p><dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>if an expression is a grammar rule. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>expr</strong> – The expression. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>if an expression is a grammar rule. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
  <span class="n">P4_IsRule</span><span class="p">(</span><span class="n">P4_GetGrammarRule</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">));</span> <span class="o">//</span> <span class="n">true</span>
 </pre></div>
 </div>
 </p>
 </dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">expr</span></code>: The expression. </p></li>
-</ul>
-</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_IsSquashed">
@@ -1826,40 +1915,42 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Grammar</span><span class="o">*</span>     <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A <a class="reference internal" href="#structP4__Grammar"><span class="std std-ref">P4_Grammar</span></a> object.</p>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A <a class="reference internal" href="#structP4__Grammar"><span class="std std-ref">P4_Grammar</span></a> object.</p>
 </dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_DeleteGrammar">
 <span class="target" id="peppapeg_8h_1af7c05e1c28f1f319f0f13e29ba4bc12a"></span><span class="pre">void</span> <code class="sig-name descname"><span class="pre">P4_DeleteGrammar</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_DeleteGrammar" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Delete the grammar object. </p>
-<p><p>It will also free all of the expression rules. </p>
-<dl class="simple">
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar.</p></li>
+<p>It will also free all of the expression rules. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar.</p></li>
 </ul>
 </dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_AddGrammarRule">
 <span class="target" id="peppapeg_8h_1ac2314a71e47de4f4c519ad4b947ec443"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddGrammarRule</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddGrammarRule" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Add a grammar rule.</p>
-<p><dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code. </p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">expr</span></code>: The grammar rule expression. </p></li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id. </p></li>
+<li><p><strong>expr</strong> – The grammar rule expression. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code. </p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_SetGrammarRuleName">
@@ -1869,17 +1960,19 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_SetRuleName</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">ENTRY</span><span class="p">,</span> <span class="s2">"entry"</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code>: The grammar rule name. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id. </p></li>
+<li><p><strong>name</strong> – The grammar rule name. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_GetGrammarRuleName">
@@ -1890,30 +1983,32 @@
  <span class="n">printf</span><span class="p">(</span><span class="s2">"</span><span class="si">%s</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">name</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The grammar rule name.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The grammar rule name.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_DeleteGrammarRule">
 <span class="target" id="peppapeg_8h_1af23454127bbb8cff82596ea1a8b12bf3"></span><span class="pre">void</span> <code class="sig-name descname"><span class="pre">P4_DeleteGrammarRule</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_DeleteGrammarRule" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Delete a grammar rule.</p>
-<p><p>WARNING: NOT IMPLEMENTED. </p>
-<dl class="simple">
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id.</p></li>
+<p>WARNING: NOT IMPLEMENTED. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id.</p></li>
 </ul>
 </dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_GetGrammarRule">
@@ -1924,36 +2019,39 @@
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_GetGrammarRule</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> <span class="o">//</span> <span class="n">The</span> <span class="n">literal</span> <span class="n">expression</span><span class="o">.</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The grammar rule expression. Returns NULL if not found.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The grammar rule id. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The grammar rule expression. Returns NULL if not found.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_GetGrammarRuleByName">
 <span class="target" id="peppapeg_8h_1a8d6421c6ef85fc9040151797555bb6f5"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_GetGrammarRuleByName</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a> <span class="pre">*</span><em><span class="pre">grammar</span></em>, <span class="pre">P4_String</span> <em><span class="pre">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetGrammarRuleByName" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Get a grammar rule by its name.</p>
-<p><dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The grammar rule expression. Returns NULL if not found. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>name</strong> – The grammar rule name. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The grammar rule expression. Returns NULL if not found. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
  <span class="n">P4_SetGrammarRuleName</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"rule_a"</span><span class="p">);</span>
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_GetGrammarRule</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s2">"rule_a"</span><span class="p">);</span> <span class="o">//</span> <span class="n">The</span> <span class="n">literal</span> <span class="n">expression</span><span class="o">.</span>
 </pre></div>
 </div>
 </p>
 </dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code>: The grammar rule name. </p></li>
-</ul>
-</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_SetGrammarRuleFlag">
@@ -1967,17 +2065,19 @@
  <span class="p">}</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code. If successful, return <a class="reference internal" href="#peppapeg_8h_1a57a1e31ea2a76eb6dc09ee1a24912e18a1617ab3136e21d235a2db4d8e29155dd"><span class="std std-ref">P4_Ok</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The ID. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">flag</span></code>: The bits of P4_ExpressionFlag. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The ID. </p></li>
+<li><p><strong>flag</strong> – The bits of P4_ExpressionFlag. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code. If successful, return <a class="reference internal" href="#peppapeg_8h_1a57a1e31ea2a76eb6dc09ee1a24912e18a1617ab3136e21d235a2db4d8e29155dd"><span class="std std-ref">P4_Ok</span></a>.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_SetRecursionLimit">
@@ -1991,31 +2091,34 @@
  <span class="n">P4_SetRecursionLimit</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1024</span><span class="o">*</span><span class="mi">20</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>An error. If successful, return <a class="reference internal" href="#peppapeg_8h_1a57a1e31ea2a76eb6dc09ee1a24912e18a1617ab3136e21d235a2db4d8e29155dd"><span class="std std-ref">P4_Ok</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">limit</span></code>: The number of maximum recursion calls. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>limit</strong> – The number of maximum recursion calls. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An error. If successful, return <a class="reference internal" href="#peppapeg_8h_1a57a1e31ea2a76eb6dc09ee1a24912e18a1617ab3136e21d235a2db4d8e29155dd"><span class="std std-ref">P4_Ok</span></a>.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_SetUserDataFreeFunc">
 <span class="target" id="peppapeg_8h_1a907b32464763c9b5d4f958ddf0e15cbb"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_SetUserDataFreeFunc</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a> <span class="pre">*</span><em><span class="pre">grammar</span></em>, <span class="pre">P4_UserDataFreeFunc</span> <em><span class="pre">free_func</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_SetUserDataFreeFunc" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Set free function for the user data. </p>
-<p><dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code. </p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">free_func</span></code>: The free function. </p></li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>free_func</strong> – The free function. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code. </p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_GetRecursionLimit">
@@ -2026,15 +2129,17 @@
  <span class="n">printf</span><span class="p">(</span><span class="s2">"limit=</span><span class="si">%u</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">limit</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The maximum allowed recursion calls. If something goes wrong, return 0.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The maximum allowed recursion calls. If something goes wrong, return 0.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateSource">
@@ -2051,16 +2156,18 @@
  <span class="n">P4_DeleteSource</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>A source object.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">content</span></code>: The content of input. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">rule_id</span></code>: The id of entry grammar rule. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>content</strong> – The content of input. </p></li>
+<li><p><strong>rule_id</strong> – The id of entry grammar rule. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A source object.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_DeleteSource">
@@ -2070,13 +2177,14 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_DeleteSource</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">source</span></code>: The source.</p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source</strong> – The source.</p></li>
 </ul>
 </dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_ResetSource">
@@ -2093,13 +2201,14 @@
  <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">source</span></code>: The source.</p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source</strong> – The source.</p></li>
 </ul>
 </dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_SetSourceSlice">
@@ -2112,45 +2221,49 @@
      <span class="n">printf</span><span class="p">(</span><span class="s2">"set buf size error</span><span class="se">\n</span><span class="s2">"</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">source</span></code>: The source. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">start</span></code>: The start position, inclusive. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">stop</span></code>: The stop position, exclusive. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source</strong> – The source. </p></li>
+<li><p><strong>start</strong> – The start position, inclusive. </p></li>
+<li><p><strong>stop</strong> – The stop position, exclusive. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_GetSourceAst">
 <span class="target" id="peppapeg_8h_1a3d50dfc45f1c8424553a35638a7be039"></span><a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_GetSourceAst</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Source" title="P4_Source"><span class="pre">P4_Source</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetSourceAst" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Get the root token of abstract syntax tree of the source. </p>
-<p><dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The root token. If the parse is failed or the root token is lifted, return NULL. </p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">source</span></code>: The source. </p></li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source</strong> – The source. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The root token. If the parse is failed or the root token is lifted, return NULL. </p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_GetSourcePosition">
 <span class="target" id="peppapeg_8h_1a01b4cc3ab1144c1159d561d69261473c"></span><span class="pre">size_t</span> <code class="sig-name descname"><span class="pre">P4_GetSourcePosition</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Source" title="P4_Source"><span class="pre">P4_Source</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetSourcePosition" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Get the last position in the input after a parse. </p>
-<p><dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The position in the input. </p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">source</span></code>: The source. </p></li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source</strong> – The source. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The position in the input. </p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_JsonifySourceAst">
@@ -2161,15 +2274,16 @@
  <span class="n">P4_JsonifySourceAst</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">root</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">stream</span></code>: The output stream. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">token</span></code>: The root node of source ast.</p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>stream</strong> – The output stream. </p></li>
+<li><p><strong>token</strong> – The root node of source ast.</p></li>
 </ul>
 </dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_InspectSourceAst">
@@ -2184,15 +2298,16 @@
  <span class="n">P4_Error</span> <span class="n">err</span> <span class="o">=</span> <span class="n">P4_InspectSourceAst</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">NULL</span><span class="p">,</span> <span class="n">MyInspector</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">token</span></code>: The root node of source ast. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">userdata</span></code>: Any additional information you want to pass in. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">inspector</span></code>: The inspecting function. It should return P4_Ok for a successful inspection.</p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>token</strong> – The root node of source ast. </p></li>
+<li><p><strong>userdata</strong> – Any additional information you want to pass in. </p></li>
+<li><p><strong>inspector</strong> – The inspecting function. It should return P4_Ok for a successful inspection.</p></li>
 </ul>
 </dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_Parse">
@@ -2204,16 +2319,18 @@
  <span class="p">}</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code. If successful, return <a class="reference internal" href="#peppapeg_8h_1a57a1e31ea2a76eb6dc09ee1a24912e18a1617ab3136e21d235a2db4d8e29155dd"><span class="std std-ref">P4_Ok</span></a>.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">source</span></code>: The source. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>source</strong> – The source. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code. If successful, return <a class="reference internal" href="#peppapeg_8h_1a57a1e31ea2a76eb6dc09ee1a24912e18a1617ab3136e21d235a2db4d8e29155dd"><span class="std std-ref">P4_Ok</span></a>.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_HasError">
@@ -2226,15 +2343,17 @@
  <span class="p">}</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>Whether the parse is failed.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">source</span></code>: The source. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source</strong> – The source. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Whether the parse is failed.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_GetError">
@@ -2246,15 +2365,17 @@
  <span class="p">}</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">source</span></code>: The source. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source</strong> – The source. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_GetErrorString">
@@ -2265,15 +2386,17 @@
  <span class="n">printf</span><span class="p">(</span><span class="s2">"</span><span class="si">%s</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">errstr</span><span class="p">);</span> <span class="o">//</span> <span class="s2">"MatchError"</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error string.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">err</span></code>: The error code. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>err</strong> – The error code. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error string.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_GetErrorMessage">
@@ -2285,16 +2408,18 @@
  <span class="p">}</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error message.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">source</span></code>: The source. </p></li>
-</ul>
-</dd>
-</dl>
 </p>
 <p>The returned value is a reference to the internal string. Don’t free it after use. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source</strong> – The source. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error message.</p>
+</dd>
+</dl>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreateToken">
@@ -2313,18 +2438,20 @@
  <span class="n">P4_DeleteToken</span><span class="p">(</span><span class="n">token</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The token.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">str</span></code>: The text. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">start</span></code>: The starting position of the text. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">stop</span></code>: The stopping position of the text. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">expr</span></code>: The expression that matches to the slice of the text. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>str</strong> – The text. </p></li>
+<li><p><strong>start</strong> – The starting position of the text. </p></li>
+<li><p><strong>stop</strong> – The stopping position of the text. </p></li>
+<li><p><strong>expr</strong> – The expression that matches to the slice of the text. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The token.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_DeleteToken">
@@ -2334,13 +2461,14 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_DeleteToken</span><span class="p">(</span><span class="n">token</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">token</span></code>: The token.</p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>token</strong> – The token.</p></li>
 </ul>
 </dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_GetTokenSlice">
@@ -2351,15 +2479,17 @@
  <span class="n">printf</span><span class="p">(</span><span class="s2">"token slice=[</span><span class="si">%u</span><span class="s2">..</span><span class="si">%u</span><span class="s2">]</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="nb">slice</span><span class="o">-&gt;</span><span class="n">i</span><span class="p">,</span> <span class="nb">slice</span><span class="o">-&gt;</span><span class="n">j</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The slice.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">token</span></code>: The token. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>token</strong> – The token. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The slice.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_GetTokenChildrenCount">
@@ -2371,15 +2501,17 @@
  <span class="n">printf</span><span class="p">(</span><span class="s2">"There are </span><span class="si">%lu</span><span class="s2"> children for root node</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">count</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The total number of token children.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">token</span></code>: The token. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>token</strong> – The token. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The total number of token children.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CopyTokenString">
@@ -2391,48 +2523,52 @@
  <span class="n">free</span><span class="p">(</span><span class="nb">str</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The string.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">token</span></code>: The token. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>token</strong> – The token. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The string.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_SetGrammarCallback">
 <span class="target" id="peppapeg_8h_1a17c94e7ab17db4dbe338ef09d71740fd"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_SetGrammarCallback</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_MatchCallback</span>, <span class="pre">P4_ErrorCallback</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_SetGrammarCallback" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Set callback function. </p>
-<p><dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code. </p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">matchcb</span></code>: The callback on a successful match. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">errcb</span></code>: The callback on a failure match. </p></li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>matchcb</strong> – The callback on a successful match. </p></li>
+<li><p><strong>errcb</strong> – The callback on a failure match. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code. </p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_ReplaceGrammarRule">
 <span class="target" id="peppapeg_8h_1ae4d41f9770f4af1ff6414f9dc68b2e08"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_ReplaceGrammarRule</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_ReplaceGrammarRule" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Replace an existing grammar rule. </p>
-<p><p>The original grammar rule will be deleted. </p>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">grammar</span></code>: The grammar. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: The rule id. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">expr</span></code>: The rule expression to replace. </p></li>
+<p>The original grammar rule will be deleted. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The rule id. </p></li>
+<li><p><strong>expr</strong> – The rule expression to replace. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_CreatePegGrammar">
@@ -2443,11 +2579,12 @@
  <span class="n">P4_DeleteGrammar</span><span class="p">(</span><span class="n">peg</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The grammar object.</p>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The grammar object.</p>
 </dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_PegEval">
@@ -2468,33 +2605,36 @@
  <span class="n">P4_DeleteGrammar</span><span class="p">(</span><span class="n">peg</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The error code.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">token</span></code>: The token tree. </p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">result</span></code>: Can be a reference several value kinds, such as size_t, <a class="reference internal" href="#structP4__Grammar"><span class="std std-ref">P4_Grammar</span></a>, <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>, etc. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>token</strong> – The token tree. </p></li>
+<li><p><strong>result</strong> – Can be a reference several value kinds, such as size_t, <a class="reference internal" href="#structP4__Grammar"><span class="std std-ref">P4_Grammar</span></a>, <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>, etc. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_StringifyPegGrammarRuleID">
 <span class="target" id="peppapeg_8h_1a8a2b1bbbc4e23deec5bfcace896bd921"></span><span class="pre">P4_String</span> <code class="sig-name descname"><span class="pre">P4_StringifyPegGrammarRuleID</span></code><span class="sig-paren">(</span><span class="pre">P4_RuleID</span> <em><span class="pre">id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_StringifyPegGrammarRuleID" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Get the corresponding rule name for a peg grammar rule id. </p>
-<p><dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">printf</span><span class="p">(</span><span class="s2">"</span><span class="si">%s</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">P4_StringifyPegGrammarRuleID</span><span class="p">(</span><span class="n">P4_PegRuleRule</span><span class="p">));</span>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> – A P4_PegRuleID. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">printf</span><span class="p">(</span><span class="s2">"</span><span class="si">%s</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">P4_StringifyPegGrammarRuleID</span><span class="p">(</span><span class="n">P4_PegRuleRule</span><span class="p">));</span>
 </pre></div>
 </div>
 </p>
 </dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code>: A P4_PegRuleID. </p></li>
-</ul>
-</dd>
 </dl>
-</p>
 </dd></dl>
 <dl class="c function">
 <dt id="c.P4_LoadGrammar">
@@ -2509,15 +2649,17 @@
  <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">);</span>
 </pre></div>
 </div>
-<dl class="simple">
-<dt><strong>Return</strong></dt><dd><p>The grammar object.</p>
-</dd>
-<dt><strong>Parameters</strong></dt><dd><ul class="breatheparameterlist simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">rules</span></code>: The rules string. </p></li>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rules</strong> – The rules string. </p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The grammar object.</p>
+</dd>
 </dl>
-</p>
 </dd></dl>
 </div>
 </section>

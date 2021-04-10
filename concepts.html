@@ -1,0 +1,286 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="PEG APIs" href="peg.html" /><link rel="prev" title="How-To Guides" href="howto.html" />
+
+    <meta name="generator" content="sphinx-3.5.3, furo 2021.03.20.beta30"/>
+        <title>Concepts - Peppa PEG 1.10.0 documentation</title>
+      <link rel="stylesheet" href="_static/styles/furo.css?digest=978e1795dfe158b585dda6a8417f6411828bf3ed">
+    <link rel="stylesheet" href="_static/pygments.css">
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
+    
+
+
+<style>
+  :root {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+
+  /* For allowing end-user-specific overrides */
+  .override-light {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  .override-dark {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+</style><link rel="stylesheet" href="_static/styles/furo-extensions.css?digest=d391b54134226e4196576da3bdb6dddb7e05ba2b"></head>
+  <body dir="">
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">Peppa PEG 1.10.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">Peppa PEG 1.10.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html">
+  <input class="sidebar-search" placeholder=Search name="q">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutcalc.html">Tutorial: Calculator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutjson.html">Tutorial: JSON</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">How-To Guides</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Concepts</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="peg.html">PEG APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lowlevel.html">Low Level APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">All APIs &amp; References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.html">Build</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debug.html">Debug</a></li>
+<li class="toctree-l1"><a class="reference internal" href="whatsnew.html">Change Log</a></li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <main class="main">
+    <div class="content">
+      <article role="main">
+        <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        </label>
+        <section id="concepts">
+<h1>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">¶</a></h1>
+<section id="what-s-a-parser">
+<h2>What’s a Parser?<a class="headerlink" href="#what-s-a-parser" title="Permalink to this headline">¶</a></h2>
+<p>A parser is usually part of a compiler. Considering a statement <cite>print(“hello world”)</cite>, a parser builds an abstract syntax tree (AST) like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Token</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleStatement</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">],</span> <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+    <span class="n">Token</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleFunction</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">]),</span>
+    <span class="n">Token</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleFunctionArgs</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">19</span><span class="p">],</span> <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">Token</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleString</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">19</span><span class="p">])</span>
+    <span class="p">])</span>
+<span class="p">])</span>
+</pre></div>
+</div>
+<p>Some parser has an additional tokenizing step before building an AST, while PEG parser can directly build such an AST from the input.</p>
+<p>The compiler takes over the rest and compiles the AST to either bytecode for interpreter language or assembly code for compiled languages.</p>
+<p>But that’s far beyond what we’re discussing here. As a parser, we only care about how to build an AST from a string input.</p>
+<p>A parser is code, a lot of code. You can use Peppa PEG, Lex/Yacc, flex/bison, antlr, or even parse from scratch.</p>
+</section>
+<section id="what-s-a-grammar">
+<h2>What’s a Grammar?<a class="headerlink" href="#what-s-a-grammar" title="Permalink to this headline">¶</a></h2>
+<p>A grammar is a set of RULES instructing a parser how to parse from the input, e.g, it is definition of parsing. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">term</span> <span class="o">=</span> <span class="n">factor</span> <span class="p">((</span><span class="n">plus</span><span class="o">/</span><span class="n">minus</span><span class="p">)</span> <span class="n">factor</span><span class="p">)</span><span class="o">*</span><span class="p">;</span>
+<span class="n">factor</span> <span class="o">=</span> <span class="n">number</span> <span class="p">((</span><span class="n">mul</span><span class="o">/</span><span class="n">div</span><span class="p">)</span> <span class="n">number</span><span class="p">);</span>
+<span class="n">number</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span> <span class="o">/</span> <span class="p">[</span><span class="mi">1</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span> <span class="p">[</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>A parser generator can read a grammar in such a (or similar) notion and produce a parser. The produced parser then reads input and produces AST.</p>
+<p>Peppa PEG provides its own dialect of PEG for describing a grammar. It was inspired by <a class="reference external" href="https://pest.rs">Pest</a> but is more powerful, faster, and more readable.</p>
+<p>See <a class="reference internal" href="peg.html#peg"><span class="std std-ref">PEG APIs</span></a> for a full specification.</p>
+</section>
+<section id="overview-of-process">
+<h2>Overview of Process<a class="headerlink" href="#overview-of-process" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Load Grammar. Load your grammar using <a class="reference internal" href="api.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a> . Alternatively, you can create your grammar using <a class="reference internal" href="api.html#c.P4_CreateGrammar" title="P4_CreateGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateGrammar()</span></code></a> and then add grammar rules using <a class="reference internal" href="lowlevel.html#lowlevel"><span class="std std-ref">Low Level APIs</span></a>.</p></li>
+<li><p>Parse Source. Wrap source string using <a class="reference internal" href="api.html#c.P4_CreateSource" title="P4_CreateSource"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateSource()</span></code></a> and then parse it using <a class="reference internal" href="api.html#c.P4_Parse" title="P4_Parse"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_Parse()</span></code></a>.</p></li>
+<li><p>Traverse AST. It’s up to you what to do when traversing the tree. You may inspect the token tree, produce bytecodes, trim the tree, etc.</p></li>
+</ol>
+<p>Unlike one of Peppa PEG alternatives - peg/leg, Peppa PEG doesn’t end up with producing C code for the grammar. It holds the grammar and the parser generator in memory so you don’t need an extra compilation step.</p>
+</section>
+<section id="parse-tree-v-s-abstract-syntax-tree">
+<h2>Parse Tree v/s Abstract Syntax Tree<a class="headerlink" href="#parse-tree-v-s-abstract-syntax-tree" title="Permalink to this headline">¶</a></h2>
+<p>Parse Tree and Abstract Syntax Tree are often used interchangeably but they’re different. Both are trees. But Parse Tree is closer to the source, while Abstract Syntax Tree is closer to the actual meaning of code.</p>
+<p>Considering <cite>[1,2]</cite>, a parse tree looks like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Token</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleArray</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+    <span class="n">Token</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleLeftParen</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]),</span>
+    <span class="n">Token</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleNumber</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]),</span>
+    <span class="n">Token</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleComma</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]),</span>
+    <span class="n">Token</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleNumber</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]),</span>
+    <span class="n">Token</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleRightParen</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">]),</span>
+<span class="p">])</span>
+</pre></div>
+</div>
+<p>While an abstract syntax tree looks like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Token</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleArray</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+    <span class="n">Token</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleNumber</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]),</span>
+    <span class="n">Token</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleNumber</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]),</span>
+<span class="p">])</span>
+</pre></div>
+</div>
+<p>e.g, left paren, comma, right paren are ignored as they’re not part of the semantic of array.</p>
+<p>You can consider abstract syntax tree as a polished version of parse tree.</p>
+<p>Peppa PEG provides some decorators allowing you to dropping some tokens; it also allows you reshaping part of the tree by setting callbacks.</p>
+</section>
+</section>
+
+      </article>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="peg.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">PEG APIs</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="howto.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">How-To Guides</div>
+                
+              </div>
+            </a>
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; 2021, Ju
+            |
+            Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+              and
+              <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+              <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+            |
+            <a class="muted-link" href="_sources/concepts.rst.txt"
+               rel="nofollow">
+              Show Source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Concepts</a><ul>
+<li><a class="reference internal" href="#what-s-a-parser">What’s a Parser?</a></li>
+<li><a class="reference internal" href="#what-s-a-grammar">What’s a Grammar?</a></li>
+<li><a class="reference internal" href="#overview-of-process">Overview of Process</a></li>
+<li><a class="reference internal" href="#parse-tree-v-s-abstract-syntax-tree">Parse Tree v/s Abstract Syntax Tree</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </main>
+</div>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+</html>

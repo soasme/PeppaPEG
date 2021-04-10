@@ -123,3 +123,18 @@ Say you want to replace stdlib malloc/free/realloc with bdwgc `GC_*`, you can de
     # define P4_REALLOC GC_REALLOC
 
     # define "peppapeg.h"
+
+How to Transfer the Ownership of Source AST?
+--------------------------------------------
+
+You may transfer the ownership of AST out of the source object using :c:func:`P4_AcquireSourceAst`.
+
+Say you want to get AST while do not want to keep track of the source, you can:
+
+.. code-block::
+
+    P4_Token* root = P4_AcquireSourceAst(source);
+    P4_DeleteSource(source);
+
+    // do something.
+    P4_DeleteToken(root);

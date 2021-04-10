@@ -1880,6 +1880,14 @@ P4_GetSourceAst(P4_Source* source) {
     return source == NULL ? NULL : source->root;
 }
 
+P4_PUBLIC P4_Token*
+P4_AcquireSourceAst(P4_Source* source) {
+    P4_Token* root = P4_GetSourceAst(source);
+    source->root = NULL;
+    P4_ResetSource(source);
+    return root;
+}
+
 P4_PUBLIC size_t
 P4_GetSourcePosition(P4_Source* source) {
     return source == NULL ? 0 : source->pos;

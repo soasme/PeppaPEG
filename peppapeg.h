@@ -1720,6 +1720,25 @@ P4_Error       P4_SetSourceSlice(P4_Source* source, size_t start, size_t stop);
  * @return      The root token. If the parse is failed or the root token is lifted, return NULL.
  */
 P4_Token*      P4_GetSourceAst(P4_Source*);
+
+
+/**
+ * @brief       Transfer the ownership of source ast to the caller.
+ * @param       source  The source.
+ * @return      The root token. If the parse is failed or the root token is lifted, return NULL.
+ *
+ * You're on your own now to manage the de-allocation of the source ast.
+ *
+ * The source is implicitly reset after the source ast is acquired by the caller.
+ *
+ * Example:
+ *
+ *      P4_Token* root = P4_AcquireSourceAst(source);
+ *      // ...
+ *      P4_DeleteToken(root);
+ */
+P4_Token*      P4_AcquireSourceAst(P4_Source* source);
+
 /**
  * @brief       Get the last position in the input after a parse.
  * @param       source  The source.

@@ -18,6 +18,7 @@ set(
     test_peg
     test_example_mustache
     test_example_json
+    test_example_calc
 )
 
 option(ENABLE_VALGRIND "Enable vagrind memory leak report." OFF)

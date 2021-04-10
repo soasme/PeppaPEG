@@ -272,5 +272,3 @@ finalize:
 #endif
 
 # endif
-
-/* TODO: remove `sign` local variable.

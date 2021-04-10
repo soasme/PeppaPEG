@@ -33,6 +33,15 @@ How-To Guides
 
    howto
 
+Concepts
+--------
+
+.. toctree::
+   :maxdepth: 2
+
+   concepts
+
+
 API & References
 ----------------
 

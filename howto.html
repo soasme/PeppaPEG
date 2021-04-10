@@ -253,6 +253,18 @@
 </pre></div>
 </div>
 </section>
+<section id="how-to-transfer-the-ownership-of-source-ast">
+<h2>How to Transfer the Ownership of Source AST?<a class="headerlink" href="#how-to-transfer-the-ownership-of-source-ast" title="Permalink to this headline">¶</a></h2>
+<p>You may transfer the ownership of AST out of the source object using <a class="reference internal" href="api.html#c.P4_AcquireSourceAst" title="P4_AcquireSourceAst"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_AcquireSourceAst()</span></code></a>.</p>
+<p>Say you want to get AST while do not want to keep track of the source, you can:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Token</span><span class="o">*</span> <span class="n">root</span> <span class="o">=</span> <span class="n">P4_AcquireSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
+<span class="n">P4_DeleteSource</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
+
+<span class="o">//</span> <span class="n">do</span> <span class="n">something</span><span class="o">.</span>
+<span class="n">P4_DeleteToken</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
 </section>
 
       </article>
@@ -315,6 +327,7 @@
 <li><a class="reference internal" href="#how-to-prevent-partial-parse">How to Prevent Partial Parse?</a></li>
 <li><a class="reference internal" href="#how-to-join-expressions-by-separators">How to Join Expressions by Separators?</a></li>
 <li><a class="reference internal" href="#how-to-replace-malloc-free-realloc">How to Replace Malloc/Free/Realloc?</a></li>
+<li><a class="reference internal" href="#how-to-transfer-the-ownership-of-source-ast">How to Transfer the Ownership of Source AST?</a></li>
 </ul>
 </li>
 </ul>

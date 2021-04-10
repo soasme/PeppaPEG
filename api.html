@@ -2254,6 +2254,29 @@
 </dl>
 </dd></dl>
 <dl class="c function">
+<dt id="c.P4_AcquireSourceAst">
+<span class="target" id="peppapeg_8h_1a7a39995c68fd4e7c2b9b2639fa43dd62"></span><a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_AcquireSourceAst</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Source" title="P4_Source"><span class="pre">P4_Source</span></a> <span class="pre">*</span><em><span class="pre">source</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AcquireSourceAst" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Transfer the ownership of source ast to the caller. </p>
+<p>You’re on your own now to manage the de-allocation of the source ast.</p>
+<p>The source is implicitly reset after the source ast is acquired by the caller.</p>
+<p>Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Token</span><span class="o">*</span> <span class="n">root</span> <span class="o">=</span> <span class="n">P4_AcquireSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
+ <span class="o">//</span> <span class="o">...</span>
+ <span class="n">P4_DeleteToken</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
+</pre></div>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>source</strong> – The source. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The root token. If the parse is failed or the root token is lifted, return NULL.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="c function">
 <dt id="c.P4_GetSourcePosition">
 <span class="target" id="peppapeg_8h_1a01b4cc3ab1144c1159d561d69261473c"></span><span class="pre">size_t</span> <code class="sig-name descname"><span class="pre">P4_GetSourcePosition</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Source" title="P4_Source"><span class="pre">P4_Source</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetSourcePosition" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Get the last position in the input after a parse. </p>

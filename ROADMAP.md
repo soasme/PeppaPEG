@@ -9,7 +9,6 @@
 - [ ] api: Until.
 - [ ] api: take a look at ohm.
 - [ ] api: Sanitize `\u0000` to whitespace for the source input, this happens in creating the source/setting the source size.
-- [ ] api: `P4_AcquireSourceAst(source, &ast)`: set ast, reset source. It's useful when we need the parsed result but not care about source itself. Token tree should now owned by ast and shall then be free by the caller.
 - [ ] New Expression Kind: Numeric.
 - [ ] New Expression Kind: CharacterSet.
 - [ ] New Expression Kind: Complement.
@@ -33,15 +32,17 @@
 - [ ] build: wasm.
 - [ ] tests: Enable AddressSanitizer. Example: cJSON.
 - [ ] tests: Add a fuzzy testing framework.
-- [ ] docs: add explanations.
 - [ ] docs: read [A parsing machine for PEGs](http://www.inf.puc-rio.br/~roberto/docs/ry08-4.pdf).
 - [ ] docs: landing page for the project doc site.
 - [ ] docs: example: brainfuck https://en.wikipedia.org/wiki/Brainfuck
 - [ ] lang: python grammar.
 - [ ] lang: ES5 grammar: https://ohmlang.github.io/editor/#0a9a649c3c630fd0a470ba6cb75393fe
 - [ ] lang: zig grammar: https://ziglang.org/documentation/master/#Grammar
+- [ ] lang: awk grammar: https://github.com/onetrueawk/awk/blob/master/lex.c https://github.com/onetrueawk/awk/blob/master/awkgram.y
 - [ ] lang: A binary executable for display parsed results in JSON output. The executable can support general programming languages, such as Mustache, Python, JSON, YAML, etc. Some other programs can then takes the input from stdin and do some fancy work. `p4 parse --lang=py38 source.py`
 - [ ] Pratt parser: https://en.wikipedia.org/wiki/Operator-precedence_parser
+- [x] api: `P4_AcquireSourceAst(source, &ast)`: set ast, reset source. It's useful when we need the parsed result but not care about source itself. Token tree should now owned by ast and shall then be free by the caller. Added in v1.11.0
+- [x] docs: add explanations.
 - [x] GetErrorString.
 - [x] Reset source so it can be re-parsed. Added in v1.11.0.
 - [x] P4_InspectSourceAst(tok, bool (f) (tok)). Example: https://golang.org/pkg/go/ast/#Inspect. Added in v1.11.0.

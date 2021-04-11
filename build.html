@@ -2,12 +2,11 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Debug" href="debug.html" /><link rel="prev" title="All APIs &amp; References" href="api.html" />
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Debug" href="debug.html" /><link rel="prev" title="All APIs &amp; References" href="api.html" />
 
-    <meta name="generator" content="sphinx-3.5.3, furo 2021.03.20.beta30"/>
+    <meta name="generator" content="sphinx-3.5.4, furo 2021.04.11.beta34"/>
         <title>Build - Peppa PEG 1.10.0 documentation</title>
-      <link rel="stylesheet" href="_static/styles/furo.css?digest=978e1795dfe158b585dda6a8417f6411828bf3ed">
+      <link rel="stylesheet" href="_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
     <link rel="stylesheet" href="_static/pygments.css">
     <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
     
@@ -142,9 +141,9 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <section id="build">
+        <div class="section" id="build">
 <h1>Build<a class="headerlink" href="#build" title="Permalink to this headline">¶</a></h1>
-<section id="build-peppa-peg">
+<div class="section" id="build-peppa-peg">
 <h2>Build Peppa PEG<a class="headerlink" href="#build-peppa-peg" title="Permalink to this headline">¶</a></h2>
 <p>Assume you have cmake and gcc installed.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>cmake -E make_directory ./build
@@ -153,8 +152,8 @@
 <span class="gp">$ </span>make
 </pre></div>
 </div>
-</section>
-<section id="development">
+</div>
+<div class="section" id="development">
 <h2>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
 <p>If you have a difficulty having a complete development environment for Peppa PEG, try Docker:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>docker run --rm -v <span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>:/app -it ubuntu:latest bash
@@ -183,13 +182,13 @@
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>cmake --build . --target docs
 </pre></div>
 </div>
-</section>
-<section id="github-actions">
+</div>
+<div class="section" id="github-actions">
 <h2>GitHub Actions<a class="headerlink" href="#github-actions" title="Permalink to this headline">¶</a></h2>
 <p>Peppa PEG uses GitHub Actions building docs whenever a change is pushed to the main branch.</p>
 <p>The docs site is pushed to gh-pages branch and published to &lt;<a class="reference external" href="https://www.soasme.com/PeppaPEG/">https://www.soasme.com/PeppaPEG/</a>&gt;.</p>
-</section>
-</section>
+</div>
+</div>
 
       </article>
       <footer>

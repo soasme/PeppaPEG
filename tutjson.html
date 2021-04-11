@@ -2,12 +2,11 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="How-To Guides" href="howto.html" /><link rel="prev" title="Tutorial: Calculator" href="tutcalc.html" />
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="How-To Guides" href="howto.html" /><link rel="prev" title="Tutorial: Calculator" href="tutcalc.html" />
 
-    <meta name="generator" content="sphinx-3.5.3, furo 2021.03.20.beta30"/>
+    <meta name="generator" content="sphinx-3.5.4, furo 2021.04.11.beta34"/>
         <title>Tutorial: JSON - Peppa PEG 1.10.0 documentation</title>
-      <link rel="stylesheet" href="_static/styles/furo.css?digest=978e1795dfe158b585dda6a8417f6411828bf3ed">
+      <link rel="stylesheet" href="_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
     <link rel="stylesheet" href="_static/pygments.css">
     <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
     
@@ -142,12 +141,12 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <section id="tutorial-json">
+        <div class="section" id="tutorial-json">
 <span id="tutjson"></span><h1>Tutorial: JSON<a class="headerlink" href="#tutorial-json" title="Permalink to this headline">¶</a></h1>
 <p>JSON, or JavaScript Object Notation, is a widely used data exchange format, using human readable text to store and transit data. As a subset of JavaScript, JSON itself is language independent.</p>
 <p>There are quite several specs trying to standardize the JSON format, such as RFC 4527, RFC 7159, RFC 8259, ECMA 262, ECMA 404, ISO/IEC 21778:2017, etc. As hinted on <a class="reference external" href="https://json.org">json.org</a>, ECMA-404 is now the JSON data interchange standard.</p>
 <p>In this tutorial, we will write a JSON parser using Peppa PEG. There are already many JSON parsers in the wild, but learning how to write a complete JSON parser gives us a better understanding of Peppa PEG. In the end, you should be able to write a parser for other grammars, as the mindset to develop any new grammar using Peppa PEG is the same.</p>
-<section id="step-1-define-ruleids">
+<div class="section" id="step-1-define-ruleids">
 <h2>Step 1: Define RuleIDs<a class="headerlink" href="#step-1-define-ruleids" title="Permalink to this headline">¶</a></h2>
 <p>Let’s create a new file “json.h” and define some enums as RuleIDs.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">"peppapeg.h"</span><span class="cp"></span>
@@ -175,8 +174,8 @@
 <span class="p">}</span> <span class="n">P4_JSONRuleID</span><span class="p">;</span>
 </pre></div>
 </div>
-</section>
-<section id="step-2-create-grammar">
+</div>
+<div class="section" id="step-2-create-grammar">
 <h2>Step 2: Create Grammar<a class="headerlink" href="#step-2-create-grammar" title="Permalink to this headline">¶</a></h2>
 <p>We’ll create the grammar using <a class="reference internal" href="api.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a>.</p>
 <p>The order of rules must be same with <cite>P4_CalcRuleID</cite>.</p>
@@ -228,8 +227,8 @@
 </pre></div>
 </div>
 <p>The rule is similar to the one described on page json.org.</p>
-</section>
-<section id="step-3-parse">
+</div>
+<div class="section" id="step-3-parse">
 <h2>Step 3: Parse<a class="headerlink" href="#step-3-parse" title="Permalink to this headline">¶</a></h2>
 <p>Let’s create a new file “parse_json.c” and parse a JSON array.</p>
 <p>The main function does below things:</p>
@@ -260,8 +259,8 @@
 <span class="go">[{"slice":[0,39],"type":"array","children":[{"slice":[1,2],"type":"number"},{"slice":[3,6],"type":"number"},{"slice":[7,10],"type":"number"},{"slice":[11,15],"type":"true"},{"slice":[16,21],"type":"false"},{"slice":[22,26],"type":"null"},{"slice":[27,32],"type":"string"},{"slice":[33,35],"type":"object"},{"slice":[36,38],"type":"array"}]}]</span>
 </pre></div>
 </div>
-</section>
-</section>
+</div>
+</div>
 
       </article>
       <footer>

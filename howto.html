@@ -2,12 +2,11 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Concepts" href="concepts.html" /><link rel="prev" title="Tutorial: JSON" href="tutjson.html" />
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Concepts" href="concepts.html" /><link rel="prev" title="Tutorial: JSON" href="tutjson.html" />
 
-    <meta name="generator" content="sphinx-3.5.3, furo 2021.03.20.beta30"/>
+    <meta name="generator" content="sphinx-3.5.4, furo 2021.04.11.beta34"/>
         <title>How-To Guides - Peppa PEG 1.10.0 documentation</title>
-      <link rel="stylesheet" href="_static/styles/furo.css?digest=978e1795dfe158b585dda6a8417f6411828bf3ed">
+      <link rel="stylesheet" href="_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
     <link rel="stylesheet" href="_static/pygments.css">
     <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
     
@@ -142,9 +141,9 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <section id="how-to-guides">
+        <div class="section" id="how-to-guides">
 <h1>How-To Guides<a class="headerlink" href="#how-to-guides" title="Permalink to this headline">¶</a></h1>
-<section id="how-to-prevent-stackerror">
+<div class="section" id="how-to-prevent-stackerror">
 <h2>How to Prevent StackError?<a class="headerlink" href="#how-to-prevent-stackerror" title="Permalink to this headline">¶</a></h2>
 <p>Considering a json nested array: <cite>[[[[…]]]]</cite>. If the depth is too deep, Peppa PEG may end up with a StackError. This is due to Peppa PEG is a recursion-based parser. To prevent the stack address exhausts, one can set a limit on the recursion depth. By default, the depth is 8192.</p>
 <p>If you need to adjust the depth, try <a class="reference internal" href="api.html#c.P4_SetRecursionLimit" title="P4_SetRecursionLimit"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_SetRecursionLimit()</span></code></a>.</p>
@@ -160,8 +159,8 @@
 <dd class="field-odd"><p><a class="reference internal" href="api.html#c.P4_SetRecursionLimit" title="P4_SetRecursionLimit"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_SetRecursionLimit()</span></code></a>.</p>
 </dd>
 </dl>
-</section>
-<section id="how-to-parse-substring">
+</div>
+<div class="section" id="how-to-parse-substring">
 <h2>How to Parse Substring?<a class="headerlink" href="#how-to-parse-substring" title="Permalink to this headline">¶</a></h2>
 <p>Peppa PEG supports parsing a subset of source input. By default, all source content are attempted.</p>
 <p>One can use <cite>P4_SetSourceSlice</cite> to set the start position and stop position in the source input.</p>
@@ -178,8 +177,8 @@
 <dd class="field-odd"><p><a class="reference internal" href="api.html#c.P4_SetSourceSlice" title="P4_SetSourceSlice"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_SetSourceSlice()</span></code></a>.</p>
 </dd>
 </dl>
-</section>
-<section id="how-to-prevent-partial-parse">
+</div>
+<div class="section" id="how-to-prevent-partial-parse">
 <h2>How to Prevent Partial Parse?<a class="headerlink" href="#how-to-prevent-partial-parse" title="Permalink to this headline">¶</a></h2>
 <p>Considering below case,</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
@@ -215,8 +214,8 @@
 <dd class="field-odd"><p><a class="reference internal" href="api.html#c.P4_CreateStartOfInput" title="P4_CreateStartOfInput"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateStartOfInput()</span></code></a>, <a class="reference internal" href="api.html#c.P4_CreateEndOfInput" title="P4_CreateEndOfInput"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateEndOfInput()</span></code></a>.</p>
 </dd>
 </dl>
-</section>
-<section id="how-to-join-expressions-by-separators">
+</div>
+<div class="section" id="how-to-join-expressions-by-separators">
 <h2>How to Join Expressions by Separators?<a class="headerlink" href="#how-to-join-expressions-by-separators" title="Permalink to this headline">¶</a></h2>
 <p>Joining a rule by a separator is a common use, such as <cite>f(p1, p2, p3)</cite>, <cite>[1, 2, 3]</cite>. Peppa PEG provides a sugar to make it easier to match such a pattern.</p>
 <p>For example, let’s match <cite>1,2,3</cite>:</p>
@@ -238,8 +237,8 @@
 </pre></div>
 </div>
 <p>The separator will not have its corresponding token, while all joined members have their tokens.</p>
-</section>
-<section id="how-to-replace-malloc-free-realloc">
+</div>
+<div class="section" id="how-to-replace-malloc-free-realloc">
 <h2>How to Replace Malloc/Free/Realloc?<a class="headerlink" href="#how-to-replace-malloc-free-realloc" title="Permalink to this headline">¶</a></h2>
 <p>You may choose your own memory management solution by replacing macros <cite>P4_MALLOC</cite>, <cite>P4_FREE</cite> and <cite>P4_REALLOC</cite>.</p>
 <p>Say you want to replace stdlib malloc/free/realloc with bdwgc <cite>GC_*</cite>, you can define the above macros before including “peppapeg.h”:</p>
@@ -252,8 +251,8 @@
 <span class="c1"># define "peppapeg.h"</span>
 </pre></div>
 </div>
-</section>
-<section id="how-to-transfer-the-ownership-of-source-ast">
+</div>
+<div class="section" id="how-to-transfer-the-ownership-of-source-ast">
 <h2>How to Transfer the Ownership of Source AST?<a class="headerlink" href="#how-to-transfer-the-ownership-of-source-ast" title="Permalink to this headline">¶</a></h2>
 <p>You may transfer the ownership of AST out of the source object using <a class="reference internal" href="api.html#c.P4_AcquireSourceAst" title="P4_AcquireSourceAst"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_AcquireSourceAst()</span></code></a>.</p>
 <p>Say you want to get AST while do not want to keep track of the source, you can:</p>
@@ -264,8 +263,8 @@
 <span class="n">P4_DeleteToken</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
 </pre></div>
 </div>
-</section>
-</section>
+</div>
+</div>
 
       </article>
       <footer>

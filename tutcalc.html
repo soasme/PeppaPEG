@@ -2,12 +2,11 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Tutorial: JSON" href="tutjson.html" /><link rel="prev" title="Getting Started" href="getting_started.html" />
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Tutorial: JSON" href="tutjson.html" /><link rel="prev" title="Getting Started" href="getting_started.html" />
 
-    <meta name="generator" content="sphinx-3.5.3, furo 2021.03.20.beta30"/>
+    <meta name="generator" content="sphinx-3.5.4, furo 2021.04.11.beta34"/>
         <title>Tutorial: Calculator - Peppa PEG 1.10.0 documentation</title>
-      <link rel="stylesheet" href="_static/styles/furo.css?digest=978e1795dfe158b585dda6a8417f6411828bf3ed">
+      <link rel="stylesheet" href="_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
     <link rel="stylesheet" href="_static/pygments.css">
     <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
     
@@ -142,7 +141,7 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <section id="tutorial-calculator">
+        <div class="section" id="tutorial-calculator">
 <span id="tutcalc"></span><h1>Tutorial: Calculator<a class="headerlink" href="#tutorial-calculator" title="Permalink to this headline">¶</a></h1>
 <p>In this tutorial, we will write a calculator. It supports</p>
 <ul class="simple">
@@ -156,7 +155,7 @@
 <li><p>Parenthesis <cite>()</cite>.</p></li>
 </ul>
 <p>The calculator can take arbitrary valid string calc expressions and yield the result.</p>
-<section id="step-1-define-ruleids">
+<div class="section" id="step-1-define-ruleids">
 <h2>Step 1: Define RuleIDs<a class="headerlink" href="#step-1-define-ruleids" title="Permalink to this headline">¶</a></h2>
 <p>Let’s create a new file “calc.h” and define some enums as RuleIDs.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">typedef</span> <span class="n">enum</span> <span class="p">{</span>
@@ -175,8 +174,8 @@
 <span class="p">}</span> <span class="n">P4_CalcRuleID</span><span class="p">;</span>
 </pre></div>
 </div>
-</section>
-<section id="step-2-create-grammar">
+</div>
+<div class="section" id="step-2-create-grammar">
 <h2>Step 2: Create Grammar<a class="headerlink" href="#step-2-create-grammar" title="Permalink to this headline">¶</a></h2>
 <p>We’ll create the grammar using <a class="reference internal" href="api.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a>.</p>
 <p>The order of rules must be same with <cite>P4_CalcRuleID</cite>.</p>
@@ -222,8 +221,8 @@
 <li><p>Rule <cite>integer</cite> are some squashed digits, which avoids creating tokens for each digit.</p></li>
 <li><p>Rule <cite>whitespace</cite> allows arbitrary number of whitespace or tab in between expressions.</p></li>
 </ul>
-</section>
-<section id="step-3-eval-ast">
+</div>
+<div class="section" id="step-3-eval-ast">
 <h2>Step 3: Eval Ast<a class="headerlink" href="#step-3-eval-ast" title="Permalink to this headline">¶</a></h2>
 <p>Next, let’s evaluate the token tree. We traverse the AST and calculate the result.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Error</span> <span class="n">P4_CalcEval</span><span class="p">(</span><span class="n">P4_Token</span><span class="o">*</span> <span class="n">token</span><span class="p">,</span> <span class="n">long</span><span class="o">*</span> <span class="n">result</span><span class="p">)</span> <span class="p">{</span>
@@ -294,8 +293,8 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-</section>
-<section id="step-4-parse">
+</div>
+<div class="section" id="step-4-parse">
 <h2>Step 4: Parse<a class="headerlink" href="#step-4-parse" title="Permalink to this headline">¶</a></h2>
 <p>Let’s create a new file “calc.c” and parse inputs reading from stdin.</p>
 <p>The main function does the below things:</p>
@@ -347,8 +346,8 @@
 <span class="go">error: eval: 6</span>
 </pre></div>
 </div>
-</section>
-</section>
+</div>
+</div>
 
       </article>
       <footer>

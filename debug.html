@@ -2,12 +2,11 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Change Log" href="whatsnew.html" /><link rel="prev" title="Build" href="build.html" />
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Change Log" href="whatsnew.html" /><link rel="prev" title="Build" href="build.html" />
 
-    <meta name="generator" content="sphinx-3.5.3, furo 2021.03.20.beta30"/>
+    <meta name="generator" content="sphinx-3.5.4, furo 2021.04.11.beta34"/>
         <title>Debug - Peppa PEG 1.10.0 documentation</title>
-      <link rel="stylesheet" href="_static/styles/furo.css?digest=978e1795dfe158b585dda6a8417f6411828bf3ed">
+      <link rel="stylesheet" href="_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
     <link rel="stylesheet" href="_static/pygments.css">
     <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
     
@@ -142,11 +141,11 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <section id="debug">
+        <div class="section" id="debug">
 <h1>Debug<a class="headerlink" href="#debug" title="Permalink to this headline">¶</a></h1>
 <p>If you encounter segfaults or memory leaks, please check with your grammar implementation.
 If you believe the issue origins from Peppa PEG and want to debug it, this document can be helpful.</p>
-<section id="checking-segfaults">
+<div class="section" id="checking-segfaults">
 <h2>Checking Segfaults<a class="headerlink" href="#checking-segfaults" title="Permalink to this headline">¶</a></h2>
 <p>Assuming your operation system has gdb or lldb installed. Depending on your toolchain, use gdb if using gcc, use lldb if using llvm. After installing a debugger, you can create a simple program that recurs the segfault problem.</p>
 <p>For example,</p>
@@ -178,8 +177,8 @@ If you believe the issue origins from Peppa PEG and want to debug it, this docum
 </pre></div>
 </div>
 <p>In this case, it’s <cite>0x0</cite> so a segfault occurred. To fix it, create the grammar using <cite>P4_CreateGrammar()</cite>.</p>
-</section>
-<section id="checking-memory-leaks">
+</div>
+<div class="section" id="checking-memory-leaks">
 <h2>Checking Memory Leaks<a class="headerlink" href="#checking-memory-leaks" title="Permalink to this headline">¶</a></h2>
 <p>Assuming your operation system has gdb or lldb installed. Depending on your toolchain, use gdb if using gcc, use lldb if using llvm. After installing a debugger, you can create a simple program that recurs the segfault problem.</p>
 <p>For example,</p>
@@ -211,13 +210,13 @@ If you believe the issue origins from Peppa PEG and want to debug it, this docum
 </pre></div>
 </div>
 <p>In this case, it’s <cite>0x0</cite> so a segfault occurred. To fix it, create the grammar using <cite>P4_CreateGrammar()</cite>.</p>
-</section>
-<section id="conclusion">
+</div>
+<div class="section" id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
 <p>Programs are not always correct as human makes mistakes.
 By crafting the debugging skills using tools like gdb/lldb/valgrind, we will follow the trace, pin point the problem, and fix the bug 🐛.</p>
-</section>
-</section>
+</div>
+</div>
 
       </article>
       <footer>

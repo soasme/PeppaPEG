@@ -105,7 +105,7 @@ P4_Parse(json, source);
 If success, the parsed source will contain an AST:
 
 ```
-P4_JsonifySourceAst(json, stdout, root);
+P4_JsonifySourceAst(source, stdout, root);
 ```
 
 ```

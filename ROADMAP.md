@@ -9,6 +9,9 @@
 - [ ] api: Until.
 - [ ] api: take a look at ohm.
 - [ ] api: Sanitize `\u0000` to whitespace for the source input, this happens in creating the source/setting the source size.
+- [ ] api: Support more spaced rules.
+- [ ] api: left recursion. https://github.com/orlandohill/peg-left-recursion
+- [ ] api: support comment in peg grammar
 - [ ] New Expression Kind: Numeric.
 - [ ] New Expression Kind: CharacterSet.
 - [ ] New Expression Kind: Complement.
@@ -19,6 +22,7 @@
 - [ ] perf: pre-alloc tokens.
 - [ ] perf: Cache literal len.
 - [ ] perf: backrefs is not necessary if there is no BackReference in Sequence.
+- [ ] perf: tracer: https://pegjs.org/documentation
 - [ ] peg: Stop on first error v/s Recover from Panic.
 - [ ] peg: built-in rules: letters.
 - [ ] peg: built-in rules: unicode letters.
@@ -29,7 +33,7 @@
 - [ ] binding: python: example: cffi, misaka, parsimonious (api). <https://tomassetti.me/parsing-in-python/>.
 - [ ] tests: benchmark: example: json-c. `valgrind --tool=massif --massif-out-file=massif.out ./build/tests/test_example_json && ms_print massif.out ms_print.out`.
 - [ ] build: static lib.
-- [ ] build: wasm.
+- [ ] build: wasm. `docker run --rm -v $(pwd):/src -u $(id -u):$(id -g)   emscripten/emsdk emcc peppapeg.c -Os -s WASM=1 -s SIDE_MODULE=1 -o /src/peppapeg.wasm`.
 - [ ] tests: Enable AddressSanitizer. Example: cJSON.
 - [ ] tests: Add a fuzzy testing framework.
 - [ ] docs: read [A parsing machine for PEGs](http://www.inf.puc-rio.br/~roberto/docs/ry08-4.pdf).

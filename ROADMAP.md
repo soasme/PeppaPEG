@@ -11,6 +11,7 @@
 - [ ] api: Sanitize `\u0000` to whitespace for the source input, this happens in creating the source/setting the source size.
 - [ ] api: Support more spaced rules.
 - [ ] api: left recursion. https://github.com/orlandohill/peg-left-recursion
+- [ ] api: register a function for matching source. This should help dealing with some inputs difficult to parse.
 - [ ] api: support comment in peg grammar
 - [ ] New Expression Kind: Numeric.
 - [ ] New Expression Kind: CharacterSet.

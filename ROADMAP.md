@@ -28,6 +28,7 @@
 - [ ] peg: built-in rules: unicode letters.
 - [ ] peg: built-in rules: digits.
 - [ ] peg: built-in rules: unicode digits.
+- [ ] peg: extend range: `[\p{L}]`, `[0-9..2,a-z,A-Z,\p{L},\u{1}-\u{10ffff}]`.
 - [ ] peg: left recursive: https://tratt.net/laurie/research/pubs/html/tratt__direct_left_recursive_parsing_expression_grammars/
       https://github.com/orlandohill/peg-left-recursion
 - [ ] binding: python: example: cffi, misaka, parsimonious (api). <https://tomassetti.me/parsing-in-python/>.

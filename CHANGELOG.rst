@@ -6,6 +6,9 @@ Not Yet Released
 
 Code change: <https://github.com/soasme/PeppaPEG/compare/v1.10.0..HEAD>.
 
+* [Feature]: Allow setting arbitrary number of @spaced rules. `#66 <https://github.com/soasme/PeppaPEG/pull/66>`_
+* [Feature]: Add P4_AcquireSourceAst. `#64 <https://github.com/soasme/PeppaPEG/pull/64>`_
+* [Example]: Add tutjson page to docs. `#63 <https://github.com/soasme/PeppaPEG/pull/63>`_
 * [Feature]: Add P4_ResetSource. `#62 <https://github.com/soasme/PeppaPEG/pull/62>`_
 * [Feature]: Add P4_InspectSourceAst. `#61 <https://github.com/soasme/PeppaPEG/pull/61>`_
 * [Feature]: Customize malloc/free/realloc. `#60 <https://github.com/soasme/PeppaPEG/pull/60>`_

@@ -2369,6 +2369,9 @@ P4_DeleteExpression(P4_Expression* expr) {
             if (expr->literal)
                 P4_FREE(expr->literal);
             break;
+        case P4_Range:
+            P4_FREE(expr->ranges);
+            break;
         case P4_Reference:
             /* Case P4_Reference is quite special - it is not the owner of ref_expr.
              * We free the referenced string if exists though. */

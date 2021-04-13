@@ -469,12 +469,8 @@ typedef struct P4_Expression {
 
         /** Used by P4_Range. */
         struct {
-            /* The lower code point of the range (inclusive). */
-            P4_Rune                 lower;
-            /* The upper code point of the range (inclusive). */
-            P4_Rune                 upper;
-            /* The step to jump inside the range. */
-            size_t                  stride;
+            size_t                  ranges_count;
+            struct P4_RuneRange*    ranges;
         };
 
         /** Used by P4_Sequence..P4_Choice. */

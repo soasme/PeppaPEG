@@ -346,8 +346,8 @@ void test_eval_insensitive(void) {
         P4_Expression* value = 0; \
         if (root) P4_PegEval(root, &value); \
         TEST_ASSERT_EQUAL(P4_Range, (value)->kind); \
-        TEST_ASSERT_EQUAL(expect_lower, (value)->lower); \
-        TEST_ASSERT_EQUAL(expect_upper, (value)->upper); \
+        TEST_ASSERT_EQUAL(expect_lower, (value)->ranges[0].lower); \
+        TEST_ASSERT_EQUAL(expect_upper, (value)->ranges[0].upper); \
         P4_DeleteExpression(value); TEARDOWN_EVAL(); \
 } while (0);
 

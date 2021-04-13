@@ -874,8 +874,19 @@ P4_MatchRange(P4_Source* s, P4_Expression* e) {
 
     uint32_t rune = 0x0;
     size_t size = P4_ReadRune(str, &rune);
+    size_t i = 0;
+    bool found = false;
 
-    if (rune < e->lower || rune > e->upper || (rune - e->lower) % e->stride != 0) {
+    for (i = 0; i < e->ranges_count; i++) {
+        if (rune < e->ranges[i].lower
+                || rune > e->ranges[i].upper
+                || (rune - e->ranges[i].lower) % e->ranges[i].stride != 0) {
+            continue;
+        } else
+            found = true;
+    }
+
+    if (!found) {
         P4_RaiseError(s, P4_MatchError, "not in range");
         return NULL;
     }
@@ -1506,9 +1517,11 @@ P4_CreateRange(P4_Rune lower, P4_Rune upper, size_t stride) {
     expr->kind = P4_Range;
     expr->flag = 0;
     expr->name = NULL;
-    expr->lower = lower;
-    expr->upper = upper;
-    expr->stride = stride;
+    expr->ranges_count = 1;
+    expr->ranges = P4_MALLOC(sizeof(P4_RuneRange));
+    expr->ranges[0].lower = lower;
+    expr->ranges[0].upper = upper;
+    expr->ranges[0].stride = stride;
     return expr;
 }
 
@@ -2744,15 +2757,30 @@ P4_Grammar* P4_CreatePegGrammar () {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_PegRuleLiteral, P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleRange, 6,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleRange, 3,
         P4_CreateLiteral("[", true),
-        P4_CreateReference(P4_PegRuleChar),
-        P4_CreateLiteral("-", true),
-        P4_CreateReference(P4_PegRuleChar),
-        P4_CreateZeroOrOnce(P4_CreateSequenceWithMembers(2,
-            P4_CreateLiteral("..", true),
-            P4_CreateReference(P4_PegRuleNumber)
-        )),
+        P4_CreateChoiceWithMembers(2,
+            P4_CreateSequenceWithMembers(3,
+                P4_CreateLiteral("\\p{", true),
+                P4_CreateChoiceWithMembers(5,
+                    P4_CreateLiteral("Cc", true),
+                    P4_CreateLiteral("Cf", true),
+                    P4_CreateLiteral("Co", true),
+                    P4_CreateLiteral("Cs", true),
+                    P4_CreateLiteral("C", true)
+                ),
+                P4_CreateLiteral("}", true)
+            ),
+            P4_CreateSequenceWithMembers(4,
+                P4_CreateReference(P4_PegRuleChar),
+                P4_CreateLiteral("-", true),
+                P4_CreateReference(P4_PegRuleChar),
+                P4_CreateZeroOrOnce(P4_CreateSequenceWithMembers(2,
+                    P4_CreateLiteral("..", true),
+                    P4_CreateReference(P4_PegRuleNumber)
+                ))
+            )
+        ),
         P4_CreateLiteral("]", true)
     ))
         goto finalize;

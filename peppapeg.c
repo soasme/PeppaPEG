@@ -332,6 +332,56 @@ size_t P4_ReadEscapedRune(char* text, P4_Rune* rune) {
     }
 }
 
+size_t P4_ReadRuneRange(char* text, size_t* count, P4_RuneRange** ranges) {
+    char ch0 = *text;
+
+    if (ch0 == '\0' || ch0 != '\\') {
+        *count = 0;
+        return 0;
+    }
+
+    char ch1 = text[1];
+
+    if (ch1 == '\0' || ch1 != 'p') {
+        *count = 0;
+        return 0;
+    }
+
+    char ch2 = text[2];
+
+    if (ch2 == '\0' || ch2 != '{') {
+        *count = 0;
+        return 0;
+    }
+
+    char* text3 = text+3;
+
+    if (strcmp(text3, "C}") == 0) {
+        *ranges = _C;
+        *count = sizeof(_C) / sizeof(P4_RuneRange);
+        return 5;
+    } else if (strcmp(text3, "Cc}") == 0) {
+        *ranges = _Cc;
+        *count = sizeof(_Cc) / sizeof(P4_RuneRange);
+        return 6;
+    } else if (strcmp(text3, "Cf}") == 0) {
+        *ranges = _Cf;
+        *count = sizeof(_Cf) / sizeof(P4_RuneRange);
+        return 6;
+    } else if (strcmp(text3, "Co}") == 0) {
+        *ranges = _Co;
+        *count = sizeof(_Co) / sizeof(P4_RuneRange);
+        return 6;
+    } else if (strcmp(text3, "Cs}") == 0) {
+        *ranges = _Cs;
+        *count = sizeof(_Cs) / sizeof(P4_RuneRange);
+        return 6;
+    } else {
+        *count = 0;
+        return 0;
+    }
+}
+
 /**
  * @brief   Get rune in lower case.
  *

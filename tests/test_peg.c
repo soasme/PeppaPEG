@@ -88,6 +88,23 @@ void test_range(void) {
 {\"slice\":[1,2],\"type\":\"char\"},\
 {\"slice\":[3,4],\"type\":\"char\"},\
 {\"slice\":[6,7],\"type\":\"number\"}]}]");
+
+    ASSERT_PEG_PARSE(P4_PegRuleRange, "[\\p{__}]", P4_MatchError, "[]")
+    ASSERT_PEG_PARSE(P4_PegRuleRange, "[\\p{C}]", P4_Ok, "\
+[{\"slice\":[0,7],\"type\":\"range\",\"children\":[\
+{\"slice\":[4,5],\"type\":\"range_category\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleRange, "[\\p{Co}]", P4_Ok, "\
+[{\"slice\":[0,8],\"type\":\"range\",\"children\":[\
+{\"slice\":[4,6],\"type\":\"range_category\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleRange, "[\\p{Cs}]", P4_Ok, "\
+[{\"slice\":[0,8],\"type\":\"range\",\"children\":[\
+{\"slice\":[4,6],\"type\":\"range_category\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleRange, "[\\p{Cf}]", P4_Ok, "\
+[{\"slice\":[0,8],\"type\":\"range\",\"children\":[\
+{\"slice\":[4,6],\"type\":\"range_category\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleRange, "[\\p{Cc}]", P4_Ok, "\
+[{\"slice\":[0,8],\"type\":\"range\",\"children\":[\
+{\"slice\":[4,6],\"type\":\"range_category\"}]}]");
 }
 
 void test_reference(void) {
@@ -473,6 +490,8 @@ void test_eval_grammar(void) {
     ASSERT_EVAL_GRAMMAR("R1 = [1-9..2];", "R1", "2", P4_MatchError, "[]");
     ASSERT_EVAL_GRAMMAR("R1 = [1-9..2];", "R1", "3", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [1-9..2];", "R1", "4", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = [\\p{Cc}];", "R1", "\n", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = [\\p{Cc}];", "R1", "\b", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = (\"\\n\" / \"\\r\")+;", "R1", "\r\n\r\n", P4_Ok, "[{\"slice\":[0,4],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "1A9F", P4_Ok, "[{\"slice\":[0,4],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "FFFFFF", P4_Ok, "[{\"slice\":[0,6],\"type\":\"R1\"}]");

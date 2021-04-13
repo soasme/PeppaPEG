@@ -333,50 +333,29 @@ size_t P4_ReadEscapedRune(char* text, P4_Rune* rune) {
     }
 }
 
-size_t P4_ReadRuneRange(char* text, size_t* count, P4_RuneRange** ranges) {
-    char ch0 = *text;
+size_t P4_ReadRuneRange(char* text, P4_Slice* slice, size_t* count, P4_RuneRange** ranges) {
+    size_t len = P4_GetSliceSize(slice);
 
-    if (ch0 == '\0' || ch0 != '\\') {
-        *count = 0;
-        return 0;
-    }
-
-    char ch1 = text[1];
-
-    if (ch1 == '\0' || ch1 != 'p') {
-        *count = 0;
-        return 0;
-    }
-
-    char ch2 = text[2];
-
-    if (ch2 == '\0' || ch2 != '{') {
-        *count = 0;
-        return 0;
-    }
-
-    char* text3 = text+3;
-
-    if (strcmp(text3, "C}") == 0) {
-        *ranges = _C;
-        *count = sizeof(_C) / sizeof(P4_RuneRange);
-        return 5;
-    } else if (strcmp(text3, "Cc}") == 0) {
+    if (memcmp(text+slice->start.pos, "Cc", len) == 0) {
         *ranges = _Cc;
         *count = sizeof(_Cc) / sizeof(P4_RuneRange);
-        return 6;
-    } else if (strcmp(text3, "Cf}") == 0) {
+        return 2;
+    } else if (memcmp(text+slice->start.pos, "Cf", len) == 0) {
         *ranges = _Cf;
         *count = sizeof(_Cf) / sizeof(P4_RuneRange);
-        return 6;
-    } else if (strcmp(text3, "Co}") == 0) {
+        return 2;
+    } else if (memcmp(text+slice->start.pos, "Co", len) == 0) {
         *ranges = _Co;
         *count = sizeof(_Co) / sizeof(P4_RuneRange);
-        return 6;
-    } else if (strcmp(text3, "Cs}") == 0) {
+        return 2;
+    } else if (memcmp(text+slice->start.pos, "Cs", len) == 0) {
         *ranges = _Cs;
         *count = sizeof(_Cs) / sizeof(P4_RuneRange);
-        return 6;
+        return 2;
+    } else if (memcmp(text+slice->start.pos, "C", len) == 0) {
+        *ranges = _C;
+        *count = sizeof(_C) / sizeof(P4_RuneRange);
+        return 1;
     } else {
         *count = 0;
         return 0;
@@ -1523,6 +1502,26 @@ P4_CreateRange(P4_Rune lower, P4_Rune upper, size_t stride) {
     expr->ranges[0].lower = lower;
     expr->ranges[0].upper = upper;
     expr->ranges[0].stride = stride;
+    return expr;
+}
+
+P4_PUBLIC P4_Expression*
+P4_CreateRanges(size_t count, P4_RuneRange* ranges) {
+    P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
+    expr->id = 0;
+    expr->kind = P4_Range;
+    expr->flag = 0;
+    expr->name = NULL;
+    expr->ranges_count = count;
+    expr->ranges = P4_MALLOC(sizeof(P4_RuneRange) * count);
+
+    size_t i = 0;
+    for (i = 0; i < count; i++) {
+        expr->ranges[i].lower = ranges[i].lower;
+        expr->ranges[i].upper = ranges[i].upper;
+        expr->ranges[i].stride = ranges[i].stride;
+    }
+
     return expr;
 }
 
@@ -2766,13 +2765,7 @@ P4_Grammar* P4_CreatePegGrammar () {
         P4_CreateChoiceWithMembers(2,
             P4_CreateSequenceWithMembers(3,
                 P4_CreateLiteral("\\p{", true),
-                P4_CreateChoiceWithMembers(5,
-                    P4_CreateLiteral("Cc", true),
-                    P4_CreateLiteral("Cf", true),
-                    P4_CreateLiteral("Co", true),
-                    P4_CreateLiteral("Cs", true),
-                    P4_CreateLiteral("C", true)
-                ),
+                P4_CreateReference(P4_PegRuleRangeCategory),
                 P4_CreateLiteral("}", true)
             ),
             P4_CreateSequenceWithMembers(4,
@@ -2790,6 +2783,18 @@ P4_Grammar* P4_CreatePegGrammar () {
         goto finalize;
 
     if (P4_Ok != P4_SetGrammarRuleName(grammar, P4_PegRuleRange, "range"))
+        goto finalize;
+
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_PegRuleRangeCategory, 5,
+        P4_CreateLiteral("Cc", true),
+        P4_CreateLiteral("Cf", true),
+        P4_CreateLiteral("Co", true),
+        P4_CreateLiteral("Cs", true),
+        P4_CreateLiteral("C", true)
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_SetGrammarRuleName(grammar, P4_PegRuleRangeCategory, "range_category"))
         goto finalize;
 
     if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleReference, 2,
@@ -3198,25 +3203,38 @@ P4_PegEvalInsensitiveLiteral(P4_Token* token, P4_Expression** expr) {
 P4_PRIVATE(P4_Error)
 P4_PegEvalRange(P4_Token* token, P4_Expression** expr) {
     P4_Error err = P4_Ok;
-    P4_Rune lower = 0, upper = 0;
-    size_t stride = 1;
 
-    if ((err = P4_PegEvalChar(token->head, &lower)) != P4_Ok)
-        return err;
+    if (token->head == token->tail) { /* one single child - \\p{XX} */
+        P4_RuneRange* ranges = NULL;
+        size_t count = 0;
 
-    if ((err = P4_PegEvalChar(token->head->next, &upper)) != P4_Ok)
-        return err;
+        if (0 == P4_ReadRuneRange(token->head->text, &token->head->slice, &count, &ranges))
+            return P4_ValueError;
 
-    if (token->head->next->next != NULL)
-        if ((err = P4_PegEvalNumber(token->head->next->next, &stride)) != P4_Ok)
+        *expr = P4_CreateRanges(count, ranges);
+        if (*expr == NULL)
+            return P4_MemoryError;
+    } else {
+        P4_Rune lower = 0, upper = 0;
+        size_t stride = 1;
+
+        if ((err = P4_PegEvalChar(token->head, &lower)) != P4_Ok)
             return err;
 
-    if (lower > upper || lower == 0 || upper == 0 || stride == 0)
-        return P4_ValueError;
+        if ((err = P4_PegEvalChar(token->head->next, &upper)) != P4_Ok)
+            return err;
 
-    *expr = P4_CreateRange(lower, upper, stride);
-    if (*expr == NULL)
-        return P4_MemoryError;
+        if (token->head->next->next != NULL)
+            if ((err = P4_PegEvalNumber(token->head->next->next, &stride)) != P4_Ok)
+                return err;
+
+        if (lower > upper || lower == 0 || upper == 0 || stride == 0)
+            return P4_ValueError;
+
+        *expr = P4_CreateRange(lower, upper, stride);
+        if (*expr == NULL)
+            return P4_MemoryError;
+    }
 
     return P4_Ok;
 }

@@ -1968,65 +1968,58 @@ P4_GetErrorMessage(P4_Source* source) {
 
 P4_PRIVATE(P4_Error)
 P4_SetWhitespaces(P4_Grammar* grammar) {
-    size_t          i = 0;
-    size_t          count = 0;
-    P4_Expression*  rules[2] = {0, 0};
-    P4_Expression*  repeat = NULL;
-    P4_Expression*  rule = NULL;
+    size_t          i = 0, j = 0;
 
-    for (i = 0; i < grammar->count; i++) {
+    /* Get the total number of SPACED rules */
+    size_t          count = 0;
+    for (i = 0; i < grammar->count; i++)
+        if (IS_SPACED(grammar->rules[i]))
+            count++;
+
+    /* Set the total number of SPACED rules */
+    grammar->spaced_count = count;
+
+    /* No whitespace rule if count == 0 */
+    if (count == 0)
+        return P4_Ok;
+
+    /* Create a wrapper repeat expression. */
+    P4_Expression*  repeat = P4_CreateChoice(count);
+    if (repeat == NULL)
+        return P4_MemoryError;
+
+    /* Add all SPACED rules to the repeat expression. */
+    P4_Expression *rule = NULL, *rule_ref = NULL;
+    for (i = 0, j = 0; i < grammar->count; i++) {
         rule = grammar->rules[i];
 
         if (IS_SPACED(rule)) {
-            rules[count] = P4_CreateReference(rule->id);
+            rule_ref = P4_CreateReference(rule->id);
 
-            if (rules[count] == NULL)
-                goto end;
+            if (rule_ref == NULL)
+                goto finalize;
 
-            rules[count]->ref_expr = rule;
+            rule_ref->ref_expr = rule;
 
-            count++;
+            if (P4_Ok != P4_SetMember(repeat, j, rule_ref))
+                goto finalize;
+
+            j++;
         }
-
-        if (count > 1)
-            break;
     }
 
-    if (count == 0) {
-        return P4_Ok;
-
-    } else if (count == 1) {
-        repeat = rules[0];
-
-    } else if (count == 2) {
-        repeat = P4_CreateChoice(2);
-        if (repeat == NULL)
-            goto end;
-        if (P4_SetMember(repeat, 0, rules[0]) != P4_Ok)
-            goto end;
-        if (P4_SetMember(repeat, 1, rules[1]) != P4_Ok)
-            goto end;
-    }
-
+    /* Repeat the choice for zero or more times. */
     if ((grammar->spaced_rules = P4_CreateZeroOrMore(repeat))== NULL)
-        goto end;
-
-    grammar->spaced_count = count;
+        goto finalize;
 
     return P4_Ok;
 
-end:
-    if (rules[0] != NULL)
-        P4_DeleteExpression(rules[0]);
-
-    if (rules[1] != NULL)
-        P4_DeleteExpression(rules[1]);
-
-    if (grammar->spaced_rules != NULL) {
-        P4_DeleteExpression(grammar->spaced_rules);
-        grammar->spaced_rules = NULL;
+finalize:
+    if (repeat != NULL) {
+        P4_DeleteExpression(repeat);
     }
 
+    grammar->spaced_rules = NULL;
     grammar->spaced_count = SIZE_MAX;
 
     return P4_MemoryError;

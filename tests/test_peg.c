@@ -608,6 +608,20 @@ void test_eval_grammar(void) {
 
     ASSERT_EVAL_GRAMMAR(
         "R1 = [a-z]+;"
+        "@spaced R2 = \" \";"
+        "@spaced R3 = \"\\t\";"
+        "@spaced R4 = \"\\r\";"
+        "@spaced R5 = \"\\n\";",
+
+        "R1", "xxx", P4_Ok,
+
+        "["
+            "{\"slice\":[0,3],\"type\":\"R1\"}"
+        "]"
+    );
+
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = [a-z]+;"
 
         "@spaced @lifted\n"
         "R2 = \" \" / \"\\t\" / \"\\r\" / \"\\n\";",

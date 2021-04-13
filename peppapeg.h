@@ -322,6 +322,22 @@ typedef struct P4_Position {
 } P4_Position;
 
 /**
+ * P4_RuneRange specifies a range between two runes.
+ *
+ * Example:
+ *
+ *      P4_RuneRange range = { .lower='a', .upper='z', .stride=1 };
+ */
+typedef struct P4_RuneRange {
+    /* The lower code point of the range (inclusive). */
+    P4_Rune                 lower;
+    /* The upper code point of the range (inclusive). */
+    P4_Rune                 upper;
+    /* The step to jump inside the range. */
+    size_t                  stride;
+} P4_RuneRange;
+
+/**
  * The slice of a string.
  *
  * P4_Slice does not hold a pointer to the string.
@@ -2001,6 +2017,7 @@ P4_String      P4_StringifyPegGrammarRuleID(P4_RuleID id);
  *      P4_Parse(grammar, source);
  */
 P4_Grammar*    P4_LoadGrammar(P4_String rules);
+
 
 #ifdef __cplusplus
 }

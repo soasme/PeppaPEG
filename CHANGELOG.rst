@@ -6,6 +6,11 @@ Not Yet Released
 
 Code change: <https://github.com/soasme/PeppaPEG/compare/v1.10.0..HEAD>.
 
+1.11.0 (8 Apr, 2021)
+---------------------
+
+Code change: <https://github.com/soasme/PeppaPEG/compare/v1.10.0..v1.11.0>.
+
 * [Feature]: Allow setting arbitrary number of @spaced rules. `#66 <https://github.com/soasme/PeppaPEG/pull/66>`_
 * [Feature]: Add P4_AcquireSourceAst. `#64 <https://github.com/soasme/PeppaPEG/pull/64>`_
 * [Example]: Add tutjson page to docs. `#63 <https://github.com/soasme/PeppaPEG/pull/63>`_

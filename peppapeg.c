@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <assert.h>
+#include <inttypes.h>
 
 #include "peppapeg.h"
 
@@ -1439,7 +1440,7 @@ P4_JsonifySourceAst(P4_Grammar* grammar, FILE* stream, P4_Token* token) {
         if (expr->name)
             fprintf(stream, ",\"type\":\"%s\"", expr->name);
         else
-            fprintf(stream, ",\"type\":\"R%lu\"", tmp->rule_id);
+            fprintf(stream, ",\"type\":\"R%" PRIu64 "\"", tmp->rule_id);
         if (tmp->head != NULL) {
             fprintf(stream, ",\"children\":");
             P4_JsonifySourceAst(grammar, stream, tmp->head);

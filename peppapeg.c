@@ -700,47 +700,47 @@ size_t P4_ReadEscapedRune(char* text, P4_Rune* rune) {
 size_t P4_ReadRuneRange(char* text, P4_Slice* slice, size_t* count, P4_RuneRange** ranges) {
     size_t len = P4_GetSliceSize(slice);
 
-    if (memcmp(text+slice->start.pos, "Cc", len) == 0) {
+    if (len == 2 && memcmp(text+slice->start.pos, "Cc", len) == 0) {
         *ranges = _Cc;
         *count = sizeof(_Cc) / sizeof(P4_RuneRange);
         return 2;
-    } else if (memcmp(text+slice->start.pos, "Cf", len) == 0) {
+    } else if (len == 2 && memcmp(text+slice->start.pos, "Cf", len) == 0) {
         *ranges = _Cf;
         *count = sizeof(_Cf) / sizeof(P4_RuneRange);
         return 2;
-    } else if (memcmp(text+slice->start.pos, "Co", len) == 0) {
+    } else if (len == 2 && memcmp(text+slice->start.pos, "Co", len) == 0) {
         *ranges = _Co;
         *count = sizeof(_Co) / sizeof(P4_RuneRange);
         return 2;
-    } else if (memcmp(text+slice->start.pos, "Cs", len) == 0) {
+    } else if (len == 2 && memcmp(text+slice->start.pos, "Cs", len) == 0) {
         *ranges = _Cs;
         *count = sizeof(_Cs) / sizeof(P4_RuneRange);
         return 2;
-    } else if (memcmp(text+slice->start.pos, "C", len) == 0) {
+    } else if (len == 1 && memcmp(text+slice->start.pos, "C", len) == 0) {
         *ranges = _C;
         *count = sizeof(_C) / sizeof(P4_RuneRange);
         return 1;
-    } else if (memcmp(text+slice->start.pos, "Ll", len) == 0) {
+    } else if (len == 2 && memcmp(text+slice->start.pos, "Ll", len) == 0) {
         *ranges = _Ll;
         *count = sizeof(_Ll) / sizeof(P4_RuneRange);
         return 2;
-    } else if (memcmp(text+slice->start.pos, "Lm", len) == 0) {
+    } else if (len == 2 && memcmp(text+slice->start.pos, "Lm", len) == 0) {
         *ranges = _Lm;
         *count = sizeof(_Lm) / sizeof(P4_RuneRange);
         return 2;
-    } else if (memcmp(text+slice->start.pos, "Lo", len) == 0) {
+    } else if (len == 2 && memcmp(text+slice->start.pos, "Lo", len) == 0) {
         *ranges = _Lo;
         *count = sizeof(_Lo) / sizeof(P4_RuneRange);
         return 2;
-    } else if (memcmp(text+slice->start.pos, "Lt", len) == 0) {
+    } else if (len == 2 && memcmp(text+slice->start.pos, "Lt", len) == 0) {
         *ranges = _Lt;
         *count = sizeof(_Lt) / sizeof(P4_RuneRange);
         return 2;
-    } else if (memcmp(text+slice->start.pos, "Lu", len) == 0) {
+    } else if (len == 2 && memcmp(text+slice->start.pos, "Lu", len) == 0) {
         *ranges = _Lu;
         *count = sizeof(_Lu) / sizeof(P4_RuneRange);
         return 2;
-    } else if (memcmp(text+slice->start.pos, "L", len) == 0) {
+    } else if (len == 1 && memcmp(text+slice->start.pos, "L", len) == 0) {
         *ranges = _L;
         *count = sizeof(_L) / sizeof(P4_RuneRange);
         return 1;
@@ -3184,7 +3184,7 @@ P4_Grammar* P4_CreatePegGrammar () {
         P4_CreateLiteral("Lo", true),
         P4_CreateLiteral("Lt", true),
         P4_CreateLiteral("Lu", true),
-        P4_CreateLiteral("L", true),
+        P4_CreateLiteral("L", true)
     ))
         goto finalize;
 

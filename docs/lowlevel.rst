@@ -501,10 +501,6 @@ For example, this rule matches "xxx", "x   x         x", etc.
 The SPACED expressions are not inserted before or after the Sequence and Repeat, hence "  Hello World  ", "  xxx  " not matching.
 
 
-.. note::
-
-    Currently, Peppa PEG only supports at maximum two SPACED grammar rules.
-
 `P4_FLAG_TIGHT`
 ``````````````````````
 

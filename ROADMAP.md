@@ -45,6 +45,7 @@
 - [ ] lang: ES5 grammar: https://ohmlang.github.io/editor/#0a9a649c3c630fd0a470ba6cb75393fe
 - [ ] lang: zig grammar: https://ziglang.org/documentation/master/#Grammar
 - [ ] lang: awk grammar: https://github.com/onetrueawk/awk/blob/master/lex.c https://github.com/onetrueawk/awk/blob/master/awkgram.y
+- [ ] lang: sql grammar: https://tomassetti.me/parsing-sql/
 - [ ] lang: A binary executable for display parsed results in JSON output. The executable can support general programming languages, such as Mustache, Python, JSON, YAML, etc. Some other programs can then takes the input from stdin and do some fancy work. `p4 parse --lang=py38 source.py`
 - [ ] Pratt parser: https://en.wikipedia.org/wiki/Operator-precedence_parser
 - [x] api: `P4_AcquireSourceAst(source, &ast)`: set ast, reset source. It's useful when we need the parsed result but not care about source itself. Token tree should now owned by ast and shall then be free by the caller. Added in v1.11.0

@@ -251,6 +251,7 @@ typedef enum {
     P4_PegRuleChar                  = 27,
     P4_PegRuleDot                   = 28,
     P4_PegRuleWhitespace            = 29,
+    P4_PegRuleRangeCategory         = 30,
 } P4_PegRuleID;
 
 /*
@@ -320,6 +321,22 @@ typedef struct P4_Position {
     /** The col offset in the line. */
     size_t              offset;
 } P4_Position;
+
+/**
+ * P4_RuneRange specifies a range between two runes.
+ *
+ * Example:
+ *
+ *      P4_RuneRange range = { .lower='a', .upper='z', .stride=1 };
+ */
+typedef struct P4_RuneRange {
+    /* The lower code point of the range (inclusive). */
+    P4_Rune                 lower;
+    /* The upper code point of the range (inclusive). */
+    P4_Rune                 upper;
+    /* The step to jump inside the range. */
+    size_t                  stride;
+} P4_RuneRange;
 
 /**
  * The slice of a string.
@@ -453,12 +470,8 @@ typedef struct P4_Expression {
 
         /** Used by P4_Range. */
         struct {
-            /* The lower code point of the range (inclusive). */
-            P4_Rune                 lower;
-            /* The upper code point of the range (inclusive). */
-            P4_Rune                 upper;
-            /* The step to jump inside the range. */
-            size_t                  stride;
+            size_t                  ranges_count;
+            struct P4_RuneRange*    ranges;
         };
 
         /** Used by P4_Sequence..P4_Choice. */
@@ -664,6 +677,22 @@ P4_Error       P4_AddLiteral(P4_Grammar*, P4_RuleID, const P4_String, bool sensi
 P4_Expression* P4_CreateRange(P4_Rune, P4_Rune, size_t);
 
 /**
+ * Create a P4_Range expression that holds multiple ranges.
+ * @param   count       The total number of ranges.
+ * @param   ranges      A list of P4_RuneRange.
+ * @return  A P4_Expression.
+ *
+ * Example:
+ *
+ *      P4_RuneRange alphadigits[] = {{'a', 'Z', 1}, {'0', '9', 1}};
+ *      P4_Expression* range = P4_CreateRanges(
+ *          sizeof(alphadigits) / sizeof(P4_RuneRange),
+ *          alphadigits
+ *      );
+ */
+P4_Expression* P4_CreateRanges(size_t count, P4_RuneRange* ranges);
+
+/**
  * Add a range expression as grammar rule.
  *
  * @param   grammar     The grammar.
@@ -680,6 +709,25 @@ P4_Expression* P4_CreateRange(P4_Rune, P4_Rune, size_t);
  *      P4_AddRange(grammar, 1, 0x4E00, 0x9FFF, 1);
  */
 P4_Error       P4_AddRange(P4_Grammar*, P4_RuleID, P4_Rune, P4_Rune, size_t);
+
+/**
+ * Add sub-ranges expression as grammar rule.
+ * @param   grammar     The grammar.
+ * @param   id          The grammar rule id.
+ * @param   count       The total number of ranges.
+ * @param   ranges      A list of P4_RuneRange.
+ * @return  The error code.
+ *
+ * Example:
+ *
+ *      P4_RuneRange alphadigits[] = {{'a', 'Z', 1}, {'0', '9', 1}};
+ *      P4_Error err = P4_AddRanges(
+ *          grammar, 1,
+ *          sizeof(alphadigits) / sizeof(P4_RuneRange),
+ *          alphadigits
+ *      );
+ */
+P4_Error       P4_AddRanges(P4_Grammar*, P4_RuleID, size_t count, P4_RuneRange* ranges);
 
 /*
  * ██████╗░███████╗███████╗███████╗██████╗░███████╗███╗░░██╗░█████╗░███████╗
@@ -2001,6 +2049,7 @@ P4_String      P4_StringifyPegGrammarRuleID(P4_RuleID id);
  *      P4_Parse(grammar, source);
  */
 P4_Grammar*    P4_LoadGrammar(P4_String rules);
+
 
 #ifdef __cplusplus
 }

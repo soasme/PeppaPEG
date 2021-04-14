@@ -108,6 +108,18 @@ In this example, only odd number between `'0'` to `'9'` can match.
 
     digits = [0-9..2];
 
+Range also supports certain unicode character sets,  such as `C`, `Cc`, `Cf`, `Co`, `Cs`,
+`Ll`, `Lm`, `Lo`, `Lt`, `Lu`, `L`, `Nd`, `Nl`, `No`, `N`, etc.
+They're wrapped via `\p{}`, for example:
+
+* unicode_letter: a Unicode code point classified as "Letter" (Ll+Lm+Lo+Lt+Lu).
+* unicode_digit: a Unicode code point classified as "Number, decimal digit"(Nd).
+
+.. code-block::
+
+    unicode_letter = [\p{L}];
+    unicode_digit  = [\p{Nd}];
+
 Dot
 ---
 
@@ -408,6 +420,8 @@ Cheatsheet
      - range with stride
    * - `[\u{1}-\u{10ffff}]`
      - range using unicode runes
+   * - `[\p{L}]`
+     - range using unicode categories
    * - `.`
      - any character
    * - `foo bar`

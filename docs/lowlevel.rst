@@ -77,7 +77,16 @@ The value of lower must be less than the upper.
     // WRONG!
     P4_Expression* expr = P4_CreateRange('z', 'a', 1);
 
-:seealso: :c:enum:`P4_Range`, :c:func:`P4_CreateRange`, :c:func:`P4_AddRange`.
+Range can be an aggregation of several sub-ranges. The below example is
+equivalent to a choice of 3 ranges.
+
+.. code-block:: c
+
+    P4_RuneRange alphadigits[] = {{'a', 'z', 1}, {'A', 'Z', 1}, {'0', '9', 1}};
+    P4_Expression* expr = P4_CreateRanges(3, alphadigits);
+
+:seealso: :c:enum:`P4_Range`, :c:func:`P4_CreateRange`, :c:func:`P4_AddRange`,
+          :c:func:`P4_CreateRanges`, :c:func:`P4_AddRanges`.
 
 Sequence
 ````````

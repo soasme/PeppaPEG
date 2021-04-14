@@ -6,7 +6,7 @@ Not Yet Released
 
 Code change: <https://github.com/soasme/PeppaPEG/compare/v1.11.0..HEAD>.
 
-* [Feature]: Support Unicode Character Categories for P4_Range. `#65 <https://github.com/soasme/PeppaPEG/pull/65>`_, `#66 <https://github.com/soasme/PeppaPEG/pull/66>`_
+* [Feature]: Support Unicode Character Categories for P4_Range. `#65 <https://github.com/soasme/PeppaPEG/pull/65>`_, `#67 <https://github.com/soasme/PeppaPEG/pull/67>`_
 
 1.11.0 (8 Apr, 2021)
 ---------------------

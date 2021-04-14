@@ -9,33 +9,24 @@
 - [ ] api: Until.
 - [ ] api: take a look at ohm.
 - [ ] api: Sanitize `\u0000` to whitespace for the source input, this happens in creating the source/setting the source size.
-- [ ] api: Support more spaced rules.
 - [ ] api: left recursion. https://github.com/orlandohill/peg-left-recursion
 - [ ] api: register a function for matching source. This should help dealing with some inputs difficult to parse.
 - [ ] api: support comment in peg grammar
-- [ ] New Expression Kind: Numeric.
-- [ ] New Expression Kind: CharacterSet.
-- [ ] New Expression Kind: Complement.
-- [ ] New Expression Kind: Panic.
-- [ ] New Expression Kind: Function.
-- [ ] New Expression Kind: Sub Grammar.
-- [ ] New Source Flag: Support UTF-8 BOM sequence (0xEF 0xBB 0xBF) at the start of source.
+- [ ] api: Support UTF-8 BOM sequence (0xEF 0xBB 0xBF) at the start of source.
+- [ ] peg: Numeric.
+- [ ] peg: Complement.
+- [ ] peg: Panic.
+- [ ] peg: Function.
+- [ ] peg: Sub Grammar.
+- [ ] peg: Stop on first error v/s Recover from Panic.
+- [ ] peg: left recursive: https://tratt.net/laurie/research/pubs/html/tratt__direct_left_recursive_parsing_expression_grammars/
 - [ ] perf: pre-alloc tokens.
 - [ ] perf: Cache literal len.
 - [ ] perf: backrefs is not necessary if there is no BackReference in Sequence.
 - [ ] perf: tracer: https://pegjs.org/documentation
-- [ ] peg: Stop on first error v/s Recover from Panic.
-- [ ] peg: built-in rules: letters.
-- [ ] peg: built-in rules: unicode letters.
-- [ ] peg: built-in rules: digits.
-- [ ] peg: built-in rules: unicode digits.
-- [ ] peg: extend range: `[\p{L}]`, `[0-9..2,a-z,A-Z,\p{L},\u{1}-\u{10ffff}]`.
-- [ ] peg: left recursive: https://tratt.net/laurie/research/pubs/html/tratt__direct_left_recursive_parsing_expression_grammars/
       https://github.com/orlandohill/peg-left-recursion
 - [ ] binding: python: example: cffi, misaka, parsimonious (api). <https://tomassetti.me/parsing-in-python/>.
 - [ ] tests: benchmark: example: json-c. `valgrind --tool=massif --massif-out-file=massif.out ./build/tests/test_example_json && ms_print massif.out ms_print.out`.
-- [ ] build: static lib.
-- [ ] build: wasm. `docker run --rm -v $(pwd):/src -u $(id -u):$(id -g)   emscripten/emsdk emcc peppapeg.c -Os -s WASM=1 -s SIDE_MODULE=1 -o /src/peppapeg.wasm`.  https://gist.github.com/kripken/59c67556dc03bb6d57052fedef1e61ab https://github.com/mbasso/awesome-wasm
 - [ ] tests: Enable AddressSanitizer. Example: cJSON.
 - [ ] tests: Add a fuzzy testing framework.
 - [ ] docs: read [A parsing machine for PEGs](http://www.inf.puc-rio.br/~roberto/docs/ry08-4.pdf).
@@ -48,6 +39,15 @@
 - [ ] lang: sql grammar: https://tomassetti.me/parsing-sql/
 - [ ] lang: A binary executable for display parsed results in JSON output. The executable can support general programming languages, such as Mustache, Python, JSON, YAML, etc. Some other programs can then takes the input from stdin and do some fancy work. `p4 parse --lang=py38 source.py`
 - [ ] Pratt parser: https://en.wikipedia.org/wiki/Operator-precedence_parser
+- [ ] build: static lib.
+- [ ] build: wasm. `docker run --rm -v $(pwd):/src -u $(id -u):$(id -g)   emscripten/emsdk emcc peppapeg.c -Os -s WASM=1 -s SIDE_MODULE=1 -o /src/peppapeg.wasm`.  https://gist.github.com/kripken/59c67556dc03bb6d57052fedef1e61ab https://github.com/mbasso/awesome-wasm
+- [x] peg: CharacterSet. can use range.
+- [x] api: Support more spaced rules. Added in v1.11.0.
+- [x] peg: extend range: `[0-9..2] / [a-z] / [\p{L}] / [\u{1}-\u{10ffff}]`. Added in v1.12.0.
+- [x] peg: built-in rules: letters.
+- [x] peg: built-in rules: unicode letters.
+- [x] peg: built-in rules: digits.
+- [x] peg: built-in rules: unicode digits.
 - [x] api: `P4_AcquireSourceAst(source, &ast)`: set ast, reset source. It's useful when we need the parsed result but not care about source itself. Token tree should now owned by ast and shall then be free by the caller. Added in v1.11.0
 - [x] docs: add explanations.
 - [x] GetErrorString.

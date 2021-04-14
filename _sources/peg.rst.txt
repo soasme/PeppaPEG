@@ -110,7 +110,7 @@ In this example, only odd number between `'0'` to `'9'` can match.
 
 Range also supports certain unicode character sets,  such as `C`, `Cc`, `Cf`, `Co`, `Cs`,
 `Ll`, `Lm`, `Lo`, `Lt`, `Lu`, `L`, `Nd`, `Nl`, `No`, `N`, etc.
-They're wrapped via `\p{}`, for example:
+They're wrapped via `\\p{}`, for example:
 
 * unicode_letter: a Unicode code point classified as "Letter" (Ll+Lm+Lo+Lt+Lu).
 * unicode_digit: a Unicode code point classified as "Number, decimal digit"(Nd).

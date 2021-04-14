@@ -108,6 +108,13 @@ In this example, only odd number between `'0'` to `'9'` can match.
 
     digits = [0-9..2];
 
+Range also supports certain unicode character sets,  such as `C`, `Cc`, `Cf`, `Co`, `Cs`,
+`Ll`, `Lm`, `Lo`, `Lt`, `Lu`, `L`, etc. They're wrapped via `\p{}`, for example:
+
+.. code-block::
+
+    id = [\p{L}]+;
+
 Dot
 ---
 

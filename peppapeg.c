@@ -572,6 +572,21 @@ static P4_RuneRange _Lu[] = {
     {0x1d670, 0x1d689, 1}, {0x1d6a8, 0x1d6c0, 1}, {0x1d6e2, 0x1d6fa, 1}, {0x1d71c, 0x1d734, 1},
     {0x1d756, 0x1d76e, 1}, {0x1d790, 0x1d7a8, 1}, {0x1d7ca, 0x1e900, 4406}, {0x1e901, 0x1e921, 1},
 };
+static P4_RuneRange _Z[] = {
+    {0x0020, 0x00a0, 128}, {0x1680, 0x2000, 2432}, {0x2001, 0x200a, 1}, {0x2028, 0x2029, 1},
+    {0x202f, 0x205f, 48}, {0x3000, 0x3000, 1},
+};
+static P4_RuneRange _Zl[] = {
+    {0x2028, 0x2028, 1},
+};
+static P4_RuneRange _Zp[] = {
+    {0x2029, 0x2029, 1},
+};
+static P4_RuneRange _Zs[] = {
+    {0x0020, 0x00a0, 128}, {0x1680, 0x2000, 2432}, {0x2001, 0x200a, 1}, {0x202f, 0x205f, 48},
+    {0x3000, 0x3000, 1},
+};
+
 
 size_t P4_GetRuneSize(P4_Rune ch) { if (0 == ((P4_Rune)0xffffff80 & ch)) {
     return 1;
@@ -743,6 +758,22 @@ size_t P4_ReadRuneRange(char* text, P4_Slice* slice, size_t* count, P4_RuneRange
     } else if (len == 1 && memcmp(text+slice->start.pos, "L", len) == 0) {
         *ranges = _L;
         *count = sizeof(_L) / sizeof(P4_RuneRange);
+        return 1;
+    } else if (len == 2 && memcmp(text+slice->start.pos, "Zl", len) == 0) {
+        *ranges = _Zl;
+        *count = sizeof(_Zl) / sizeof(P4_RuneRange);
+        return 2;
+    } else if (len == 2 && memcmp(text+slice->start.pos, "Zp", len) == 0) {
+        *ranges = _Zp;
+        *count = sizeof(_Zp) / sizeof(P4_RuneRange);
+        return 2;
+    } else if (len == 2 && memcmp(text+slice->start.pos, "Zs", len) == 0) {
+        *ranges = _Zs;
+        *count = sizeof(_Zs) / sizeof(P4_RuneRange);
+        return 2;
+    } else if (len == 1 && memcmp(text+slice->start.pos, "Z", len) == 0) {
+        *ranges = _Z;
+        *count = sizeof(_Z) / sizeof(P4_RuneRange);
         return 1;
     } else {
         *count = 0;
@@ -3180,7 +3211,7 @@ P4_Grammar* P4_CreatePegGrammar () {
     if (P4_Ok != P4_SetGrammarRuleName(grammar, P4_PegRuleRange, "range"))
         goto finalize;
 
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_PegRuleRangeCategory, 11,
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_PegRuleRangeCategory, 15,
         P4_CreateLiteral("Cc", true),
         P4_CreateLiteral("Cf", true),
         P4_CreateLiteral("Co", true),
@@ -3191,7 +3222,11 @@ P4_Grammar* P4_CreatePegGrammar () {
         P4_CreateLiteral("Lo", true),
         P4_CreateLiteral("Lt", true),
         P4_CreateLiteral("Lu", true),
-        P4_CreateLiteral("L", true)
+        P4_CreateLiteral("L", true),
+        P4_CreateLiteral("Zl", true),
+        P4_CreateLiteral("Zp", true),
+        P4_CreateLiteral("Zs", true),
+        P4_CreateLiteral("Z", true)
     ))
         goto finalize;
 

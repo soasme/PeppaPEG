@@ -415,6 +415,8 @@ Cheatsheet
      - range with stride
    * - `[\u{1}-\u{10ffff}]`
      - range using unicode runes
+   * - `[\p{L}]`
+     - range using unicode categories
    * - `.`
      - any character
    * - `foo bar`

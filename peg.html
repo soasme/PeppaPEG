@@ -215,6 +215,17 @@ In this example, only odd number between <cite>‘0’</cite> to <cite>‘9’</
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">digits</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="o">-</span><span class="mf">9.</span><span class="o">.</span><span class="mi">2</span><span class="p">];</span>
 </pre></div>
 </div>
+<p>Range also supports certain unicode character sets,  such as <cite>C</cite>, <cite>Cc</cite>, <cite>Cf</cite>, <cite>Co</cite>, <cite>Cs</cite>,
+<cite>Ll</cite>, <cite>Lm</cite>, <cite>Lo</cite>, <cite>Lt</cite>, <cite>Lu</cite>, <cite>L</cite>, <cite>Nd</cite>, <cite>Nl</cite>, <cite>No</cite>, <cite>N</cite>, etc.
+They’re wrapped via <cite>p{}</cite>, for example:</p>
+<ul class="simple">
+<li><p>unicode_letter: a Unicode code point classified as “Letter” (Ll+Lm+Lo+Lt+Lu).</p></li>
+<li><p>unicode_digit: a Unicode code point classified as “Number, decimal digit”(Nd).</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">unicode_letter</span> <span class="o">=</span> <span class="p">[</span>\<span class="n">p</span><span class="p">{</span><span class="n">L</span><span class="p">}];</span>
+<span class="n">unicode_digit</span>  <span class="o">=</span> <span class="p">[</span>\<span class="n">p</span><span class="p">{</span><span class="n">Nd</span><span class="p">}];</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="dot">
 <h2>Dot<a class="headerlink" href="#dot" title="Permalink to this headline">¶</a></h2>
@@ -472,40 +483,43 @@ number = [0-9];
 <tr class="row-odd"><td><p><cite>[u{1}-u{10ffff}]</cite></p></td>
 <td><p>range using unicode runes</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>.</cite></p></td>
+<tr class="row-even"><td><p><cite>[p{L}]</cite></p></td>
+<td><p>range using unicode categories</p></td>
+</tr>
+<tr class="row-odd"><td><p><cite>.</cite></p></td>
 <td><p>any character</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>foo bar</cite></p></td>
+<tr class="row-even"><td><p><cite>foo bar</cite></p></td>
 <td><p>sequence</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>foo / bar</cite></p></td>
+<tr class="row-odd"><td><p><cite>foo / bar</cite></p></td>
 <td><p>choice</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>&amp;foo</cite></p></td>
+<tr class="row-even"><td><p><cite>&amp;foo</cite></p></td>
 <td><p>positive</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>!foo</cite></p></td>
+<tr class="row-odd"><td><p><cite>!foo</cite></p></td>
 <td><p>negative</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>foo*</cite></p></td>
+<tr class="row-even"><td><p><cite>foo*</cite></p></td>
 <td><p>zero or more</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>foo+</cite></p></td>
+<tr class="row-odd"><td><p><cite>foo+</cite></p></td>
 <td><p>once or more</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>foo?</cite></p></td>
+<tr class="row-even"><td><p><cite>foo?</cite></p></td>
 <td><p>optional</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>foo{m,}</cite></p></td>
+<tr class="row-odd"><td><p><cite>foo{m,}</cite></p></td>
 <td><p>repeat at least m times</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>foo{,n}</cite></p></td>
+<tr class="row-even"><td><p><cite>foo{,n}</cite></p></td>
 <td><p>repeat at most n times</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>foo{m,n}</cite></p></td>
+<tr class="row-odd"><td><p><cite>foo{m,n}</cite></p></td>
 <td><p>repeat between m-n times</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>foo{m}</cite></p></td>
+<tr class="row-even"><td><p><cite>foo{m}</cite></p></td>
 <td><p>repeat exact n times</p></td>
 </tr>
 </tbody>

@@ -198,9 +198,16 @@
 <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRange</span><span class="p">(</span><span class="sc">'z'</span><span class="p">,</span> <span class="sc">'a'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
 </div>
+<p>Range can be an aggregation of several sub-ranges. The below example is
+equivalent to a choice of 3 ranges.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_RuneRange</span> <span class="n">alphadigits</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{{</span><span class="sc">'a'</span><span class="p">,</span> <span class="sc">'z'</span><span class="p">,</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="sc">'A'</span><span class="p">,</span> <span class="sc">'Z'</span><span class="p">,</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="sc">'0'</span><span class="p">,</span> <span class="sc">'9'</span><span class="p">,</span> <span class="mi">1</span><span class="p">}};</span>
+<span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRanges</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">alphadigits</span><span class="p">);</span>
+</pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">seealso</dt>
-<dd class="field-odd"><p><a class="reference internal" href="api.html#c.P4_ExpressionKind.P4_Range" title="P4_Range"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_Range</span></code></a>, <a class="reference internal" href="api.html#c.P4_CreateRange" title="P4_CreateRange"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateRange()</span></code></a>, <a class="reference internal" href="api.html#c.P4_AddRange" title="P4_AddRange"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_AddRange()</span></code></a>.</p>
+<dd class="field-odd"><p><a class="reference internal" href="api.html#c.P4_ExpressionKind.P4_Range" title="P4_Range"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_Range</span></code></a>, <a class="reference internal" href="api.html#c.P4_CreateRange" title="P4_CreateRange"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateRange()</span></code></a>, <a class="reference internal" href="api.html#c.P4_AddRange" title="P4_AddRange"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_AddRange()</span></code></a>,
+<a class="reference internal" href="api.html#c.P4_CreateRanges" title="P4_CreateRanges"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateRanges()</span></code></a>, <a class="reference internal" href="api.html#c.P4_AddRanges" title="P4_AddRanges"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_AddRanges()</span></code></a>.</p>
 </dd>
 </dl>
 </div>

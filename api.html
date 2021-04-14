@@ -753,6 +753,10 @@
 <dt id="c.P4_PegRuleID.P4_PegRuleWhitespace">
 <span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10a18caf913b7ebe95c351109910698a8f2"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleWhitespace</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleWhitespace" title="Permalink to this definition">¶</a><br/></dt>
 <dd></dd></dl>
+<dl class="c enumerator">
+<dt id="c.P4_PegRuleID.P4_PegRuleRangeCategory">
+<span class="target" id="peppapeg_8h_1a4c8283656061440e75c0301870e7be10a37f9522ec50b3302050531153cd41838"></span><em class="property"><span class="pre">enumerator</span> </em><code class="sig-name descname"><span class="pre">P4_PegRuleRangeCategory</span></code><a class="headerlink" href="#c.P4_PegRuleID.P4_PegRuleRangeCategory" title="Permalink to this definition">¶</a><br/></dt>
+<dd></dd></dl>
 </dd></dl>
 </div>
 </div>
@@ -917,6 +921,30 @@
 </dl>
 </dd></dl>
 <dl class="c function">
+<dt id="c.P4_CreateRanges">
+<span class="target" id="peppapeg_8h_1a89b811e8038a1d5a89ed579184dc72f0"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateRanges</span></code><span class="sig-paren">(</span><span class="pre">size_t</span> <em><span class="pre">count</span></em>, <span class="pre">P4_RuneRange</span> <span class="pre">*</span><em><span class="pre">ranges</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateRanges" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Create a P4_Range expression that holds multiple ranges. <p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_RuneRange</span> <span class="n">alphadigits</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{{</span><span class="s1">'a'</span><span class="p">,</span> <span class="s1">'Z'</span><span class="p">,</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s1">'0'</span><span class="p">,</span> <span class="s1">'9'</span><span class="p">,</span> <span class="mi">1</span><span class="p">}};</span>
+ <span class="n">P4_Expression</span><span class="o">*</span> <span class="nb">range</span> <span class="o">=</span> <span class="n">P4_CreateRanges</span><span class="p">(</span>
+     <span class="n">sizeof</span><span class="p">(</span><span class="n">alphadigits</span><span class="p">)</span> <span class="o">/</span> <span class="n">sizeof</span><span class="p">(</span><span class="n">P4_RuneRange</span><span class="p">),</span>
+     <span class="n">alphadigits</span>
+ <span class="p">);</span>
+</pre></div>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>count</strong> – The total number of ranges. </p></li>
+<li><p><strong>ranges</strong> – A list of P4_RuneRange. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#structP4__Expression"><span class="std std-ref">P4_Expression</span></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="c function">
 <dt id="c.P4_AddRange">
 <span class="target" id="peppapeg_8h_1a0d9ba26573f0d13e5793e1debd72c2bc"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddRange</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">P4_Rune</span>, <span class="pre">P4_Rune</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddRange" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Add a range expression as grammar rule.</p>
@@ -935,6 +963,33 @@
 <li><p><strong>lower</strong> – The lower bound of UTF-8 rule to match (inclusive). </p></li>
 <li><p><strong>upper</strong> – The upper bound of UTF-8 rule to match (inclusive). </p></li>
 <li><p><strong>stride</strong> – The stride when iterating the characters in range. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="c function">
+<dt id="c.P4_AddRanges">
+<span class="target" id="peppapeg_8h_1aac0556370ced16e56afbe99ddf346e6a"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddRanges</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">size_t</span> <em><span class="pre">count</span></em>, <span class="pre">P4_RuneRange</span> <span class="pre">*</span><em><span class="pre">ranges</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddRanges" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Add sub-ranges expression as grammar rule. <p>Example: </p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_RuneRange</span> <span class="n">alphadigits</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{{</span><span class="s1">'a'</span><span class="p">,</span> <span class="s1">'Z'</span><span class="p">,</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s1">'0'</span><span class="p">,</span> <span class="s1">'9'</span><span class="p">,</span> <span class="mi">1</span><span class="p">}};</span>
+ <span class="n">P4_Error</span> <span class="n">err</span> <span class="o">=</span> <span class="n">P4_AddRanges</span><span class="p">(</span>
+     <span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
+     <span class="n">sizeof</span><span class="p">(</span><span class="n">alphadigits</span><span class="p">)</span> <span class="o">/</span> <span class="n">sizeof</span><span class="p">(</span><span class="n">P4_RuneRange</span><span class="p">),</span>
+     <span class="n">alphadigits</span>
+ <span class="p">);</span>
+</pre></div>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>id</strong> – The grammar rule id. </p></li>
+<li><p><strong>count</strong> – The total number of ranges. </p></li>
+<li><p><strong>ranges</strong> – A list of P4_RuneRange. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

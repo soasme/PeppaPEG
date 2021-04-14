@@ -2573,6 +2573,13 @@ P4_AddRange(P4_Grammar* grammar, P4_RuleID id, P4_Rune lower, P4_Rune upper, siz
 }
 
 P4_PUBLIC P4_Error
+P4_AddRanges(P4_Grammar* grammar, P4_RuleID id, size_t count, P4_RuneRange* ranges) {
+    P4_AddSomeGrammarRule(grammar, id, P4_CreateRanges(count, ranges));
+    return P4_Ok;
+}
+
+
+P4_PUBLIC P4_Error
 P4_AddPositive(P4_Grammar* grammar, P4_RuleID id, P4_Expression* ref_expr) {
     if (ref_expr == NULL)
         return P4_NullError;

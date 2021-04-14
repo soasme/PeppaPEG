@@ -677,6 +677,22 @@ P4_Error       P4_AddLiteral(P4_Grammar*, P4_RuleID, const P4_String, bool sensi
 P4_Expression* P4_CreateRange(P4_Rune, P4_Rune, size_t);
 
 /**
+ * Create a P4_Range expression that holds multiple ranges.
+ * @param   count       The total number of ranges.
+ * @param   ranges      A list of P4_RuneRange.
+ * @return  A P4_Expression.
+ *
+ * Example:
+ *
+ *      P4_RuneRange alphadigits[] = {{'a', 'Z', 1}, {'0', '9', 1}};
+ *      P4_Expression* range = P4_CreateRanges(
+ *          sizeof(alphadigits) / sizeof(P4_RuneRange),
+ *          alphadigits
+ *      );
+ */
+P4_Expression* P4_CreateRanges(size_t count, P4_RuneRange* ranges);
+
+/**
  * Add a range expression as grammar rule.
  *
  * @param   grammar     The grammar.
@@ -693,6 +709,25 @@ P4_Expression* P4_CreateRange(P4_Rune, P4_Rune, size_t);
  *      P4_AddRange(grammar, 1, 0x4E00, 0x9FFF, 1);
  */
 P4_Error       P4_AddRange(P4_Grammar*, P4_RuleID, P4_Rune, P4_Rune, size_t);
+
+/**
+ * Add sub-ranges expression as grammar rule.
+ * @param   grammar     The grammar.
+ * @param   id          The grammar rule id.
+ * @param   count       The total number of ranges.
+ * @param   ranges      A list of P4_RuneRange.
+ * @return  The error code.
+ *
+ * Example:
+ *
+ *      P4_RuneRange alphadigits[] = {{'a', 'Z', 1}, {'0', '9', 1}};
+ *      P4_Error err = P4_AddRanges(
+ *          grammar, 1,
+ *          sizeof(alphadigits) / sizeof(P4_RuneRange),
+ *          alphadigits
+ *      );
+ */
+P4_Error       P4_AddRanges(P4_Grammar*, P4_RuleID, size_t count, P4_RuneRange* ranges);
 
 /*
  * ██████╗░███████╗███████╗███████╗██████╗░███████╗███╗░░██╗░█████╗░███████╗

@@ -87,7 +87,7 @@ The lower and upper character of the range can be not only ASCII characters but 
 
     digits = [\u{4e00}-\u{9fff}];
 
-A small trick to match any character is to specify the range from `\u{1}` to `\u{10ffff}`,
+A small trick to match any character is to specify the range from `\\u{1}` to `\\u{10ffff}`,
 which are the minimum and the maximum code point in UTF-8 encoding.
 
 .. code-block::
@@ -123,7 +123,7 @@ They're wrapped via `\p{}`, for example:
 Dot
 ---
 
-Single dot `.` can match any UTF-8 code point. It's a syntax sugar for `[\u{1}-\u{10ffff}]`.
+Single dot `.` can match any UTF-8 code point. It's a syntax sugar for `[\\u{1}-\\u{10ffff}]`.
 
 .. code-block::
 
@@ -418,9 +418,9 @@ Cheatsheet
      - range
    * - `[0-9..2]`
      - range with stride
-   * - `[\u{1}-\u{10ffff}]`
+   * - `[\\u{1}-\\u{10ffff}]`
      - range using unicode runes
-   * - `[\p{L}]`
+   * - `[\\p{L}]`
      - range using unicode categories
    * - `.`
      - any character

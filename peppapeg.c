@@ -3585,6 +3585,22 @@ P4_Grammar* P4_CreatePegGrammar () {
                 P4_FLAG_LIFTED | P4_FLAG_SPACED))
         goto finalize;
 
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleComment, 3,
+        P4_CreateLiteral("#", true),
+        P4_CreateZeroOrMore(
+            P4_CreateSequenceWithMembers(2,
+                P4_CreateNegative(P4_CreateLiteral("\n", true)),
+                P4_CreateRange(0x1, 0x10ffff, 1)
+            )
+        ),
+        P4_CreateZeroOrOnce(P4_CreateLiteral("\n", true))
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_PegRuleComment,
+                P4_FLAG_LIFTED | P4_FLAG_SPACED))
+        goto finalize;
+
     return grammar;
 
 finalize:

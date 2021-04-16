@@ -252,6 +252,7 @@ typedef enum {
     P4_PegRuleDot                   = 28,
     P4_PegRuleWhitespace            = 29,
     P4_PegRuleRangeCategory         = 30,
+    P4_PegRuleComment               = 31,
 } P4_PegRuleID;
 
 /*

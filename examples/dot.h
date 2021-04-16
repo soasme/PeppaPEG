@@ -87,7 +87,7 @@ P4_Grammar* P4_CreateDotGrammar() {
         "number = \"-\"? ((\".\" [0-9]+) / [0-9]+ (\".\" [0-9]*)?);\n"
 
         "@squashed @tight\n"
-        "string = \"\\\"\" (!\"\\\"\" .)+ \"\\\"\";\n"
+        "string = \"\\\"\" (!\"\\\"\" . / \"\\\\\\\"\")+ \"\\\"\";\n"
 
         "@nonterminal\n"
         "node_id = ID port?;\n"

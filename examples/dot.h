@@ -40,7 +40,8 @@ extern "C"
 #include "../peppapeg.h"
 
 typedef enum P4_DotRule {
-    P4_DotRuleGraph = 1,
+    P4_DotRuleEntry = 1,
+    P4_DotRuleGraph,
     P4_DotRuleID,
     P4_DotRuleIdentifier,
     P4_DotRuleNumber,
@@ -76,6 +77,9 @@ typedef enum P4_DotRule {
 
 P4_Grammar* P4_CreateDotGrammar() {
     return P4_LoadGrammar(
+        "@lifted\n"
+        "entry = &. graph+ !.;\n"
+
         "graph = keyword_strict? (keyword_graph / keyword_digraph) ID? \"{\" stmts \"}\";\n"
 
         "@squashed\n"

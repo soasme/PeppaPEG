@@ -191,7 +191,7 @@ void test_edge_stmt(void) {
 }
 
 void test_graph(void) {
-    ASSERT_DOT(P4_DotRuleGraph, "graph G {a--b}", P4_Ok, "[{\"slice\":[0,14],\"type\":\"graph\",\"children\":["
+    ASSERT_DOT(P4_DotRuleEntry, "graph G {a--b}", P4_Ok, "[{\"slice\":[0,14],\"type\":\"graph\",\"children\":["
         "{\"slice\":[0,5],\"type\":\"keyword_graph\"},"
         "{\"slice\":[6,7],\"type\":\"ID\"},"
         "{\"slice\":[9,13],\"type\":\"stmts\",\"children\":["
@@ -202,7 +202,7 @@ void test_graph(void) {
             "]}"
         "]}"
     "]}]");
-    ASSERT_DOT(P4_DotRuleGraph, "digraph G {a->b}", P4_Ok, "[{\"slice\":[0,16],\"type\":\"graph\",\"children\":["
+    ASSERT_DOT(P4_DotRuleEntry, "digraph G {a->b}", P4_Ok, "[{\"slice\":[0,16],\"type\":\"graph\",\"children\":["
         "{\"slice\":[0,7],\"type\":\"keyword_digraph\"},"
         "{\"slice\":[8,9],\"type\":\"ID\"},"
         "{\"slice\":[11,15],\"type\":\"stmts\",\"children\":["

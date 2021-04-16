@@ -184,6 +184,7 @@ The outputs are stored on `build/docs`.
 * Write a Mustache Parser using Peppa PEG: [mustache.h](examples/mustache.h).
 * Write a JSON Parser using Peppa PEG: [json.h](examples/json.h).
 * Write a Calculator Parser using Peppa PEG: [calc.h](examples/calc.h), [calc.c](examples/calc.c).
+* Write a [Dot](https://graphviz.org/doc/info/lang.html) parser using Peppa PEG: [dot.h](examples/dot.h).
 
 Made with ❤️  by [Ju](https://github.com/soasme).
 

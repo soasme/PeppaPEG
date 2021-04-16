@@ -67,6 +67,10 @@ typedef enum P4_DotRule {
     P4_DotRuleEdgeStmt,
     P4_DotRuleKeywordDigraph,
     P4_DotRuleStrict,
+    P4_DotRuleComment,
+    P4_DotRuleMacroComment,
+    P4_DotRuleCComment,
+    P4_DotRuleBlockComment,
 } P4_DotRule;
 
 P4_Grammar* P4_CreateDotGrammar() {
@@ -127,6 +131,12 @@ P4_Grammar* P4_CreateDotGrammar() {
 
         "keyword_digraph = \"digraph\";\n"
         "keyword_strict = \"strict\";\n"
+
+        "@spaced @squashed @lifted\n"
+        "comment = macro_comment / c_comment / block_comment;\n"
+        "macro_comment = \"#\" (!\"\\n\" .)* \"\\n\"?;\n"
+        "c_comment = \"//\" (!\"\\n\" .)* \"\\n\"?;\n"
+        "block_comment = \"/*\" (!\"*/\" .)* \"*/\";\n"
     );
 }
 

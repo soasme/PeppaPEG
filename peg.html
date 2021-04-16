@@ -315,6 +315,15 @@ If any one of the attempts succeeds, the match succeeds. If all attempts fail, t
 </pre></div>
 </div>
 </div>
+<div class="section" id="comment">
+<h2>Comment<a class="headerlink" href="#comment" title="Permalink to this headline">¶</a></h2>
+<p>Comment are any characters followed by a # (included) in a line.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># THIS IS A COMMENT.</span>
+<span class="n">rule</span> <span class="o">=</span> <span class="s2">"hello"</span><span class="p">;</span> <span class="c1"># THIS IS ANOTHER COMMENT.</span>
+</pre></div>
+</div>
+<p>Comments are ignored.</p>
+</div>
 <div class="section" id="grammar-rule-flags">
 <h2>Grammar Rule Flags<a class="headerlink" href="#grammar-rule-flags" title="Permalink to this headline">¶</a></h2>
 <p>The grammar rule allows setting flags by inserting some <cite>@decorator</cite> (s) before the names.
@@ -522,6 +531,9 @@ number = [0-9];
 <tr class="row-even"><td><p><cite>foo{m}</cite></p></td>
 <td><p>repeat exact n times</p></td>
 </tr>
+<tr class="row-odd"><td><p><cite># IGNORE</cite></p></td>
+<td><p>comment</p></td>
+</tr>
 </tbody>
 </table></div>
 </div>
@@ -592,6 +604,7 @@ number = [0-9];
 <li><a class="reference internal" href="#positive">Positive</a></li>
 <li><a class="reference internal" href="#negative">Negative</a></li>
 <li><a class="reference internal" href="#repeat">Repeat</a></li>
+<li><a class="reference internal" href="#comment">Comment</a></li>
 <li><a class="reference internal" href="#grammar-rule-flags">Grammar Rule Flags</a><ul>
 <li><a class="reference internal" href="#spaced">&#64;spaced</a></li>
 <li><a class="reference internal" href="#tight">&#64;tight</a></li>

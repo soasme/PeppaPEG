@@ -246,6 +246,18 @@ Repeat **matches the sub-expression several times**.
 
    hex = "\u{" ([0-9] / [a-z] / [A-Z]){1,6} "}";
 
+Comment
+-------
+
+Comment are any characters followed by a # (included) in a line.
+
+.. code-block::
+
+   # THIS IS A COMMENT.
+   rule = "hello"; # THIS IS ANOTHER COMMENT.
+
+Comments are ignored.
+
 Grammar Rule Flags
 ------------------
 
@@ -446,3 +458,5 @@ Cheatsheet
      - repeat between m-n times
    * - `foo{m}`
      - repeat exact n times
+   * - `# IGNORE`
+     - comment

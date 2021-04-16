@@ -37,6 +37,9 @@ void test_id(void) {
     ASSERT_DOT(P4_DotRuleID, "\"你好 世界\"", P4_Ok, "[{\"slice\":[0,15],\"type\":\"ID\"}]");
     ASSERT_DOT(P4_DotRuleID, "\"a\\\"\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"ID\"}]");
     ASSERT_DOT(P4_DotRuleID, "\"a\nb\"", P4_Ok, "[{\"slice\":[0,5],\"type\":\"ID\"}]");
+    ASSERT_DOT(P4_DotRuleID, "<table>", P4_Ok, "[{\"slice\":[0,7],\"type\":\"ID\"}]");
+    ASSERT_DOT(P4_DotRuleID, "<<table>>", P4_Ok, "[{\"slice\":[0,9],\"type\":\"ID\"}]");
+    ASSERT_DOT(P4_DotRuleID, "<<table></table>>", P4_Ok, "[{\"slice\":[0,17],\"type\":\"ID\"}]");
 }
 
 void test_compass_pt(void) {

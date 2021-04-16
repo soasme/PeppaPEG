@@ -71,6 +71,7 @@ typedef enum P4_DotRule {
     P4_DotRuleMacroComment,
     P4_DotRuleCComment,
     P4_DotRuleBlockComment,
+    P4_DotRuleHtmlString,
 } P4_DotRule;
 
 P4_Grammar* P4_CreateDotGrammar() {
@@ -78,7 +79,7 @@ P4_Grammar* P4_CreateDotGrammar() {
         "graph = keyword_strict? (keyword_graph / keyword_digraph) ID? \"{\" stmts \"}\";\n"
 
         "@squashed\n"
-        "ID = identifier / number / string;\n"
+        "ID = identifier / number / html_string / string;\n"
 
         "@squashed @tight\n"
         "identifier = ([a-z]/[A-Z]/\"_\") ([a-z]/[A-Z]/[0-9]/\"_\")*;\n"
@@ -137,6 +138,9 @@ P4_Grammar* P4_CreateDotGrammar() {
         "macro_comment = \"#\" (!\"\\n\" .)* \"\\n\"?;\n"
         "c_comment = \"//\" (!\"\\n\" .)* \"\\n\"?;\n"
         "block_comment = \"/*\" (!\"*/\" .)* \"*/\";\n"
+
+        "@squashed\n"
+        "html_string = \"<\" ((!(\"<\" / \">\") .)+/ html_string)* \">\";\n"
     );
 }
 

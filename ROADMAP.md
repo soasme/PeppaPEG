@@ -11,7 +11,6 @@
 - [ ] api: Sanitize `\u0000` to whitespace for the source input, this happens in creating the source/setting the source size.
 - [ ] api: left recursion. https://github.com/orlandohill/peg-left-recursion
 - [ ] api: register a function for matching source. This should help dealing with some inputs difficult to parse.
-- [ ] api: support comment in peg grammar
 - [ ] api: Support UTF-8 BOM sequence (0xEF 0xBB 0xBF) at the start of source.
 - [ ] peg: Numeric.
 - [ ] peg: Complement.
@@ -23,6 +22,7 @@
 - [ ] perf: pre-alloc tokens.
 - [ ] perf: Cache literal len.
 - [ ] perf: backrefs is not necessary if there is no BackReference in Sequence.
+- [ ] perf: trace: add a tracer in P4_Source. When matching, annotate the tracer. An additional tool can aggregate data and output a DOT / compile to png.
 - [ ] perf: tracer: https://pegjs.org/documentation
       https://github.com/orlandohill/peg-left-recursion
 - [ ] binding: python: example: cffi, misaka, parsimonious (api). <https://tomassetti.me/parsing-in-python/>.
@@ -41,13 +41,14 @@
 - [ ] Pratt parser: https://en.wikipedia.org/wiki/Operator-precedence_parser
 - [ ] build: static lib.
 - [ ] build: wasm. `docker run --rm -v $(pwd):/src -u $(id -u):$(id -g)   emscripten/emsdk emcc peppapeg.c -Os -s WASM=1 -s SIDE_MODULE=1 -o /src/peppapeg.wasm`.  https://gist.github.com/kripken/59c67556dc03bb6d57052fedef1e61ab https://github.com/mbasso/awesome-wasm
+- [x] api: support comment in peg grammar. Added in v1.12.0.
 - [x] peg: CharacterSet. can use range.
-- [x] api: Support more spaced rules. Added in v1.11.0.
 - [x] peg: extend range: `[0-9..2] / [a-z] / [\p{L}] / [\u{1}-\u{10ffff}]`. Added in v1.12.0.
 - [x] peg: built-in rules: letters.
 - [x] peg: built-in rules: unicode letters.
 - [x] peg: built-in rules: digits.
 - [x] peg: built-in rules: unicode digits.
+- [x] api: Support more spaced rules. Added in v1.11.0.
 - [x] api: `P4_AcquireSourceAst(source, &ast)`: set ast, reset source. It's useful when we need the parsed result but not care about source itself. Token tree should now owned by ast and shall then be free by the caller. Added in v1.11.0
 - [x] docs: add explanations.
 - [x] GetErrorString.

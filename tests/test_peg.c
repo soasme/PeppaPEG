@@ -525,6 +525,9 @@ void test_eval_grammar(void) {
     ASSERT_EVAL_GRAMMAR("R1 = .;", "R1", "好", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\"* !.;", "R1", "aaab", P4_MatchError, "[]");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\"*;", "R1", "aaab", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"1\"# R1 = \"3\";\n;", "R1", "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("# R1 = \"2\";\nR1 = \"1\";", "R1", "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"1\";##", "R1", "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
 
     ASSERT_EVAL_GRAMMAR(
         "R1 = R2; "

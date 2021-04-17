@@ -104,6 +104,11 @@ P4_Parse(json, source);
 
 If success, the parsed source will contain an AST:
 
+![Example JSON AST](docs/_static/readme-json-ast.svg)
+
+You can traverse the AST and do whatever you can. For example, the below function
+outputs the source AST into JSON format:
+
 ```
 P4_JsonifySourceAst(source, stdout, root);
 ```
@@ -124,7 +129,6 @@ P4_JsonifySourceAst(source, stdout, root);
 ]
 ```
 
-You can traverse the AST and do whatever you can. :)
 
 Read the documentation here: <https://www.soasme.com/PeppaPEG/>.
 

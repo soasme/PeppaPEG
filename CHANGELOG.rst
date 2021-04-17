@@ -4,7 +4,12 @@ Change Log
 Not Yet Released
 ----------------
 
-Code change: <https://github.com/soasme/PeppaPEG/compare/v1.11.0..HEAD>.
+Code change: <https://github.com/soasme/PeppaPEG/compare/v1.12.0..HEAD>.
+
+1.12.0 (17 Apr, 2021)
+---------------------
+
+Code change: <https://github.com/soasme/PeppaPEG/compare/v1.11.0..v1.12.0>.
 
 * [Feature]: Support Comment for PEG Grammar. `#69 <https://github.com/soasme/PeppaPEG/pull/69>`_
 * [Feature]: Support Unicode Character Categories for P4_Range. `#65 <https://github.com/soasme/PeppaPEG/pull/65>`_, `#67 <https://github.com/soasme/PeppaPEG/pull/67>`_

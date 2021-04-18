@@ -1334,7 +1334,9 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
     P4_MarkPosition(s, startpos);
     if ((!e->sensitive && P4_CaseCmpInsensitive(e->literal, str, len) != 0)
             || (e->sensitive && memcmp(e->literal, str, len) != 0)) {
-        P4_RaiseError(s, P4_MatchError, "expect literal");
+        char errmsg[strlen(e->literal)+8];
+        sprintf(errmsg, "expect %s", e->literal);
+        P4_RaiseError(s, P4_MatchError, errmsg);
         return NULL;
     }
 
@@ -2507,6 +2509,9 @@ P4_Parse(P4_Grammar* grammar, P4_Source* source) {
     source->grammar = grammar;
 
     P4_Expression* expr     = P4_GetGrammarRule(grammar, source->rule_id);
+    if (expr == NULL)
+        return P4_NullError;
+
     P4_Token*      tok      = P4_Match(source, expr);
 
     source->root            = tok;

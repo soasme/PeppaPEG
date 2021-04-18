@@ -64,6 +64,7 @@ void TEST_ADD_WHITESPACE(P4_Grammar* grammar, P4_RuleID id) {
 
 char* read_file(const char* path) {
     FILE* f = fopen (path, "rb");
+    TEST_ASSERT_NOT_NULL_MESSAGE(f, "unable to open file");
     fseek(f, 0, SEEK_END);
     long length = ftell(f);
     fseek (f, 0, SEEK_SET);

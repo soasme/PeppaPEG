@@ -19,6 +19,8 @@
 - [ ] peg: Sub Grammar.
 - [ ] peg: Stop on first error v/s Recover from Panic.
 - [ ] peg: left recursive: https://tratt.net/laurie/research/pubs/html/tratt__direct_left_recursive_parsing_expression_grammars/
+- [ ] peg: support Python-style INDENT rule.
+- [ ] peg: describe grammar AST using ADSL-style rules.
 - [ ] perf: pre-alloc tokens.
 - [ ] perf: Cache literal len.
 - [ ] perf: backrefs is not necessary if there is no BackReference in Sequence.

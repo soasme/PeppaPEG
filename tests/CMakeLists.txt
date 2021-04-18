@@ -20,6 +20,7 @@ set(
     test_example_json
     test_example_calc
     test_example_dot
+    test_example_asdl
 )
 
 option(ENABLE_VALGRIND "Enable vagrind memory leak report." OFF)
@@ -54,12 +55,21 @@ foreach(unity_testcase ${unity_testcases})
             COMMAND "./${unity_testcase}"
         )
     endif()
-
 endforeach()
+
+add_custom_command(
+    TARGET test_example_json PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/json_test_parsing ${CMAKE_CURRENT_BINARY_DIR}/json_test_parsing
+    COMMAND echo copied `ls ${CMAKE_CURRENT_BINARY_DIR}/json_test_parsing | wc -l` json spec files
+)
+
+add_custom_command(
+    TARGET test_example_asdl PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/Python.asdl ${CMAKE_CURRENT_BINARY_DIR}/Python.asdl
+)
 
 add_custom_target(
     check
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/json_test_parsing ${CMAKE_CURRENT_BINARY_DIR}/json_test_parsing
     COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
     DEPENDS ${unity_testcases}
 )

@@ -38,57 +38,52 @@ extern "C"
 #include "../peppapeg.h"
 
 typedef enum P4_AsdlRule {
-    P4_AsdlRuleId = 1,
+    P4_AsdlRuleEntry = 1,
+    P4_AsdlRuleModule,
+    P4_AsdlRuleDefinitions,
+    P4_AsdlRuleDefinition,
+    P4_AsdlRuleId,
     P4_AsdlRuleTypeId,
     P4_AsdlRuleConstructorId,
-    P4_AsdlRuleEquals,
-    P4_AsdlRuleComma,
     P4_AsdlRuleQuestion,
-    P4_AsdlRulePipe,
-    P4_AsdlRuleLParen,
-    P4_AsdlRuleRParen,
     P4_AsdlRuleAsterisk,
-    P4_AsdlRuleLBrace,
-    P4_AsdlRuleRBrace,
     P4_AsdlRuleField,
     P4_AsdlRuleFields,
     P4_AsdlRuleConstructor,
+    P4_AsdlRuleType,
+    P4_AsdlRuleSum,
+    P4_AsdlRuleProduct,
     P4_AsdlRuleWhitespace,
     P4_AsdlRuleComment,
-    /*
-    P4_AsdlRuleComment,
-    */
 } P4_AsdlRule;
 
 P4_Grammar* P4_CreateAsdlGrammar() {
-    /*
-    P4_String s =
-        ;
-    */
     return P4_LoadGrammar(
+        "@lifted entry = &. module !.;\n"
+
+        "module = \"module\" id \"{\" definitions \"}\";\n"
+        "definitions = definition*;\n"
+        "definition = type_id \"=\" type;\n"
+
         "@lifted   id               = type_id / constructor_id;\n"
         "@squashed @tight type_id          = [a-z] ([a-z] / [A-Z] / [0-9] / \"_\")*;\n"
-        "@squashed @tight constructor_id   = [A-Z] ([a-z] / [A-Z] / [0-9] / \"_\")+;\n"
+        "@squashed @tight constructor_id   = [A-Z] ([a-z] / [A-Z] / [0-9] / \"_\")*;\n"
 
-        "equals     = \"=\";\n"
-        "comma      = \",\";\n"
         "question   = \"?\";\n"
-        "pipe       = \"|\";\n"
-        "lparen     = \"(\";\n"
-        "rparen     = \")\";\n"
         "asterisk   = \"*\";\n"
-        "lbrace     = \"{\";\n"
-        "rbrace     = \"}\";\n"
 
         "field = type_id (question / asterisk)? id?;\n"
         "fields = \"(\" field (\",\" field)* \")\";\n"
-        "constructor = constructor_id fields?\n"
+        "constructor = constructor_id fields?;\n"
+
+        "@lifted type = sum / product;\n"
+        "sum = constructor (\"|\" constructor)* (\"attributes\" fields)?;\n"
+        "product = fields (\"attributes\" fields)?;\n"
 
         "@spaced @lifted\n"
         "whitespace = \" \" / \"\\t\" / \"\\r\" / \"\\n\";"
         "@spaced @lifted\n"
-        "comment = (\"--\" / \"#\") (!\"\\n\" .) \"\\n\"?;\n"
-
+        "comment = (\"--\" / \"#\") (!\"\\n\" .)* \"\\n\"?;\n"
     );
 }
 

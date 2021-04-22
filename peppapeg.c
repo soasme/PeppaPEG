@@ -39,6 +39,32 @@
 /** It indicates the function or type is not for public use. */
 # define P4_PRIVATE(type) static type
 
+# ifdef  DEBUG
+  #define ASSERT(condition, message)                                           \
+      do {                                                                     \
+        if (!(condition)) {                                                    \
+          fprintf(stderr, "[%s:%d] Assert failed in %s(): %s\n",               \
+              __FILE__, __LINE__, __func__, message);                          \
+          abort();                                                             \
+        }                                                                      \
+      } while (false)
+  #define UNREACHABLE()                                                        \
+      do {                                                                     \
+        fprintf(stderr, "[%s:%d] This code should not be reached in %s()\n",   \
+            __FILE__, __LINE__, __func__);                                     \
+        abort();                                                               \
+      } while (false)
+# else
+  #define ASSERT(condition, message) do { } while (false)
+  #if defined( _MSC_VER )
+    #define UNREACHABLE() __assume(0)
+  #elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
+    #define UNREACHABLE() __builtin_unreachable()
+  #else
+    #define UNREACHABLE()
+  #endif
+# endif
+
 # define                        IS_END(s) ((s)->pos >= (s)->slice.stop.pos)
 # define                        IS_TIGHT(e) (((e)->flag & P4_FLAG_TIGHT) != 0)
 # define                        IS_SCOPED(e) (((e)->flag & P4_FLAG_SCOPED) != 0)
@@ -787,7 +813,7 @@ size_t P4_ReadEscapedRune(char* text, P4_Rune* rune) {
             *rune = strtoul(chs, NULL, 16);
             return size + 1;
         }
-        default: return 0;
+        default: UNREACHABLE(); return 0;
     }
 }
 
@@ -1772,8 +1798,8 @@ P4_Expression_dispatch(P4_Source* s, P4_Expression* e) {
             result = NULL;
             break;
         default:
-            P4_RaiseError(s, P4_ValueError, "no such kind");
-            result = NULL;
+            UNREACHABLE();
+            P4_RaiseError(s, P4_InternalError, "invalid dispatch kind");
             break;
     }
 
@@ -3931,6 +3957,7 @@ P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr) {
             max = min;
             break;
         default:
+            UNREACHABLE();
             err = P4_ValueError;
             goto finalize;
     }
@@ -4162,7 +4189,9 @@ P4_PegEval(P4_Token* token, void* result) {
             return P4_PegEvalReference(token, result);
         case P4_PegGrammar:
             return P4_PegEvalGrammar(token, result);
-        default: return P4_ValueError;
+        default:
+            UNREACHABLE();
+            return P4_ValueError;
     }
     return P4_Ok;
 }

@@ -19,6 +19,8 @@
 - [ ] peg: Sub Grammar.
 - [ ] peg: Stop on first error v/s Recover from Panic.
 - [ ] peg: left recursive: https://tratt.net/laurie/research/pubs/html/tratt__direct_left_recursive_parsing_expression_grammars/
+- [ ] peg: support Python-style INDENT rule.
+- [ ] peg: describe grammar AST using ADSL-style rules.
 - [ ] perf: pre-alloc tokens.
 - [ ] perf: Cache literal len.
 - [ ] perf: backrefs is not necessary if there is no BackReference in Sequence.
@@ -41,6 +43,7 @@
 - [ ] Pratt parser: https://en.wikipedia.org/wiki/Operator-precedence_parser
 - [ ] build: static lib.
 - [ ] build: wasm. `docker run --rm -v $(pwd):/src -u $(id -u):$(id -g)   emscripten/emsdk emcc peppapeg.c -Os -s WASM=1 -s SIDE_MODULE=1 -o /src/peppapeg.wasm`.  https://gist.github.com/kripken/59c67556dc03bb6d57052fedef1e61ab https://github.com/mbasso/awesome-wasm
+- [ ] bug: eval grammar: when failed, should produce no grammar.
 - [x] api: support comment in peg grammar. Added in v1.12.0.
 - [x] peg: CharacterSet. can use range.
 - [x] peg: extend range: `[0-9..2] / [a-z] / [\p{L}] / [\u{1}-\u{10ffff}]`. Added in v1.12.0.

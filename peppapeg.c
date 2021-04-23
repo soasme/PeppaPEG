@@ -39,6 +39,32 @@
 /** It indicates the function or type is not for public use. */
 # define P4_PRIVATE(type) static type
 
+# ifdef  DEBUG
+  #define ASSERT(condition, message)                                           \
+      do {                                                                     \
+        if (!(condition)) {                                                    \
+          fprintf(stderr, "[%s:%d] Assert failed in %s(): %s\n",               \
+              __FILE__, __LINE__, __func__, message);                          \
+          abort();                                                             \
+        }                                                                      \
+      } while (false)
+  #define UNREACHABLE()                                                        \
+      do {                                                                     \
+        fprintf(stderr, "[%s:%d] This code should not be reached in %s()\n",   \
+            __FILE__, __LINE__, __func__);                                     \
+        abort();                                                               \
+      } while (false)
+# else
+  #define ASSERT(condition, message) do { } while (false)
+  #if defined( _MSC_VER )
+    #define UNREACHABLE() __assume(0)
+  #elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
+    #define UNREACHABLE() __builtin_unreachable()
+  #else
+    #define UNREACHABLE()
+  #endif
+# endif
+
 # define                        IS_END(s) ((s)->pos >= (s)->slice.stop.pos)
 # define                        IS_TIGHT(e) (((e)->flag & P4_FLAG_TIGHT) != 0)
 # define                        IS_SCOPED(e) (((e)->flag & P4_FLAG_SCOPED) != 0)
@@ -787,7 +813,7 @@ size_t P4_ReadEscapedRune(char* text, P4_Rune* rune) {
             *rune = strtoul(chs, NULL, 16);
             return size + 1;
         }
-        default: return 0;
+        default: UNREACHABLE(); return 0;
     }
 }
 
@@ -1186,14 +1212,11 @@ P4_CreateToken (const P4_String     str,
 /*
  * Free the token.
  *
- * Danger: if free the token only without cleaning next & head & tail,
- * they're in risk of being dangled.
+ * DANGER: this function does not free children nodes.
  */
 P4_PRIVATE(void)
 P4_DeleteTokenNode(P4_Token* token) {
-    assert(token != NULL);
-    if (token)
-        P4_FREE(token);
+    if (token) P4_FREE(token);
 }
 
 
@@ -1202,7 +1225,9 @@ P4_DeleteTokenNode(P4_Token* token) {
  */
 P4_PRIVATE(void)
 P4_DeleteTokenChildren(P4_Token* token) {
-    assert(token != NULL);
+    if (token == NULL)
+        return;
+
     P4_Token*   child   = token->head;
     P4_Token*   tmp     = NULL;
 
@@ -1310,9 +1335,12 @@ P4_PopFrame(P4_Source* s, P4_Frame* f) {
         return P4_MemoryError;
 
     P4_Frame* oldtop = s->frame_stack;
-    s->frame_stack = s->frame_stack->next;
-    if (oldtop) P4_FREE(oldtop);
-    s->frame_stack_size--;
+
+    if (oldtop) {
+        s->frame_stack = oldtop->next;
+        s->frame_stack_size--;
+        P4_FREE(oldtop);
+    }
 
     return P4_Ok;
 }
@@ -1772,8 +1800,8 @@ P4_Expression_dispatch(P4_Source* s, P4_Expression* e) {
             result = NULL;
             break;
         default:
-            P4_RaiseError(s, P4_ValueError, "no such kind");
-            result = NULL;
+            UNREACHABLE();
+            P4_RaiseError(s, P4_InternalError, "invalid dispatch kind");
             break;
     }
 
@@ -3779,8 +3807,13 @@ P4_PegEvalRange(P4_Token* token, P4_Expression** expr) {
             if ((err = P4_PegEvalNumber(token->head->next->next, &stride)) != P4_Ok)
                 return err;
 
-        if (lower > upper || lower == 0 || upper == 0 || stride == 0)
+        if (lower > upper) {
             return P4_ValueError;
+        }
+
+        if ((lower == 0) || (upper == 0) || (stride == 0)) {
+            return P4_ValueError;
+        }
 
         *expr = P4_CreateRange(lower, upper, stride);
         if (*expr == NULL)
@@ -3931,6 +3964,7 @@ P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr) {
             max = min;
             break;
         default:
+            UNREACHABLE();
             err = P4_ValueError;
             goto finalize;
     }
@@ -4123,8 +4157,11 @@ P4_PegEvalGrammar(P4_Token* token, P4_Grammar** result) {
     }
 
 finalize:
-    if (err)
+
+    if (err) {
         P4_DeleteGrammar(*result);
+        *result = NULL;
+    }
 
     return err;
 }
@@ -4162,7 +4199,9 @@ P4_PegEval(P4_Token* token, void* result) {
             return P4_PegEvalReference(token, result);
         case P4_PegGrammar:
             return P4_PegEvalGrammar(token, result);
-        default: return P4_ValueError;
+        default:
+            UNREACHABLE();
+            return P4_ValueError;
     }
     return P4_Ok;
 }
@@ -4173,6 +4212,7 @@ P4_LoadGrammar(P4_String rules) {
     P4_Grammar* grammar   = NULL;
     P4_Source*  rules_src = NULL;
     P4_Token*   rules_tok = NULL;
+    P4_Error    err       = P4_Ok;
 
     bootstrap = P4_CreatePegGrammar();
     if (bootstrap == NULL)
@@ -4182,15 +4222,18 @@ P4_LoadGrammar(P4_String rules) {
     if (rules_src == NULL)
         goto finalize;
 
-    if (P4_Ok != P4_Parse(bootstrap, rules_src))
+    if (P4_Ok != (err = P4_Parse(bootstrap, rules_src))) {
+        ASSERT(0, P4_GetErrorMessage(rules_src));
         goto finalize;
+    }
 
     rules_tok = P4_GetSourceAst(rules_src);
     if (rules_tok == NULL)
         goto finalize;
 
-    if (P4_Ok != P4_PegEval(rules_tok, &grammar))
+    if (P4_Ok != (err = P4_PegEval(rules_tok, &grammar))) {
         goto finalize;
+    }
 
 finalize:
     if (rules_src)
@@ -4198,6 +4241,9 @@ finalize:
 
     if (bootstrap)
         P4_DeleteGrammar(bootstrap);
+
+    /* TODO: make it explicit where causes the syntax error. */
+    ASSERT(err == P4_Ok, "invalid grammar");
 
     return grammar;
 }

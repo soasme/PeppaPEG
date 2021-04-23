@@ -199,6 +199,7 @@ P4_PRIVATE(P4_Error)            P4_PegEvalFlag(P4_Token* token, P4_EvalResult* r
 P4_PRIVATE(P4_Error)            P4_PegEvalRuleFlags(P4_Token* token, P4_EvalResult* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalNumber(P4_Token* token, P4_EvalResult* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalChar(P4_Token* token, P4_EvalResult* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalRuleName(P4_Token* token, P4_EvalResult* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalLiteral(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalInsensitiveLiteral(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalRange(P4_Token* token, P4_Expression** expr);
@@ -209,7 +210,6 @@ P4_PRIVATE(P4_Error)            P4_PegEvalPositive(P4_Token* token, P4_Expressio
 P4_PRIVATE(P4_Error)            P4_PegEvalNegative(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalDot(P4_Token* token, P4_Expression** expr);
-P4_PRIVATE(P4_Error)            P4_PegEvalRuleName(P4_Token* token, P4_String* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalReference(P4_Token* token, P4_Expression** result);
 P4_PRIVATE(P4_Error)            P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result);
 P4_PRIVATE(P4_Error)            P4_PegEvalGrammarReferences(P4_Grammar* grammar, P4_Expression* expr);
@@ -4068,31 +4068,39 @@ P4_PegEvalDot(P4_Token* token, P4_Expression** expr) {
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalRuleName(P4_Token* token, P4_String* result) {
-    size_t len = P4_GetSliceSize(&token->slice); /* remove quotes */
-    if (len <= 0)
-        return P4_ValueError;
+P4_PegEvalRuleName(P4_Token* token, P4_EvalResult* result) {
+    size_t len = P4_GetSliceSize(&token->slice);
 
-    *result = P4_MALLOC((len+1) * sizeof(char));
-    if (*result == NULL)
+    ASSERT(len > 0, "empty rule name");
+
+    P4_String dest = NULL;
+
+    if ((dest = P4_MALLOC((len+1) * sizeof(char))) == NULL) {
+        sprintf(result->reason, "out of memory");
         return P4_MemoryError;
+    }
 
-    memcpy(*result, token->text + token->slice.start.pos, len);
-    (*result)[len] = '\0';
+    memcpy(dest, token->text + token->slice.start.pos, len);
+    dest[len] = '\0';
+    result->str = dest;
 
     return P4_Ok;
 }
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalReference(P4_Token* token, P4_Expression** result) {
-    P4_Error err = P4_Ok;
-    P4_String reference = NULL;
+    P4_Error    err = P4_Ok;
+    P4_String   reference = NULL;
+    P4_EvalResult* child_result = &(P4_EvalResult){0};
 
-    if ((err = P4_PegEvalRuleName(token, &reference)) != P4_Ok)
-        return err;
+    P4_Finalize(
+        P4_PegEvalRuleName(token, child_result)
+    );
 
-    if (reference == NULL)
-        return P4_ValueError;
+    if ((reference = child_result->str) == NULL) {
+        err = P4_ValueError;
+        goto finalize;
+    }
 
     /* We can't know the ref_id at this stage.
      * So, let's just simply create a placeholder.
@@ -4118,24 +4126,28 @@ finalize:
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result) {
+    P4_Error            err       = P4_Ok;
+
     P4_String           rule_name = NULL;
     P4_ExpressionFlag   rule_flag = 0;
+
     P4_Token*           child     = NULL;
-    P4_Error            err       = P4_Ok;
-    P4_EvalResult       child_result = {0};
+    P4_EvalResult*      child_result = &(P4_EvalResult){0};
 
     *result = NULL;
 
     for (child = token->head; child != NULL; child = child->next) {
         switch (child->rule_id) {
             case P4_PegRuleRuleDecorators:
-                err = P4_PegEval(child, &child_result);
-                rule_flag = child_result.flag;
-                /* TBD: copy child result error reason. */
+                err = P4_PegEval(child, child_result);
+                rule_flag = child_result->flag;
                 break;
+
             case P4_PegRuleRuleName:
-                err = P4_PegEvalRuleName(child, &rule_name);
+                err = P4_PegEval(child, child_result);
+                rule_name = child_result->str;
                 break;
+
             default:
                 err = P4_PegEval(child, result);
                 break;
@@ -4271,6 +4283,8 @@ P4_PegEval(P4_Token* token, void* result) {
             return P4_PegEvalDot(token, result);
         case P4_PegRuleReference:
             return P4_PegEvalReference(token, result);
+        case P4_PegRuleRuleName:
+            return P4_PegEvalRuleName(token, result);
         case P4_PegGrammar:
             return P4_PegEvalGrammar(token, result);
         default:

@@ -557,7 +557,7 @@ typedef struct P4_EvalResult{
         size_t              size;
         P4_Rune             rune;
         P4_String           str;
-        P4_Expression**     expr;
+        P4_Expression*      expr;
         P4_Grammar*         grammar;
     };
 } P4_EvalResult;

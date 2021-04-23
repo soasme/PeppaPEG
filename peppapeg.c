@@ -3676,37 +3676,30 @@ P4_String   P4_StringifyPegGrammarRuleID(P4_RuleID id) {
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalFlag(P4_Token* token, P4_EvalResult* result) {
-    if (P4_CmpSliceString(token->text, &token->slice, "@squashed") == 0)
-        result->flag = P4_FLAG_SQUASHED;
-
-    else if (P4_CmpSliceString(token->text, &token->slice, "@scoped") == 0)
-        result->flag = P4_FLAG_SCOPED;
-
-    else if (P4_CmpSliceString(token->text, &token->slice, "@spaced") == 0)
-        result->flag = P4_FLAG_SPACED;
-
-    else if (P4_CmpSliceString(token->text, &token->slice, "@lifted") == 0)
-        result->flag = P4_FLAG_LIFTED;
-
-    else if (P4_CmpSliceString(token->text, &token->slice, "@tight") == 0)
-        result->flag = P4_FLAG_TIGHT;
-
-    else if (P4_CmpSliceString(token->text, &token->slice, "@nonterminal") == 0)
-        result->flag = P4_FLAG_NON_TERMINAL;
-
-    else {
-        UNREACHABLE(); /* Parse guarantees only 6 kinds of flags would appear. */
-
-        result->flag = 0;
-
-        P4_String str = P4_CopyTokenString(token);
-        sprintf(result->reason, "invalid flag: %s", str);
-        free(str);
-
-        return P4_ValueError;
+# define EVAL_FLAG(d, f) \
+    if (P4_CmpSliceString(token->text, &token->slice, (d)) == 0) {\
+        result->flag = (f); \
+        return P4_Ok; \
     }
 
-    return P4_Ok;
+    EVAL_FLAG("@squashed", P4_FLAG_SQUASHED);
+    EVAL_FLAG("@scoped", P4_FLAG_SCOPED);
+    EVAL_FLAG("@spaced", P4_FLAG_SPACED);
+    EVAL_FLAG("@lifted", P4_FLAG_LIFTED);
+    EVAL_FLAG("@tight", P4_FLAG_TIGHT);
+    EVAL_FLAG("@nonterminal", P4_FLAG_NON_TERMINAL);
+
+    /* Parse guarantees only 6 kinds of flags would appear.
+     * Below code are unreachable. */
+    UNREACHABLE();
+
+    result->flag = 0;
+
+    P4_String str = P4_CopyTokenString(token);
+    sprintf(result->reason, "invalid flag: %s", str);
+    free(str);
+
+    return P4_ValueError;
 }
 
 P4_PRIVATE(P4_Error)

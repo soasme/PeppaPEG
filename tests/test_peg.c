@@ -291,13 +291,13 @@ void test_eval_flag(void) {
 }
 
 void test_eval_flags(void) {
-    ASSERT_EVAL(P4_PegRuleRuleDecorators, "@squashed @lifted", P4_ExpressionFlag, P4_FLAG_SQUASHED | P4_FLAG_LIFTED);
-    ASSERT_EVAL(P4_PegRuleRuleDecorators, "@squashed @lifted @squashed", P4_ExpressionFlag, P4_FLAG_SQUASHED | P4_FLAG_LIFTED);
-    ASSERT_EVAL(P4_PegRuleRuleDecorators, "@spaced", P4_ExpressionFlag, P4_FLAG_SPACED);
-    ASSERT_EVAL(P4_PegRuleRuleDecorators, "@spaced @squashed @lifted", P4_ExpressionFlag,
-            P4_FLAG_SPACED | P4_FLAG_SQUASHED | P4_FLAG_LIFTED);
-    ASSERT_EVAL(P4_PegRuleRuleDecorators, "@nonterminal", P4_ExpressionFlag, P4_FLAG_NON_TERMINAL);
-    ASSERT_EVAL(P4_PegRuleRuleDecorators, "@whatever", P4_ExpressionFlag, 0);
+    ASSERT_EVAL2(P4_PegRuleRuleDecorators, "@squashed @lifted", flag, P4_FLAG_SQUASHED | P4_FLAG_LIFTED, "");
+    ASSERT_EVAL2(P4_PegRuleRuleDecorators, "@squashed @lifted @squashed", flag, P4_FLAG_SQUASHED | P4_FLAG_LIFTED, "");
+    ASSERT_EVAL2(P4_PegRuleRuleDecorators, "@spaced", flag, P4_FLAG_SPACED, "");
+    ASSERT_EVAL2(P4_PegRuleRuleDecorators, "@spaced @squashed @lifted", flag,
+            P4_FLAG_SPACED | P4_FLAG_SQUASHED | P4_FLAG_LIFTED, "");
+    ASSERT_EVAL2(P4_PegRuleRuleDecorators, "@nonterminal", flag, P4_FLAG_NON_TERMINAL, "");
+    ASSERT_EVAL2(P4_PegRuleRuleDecorators, "@whatever", flag, 0, "");
 }
 
 void test_eval_num(void) {

@@ -77,6 +77,12 @@
 # define                        NEED_SPACE(s) (!(s)->whitespacing && ((s)->frame_stack ? (s)->frame_stack->space : false))
 # define                        NO_ERROR(s) ((s)->err == P4_Ok)
 # define                        NO_MATCH(s) ((s)->err == P4_MatchError)
+# define                        P4_Finalize(call) \
+    do { \
+        if ((err = (call)) != P4_Ok) { \
+            goto finalize; \
+        } \
+    } while (0);
 # define                        P4_GetSliceSize(s) ((s)->stop.pos - (s)->start.pos)
 # define                        P4_SetPosition(s, d) do { \
     (s)->pos = (d)->pos; \
@@ -190,7 +196,7 @@ P4_PRIVATE(P4_Token*)           P4_MatchBackReference(P4_Source*, P4_Expression*
 
 
 P4_PRIVATE(P4_Error)            P4_PegEvalFlag(P4_Token* token, P4_EvalResult* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalRuleFlags(P4_Token* token, P4_ExpressionFlag* flag);
+P4_PRIVATE(P4_Error)            P4_PegEvalRuleFlags(P4_Token* token, P4_EvalResult* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalNumber(P4_Token* token, size_t* num);
 P4_PRIVATE(P4_Error)            P4_PegEvalChar(P4_Token* token, P4_Rune* rune);
 P4_PRIVATE(P4_Error)            P4_PegEvalLiteral(P4_Token* token, P4_Expression** expr);
@@ -3677,13 +3683,13 @@ P4_String   P4_StringifyPegGrammarRuleID(P4_RuleID id) {
 P4_PRIVATE(P4_Error)
 P4_PegEvalFlag(P4_Token* token, P4_EvalResult* result) {
     ASSERT(token->rule_id == P4_PegRuleDecorator,
-           "P4_PegEvalFlag() can only handle P4_PegRuleDecorator.");
+            "P4_PegEvalFlag() can only handle P4_PegRuleDecorator.");
 
     /* If the given `d` equals to the token sliced text, set flag to `f`. */
 
 # define EVAL_FLAG(d, f) \
     if (P4_CmpSliceString(token->text, &token->slice, (d)) == 0) {\
-        result->flag = (f); \
+        result->flag |= (f); \
         return P4_Ok; \
     }
 
@@ -3709,19 +3715,38 @@ P4_PegEvalFlag(P4_Token* token, P4_EvalResult* result) {
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalRuleFlags(P4_Token* token, P4_ExpressionFlag* flag) {
-    P4_Token* child = NULL;
-    P4_Error err = P4_Ok;
-    P4_EvalResult result = {0};
-    for (child = token->head; child != NULL; child = child->next) {
-        ASSERT(child->rule_id == P4_PegRuleDecorator, "rule should be a decorator");
-        if ((err = P4_PegEval(child, &result)) != P4_Ok) {
-            *flag = 0;
-            return err;
-        }
-        *flag |= result.flag;
-    }
+P4_PegEvalRuleFlags(P4_Token* token, P4_EvalResult* result) {
+    /* Perform bit-or operation for the inner flags.
+     *       ┌───────┐
+     *       │ token │ (of rule_id P4_PegRuleDecorators)
+     *       └───────┘
+     *    ┌──────┬───────┐
+     *    │      │       │
+     * ┌──▼──┐ ┌─▼─┐  ┌──▼──┐
+     * │flag1│ │...│  │flagN│ (of rule_id P4_PegRuleDecorator)
+     * └─────┘ └───┘  └─────┘
+     *
+     * result->flag = flag1 | ... | flagN;
+     *
+     */
+
+    ASSERT(
+        token->rule_id == P4_PegRuleDecorators,
+        "P4_PegEvalRuleFlags() can only handle P4_PegRuleDecorators."
+    );
+
+    P4_Error        err           = P4_Ok;
+    P4_Token*       child         = NULL;
+
+    for (child = token->head; child != NULL; child = child->next)
+        P4_Finalize(
+            P4_PegEval(child, result)
+        );
+
     return P4_Ok;
+
+finalize:
+    return err;
 }
 
 P4_PRIVATE(P4_Error)
@@ -4071,13 +4096,16 @@ P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result) {
     P4_ExpressionFlag   rule_flag = 0;
     P4_Token*           child     = NULL;
     P4_Error            err       = P4_Ok;
+    P4_EvalResult       child_result = {0};
 
     *result = NULL;
 
     for (child = token->head; child != NULL; child = child->next) {
         switch (child->rule_id) {
             case P4_PegRuleRuleDecorators:
-                err = P4_PegEvalRuleFlags(child, &rule_flag);
+                err = P4_PegEval(child, &child_result);
+                rule_flag = child_result.flag;
+                /* TBD: copy child result error reason. */
                 break;
             case P4_PegRuleRuleName:
                 err = P4_PegEvalRuleName(child, &rule_name);

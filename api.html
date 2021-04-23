@@ -772,8 +772,8 @@
 <dt id="c.P4_Version">
 <span class="target" id="peppapeg_8h_1a226f9ecef1d34a1146129d32a2d70bf8"></span><span class="pre">P4_String</span> <code class="sig-name descname"><span class="pre">P4_Version</span></code><span class="sig-paren">(</span><span class="pre">void</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_Version" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Provide the version string for the library.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_String</span>   <span class="n">version</span> <span class="o">=</span> <span class="n">P4_Version</span><span class="p">();</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_String</span>   <span class="n">version</span> <span class="o">=</span> <span class="n">P4_Version</span><span class="p">();</span>
  <span class="n">printf</span><span class="p">(</span><span class="s2">"version=</span><span class="si">%s</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">version</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -789,8 +789,8 @@
 <span class="target" id="peppapeg_8h_1a510196c85378c76a8ce9fb93fb9f13ba"></span><span class="pre">size_t</span> <code class="sig-name descname"><span class="pre">P4_ReadRune</span></code><span class="sig-paren">(</span><span class="pre">P4_String</span> <em><span class="pre">s</span></em>, <span class="pre">P4_Rune</span> <span class="pre">*</span><em><span class="pre">c</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_ReadRune" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Reads a single UTF-8 code point from the string. </p>
 <p>Read a single code point (rune) from an UTF-8 string.</p>
-<p><p>Example:: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">uint32_t</span> <span class="n">c</span> <span class="o">=</span> <span class="mh">0x0</span>
+<p>
+Example:: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">uint32_t</span> <span class="n">c</span> <span class="o">=</span> <span class="mh">0x0</span>
 <span class="o">&gt;</span> <span class="n">P4_ReadRune</span><span class="p">(</span><span class="s2">"你好"</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">)</span>
 <span class="mi">3</span>
 <span class="o">&gt;</span> <span class="n">printf</span><span class="p">(</span><span class="s2">"%p </span><span class="si">%d</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
@@ -814,8 +814,8 @@
 <dt id="c.P4_ReadEscapedRune">
 <span class="target" id="peppapeg_8h_1a556692f6f9e171f48d6051b4ec45757e"></span><span class="pre">size_t</span> <code class="sig-name descname"><span class="pre">P4_ReadEscapedRune</span></code><span class="sig-paren">(</span><span class="pre">char</span> <span class="pre">*</span><em><span class="pre">text</span></em>, <span class="pre">P4_Rune</span> <span class="pre">*</span><em><span class="pre">rune</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_ReadEscapedRune" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Read an escaped single code point (rune) from an UTF-8 string.</p>
-<p><p>For example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Rune</span> <span class="n">rune</span><span class="p">;</span>
+<p>
+For example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Rune</span> <span class="n">rune</span><span class="p">;</span>
  <span class="n">P4_ReadEscapedRune</span><span class="p">(</span><span class="s2">"</span><span class="se">\\</span><span class="s2">u000D"</span><span class="p">,</span> <span class="n">rune</span><span class="p">);</span> <span class="o">//</span> <span class="mh">0xd</span>
 </pre></div>
 </div>
@@ -853,8 +853,8 @@
 <dt id="c.P4_CreateLiteral">
 <span class="target" id="peppapeg_8h_1a3e1c76f172524a5d6b7c1b3fdf8c7339"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateLiteral</span></code><span class="sig-paren">(</span><em class="property"><span class="pre">const</span></em> <span class="pre">P4_String</span>, <span class="pre">bool</span> <em><span class="pre">sensitive</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateLiteral" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Literal expression.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="s2">"let"</span><span class="p">,</span> <span class="s2">"Let"</span><span class="p">,</span> <span class="s2">"LET"</span><span class="p">,</span> <span class="n">etc</span><span class="o">.</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="s2">"let"</span><span class="p">,</span> <span class="s2">"Let"</span><span class="p">,</span> <span class="s2">"LET"</span><span class="p">,</span> <span class="n">etc</span><span class="o">.</span>
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"let"</span><span class="p">,</span> <span class="n">false</span><span class="p">);</span>
 
  <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">only</span> <span class="n">match</span> <span class="s2">"let"</span><span class="o">.</span>
@@ -879,8 +879,8 @@
 <dt id="c.P4_AddLiteral">
 <span class="target" id="peppapeg_8h_1a3ceb049b409973acf903f30136d292ea"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddLiteral</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <em class="property"><span class="pre">const</span></em> <span class="pre">P4_String</span>, <span class="pre">bool</span> <em><span class="pre">sensitive</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddLiteral" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Add a literal expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"let"</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"let"</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
 </pre></div>
 </div>
 </p>
@@ -902,8 +902,8 @@
 <dt id="c.P4_CreateRange">
 <span class="target" id="peppapeg_8h_1a3bcde0b96cf5afe00679346c03c04fed"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateRange</span></code><span class="sig-paren">(</span><span class="pre">P4_Rune</span>, <span class="pre">P4_Rune</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateRange" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Range expression.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mf">9.</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mf">9.</span>
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRange</span><span class="p">(</span><span class="s1">'0'</span><span class="p">,</span> <span class="s1">'9'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 
  <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="nb">any</span> <span class="n">code</span> <span class="n">points</span> <span class="n">starting</span> <span class="kn">from</span> <span class="nn">U</span><span class="o">+</span><span class="mf">4E00</span> <span class="n">to</span> <span class="n">U</span><span class="o">+</span><span class="mi">9</span><span class="n">FCC</span> <span class="p">(</span><span class="n">CJK</span> <span class="n">unified</span> <span class="n">ideographs</span> <span class="n">block</span><span class="p">)</span><span class="o">.</span>
@@ -927,7 +927,8 @@
 <dl class="c function">
 <dt id="c.P4_CreateRanges">
 <span class="target" id="peppapeg_8h_1a89b811e8038a1d5a89ed579184dc72f0"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateRanges</span></code><span class="sig-paren">(</span><span class="pre">size_t</span> <em><span class="pre">count</span></em>, <span class="pre">P4_RuneRange</span> <span class="pre">*</span><em><span class="pre">ranges</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateRanges" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>Create a P4_Range expression that holds multiple ranges. <p>Example: </p>
+<dd><p><p>Create a P4_Range expression that holds multiple ranges.</p>
+<p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_RuneRange</span> <span class="n">alphadigits</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{{</span><span class="s1">'a'</span><span class="p">,</span> <span class="s1">'Z'</span><span class="p">,</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s1">'0'</span><span class="p">,</span> <span class="s1">'9'</span><span class="p">,</span> <span class="mi">1</span><span class="p">}};</span>
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="nb">range</span> <span class="o">=</span> <span class="n">P4_CreateRanges</span><span class="p">(</span>
      <span class="n">sizeof</span><span class="p">(</span><span class="n">alphadigits</span><span class="p">)</span> <span class="o">/</span> <span class="n">sizeof</span><span class="p">(</span><span class="n">P4_RuneRange</span><span class="p">),</span>
@@ -952,8 +953,8 @@
 <dt id="c.P4_AddRange">
 <span class="target" id="peppapeg_8h_1a0d9ba26573f0d13e5793e1debd72c2bc"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddRange</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">P4_Rune</span>, <span class="pre">P4_Rune</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddRange" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Add a range expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddRange</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'0'</span><span class="p">,</span> <span class="s1">'9'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddRange</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">'0'</span><span class="p">,</span> <span class="s1">'9'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 
  <span class="n">P4_AddRange</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mh">0x4E00</span><span class="p">,</span> <span class="mh">0x9FFF</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
@@ -977,7 +978,8 @@
 <dl class="c function">
 <dt id="c.P4_AddRanges">
 <span class="target" id="peppapeg_8h_1aac0556370ced16e56afbe99ddf346e6a"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddRanges</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">size_t</span> <em><span class="pre">count</span></em>, <span class="pre">P4_RuneRange</span> <span class="pre">*</span><em><span class="pre">ranges</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddRanges" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>Add sub-ranges expression as grammar rule. <p>Example: </p>
+<dd><p><p>Add sub-ranges expression as grammar rule.</p>
+<p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_RuneRange</span> <span class="n">alphadigits</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{{</span><span class="s1">'a'</span><span class="p">,</span> <span class="s1">'Z'</span><span class="p">,</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="s1">'0'</span><span class="p">,</span> <span class="s1">'9'</span><span class="p">,</span> <span class="mi">1</span><span class="p">}};</span>
  <span class="n">P4_Error</span> <span class="n">err</span> <span class="o">=</span> <span class="n">P4_AddRanges</span><span class="p">(</span>
      <span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
@@ -1005,8 +1007,8 @@
 <dt id="c.P4_CreateReference">
 <span class="target" id="peppapeg_8h_1a0d14c0fa4e678637487ac7075920a0df"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateReference</span></code><span class="sig-paren">(</span><span class="pre">P4_RuleID</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateReference" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Reference expression.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateReference</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateReference</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
 </pre></div>
 </div>
 </p>
@@ -1025,8 +1027,8 @@
 <dt id="c.P4_AddReference">
 <span class="target" id="peppapeg_8h_1ae7bf61c3e305feaf4485735e6bddc623"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddReference</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">P4_RuleID</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddReference" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Add a reference expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddReference</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddReference</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
 </pre></div>
 </div>
 </p>
@@ -1047,8 +1049,8 @@
 <dt id="c.P4_CreatePositive">
 <span class="target" id="peppapeg_8h_1ad1ecf3ea8eb8ca643ea80aa5efa2007d"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreatePositive</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreatePositive" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Positive expression.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">If</span> <span class="n">the</span> <span class="n">following</span> <span class="n">text</span> <span class="n">includes</span> <span class="s2">"let"</span><span class="p">,</span> <span class="n">the</span> <span class="n">match</span> <span class="ow">is</span> <span class="n">successful</span><span class="o">.</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">If</span> <span class="n">the</span> <span class="n">following</span> <span class="n">text</span> <span class="n">includes</span> <span class="s2">"let"</span><span class="p">,</span> <span class="n">the</span> <span class="n">match</span> <span class="ow">is</span> <span class="n">successful</span><span class="o">.</span>
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreatePositive</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"let"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
 </pre></div>
 </div>
@@ -1068,8 +1070,8 @@
 <dt id="c.P4_AddPositive">
 <span class="target" id="peppapeg_8h_1ae7c0e21b42dbb220e4ac16aac23ee89c"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddPositive</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddPositive" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Add a positive expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddPositive</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"let"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddPositive</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"let"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
 </pre></div>
 </div>
 </p>
@@ -1090,8 +1092,8 @@
 <dt id="c.P4_CreateNegative">
 <span class="target" id="peppapeg_8h_1a66375da1156c72649224dbd20c8b62c7"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateNegative</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateNegative" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Negative expression.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">If</span> <span class="n">the</span> <span class="n">following</span> <span class="n">text</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">start</span> <span class="k">with</span> <span class="s2">"let"</span><span class="p">,</span> <span class="n">the</span> <span class="n">match</span> <span class="ow">is</span> <span class="n">successful</span><span class="o">.</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">If</span> <span class="n">the</span> <span class="n">following</span> <span class="n">text</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">start</span> <span class="k">with</span> <span class="s2">"let"</span><span class="p">,</span> <span class="n">the</span> <span class="n">match</span> <span class="ow">is</span> <span class="n">successful</span><span class="o">.</span>
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateNegative</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"let"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
 </pre></div>
 </div>
@@ -1111,8 +1113,8 @@
 <dt id="c.P4_AddNegative">
 <span class="target" id="peppapeg_8h_1a0e7b92d6ac6c285c55779de054f549b6"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddNegative</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddNegative" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Add a negative expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddNegative</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"let"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddNegative</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"let"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
 </pre></div>
 </div>
 </p>
@@ -1133,8 +1135,8 @@
 <dt id="c.P4_CreateSequence">
 <span class="target" id="peppapeg_8h_1ada3acc9dce62a0c7d839b6393bca8716"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateSequence</span></code><span class="sig-paren">(</span><span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateSequence" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Sequence expression.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequence</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequence</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
 </pre></div>
 </div>
 </p>
@@ -1155,8 +1157,8 @@
 <dt id="c.P4_CreateSequenceWithMembers">
 <span class="target" id="peppapeg_8h_1ad53173e355e2eab810e9b9ddb9de6ec7"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateSequenceWithMembers</span></code><span class="sig-paren">(</span><span class="pre">size_t</span>, <span class="pre">...</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateSequenceWithMembers" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Sequence expression.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="p">{</span> <span class="n">BODY</span> <span class="p">}</span><span class="o">.</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="p">{</span> <span class="n">BODY</span> <span class="p">}</span><span class="o">.</span>
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>
      <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"{"</span><span class="p">),</span>
      <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">BODY</span><span class="p">),</span>
@@ -1181,8 +1183,8 @@
 <dt id="c.P4_AddSequence">
 <span class="target" id="peppapeg_8h_1a1a1bc7bfb986b831ce422cce87fbe2f8"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddSequence</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddSequence" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Add a sequence expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddSequence</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddSequence</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
 </pre></div>
 </div>
 </p>
@@ -1205,8 +1207,8 @@
 <dt id="c.P4_AddSequenceWithMembers">
 <span class="target" id="peppapeg_8h_1a3c42966162f1dd87a40d037ae6e68451"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddSequenceWithMembers</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">size_t</span>, <span class="pre">...</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddSequenceWithMembers" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Add a sequence expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span>
      <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"{"</span><span class="p">),</span>
      <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">BODY</span><span class="p">),</span>
      <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"}"</span><span class="p">)</span>
@@ -1232,8 +1234,8 @@
 <dt id="c.P4_CreateChoice">
 <span class="target" id="peppapeg_8h_1afdbd1b716b6e4a30832398e5e7355bfb"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateChoice</span></code><span class="sig-paren">(</span><span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateChoice" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Choice expression.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateChoice</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateChoice</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
 </pre></div>
 </div>
 </p>
@@ -1254,8 +1256,8 @@
 <dt id="c.P4_CreateChoiceWithMembers">
 <span class="target" id="peppapeg_8h_1ab9879a20f50c05e06506d8c13e45a41f"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateChoiceWithMembers</span></code><span class="sig-paren">(</span><span class="pre">size_t</span>, <span class="pre">...</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateChoiceWithMembers" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Choice expression.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">whitespace</span><span class="p">,</span> <span class="n">tab</span> <span class="ow">and</span> <span class="n">newline</span><span class="o">.</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">whitespace</span><span class="p">,</span> <span class="n">tab</span> <span class="ow">and</span> <span class="n">newline</span><span class="o">.</span>
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateChoiceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>
      <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">" "</span><span class="p">),</span>
      <span class="n">P4_CreateReference</span><span class="p">(</span>\<span class="n">t</span><span class="p">),</span>
@@ -1280,8 +1282,8 @@
 <dt id="c.P4_AddChoice">
 <span class="target" id="peppapeg_8h_1a174b886be6d0263ad2a20daab7129a80"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddChoice</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddChoice" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Add a choice expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddChoice</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddChoice</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
 </pre></div>
 </div>
 </p>
@@ -1304,8 +1306,8 @@
 <dt id="c.P4_AddChoiceWithMembers">
 <span class="target" id="peppapeg_8h_1a89691bbe049dc811b16ef85abb039577"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddChoiceWithMembers</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">size_t</span>, <span class="pre">...</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddChoiceWithMembers" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Add a choice expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddChoiceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddChoiceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span>
      <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">" "</span><span class="p">),</span>
      <span class="n">P4_CreateReference</span><span class="p">(</span>\<span class="n">t</span><span class="p">),</span>
      <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
@@ -1331,8 +1333,8 @@
 <dt id="c.P4_CreateRepeatMinMax">
 <span class="target" id="peppapeg_8h_1a88de0c3dc36eaa8a52ba2a78b56ff0bd"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateRepeatMinMax</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span>, <span class="pre">size_t</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateRepeatMinMax" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Repeat expression minimal min times and maximal max times.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="ow">or</span> <span class="s2">"aaa"</span><span class="o">.</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="ow">or</span> <span class="s2">"aaa"</span><span class="o">.</span>
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRepeatMinMax</span><span class="p">(</span>
      <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span>
      <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span>
@@ -1357,8 +1359,8 @@
 <dt id="c.P4_AddRepeatMinMax">
 <span class="target" id="peppapeg_8h_1a8f62ad561fd83da8fc4e988a6238f9ac"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddRepeatMinMax</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span>, <span class="pre">size_t</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddRepeatMinMax" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Repeat expression minimal min times and maximal max times.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="ow">or</span> <span class="s2">"aaa"</span><span class="o">.</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="ow">or</span> <span class="s2">"aaa"</span><span class="o">.</span>
  <span class="n">P4_AddRepeatMinMax</span><span class="p">(</span>
      <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span>
      <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span>
@@ -1385,8 +1387,8 @@
 <dt id="c.P4_CreateRepeatMin">
 <span class="target" id="peppapeg_8h_1adcd1fde57f4974fcb81b0b94ac6537ef"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateRepeatMin</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateRepeatMin" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Repeat expression minimal min times and maximal SIZE_MAX times.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="s2">"aaa"</span><span class="p">,</span> <span class="o">....</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="s2">"aaa"</span><span class="p">,</span> <span class="o">....</span>
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRepeatMin</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -1408,8 +1410,8 @@
 <dt id="c.P4_AddRepeatMin">
 <span class="target" id="peppapeg_8h_1a9ea3b03f065249ebf2683736f1534055"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddRepeatMin</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddRepeatMin" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a RepeatMin expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="s2">"aaa"</span><span class="p">,</span> <span class="o">....</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="s2">"aaa"</span><span class="p">,</span> <span class="o">....</span>
  <span class="n">P4_AddRepeatMin</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -1432,8 +1434,8 @@
 <dt id="c.P4_CreateRepeatMax">
 <span class="target" id="peppapeg_8h_1afd2de9ccbb61ed97ec5dbbbfa7602e1e"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateRepeatMax</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateRepeatMax" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Repeat expression maximal max times.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">""</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="s2">"aaa"</span><span class="o">.</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">""</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="s2">"aaa"</span><span class="o">.</span>
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRepeatMax</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span> <span class="mi">3</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -1455,8 +1457,8 @@
 <dt id="c.P4_AddRepeatMax">
 <span class="target" id="peppapeg_8h_1a762544ef6dc1c5fbf6f461dabcc23b1b"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddRepeatMax</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddRepeatMax" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Add a RepeatMax expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">""</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="s2">"aaa"</span><span class="o">.</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">""</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="s2">"aaa"</span><span class="o">.</span>
  <span class="n">P4_AddRepeatMax</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span> <span class="mi">3</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -1479,8 +1481,8 @@
 <dt id="c.P4_CreateRepeatExact">
 <span class="target" id="peppapeg_8h_1a3e38c0b531c6afa84f2b1045eb9c9005"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateRepeatExact</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateRepeatExact" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Repeat expression exact N times.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"aaa"</span><span class="o">.</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"aaa"</span><span class="o">.</span>
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRepeatExact</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span> <span class="mi">3</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -1502,8 +1504,8 @@
 <dt id="c.P4_AddRepeatExact">
 <span class="target" id="peppapeg_8h_1a7894b10e3f3abae36d410ad5c25438c6"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddRepeatExact</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddRepeatExact" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Add a RepeatExact expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"aaa"</span><span class="o">.</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"aaa"</span><span class="o">.</span>
  <span class="n">P4_AddRepeatExact</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span> <span class="mi">3</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -1526,8 +1528,8 @@
 <dt id="c.P4_CreateZeroOrOnce">
 <span class="target" id="peppapeg_8h_1aeacf775cc7792e5d56eaf5157db02b4b"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateZeroOrOnce</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateZeroOrOnce" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Repeat expression zero or once.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">""</span> <span class="ow">or</span> <span class="s2">"a"</span><span class="o">.</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">""</span> <span class="ow">or</span> <span class="s2">"a"</span><span class="o">.</span>
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateZeroOrOnce</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
 </pre></div>
 </div>
@@ -1548,8 +1550,8 @@
 <dt id="c.P4_AddZeroOrOnce">
 <span class="target" id="peppapeg_8h_1a4441acc92e58f5f9f8a06b7c81c13fc1"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddZeroOrOnce</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddZeroOrOnce" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Add a ZeroOrOnce expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">""</span> <span class="ow">or</span> <span class="s2">"a"</span><span class="o">.</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">""</span> <span class="ow">or</span> <span class="s2">"a"</span><span class="o">.</span>
  <span class="n">P4_AddZeroOrOnce</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
 </pre></div>
 </div>
@@ -1572,8 +1574,8 @@
 <dt id="c.P4_CreateZeroOrMore">
 <span class="target" id="peppapeg_8h_1a3a294d097ad08a292a7d1caa2d2b4324"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateZeroOrMore</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateZeroOrMore" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Repeat expression zero or more times.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">""</span> <span class="ow">or</span> <span class="s2">"a"</span><span class="o">.</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">""</span> <span class="ow">or</span> <span class="s2">"a"</span><span class="o">.</span>
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateZeroOrMore</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
 </pre></div>
 </div>
@@ -1594,8 +1596,8 @@
 <dt id="c.P4_AddZeroOrMore">
 <span class="target" id="peppapeg_8h_1a3352bf0775cd2a01e58e07b5a2e8fd1f"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddZeroOrMore</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddZeroOrMore" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Add a ZeroOrMore expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">""</span> <span class="ow">or</span> <span class="s2">"a"</span><span class="o">.</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">""</span> <span class="ow">or</span> <span class="s2">"a"</span><span class="o">.</span>
  <span class="n">P4_AddZeroOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
 </pre></div>
 </div>
@@ -1617,8 +1619,8 @@
 <dt id="c.P4_CreateOnceOrMore">
 <span class="target" id="peppapeg_8h_1a13e5caca6ee3e7f46cb5104f69796693"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateOnceOrMore</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateOnceOrMore" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Repeat expression once or more times.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="s2">"aaa"</span><span class="p">,</span> <span class="o">....</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="s2">"aaa"</span><span class="p">,</span> <span class="o">....</span>
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateOnceOrMore</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
 </pre></div>
 </div>
@@ -1639,8 +1641,8 @@
 <dt id="c.P4_AddOnceOrMore">
 <span class="target" id="peppapeg_8h_1a5b3716ec1463a989864b2ef0b8f65a0e"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddOnceOrMore</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddOnceOrMore" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Add an OnceOrMore expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="s2">"aaa"</span><span class="p">,</span> <span class="o">....</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"a"</span><span class="p">,</span> <span class="s2">"aa"</span><span class="p">,</span> <span class="s2">"aaa"</span><span class="p">,</span> <span class="o">....</span>
  <span class="n">P4_AddOnceOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">));</span>
 </pre></div>
 </div>
@@ -1662,8 +1664,8 @@
 <dt id="c.P4_CreateBackReference">
 <span class="target" id="peppapeg_8h_1a30e6218cadafbfd893375f379de9300d"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateBackReference</span></code><span class="sig-paren">(</span><span class="pre">size_t</span>, <span class="pre">bool</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateBackReference" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_BackReference expression.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"EOF MULTILINE EOF"</span> <span class="ow">or</span> <span class="s2">"eof MULTILINE eof"</span><span class="p">,</span> <span class="n">but</span> <span class="ow">not</span> <span class="s2">"EOF MULTILINE eof"</span><span class="o">.</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="n">string</span> <span class="s2">"EOF MULTILINE EOF"</span> <span class="ow">or</span> <span class="s2">"eof MULTILINE eof"</span><span class="p">,</span> <span class="n">but</span> <span class="ow">not</span> <span class="s2">"EOF MULTILINE eof"</span><span class="o">.</span>
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span>
      <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"EOF"</span><span class="p">,</span> <span class="n">false</span><span class="p">),</span>
      <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">MULTILINE</span><span class="p">),</span>
@@ -1688,8 +1690,8 @@
 <dt id="c.P4_SetMember">
 <span class="target" id="peppapeg_8h_1a32d462156691315260a10e3196cc5582"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_SetMember</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span>, <span class="pre">size_t</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_SetMember" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Set the member of Sequence/Choice at a given index.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Error</span>       <span class="n">err</span><span class="p">;</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Error</span>       <span class="n">err</span><span class="p">;</span>
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequence</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
  <span class="k">if</span> <span class="p">((</span><span class="n">err</span> <span class="o">=</span> <span class="n">P4_SetMember</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">)))</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="p">{</span>
      <span class="o">//</span> <span class="n">handle</span> <span class="n">error</span><span class="o">.</span>
@@ -1717,8 +1719,8 @@
 <dt id="c.P4_SetReferenceMember">
 <span class="target" id="peppapeg_8h_1abca4d482f4e0bf47ec7dda15f7687cf4"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_SetReferenceMember</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span>, <span class="pre">size_t</span>, <span class="pre">P4_RuleID</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_SetReferenceMember" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Set the referenced member of Sequence/Choice at a given index.</p>
-<p><p>It’s equivalent to: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_SetMember</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">member_rule_id</span><span class="p">));</span>
+<p>
+It’s equivalent to: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_SetMember</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">member_rule_id</span><span class="p">));</span>
 </pre></div>
 </div>
 </p>
@@ -1758,8 +1760,8 @@
 <dt id="c.P4_GetMember">
 <span class="target" id="peppapeg_8h_1af57328c72b6ed3e53417861c30baff12"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_GetMember</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span>, <span class="pre">size_t</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetMember" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Get the member of sequence/choice at a given index.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">member</span> <span class="o">=</span> <span class="n">P4_GetMember</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">member</span> <span class="o">=</span> <span class="n">P4_GetMember</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
 </pre></div>
 </div>
 </p>
@@ -1779,8 +1781,8 @@
 <dt id="c.P4_CreateStartOfInput">
 <span class="target" id="peppapeg_8h_1ad4cfeca4838a811798dae11f2cad9614"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateStartOfInput</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateStartOfInput" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create an Start-Of-Input expression.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateStartOfInput</span><span class="p">();</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateStartOfInput</span><span class="p">();</span>
 </pre></div>
 </div>
 </p>
@@ -1803,8 +1805,8 @@
 <dt id="c.P4_CreateEndOfInput">
 <span class="target" id="peppapeg_8h_1af4859d1e8f38ce3629b0538e94828c71"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateEndOfInput</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateEndOfInput" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create an End-Of-Input expression.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateEndOfInput</span><span class="p">();</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateEndOfInput</span><span class="p">();</span>
 </pre></div>
 </div>
 </p>
@@ -1827,8 +1829,8 @@
 <dt id="c.P4_AddJoin">
 <span class="target" id="peppapeg_8h_1a28eebc5b7461e4e39a1bd156dc860d2d"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_AddJoin</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a> <span class="pre">*</span><em><span class="pre">grammar</span></em>, <span class="pre">P4_RuleID</span> <em><span class="pre">id</span></em>, <em class="property"><span class="pre">const</span></em> <span class="pre">P4_String</span> <em><span class="pre">joiner</span></em>, <span class="pre">P4_RuleID</span> <em><span class="pre">rule_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddJoin" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Add a Join expression as grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">row</span> <span class="o">=</span> <span class="n">P4_AddJoin</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">","</span><span class="p">,</span> <span class="n">Element</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">row</span> <span class="o">=</span> <span class="n">P4_AddJoin</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">","</span><span class="p">,</span> <span class="n">Element</span><span class="p">);</span>
 </pre></div>
 </div>
 </p>
@@ -1850,8 +1852,8 @@
 <dt id="c.P4_CreateJoin">
 <span class="target" id="peppapeg_8h_1a2c13269e2785ad1a8ce212d9169ec00b"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateJoin</span></code><span class="sig-paren">(</span><em class="property"><span class="pre">const</span></em> <span class="pre">P4_String</span> <em><span class="pre">joiner</span></em>, <span class="pre">P4_RuleID</span> <em><span class="pre">rule_id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateJoin" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a Join expression.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">row</span> <span class="o">=</span> <span class="n">P4_CreateJoin</span><span class="p">(</span><span class="s2">","</span><span class="p">,</span> <span class="n">Element</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">row</span> <span class="o">=</span> <span class="n">P4_CreateJoin</span><span class="p">(</span><span class="s2">","</span><span class="p">,</span> <span class="n">Element</span><span class="p">);</span>
 </pre></div>
 </div>
 </p>
@@ -1875,8 +1877,8 @@
 <dt id="c.P4_DeleteExpression">
 <span class="target" id="peppapeg_8h_1a6f0a7f7d6780e5839cb385f167aeab30"></span><span class="pre">void</span> <code class="sig-name descname"><span class="pre">P4_DeleteExpression</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_DeleteExpression" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Free an expression.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
  <span class="n">P4_DeleteExpression</span><span class="p">(</span><span class="n">expr</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -1895,8 +1897,8 @@
 <dt id="c.P4_SetRuleID">
 <span class="target" id="peppapeg_8h_1a804f8641dc2dda42b2230a0d48beb62d"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_SetRuleID</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_SetRuleID" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Set the rule id for the expression.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
  <span class="n">P4_SetRuleID</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -1972,8 +1974,8 @@
 <dt id="c.P4_CreateGrammar">
 <span class="target" id="peppapeg_8h_1ae5582427ffd195aaae330c4c3b19c325"></span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateGrammar</span></code><span class="sig-paren">(</span><span class="pre">void</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateGrammar" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a <a class="reference internal" href="#structP4__Grammar"><span class="std std-ref">P4_Grammar</span></a> object. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Grammar</span><span class="o">*</span>     <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Grammar</span><span class="o">*</span>     <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
 </pre></div>
 </div>
 </p>
@@ -1987,7 +1989,8 @@
 <dt id="c.P4_DeleteGrammar">
 <span class="target" id="peppapeg_8h_1af7c05e1c28f1f319f0f13e29ba4bc12a"></span><span class="pre">void</span> <code class="sig-name descname"><span class="pre">P4_DeleteGrammar</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_DeleteGrammar" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Delete the grammar object. </p>
-<p>It will also free all of the expression rules. </p>
+<p>
+It will also free all of the expression rules. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -2017,8 +2020,8 @@
 <dt id="c.P4_SetGrammarRuleName">
 <span class="target" id="peppapeg_8h_1a856ccd065faf3cedc80d415700c545cf"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_SetGrammarRuleName</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a> <span class="pre">*</span><em><span class="pre">grammar</span></em>, <span class="pre">P4_RuleID</span> <em><span class="pre">id</span></em>, <span class="pre">P4_String</span> <em><span class="pre">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_SetGrammarRuleName" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Set the name for a grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_SetRuleName</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">ENTRY</span><span class="p">,</span> <span class="s2">"entry"</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_SetRuleName</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">ENTRY</span><span class="p">,</span> <span class="s2">"entry"</span><span class="p">);</span>
 </pre></div>
 </div>
 </p>
@@ -2039,8 +2042,8 @@
 <dt id="c.P4_GetGrammarRuleName">
 <span class="target" id="peppapeg_8h_1a8397481b36ab54ed19f30a77d5d89484"></span><span class="pre">P4_String</span> <code class="sig-name descname"><span class="pre">P4_GetGrammarRuleName</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a> <span class="pre">*</span><em><span class="pre">grammar</span></em>, <span class="pre">P4_RuleID</span> <em><span class="pre">id</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetGrammarRuleName" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Get the name for a grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">P4_GetRuleName</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">ENTRY</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">P4_GetRuleName</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">ENTRY</span><span class="p">);</span>
  <span class="n">printf</span><span class="p">(</span><span class="s2">"</span><span class="si">%s</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">name</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -2061,7 +2064,8 @@
 <dt id="c.P4_DeleteGrammarRule">
 <span class="target" id="peppapeg_8h_1af23454127bbb8cff82596ea1a8b12bf3"></span><span class="pre">void</span> <code class="sig-name descname"><span class="pre">P4_DeleteGrammarRule</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_DeleteGrammarRule" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Delete a grammar rule.</p>
-<p>WARNING: NOT IMPLEMENTED. </p>
+<p>
+WARNING: NOT IMPLEMENTED. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -2075,8 +2079,8 @@
 <dt id="c.P4_GetGrammarRule">
 <span class="target" id="peppapeg_8h_1a66e3db49e055c2ade5ccff77469a7a73"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_GetGrammarRule</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetGrammarRule" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Get a grammar rule.</p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"a"</span><span class="p">,</span> <span class="n">true</span><span class="p">);</span>
  <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_GetGrammarRule</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> <span class="o">//</span> <span class="n">The</span> <span class="n">literal</span> <span class="n">expression</span><span class="o">.</span>
 </pre></div>
 </div>
@@ -2118,8 +2122,8 @@
 <dt id="c.P4_SetGrammarRuleFlag">
 <span class="target" id="peppapeg_8h_1af4967fab45bc07acda8dd6345dcd361d"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_SetGrammarRuleFlag</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <span class="pre">P4_ExpressionFlag</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_SetGrammarRuleFlag" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Set the flag of a grammar rule. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Error</span> <span class="n">err</span> <span class="o">=</span> <span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Entry</span><span class="p">,</span> <span class="n">P4_FLAG_SQUASHED</span> <span class="o">|</span> <span class="n">P4_FLAG_LIFTED</span> <span class="o">|</span> <span class="n">P4_FLAG_TIGHT</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Error</span> <span class="n">err</span> <span class="o">=</span> <span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Entry</span><span class="p">,</span> <span class="n">P4_FLAG_SQUASHED</span> <span class="o">|</span> <span class="n">P4_FLAG_LIFTED</span> <span class="o">|</span> <span class="n">P4_FLAG_TIGHT</span><span class="p">);</span>
  <span class="k">if</span> <span class="p">(</span><span class="n">err</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="p">{</span>
      <span class="n">printf</span><span class="p">(</span><span class="s2">"err=</span><span class="si">%u</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">err</span><span class="p">);</span>
      <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
@@ -2144,8 +2148,8 @@
 <dt id="c.P4_SetRecursionLimit">
 <span class="target" id="peppapeg_8h_1a093dab7adb57ec1cbed3577b7c4df8c0"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_SetRecursionLimit</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">size_t</span> <em><span class="pre">limit</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_SetRecursionLimit" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Set the maximum allowed recursion calls. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">on</span> <span class="n">a</span> <span class="n">machine</span> <span class="k">with</span> <span class="n">small</span> <span class="n">memory</span><span class="o">.</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">on</span> <span class="n">a</span> <span class="n">machine</span> <span class="k">with</span> <span class="n">small</span> <span class="n">memory</span><span class="o">.</span>
  <span class="n">P4_SetRecursionLimit</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">256</span><span class="p">);</span>
 
  <span class="o">//</span> <span class="n">on</span> <span class="n">a</span> <span class="n">machine</span> <span class="k">with</span> <span class="n">large</span> <span class="n">memory</span><span class="o">.</span>
@@ -2185,8 +2189,8 @@
 <dt id="c.P4_GetRecursionLimit">
 <span class="target" id="peppapeg_8h_1af46d26c8cbd1649451e0bcdc9e884bae"></span><span class="pre">size_t</span> <code class="sig-name descname"><span class="pre">P4_GetRecursionLimit</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetRecursionLimit" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Get the maximum allowed recursion calls. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">size_t</span>  <span class="n">limit</span> <span class="o">=</span> <span class="n">P4_GetRecursionLimit</span><span class="p">(</span><span class="n">grammar</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">size_t</span>  <span class="n">limit</span> <span class="o">=</span> <span class="n">P4_GetRecursionLimit</span><span class="p">(</span><span class="n">grammar</span><span class="p">);</span>
  <span class="n">printf</span><span class="p">(</span><span class="s2">"limit=</span><span class="si">%u</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">limit</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -2206,8 +2210,8 @@
 <dt id="c.P4_CreateSource">
 <span class="target" id="peppapeg_8h_1a22d2f6d634356a775aac9bfd399b5f98"></span><a class="reference internal" href="#c.P4_Source" title="P4_Source"><span class="pre">P4_Source</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateSource</span></code><span class="sig-paren">(</span><span class="pre">P4_String</span>, <span class="pre">P4_RuleID</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateSource" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a <a class="reference internal" href="#structP4__Source"><span class="std std-ref">P4_Source</span></a>* object. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">char</span><span class="o">*</span>       <span class="n">content</span> <span class="o">=</span> <span class="o">...</span> <span class="o">//</span> <span class="n">read</span> <span class="kn">from</span> <span class="nn">some</span> <span class="n">files</span><span class="o">.</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">char</span><span class="o">*</span>       <span class="n">content</span> <span class="o">=</span> <span class="o">...</span> <span class="o">//</span> <span class="n">read</span> <span class="kn">from</span> <span class="nn">some</span> <span class="n">files</span><span class="o">.</span>
  <span class="n">P4_RuleID</span>   <span class="n">rule_id</span> <span class="o">=</span> <span class="n">My_EntryRule</span><span class="p">;</span>
 
  <span class="n">P4_Source</span><span class="o">*</span>  <span class="n">source</span>  <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">rule_id</span><span class="p">);</span>
@@ -2234,8 +2238,8 @@
 <dt id="c.P4_DeleteSource">
 <span class="target" id="peppapeg_8h_1a4e2cdb2466206eaa3f935d9e1c556af1"></span><span class="pre">void</span> <code class="sig-name descname"><span class="pre">P4_DeleteSource</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Source" title="P4_Source"><span class="pre">P4_Source</span></a> <span class="pre">*</span><em><span class="pre">source</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_DeleteSource" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Free the allocated memory of a source. If the source has been parsed and has an AST, the entire AST will also be free-ed. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_DeleteSource</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_DeleteSource</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
 </pre></div>
 </div>
 </p>
@@ -2251,8 +2255,8 @@
 <dt id="c.P4_ResetSource">
 <span class="target" id="peppapeg_8h_1a22abb6b0c1590a3a732dc7f3e5603013"></span><span class="pre">void</span> <code class="sig-name descname"><span class="pre">P4_ResetSource</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Source" title="P4_Source"><span class="pre">P4_Source</span></a> <span class="pre">*</span><em><span class="pre">source</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_ResetSource" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Reset the source so it can be called with P4_Parse again. All of its internal states are cleared. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">parse</span> <span class="n">full</span> <span class="n">text</span><span class="o">.</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">parse</span> <span class="n">full</span> <span class="n">text</span><span class="o">.</span>
  <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">);</span>
 
  <span class="n">P4_ResetSource</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
@@ -2275,8 +2279,8 @@
 <dt id="c.P4_SetSourceSlice">
 <span class="target" id="peppapeg_8h_1a73cbc2e63b816e1a69a2681de57a4978"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_SetSourceSlice</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Source" title="P4_Source"><span class="pre">P4_Source</span></a> <span class="pre">*</span><em><span class="pre">source</span></em>, <span class="pre">size_t</span> <em><span class="pre">start</span></em>, <span class="pre">size_t</span> <em><span class="pre">stop</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_SetSourceSlice" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Set the buf size of the source content. If not set, strlen(source-&gt;content) is used. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_String</span>  <span class="nb">input</span> <span class="o">=</span> <span class="s2">"(a)"</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_String</span>  <span class="nb">input</span> <span class="o">=</span> <span class="s2">"(a)"</span>
  <span class="n">P4_Source</span><span class="o">*</span> <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">RuleA</span><span class="p">);</span>
  <span class="k">if</span> <span class="p">(</span><span class="n">P4_Ok</span> <span class="o">!=</span> <span class="n">P4_SetSourceSlice</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">//</span> <span class="n">only</span> <span class="n">parse</span> <span class="s2">"a"</span>
      <span class="n">printf</span><span class="p">(</span><span class="s2">"set buf size error</span><span class="se">\n</span><span class="s2">"</span><span class="p">);</span>
@@ -2315,7 +2319,8 @@
 <dt id="c.P4_AcquireSourceAst">
 <span class="target" id="peppapeg_8h_1a7a39995c68fd4e7c2b9b2639fa43dd62"></span><a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_AcquireSourceAst</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Source" title="P4_Source"><span class="pre">P4_Source</span></a> <span class="pre">*</span><em><span class="pre">source</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AcquireSourceAst" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Transfer the ownership of source ast to the caller. </p>
-<p>You’re on your own now to manage the de-allocation of the source ast.</p>
+<p>
+You’re on your own now to manage the de-allocation of the source ast.</p>
 <p>The source is implicitly reset after the source ast is acquired by the caller.</p>
 <p>Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Token</span><span class="o">*</span> <span class="n">root</span> <span class="o">=</span> <span class="n">P4_AcquireSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
  <span class="o">//</span> <span class="o">...</span>
@@ -2353,8 +2358,8 @@
 <dt id="c.P4_JsonifySourceAst">
 <span class="target" id="peppapeg_8h_1a030ba0b31fccc93444a2ebc77873bc35"></span><span class="pre">void</span> <code class="sig-name descname"><span class="pre">P4_JsonifySourceAst</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a> <span class="pre">*</span><em><span class="pre">grammar</span></em>, <span class="pre">FILE</span> <span class="pre">*</span><em><span class="pre">stream</span></em>, <a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a> <span class="pre">*</span><em><span class="pre">token</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_JsonifySourceAst" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Print the token tree. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Token</span><span class="o">*</span> <span class="n">root</span> <span class="o">=</span> <span class="n">P4_GetSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Token</span><span class="o">*</span> <span class="n">root</span> <span class="o">=</span> <span class="n">P4_GetSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
  <span class="n">P4_JsonifySourceAst</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">root</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -2373,8 +2378,8 @@
 <dt id="c.P4_InspectSourceAst">
 <span class="target" id="peppapeg_8h_1aa31f6e8df5e9c2ca01da942072367ee9"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_InspectSourceAst</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a> <span class="pre">*</span><em><span class="pre">token</span></em>, <span class="pre">void</span> <span class="pre">*</span><em><span class="pre">userdata</span></em>, <a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <span class="pre">(</span><span class="pre">*</span><em><span class="pre">inspector</span></em><span class="pre">)</span><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a><span class="pre">*</span>, <span class="pre">void</span><span class="pre">*</span><span class="sig-paren">)</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_InspectSourceAst" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Inspect the token tree. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">void</span> <span class="n">MyInspector</span><span class="p">(</span><span class="n">P4_Token</span><span class="o">*</span> <span class="n">token</span><span class="p">,</span> <span class="n">void</span><span class="o">*</span> <span class="n">userdata</span><span class="p">)</span> <span class="p">{</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">void</span> <span class="n">MyInspector</span><span class="p">(</span><span class="n">P4_Token</span><span class="o">*</span> <span class="n">token</span><span class="p">,</span> <span class="n">void</span><span class="o">*</span> <span class="n">userdata</span><span class="p">)</span> <span class="p">{</span>
      <span class="n">printf</span><span class="p">(</span><span class="s2">"</span><span class="si">%lu</span><span class="se">\t</span><span class="si">%lu</span><span class="se">\t</span><span class="s2">%p</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">token</span><span class="o">-&gt;</span><span class="nb">slice</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">pos</span><span class="p">,</span> <span class="n">token</span><span class="o">-&gt;</span><span class="n">rule_id</span><span class="p">,</span> <span class="n">userdata</span><span class="p">);</span>
      <span class="k">return</span> <span class="n">P4_Ok</span><span class="p">;</span>
  <span class="p">}</span>
@@ -2397,8 +2402,8 @@
 <dt id="c.P4_Parse">
 <span class="target" id="peppapeg_8h_1a463760e7895418b673731442f917ddef"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_Parse</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <a class="reference internal" href="#c.P4_Source" title="P4_Source"><span class="pre">P4_Source</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_Parse" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Parse the source given a grammar. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="k">if</span> <span class="p">((</span><span class="n">err</span> <span class="o">=</span> <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">))</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="p">{</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="k">if</span> <span class="p">((</span><span class="n">err</span> <span class="o">=</span> <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">))</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="p">{</span>
      <span class="o">//</span> <span class="n">error</span> <span class="n">handling</span> <span class="o">...</span>
  <span class="p">}</span>
 </pre></div>
@@ -2420,8 +2425,8 @@
 <dt id="c.P4_HasError">
 <span class="target" id="peppapeg_8h_1a0ef94affc3a4f539563e6c81484e0cb9"></span><span class="pre">bool</span> <code class="sig-name descname"><span class="pre">P4_HasError</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Source" title="P4_Source"><span class="pre">P4_Source</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_HasError" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Determine whether the parse is failed. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="k">if</span> <span class="p">(</span><span class="n">P4_HasError</span><span class="p">(</span><span class="n">source</span><span class="p">))</span> <span class="p">{</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="k">if</span> <span class="p">(</span><span class="n">P4_HasError</span><span class="p">(</span><span class="n">source</span><span class="p">))</span> <span class="p">{</span>
      <span class="n">printf</span><span class="p">(</span><span class="s2">"err=</span><span class="si">%u</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">P4_GetError</span><span class="p">(</span><span class="n">source</span><span class="p">));</span>
      <span class="n">printf</span><span class="p">(</span><span class="s2">"msg=</span><span class="si">%s</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">P4_GetErrorMessage</span><span class="p">(</span><span class="n">source</span><span class="p">));</span>
  <span class="p">}</span>
@@ -2443,8 +2448,8 @@
 <dt id="c.P4_GetError">
 <span class="target" id="peppapeg_8h_1a3b80a0694824aeba6ea5fb8ad49ff639"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_GetError</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Source" title="P4_Source"><span class="pre">P4_Source</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetError" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Get the error code if failed to parse the source. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="k">if</span> <span class="p">(</span><span class="n">P4_Ok</span> <span class="o">!=</span> <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">))</span> <span class="p">{</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="k">if</span> <span class="p">(</span><span class="n">P4_Ok</span> <span class="o">!=</span> <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">))</span> <span class="p">{</span>
      <span class="n">printf</span><span class="p">(</span><span class="s2">"err=</span><span class="si">%u</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">P4_GetError</span><span class="p">(</span><span class="n">source</span><span class="p">));</span>
  <span class="p">}</span>
 </pre></div>
@@ -2465,8 +2470,8 @@
 <dt id="c.P4_GetErrorString">
 <span class="target" id="peppapeg_8h_1ac216897279702ed6b077c6a825286c5c"></span><span class="pre">P4_String</span> <code class="sig-name descname"><span class="pre">P4_GetErrorString</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <em><span class="pre">err</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetErrorString" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Get the error string given an error code. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_String</span> <span class="n">errstr</span> <span class="o">=</span> <span class="n">P4_GetErrorString</span><span class="p">(</span><span class="n">P4_MatchError</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_String</span> <span class="n">errstr</span> <span class="o">=</span> <span class="n">P4_GetErrorString</span><span class="p">(</span><span class="n">P4_MatchError</span><span class="p">);</span>
  <span class="n">printf</span><span class="p">(</span><span class="s2">"</span><span class="si">%s</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">errstr</span><span class="p">);</span> <span class="o">//</span> <span class="s2">"MatchError"</span>
 </pre></div>
 </div>
@@ -2486,8 +2491,8 @@
 <dt id="c.P4_GetErrorMessage">
 <span class="target" id="peppapeg_8h_1a877cb1cbe4215981b411083626ad74d4"></span><span class="pre">P4_String</span> <code class="sig-name descname"><span class="pre">P4_GetErrorMessage</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Source" title="P4_Source"><span class="pre">P4_Source</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetErrorMessage" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Get the error message if failed to parse the source. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="k">if</span> <span class="p">(</span><span class="n">P4_Ok</span> <span class="o">!=</span> <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">))</span> <span class="p">{</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="k">if</span> <span class="p">(</span><span class="n">P4_Ok</span> <span class="o">!=</span> <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">))</span> <span class="p">{</span>
      <span class="n">printf</span><span class="p">(</span><span class="s2">"msg=</span><span class="si">%s</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">P4_GetErrorMessage</span><span class="p">(</span><span class="n">source</span><span class="p">));</span>
  <span class="p">}</span>
 </pre></div>
@@ -2509,8 +2514,8 @@
 <dt id="c.P4_CreateToken">
 <span class="target" id="peppapeg_8h_1a2ad57d8617848c080b1f2a311383ce5c"></span><a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreateToken</span></code><span class="sig-paren">(</span><span class="pre">P4_String</span>, <span class="pre">P4_Position</span><span class="pre">*</span>, <span class="pre">P4_Position</span><span class="pre">*</span>, <span class="pre">P4_RuleID</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateToken" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a token. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_String</span>       <span class="nb">str</span>     <span class="o">=</span> <span class="s2">"Hello world"</span><span class="p">;</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_String</span>       <span class="nb">str</span>     <span class="o">=</span> <span class="s2">"Hello world"</span><span class="p">;</span>
  <span class="n">size_t</span>          <span class="n">start</span>   <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
  <span class="n">size_t</span>          <span class="n">stop</span>    <span class="o">=</span> <span class="mi">11</span><span class="p">;</span>
  <span class="n">P4_Expression</span><span class="o">*</span>  <span class="n">expr</span>    <span class="o">=</span> <span class="n">P4_GetGrammarRule</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">ENTRY</span><span class="p">);</span>
@@ -2541,8 +2546,8 @@
 <dt id="c.P4_DeleteToken">
 <span class="target" id="peppapeg_8h_1a30988c2e5a897a03963d34feff181a01"></span><span class="pre">void</span> <code class="sig-name descname"><span class="pre">P4_DeleteToken</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_DeleteToken" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Delete the token. This will free the occupied memory for token. The str of the token won’t be free-ed since the token only owns not the string but the slice of a string. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_DeleteToken</span><span class="p">(</span><span class="n">token</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_DeleteToken</span><span class="p">(</span><span class="n">token</span><span class="p">);</span>
 </pre></div>
 </div>
 </p>
@@ -2558,8 +2563,8 @@
 <dt id="c.P4_GetTokenSlice">
 <span class="target" id="peppapeg_8h_1a72f02f7655bbee3dded8d03d5fbd1538"></span><a class="reference internal" href="#c.P4_Slice" title="P4_Slice"><span class="pre">P4_Slice</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_GetTokenSlice</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetTokenSlice" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Get the slice that the token covers. The slice is owned by the token so don’t free it. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Slice</span><span class="o">*</span> <span class="nb">slice</span> <span class="o">=</span> <span class="n">P4_GetTokenSlice</span><span class="p">(</span><span class="n">token</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Slice</span><span class="o">*</span> <span class="nb">slice</span> <span class="o">=</span> <span class="n">P4_GetTokenSlice</span><span class="p">(</span><span class="n">token</span><span class="p">);</span>
  <span class="n">printf</span><span class="p">(</span><span class="s2">"token slice=[</span><span class="si">%u</span><span class="s2">..</span><span class="si">%u</span><span class="s2">]</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="nb">slice</span><span class="o">-&gt;</span><span class="n">i</span><span class="p">,</span> <span class="nb">slice</span><span class="o">-&gt;</span><span class="n">j</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -2579,8 +2584,8 @@
 <dt id="c.P4_GetTokenChildrenCount">
 <span class="target" id="peppapeg_8h_1a86b5402714fde51c27cb00fab100401c"></span><span class="pre">size_t</span> <code class="sig-name descname"><span class="pre">P4_GetTokenChildrenCount</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a> <span class="pre">*</span><em><span class="pre">token</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetTokenChildrenCount" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Get the total number of token children. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Token</span><span class="o">*</span> <span class="n">root</span> <span class="o">=</span> <span class="n">P4_GetSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Token</span><span class="o">*</span> <span class="n">root</span> <span class="o">=</span> <span class="n">P4_GetSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
  <span class="n">size_t</span> <span class="n">count</span> <span class="o">=</span> <span class="n">P4_GetTokenChildrenCount</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
  <span class="n">printf</span><span class="p">(</span><span class="s2">"There are </span><span class="si">%lu</span><span class="s2"> children for root node</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">count</span><span class="p">);</span>
 </pre></div>
@@ -2601,8 +2606,8 @@
 <dt id="c.P4_CopyTokenString">
 <span class="target" id="peppapeg_8h_1ad3758cb6df8cbd4811c47c64b0e075bf"></span><span class="pre">P4_String</span> <code class="sig-name descname"><span class="pre">P4_CopyTokenString</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CopyTokenString" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Copy the string that the token covers. The caller is responsible for freeing the string. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_String</span><span class="o">*</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">P4_CopyTokenString</span><span class="p">(</span><span class="n">token</span><span class="p">);</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_String</span><span class="o">*</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">P4_CopyTokenString</span><span class="p">(</span><span class="n">token</span><span class="p">);</span>
  <span class="n">printf</span><span class="p">(</span><span class="s2">"token str=</span><span class="si">%s</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="nb">str</span><span class="p">);</span>
  <span class="n">free</span><span class="p">(</span><span class="nb">str</span><span class="p">);</span>
 </pre></div>
@@ -2640,7 +2645,8 @@
 <dt id="c.P4_ReplaceGrammarRule">
 <span class="target" id="peppapeg_8h_1ae4d41f9770f4af1ff6414f9dc68b2e08"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_ReplaceGrammarRule</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a><span class="pre">*</span>, <span class="pre">P4_RuleID</span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="pre">P4_Expression</span></a><span class="pre">*</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_ReplaceGrammarRule" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Replace an existing grammar rule. </p>
-<p>The original grammar rule will be deleted. </p>
+<p>
+The original grammar rule will be deleted. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -2658,8 +2664,8 @@
 <dt id="c.P4_CreatePegGrammar">
 <span class="target" id="peppapeg_8h_1af39ce66014ef60f9a8c0534000f9426c"></span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_CreatePegGrammar</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreatePegGrammar" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a grammar that can parse other grammars written in PEG syntax. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">peg</span> <span class="o">=</span> <span class="n">P4_CreatePegGrammar</span><span class="p">();</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">peg</span> <span class="o">=</span> <span class="n">P4_CreatePegGrammar</span><span class="p">();</span>
  <span class="n">P4_DeleteGrammar</span><span class="p">(</span><span class="n">peg</span><span class="p">);</span>
 </pre></div>
 </div>
@@ -2674,8 +2680,8 @@
 <dt id="c.P4_PegEval">
 <span class="target" id="peppapeg_8h_1a0a47d15c8bbf3c5e091873ff23c96d2c"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="pre">P4_Error</span></a> <code class="sig-name descname"><span class="pre">P4_PegEval</span></code><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Token" title="P4_Token"><span class="pre">P4_Token</span></a> <span class="pre">*</span><em><span class="pre">token</span></em>, <span class="pre">void</span> <span class="pre">*</span><em><span class="pre">result</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_PegEval" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Evaluate the token ast parsed by P4_CreatePegGrammar. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">peg</span>     <span class="o">=</span> <span class="n">P4_CreatePegGrammar</span><span class="p">();</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">peg</span>     <span class="o">=</span> <span class="n">P4_CreatePegGrammar</span><span class="p">();</span>
  <span class="n">P4_Source</span><span class="o">*</span>  <span class="n">peggram</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s2">"my_grammar = </span><span class="se">\"</span><span class="s2">abc</span><span class="se">\"</span><span class="s2">;"</span><span class="p">,</span> <span class="n">P4_PegGrammar</span><span class="p">);</span>
  <span class="n">P4_Parse</span><span class="p">(</span><span class="n">peg</span><span class="p">,</span> <span class="n">peggram</span><span class="p">);</span>
 
@@ -2724,8 +2730,8 @@
 <dt id="c.P4_LoadGrammar">
 <span class="target" id="peppapeg_8h_1a41844d9c4c94c072c60cde6d7b06b37c"></span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="pre">P4_Grammar</span></a> <span class="pre">*</span><code class="sig-name descname"><span class="pre">P4_LoadGrammar</span></code><span class="sig-paren">(</span><span class="pre">P4_String</span> <em><span class="pre">rules</span></em><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_LoadGrammar" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Load peg grammar from a string. </p>
-<p><p>Example: </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_LoadGrammar</span><span class="p">(</span>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_LoadGrammar</span><span class="p">(</span>
      <span class="s2">"entry = one one;</span><span class="se">\n</span><span class="s2">"</span>
      <span class="s2">"one   = </span><span class="se">\"</span><span class="s2">1</span><span class="se">\"</span><span class="s2">;</span><span class="se">\n</span><span class="s2">"</span>
  <span class="p">);</span>

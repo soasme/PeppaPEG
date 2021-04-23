@@ -4237,6 +4237,7 @@ finalize:
     if (bootstrap)
         P4_DeleteGrammar(bootstrap);
 
+    /* TODO: make it explicit where causes the syntax error. */
     ASSERT(err == P4_Ok, "invalid grammar");
 
     return grammar;

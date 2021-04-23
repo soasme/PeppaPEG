@@ -3676,6 +3676,11 @@ P4_String   P4_StringifyPegGrammarRuleID(P4_RuleID id) {
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalFlag(P4_Token* token, P4_EvalResult* result) {
+    ASSERT(token->rule_id == P4_PegRuleDecorator,
+           "P4_PegEvalFlag() can only handle P4_PegRuleDecorator.");
+
+    /* If the given `d` equals to the token sliced text, set flag to `f`. */
+
 # define EVAL_FLAG(d, f) \
     if (P4_CmpSliceString(token->text, &token->slice, (d)) == 0) {\
         result->flag = (f); \
@@ -3689,8 +3694,9 @@ P4_PegEvalFlag(P4_Token* token, P4_EvalResult* result) {
     EVAL_FLAG("@tight", P4_FLAG_TIGHT);
     EVAL_FLAG("@nonterminal", P4_FLAG_NON_TERMINAL);
 
-    /* Parse guarantees only 6 kinds of flags would appear.
+    /* P4_CreatePegGrammar guarantees only 6 kinds of flags would appear.
      * Below code are unreachable. */
+
     UNREACHABLE();
 
     result->flag = 0;

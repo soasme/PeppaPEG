@@ -309,28 +309,28 @@ void test_eval_num(void) {
 }
 
 void test_eval_char(void) {
-    ASSERT_EVAL(P4_PegRuleChar, "a", P4_Rune, 'a');
-    ASSERT_EVAL(P4_PegRuleChar, "A", P4_Rune, 'A');
-    ASSERT_EVAL(P4_PegRuleChar, "\\b", P4_Rune, '\b');
-    ASSERT_EVAL(P4_PegRuleChar, "\\t", P4_Rune, '\t');
-    ASSERT_EVAL(P4_PegRuleChar, "\\n", P4_Rune, '\n');
-    ASSERT_EVAL(P4_PegRuleChar, "\\f", P4_Rune, '\f');
-    ASSERT_EVAL(P4_PegRuleChar, "\\r", P4_Rune, '\r');
-    ASSERT_EVAL(P4_PegRuleChar, "\\\\", P4_Rune, '\\');
-    ASSERT_EVAL(P4_PegRuleChar, "ç", P4_Rune, 0x00e7);
-    ASSERT_EVAL(P4_PegRuleChar, "Ç", P4_Rune, 0x00C7);
-    ASSERT_EVAL(P4_PegRuleChar, "你", P4_Rune, 0x4f60); /* https://www.compart.com/en/unicode/U+4F60 */
-    ASSERT_EVAL(P4_PegRuleChar, "🐷", P4_Rune, 0x1f437); /* https://www.compart.com/en/unicode/U+1F437 */
-    ASSERT_EVAL(P4_PegRuleChar, "\\u{4f60}", P4_Rune, 0x4f60);
-    ASSERT_EVAL(P4_PegRuleChar, "\\u{a}", P4_Rune, '\n');
-    ASSERT_EVAL(P4_PegRuleChar, "\\u{A}", P4_Rune, '\n');
-    ASSERT_EVAL(P4_PegRuleChar, "\\u{41}", P4_Rune, 'A');
-    ASSERT_EVAL(P4_PegRuleChar, "\\u{61}", P4_Rune, 'a');
-    ASSERT_EVAL(P4_PegRuleChar, "\\u{0041}", P4_Rune, 'A');
-    ASSERT_EVAL(P4_PegRuleChar, "\\u{0061}", P4_Rune, 'a');
-    ASSERT_EVAL(P4_PegRuleChar, "\\u{000a}", P4_Rune, '\n');
-    ASSERT_EVAL(P4_PegRuleChar, "\\u{000A}", P4_Rune, '\n');
-    ASSERT_EVAL(P4_PegRuleChar, "\\u{10ffff}", P4_Rune, 0x10ffff);
+    ASSERT_EVAL2(P4_PegRuleChar, "a", rune, 'a', "");
+    ASSERT_EVAL2(P4_PegRuleChar, "A", rune, 'A', "");
+    ASSERT_EVAL2(P4_PegRuleChar, "\\b", rune, '\b', "");
+    ASSERT_EVAL2(P4_PegRuleChar, "\\t", rune, '\t', "");
+    ASSERT_EVAL2(P4_PegRuleChar, "\\n", rune, '\n', "");
+    ASSERT_EVAL2(P4_PegRuleChar, "\\f", rune, '\f', "");
+    ASSERT_EVAL2(P4_PegRuleChar, "\\r", rune, '\r', "");
+    ASSERT_EVAL2(P4_PegRuleChar, "\\\\", rune, '\\', "");
+    ASSERT_EVAL2(P4_PegRuleChar, "ç", rune, 0x00e7, "");
+    ASSERT_EVAL2(P4_PegRuleChar, "Ç", rune, 0x00C7, "");
+    ASSERT_EVAL2(P4_PegRuleChar, "你", rune, 0x4f60, ""); /* https://www.compart.com/en/unicode/U+4F60 */
+    ASSERT_EVAL2(P4_PegRuleChar, "🐷", rune, 0x1f437, ""); /* https://www.compart.com/en/unicode/U+1F437 */
+    ASSERT_EVAL2(P4_PegRuleChar, "\\u{4f60}", rune, 0x4f60, "");
+    ASSERT_EVAL2(P4_PegRuleChar, "\\u{a}", rune, '\n', "");
+    ASSERT_EVAL2(P4_PegRuleChar, "\\u{A}", rune, '\n', "");
+    ASSERT_EVAL2(P4_PegRuleChar, "\\u{41}", rune, 'A', "");
+    ASSERT_EVAL2(P4_PegRuleChar, "\\u{61}", rune, 'a', "");
+    ASSERT_EVAL2(P4_PegRuleChar, "\\u{0041}", rune, 'A', "");
+    ASSERT_EVAL2(P4_PegRuleChar, "\\u{0061}", rune, 'a', "");
+    ASSERT_EVAL2(P4_PegRuleChar, "\\u{000a}", rune, '\n', "");
+    ASSERT_EVAL2(P4_PegRuleChar, "\\u{000A}", rune, '\n', "");
+    ASSERT_EVAL2(P4_PegRuleChar, "\\u{10ffff}", rune, 0x10ffff, "");
 }
 
 #define ASSERT_EVAL_LITERAL(entry, input, expect_lit, expect_sensitive) do { \

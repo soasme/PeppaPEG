@@ -198,7 +198,7 @@ P4_PRIVATE(P4_Token*)           P4_MatchBackReference(P4_Source*, P4_Expression*
 P4_PRIVATE(P4_Error)            P4_PegEvalFlag(P4_Token* token, P4_EvalResult* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalRuleFlags(P4_Token* token, P4_EvalResult* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalNumber(P4_Token* token, P4_EvalResult* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalChar(P4_Token* token, P4_Rune* rune);
+P4_PRIVATE(P4_Error)            P4_PegEvalChar(P4_Token* token, P4_EvalResult* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalLiteral(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalInsensitiveLiteral(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalRange(P4_Token* token, P4_Expression** expr);
@@ -3750,6 +3750,11 @@ finalize:
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalNumber(P4_Token* token, P4_EvalResult* result) {
+    ASSERT(
+        token->rule_id == P4_PegRuleNumber,
+        "P4_PegEvalNumber() can only handle P4_PegRuleNumber."
+    );
+
     P4_Error    err = P4_Ok;
     P4_String   str = NULL;
 
@@ -3759,16 +3764,21 @@ P4_PegEvalNumber(P4_Token* token, P4_EvalResult* result) {
         goto finalize;
     }
 
-    result->size = atol(s);
+    result->size = atol(str);
 
 finalize:
-    if (s) P4_FREE(s);
+    if (str)
+        P4_FREE(str);
+
     return err;
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalChar(P4_Token* token, P4_Rune* rune) {
-    size_t size = P4_ReadEscapedRune(token->text+token->slice.start.pos, rune);
+P4_PegEvalChar(P4_Token* token, P4_EvalResult* result) {
+    size_t size = P4_ReadEscapedRune(
+        token->text+token->slice.start.pos,
+        &result->rune
+    );
 
     if (size == 0)
         return P4_ValueError;
@@ -3844,18 +3854,18 @@ P4_PegEvalRange(P4_Token* token, P4_Expression** expr) {
         if (*expr == NULL)
             return P4_MemoryError;
     } else {
-        P4_Rune lower = 0, upper = 0;
-        size_t stride = 1;
+        P4_Rune lower   = 0,
+                upper   = 0;
+        size_t  stride  = 1;
 
-        if ((err = P4_PegEvalChar(token->head, &lower)) != P4_Ok)
-            return err;
+        P4_Finalize(P4_PegEval(token->head, &result));
+        lower = result.rune;
 
-        if ((err = P4_PegEvalChar(token->head->next, &upper)) != P4_Ok)
-            return err;
+        P4_Finalize(P4_PegEval(token->head->next, &result));
+        upper = result.rune;
 
         if (token->head->next->next != NULL) {
-            if ((err = P4_PegEval(token->head->next->next, &result)) != P4_Ok)
-                return err;
+            P4_Finalize(P4_PegEval(token->head->next->next, &result));
             stride = result.size;
         }
 
@@ -3873,6 +3883,9 @@ P4_PegEvalRange(P4_Token* token, P4_Expression** expr) {
     }
 
     return P4_Ok;
+
+finalize:
+    return err;
 }
 
 P4_PRIVATE(P4_Error)

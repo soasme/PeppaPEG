@@ -200,8 +200,8 @@ P4_PRIVATE(P4_Error)            P4_PegEvalRuleFlags(P4_Token* token, P4_EvalResu
 P4_PRIVATE(P4_Error)            P4_PegEvalNumber(P4_Token* token, P4_EvalResult* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalChar(P4_Token* token, P4_EvalResult* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalRuleName(P4_Token* token, P4_EvalResult* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalLiteral(P4_Token* token, P4_Expression** expr);
-P4_PRIVATE(P4_Error)            P4_PegEvalInsensitiveLiteral(P4_Token* token, P4_Expression** expr);
+P4_PRIVATE(P4_Error)            P4_PegEvalLiteral(P4_Token*, P4_EvalResult*);
+P4_PRIVATE(P4_Error)            P4_PegEvalInsensitiveLiteral(P4_Token*, P4_EvalResult*);
 P4_PRIVATE(P4_Error)            P4_PegEvalRange(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalMembers(P4_Token* token, P4_Expression* expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalSequence(P4_Token* token, P4_Expression** expr);
@@ -3790,36 +3790,43 @@ P4_PegEvalChar(P4_Token* token, P4_EvalResult* result) {
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalLiteral(P4_Token* token, P4_Expression** expr) {
+P4_PegEvalLiteral(P4_Token* token, P4_EvalResult* result) {
     size_t len = P4_GetSliceSize(&token->slice) - 2; /* remove quotes */
     if (len < 0)
         return P4_ValueError;
 
-    size_t i = 0,
-           size = 0;
-    P4_Error err = 0;
-    P4_Rune rune = 0;
-    P4_String lit = P4_MALLOC((len+1) * sizeof(char)),
-              cur = lit;
+    size_t      i = 0,
+                size = 0;
+    P4_Error    err = 0;
+    P4_Rune     rune = 0;
+    P4_String   lit = P4_MALLOC((len+1) * sizeof(char)),
+                cur = lit;
 
-    if (lit == NULL)
-        return P4_MemoryError;
+    if (lit == NULL) {
+        err = P4_MemoryError;
+        sprintf(result->reason, "out of memory");
+        goto finalize;
+    }
 
     for (i = token->slice.start.pos+1; i < token->slice.stop.pos-1; i += size) {
         size = P4_ReadEscapedRune(token->text+i, &rune);
         if (size == 0) {
             err = P4_ValueError;
+            sprintf(result->reason, "invalid code point");
             goto finalize;
         }
+
         if (i + size > token->slice.stop.pos-1) {
             err = P4_ValueError;
+            sprintf(result->reason, "read too much code points");
             goto finalize;
         }
+
         cur = P4_ConcatRune(cur, rune, size);
     }
     *cur = '\0';
 
-    *expr = P4_CreateLiteral(lit, true);
+    result->expr = P4_CreateLiteral(lit, true);
 
 finalize:
     P4_FREE(lit);
@@ -3827,15 +3834,13 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalInsensitiveLiteral(P4_Token* token, P4_Expression** expr) {
+P4_PegEvalInsensitiveLiteral(P4_Token* token, P4_EvalResult* result) {
     P4_Error err = P4_Ok;
-
-    if ((err = P4_PegEvalLiteral(token->head, expr)) != P4_Ok)
-        return err;
-
-    (*expr)->sensitive = false;
-
+    P4_Finalize(P4_PegEval(token->head, &(result->expr))); /* TODO: remove ->expr */
+    result->expr->sensitive = false;
     return P4_Ok;
+finalize:
+    return err;
 }
 
 P4_PRIVATE(P4_Error)
@@ -4254,6 +4259,9 @@ finalize:
 
 P4_PUBLIC P4_Error
 P4_PegEval(P4_Token* token, void* result) {
+    P4_Error err = P4_Ok;
+    P4_EvalResult* eval_result = &(P4_EvalResult){0};
+
     switch (token->rule_id) {
         case P4_PegRuleDecorator:
             return P4_PegEvalFlag(token, result);
@@ -4264,9 +4272,13 @@ P4_PegEval(P4_Token* token, void* result) {
         case P4_PegRuleChar:
             return P4_PegEvalChar(token, result);
         case P4_PegRuleLiteral:
-            return P4_PegEvalLiteral(token, result);
+            err = P4_PegEvalLiteral(token, eval_result);
+            *(P4_Expression **)result = eval_result->expr;
+            return err;
         case P4_PegRuleInsensitiveLiteral:
-            return P4_PegEvalInsensitiveLiteral(token, result);
+            err = P4_PegEvalInsensitiveLiteral(token, eval_result);
+            *(P4_Expression **)result = eval_result->expr;
+            return err;
         case P4_PegRuleRange:
             return P4_PegEvalRange(token, result);
         case P4_PegRuleSequence:

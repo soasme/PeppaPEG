@@ -169,6 +169,7 @@ P4_PRIVATE(P4_Error)            P4_PopFrame(P4_Source*, P4_Frame*);
 P4_PRIVATE(P4_Expression*)      P4_GetReference(P4_Source*, P4_Expression*);
 
 P4_PRIVATE(P4_String)           P4_CopySliceString(P4_String, P4_Slice*);
+P4_PRIVATE(int)                 P4_CmpSliceString(P4_String src, P4_Slice* slice, P4_String dest);
 
 P4_PRIVATE(P4_Error)            P4_SetWhitespaces(P4_Grammar*);
 P4_PRIVATE(P4_Expression*)      P4_GetWhitespaces(P4_Grammar*);
@@ -187,20 +188,8 @@ P4_PRIVATE(P4_Token*)           P4_MatchRepeat(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchSpacedExpressions(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchBackReference(P4_Source*, P4_Expression*, P4_Slice*, P4_Expression*);
 
-typedef struct EvalResult{
-    P4_String   reason;
-    P4_PegRule  rule;
-    union {
-        P4_ExpressionFlag*  flag;
-        size_t*             size;
-        P4_Rune*            rune;
-        P4_Expression**     expr;
-        P4_String*          str;
-        P4_Grammar*         grammar;
-    };
-};
 
-P4_PRIVATE(P4_Error)            P4_PegEvalFlag(P4_Token* token, P4_ExpressionFlag *flag);
+P4_PRIVATE(P4_Error)            P4_PegEvalFlag(P4_Token* token, P4_EvalResult* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalRuleFlags(P4_Token* token, P4_ExpressionFlag* flag);
 P4_PRIVATE(P4_Error)            P4_PegEvalNumber(P4_Token* token, size_t* num);
 P4_PRIVATE(P4_Error)            P4_PegEvalChar(P4_Token* token, P4_Rune* rune);
@@ -3092,6 +3081,13 @@ P4_CopyTokenString(P4_Token* token) {
     return P4_CopySliceString(token->text, &(token->slice));
 }
 
+P4_PRIVATE(int)
+P4_CmpSliceString(P4_String src, P4_Slice* slice, P4_String dest) {
+    P4_String sliced_src = src + slice->start.pos;
+    size_t len = P4_GetSliceSize(slice);
+    return memcmp(dest, sliced_src, len);
+}
+
 /*
  * Determine if expression has flag P4_FLAG_SQUASHED.
  */
@@ -3679,24 +3675,35 @@ P4_String   P4_StringifyPegGrammarRuleID(P4_RuleID id) {
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalFlag(P4_Token* token, P4_ExpressionFlag *flag) {
-    P4_String token_str = token->text + token->slice.start.pos; /* XXX: need slice api. */
-    size_t token_len = P4_GetSliceSize(&token->slice); /* XXX: need slice api. */
+P4_PegEvalFlag(P4_Token* token, P4_EvalResult* result) {
+    if (P4_CmpSliceString(token->text, &token->slice, "@squashed") == 0)
+        result->flag = P4_FLAG_SQUASHED;
 
-    if (memcmp("@squashed", token_str, token_len) == 0)
-        *flag = P4_FLAG_SQUASHED;
-    else if (memcmp("@scoped", token_str, token_len) == 0)
-        *flag = P4_FLAG_SCOPED;
-    else if (memcmp("@spaced", token_str, token_len) == 0)
-        *flag = P4_FLAG_SPACED;
-    else if (memcmp("@lifted", token_str, token_len) == 0)
-        *flag = P4_FLAG_LIFTED;
-    else if (memcmp("@tight", token_str, token_len) == 0)
-        *flag = P4_FLAG_TIGHT;
-    else if (memcmp("@nonterminal", token_str, token_len) == 0)
-        *flag = P4_FLAG_NON_TERMINAL;
+    else if (P4_CmpSliceString(token->text, &token->slice, "@scoped") == 0)
+        result->flag = P4_FLAG_SCOPED;
+
+    else if (P4_CmpSliceString(token->text, &token->slice, "@spaced") == 0)
+        result->flag = P4_FLAG_SPACED;
+
+    else if (P4_CmpSliceString(token->text, &token->slice, "@lifted") == 0)
+        result->flag = P4_FLAG_LIFTED;
+
+    else if (P4_CmpSliceString(token->text, &token->slice, "@tight") == 0)
+        result->flag = P4_FLAG_TIGHT;
+
+    else if (P4_CmpSliceString(token->text, &token->slice, "@nonterminal") == 0)
+        result->flag = P4_FLAG_NON_TERMINAL;
+
     else {
-        *flag = 0; return P4_ValueError;
+        UNREACHABLE(); /* Parse guarantees only 6 kinds of flags would appear. */
+
+        result->flag = 0;
+
+        P4_String str = P4_CopyTokenString(token);
+        sprintf(result->reason, "invalid flag: %s", str);
+        free(str);
+
+        return P4_ValueError;
     }
 
     return P4_Ok;
@@ -3705,14 +3712,15 @@ P4_PegEvalFlag(P4_Token* token, P4_ExpressionFlag *flag) {
 P4_PRIVATE(P4_Error)
 P4_PegEvalRuleFlags(P4_Token* token, P4_ExpressionFlag* flag) {
     P4_Token* child = NULL;
-    P4_ExpressionFlag child_flag = 0;
     P4_Error err = P4_Ok;
+    P4_EvalResult result = {0};
     for (child = token->head; child != NULL; child = child->next) {
-        if ((err = P4_PegEvalFlag(child, &child_flag)) != P4_Ok) {
+        ASSERT(child->rule_id == P4_PegRuleDecorator, "rule should be a decorator");
+        if ((err = P4_PegEval(child, &result)) != P4_Ok) {
             *flag = 0;
             return err;
         }
-        *flag |= child_flag;
+        *flag |= result.flag;
     }
     return P4_Ok;
 }

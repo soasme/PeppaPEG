@@ -550,6 +550,19 @@ typedef struct P4_Grammar{
     P4_UserDataFreeFunc     free_func;
 } P4_Grammar;
 
+typedef struct P4_EvalResult{
+    P4_PegRuleID    rule;
+    char            reason[64];
+    union {
+        P4_ExpressionFlag   flag;
+        size_t              size;
+        P4_Rune             rune;
+        P4_String           str;
+        P4_Expression**     expr;
+        P4_Grammar*         grammar;
+    };
+} P4_EvalResult;
+
 
 /*
  *

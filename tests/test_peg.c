@@ -264,6 +264,15 @@ void test_grammar(void) {
     );
 }
 
+#define ASSERT_EVAL2(entry, input, expect_t, expect_value, expect_reason) do { \
+        SETUP_EVAL((entry), (input)); \
+        P4_EvalResult r = {0}; \
+        if (root) P4_PegEval(root, &r); \
+        TEST_ASSERT_EQUAL((expect_value), r.expect_t ); \
+        TEST_ASSERT_EQUAL_STRING((expect_reason), r.reason ); \
+        TEARDOWN_EVAL(); \
+} while (0);
+
 #define ASSERT_EVAL(entry, input, expect_t, expect) do { \
         SETUP_EVAL((entry), (input)); \
         expect_t value = 0; \
@@ -273,12 +282,12 @@ void test_grammar(void) {
 } while (0);
 
 void test_eval_flag(void) {
-    ASSERT_EVAL(P4_PegRuleDecorator, "@squashed", P4_ExpressionFlag, P4_FLAG_SQUASHED);
-    ASSERT_EVAL(P4_PegRuleDecorator, "@scoped", P4_ExpressionFlag, P4_FLAG_SCOPED);
-    ASSERT_EVAL(P4_PegRuleDecorator, "@spaced", P4_ExpressionFlag, P4_FLAG_SPACED);
-    ASSERT_EVAL(P4_PegRuleDecorator, "@lifted", P4_ExpressionFlag, P4_FLAG_LIFTED);
-    ASSERT_EVAL(P4_PegRuleDecorator, "@tight", P4_ExpressionFlag, P4_FLAG_TIGHT);
-    ASSERT_EVAL(P4_PegRuleDecorator, "@nonterminal", P4_ExpressionFlag, P4_FLAG_NON_TERMINAL);
+    ASSERT_EVAL2(P4_PegRuleDecorator, "@squashed", flag, P4_FLAG_SQUASHED, "");
+    ASSERT_EVAL2(P4_PegRuleDecorator, "@scoped", flag, P4_FLAG_SCOPED, "");
+    ASSERT_EVAL2(P4_PegRuleDecorator, "@spaced", flag, P4_FLAG_SPACED, "");
+    ASSERT_EVAL2(P4_PegRuleDecorator, "@lifted", flag, P4_FLAG_LIFTED, "");
+    ASSERT_EVAL2(P4_PegRuleDecorator, "@tight", flag, P4_FLAG_TIGHT, "");
+    ASSERT_EVAL2(P4_PegRuleDecorator, "@nonterminal", flag, P4_FLAG_NON_TERMINAL, "");
 }
 
 void test_eval_flags(void) {

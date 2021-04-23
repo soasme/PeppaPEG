@@ -414,10 +414,12 @@ void test_eval_choice(void) {
 #define ASSERT_EVAL_LOOKAHEAD(entry, input, expect_kind) do { \
     SETUP_EVAL((entry), (input)); \
     P4_Expression* value = 0; \
-    if (root) P4_PegEval(root, &value); \
+    P4_Error err = P4_Ok; \
+    if (root) err = P4_PegEval(root, &value); \
+    TEST_ASSERT_EQUAL_MESSAGE( P4_Ok, err, "parse failed"); \
     TEST_ASSERT_EQUAL( (expect_kind), value->kind ); \
     TEST_ASSERT_NOT_NULL( value->ref_expr ); \
-    P4_DeleteExpression(value); \
+    if (value) P4_DeleteExpression(value); \
     TEARDOWN_EVAL(); \
 } while (0);
 

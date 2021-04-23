@@ -206,7 +206,7 @@ P4_PRIVATE(P4_Error)            P4_PegEvalRange(P4_Token* token, P4_EvalResult* 
 P4_PRIVATE(P4_Error)            P4_PegEvalMembers(P4_Token* token, P4_Expression* expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalSequence(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalChoice(P4_Token* token, P4_Expression** expr);
-P4_PRIVATE(P4_Error)            P4_PegEvalPositive(P4_Token* token, P4_Expression** expr);
+P4_PRIVATE(P4_Error)            P4_PegEvalPositive(P4_Token* token, P4_EvalResult* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalNegative(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalDot(P4_Token* token, P4_Expression** expr);
@@ -3945,27 +3945,31 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalPositive(P4_Token* token, P4_Expression** expr) {
+P4_PegEvalPositive(P4_Token* token, P4_EvalResult* result) {
     P4_Error        err = P4_Ok;
     P4_Expression*  ref = NULL;
+    P4_Expression*  exp = NULL;
 
-    if ((err = P4_PegEval(token->head, &ref)) != P4_Ok) {
-        return err;
-    }
+    P4_Finalize(P4_PegEval(token->head, &(result->expr))); /* TODO: remove ->expr */
 
-    if (ref == NULL)
-        return P4_MemoryError;
-
-    if ((*expr = P4_CreatePositive(ref)) == NULL) {
+    if ((ref = result->expr) == NULL) {
+        sprintf(result->reason, "out of memory");
         err = P4_MemoryError;
         goto finalize;
     }
 
+    if ((exp = P4_CreatePositive(ref)) == NULL) {
+        sprintf(result->reason, "out of memory");
+        err = P4_MemoryError;
+        goto finalize;
+    }
+
+    result->expr = exp;
     return P4_Ok;
 
 finalize:
-    P4_DeleteExpression(ref);
-    P4_DeleteExpression(*expr);
+    if (ref) P4_DeleteExpression(ref);
+    if (exp) P4_DeleteExpression(exp);
     return err;
 }
 
@@ -4269,23 +4273,25 @@ P4_PegEval(P4_Token* token, void* result) {
         case P4_PegRuleChar:
             return P4_PegEvalChar(token, result);
         case P4_PegRuleLiteral:
-            err = P4_PegEvalLiteral(token, eval_result);
+            P4_Finalize(P4_PegEvalLiteral(token, eval_result));
             *(P4_Expression **)result = eval_result->expr;
-            return err;
+            break;
         case P4_PegRuleInsensitiveLiteral:
-            err = P4_PegEvalInsensitiveLiteral(token, eval_result);
+            P4_Finalize(P4_PegEvalInsensitiveLiteral(token, eval_result));
             *(P4_Expression **)result = eval_result->expr;
-            return err;
+            break;
         case P4_PegRuleRange:
-            err = P4_PegEvalRange(token, eval_result);
+            P4_Finalize(P4_PegEvalRange(token, eval_result));
             *(P4_Expression **)result = eval_result->expr;
-            return err;
+            break;
         case P4_PegRuleSequence:
             return P4_PegEvalSequence(token, result);
         case P4_PegRuleChoice:
             return P4_PegEvalChoice(token, result);
         case P4_PegRulePositive:
-            return P4_PegEvalPositive(token, result);
+            P4_Finalize(P4_PegEvalPositive(token, eval_result));
+            *(P4_Expression **)result = eval_result->expr;
+            return err;
         case P4_PegRuleNegative:
             return P4_PegEvalNegative(token, result);
         case P4_PegRuleRepeat:
@@ -4303,6 +4309,9 @@ P4_PegEval(P4_Token* token, void* result) {
             return P4_ValueError;
     }
     return P4_Ok;
+finalize:
+    result = 0;
+    return err;
 }
 
 P4_PUBLIC P4_Grammar*

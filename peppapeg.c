@@ -1212,14 +1212,11 @@ P4_CreateToken (const P4_String     str,
 /*
  * Free the token.
  *
- * Danger: if free the token only without cleaning next & head & tail,
- * they're in risk of being dangled.
+ * DANGER: this function does not free children nodes.
  */
 P4_PRIVATE(void)
 P4_DeleteTokenNode(P4_Token* token) {
-    assert(token != NULL);
-    if (token)
-        P4_FREE(token);
+    if (token) P4_FREE(token);
 }
 
 
@@ -1228,16 +1225,13 @@ P4_DeleteTokenNode(P4_Token* token) {
  */
 P4_PRIVATE(void)
 P4_DeleteTokenChildren(P4_Token* token) {
-    assert(token != NULL);
-    P4_Token*   child   = token->head;
-    P4_Token*   tmp     = NULL;
+    if (token == NULL)
+        return;
 
-    while (child) {
-        tmp = child->next;
-        if (child->head)
-            P4_DeleteTokenChildren(child);
-        P4_DeleteTokenNode(child);
-        child = tmp;
+    for (token = token->head; token != NULL; token = token->next) {
+        if (token->head)
+            P4_DeleteTokenChildren(token);
+        P4_DeleteTokenNode(token);
     }
 }
 
@@ -4230,7 +4224,6 @@ P4_LoadGrammar(P4_String rules) {
         goto finalize;
 
     if (P4_Ok != (err = P4_PegEval(rules_tok, &grammar))) {
-        ASSERT(0, "invalid grammar");
         goto finalize;
     }
 
@@ -4240,6 +4233,8 @@ finalize:
 
     if (bootstrap)
         P4_DeleteGrammar(bootstrap);
+
+    ASSERT(err == P4_Ok, "invalid grammar");
 
     return grammar;
 }

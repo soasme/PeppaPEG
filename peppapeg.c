@@ -3805,8 +3805,13 @@ P4_PegEvalRange(P4_Token* token, P4_Expression** expr) {
             if ((err = P4_PegEvalNumber(token->head->next->next, &stride)) != P4_Ok)
                 return err;
 
-        if (lower > upper || lower == 0 || upper == 0 || stride == 0)
+        if (lower > upper) {
             return P4_ValueError;
+        }
+
+        if ((lower == 0) || (upper == 0) || (stride == 0)) {
+            return P4_ValueError;
+        }
 
         *expr = P4_CreateRange(lower, upper, stride);
         if (*expr == NULL)
@@ -4150,8 +4155,11 @@ P4_PegEvalGrammar(P4_Token* token, P4_Grammar** result) {
     }
 
 finalize:
-    if (err)
+
+    if (err) {
         P4_DeleteGrammar(*result);
+        *result = NULL;
+    }
 
     return err;
 }
@@ -4202,6 +4210,7 @@ P4_LoadGrammar(P4_String rules) {
     P4_Grammar* grammar   = NULL;
     P4_Source*  rules_src = NULL;
     P4_Token*   rules_tok = NULL;
+    P4_Error    err       = P4_Ok;
 
     bootstrap = P4_CreatePegGrammar();
     if (bootstrap == NULL)
@@ -4211,15 +4220,19 @@ P4_LoadGrammar(P4_String rules) {
     if (rules_src == NULL)
         goto finalize;
 
-    if (P4_Ok != P4_Parse(bootstrap, rules_src))
+    if (P4_Ok != (err = P4_Parse(bootstrap, rules_src))) {
+        ASSERT(0, P4_GetErrorMessage(rules_src));
         goto finalize;
+    }
 
     rules_tok = P4_GetSourceAst(rules_src);
     if (rules_tok == NULL)
         goto finalize;
 
-    if (P4_Ok != P4_PegEval(rules_tok, &grammar))
+    if (P4_Ok != (err = P4_PegEval(rules_tok, &grammar))) {
+        ASSERT(0, "invalid grammar");
         goto finalize;
+    }
 
 finalize:
     if (rules_src)

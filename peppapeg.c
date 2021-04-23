@@ -1228,10 +1228,15 @@ P4_DeleteTokenChildren(P4_Token* token) {
     if (token == NULL)
         return;
 
-    for (token = token->head; token != NULL; token = token->next) {
-        if (token->head)
-            P4_DeleteTokenChildren(token);
-        P4_DeleteTokenNode(token);
+    P4_Token*   child   = token->head;
+    P4_Token*   tmp     = NULL;
+
+    while (child) {
+        tmp = child->next;
+        if (child->head)
+            P4_DeleteTokenChildren(child);
+        P4_DeleteTokenNode(child);
+        child = tmp;
     }
 }
 

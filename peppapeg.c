@@ -1330,9 +1330,12 @@ P4_PopFrame(P4_Source* s, P4_Frame* f) {
         return P4_MemoryError;
 
     P4_Frame* oldtop = s->frame_stack;
-    s->frame_stack = s->frame_stack->next;
-    if (oldtop) P4_FREE(oldtop);
-    s->frame_stack_size--;
+
+    if (oldtop) {
+        s->frame_stack = oldtop->next;
+        s->frame_stack_size--;
+        P4_FREE(oldtop);
+    }
 
     return P4_Ok;
 }

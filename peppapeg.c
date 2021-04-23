@@ -187,6 +187,19 @@ P4_PRIVATE(P4_Token*)           P4_MatchRepeat(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchSpacedExpressions(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchBackReference(P4_Source*, P4_Expression*, P4_Slice*, P4_Expression*);
 
+typedef struct EvalResult{
+    P4_String   reason;
+    P4_PegRule  rule;
+    union {
+        P4_ExpressionFlag*  flag;
+        size_t*             size;
+        P4_Rune*            rune;
+        P4_Expression**     expr;
+        P4_String*          str;
+        P4_Grammar*         grammar;
+    };
+};
+
 P4_PRIVATE(P4_Error)            P4_PegEvalFlag(P4_Token* token, P4_ExpressionFlag *flag);
 P4_PRIVATE(P4_Error)            P4_PegEvalRuleFlags(P4_Token* token, P4_ExpressionFlag* flag);
 P4_PRIVATE(P4_Error)            P4_PegEvalNumber(P4_Token* token, size_t* num);

@@ -551,7 +551,6 @@ typedef struct P4_Grammar{
 } P4_Grammar;
 
 typedef struct P4_EvalResult{
-    P4_PegRuleID    rule;
     char            reason[64];
     union {
         P4_ExpressionFlag   flag;

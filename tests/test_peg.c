@@ -301,11 +301,11 @@ void test_eval_flags(void) {
 }
 
 void test_eval_num(void) {
-    ASSERT_EVAL(P4_PegRuleNumber, "0", long, 0);
-    ASSERT_EVAL(P4_PegRuleNumber, "1", long, 1);
-    ASSERT_EVAL(P4_PegRuleNumber, "12", long, 12);
-    ASSERT_EVAL(P4_PegRuleNumber, "999", long, 999);
-    ASSERT_EVAL(P4_PegRuleNumber, "10000", long, 10000);
+    ASSERT_EVAL2(P4_PegRuleNumber, "0", size, 0, "");
+    ASSERT_EVAL2(P4_PegRuleNumber, "1", size, 1, "");
+    ASSERT_EVAL2(P4_PegRuleNumber, "12", size, 12, "");
+    ASSERT_EVAL2(P4_PegRuleNumber, "999", size, 999, "");
+    ASSERT_EVAL2(P4_PegRuleNumber, "10000", size, 10000, "");
 }
 
 void test_eval_char(void) {

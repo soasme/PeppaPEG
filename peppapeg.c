@@ -197,7 +197,7 @@ P4_PRIVATE(P4_Token*)           P4_MatchBackReference(P4_Source*, P4_Expression*
 
 P4_PRIVATE(P4_Error)            P4_PegEvalFlag(P4_Token* token, P4_EvalResult* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalRuleFlags(P4_Token* token, P4_EvalResult* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalNumber(P4_Token* token, size_t* num);
+P4_PRIVATE(P4_Error)            P4_PegEvalNumber(P4_Token* token, P4_EvalResult* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalChar(P4_Token* token, P4_Rune* rune);
 P4_PRIVATE(P4_Error)            P4_PegEvalLiteral(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalInsensitiveLiteral(P4_Token* token, P4_Expression** expr);
@@ -3738,10 +3738,9 @@ P4_PegEvalRuleFlags(P4_Token* token, P4_EvalResult* result) {
     P4_Error        err           = P4_Ok;
     P4_Token*       child         = NULL;
 
-    for (child = token->head; child != NULL; child = child->next)
-        P4_Finalize(
-            P4_PegEval(child, result)
-        );
+    for (child = token->head; child != NULL; child = child->next) {
+        P4_Finalize(P4_PegEval(child, result));
+    }
 
     return P4_Ok;
 
@@ -3750,16 +3749,21 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalNumber(P4_Token* token, size_t* num) {
-    P4_String s = P4_CopyTokenString(token);
+P4_PegEvalNumber(P4_Token* token, P4_EvalResult* result) {
+    P4_Error    err = P4_Ok;
+    P4_String   str = NULL;
 
-    if (s == NULL)
-        return P4_MemoryError;
+    if ((str = P4_CopyTokenString(token)) == NULL) {
+        err = P4_MemoryError;
+        sprintf(result->reason, "OOM");
+        goto finalize;
+    }
 
-    *num = atol(s);
-    P4_FREE(s);
+    result->size = atol(s);
 
-    return P4_Ok;
+finalize:
+    if (s) P4_FREE(s);
+    return err;
 }
 
 P4_PRIVATE(P4_Error)
@@ -3827,6 +3831,7 @@ P4_PegEvalInsensitiveLiteral(P4_Token* token, P4_Expression** expr) {
 P4_PRIVATE(P4_Error)
 P4_PegEvalRange(P4_Token* token, P4_Expression** expr) {
     P4_Error err = P4_Ok;
+    P4_EvalResult result = {0};
 
     if (token->head == token->tail) { /* one single child - \\p{XX} */
         P4_RuneRange* ranges = NULL;
@@ -3848,9 +3853,11 @@ P4_PegEvalRange(P4_Token* token, P4_Expression** expr) {
         if ((err = P4_PegEvalChar(token->head->next, &upper)) != P4_Ok)
             return err;
 
-        if (token->head->next->next != NULL)
-            if ((err = P4_PegEvalNumber(token->head->next->next, &stride)) != P4_Ok)
+        if (token->head->next->next != NULL) {
+            if ((err = P4_PegEval(token->head->next->next, &result)) != P4_Ok)
                 return err;
+            stride = result.size;
+        }
 
         if (lower > upper) {
             return P4_ValueError;
@@ -3976,6 +3983,7 @@ P4_PRIVATE(P4_Error)
 P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr) {
     P4_Error        err = P4_Ok;
     P4_Expression*  ref = NULL;
+    P4_EvalResult   ref_result = {0};
     size_t          min = 0, max = SIZE_MAX;
 
     if ((err = P4_PegEval(token->head, &ref)) != P4_Ok) {
@@ -3990,26 +3998,31 @@ P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr) {
         case P4_PegRuleRepeatZeroOrOnce: min = 0; max = 1; break;
         case P4_PegRuleRepeatOnceOrMore: min = 1; max = SIZE_MAX; break;
         case P4_PegRuleRepeatMin:
-            if ((err = P4_PegEvalNumber(token->head->next->head, &min)) != P4_Ok)
-                goto finalize;
+            P4_Finalize(P4_PegEval(token->head->next->head, &ref_result));
+            min = ref_result.size;
             break;
+
         case P4_PegRuleRepeatMax:
-            if ((err = P4_PegEvalNumber(token->head->next->head, &max)) != P4_Ok)
-                goto finalize;
+            P4_Finalize(P4_PegEval(token->head->next->head, &ref_result));
+            max = ref_result.size;
             break;
+
         case P4_PegRuleRepeatMinMax:
-            if ((err = P4_PegEvalNumber(token->head->next->head, &min)) != P4_Ok)
-                goto finalize;
-            if ((err = P4_PegEvalNumber(token->head->next->tail, &max)) != P4_Ok)
-                goto finalize;
+            P4_Finalize(P4_PegEval(token->head->next->head, &ref_result));
+            min = ref_result.size;
+
+            P4_Finalize(P4_PegEval(token->head->next->tail, &ref_result));
+            max = ref_result.size;
             break;
+
         case P4_PegRuleRepeatExact:
-            if ((err = P4_PegEvalNumber(token->head->next->head, &min)) != P4_Ok)
-                goto finalize;
-            max = min;
+            P4_Finalize(P4_PegEval(token->head->next->head, &ref_result));
+            max = min = ref_result.size;
             break;
+
         default:
             UNREACHABLE();
+            sprintf(ref_result.reason, "unknown rule");
             err = P4_ValueError;
             goto finalize;
     }

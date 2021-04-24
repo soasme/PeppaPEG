@@ -3586,7 +3586,7 @@ P4_PRIVATE(P4_Error)
 P4_PegEvalRuleFlags(P4_Token* token, P4_EvalResult* result) {
     /* Perform bit-or operation for the inner flags.
      *       ┌───────┐
-     *       │ token │ (of rule_id P4_PegRuleDecorators)
+     *       │ token │ (of rule_id P4_PegRuleRuleDecorators)
      *       └───────┘
      *    ┌──────┬───────┐
      *    │      │       │
@@ -3599,8 +3599,8 @@ P4_PegEvalRuleFlags(P4_Token* token, P4_EvalResult* result) {
      */
 
     ASSERT(
-        token->rule_id == P4_PegRuleDecorators,
-        "P4_PegEvalRuleFlags() can only handle P4_PegRuleDecorators."
+        token->rule_id == P4_PegRuleRuleDecorators,
+        "P4_PegEvalRuleFlags() can only handle P4_PegRuleRuleDecorators."
     );
 
     P4_Error        err           = P4_Ok;
@@ -3714,6 +3714,7 @@ finalize:
 P4_PRIVATE(P4_Error)
 P4_PegEvalRange(P4_Token* token, P4_EvalResult* result) {
     P4_Error err = P4_Ok;
+    P4_EvalResult*  child_result = &(P4_EvalResult){0};
 
     if (token->head == token->tail) { /* one single child - \\p{XX} */
         P4_RuneRange* ranges = NULL;
@@ -3729,32 +3730,43 @@ P4_PegEvalRange(P4_Token* token, P4_EvalResult* result) {
                 upper   = 0;
         size_t  stride  = 1;
 
-        P4_Finalize(P4_PegEval(token->head, result));
-        lower = result->rune;
 
-        P4_Finalize(P4_PegEval(token->head->next, result));
-        upper = result->rune;
+        P4_Finalize(P4_PegEval(token->head, child_result));
+        lower = child_result->rune;
+
+        P4_Finalize(P4_PegEval(token->head->next, child_result));
+        upper = child_result->rune;
 
         if (token->head->next->next != NULL) {
-            P4_Finalize(P4_PegEval(token->head->next->next, result));
-            stride = result->size;
+            P4_Finalize(P4_PegEval(token->head->next->next, child_result));
+            stride = child_result->size;
         }
 
         if (lower > upper) {
-            return P4_ValueError;
+            sprintf(result->reason, "range lower is greater than upper");
+            err = P4_ValueError;
+            goto finalize;
         }
 
         if ((lower == 0) || (upper == 0) || (stride == 0)) {
-            return P4_ValueError;
+            sprintf(result->reason, "range lower/upper/stride is zero");
+            err = P4_ValueError;
+            goto finalize;
         }
 
-        if ((result->expr = P4_CreateRange(lower, upper, stride)) == NULL)
-            return P4_MemoryError;
+        if ((result->expr = P4_CreateRange(lower, upper, stride)) == NULL) {
+            sprintf(result->reason, "out of memory");
+            err = P4_MemoryError;
+            goto finalize;
+        }
     }
 
     return P4_Ok;
 
 finalize:
+    result->expr = NULL;
+    if (result->reason == NULL && child_result->reason != NULL)
+        strcpy(result->reason, child_result->reason);
     return err;
 }
 
@@ -4108,6 +4120,9 @@ P4_PegEvalGrammar(P4_Token* token, P4_EvalResult* result) {
 
 finalize:
 
+    if (child_result->reason != NULL)
+        strcpy(result->reason, child_result->reason);
+
     if (err) {
         P4_DeleteGrammar(result->grammar);
         result->grammar = NULL;
@@ -4212,8 +4227,7 @@ finalize:
     if (bootstrap)
         P4_DeleteGrammar(bootstrap);
 
-    /* TODO: make it explicit where causes the syntax error. */
-    ASSERT(err == P4_Ok, "invalid grammar");
+    ASSERT(err == P4_Ok, eval_result->reason);
 
     return grammar;
 }

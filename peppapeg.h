@@ -551,7 +551,7 @@ typedef struct P4_Grammar{
 } P4_Grammar;
 
 typedef struct P4_EvalResult{
-    char            reason[64];
+    char            reason[128];
     union {
         P4_ExpressionFlag   flag;
         size_t              size;

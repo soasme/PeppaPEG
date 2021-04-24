@@ -3720,11 +3720,25 @@ P4_PegEvalRange(P4_Token* token, P4_EvalResult* result) {
         P4_RuneRange* ranges = NULL;
         size_t count = 0;
 
-        if (0 == P4_ReadRuneRange(token->head->text, &token->head->slice, &count, &ranges))
-            return P4_ValueError;
+        if (0 == P4_ReadRuneRange(token->head->text, &token->head->slice, &count, &ranges)) {
+            /* P4_CreatePegGrammar() ensures only supported unicode
+               categories are parsed and read by P4_ReadRuneRange(). */
+            UNREACHABLE();
 
-        if ((result->expr = P4_CreateRanges(count, ranges)) == NULL)
-            return P4_MemoryError;
+            sprintf(result->reason,
+                    "ValueError: Invalid unicode category: (char %lu)",
+                    token->head->slice.start.pos);
+            err = P4_ValueError;
+            goto finalize;
+        }
+
+        if ((result->expr = P4_CreateRanges(count, ranges)) == NULL) {
+            sprintf(result->reason,
+                    "MemoryError: Out of memory: (char %lu)",
+                    token->head->slice.start.pos);
+            err = P4_MemoryError;
+            goto finalize;
+        }
     } else {
         P4_Rune lower   = 0,
                 upper   = 0;
@@ -3743,19 +3757,25 @@ P4_PegEvalRange(P4_Token* token, P4_EvalResult* result) {
         }
 
         if (lower > upper) {
-            sprintf(result->reason, "range lower is greater than upper");
+            sprintf(result->reason,
+                    "ValueError: Range lower is greater than upper: (char %lu)",
+                    token->head->slice.start.pos);
             err = P4_ValueError;
             goto finalize;
         }
 
         if ((lower == 0) || (upper == 0) || (stride == 0)) {
-            sprintf(result->reason, "range lower/upper/stride is zero");
+            sprintf(result->reason,
+                    "ValueError: Range lower/upper/stride is zero: (char %lu)",
+                    token->head->slice.start.pos);
             err = P4_ValueError;
             goto finalize;
         }
 
         if ((result->expr = P4_CreateRange(lower, upper, stride)) == NULL) {
-            sprintf(result->reason, "out of memory");
+            sprintf(result->reason,
+                    "MemoryError: Out of memory: (char %lu)",
+                    token->head->slice.start.pos);
             err = P4_MemoryError;
             goto finalize;
         }

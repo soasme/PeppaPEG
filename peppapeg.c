@@ -208,7 +208,7 @@ P4_PRIVATE(P4_Error)            P4_PegEvalSequence(P4_Token* token, P4_Expressio
 P4_PRIVATE(P4_Error)            P4_PegEvalChoice(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalPositive(P4_Token* token, P4_EvalResult* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalNegative(P4_Token* token, P4_EvalResult* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr);
+P4_PRIVATE(P4_Error)            P4_PegEvalRepeat(P4_Token* token, P4_EvalResult* expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalDot(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalReference(P4_Token* token, P4_Expression** result);
 P4_PRIVATE(P4_Error)            P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result);
@@ -4003,15 +4003,12 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr) {
+P4_PegEvalRepeat(P4_Token* token, P4_EvalResult* result) {
     P4_Error        err = P4_Ok;
     P4_Expression*  ref = NULL;
-    P4_EvalResult   ref_result = {0};
     size_t          min = 0, max = SIZE_MAX;
 
-    if ((err = P4_PegEval(token->head, &ref)) != P4_Ok) {
-        return err;
-    }
+    P4_Finalize(P4_PegEval(token->head, &ref));
 
     if (ref == NULL)
         return P4_MemoryError;
@@ -4021,31 +4018,31 @@ P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr) {
         case P4_PegRuleRepeatZeroOrOnce: min = 0; max = 1; break;
         case P4_PegRuleRepeatOnceOrMore: min = 1; max = SIZE_MAX; break;
         case P4_PegRuleRepeatMin:
-            P4_Finalize(P4_PegEval(token->head->next->head, &ref_result));
-            min = ref_result.size;
+            P4_Finalize(P4_PegEval(token->head->next->head, result));
+            min = result->size;
             break;
 
         case P4_PegRuleRepeatMax:
-            P4_Finalize(P4_PegEval(token->head->next->head, &ref_result));
-            max = ref_result.size;
+            P4_Finalize(P4_PegEval(token->head->next->head, result));
+            max = result->size;
             break;
 
         case P4_PegRuleRepeatMinMax:
-            P4_Finalize(P4_PegEval(token->head->next->head, &ref_result));
-            min = ref_result.size;
+            P4_Finalize(P4_PegEval(token->head->next->head, result));
+            min = result->size;
 
-            P4_Finalize(P4_PegEval(token->head->next->tail, &ref_result));
-            max = ref_result.size;
+            P4_Finalize(P4_PegEval(token->head->next->tail, result));
+            max = result->size;
             break;
 
         case P4_PegRuleRepeatExact:
-            P4_Finalize(P4_PegEval(token->head->next->head, &ref_result));
-            max = min = ref_result.size;
+            P4_Finalize(P4_PegEval(token->head->next->head, result));
+            max = min = result->size;
             break;
 
         default:
             UNREACHABLE();
-            sprintf(ref_result.reason, "unknown rule");
+            sprintf(result->reason, "unknown rule");
             err = P4_ValueError;
             goto finalize;
     }
@@ -4056,7 +4053,7 @@ P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr) {
     }
 
 
-    if ((*expr = P4_CreateRepeatMinMax(ref, min, max)) == NULL) {
+    if ((result->expr = P4_CreateRepeatMinMax(ref, min, max)) == NULL) {
         err = P4_MemoryError;
         goto finalize;
     }
@@ -4065,7 +4062,7 @@ P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr) {
 
 finalize:
     P4_DeleteExpression(ref);
-    P4_DeleteExpression(*expr);
+    P4_DeleteExpression(result->expr);
     return err;
 }
 
@@ -4301,7 +4298,9 @@ P4_PegEval(P4_Token* token, void* result) {
             *(P4_Expression **)result = eval_result->expr;
             break;
         case P4_PegRuleRepeat:
-            return P4_PegEvalRepeat(token, result);
+            P4_Finalize(P4_PegEvalRepeat(token, eval_result));
+            *(P4_Expression **)result = eval_result->expr;
+            break;
         case P4_PegRuleDot:
             return P4_PegEvalDot(token, result);
         case P4_PegRuleReference:

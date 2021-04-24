@@ -2038,16 +2038,6 @@ P4_Grammar*    P4_CreatePegGrammar ();
 P4_Error       P4_PegEval(P4_Token* token, void* result);
 
 /**
- * @brief       Get the corresponding rule name for a peg grammar rule id.
- * @param       id      A P4_PegRuleID.
- * @return      The name.
- *
- *      printf("%s\n", P4_StringifyPegGrammarRuleID(P4_PegRuleRule));
- */
-P4_String      P4_StringifyPegGrammarRuleID(P4_RuleID id);
-
-
-/**
  * @brief       Load peg grammar from a string.
  * @param       rules   The rules string.
  * @return      The grammar object.

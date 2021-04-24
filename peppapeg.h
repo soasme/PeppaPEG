@@ -559,6 +559,7 @@ typedef struct P4_EvalResult{
         P4_String           str;
         P4_Expression*      expr;
         P4_Grammar*         grammar;
+        P4_Token*           token;
     };
 } P4_EvalResult;
 

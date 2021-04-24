@@ -4208,37 +4208,41 @@ finalize:
     return err;
 }
 
-P4_PUBLIC P4_Grammar*
-P4_LoadGrammar(P4_String rules) {
+P4_PRIVATE(P4_Error)
+P4_LoadMetaAST(P4_String rules, P4_EvalResult* result) {
     P4_Grammar* bootstrap = NULL;
-    P4_Grammar* grammar   = NULL;
     P4_Source*  rules_src = NULL;
     P4_Token*   rules_tok = NULL;
     P4_Error    err       = P4_Ok;
-    P4_EvalResult* eval_result = &(P4_EvalResult){0};
 
     bootstrap = P4_CreatePegGrammar();
-    if (bootstrap == NULL)
+    if (bootstrap == NULL) {
+        err = P4_MemoryError;
+        sprintf(result->reason, "MemoryError: out of memory");
         goto finalize;
+    }
 
     rules_src = P4_CreateSource(rules, P4_PegGrammar);
-    if (rules_src == NULL)
+    if (rules_src == NULL) {
+        err = P4_MemoryError;
+        sprintf(result->reason, "MemoryError: out of memory");
         goto finalize;
+    }
 
     if (P4_Ok != (err = P4_Parse(bootstrap, rules_src))) {
-        ASSERT(0, P4_GetErrorMessage(rules_src));
+        err = P4_ValueError;
+        sprintf(result->reason, "ValueError: %s", P4_GetErrorMessage(rules_src));
         goto finalize;
     }
 
-    rules_tok = P4_GetSourceAst(rules_src);
-    if (rules_tok == NULL)
-        goto finalize;
-
-    if (P4_Ok != (err = P4_PegEval(rules_tok, eval_result))) {
+    rules_tok = P4_AcquireSourceAst(rules_src);
+    if (rules_tok == NULL) {
+        err = P4_ValueError;
+        sprintf(result->reason, "ValueError: no meta-ast generated");
         goto finalize;
     }
 
-    grammar = eval_result->grammar;
+    result->token = rules_tok;
 
 finalize:
     if (rules_src)
@@ -4247,7 +4251,31 @@ finalize:
     if (bootstrap)
         P4_DeleteGrammar(bootstrap);
 
-    ASSERT(err == P4_Ok, eval_result->reason);
+    if (err)
+        result->token = rules_tok;
+
+    return err;
+}
+
+P4_PUBLIC P4_Grammar*
+P4_LoadGrammar(P4_String rules) {
+    P4_Error err = P4_Ok;
+    P4_EvalResult* result = &(P4_EvalResult){0};
+
+    P4_Finalize(P4_LoadMetaAST(rules, result));
+    P4_Token* meta_ast = result->token;
+
+    if (P4_Ok != (err = P4_PegEval(meta_ast, result))) {
+        goto finalize;
+    }
+
+    P4_Grammar* grammar = result->grammar;
+
+finalize:
+    if (meta_ast)
+        P4_DeleteToken(meta_ast);
+
+    ASSERT(err == P4_Ok, result->reason);
 
     return grammar;
 }

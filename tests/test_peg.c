@@ -743,6 +743,9 @@ void test_eval_grammar(void) {
 
 }
 
+void test_eval_bad_grammar(void) {
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -778,6 +781,7 @@ int main(void) {
     RUN_TEST(test_eval_repeat);
     RUN_TEST(test_eval_reference);
     RUN_TEST(test_eval_grammar);
+    RUN_TEST(test_eval_bad_grammar);
 
     return UNITY_END();
 }

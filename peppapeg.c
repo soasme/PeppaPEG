@@ -209,7 +209,7 @@ P4_PRIVATE(P4_Error)            P4_PegEvalChoice(P4_Token* token, P4_Expression*
 P4_PRIVATE(P4_Error)            P4_PegEvalPositive(P4_Token* token, P4_EvalResult* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalNegative(P4_Token* token, P4_EvalResult* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalRepeat(P4_Token* token, P4_EvalResult* expr);
-P4_PRIVATE(P4_Error)            P4_PegEvalDot(P4_Token* token, P4_Expression** expr);
+P4_PRIVATE(P4_Error)            P4_PegEvalDot(P4_Token* token, P4_EvalResult* expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalReference(P4_Token* token, P4_Expression** result);
 P4_PRIVATE(P4_Error)            P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result);
 P4_PRIVATE(P4_Error)            P4_PegEvalGrammarReferences(P4_Grammar* grammar, P4_Expression* expr);
@@ -4067,8 +4067,9 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalDot(P4_Token* token, P4_Expression** expr) {
-    if ((*expr = P4_CreateRange(0x1, 0x10ffff, 1)) == NULL) {
+P4_PegEvalDot(P4_Token* token, P4_EvalResult* result) {
+    if ((result->expr = P4_CreateRange(0x1, 0x10ffff, 1)) == NULL) {
+        sprintf(result->reason, "out of memory");
         return P4_MemoryError;
     }
     return P4_Ok;
@@ -4302,7 +4303,9 @@ P4_PegEval(P4_Token* token, void* result) {
             *(P4_Expression **)result = eval_result->expr;
             break;
         case P4_PegRuleDot:
-            return P4_PegEvalDot(token, result);
+            P4_Finalize(P4_PegEvalDot(token, eval_result));
+            *(P4_Expression **)result = eval_result->expr;
+            break;
         case P4_PegRuleReference:
             return P4_PegEvalReference(token, result);
         case P4_PegRuleRuleName:

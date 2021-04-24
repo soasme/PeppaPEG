@@ -195,25 +195,25 @@ P4_PRIVATE(P4_Token*)           P4_MatchSpacedExpressions(P4_Source*, P4_Express
 P4_PRIVATE(P4_Token*)           P4_MatchBackReference(P4_Source*, P4_Expression*, P4_Slice*, P4_Expression*);
 
 
-P4_PRIVATE(P4_Error)            P4_PegEvalFlag(P4_Token* token, P4_EvalResult* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalRuleFlags(P4_Token* token, P4_EvalResult* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalNumber(P4_Token* token, P4_EvalResult* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalChar(P4_Token* token, P4_EvalResult* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalRuleName(P4_Token* token, P4_EvalResult* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalFlag(P4_Token* token, P4_EvalResult*);
+P4_PRIVATE(P4_Error)            P4_PegEvalRuleFlags(P4_Token* token, P4_EvalResult*);
+P4_PRIVATE(P4_Error)            P4_PegEvalNumber(P4_Token* token, P4_EvalResult*);
+P4_PRIVATE(P4_Error)            P4_PegEvalChar(P4_Token* token, P4_EvalResult*);
+P4_PRIVATE(P4_Error)            P4_PegEvalRuleName(P4_Token* token, P4_EvalResult*);
 P4_PRIVATE(P4_Error)            P4_PegEvalLiteral(P4_Token*, P4_EvalResult*);
 P4_PRIVATE(P4_Error)            P4_PegEvalInsensitiveLiteral(P4_Token*, P4_EvalResult*);
-P4_PRIVATE(P4_Error)            P4_PegEvalRange(P4_Token* token, P4_EvalResult* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalMembers(P4_Token* token, P4_EvalResult* expr);
-P4_PRIVATE(P4_Error)            P4_PegEvalSequence(P4_Token* token, P4_EvalResult* expr);
-P4_PRIVATE(P4_Error)            P4_PegEvalChoice(P4_Token* token, P4_EvalResult* expr);
-P4_PRIVATE(P4_Error)            P4_PegEvalPositive(P4_Token* token, P4_EvalResult* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalNegative(P4_Token* token, P4_EvalResult* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalRepeat(P4_Token* token, P4_EvalResult* expr);
-P4_PRIVATE(P4_Error)            P4_PegEvalDot(P4_Token* token, P4_EvalResult* expr);
-P4_PRIVATE(P4_Error)            P4_PegEvalReference(P4_Token* token, P4_EvalResult* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalGrammarRule(P4_Token* token, P4_EvalResult* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalGrammarReferences(P4_Grammar* grammar, P4_Expression* expr);
-P4_PRIVATE(P4_Error)            P4_PegEvalGrammar(P4_Token* token, P4_EvalResult* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalRange(P4_Token* token, P4_EvalResult*);
+P4_PRIVATE(P4_Error)            P4_PegEvalMembers(P4_Token* token, P4_EvalResult*);
+P4_PRIVATE(P4_Error)            P4_PegEvalSequence(P4_Token* token, P4_EvalResult*);
+P4_PRIVATE(P4_Error)            P4_PegEvalChoice(P4_Token* token, P4_EvalResult*);
+P4_PRIVATE(P4_Error)            P4_PegEvalPositive(P4_Token* token, P4_EvalResult*);
+P4_PRIVATE(P4_Error)            P4_PegEvalNegative(P4_Token* token, P4_EvalResult*);
+P4_PRIVATE(P4_Error)            P4_PegEvalRepeat(P4_Token* token, P4_EvalResult*);
+P4_PRIVATE(P4_Error)            P4_PegEvalDot(P4_Token* token, P4_EvalResult*);
+P4_PRIVATE(P4_Error)            P4_PegEvalReference(P4_Token* token, P4_EvalResult*);
+P4_PRIVATE(P4_Error)            P4_PegEvalGrammarRule(P4_Token* token, P4_EvalResult*);
+P4_PRIVATE(P4_Error)            P4_PegEvalGrammarReferences(P4_Grammar* grammar, P4_Expression*);
+P4_PRIVATE(P4_Error)            P4_PegEvalGrammar(P4_Token* token, P4_EvalResult*);
 
 static P4_RuneRange _C[] = {
     {0x0000, 0x001f, 1}, {0x007f, 0x009f, 1}, {0x00ad, 0x0600, 1363}, {0x0601, 0x0605, 1},
@@ -3836,7 +3836,7 @@ finalize:
 P4_PRIVATE(P4_Error)
 P4_PegEvalInsensitiveLiteral(P4_Token* token, P4_EvalResult* result) {
     P4_Error err = P4_Ok;
-    P4_Finalize(P4_PegEval(token->head, &(result->expr))); /* TODO: remove ->expr */
+    P4_Finalize(P4_PegEval(token->head, result));
     result->expr->sensitive = false;
     return P4_Ok;
 finalize:
@@ -3895,15 +3895,16 @@ P4_PegEvalMembers(P4_Token* token, P4_EvalResult* result) {
     size_t i = 0;
     P4_Token* child = token->head;
     P4_Error err = P4_Ok;
+    P4_EvalResult* child_result = &(P4_EvalResult){0};
     while (child != NULL) {
-        P4_Expression* child_expr = NULL;
-        if ((err = P4_PegEval(child, &child_expr)) != P4_Ok)
-            return err;
-        P4_SetMember(result->expr, i, child_expr);
+        P4_Finalize(P4_PegEval(child, child_result));
+        P4_Finalize(P4_SetMember(result->expr, i, child_result->expr));
         child = child->next;
         i++;
     }
     return P4_Ok;
+finalize:
+    return err;
 }
 
 P4_PRIVATE(P4_Error)
@@ -3946,7 +3947,7 @@ P4_PegEvalPositive(P4_Token* token, P4_EvalResult* result) {
     P4_Expression*  ref = NULL;
     P4_Expression*  exp = NULL;
 
-    P4_Finalize(P4_PegEval(token->head, &(result->expr))); /* TODO: remove ->expr */
+    P4_Finalize(P4_PegEval(token->head, result));
 
     if ((ref = result->expr) == NULL) {
         sprintf(result->reason, "out of memory");
@@ -3975,7 +3976,7 @@ P4_PegEvalNegative(P4_Token* token, P4_EvalResult* result) {
     P4_Expression*  ref = NULL;
     P4_Expression*  exp = NULL;
 
-    P4_Finalize(P4_PegEval(token->head, &(result->expr))); /* TODO: remove ->expr */
+    P4_Finalize(P4_PegEval(token->head, result));
 
     if ((ref = result->expr) == NULL) {
         sprintf(result->reason, "out of memory");
@@ -4004,8 +4005,10 @@ P4_PegEvalRepeat(P4_Token* token, P4_EvalResult* result) {
     P4_Expression*  ref = NULL;
     size_t          min = 0, max = SIZE_MAX;
 
-    P4_Finalize(P4_PegEval(token->head, &ref));
+    P4_EvalResult* child_result = &(P4_EvalResult){0};
+    P4_Finalize(P4_PegEval(token->head, child_result));
 
+    ref = child_result->expr;
     if (ref == NULL)
         return P4_MemoryError;
 
@@ -4150,7 +4153,7 @@ P4_PegEvalGrammarRule(P4_Token* token, P4_EvalResult* result) {
                 break;
 
             default:
-                err = P4_PegEval(child, &result->expr);
+                err = P4_PegEval(child, result);
                 break;
         }
         if (err != P4_Ok)
@@ -4247,8 +4250,6 @@ finalize:
 P4_PUBLIC P4_Error
 P4_PegEval(P4_Token* token, void* result) {
     P4_Error err = P4_Ok;
-    P4_EvalResult* eval_result = &(P4_EvalResult){0};
-
     switch (token->rule_id) {
         case P4_PegRuleDecorator:
             return P4_PegEvalFlag(token, result);
@@ -4259,49 +4260,40 @@ P4_PegEval(P4_Token* token, void* result) {
         case P4_PegRuleChar:
             return P4_PegEvalChar(token, result);
         case P4_PegRuleLiteral:
-            P4_Finalize(P4_PegEvalLiteral(token, eval_result));
-            *(P4_Expression **)result = eval_result->expr;
+            P4_Finalize(P4_PegEvalLiteral(token, result));
             break;
         case P4_PegRuleInsensitiveLiteral:
-            P4_Finalize(P4_PegEvalInsensitiveLiteral(token, eval_result));
-            *(P4_Expression **)result = eval_result->expr;
+            P4_Finalize(P4_PegEvalInsensitiveLiteral(token, result));
             break;
         case P4_PegRuleRange:
-            P4_Finalize(P4_PegEvalRange(token, eval_result));
-            *(P4_Expression **)result = eval_result->expr;
+            P4_Finalize(P4_PegEvalRange(token, result));
             break;
         case P4_PegRuleSequence:
-            P4_Finalize(P4_PegEvalSequence(token, eval_result));
-            *(P4_Expression **)result = eval_result->expr;
+            P4_Finalize(P4_PegEvalSequence(token, result));
             return err;
         case P4_PegRuleChoice:
-            P4_Finalize(P4_PegEvalChoice(token, eval_result));
-            *(P4_Expression **)result = eval_result->expr;
+            P4_Finalize(P4_PegEvalChoice(token, result));
             return err;
         case P4_PegRulePositive:
-            P4_Finalize(P4_PegEvalPositive(token, eval_result));
-            *(P4_Expression **)result = eval_result->expr;
+            P4_Finalize(P4_PegEvalPositive(token, result));
             return err;
         case P4_PegRuleNegative:
-            P4_Finalize(P4_PegEvalNegative(token, eval_result));
-            *(P4_Expression **)result = eval_result->expr;
+            P4_Finalize(P4_PegEvalNegative(token, result));
             break;
         case P4_PegRuleRepeat:
-            P4_Finalize(P4_PegEvalRepeat(token, eval_result));
-            *(P4_Expression **)result = eval_result->expr;
+            P4_Finalize(P4_PegEvalRepeat(token, result));
             break;
         case P4_PegRuleDot:
-            P4_Finalize(P4_PegEvalDot(token, eval_result));
-            *(P4_Expression **)result = eval_result->expr;
+            P4_Finalize(P4_PegEvalDot(token, result));
             break;
         case P4_PegRuleReference:
-            P4_Finalize(P4_PegEvalReference(token, eval_result));
-            *(P4_Expression **)result = eval_result->expr;
+            P4_Finalize(P4_PegEvalReference(token, result));
             break;
         case P4_PegRuleRuleName:
             return P4_PegEvalRuleName(token, result);
         case P4_PegGrammar:
-            return P4_PegEvalGrammar(token, result);
+            P4_Finalize(P4_PegEvalGrammar(token, result));
+            break;
         default:
             UNREACHABLE();
             return P4_ValueError;

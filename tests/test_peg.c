@@ -335,12 +335,15 @@ void test_eval_char(void) {
 
 #define ASSERT_EVAL_LITERAL(entry, input, expect_lit, expect_sensitive) do { \
         SETUP_EVAL((entry), (input)); \
-        P4_Expression* value = 0; \
-        if (root) P4_PegEval(root, &value); \
-        TEST_ASSERT_EQUAL(P4_Literal, (value)->kind); \
-        TEST_ASSERT_EQUAL_STRING(expect_lit, (value)->literal); \
-        TEST_ASSERT_EQUAL(expect_sensitive, (value)->sensitive); \
-        P4_DeleteExpression(value); TEARDOWN_EVAL(); \
+        P4_Error err = P4_Ok; \
+        P4_EvalResult* result = &(P4_EvalResult){0}; \
+        if (root) err = P4_PegEval(root, result); \
+        TEST_ASSERT_EQUAL_MESSAGE( P4_Ok, err, "parse failed."); \
+        TEST_ASSERT_EQUAL(P4_Literal, result->expr->kind); \
+        TEST_ASSERT_EQUAL_STRING(expect_lit, result->expr->literal); \
+        TEST_ASSERT_EQUAL(expect_sensitive, result->expr->sensitive); \
+        P4_DeleteExpression(result->expr); \
+        TEARDOWN_EVAL(); \
 } while (0);
 
 void test_eval_literal(void) {
@@ -369,12 +372,15 @@ void test_eval_insensitive(void) {
 
 #define ASSERT_EVAL_RANGE(entry, input, expect_lower, expect_upper) do { \
         SETUP_EVAL((entry), (input)); \
-        P4_Expression* value = 0; \
-        if (root) P4_PegEval(root, &value); \
-        TEST_ASSERT_EQUAL(P4_Range, (value)->kind); \
-        TEST_ASSERT_EQUAL(expect_lower, (value)->ranges[0].lower); \
-        TEST_ASSERT_EQUAL(expect_upper, (value)->ranges[0].upper); \
-        P4_DeleteExpression(value); TEARDOWN_EVAL(); \
+        P4_Error err = P4_Ok; \
+        P4_EvalResult* result = &(P4_EvalResult){0}; \
+        if (root) err = P4_PegEval(root, result); \
+        TEST_ASSERT_EQUAL_MESSAGE( P4_Ok, err, "parse failed."); \
+        TEST_ASSERT_EQUAL(P4_Range, result->expr->kind); \
+        TEST_ASSERT_EQUAL(expect_lower, result->expr->ranges[0].lower); \
+        TEST_ASSERT_EQUAL(expect_upper, result->expr->ranges[0].upper); \
+        P4_DeleteExpression(result->expr); \
+        TEARDOWN_EVAL(); \
 } while (0);
 
 void test_eval_range(void) {
@@ -387,17 +393,19 @@ void test_eval_range(void) {
 
 #define ASSERT_EVAL_CONTAINER(entry, input, expect_kind, expect_count) do { \
     SETUP_EVAL((entry), (input)); \
-    P4_Expression* value = 0; \
-    if (root) P4_PegEval(root, &value); \
-    TEST_ASSERT_EQUAL( (expect_kind), value->kind ); \
-    TEST_ASSERT_EQUAL( (expect_count), value->count ); \
-    TEST_ASSERT_NOT_NULL( value->members ); \
+    P4_Error err = P4_Ok; \
+    P4_EvalResult* result = &(P4_EvalResult){0}; \
+    if (root) err = P4_PegEval(root, result); \
+    TEST_ASSERT_EQUAL_MESSAGE( P4_Ok, err, "parse failed."); \
+    TEST_ASSERT_EQUAL( (expect_kind), result->expr->kind ); \
+    TEST_ASSERT_EQUAL( (expect_count), result->expr->count ); \
+    TEST_ASSERT_NOT_NULL( result->expr->members ); \
     size_t i = 0; \
-    for (i = 0; i < value->count; i++) { \
-        P4_Expression* member = P4_GetMember(value, i); \
+    for (i = 0; i < result->expr->count; i++) { \
+        P4_Expression* member = P4_GetMember(result->expr, i); \
         TEST_ASSERT_NOT_NULL( member ); \
     } \
-    P4_DeleteExpression(value); \
+    P4_DeleteExpression(result->expr); \
     TEARDOWN_EVAL(); \
 } while (0);
 
@@ -413,13 +421,13 @@ void test_eval_choice(void) {
 
 #define ASSERT_EVAL_LOOKAHEAD(entry, input, expect_kind) do { \
     SETUP_EVAL((entry), (input)); \
-    P4_Expression* value = 0; \
     P4_Error err = P4_Ok; \
-    if (root) err = P4_PegEval(root, &value); \
-    TEST_ASSERT_EQUAL_MESSAGE( P4_Ok, err, "parse failed"); \
-    TEST_ASSERT_EQUAL( (expect_kind), value->kind ); \
-    TEST_ASSERT_NOT_NULL( value->ref_expr ); \
-    if (value) P4_DeleteExpression(value); \
+    P4_EvalResult* result = &(P4_EvalResult){0}; \
+    if (root) err = P4_PegEval(root, result); \
+    TEST_ASSERT_EQUAL_MESSAGE( P4_Ok, err, "parse failed."); \
+    TEST_ASSERT_EQUAL( (expect_kind), result->expr->kind ); \
+    TEST_ASSERT_NOT_NULL( result->expr->ref_expr ); \
+    if (result->expr) P4_DeleteExpression(result->expr); \
     TEARDOWN_EVAL(); \
 } while (0);
 
@@ -435,13 +443,15 @@ void test_eval_negative(void) {
 
 #define ASSERT_EVAL_REPEAT(entry, input, min, max) do { \
     SETUP_EVAL((entry), (input)); \
-    P4_Expression* value = 0; \
-    if (root) P4_PegEval(root, &value); \
-    TEST_ASSERT_EQUAL( P4_Repeat, value->kind ); \
-    TEST_ASSERT_NOT_NULL( value->repeat_expr ); \
-    TEST_ASSERT_EQUAL( (min), value->repeat_min ); \
-    TEST_ASSERT_EQUAL( (max), value->repeat_max ); \
-    P4_DeleteExpression(value); \
+    P4_Error err = P4_Ok; \
+    P4_EvalResult* result = &(P4_EvalResult){0}; \
+    if (root) err = P4_PegEval(root, result); \
+    TEST_ASSERT_EQUAL_MESSAGE( P4_Ok, err, "parse failed."); \
+    TEST_ASSERT_EQUAL( P4_Repeat, result->expr->kind ); \
+    TEST_ASSERT_NOT_NULL( result->expr->repeat_expr ); \
+    TEST_ASSERT_EQUAL( (min), result->expr->repeat_min ); \
+    TEST_ASSERT_EQUAL( (max), result->expr->repeat_max ); \
+    P4_DeleteExpression(result->expr); \
     TEARDOWN_EVAL(); \
 } while (0);
 
@@ -457,12 +467,14 @@ void test_eval_repeat(void) {
 
 #define ASSERT_EVAL_REFERENCE(entry, input, expect_ref_id) do { \
     SETUP_EVAL((entry), (input)); \
-    P4_Expression* value = 0; \
-    if (root) P4_PegEval(root, &value); \
-    TEST_ASSERT_EQUAL( P4_Reference, value->kind ); \
-    TEST_ASSERT_EQUAL_STRING( (input), value->reference ); \
-    TEST_ASSERT_EQUAL( (expect_ref_id), value->ref_id); \
-    P4_DeleteExpression(value); \
+    P4_Error err = P4_Ok; \
+    P4_EvalResult* result = &(P4_EvalResult){0}; \
+    if (root) err = P4_PegEval(root, result); \
+    TEST_ASSERT_EQUAL_MESSAGE( P4_Ok, err, "parse failed."); \
+    TEST_ASSERT_EQUAL( P4_Reference, result->expr->kind ); \
+    TEST_ASSERT_EQUAL_STRING( (input), result->expr->reference ); \
+    TEST_ASSERT_EQUAL( (expect_ref_id), result->expr->ref_id); \
+    P4_DeleteExpression(result->expr); \
     TEARDOWN_EVAL(); \
 } while (0);
 

@@ -211,7 +211,7 @@ P4_PRIVATE(P4_Error)            P4_PegEvalNegative(P4_Token* token, P4_EvalResul
 P4_PRIVATE(P4_Error)            P4_PegEvalRepeat(P4_Token* token, P4_EvalResult* expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalDot(P4_Token* token, P4_EvalResult* expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalReference(P4_Token* token, P4_EvalResult* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result);
+P4_PRIVATE(P4_Error)            P4_PegEvalGrammarRule(P4_Token* token, P4_EvalResult* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalGrammarReferences(P4_Grammar* grammar, P4_Expression* expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalGrammar(P4_Token* token, P4_Grammar** result);
 
@@ -4128,7 +4128,7 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result) {
+P4_PegEvalGrammarRule(P4_Token* token, P4_EvalResult* result) {
     P4_Error            err       = P4_Ok;
 
     P4_String           rule_name = NULL;
@@ -4136,8 +4136,6 @@ P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result) {
 
     P4_Token*           child     = NULL;
     P4_EvalResult*      child_result = &(P4_EvalResult){0};
-
-    *result = NULL;
 
     for (child = token->head; child != NULL; child = child->next) {
         switch (child->rule_id) {
@@ -4152,21 +4150,20 @@ P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result) {
                 break;
 
             default:
-                err = P4_PegEval(child, result);
+                err = P4_PegEval(child, &result->expr);
                 break;
         }
         if (err != P4_Ok)
             goto finalize;
     }
 
-    (*result)->name = rule_name;
-    (*result)->flag = rule_flag;
-
+    result->expr->name = rule_name;
+    result->expr->flag = rule_flag;
     return P4_Ok;
 
 finalize:
     if (rule_name) P4_FREE(rule_name);
-    if (*result) P4_DeleteExpression(*result);
+    if (result->expr) P4_DeleteExpression(result->expr);
     return err;
 }
 
@@ -4225,24 +4222,16 @@ P4_PegEvalGrammar(P4_Token* token, P4_Grammar** result) {
 
     P4_Token* child = NULL;
     P4_RuleID id = 1;
+    P4_EvalResult* child_result = &(P4_EvalResult){0};
+
     for (child = token->head; child != NULL; child = child->next) {
-        P4_Expression* rule = NULL;
-
-        if ((err = P4_PegEvalGrammarRule(child, &rule)) != P4_Ok) {
-            goto finalize;
-        }
-
-        if ((err = P4_AddGrammarRule(*result, id, rule)) != P4_Ok) {
-            goto finalize;
-        }
-
+        P4_Finalize(P4_PegEvalGrammarRule(child, child_result));
+        P4_Finalize(P4_AddGrammarRule(*result, id, child_result->expr));
         id++;
     }
 
     for (i = 0; i < (*result)->count; i++) {
-        if ((err = P4_PegEvalGrammarReferences(*result, (*result)->rules[i])) != P4_Ok) {
-            goto finalize;
-        }
+        P4_Finalize(P4_PegEvalGrammarReferences(*result, (*result)->rules[i]));
     }
 
 finalize:

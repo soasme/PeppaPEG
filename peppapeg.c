@@ -3797,73 +3797,61 @@ P4_PegEvalInsensitiveLiteral(P4_Token* token, P4_Expression** expr) {
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalRange(P4_Token* token, P4_Expression** expr) {
+# define ERROR_HINT_FMT "char %lu-%lu: %*.*s\n"
+# define ERROR_HINT \
+                token->slice.start.pos, \
+                token->slice.stop.pos, \
+                (int)P4_GetSliceSize(&token->slice), \
+                (int)P4_GetSliceSize(&token->slice), \
+                token->text + token->slice.start.pos
+
     P4_Error err = P4_Ok;
 
-    if (token->head == token->tail) { /* one single child - \\p{XX} */
+    if (token->head == token->tail) { /* one single child - [\\p{XX}] */
         P4_RuneRange* ranges = NULL;
         size_t count = 0;
 
         if (0 == P4_ReadRuneRange(token->head->text, &token->head->slice, &count, &ranges))
-            error(P4_ValueError, "Failed to read code point from source. char %lu-%lu: %*.*s\n",
-                token->slice.start.pos,
-                token->slice.stop.pos,
-                (int)P4_GetSliceSize(&token->slice),
-                (int)P4_GetSliceSize(&token->slice),
-                token->text + token->slice.start.pos
-            );
+            error(P4_ValueError,
+                  "Failed to read code point from source. "
+                  ERROR_HINT_FMT,
+                  ERROR_HINT);
 
         if ((*expr = P4_CreateRanges(count, ranges)) == NULL)
-            error(P4_MemoryError, "Failed to create range rule. char %lu-%lu: %*.*s\n",
-                token->slice.start.pos,
-                token->slice.stop.pos,
-                (int)P4_GetSliceSize(&token->slice),
-                (int)P4_GetSliceSize(&token->slice),
-                token->text + token->slice.start.pos
-            );
+            error(P4_MemoryError,
+                    "Failed to create range rule. "
+                    ERROR_HINT_FMT,
+                    ERROR_HINT);
 
-    } else {
+    } else { /* two to three children - [lower-upper] or [lower-upper..stride] */
         P4_Rune lower = 0, upper = 0;
         size_t stride = 1;
 
-        catch(P4_PegEvalChar(token->head, &lower));
-        catch(P4_PegEvalChar(token->head->next, &upper));
-        if (token->head->next->next != NULL)
-            catch(P4_PegEvalNumber(token->head->next->next, &stride));
+        P4_Token* lower_token = token->head;
+        P4_Token* upper_token = lower_token->next;
+        P4_Token* stride_token = upper_token->next;
+
+        catch(P4_PegEvalChar(lower_token, &lower));
+        catch(P4_PegEvalChar(upper_token, &upper));
+        if (stride_token) catch(P4_PegEvalNumber(stride_token, &stride));
 
         if (lower > upper)
-            error(
-                P4_PegError,
-                "Range lower 0x%u is greater than upper 0x%u. char %lu-%lu: %*.*s\n",
-                lower,
-                upper,
-                token->slice.start.pos,
-                token->slice.stop.pos,
-                (int)P4_GetSliceSize(&token->slice),
-                (int)P4_GetSliceSize(&token->slice),
-                token->text + token->slice.start.pos
-            );
+            error(P4_PegError,
+                    "Range lower 0x%u is greater than upper 0x%u. "
+                    ERROR_HINT_FMT,
+                    lower, upper, ERROR_HINT);
 
         if ((lower == 0) || (upper == 0) || (stride == 0))
             error(P4_PegError,
-                "Range lower(0x%u)/upper(0x%u)/stride(0x%lu) must be all non-zeros. "
-                "char %lu-%lu: %*.*s\n",
-                lower, upper, stride,
-                token->slice.start.pos,
-                token->slice.stop.pos,
-                (int)P4_GetSliceSize(&token->slice),
-                (int)P4_GetSliceSize(&token->slice),
-                token->text + token->slice.start.pos
-            );
+                    "Range lower(0x%u)/upper(0x%u)/stride(0x%lu) must be all non-zeros. "
+                    ERROR_HINT_FMT,
+                    lower, upper, stride, ERROR_HINT);
 
         if ((*expr = P4_CreateRange(lower, upper, stride)) == NULL)
             error(P4_MemoryError,
-                "Failed to create range rule. char %lu-%lu: %*.*s\n",
-                token->slice.start.pos,
-                token->slice.stop.pos,
-                (int)P4_GetSliceSize(&token->slice),
-                (int)P4_GetSliceSize(&token->slice),
-                token->text + token->slice.start.pos
-            );
+                    "Failed to create range rule. "
+                    ERROR_HINT_FMT,
+                    ERROR_HINT);
     }
     return P4_Ok;
 

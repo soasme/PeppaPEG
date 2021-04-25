@@ -216,6 +216,8 @@ typedef enum {
     P4_NullError            = 9,
     /** When recursion limit is reached. */
     P4_StackError           = 10,
+    /** When the given value is not valid peg grammar. */
+    P4_PegError             = 11,
 } P4_Error;
 
 /**

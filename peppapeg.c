@@ -1993,7 +1993,6 @@ P4_InspectSourceAst(P4_Token* token, void* userdata, P4_Error (*inspector)(P4_To
     return err;
 }
 
-
 /*
  * Get version string.
  */
@@ -2584,6 +2583,8 @@ P4_GetErrorString(P4_Error err) {
             return "NullError";
         case P4_StackError:
             return "StackError";
+        case P4_PegError:
+            return "PegError";
         default:
             return "UnknownError";
     }
@@ -3808,11 +3809,18 @@ P4_PegEvalRange(P4_Token* token, P4_Expression** expr) {
                 return err;
 
         if (lower > upper) {
-            return P4_ValueError;
+            P4_String range_str = P4_CopyTokenString(token);
+            fprintf(stderr,
+                    "%s: range lower 0x%u is greater than upper 0x%u. "
+                    "char %lu: %s\n",
+                    P4_GetErrorString(P4_PegError), lower, upper,
+                    token->head->slice.start.pos, range_str);
+            P4_FREE(range_str);
+            return P4_PegError;
         }
 
         if ((lower == 0) || (upper == 0) || (stride == 0)) {
-            return P4_ValueError;
+            return P4_PegError;
         }
 
         *expr = P4_CreateRange(lower, upper, stride);
@@ -4241,9 +4249,6 @@ finalize:
 
     if (bootstrap)
         P4_DeleteGrammar(bootstrap);
-
-    /* TODO: make it explicit where causes the syntax error. */
-    ASSERT(err == P4_Ok, "invalid grammar");
 
     return grammar;
 }

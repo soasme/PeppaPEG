@@ -720,6 +720,21 @@ void test_eval_grammar(void) {
 
 }
 
+void test_eval_bad_grammar_range(void) {
+    /* lower > upper. */
+    TEST_ASSERT_NULL(P4_LoadGrammar("R1 = [9-0];"));
+    TEST_ASSERT_NULL(P4_LoadGrammar("R1 = [z-a];"));
+
+    /* lower / upper / stride is zero. */
+    TEST_ASSERT_NULL(P4_LoadGrammar("R1 = [\\u{10ffff}-\\u{0001}];"));
+    TEST_ASSERT_NULL(P4_LoadGrammar("R1 = [\\u{0}-\\u{10ffff}];"));
+    TEST_ASSERT_NULL(P4_LoadGrammar("R1 = [\\u{0}-\\u{10ffff}];"));
+    TEST_ASSERT_NULL(P4_LoadGrammar("R1 = [a-f..0];"));
+    TEST_ASSERT_NULL(P4_LoadGrammar("R1 = [\\u{1}-\\u{10ffff}..0];"));
+
+    TEST_ASSERT_NULL(P4_LoadGrammar("R1 = [\\u{1}-\\u{110000}];"));
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -755,6 +770,8 @@ int main(void) {
     RUN_TEST(test_eval_repeat);
     RUN_TEST(test_eval_reference);
     RUN_TEST(test_eval_grammar);
+
+    RUN_TEST(test_eval_bad_grammar_range);
 
     return UNITY_END();
 }

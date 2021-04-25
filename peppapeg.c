@@ -72,7 +72,7 @@
         } \
     } while (0);
 
-# define                        error(errcode, fmt, ...) \
+# define                        raise(errcode, fmt, ...) \
     do { \
         err = errcode; \
         fprintf(stderr, "%s: ", P4_GetErrorString(err)); \
@@ -3652,34 +3652,14 @@ finalize:
     return NULL;
 }
 
-P4_String   P4_StringifyPegGrammarRuleID(P4_RuleID id) {
-    switch (id) {
-        case P4_PegRuleNumber: return "number";
-        case P4_PegRuleChar: return "char";
-        case P4_PegRuleLiteral: return "literal";
-        case P4_PegRuleInsensitiveLiteral: return "insensitive";
-        case P4_PegRuleRange: return "range";
-        case P4_PegRuleReference: return "reference";
-        case P4_PegRulePositive: return "positive";
-        case P4_PegRuleNegative: return "negative";
-        case P4_PegRuleChoice: return "choice";
-        case P4_PegRuleSequence: return "sequence";
-        case P4_PegRuleRepeat: return "repeat";
-        case P4_PegRuleRepeatOnceOrMore: return "onceormore";
-        case P4_PegRuleRepeatZeroOrMore: return "zeroormore";
-        case P4_PegRuleRepeatZeroOrOnce: return "zerooronce";
-        case P4_PegRuleRepeatMin: return "repeatmin";
-        case P4_PegRuleRepeatMax: return "repeatmax";
-        case P4_PegRuleRepeatMinMax: return "repeatminmax";
-        case P4_PegRuleRepeatExact: return "repeatexact";
-        case P4_PegRuleRuleName: return "name";
-        case P4_PegRuleRuleDecorators: return "decorators";
-        case P4_PegRuleDecorator: return "decorator";
-        case P4_PegRuleRule: return "rule";
-        case P4_PegGrammar: return "grammar";
-        default: return "<unknown>";
-    }
-}
+# define TOKEN_ERROR_HINT_FMT "char %lu-%lu: %*.*s\n"
+# define TOKEN_ERROR_HINT \
+                token->slice.start.pos, \
+                token->slice.stop.pos, \
+                (int)P4_GetSliceSize(&token->slice), \
+                (int)P4_GetSliceSize(&token->slice), \
+                token->text + token->slice.start.pos
+
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalFlag(P4_Token* token, P4_ExpressionFlag *flag) {
@@ -3760,14 +3740,18 @@ P4_PegEvalLiteral(P4_Token* token, P4_Expression** expr) {
               cur = lit;
 
     if (lit == NULL)
-        return P4_MemoryError;
+        raise(P4_MemoryError,
+            "Failed to copy literal string. "
+            TOKEN_ERROR_HINT_FMT,
+            TOKEN_ERROR_HINT
+        );
 
     for (i = token->slice.start.pos+1; i < token->slice.stop.pos-1; i += size) {
         size = P4_ReadEscapedRune(token->text+i, &rune);
-        if (size == 0) {
-            err = P4_ValueError;
-            goto finalize;
-        }
+
+        if (size == 0)
+            raise(P4_ValueError, "Eof of text" TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
+
         if (i + size > token->slice.stop.pos-1) {
             err = P4_ValueError;
             goto finalize;
@@ -3797,14 +3781,6 @@ P4_PegEvalInsensitiveLiteral(P4_Token* token, P4_Expression** expr) {
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalRange(P4_Token* token, P4_Expression** expr) {
-# define ERROR_HINT_FMT "char %lu-%lu: %*.*s\n"
-# define ERROR_HINT \
-                token->slice.start.pos, \
-                token->slice.stop.pos, \
-                (int)P4_GetSliceSize(&token->slice), \
-                (int)P4_GetSliceSize(&token->slice), \
-                token->text + token->slice.start.pos
-
     P4_Error err = P4_Ok;
 
     if (token->head == token->tail) { /* one single child - [\\p{XX}] */
@@ -3812,16 +3788,20 @@ P4_PegEvalRange(P4_Token* token, P4_Expression** expr) {
         size_t count = 0;
 
         if (0 == P4_ReadRuneRange(token->head->text, &token->head->slice, &count, &ranges))
-            error(P4_ValueError,
-                  "Failed to read code point from source. "
-                  ERROR_HINT_FMT,
-                  ERROR_HINT);
+            raise(
+                P4_ValueError,
+                "Failed to read code point from source. "
+                TOKEN_ERROR_HINT_FMT,
+                TOKEN_ERROR_HINT
+            );
 
         if ((*expr = P4_CreateRanges(count, ranges)) == NULL)
-            error(P4_MemoryError,
-                    "Failed to create range rule. "
-                    ERROR_HINT_FMT,
-                    ERROR_HINT);
+            raise(
+                P4_MemoryError,
+                "Failed to create range rule. "
+                TOKEN_ERROR_HINT_FMT,
+                TOKEN_ERROR_HINT
+            );
 
     } else { /* two to three children - [lower-upper] or [lower-upper..stride] */
         P4_Rune lower = 0, upper = 0;
@@ -3836,22 +3816,32 @@ P4_PegEvalRange(P4_Token* token, P4_Expression** expr) {
         if (stride_token) catch(P4_PegEvalNumber(stride_token, &stride));
 
         if (lower > upper)
-            error(P4_PegError,
-                    "Range lower 0x%u is greater than upper 0x%u. "
-                    ERROR_HINT_FMT,
-                    lower, upper, ERROR_HINT);
+            raise(P4_PegError,
+                "Range lower 0x%u is greater than upper 0x%u. "
+                TOKEN_ERROR_HINT_FMT,
+                lower, upper, TOKEN_ERROR_HINT
+            );
 
         if ((lower == 0) || (upper == 0) || (stride == 0))
-            error(P4_PegError,
-                    "Range lower(0x%u)/upper(0x%u)/stride(0x%lu) must be all non-zeros. "
-                    ERROR_HINT_FMT,
-                    lower, upper, stride, ERROR_HINT);
+            raise(P4_PegError,
+                "Range lower(0x%u)/upper(0x%u)/stride(0x%lu) must be all non-zeros. "
+                TOKEN_ERROR_HINT_FMT,
+                lower, upper, stride, TOKEN_ERROR_HINT
+            );
+
+        if ((lower > 0x10ffff) || (upper > 0x10ffff))
+            raise(P4_PegError,
+                "Range lower(0x%u)/upper(0x%u) must be less than 0x10ffff. "
+                TOKEN_ERROR_HINT_FMT,
+                lower, upper, TOKEN_ERROR_HINT
+            );
 
         if ((*expr = P4_CreateRange(lower, upper, stride)) == NULL)
-            error(P4_MemoryError,
-                    "Failed to create range rule. "
-                    ERROR_HINT_FMT,
-                    ERROR_HINT);
+            raise(P4_MemoryError,
+                "Failed to create range rule. "
+                TOKEN_ERROR_HINT_FMT,
+                TOKEN_ERROR_HINT
+            );
     }
     return P4_Ok;
 

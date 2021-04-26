@@ -3729,7 +3729,8 @@ P4_PegEvalChar(P4_Token* token, P4_Rune* rune) {
 P4_PRIVATE(P4_Error)
 P4_PegEvalLiteral(P4_Token* token, P4_Expression** expr) {
     size_t    i    = 0,
-              size = 0;
+              size = 0,
+              idx  = 0;
     P4_Error  err  = 0;
     P4_Rune   rune = 0;
     P4_String lit  = NULL,
@@ -3750,19 +3751,20 @@ P4_PegEvalLiteral(P4_Token* token, P4_Expression** expr) {
             TOKEN_ERROR_HINT
         );
 
-    for (i = token->slice.start.pos+1; i < token->slice.stop.pos-1; i += size) {
+    for (i = token->slice.start.pos+1, idx = 0; i < token->slice.stop.pos-1; i += size) {
         size = P4_ReadEscapedRune(token->text+i, &rune);
 
-        if ((size == 0) || (i + size > token->slice.stop.pos-1)) {
-            /* P4_CreatePegRule() guarantees literal contains valid chars. */
-            UNREACHABLE();
-            raise(P4_ValueError,
-                "Invalid char %lu" TOKEN_ERROR_HINT_FMT,
-                i+size, TOKEN_ERROR_HINT
+        if ((rune > 0x10ffff) ||
+                (rune == 0) ||
+                (size == 0) ||
+                (i + size > token->slice.stop.pos-1))
+            raise(P4_PegError,
+                "Character %lu is invalid. "
+                TOKEN_ERROR_HINT_FMT, idx, TOKEN_ERROR_HINT
             );
-        }
 
         cur = P4_ConcatRune(cur, rune, size);
+        idx++;
     }
     *cur = '\0';
 
@@ -3779,12 +3781,13 @@ P4_PRIVATE(P4_Error)
 P4_PegEvalInsensitiveLiteral(P4_Token* token, P4_Expression** expr) {
     P4_Error err = P4_Ok;
 
-    if ((err = P4_PegEvalLiteral(token->head, expr)) != P4_Ok)
-        return err;
+    catch(P4_PegEvalLiteral(token->head, expr));
 
     (*expr)->sensitive = false;
-
     return P4_Ok;
+
+finalize:
+    return err;
 }
 
 P4_PRIVATE(P4_Error)

@@ -3728,17 +3728,21 @@ P4_PegEvalChar(P4_Token* token, P4_Rune* rune) {
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalLiteral(P4_Token* token, P4_Expression** expr) {
-    size_t len = P4_GetSliceSize(&token->slice) - 2; /* remove quotes */
-    if (len < 0)
-        return P4_ValueError;
+    size_t    i    = 0,
+              size = 0;
+    P4_Error  err  = 0;
+    P4_Rune   rune = 0;
+    P4_String lit  = NULL,
+              cur  = NULL;
 
-    size_t i = 0,
-           size = 0;
-    P4_Error err = 0;
-    P4_Rune rune = 0;
-    P4_String lit = P4_MALLOC((len+1) * sizeof(char)),
-              cur = lit;
+    size_t len = P4_GetSliceSize(&token->slice) - 2; /* - 2: remove two quotes */
+    if (len <= 0)
+        raise(P4_PegError,
+            "Literal rule should have at least one character. "
+            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT
+        );
 
+    cur = lit = P4_MALLOC((len+1) * sizeof(char));
     if (lit == NULL)
         raise(P4_MemoryError,
             "Failed to copy literal string. "
@@ -3749,18 +3753,22 @@ P4_PegEvalLiteral(P4_Token* token, P4_Expression** expr) {
     for (i = token->slice.start.pos+1; i < token->slice.stop.pos-1; i += size) {
         size = P4_ReadEscapedRune(token->text+i, &rune);
 
-        if (size == 0)
-            raise(P4_ValueError, "Eof of text" TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
-
-        if (i + size > token->slice.stop.pos-1) {
-            err = P4_ValueError;
-            goto finalize;
+        if ((size == 0) || (i + size > token->slice.stop.pos-1)) {
+            /* P4_CreatePegRule() guarantees literal contains valid chars. */
+            UNREACHABLE();
+            raise(P4_ValueError,
+                "Invalid char %lu" TOKEN_ERROR_HINT_FMT,
+                i+size, TOKEN_ERROR_HINT
+            );
         }
+
         cur = P4_ConcatRune(cur, rune, size);
     }
     *cur = '\0';
 
-    *expr = P4_CreateLiteral(lit, true);
+    if ((*expr = P4_CreateLiteral(lit, true)) == NULL)
+        raise(P4_MemoryError, "Failed to create literal token. "
+                TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT)
 
 finalize:
     P4_FREE(lit);
@@ -3817,21 +3825,21 @@ P4_PegEvalRange(P4_Token* token, P4_Expression** expr) {
 
         if (lower > upper)
             raise(P4_PegError,
-                "Range lower 0x%u is greater than upper 0x%u. "
+                "Range lower 0x%x is greater than upper 0x%x. "
                 TOKEN_ERROR_HINT_FMT,
                 lower, upper, TOKEN_ERROR_HINT
             );
 
         if ((lower == 0) || (upper == 0) || (stride == 0))
             raise(P4_PegError,
-                "Range lower(0x%u)/upper(0x%u)/stride(0x%lu) must be all non-zeros. "
+                "Range lower 0x%x, upper 0x%x, stride 0x%lx must be all non-zeros. "
                 TOKEN_ERROR_HINT_FMT,
                 lower, upper, stride, TOKEN_ERROR_HINT
             );
 
         if ((lower > 0x10ffff) || (upper > 0x10ffff))
             raise(P4_PegError,
-                "Range lower(0x%u)/upper(0x%u) must be less than 0x10ffff. "
+                "Range lower 0x%x, upper 0x%x must be less than 0x10ffff. "
                 TOKEN_ERROR_HINT_FMT,
                 lower, upper, TOKEN_ERROR_HINT
             );

@@ -3663,8 +3663,9 @@ finalize:
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalFlag(P4_Token* token, P4_ExpressionFlag *flag) {
-    P4_String token_str = token->text + token->slice.start.pos; /* XXX: need slice api. */
-    size_t token_len = P4_GetSliceSize(&token->slice); /* XXX: need slice api. */
+    P4_Error  err       = P4_Ok;
+    P4_String token_str = token->text + token->slice.start.pos;
+    size_t    token_len = P4_GetSliceSize(&token->slice);
 
     if (memcmp("@squashed", token_str, token_len) == 0)
         *flag = P4_FLAG_SQUASHED;
@@ -3679,40 +3680,55 @@ P4_PegEvalFlag(P4_Token* token, P4_ExpressionFlag *flag) {
     else if (memcmp("@nonterminal", token_str, token_len) == 0)
         *flag = P4_FLAG_NON_TERMINAL;
     else {
-        *flag = 0; return P4_ValueError;
+        /* P4_CreatePegRule() guarantees only 6 kinds of strings are possible. */
+        UNREACHABLE();
+        raise(
+            P4_ValueError,
+            "Invalid flag: %s" TOKEN_ERROR_HINT_FMT,
+            token_str, TOKEN_ERROR_HINT
+        );
     }
 
     return P4_Ok;
+finalize:
+    *flag = 0;
+    return err;
 }
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalRuleFlags(P4_Token* token, P4_ExpressionFlag* flag) {
-    P4_Token* child = NULL;
+    P4_Error          err        = P4_Ok;
+    P4_Token*         child      = NULL;
     P4_ExpressionFlag child_flag = 0;
-    P4_Error err = P4_Ok;
+
     for (child = token->head; child != NULL; child = child->next) {
-        if ((err = P4_PegEvalFlag(child, &child_flag)) != P4_Ok) {
-            *flag = 0;
-            return err;
-        }
+        catch(P4_PegEvalFlag(child, &child_flag));
         *flag |= child_flag;
     }
     return P4_Ok;
+
+finalize:
+    *flag = 0;
+    return err;
 }
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalNumber(P4_Token* token, size_t* num) {
     P4_Error  err = P4_Ok;
-    P4_String s   = NULL;
+    P4_String str = NULL;
 
-    if ((s = P4_CopyTokenString(token)) == NULL)
-        raise(P4_MemoryError, "Failed to copy number string. "
-                TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
+    if ((str = P4_CopyTokenString(token)) == NULL) {
+        *num = 0;
+        raise(
+            P4_MemoryError,
+            "Failed to copy number string. " TOKEN_ERROR_HINT_FMT,
+            TOKEN_ERROR_HINT
+        );
+    }
 
-    *num = atol(s);
-
+    *num = atol(str);
 finalize:
-    P4_FREE(s);
+    P4_FREE(str);
     return err;
 }
 
@@ -3865,18 +3881,25 @@ finalize:
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalMembers(P4_Token* token, P4_Expression* expr) {
-    size_t i = 0;
+    size_t    i     = 0;
+    P4_Error  err   = P4_Ok;
     P4_Token* child = token->head;
-    P4_Error err = P4_Ok;
+
     while (child != NULL) {
         P4_Expression* child_expr = NULL;
-        if ((err = P4_PegEval(child, &child_expr)) != P4_Ok)
-            return err;
-        P4_SetMember(expr, i, child_expr);
+        catch(P4_PegEval(child, &child_expr));
+        catch(P4_SetMember(expr, i, child_expr));
         child = child->next;
         i++;
     }
-    return P4_Ok;
+
+finalize:
+    if (err)
+        raise(err,
+            "Failed to set %luth member. " TOKEN_ERROR_HINT_FMT,
+            i, TOKEN_ERROR_HINT
+        );
+    return err;
 }
 
 P4_PRIVATE(P4_Error)

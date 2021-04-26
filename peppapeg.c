@@ -65,6 +65,21 @@
   #endif
 # endif
 
+# define                        catch(s) \
+    do { \
+        if ((err = (s)) != P4_Ok) { \
+            goto finalize; \
+        } \
+    } while (0);
+
+# define                        raise(errcode, fmt, ...) \
+    do { \
+        err = errcode; \
+        fprintf(stderr, "%s: ", P4_GetErrorString(err)); \
+        fprintf(stderr, fmt, __VA_ARGS__); \
+        goto finalize; \
+    } while (0);
+
 # define                        IS_END(s) ((s)->pos >= (s)->slice.stop.pos)
 # define                        IS_TIGHT(e) (((e)->flag & P4_FLAG_TIGHT) != 0)
 # define                        IS_SCOPED(e) (((e)->flag & P4_FLAG_SCOPED) != 0)
@@ -1993,7 +2008,6 @@ P4_InspectSourceAst(P4_Token* token, void* userdata, P4_Error (*inspector)(P4_To
     return err;
 }
 
-
 /*
  * Get version string.
  */
@@ -2584,6 +2598,8 @@ P4_GetErrorString(P4_Error err) {
             return "NullError";
         case P4_StackError:
             return "StackError";
+        case P4_PegError:
+            return "PegError";
         default:
             return "UnknownError";
     }
@@ -3636,39 +3652,20 @@ finalize:
     return NULL;
 }
 
-P4_String   P4_StringifyPegGrammarRuleID(P4_RuleID id) {
-    switch (id) {
-        case P4_PegRuleNumber: return "number";
-        case P4_PegRuleChar: return "char";
-        case P4_PegRuleLiteral: return "literal";
-        case P4_PegRuleInsensitiveLiteral: return "insensitive";
-        case P4_PegRuleRange: return "range";
-        case P4_PegRuleReference: return "reference";
-        case P4_PegRulePositive: return "positive";
-        case P4_PegRuleNegative: return "negative";
-        case P4_PegRuleChoice: return "choice";
-        case P4_PegRuleSequence: return "sequence";
-        case P4_PegRuleRepeat: return "repeat";
-        case P4_PegRuleRepeatOnceOrMore: return "onceormore";
-        case P4_PegRuleRepeatZeroOrMore: return "zeroormore";
-        case P4_PegRuleRepeatZeroOrOnce: return "zerooronce";
-        case P4_PegRuleRepeatMin: return "repeatmin";
-        case P4_PegRuleRepeatMax: return "repeatmax";
-        case P4_PegRuleRepeatMinMax: return "repeatminmax";
-        case P4_PegRuleRepeatExact: return "repeatexact";
-        case P4_PegRuleRuleName: return "name";
-        case P4_PegRuleRuleDecorators: return "decorators";
-        case P4_PegRuleDecorator: return "decorator";
-        case P4_PegRuleRule: return "rule";
-        case P4_PegGrammar: return "grammar";
-        default: return "<unknown>";
-    }
-}
+# define TOKEN_ERROR_HINT_FMT "char %lu-%lu: %*.*s\n"
+# define TOKEN_ERROR_HINT \
+                token->slice.start.pos, \
+                token->slice.stop.pos, \
+                (int)P4_GetSliceSize(&token->slice), \
+                (int)P4_GetSliceSize(&token->slice), \
+                token->text + token->slice.start.pos
+
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalFlag(P4_Token* token, P4_ExpressionFlag *flag) {
-    P4_String token_str = token->text + token->slice.start.pos; /* XXX: need slice api. */
-    size_t token_len = P4_GetSliceSize(&token->slice); /* XXX: need slice api. */
+    P4_Error  err       = P4_Ok;
+    P4_String token_str = token->text + token->slice.start.pos;
+    size_t    token_len = P4_GetSliceSize(&token->slice);
 
     if (memcmp("@squashed", token_str, token_len) == 0)
         *flag = P4_FLAG_SQUASHED;
@@ -3683,38 +3680,56 @@ P4_PegEvalFlag(P4_Token* token, P4_ExpressionFlag *flag) {
     else if (memcmp("@nonterminal", token_str, token_len) == 0)
         *flag = P4_FLAG_NON_TERMINAL;
     else {
-        *flag = 0; return P4_ValueError;
+        /* P4_CreatePegRule() guarantees only 6 kinds of strings are possible. */
+        UNREACHABLE();
+        raise(
+            P4_ValueError,
+            "Invalid flag: %s" TOKEN_ERROR_HINT_FMT,
+            token_str, TOKEN_ERROR_HINT
+        );
     }
 
     return P4_Ok;
+finalize:
+    *flag = 0;
+    return err;
 }
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalRuleFlags(P4_Token* token, P4_ExpressionFlag* flag) {
-    P4_Token* child = NULL;
+    P4_Error          err        = P4_Ok;
+    P4_Token*         child      = NULL;
     P4_ExpressionFlag child_flag = 0;
-    P4_Error err = P4_Ok;
+
     for (child = token->head; child != NULL; child = child->next) {
-        if ((err = P4_PegEvalFlag(child, &child_flag)) != P4_Ok) {
-            *flag = 0;
-            return err;
-        }
+        catch(P4_PegEvalFlag(child, &child_flag));
         *flag |= child_flag;
     }
     return P4_Ok;
+
+finalize:
+    *flag = 0;
+    return err;
 }
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalNumber(P4_Token* token, size_t* num) {
-    P4_String s = P4_CopyTokenString(token);
+    P4_Error  err = P4_Ok;
+    P4_String str = NULL;
 
-    if (s == NULL)
-        return P4_MemoryError;
+    if ((str = P4_CopyTokenString(token)) == NULL) {
+        *num = 0;
+        raise(
+            P4_MemoryError,
+            "Failed to copy number string. " TOKEN_ERROR_HINT_FMT,
+            TOKEN_ERROR_HINT
+        );
+    }
 
-    *num = atol(s);
-    P4_FREE(s);
-
-    return P4_Ok;
+    *num = atol(str);
+finalize:
+    P4_FREE(str);
+    return err;
 }
 
 P4_PRIVATE(P4_Error)
@@ -3732,35 +3747,49 @@ P4_PegEvalChar(P4_Token* token, P4_Rune* rune) {
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalLiteral(P4_Token* token, P4_Expression** expr) {
-    size_t len = P4_GetSliceSize(&token->slice) - 2; /* remove quotes */
-    if (len < 0)
-        return P4_ValueError;
+    size_t    i    = 0,
+              size = 0,
+              idx  = 0;
+    P4_Error  err  = 0;
+    P4_Rune   rune = 0;
+    P4_String lit  = NULL,
+              cur  = NULL;
 
-    size_t i = 0,
-           size = 0;
-    P4_Error err = 0;
-    P4_Rune rune = 0;
-    P4_String lit = P4_MALLOC((len+1) * sizeof(char)),
-              cur = lit;
+    size_t len = P4_GetSliceSize(&token->slice) - 2; /* - 2: remove two quotes */
+    if (len <= 0)
+        raise(P4_PegError,
+            "Literal rule should have at least one character. "
+            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT
+        );
 
+    cur = lit = P4_MALLOC((len+1) * sizeof(char));
     if (lit == NULL)
-        return P4_MemoryError;
+        raise(P4_MemoryError,
+            "Failed to copy literal string. "
+            TOKEN_ERROR_HINT_FMT,
+            TOKEN_ERROR_HINT
+        );
 
-    for (i = token->slice.start.pos+1; i < token->slice.stop.pos-1; i += size) {
+    for (i = token->slice.start.pos+1, idx = 0; i < token->slice.stop.pos-1; i += size) {
         size = P4_ReadEscapedRune(token->text+i, &rune);
-        if (size == 0) {
-            err = P4_ValueError;
-            goto finalize;
-        }
-        if (i + size > token->slice.stop.pos-1) {
-            err = P4_ValueError;
-            goto finalize;
-        }
+
+        if ((rune > 0x10ffff) ||
+                (rune == 0) ||
+                (size == 0) ||
+                (i + size > token->slice.stop.pos-1))
+            raise(P4_PegError,
+                "Character %lu is invalid. "
+                TOKEN_ERROR_HINT_FMT, idx, TOKEN_ERROR_HINT
+            );
+
         cur = P4_ConcatRune(cur, rune, size);
+        idx++;
     }
     *cur = '\0';
 
-    *expr = P4_CreateLiteral(lit, true);
+    if ((*expr = P4_CreateLiteral(lit, true)) == NULL)
+        raise(P4_MemoryError, "Failed to create literal token. "
+                TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT)
 
 finalize:
     P4_FREE(lit);
@@ -3771,86 +3800,120 @@ P4_PRIVATE(P4_Error)
 P4_PegEvalInsensitiveLiteral(P4_Token* token, P4_Expression** expr) {
     P4_Error err = P4_Ok;
 
-    if ((err = P4_PegEvalLiteral(token->head, expr)) != P4_Ok)
-        return err;
+    catch(P4_PegEvalLiteral(token->head, expr));
 
     (*expr)->sensitive = false;
-
     return P4_Ok;
+
+finalize:
+    return err;
 }
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalRange(P4_Token* token, P4_Expression** expr) {
     P4_Error err = P4_Ok;
 
-    if (token->head == token->tail) { /* one single child - \\p{XX} */
+    if (token->head == token->tail) { /* one single child - [\\p{XX}] */
         P4_RuneRange* ranges = NULL;
         size_t count = 0;
 
         if (0 == P4_ReadRuneRange(token->head->text, &token->head->slice, &count, &ranges))
-            return P4_ValueError;
+            raise(
+                P4_ValueError,
+                "Failed to read code point from source. "
+                TOKEN_ERROR_HINT_FMT,
+                TOKEN_ERROR_HINT
+            );
 
-        *expr = P4_CreateRanges(count, ranges);
-        if (*expr == NULL)
-            return P4_MemoryError;
-    } else {
+        if ((*expr = P4_CreateRanges(count, ranges)) == NULL)
+            raise(
+                P4_MemoryError,
+                "Failed to create range rule. "
+                TOKEN_ERROR_HINT_FMT,
+                TOKEN_ERROR_HINT
+            );
+
+    } else { /* two to three children - [lower-upper] or [lower-upper..stride] */
         P4_Rune lower = 0, upper = 0;
         size_t stride = 1;
 
-        if ((err = P4_PegEvalChar(token->head, &lower)) != P4_Ok)
-            return err;
+        P4_Token* lower_token = token->head;
+        P4_Token* upper_token = lower_token->next;
+        P4_Token* stride_token = upper_token->next;
 
-        if ((err = P4_PegEvalChar(token->head->next, &upper)) != P4_Ok)
-            return err;
+        catch(P4_PegEvalChar(lower_token, &lower));
+        catch(P4_PegEvalChar(upper_token, &upper));
+        if (stride_token) catch(P4_PegEval(stride_token, &stride));
 
-        if (token->head->next->next != NULL)
-            if ((err = P4_PegEvalNumber(token->head->next->next, &stride)) != P4_Ok)
-                return err;
+        if (lower > upper)
+            raise(P4_PegError,
+                "Range lower 0x%x is greater than upper 0x%x. "
+                TOKEN_ERROR_HINT_FMT,
+                lower, upper, TOKEN_ERROR_HINT
+            );
 
-        if (lower > upper) {
-            return P4_ValueError;
-        }
+        if ((lower == 0) || (upper == 0) || (stride == 0))
+            raise(P4_PegError,
+                "Range lower 0x%x, upper 0x%x, stride 0x%lx must be all non-zeros. "
+                TOKEN_ERROR_HINT_FMT,
+                lower, upper, stride, TOKEN_ERROR_HINT
+            );
 
-        if ((lower == 0) || (upper == 0) || (stride == 0)) {
-            return P4_ValueError;
-        }
+        if ((lower > 0x10ffff) || (upper > 0x10ffff))
+            raise(P4_PegError,
+                "Range lower 0x%x, upper 0x%x must be less than 0x10ffff. "
+                TOKEN_ERROR_HINT_FMT,
+                lower, upper, TOKEN_ERROR_HINT
+            );
 
-        *expr = P4_CreateRange(lower, upper, stride);
-        if (*expr == NULL)
-            return P4_MemoryError;
+        if ((*expr = P4_CreateRange(lower, upper, stride)) == NULL)
+            raise(P4_MemoryError,
+                "Failed to create range rule. "
+                TOKEN_ERROR_HINT_FMT,
+                TOKEN_ERROR_HINT
+            );
     }
-
     return P4_Ok;
+
+finalize:
+    return err;
 }
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalMembers(P4_Token* token, P4_Expression* expr) {
-    size_t i = 0;
+    size_t    i     = 0;
+    P4_Error  err   = P4_Ok;
     P4_Token* child = token->head;
-    P4_Error err = P4_Ok;
+
     while (child != NULL) {
         P4_Expression* child_expr = NULL;
-        if ((err = P4_PegEval(child, &child_expr)) != P4_Ok)
-            return err;
-        P4_SetMember(expr, i, child_expr);
+        catch(P4_PegEval(child, &child_expr));
+        catch(P4_SetMember(expr, i, child_expr));
         child = child->next;
         i++;
     }
-    return P4_Ok;
+
+finalize:
+    if (err)
+        raise(err,
+            "Failed to set %luth member. " TOKEN_ERROR_HINT_FMT,
+            i, TOKEN_ERROR_HINT
+        );
+    return err;
 }
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalSequence(P4_Token* token, P4_Expression** expr) {
     P4_Error  err = P4_Ok;
 
-    if ((*expr = P4_CreateSequence(P4_GetTokenChildrenCount(token))) == NULL) {
-        err = P4_MemoryError;
-        goto finalize;
-    }
+    if ((*expr = P4_CreateSequence(P4_GetTokenChildrenCount(token))) == NULL)
+        raise(
+            P4_MemoryError,
+            "Failed to create sequence rule. "
+            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT
+        );
 
-    if ((err = P4_PegEvalMembers(token, *expr)) != P4_Ok)
-        goto finalize;
-
+    catch(P4_PegEvalMembers(token, *expr));
     return P4_Ok;
 
 finalize:
@@ -3860,16 +3923,18 @@ finalize:
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalChoice(P4_Token* token, P4_Expression** expr) {
+    *expr = NULL;
+
     P4_Error  err = P4_Ok;
 
-    if ((*expr = P4_CreateChoice(P4_GetTokenChildrenCount(token))) == NULL) {
-        err = P4_MemoryError;
-        goto finalize;
-    }
+    if ((*expr = P4_CreateChoice(P4_GetTokenChildrenCount(token))) == NULL)
+        raise(
+            P4_MemoryError,
+            "Failed to create choice rule. "
+            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT
+        );
 
-    if ((err = P4_PegEvalMembers(token, *expr)) != P4_Ok)
-        goto finalize;
-
+    catch(P4_PegEvalMembers(token, *expr));
     return P4_Ok;
 
 finalize:
@@ -3879,20 +3944,19 @@ finalize:
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalPositive(P4_Token* token, P4_Expression** expr) {
+    *expr = NULL;
+
     P4_Error        err = P4_Ok;
     P4_Expression*  ref = NULL;
 
-    if ((err = P4_PegEval(token->head, &ref)) != P4_Ok) {
-        return err;
-    }
+    catch(P4_PegEval(token->head, &ref));
 
-    if (ref == NULL)
-        return P4_MemoryError;
-
-    if ((*expr = P4_CreatePositive(ref)) == NULL) {
-        err = P4_MemoryError;
-        goto finalize;
-    }
+    if ((*expr = P4_CreatePositive(ref)) == NULL)
+        raise(
+            P4_MemoryError,
+            "Failed to create positive rule. "
+            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT
+        );
 
     return P4_Ok;
 
@@ -3904,20 +3968,19 @@ finalize:
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalNegative(P4_Token* token, P4_Expression** expr) {
+    *expr = NULL;
+
     P4_Error        err = P4_Ok;
     P4_Expression*  ref = NULL;
 
-    if ((err = P4_PegEval(token->head, &ref)) != P4_Ok) {
-        return err;
-    }
+    catch(P4_PegEval(token->head, &ref));
 
-    if (ref == NULL)
-        return P4_MemoryError;
-
-    if ((*expr = P4_CreateNegative(ref)) == NULL) {
-        err = P4_MemoryError;
-        goto finalize;
-    }
+    if ((*expr = P4_CreateNegative(ref)) == NULL)
+        raise(
+            P4_MemoryError,
+            "Failed to create negative rule. "
+            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT
+        );
 
     return P4_Ok;
 
@@ -3929,56 +3992,61 @@ finalize:
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr) {
+    *expr = NULL;
+
     P4_Error        err = P4_Ok;
     P4_Expression*  ref = NULL;
-    size_t          min = 0, max = SIZE_MAX;
+    size_t          min = 0,
+                    max = SIZE_MAX;
 
-    if ((err = P4_PegEval(token->head, &ref)) != P4_Ok) {
-        return err;
-    }
-
-    if (ref == NULL)
-        return P4_MemoryError;
+    catch(P4_PegEval(token->head, &ref));
 
     switch (token->head->next->rule_id) {
-        case P4_PegRuleRepeatZeroOrMore: min = 0; max = SIZE_MAX; break;
-        case P4_PegRuleRepeatZeroOrOnce: min = 0; max = 1; break;
-        case P4_PegRuleRepeatOnceOrMore: min = 1; max = SIZE_MAX; break;
+        case P4_PegRuleRepeatZeroOrMore:
+            min = 0; max = SIZE_MAX;
+            break;
+        case P4_PegRuleRepeatZeroOrOnce:
+            min = 0; max = 1;
+            break;
+        case P4_PegRuleRepeatOnceOrMore:
+            min = 1; max = SIZE_MAX;
+            break;
         case P4_PegRuleRepeatMin:
-            if ((err = P4_PegEvalNumber(token->head->next->head, &min)) != P4_Ok)
-                goto finalize;
+            catch(P4_PegEval(token->head->next->head, &min));
             break;
         case P4_PegRuleRepeatMax:
-            if ((err = P4_PegEvalNumber(token->head->next->head, &max)) != P4_Ok)
-                goto finalize;
+            catch(P4_PegEval(token->head->next->head, &max));
             break;
         case P4_PegRuleRepeatMinMax:
-            if ((err = P4_PegEvalNumber(token->head->next->head, &min)) != P4_Ok)
-                goto finalize;
-            if ((err = P4_PegEvalNumber(token->head->next->tail, &max)) != P4_Ok)
-                goto finalize;
+            catch(P4_PegEval(token->head->next->head, &min));
+            catch(P4_PegEval(token->head->next->tail, &max));
             break;
         case P4_PegRuleRepeatExact:
-            if ((err = P4_PegEvalNumber(token->head->next->head, &min)) != P4_Ok)
-                goto finalize;
+            catch(P4_PegEval(token->head->next->head, &min));
             max = min;
             break;
         default:
             UNREACHABLE();
-            err = P4_ValueError;
-            goto finalize;
+            raise(
+                P4_ValueError,
+                "Unknown repeat kind: %lu" TOKEN_ERROR_HINT_FMT,
+                token->head->next->rule_id, TOKEN_ERROR_HINT
+            );
     }
 
-    if (min > max) {
-        err = P4_ValueError;
-        goto finalize;
-    }
+    if (min > max)
+        raise(
+            P4_PegError,
+            "Repeat min %lu is greater than max %lu. " TOKEN_ERROR_HINT_FMT,
+            min, max, TOKEN_ERROR_HINT
+        );
 
-
-    if ((*expr = P4_CreateRepeatMinMax(ref, min, max)) == NULL) {
-        err = P4_MemoryError;
-        goto finalize;
-    }
+    if ((*expr = P4_CreateRepeatMinMax(ref, min, max)) == NULL)
+        raise(
+            P4_MemoryError,
+            "Failed to create repeat rule. "
+            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT
+        );
 
     return P4_Ok;
 
@@ -3990,57 +4058,67 @@ finalize:
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalDot(P4_Token* token, P4_Expression** expr) {
-    if ((*expr = P4_CreateRange(0x1, 0x10ffff, 1)) == NULL) {
-        return P4_MemoryError;
-    }
-    return P4_Ok;
+    P4_Error err = P4_Ok;
+    if ((*expr = P4_CreateRange(0x1, 0x10ffff, 1)) == NULL)
+        raise(
+            P4_MemoryError,
+            "Failed to create dot rule. "
+            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT
+        );
+finalize:
+    return err;
 }
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalRuleName(P4_Token* token, P4_String* result) {
-    size_t len = P4_GetSliceSize(&token->slice); /* remove quotes */
-    if (len <= 0)
-        return P4_ValueError;
+    P4_Error err = P4_Ok;
+    size_t   len = P4_GetSliceSize(&token->slice);
 
-    *result = P4_MALLOC((len+1) * sizeof(char));
-    if (*result == NULL)
-        return P4_MemoryError;
+    ASSERT(len > 0, "Token slice size should be greater than zero.");
+
+    if ((*result = P4_MALLOC((len+1) * sizeof(char)))== NULL)
+        raise(
+            P4_MemoryError,
+            "Failed to allocate rule name string. "
+            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT
+        );
 
     memcpy(*result, token->text + token->slice.start.pos, len);
     (*result)[len] = '\0';
 
-    return P4_Ok;
+finalize:
+    return err;
 }
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalReference(P4_Token* token, P4_Expression** result) {
-    P4_Error err = P4_Ok;
-    P4_String reference = NULL;
+    *result = NULL;
 
-    if ((err = P4_PegEvalRuleName(token, &reference)) != P4_Ok)
-        return err;
+    P4_Error    err = P4_Ok;
+    P4_String   ref = NULL;
 
-    if (reference == NULL)
-        return P4_ValueError;
+    catch(P4_PegEvalRuleName(token, &ref));
 
     /* We can't know the ref_id at this stage.
-     * So, let's just simply create a placeholder.
+     * So, let's just simply create a placeholder with id=SIZE_MAX.
      */
-    if ((*result = P4_CreateReference(SIZE_MAX)) == NULL) {
-        err = P4_MemoryError;
-        goto finalize;
-    }
+    if ((*result = P4_CreateReference(SIZE_MAX)) == NULL)
+        raise(
+            P4_MemoryError,
+            "Failed to create reference rule. "
+            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT
+        );
 
-    /* The string reference is set.
-     * When the full grammar is evaluated, we will refresh all ref_ids.
+    /* However, the string reference must be set.
+     * When the full grammar is evaluated, we will refresh
+     * all ref_ids based on these reference names.
      */
-    (*result)->reference = reference;
-
+    (*result)->reference = ref;
     return P4_Ok;
 
 finalize:
-    if (reference)
-        P4_FREE(reference);
+    if (ref)
+        P4_FREE(ref);
 
     return err;
 }
@@ -4054,65 +4132,61 @@ P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result) {
 
     *result = NULL;
 
-    for (child = token->head; child != NULL; child = child->next) {
+    for (child = token->head; child != NULL; child = child->next)
         switch (child->rule_id) {
             case P4_PegRuleRuleDecorators:
-                err = P4_PegEvalRuleFlags(child, &rule_flag);
+                catch(P4_PegEvalRuleFlags(child, &rule_flag));
                 break;
             case P4_PegRuleRuleName:
-                err = P4_PegEvalRuleName(child, &rule_name);
+                catch(P4_PegEvalRuleName(child, &rule_name));
                 break;
             default:
-                err = P4_PegEval(child, result);
+                catch(P4_PegEval(child, result));
                 break;
         }
-        if (err != P4_Ok)
-            goto finalize;
-    }
 
     (*result)->name = rule_name;
     (*result)->flag = rule_flag;
-
     return P4_Ok;
 
 finalize:
     if (rule_name) P4_FREE(rule_name);
-    if (*result) P4_DeleteExpression(*result);
+    if (*result)   P4_DeleteExpression(*result);
     return err;
 }
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalGrammarReferences(P4_Grammar* grammar, P4_Expression* expr) {
-    if (expr == NULL)
-        return P4_NullError;
-
-    size_t i = 0;
+    size_t   i   = 0;
     P4_Error err = P4_Ok;
+
+    if (expr == NULL)
+        raise(P4_NullError, "Failed to resolve references: %p.\n", expr);
+
     switch (expr->kind) {
         case P4_Positive:
         case P4_Negative:
             if (expr->ref_expr)
-                err = P4_PegEvalGrammarReferences(grammar, expr->ref_expr);
+                catch(P4_PegEvalGrammarReferences(grammar, expr->ref_expr));
             break;
         case P4_Sequence:
         case P4_Choice:
             for (i = 0; i < expr->count; i++)
                 if (expr->members[i])
-                    if ((err = P4_PegEvalGrammarReferences(grammar, expr->members[i])) != P4_Ok)
-                        return err;
+                    catch(P4_PegEvalGrammarReferences(grammar, expr->members[i]));
             break;
         case P4_Repeat:
             if (expr->repeat_expr)
-                err = P4_PegEvalGrammarReferences(grammar, expr->repeat_expr);
+                catch(P4_PegEvalGrammarReferences(grammar, expr->repeat_expr));
             break;
         case P4_Reference:
         {
             if (expr->reference == NULL)
-                return P4_NullError;
+                raise(P4_ValueError, "Reference name is not set: %p\n", expr->reference);
 
             P4_Expression* ref = P4_GetGrammarRuleByName(grammar, expr->reference);
-            if (expr == NULL)
-                return P4_NameError;
+            if (ref == NULL)
+                raise(P4_NameError, "Reference name is not resolved: %s\n", expr->reference);
 
             expr->ref_id = ref->id;
             break;
@@ -4121,6 +4195,7 @@ P4_PegEvalGrammarReferences(P4_Grammar* grammar, P4_Expression* expr) {
             break;
     }
 
+finalize:
     return err;
 }
 
@@ -4129,32 +4204,30 @@ P4_PegEvalGrammar(P4_Token* token, P4_Grammar** result) {
     P4_Error    err = P4_Ok;
     size_t      i = 0;
 
-    if ((*result = P4_CreateGrammar()) == NULL) {
-        err = P4_MemoryError;
-        goto finalize;
-    }
+    if ((*result = P4_CreateGrammar()) == NULL)
+        raise(
+            P4_MemoryError,
+            "%s",
+            "Failed to create grammar object. \n"
+        );
 
-    P4_Token* child = NULL;
-    P4_RuleID id = 1;
+    P4_Expression* rule = NULL;
+    P4_Token*      child = NULL;
+    P4_RuleID      id = 1;
+
+    /* Eval grammar rules. */
     for (child = token->head; child != NULL; child = child->next) {
-        P4_Expression* rule = NULL;
+        catch(P4_PegEvalGrammarRule(child, &rule));
 
-        if ((err = P4_PegEvalGrammarRule(child, &rule)) != P4_Ok) {
-            goto finalize;
-        }
-
-        if ((err = P4_AddGrammarRule(*result, id, rule)) != P4_Ok) {
-            goto finalize;
-        }
+        if ((err = P4_AddGrammarRule(*result, id, rule)) != P4_Ok)
+            raise(err, "Failed to add %luth grammar rule.\n", id);
 
         id++;
     }
 
-    for (i = 0; i < (*result)->count; i++) {
-        if ((err = P4_PegEvalGrammarReferences(*result, (*result)->rules[i])) != P4_Ok) {
-            goto finalize;
-        }
-    }
+    /* Resolve named references. */
+    for (i = 0; i < (*result)->count; i++)
+        catch(P4_PegEvalGrammarReferences(*result, (*result)->rules[i]));
 
 finalize:
 
@@ -4241,9 +4314,6 @@ finalize:
 
     if (bootstrap)
         P4_DeleteGrammar(bootstrap);
-
-    /* TODO: make it explicit where causes the syntax error. */
-    ASSERT(err == P4_Ok, "invalid grammar");
 
     return grammar;
 }

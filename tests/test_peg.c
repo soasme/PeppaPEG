@@ -2,6 +2,17 @@
 #include "unity/src/unity.h"
 #include "common.h"
 
+
+# define ASSERT_BAD_GRAMMAR(rule, err) do {\
+    char BUF[1024] = {0}; \
+    setbuf(stderr, BUF); \
+    fseek(stderr, 0, SEEK_SET); \
+    memset(BUF, 0, sizeof(char)); \
+    TEST_ASSERT_NULL(P4_LoadGrammar((rule))); \
+    fflush(stderr); \
+    TEST_ASSERT_EQUAL_STRING((err), BUF); \
+} while (0);
+
 # define ASSERT_PEG_PARSE(entry, input, code, output) do { \
     P4_Grammar* grammar = P4_CreatePegGrammar(); \
     P4_Source* source = P4_CreateSource((input), (entry)); \
@@ -720,6 +731,84 @@ void test_eval_grammar(void) {
 
 }
 
+void test_eval_bad_grammar_literal(void) {
+    ASSERT_BAD_GRAMMAR(
+        "R1 = \"\";",
+        "PegError: Literal rule should have at least one character. char 5-7: \"\"\n"
+    );
+
+    ASSERT_BAD_GRAMMAR(
+        "R1 = \"\\u{110000}\";",
+        "PegError: Character 0 is invalid. char 5-17: \"\\u{110000}\"\n"
+    );
+
+    ASSERT_BAD_GRAMMAR(
+        "R1 = \"\\u{0}\";",
+        "PegError: Character 0 is invalid. char 5-12: \"\\u{0}\"\n"
+    );
+}
+
+void test_eval_bad_grammar_range(void) {
+    /* lower > upper. */
+
+    ASSERT_BAD_GRAMMAR(
+        "R1 = [9-0];",
+        "PegError: Range lower 0x39 is greater than upper 0x30. char 5-10: [9-0]\n"
+    );
+
+    ASSERT_BAD_GRAMMAR(
+        "R1 = [z-a];",
+        "PegError: Range lower 0x7a is greater than upper 0x61. char 5-10: [z-a]\n"
+    );
+
+    ASSERT_BAD_GRAMMAR(
+        "R1 = [\\u{10ffff}-\\u{0001}];",
+        "PegError: Range lower 0x10ffff is greater than upper 0x1. char 5-26: [\\u{10ffff}-\\u{0001}]\n"
+    );
+
+    ASSERT_BAD_GRAMMAR(
+        "R1 = [\\u{10ffff}-\\u{0001}];",
+        "PegError: Range lower 0x10ffff is greater than upper 0x1. char 5-26: [\\u{10ffff}-\\u{0001}]\n"
+    );
+
+    /* lower / upper / stride is zero. */
+
+    ASSERT_BAD_GRAMMAR(
+        "R1 = [\\u{0}-\\u{10ffff}];",
+        "PegError: Range lower 0x0, upper 0x10ffff, stride 0x1 must be all non-zeros. char 5-23: [\\u{0}-\\u{10ffff}]\n"
+    );
+
+    ASSERT_BAD_GRAMMAR(
+        "R1 = [a-f..0];",
+        "PegError: Range lower 0x61, upper 0x66, stride 0x0 must be all non-zeros. char 5-13: [a-f..0]\n"
+    );
+
+    ASSERT_BAD_GRAMMAR(
+        "R1 = [\\u{1}-\\u{10ffff}..0];",
+        "PegError: Range lower 0x1, upper 0x10ffff, stride 0x0 must be all non-zeros. char 5-26: [\\u{1}-\\u{10ffff}..0]\n"
+    );
+
+    ASSERT_BAD_GRAMMAR(
+        "R1 = [\\u{1}-\\u{110000}];",
+        "PegError: Range lower 0x1, upper 0x110000 must be less than 0x10ffff. char 5-23: [\\u{1}-\\u{110000}]\n"
+    );
+
+}
+
+void test_eval_bad_grammar_repeat(void) {
+    ASSERT_BAD_GRAMMAR(
+        "R1 = [0-9]{3,2};",
+        "PegError: Repeat min 3 is greater than max 2. char 5-15: [0-9]{3,2}\n"
+    );
+}
+
+void test_eval_bad_grammar_reference(void) {
+    ASSERT_BAD_GRAMMAR(
+        "R1 = R2;",
+        "NameError: Reference name is not resolved: R2\n"
+    );
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -755,6 +844,11 @@ int main(void) {
     RUN_TEST(test_eval_repeat);
     RUN_TEST(test_eval_reference);
     RUN_TEST(test_eval_grammar);
+
+    RUN_TEST(test_eval_bad_grammar_literal);
+    RUN_TEST(test_eval_bad_grammar_range);
+    RUN_TEST(test_eval_bad_grammar_repeat);
+    RUN_TEST(test_eval_bad_grammar_reference);
 
     return UNITY_END();
 }

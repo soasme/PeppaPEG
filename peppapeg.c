@@ -3906,14 +3906,14 @@ P4_PRIVATE(P4_Error)
 P4_PegEvalSequence(P4_Token* token, P4_Expression** expr) {
     P4_Error  err = P4_Ok;
 
-    if ((*expr = P4_CreateSequence(P4_GetTokenChildrenCount(token))) == NULL) {
-        err = P4_MemoryError;
-        goto finalize;
-    }
+    if ((*expr = P4_CreateSequence(P4_GetTokenChildrenCount(token))) == NULL)
+        raise(
+            P4_MemoryError,
+            "Failed to create sequence rule. "
+            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT
+        );
 
-    if ((err = P4_PegEvalMembers(token, *expr)) != P4_Ok)
-        goto finalize;
-
+    catch(P4_PegEvalMembers(token, *expr));
     return P4_Ok;
 
 finalize:
@@ -3923,16 +3923,18 @@ finalize:
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalChoice(P4_Token* token, P4_Expression** expr) {
+    *expr = NULL;
+
     P4_Error  err = P4_Ok;
 
-    if ((*expr = P4_CreateChoice(P4_GetTokenChildrenCount(token))) == NULL) {
-        err = P4_MemoryError;
-        goto finalize;
-    }
+    if ((*expr = P4_CreateChoice(P4_GetTokenChildrenCount(token))) == NULL)
+        raise(
+            P4_MemoryError,
+            "Failed to create choice rule. "
+            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT
+        );
 
-    if ((err = P4_PegEvalMembers(token, *expr)) != P4_Ok)
-        goto finalize;
-
+    catch(P4_PegEvalMembers(token, *expr));
     return P4_Ok;
 
 finalize:
@@ -3942,20 +3944,19 @@ finalize:
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalPositive(P4_Token* token, P4_Expression** expr) {
+    *expr = NULL;
+
     P4_Error        err = P4_Ok;
     P4_Expression*  ref = NULL;
 
-    if ((err = P4_PegEval(token->head, &ref)) != P4_Ok) {
-        return err;
-    }
+    catch(P4_PegEval(token->head, &ref));
 
-    if (ref == NULL)
-        return P4_MemoryError;
-
-    if ((*expr = P4_CreatePositive(ref)) == NULL) {
-        err = P4_MemoryError;
-        goto finalize;
-    }
+    if ((*expr = P4_CreatePositive(ref)) == NULL)
+        raise(
+            P4_MemoryError,
+            "Failed to create positive rule. "
+            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT
+        );
 
     return P4_Ok;
 
@@ -3967,20 +3968,19 @@ finalize:
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalNegative(P4_Token* token, P4_Expression** expr) {
+    *expr = NULL;
+
     P4_Error        err = P4_Ok;
     P4_Expression*  ref = NULL;
 
-    if ((err = P4_PegEval(token->head, &ref)) != P4_Ok) {
-        return err;
-    }
+    catch(P4_PegEval(token->head, &ref));
 
-    if (ref == NULL)
-        return P4_MemoryError;
-
-    if ((*expr = P4_CreateNegative(ref)) == NULL) {
-        err = P4_MemoryError;
-        goto finalize;
-    }
+    if ((*expr = P4_CreateNegative(ref)) == NULL)
+        raise(
+            P4_MemoryError,
+            "Failed to create negative rule. "
+            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT
+        );
 
     return P4_Ok;
 
@@ -3992,56 +3992,61 @@ finalize:
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr) {
+    *expr = NULL;
+
     P4_Error        err = P4_Ok;
     P4_Expression*  ref = NULL;
-    size_t          min = 0, max = SIZE_MAX;
+    size_t          min = 0,
+                    max = SIZE_MAX;
 
-    if ((err = P4_PegEval(token->head, &ref)) != P4_Ok) {
-        return err;
-    }
-
-    if (ref == NULL)
-        return P4_MemoryError;
+    catch(P4_PegEval(token->head, &ref));
 
     switch (token->head->next->rule_id) {
-        case P4_PegRuleRepeatZeroOrMore: min = 0; max = SIZE_MAX; break;
-        case P4_PegRuleRepeatZeroOrOnce: min = 0; max = 1; break;
-        case P4_PegRuleRepeatOnceOrMore: min = 1; max = SIZE_MAX; break;
+        case P4_PegRuleRepeatZeroOrMore:
+            min = 0; max = SIZE_MAX;
+            break;
+        case P4_PegRuleRepeatZeroOrOnce:
+            min = 0; max = 1;
+            break;
+        case P4_PegRuleRepeatOnceOrMore:
+            min = 1; max = SIZE_MAX;
+            break;
         case P4_PegRuleRepeatMin:
-            if ((err = P4_PegEval(token->head->next->head, &min)) != P4_Ok)
-                goto finalize;
+            catch(P4_PegEval(token->head->next->head, &min));
             break;
         case P4_PegRuleRepeatMax:
-            if ((err = P4_PegEval(token->head->next->head, &max)) != P4_Ok)
-                goto finalize;
+            catch(P4_PegEval(token->head->next->head, &max));
             break;
         case P4_PegRuleRepeatMinMax:
-            if ((err = P4_PegEval(token->head->next->head, &min)) != P4_Ok)
-                goto finalize;
-            if ((err = P4_PegEval(token->head->next->tail, &max)) != P4_Ok)
-                goto finalize;
+            catch(P4_PegEval(token->head->next->head, &min));
+            catch(P4_PegEval(token->head->next->tail, &max));
             break;
         case P4_PegRuleRepeatExact:
-            if ((err = P4_PegEval(token->head->next->head, &min)) != P4_Ok)
-                goto finalize;
+            catch(P4_PegEval(token->head->next->head, &min));
             max = min;
             break;
         default:
             UNREACHABLE();
-            err = P4_ValueError;
-            goto finalize;
+            raise(
+                P4_ValueError,
+                "Unknown repeat kind: %lu" TOKEN_ERROR_HINT_FMT,
+                token->head->next->rule_id, TOKEN_ERROR_HINT
+            );
     }
 
-    if (min > max) {
-        err = P4_ValueError;
-        goto finalize;
-    }
+    if (min > max)
+        raise(
+            P4_PegError,
+            "Repeat min %lu is greater than max %lu. " TOKEN_ERROR_HINT_FMT,
+            min, max, TOKEN_ERROR_HINT
+        );
 
-
-    if ((*expr = P4_CreateRepeatMinMax(ref, min, max)) == NULL) {
-        err = P4_MemoryError;
-        goto finalize;
-    }
+    if ((*expr = P4_CreateRepeatMinMax(ref, min, max)) == NULL)
+        raise(
+            P4_MemoryError,
+            "Failed to create repeat rule. "
+            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT
+        );
 
     return P4_Ok;
 
@@ -4053,26 +4058,36 @@ finalize:
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalDot(P4_Token* token, P4_Expression** expr) {
-    if ((*expr = P4_CreateRange(0x1, 0x10ffff, 1)) == NULL) {
-        return P4_MemoryError;
-    }
-    return P4_Ok;
+    P4_Error err = P4_Ok;
+    if ((*expr = P4_CreateRange(0x1, 0x10ffff, 1)) == NULL)
+        raise(
+            P4_MemoryError,
+            "Failed to create dot rule. "
+            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT
+        );
+finalize:
+    return err;
 }
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalRuleName(P4_Token* token, P4_String* result) {
-    size_t len = P4_GetSliceSize(&token->slice); /* remove quotes */
-    if (len <= 0)
-        return P4_ValueError;
+    P4_Error err = P4_Ok;
+    size_t   len = P4_GetSliceSize(&token->slice);
 
-    *result = P4_MALLOC((len+1) * sizeof(char));
-    if (*result == NULL)
-        return P4_MemoryError;
+    ASSERT(len > 0, "Token slice size should be greater than zero.");
+
+    if ((*result = P4_MALLOC((len+1) * sizeof(char)))== NULL)
+        raise(
+            P4_MemoryError,
+            "Failed to allocate rule name string. "
+            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT
+        );
 
     memcpy(*result, token->text + token->slice.start.pos, len);
     (*result)[len] = '\0';
 
-    return P4_Ok;
+finalize:
+    return err;
 }
 
 P4_PRIVATE(P4_Error)

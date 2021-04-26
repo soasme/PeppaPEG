@@ -3824,7 +3824,7 @@ P4_PegEvalRange(P4_Token* token, P4_Expression** expr) {
 
         catch(P4_PegEvalChar(lower_token, &lower));
         catch(P4_PegEvalChar(upper_token, &upper));
-        if (stride_token) catch(P4_PegEvalNumber(stride_token, &stride));
+        if (stride_token) catch(P4_PegEval(stride_token, &stride));
 
         if (lower > upper)
             raise(P4_PegError,
@@ -3982,21 +3982,21 @@ P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr) {
         case P4_PegRuleRepeatZeroOrOnce: min = 0; max = 1; break;
         case P4_PegRuleRepeatOnceOrMore: min = 1; max = SIZE_MAX; break;
         case P4_PegRuleRepeatMin:
-            if ((err = P4_PegEvalNumber(token->head->next->head, &min)) != P4_Ok)
+            if ((err = P4_PegEval(token->head->next->head, &min)) != P4_Ok)
                 goto finalize;
             break;
         case P4_PegRuleRepeatMax:
-            if ((err = P4_PegEvalNumber(token->head->next->head, &max)) != P4_Ok)
+            if ((err = P4_PegEval(token->head->next->head, &max)) != P4_Ok)
                 goto finalize;
             break;
         case P4_PegRuleRepeatMinMax:
-            if ((err = P4_PegEvalNumber(token->head->next->head, &min)) != P4_Ok)
+            if ((err = P4_PegEval(token->head->next->head, &min)) != P4_Ok)
                 goto finalize;
-            if ((err = P4_PegEvalNumber(token->head->next->tail, &max)) != P4_Ok)
+            if ((err = P4_PegEval(token->head->next->tail, &max)) != P4_Ok)
                 goto finalize;
             break;
         case P4_PegRuleRepeatExact:
-            if ((err = P4_PegEvalNumber(token->head->next->head, &min)) != P4_Ok)
+            if ((err = P4_PegEval(token->head->next->head, &min)) != P4_Ok)
                 goto finalize;
             max = min;
             break;

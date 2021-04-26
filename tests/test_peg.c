@@ -795,6 +795,13 @@ void test_eval_bad_grammar_range(void) {
 
 }
 
+void test_eval_bad_grammar_repeat(void) {
+    ASSERT_BAD_GRAMMAR(
+        "R1 = [0-9]{3,2};",
+        "PegError: Repeat min 3 is greater than max 2. char 5-15: [0-9]{3,2}\n"
+    );
+}
+
 void test_eval_bad_grammar_reference(void) {
     ASSERT_BAD_GRAMMAR(
         "R1 = R2;",
@@ -840,6 +847,7 @@ int main(void) {
 
     RUN_TEST(test_eval_bad_grammar_literal);
     RUN_TEST(test_eval_bad_grammar_range);
+    RUN_TEST(test_eval_bad_grammar_repeat);
     RUN_TEST(test_eval_bad_grammar_reference);
 
     return UNITY_END();

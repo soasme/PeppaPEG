@@ -3702,15 +3702,18 @@ P4_PegEvalRuleFlags(P4_Token* token, P4_ExpressionFlag* flag) {
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalNumber(P4_Token* token, size_t* num) {
-    P4_String s = P4_CopyTokenString(token);
+    P4_Error  err = P4_Ok;
+    P4_String s   = NULL;
 
-    if (s == NULL)
-        return P4_MemoryError;
+    if ((s = P4_CopyTokenString(token)) == NULL)
+        raise(P4_MemoryError, "Failed to copy number string. "
+                TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
 
     *num = atol(s);
-    P4_FREE(s);
 
-    return P4_Ok;
+finalize:
+    P4_FREE(s);
+    return err;
 }
 
 P4_PRIVATE(P4_Error)

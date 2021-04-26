@@ -795,6 +795,13 @@ void test_eval_bad_grammar_range(void) {
 
 }
 
+void test_eval_bad_grammar_reference(void) {
+    ASSERT_BAD_GRAMMAR(
+        "R1 = R2;",
+        "NameError: Reference name is not resolved: R2\n"
+    );
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -833,6 +840,7 @@ int main(void) {
 
     RUN_TEST(test_eval_bad_grammar_literal);
     RUN_TEST(test_eval_bad_grammar_range);
+    RUN_TEST(test_eval_bad_grammar_reference);
 
     return UNITY_END();
 }

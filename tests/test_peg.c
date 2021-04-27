@@ -809,13 +809,6 @@ void test_eval_bad_grammar_reference(void) {
     );
 }
 
-void test_eval_bad_grammar_parse(void) {
-    ASSERT_BAD_GRAMMAR(
-        "R1 = \"1\"",
-        "MatchError: Expected grammar. char 0\n"
-    );
-}
-
 int main(void) {
     UNITY_BEGIN();
 
@@ -856,7 +849,6 @@ int main(void) {
     RUN_TEST(test_eval_bad_grammar_range);
     RUN_TEST(test_eval_bad_grammar_repeat);
     RUN_TEST(test_eval_bad_grammar_reference);
-    RUN_TEST(test_eval_bad_grammar_parse);
 
     return UNITY_END();
 }

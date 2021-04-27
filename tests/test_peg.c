@@ -745,6 +745,11 @@ void test_eval_bad_grammar_literal(void) {
     );
 
     ASSERT_BAD_GRAMMAR(
+        "R1 = i\"\";",
+        "PegError: Literal rule should have at least one character. char 6-8: \"\"\n"
+    );
+
+    ASSERT_BAD_GRAMMAR(
         "R1 = \"\\u{110000}\";",
         "PegError: Character 0 is invalid. char 5-17: \"\\u{110000}\"\n"
     );

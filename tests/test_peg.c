@@ -731,6 +731,13 @@ void test_eval_grammar(void) {
 
 }
 
+void test_eval_bad_grammar(void) {
+    ASSERT_BAD_GRAMMAR(
+        "R1 = \"a\"",
+        "MatchError: Failed to parse rules: expect grammar\n"
+    );
+}
+
 void test_eval_bad_grammar_literal(void) {
     ASSERT_BAD_GRAMMAR(
         "R1 = \"\";",
@@ -845,6 +852,7 @@ int main(void) {
     RUN_TEST(test_eval_reference);
     RUN_TEST(test_eval_grammar);
 
+    RUN_TEST(test_eval_bad_grammar);
     RUN_TEST(test_eval_bad_grammar_literal);
     RUN_TEST(test_eval_bad_grammar_range);
     RUN_TEST(test_eval_bad_grammar_repeat);

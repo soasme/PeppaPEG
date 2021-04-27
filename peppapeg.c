@@ -1857,6 +1857,14 @@ P4_Match(P4_Source* s, P4_Expression* e) {
     }
 
     if (s->err != P4_Ok) {
+        if (e->name != NULL) {
+            size_t len = strlen(e->name);
+            P4_String errmsg = P4_MALLOC(sizeof(char) * (len+8));
+            memset(errmsg, 0, len);
+            sprintf(errmsg, "expect %s", e->name);
+            P4_RaiseError(s, s->err, errmsg);
+            P4_FREE(errmsg);
+        }
         P4_DeleteToken(result);
         goto finalize;
     }

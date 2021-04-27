@@ -4287,26 +4287,19 @@ P4_LoadGrammar(P4_String rules) {
     P4_Token*   rules_tok = NULL;
     P4_Error    err       = P4_Ok;
 
-    bootstrap = P4_CreatePegGrammar();
-    if (bootstrap == NULL)
-        goto finalize;
+    if ((bootstrap = P4_CreatePegGrammar()) == NULL)
+        raise(P4_MemoryError, "%s\n", "Failed to create bootstrap grammar.");
 
-    rules_src = P4_CreateSource(rules, P4_PegGrammar);
-    if (rules_src == NULL)
-        goto finalize;
+    if ((rules_src = P4_CreateSource(rules, P4_PegGrammar)) == NULL)
+        raise(P4_MemoryError, "%s\n", "Failed to create source for PEG rules.");
 
-    if (P4_Ok != (err = P4_Parse(bootstrap, rules_src))) {
-        ASSERT(0, P4_GetErrorMessage(rules_src));
-        goto finalize;
-    }
+    if ((err = P4_Parse(bootstrap, rules_src)) != P4_Ok)
+        raise(err, "Failed to parse rules: %s\n", P4_GetErrorMessage(rules_src));
 
-    rules_tok = P4_GetSourceAst(rules_src);
-    if (rules_tok == NULL)
-        goto finalize;
+    if ((rules_tok = P4_GetSourceAst(rules_src)) == NULL)
+        raise(P4_PegError, "%s\n", "Failed to get meta ast for PEG rules.");
 
-    if (P4_Ok != (err = P4_PegEval(rules_tok, &grammar))) {
-        goto finalize;
-    }
+    catch(P4_PegEval(rules_tok, &grammar));
 
 finalize:
     if (rules_src)

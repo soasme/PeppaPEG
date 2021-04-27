@@ -17,13 +17,17 @@
     P4_Grammar* grammar = P4_CreatePegGrammar(); \
     P4_Source* source = P4_CreateSource((input), (entry)); \
     TEST_ASSERT_EQUAL_MESSAGE((code), P4_Parse(grammar, source), "unexpected parse grammar return code"); \
-    P4_Token* root = P4_GetSourceAst(source); \
-    FILE *f = fopen("check.json","w"); \
-    P4_JsonifySourceAst(grammar, f, root); \
-    fclose(f); \
-    P4_String s = read_file("check.json"); \
-    TEST_ASSERT_EQUAL_STRING((output), s); \
-    free(s); \
+    if ((code) == P4_Ok) { \
+        P4_Token* root = P4_GetSourceAst(source); \
+        FILE *f = fopen("check.json","w"); \
+        P4_JsonifySourceAst(grammar, f, root); \
+        fclose(f); \
+        P4_String s = read_file("check.json"); \
+        TEST_ASSERT_EQUAL_STRING((output), s); \
+        free(s); \
+    } else { \
+        TEST_ASSERT_EQUAL_STRING((output), source->errmsg); \
+    } \
     P4_DeleteSource(source); \
     P4_DeleteGrammar(grammar); \
 } while (0);
@@ -42,6 +46,7 @@ void test_number(void) {
     ASSERT_PEG_PARSE(P4_PegRuleNumber, "0", P4_Ok, "[{\"slice\":[0,1],\"type\":\"number\"}]");
     ASSERT_PEG_PARSE(P4_PegRuleNumber, "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"number\"}]");
     ASSERT_PEG_PARSE(P4_PegRuleNumber, "123", P4_Ok, "[{\"slice\":[0,3],\"type\":\"number\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleNumber, "a", P4_MatchError, "expect number");
 }
 
 void test_char(void) {
@@ -54,7 +59,7 @@ void test_char(void) {
     ASSERT_PEG_PARSE(P4_PegRuleChar, "\\u{20}", P4_Ok, "[{\"slice\":[0,6],\"type\":\"char\"}]");
     ASSERT_PEG_PARSE(P4_PegRuleChar, "\\u{0020}", P4_Ok, "[{\"slice\":[0,8],\"type\":\"char\"}]");
     ASSERT_PEG_PARSE(P4_PegRuleChar, "\\u{10ffff}", P4_Ok, "[{\"slice\":[0,10],\"type\":\"char\"}]");
-    ASSERT_PEG_PARSE(P4_PegRuleChar, "\"", P4_MatchError, "[]");
+    ASSERT_PEG_PARSE(P4_PegRuleChar, "\"", P4_MatchError, "expect char");
 }
 
 void test_literal(void) {
@@ -100,7 +105,7 @@ void test_range(void) {
 {\"slice\":[3,4],\"type\":\"char\"},\
 {\"slice\":[6,7],\"type\":\"number\"}]}]");
 
-    ASSERT_PEG_PARSE(P4_PegRuleRange, "[\\p{__}]", P4_MatchError, "[]")
+    ASSERT_PEG_PARSE(P4_PegRuleRange, "[\\p{__}]", P4_MatchError, "expect range")
     ASSERT_PEG_PARSE(P4_PegRuleRange, "[\\p{C}]", P4_Ok, "\
 [{\"slice\":[0,7],\"type\":\"range\",\"children\":[\
 {\"slice\":[4,5],\"type\":\"range_category\"}]}]");
@@ -123,7 +128,7 @@ void test_reference(void) {
     ASSERT_PEG_PARSE(P4_PegRuleReference, "JsonEntry", P4_Ok, "[{\"slice\":[0,9],\"type\":\"reference\"}]");
     ASSERT_PEG_PARSE(P4_PegRuleReference, "P4", P4_Ok, "[{\"slice\":[0,2],\"type\":\"reference\"}]");
     ASSERT_PEG_PARSE(P4_PegRuleReference, "P4_PegRule", P4_Ok, "[{\"slice\":[0,10],\"type\":\"reference\"}]");
-    ASSERT_PEG_PARSE(P4_PegRuleReference, "4PEG", P4_MatchError, "[]");
+    ASSERT_PEG_PARSE(P4_PegRuleReference, "4PEG", P4_MatchError, "expect reference");
 }
 
 void test_positive(void) {
@@ -188,11 +193,12 @@ void test_rule_name(void) {
     ASSERT_PEG_PARSE(P4_PegRuleRuleName, "JsonEntry", P4_Ok, "[{\"slice\":[0,9],\"type\":\"name\"}]");
     ASSERT_PEG_PARSE(P4_PegRuleRuleName, "P4", P4_Ok, "[{\"slice\":[0,2],\"type\":\"name\"}]");
     ASSERT_PEG_PARSE(P4_PegRuleRuleName, "P4_PegRule", P4_Ok, "[{\"slice\":[0,10],\"type\":\"name\"}]");
-    ASSERT_PEG_PARSE(P4_PegRuleRuleName, "4PEG", P4_MatchError, "[]");
+    ASSERT_PEG_PARSE(P4_PegRuleRuleName, "4PEG", P4_MatchError, "expect reference");
 }
 
 void test_rule_flag(void) {
     ASSERT_PEG_PARSE(P4_PegRuleDecorator, "@scoped", P4_Ok, "[{\"slice\":[0,7],\"type\":\"decorator\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleDecorator, "@whatever", P4_MatchError, "expect decorator");
 }
 
 void test_rule(void) {
@@ -251,6 +257,8 @@ void test_rule(void) {
             "{\"slice\":[58,61],\"type\":\"literal\"}"
         "]}"
     "]");
+
+    ASSERT_PEG_PARSE(P4_PegRuleRule, "a = \"1\"", P4_MatchError, "expect rule");
 }
 
 void test_grammar(void) {

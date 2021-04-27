@@ -1857,7 +1857,8 @@ P4_Match(P4_Source* s, P4_Expression* e) {
     }
 
     if (s->err != P4_Ok) {
-        if (e->name != NULL) {
+        P4_DeleteToken(result);
+        if (e->name != NULL && memcmp(s->errmsg, "expect", 6) != 0) {
             size_t len = strlen(e->name);
             P4_String errmsg = P4_MALLOC(sizeof(char) * (len+8));
             memset(errmsg, 0, len);
@@ -1865,7 +1866,6 @@ P4_Match(P4_Source* s, P4_Expression* e) {
             P4_RaiseError(s, s->err, errmsg);
             P4_FREE(errmsg);
         }
-        P4_DeleteToken(result);
         goto finalize;
     }
 
@@ -2442,6 +2442,9 @@ P4_SetGrammarRuleName(P4_Grammar* grammar, P4_RuleID id, P4_String name) {
 
     if (expr == NULL)
         return P4_NullError;
+
+    if (strlen(name) >= P4_MAX_RULE_NAME_LEN)
+        return P4_ValueError;
 
     if (expr->name != NULL)
         P4_FREE(expr->name);
@@ -3619,7 +3622,11 @@ P4_Grammar* P4_CreatePegGrammar () {
     if (P4_Ok != P4_SetGrammarRuleName(grammar, P4_PegRuleRule, "rule"))
         goto finalize;
 
-    if (P4_Ok != P4_AddOnceOrMore(grammar, P4_PegGrammar, P4_CreateReference(P4_PegRuleRule)))
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegGrammar, 3,
+        P4_CreateStartOfInput(),
+        P4_CreateOnceOrMore(P4_CreateReference(P4_PegRuleRule)),
+        P4_CreateEndOfInput()
+    ))
         goto finalize;
 
     if (P4_Ok != P4_SetGrammarRuleName(grammar, P4_PegGrammar, "grammar"))

@@ -153,6 +153,9 @@ extern "C"
  */
 # define P4_DEFAULT_RECURSION_LIMIT     8192
 
+
+# define P4_MAX_RULE_NAME_LEN           32
+
 /*
  *
  * ███████╗███╗░░██╗██╗░░░██╗███╗░░░███╗░██████╗

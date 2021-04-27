@@ -177,6 +177,12 @@ P4_PRIVATE(bool)         P4_NeedLift(P4_Source*, P4_Expression*);
 
 P4_PRIVATE(void)         P4_RaiseError(P4_Source*, P4_Error, P4_String);
 P4_PRIVATE(void)         P4_RescueError(P4_Source*);
+# define                 P4_RaiseErrorf(src,e,str,...) \
+    do { \
+        char buf[256]; \
+        sprintf(buf, (str), __VA_ARGS__); \
+        P4_RaiseError((s), (e), buf); \
+    } while (0);
 
 P4_PRIVATE(P4_Error)            P4_PushFrame(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Error)            P4_PopFrame(P4_Source*, P4_Frame*);
@@ -1679,7 +1685,9 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
             }
 
             if (min != SIZE_MAX && repeated < min) {
-                P4_RaiseError(s, P4_MatchError, "insufficient repetitions");
+                P4_RaiseErrorf(s, P4_MatchError,
+                        "Repeat at least %lu time(s). char %lu",
+                        min, s->pos);
                 goto finalize;
             } else {                       /* sufficient repetitions. */
                 P4_RescueError(s);
@@ -1857,6 +1865,7 @@ P4_Match(P4_Source* s, P4_Expression* e) {
     }
 
     if (s->err != P4_Ok) {
+        P4_RaiseErrorf(s, s->err, "Expected %s. char %lu", e->name, s->pos);
         P4_DeleteToken(result);
         goto finalize;
     }
@@ -4201,15 +4210,11 @@ finalize:
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalGrammar(P4_Token* token, P4_Grammar** result) {
-    P4_Error    err = P4_Ok;
-    size_t      i = 0;
+    P4_Error       err = P4_Ok;
+    size_t         i = 0;
 
     if ((*result = P4_CreateGrammar()) == NULL)
-        raise(
-            P4_MemoryError,
-            "%s",
-            "Failed to create grammar object. \n"
-        );
+        raise(P4_MemoryError, "%s\n", "Failed to create grammar object.");
 
     P4_Expression* rule = NULL;
     P4_Token*      child = NULL;
@@ -4294,7 +4299,7 @@ P4_LoadGrammar(P4_String rules) {
         raise(P4_MemoryError, "%s\n", "Failed to create source for PEG rules.");
 
     if ((err = P4_Parse(bootstrap, rules_src)) != P4_Ok)
-        raise(err, "Failed to parse rules: %s\n", P4_GetErrorMessage(rules_src));
+        raise(err, "%s\n", P4_GetErrorMessage(rules_src));
 
     if ((rules_tok = P4_GetSourceAst(rules_src)) == NULL)
         raise(P4_PegError, "%s\n", "Failed to get meta ast for PEG rules.");

@@ -12,6 +12,7 @@
 - [ ] api: left recursion. https://github.com/orlandohill/peg-left-recursion
 - [ ] api: register a function for matching source. This should help dealing with some inputs difficult to parse.
 - [ ] api: Support UTF-8 BOM sequence (0xEF 0xBB 0xBF) at the start of source.
+- [ ] api: add `expect_rule_id`, instead of saving `errmsg`.
 - [ ] peg: Numeric.
 - [ ] peg: Complement.
 - [ ] peg: Panic.

@@ -219,8 +219,7 @@ P4_Error my_inspect(P4_Token* token, void* userdata) {
 }
 
 void test_inspect(void) {
-    P4_Grammar* grammar = P4_LoadGrammar("entry = any any; any = .;");
-    TEST_ASSERT_NOT_NULL(grammar);
+    P4_Grammar* grammar = P4_LoadGrammarUnwrap("entry = any any; any = .;");
 
     P4_Source* source = P4_CreateSource("XX", 1);
     TEST_ASSERT_NOT_NULL(source);
@@ -242,8 +241,7 @@ P4_Error my_inspect2(P4_Token* token, void* userdata) {
 }
 
 void test_inspect2(void) {
-    P4_Grammar* grammar = P4_LoadGrammar("entry = any any; any = .;");
-    TEST_ASSERT_NOT_NULL(grammar);
+    P4_Grammar* grammar = P4_LoadGrammarUnwrap("entry = any any; any = .;");
 
     P4_Source* source = P4_CreateSource("XX", 1);
     TEST_ASSERT_NOT_NULL(source);
@@ -258,8 +256,7 @@ void test_inspect2(void) {
 }
 
 void test_acquire_source_ast(void) {
-    P4_Grammar* grammar = P4_LoadGrammar("entry = .;");
-    TEST_ASSERT_NOT_NULL(grammar);
+    P4_Grammar* grammar = P4_LoadGrammarUnwrap("entry = .;");
 
     P4_Source* source = P4_CreateSource("X", 1);
     TEST_ASSERT_NOT_NULL(source);

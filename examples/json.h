@@ -61,7 +61,7 @@ typedef enum {
 } P4_JSONRuleID;
 
 P4_Grammar*  P4_CreateJSONGrammar() {
-    return P4_LoadGrammar(
+    return P4_LoadGrammarUnwrap(
         "@lifted\n"
         "entry = &. value !.;\n"
 

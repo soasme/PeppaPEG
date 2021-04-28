@@ -76,7 +76,7 @@ typedef enum P4_DotRule {
 } P4_DotRule;
 
 P4_Grammar* P4_CreateDotGrammar() {
-    return P4_LoadGrammar(
+    return P4_LoadGrammarUnwrap(
         "@lifted\n"
         "entry = &. graph+ !.;\n"
 

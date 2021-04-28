@@ -3667,7 +3667,7 @@ finalize:
     return NULL;
 }
 
-# define TOKEN_ERROR_HINT_FMT "char %lu-%lu: %*.*s\n"
+# define TOKEN_ERROR_HINT_FMT "char %zu-%zu: %*.*s\n"
 # define TOKEN_ERROR_HINT \
                 token->slice.start.pos, \
                 token->slice.stop.pos, \
@@ -3911,7 +3911,7 @@ P4_PegEvalMembers(P4_Token* token, P4_Expression* expr) {
 finalize:
     if (err)
         raise(err,
-            "Failed to set %luth member. " TOKEN_ERROR_HINT_FMT,
+            "Failed to set %zuth member. " TOKEN_ERROR_HINT_FMT,
             i, TOKEN_ERROR_HINT
         );
     return err;
@@ -4044,7 +4044,7 @@ P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr) {
             UNREACHABLE();
             raise(
                 P4_ValueError,
-                "Unknown repeat kind: %lu" TOKEN_ERROR_HINT_FMT,
+                "Unknown repeat kind: %" PRIu64 TOKEN_ERROR_HINT_FMT,
                 token->head->next->rule_id, TOKEN_ERROR_HINT
             );
     }
@@ -4235,7 +4235,7 @@ P4_PegEvalGrammar(P4_Token* token, P4_Grammar** result) {
         catch(P4_PegEvalGrammarRule(child, &rule));
 
         if ((err = P4_AddGrammarRule(*result, id, rule)) != P4_Ok)
-            raise(err, "Failed to add %luth grammar rule.\n", id);
+            raise(err, "Failed to add %" PRIu64 "th grammar rule.\n", id);
 
         id++;
     }

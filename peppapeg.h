@@ -45,6 +45,7 @@ extern "C"
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 
 # ifndef P4_MALLOC
 # define P4_MALLOC malloc
@@ -155,6 +156,74 @@ extern "C"
 
 
 # define P4_MAX_RULE_NAME_LEN           32
+
+static void P4_Panic(const char * str)     __attribute__((noreturn));
+static void P4_Panic(const char * str)     { fputs(str, stderr); exit(1); }
+static void P4_Panicf(const char * fmt, ...) __attribute__((noreturn));
+static void P4_Panicf(const char * fmt, ...) { va_list args; va_start(args, fmt); vfprintf(stderr, fmt, args); exit(1); }
+
+#define P4_Result(type)             P4_Result_ ## type
+#define P4_ResultOk(type)           P4_Result_ ## type ## _Ok
+#define P4_ResultErr(type)          P4_Result_ ## type ## _Err
+#define P4_ResultIsOk(type)         P4_Result_ ## type ## _is_ok
+#define P4_ResultIsErr(type)        P4_Result_ ## type ## _is_err
+#define P4_ResultUnwrap(type)       P4_Result_ ## type ## _unwrap
+#define P4_ResultExpect(type)       P4_Result_ ## type ## _expect
+#define P4_ResultUnwrapOr(type)     P4_Result_ ## type ## _unwrap_or
+#define P4_ResultUnwrapErr(type)    P4_Result_ ## type ## _unwrap_err
+
+#define P4_DeclareResult(type)      \
+    typedef struct P4_Result(type) { \
+        type value;               \
+        /* string literals only */\
+        const char * err;         \
+    } P4_Result(type);               \
+    P4_Result(type)                 P4_ResultOk(type)(type value);        \
+    P4_Result(type)                 P4_ResultErr(type)(const char *err);  \
+    bool                            P4_ResultIsOk(type)(const P4_Result(type) *); \
+    bool                            P4_ResultIsErr(type)(const P4_Result(type) *); \
+    type                            P4_ResultUnwrap(type)(const P4_Result(type) *); \
+    type                            P4_ResultExpect(type)(const P4_Result(type) *, const char *); \
+    type                            P4_ResultUnwrapOr(type)(const P4_Result(type) *, type);      \
+    const char *                    P4_ResultUnwrapErr(type)(const P4_Result(type) *);
+
+#define P4_DefineResult(type) \
+    P4_Result(type) P4_ResultOk(type)(type value) { \
+        P4_Result(type) res = {                   \
+            .value = value,                    \
+            .err = NULL                        \
+        };                                     \
+        return res;                            \
+    } \
+    P4_Result(type) P4_ResultErr(type)(const char *err) { \
+        P4_Result(type) res = {          \
+            .err = err                \
+        };                            \
+        return res;                   \
+    } \
+    bool P4_ResultIsOk(type)(const P4_Result(type) * res) { \
+        return res->err == NULL;                        \
+    } \
+    bool P4_ResultIsErr(type)(const P4_Result(type) * res) { \
+        return res->err != NULL;                         \
+    } \
+    type P4_ResultUnwrap(type)(const P4_Result(type) * res) {                                 \
+        if (P4_ResultIsErr(type)(res)) P4_Panicf("Panic on wrapping result of type " #type ". " \
+                                                 "Error: %s\n", res->err); \
+        return res->value;                                                               \
+    } \
+    type P4_ResultExpect(type)(const P4_Result(type) * res, const char * message_on_err) { \
+        if (P4_ResultIsErr(type)(res)) P4_Panic(message_on_err);                          \
+        return res->value;                                                            \
+    } \
+    type P4_ResultUnwrapOr(type)(const P4_Result(type) * res, type else_val) { \
+        if (P4_ResultIsErr(type)(res)) return else_val;                     \
+        return res->value;                                                 \
+    } \
+    const char * P4_ResultUnwrapErr(type)(const P4_Result(type) * res) {                 \
+        if (P4_ResultIsOk(type)(res)) P4_Panic("Result was not an error; type: " #type); \
+        return res->err;                                                             \
+    }
 
 /*
  *
@@ -554,6 +623,10 @@ typedef struct P4_Grammar{
     /** The callback to free user data. */
     P4_UserDataFreeFunc     free_func;
 } P4_Grammar;
+
+typedef struct P4_Grammar* P4_GrammarPtr;
+
+P4_DeclareResult(P4_GrammarPtr);
 
 
 /*
@@ -2043,6 +2116,23 @@ P4_String      P4_StringifyPegGrammarRuleID(P4_RuleID id);
 /**
  * @brief       Load peg grammar from a string.
  * @param       rules   The rules string.
+ * @return      Result<Ok(Grammar), Err(P4_String)>.
+ *
+ * Example:
+ *
+ *      P4_Result(P4_GrammarPtr) grammar_r = P4_LoadGrammar(
+ *          "entry = one one;\n"
+ *          "one   = \"1\";\n"
+ *      );
+ *      P4_GrammarPtr grammar = P4_ResultUnwrap(P4_GrammarPtr)(&grammar);
+ *      P4_Source* source = P4_CreateSource("11", 1);
+ *      P4_Parse(grammar, source);
+ */
+P4_Result(P4_GrammarPtr)   P4_LoadGrammar(P4_String rules);
+
+/**
+ * @brief       Load peg grammar from a string.
+ * @param       rules   The rules string.
  * @return      The grammar object.
  *
  * Example:
@@ -2054,7 +2144,7 @@ P4_String      P4_StringifyPegGrammarRuleID(P4_RuleID id);
  *      P4_Source* source = P4_CreateSource("11", 1);
  *      P4_Parse(grammar, source);
  */
-P4_Grammar*    P4_LoadGrammar(P4_String rules);
+P4_GrammarPtr              P4_LoadGrammarUnwrap(P4_String rules);
 
 
 #ifdef __cplusplus

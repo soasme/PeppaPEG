@@ -33,6 +33,8 @@
 
 #include "peppapeg.h"
 
+P4_DefineResult(P4_GrammarPtr);
+
 /** It indicates the function or type is for public use. */
 # define P4_PUBLIC
 
@@ -4294,27 +4296,42 @@ P4_PegEval(P4_Token* token, void* result) {
     return P4_Ok;
 }
 
-P4_PUBLIC P4_Grammar*
+P4_PUBLIC P4_Result(P4_GrammarPtr)
 P4_LoadGrammar(P4_String rules) {
     P4_Grammar* bootstrap = NULL;
     P4_Grammar* grammar   = NULL;
     P4_Source*  rules_src = NULL;
     P4_Token*   rules_tok = NULL;
     P4_Error    err       = P4_Ok;
+    P4_String   errmsg    = NULL;
 
-    if ((bootstrap = P4_CreatePegGrammar()) == NULL)
-        raise(P4_MemoryError, "%s\n", "Failed to create bootstrap grammar.");
+    if ((bootstrap = P4_CreatePegGrammar()) == NULL) {
+        errmsg = "Failed to create bootstrap grammar.";
+        goto finalize;
+    }
 
-    if ((rules_src = P4_CreateSource(rules, P4_PegGrammar)) == NULL)
-        raise(P4_MemoryError, "%s\n", "Failed to create source for PEG rules.");
+    if ((rules_src = P4_CreateSource(rules, P4_PegGrammar)) == NULL) {
+        errmsg = "Failed to create source for PEG rules.";
+        goto finalize;
+    }
 
-    if ((err = P4_Parse(bootstrap, rules_src)) != P4_Ok)
-        raise(err, "Failed to parse rules: %s\n", P4_GetErrorMessage(rules_src));
+    if ((err = P4_Parse(bootstrap, rules_src)) != P4_Ok) {
+        /* TBD: */
+        /* errmsg = P4_GetErrorMessage(rules_src); */
+        errmsg = "Failed to parse PEG rules.";
+        goto finalize;
+    }
 
-    if ((rules_tok = P4_GetSourceAst(rules_src)) == NULL)
-        raise(P4_PegError, "%s\n", "Failed to get meta ast for PEG rules.");
+    if ((rules_tok = P4_GetSourceAst(rules_src)) == NULL) {
+        errmsg = "Failed to get meta ast for PEG rules.";
+        goto finalize;
+    }
 
-    catch(P4_PegEval(rules_tok, &grammar));
+    if ((err = P4_PegEval(rules_tok, &grammar)) != P4_Ok) {
+        errmsg = "Failed to evaluate meta ast for PEG rules.";
+        goto finalize;
+    }
+
 
 finalize:
     if (rules_src)
@@ -4323,5 +4340,14 @@ finalize:
     if (bootstrap)
         P4_DeleteGrammar(bootstrap);
 
-    return grammar;
+    if (errmsg)
+        return P4_ResultErr(P4_GrammarPtr)(errmsg);
+
+    return P4_ResultOk(P4_GrammarPtr)(grammar);
+}
+
+P4_PUBLIC P4_GrammarPtr
+P4_LoadGrammarUnwrap(P4_String rules) {
+    P4_Result(P4_GrammarPtr) result = P4_LoadGrammar(rules);
+    return P4_ResultUnwrap(P4_GrammarPtr) (&result);
 }

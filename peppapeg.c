@@ -1858,6 +1858,14 @@ P4_Match(P4_Source* s, P4_Expression* e) {
 
     if (s->err != P4_Ok) {
         P4_DeleteToken(result);
+        if (e->name != NULL && memcmp(s->errmsg, "expect", 6) != 0) {
+            size_t len = strlen(e->name);
+            P4_String errmsg = P4_MALLOC(sizeof(char) * (len+8));
+            memset(errmsg, 0, len);
+            sprintf(errmsg, "expect %s", e->name);
+            P4_RaiseError(s, s->err, errmsg);
+            P4_FREE(errmsg);
+        }
         goto finalize;
     }
 
@@ -2434,6 +2442,9 @@ P4_SetGrammarRuleName(P4_Grammar* grammar, P4_RuleID id, P4_String name) {
 
     if (expr == NULL)
         return P4_NullError;
+
+    if (strlen(name) >= P4_MAX_RULE_NAME_LEN)
+        return P4_ValueError;
 
     if (expr->name != NULL)
         P4_FREE(expr->name);
@@ -3611,7 +3622,11 @@ P4_Grammar* P4_CreatePegGrammar () {
     if (P4_Ok != P4_SetGrammarRuleName(grammar, P4_PegRuleRule, "rule"))
         goto finalize;
 
-    if (P4_Ok != P4_AddOnceOrMore(grammar, P4_PegGrammar, P4_CreateReference(P4_PegRuleRule)))
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegGrammar, 3,
+        P4_CreateStartOfInput(),
+        P4_CreateOnceOrMore(P4_CreateReference(P4_PegRuleRule)),
+        P4_CreateEndOfInput()
+    ))
         goto finalize;
 
     if (P4_Ok != P4_SetGrammarRuleName(grammar, P4_PegGrammar, "grammar"))
@@ -3652,7 +3667,7 @@ finalize:
     return NULL;
 }
 
-# define TOKEN_ERROR_HINT_FMT "char %lu-%lu: %*.*s\n"
+# define TOKEN_ERROR_HINT_FMT "char %zu-%zu: %*.*s\n"
 # define TOKEN_ERROR_HINT \
                 token->slice.start.pos, \
                 token->slice.stop.pos, \
@@ -3896,7 +3911,7 @@ P4_PegEvalMembers(P4_Token* token, P4_Expression* expr) {
 finalize:
     if (err)
         raise(err,
-            "Failed to set %luth member. " TOKEN_ERROR_HINT_FMT,
+            "Failed to set %zuth member. " TOKEN_ERROR_HINT_FMT,
             i, TOKEN_ERROR_HINT
         );
     return err;
@@ -4029,7 +4044,7 @@ P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr) {
             UNREACHABLE();
             raise(
                 P4_ValueError,
-                "Unknown repeat kind: %lu" TOKEN_ERROR_HINT_FMT,
+                "Unknown repeat kind: %" PRIu64 TOKEN_ERROR_HINT_FMT,
                 token->head->next->rule_id, TOKEN_ERROR_HINT
             );
     }
@@ -4220,7 +4235,7 @@ P4_PegEvalGrammar(P4_Token* token, P4_Grammar** result) {
         catch(P4_PegEvalGrammarRule(child, &rule));
 
         if ((err = P4_AddGrammarRule(*result, id, rule)) != P4_Ok)
-            raise(err, "Failed to add %luth grammar rule.\n", id);
+            raise(err, "Failed to add %" PRIu64 "th grammar rule.\n", id);
 
         id++;
     }
@@ -4287,26 +4302,19 @@ P4_LoadGrammar(P4_String rules) {
     P4_Token*   rules_tok = NULL;
     P4_Error    err       = P4_Ok;
 
-    bootstrap = P4_CreatePegGrammar();
-    if (bootstrap == NULL)
-        goto finalize;
+    if ((bootstrap = P4_CreatePegGrammar()) == NULL)
+        raise(P4_MemoryError, "%s\n", "Failed to create bootstrap grammar.");
 
-    rules_src = P4_CreateSource(rules, P4_PegGrammar);
-    if (rules_src == NULL)
-        goto finalize;
+    if ((rules_src = P4_CreateSource(rules, P4_PegGrammar)) == NULL)
+        raise(P4_MemoryError, "%s\n", "Failed to create source for PEG rules.");
 
-    if (P4_Ok != (err = P4_Parse(bootstrap, rules_src))) {
-        ASSERT(0, P4_GetErrorMessage(rules_src));
-        goto finalize;
-    }
+    if ((err = P4_Parse(bootstrap, rules_src)) != P4_Ok)
+        raise(err, "Failed to parse rules: %s\n", P4_GetErrorMessage(rules_src));
 
-    rules_tok = P4_GetSourceAst(rules_src);
-    if (rules_tok == NULL)
-        goto finalize;
+    if ((rules_tok = P4_GetSourceAst(rules_src)) == NULL)
+        raise(P4_PegError, "%s\n", "Failed to get meta ast for PEG rules.");
 
-    if (P4_Ok != (err = P4_PegEval(rules_tok, &grammar))) {
-        goto finalize;
-    }
+    catch(P4_PegEval(rules_tok, &grammar));
 
 finalize:
     if (rules_src)

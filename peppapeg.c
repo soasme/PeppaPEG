@@ -34,6 +34,7 @@
 #include "peppapeg.h"
 
 P4_DefineResult(P4_GrammarPtr);
+P4_DefineResult(size_t);
 
 /** It indicates the function or type is for public use. */
 # define P4_PUBLIC
@@ -204,9 +205,9 @@ P4_PRIVATE(P4_Token*)           P4_MatchRepeat(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchSpacedExpressions(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchBackReference(P4_Source*, P4_Expression*, P4_Slice*, P4_Expression*);
 
-P4_PRIVATE(P4_Error)            P4_PegEvalFlag(P4_Token* token, P4_ExpressionFlag *flag);
-P4_PRIVATE(P4_Error)            P4_PegEvalRuleFlags(P4_Token* token, P4_ExpressionFlag* flag);
-P4_PRIVATE(P4_Error)            P4_PegEvalNumber(P4_Token* token, size_t* num);
+P4_PRIVATE(P4_ExpressionFlag)   P4_PegEvalFlag(P4_Token* token);
+P4_PRIVATE(P4_ExpressionFlag)   P4_PegEvalRuleFlags(P4_Token* token);
+P4_PRIVATE(P4_Result(size_t))   P4_PegEvalNumber(P4_Token* token);
 P4_PRIVATE(P4_Error)            P4_PegEvalChar(P4_Token* token, P4_Rune* rune);
 P4_PRIVATE(P4_Error)            P4_PegEvalLiteral(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalInsensitiveLiteral(P4_Token* token, P4_Expression** expr);
@@ -3678,75 +3679,56 @@ finalize:
                 token->text + token->slice.start.pos
 
 
-P4_PRIVATE(P4_Error)
-P4_PegEvalFlag(P4_Token* token, P4_ExpressionFlag *flag) {
-    P4_Error  err       = P4_Ok;
+P4_PRIVATE(P4_ExpressionFlag)
+P4_PegEvalFlag(P4_Token* token) {
     P4_String token_str = token->text + token->slice.start.pos;
     size_t    token_len = P4_GetSliceSize(&token->slice);
 
     if (memcmp("@squashed", token_str, token_len) == 0)
-        *flag = P4_FLAG_SQUASHED;
+        return P4_FLAG_SQUASHED;
     else if (memcmp("@scoped", token_str, token_len) == 0)
-        *flag = P4_FLAG_SCOPED;
+        return P4_FLAG_SCOPED;
     else if (memcmp("@spaced", token_str, token_len) == 0)
-        *flag = P4_FLAG_SPACED;
+        return P4_FLAG_SPACED;
     else if (memcmp("@lifted", token_str, token_len) == 0)
-        *flag = P4_FLAG_LIFTED;
+        return P4_FLAG_LIFTED;
     else if (memcmp("@tight", token_str, token_len) == 0)
-        *flag = P4_FLAG_TIGHT;
+        return P4_FLAG_TIGHT;
     else if (memcmp("@nonterminal", token_str, token_len) == 0)
-        *flag = P4_FLAG_NON_TERMINAL;
+        return P4_FLAG_NON_TERMINAL;
     else {
         /* P4_CreatePegRule() guarantees only 6 kinds of strings are possible. */
         UNREACHABLE();
-        raise(
-            P4_ValueError,
-            "Invalid flag: %s" TOKEN_ERROR_HINT_FMT,
-            token_str, TOKEN_ERROR_HINT
-        );
+        P4_Panicf("Invalid flag: %s" TOKEN_ERROR_HINT_FMT, token_str, TOKEN_ERROR_HINT);
     }
-
-    return P4_Ok;
-finalize:
-    *flag = 0;
-    return err;
 }
 
-P4_PRIVATE(P4_Error)
-P4_PegEvalRuleFlags(P4_Token* token, P4_ExpressionFlag* flag) {
-    P4_Error          err        = P4_Ok;
-    P4_Token*         child      = NULL;
-    P4_ExpressionFlag child_flag = 0;
+P4_PRIVATE(P4_ExpressionFlag)
+P4_PegEvalRuleFlags(P4_Token* token) {
+    P4_Token*         child  = NULL;
+    P4_ExpressionFlag result = 0;
 
-    for (child = token->head; child != NULL; child = child->next) {
-        catch(P4_PegEvalFlag(child, &child_flag));
-        *flag |= child_flag;
-    }
-    return P4_Ok;
+    for (child = token->head; child != NULL; child = child->next)
+        result |= P4_PegEvalFlag(child);
 
-finalize:
-    *flag = 0;
-    return err;
+    return result;
 }
 
-P4_PRIVATE(P4_Error)
-P4_PegEvalNumber(P4_Token* token, size_t* num) {
-    P4_Error  err = P4_Ok;
-    P4_String str = NULL;
+P4_PRIVATE(P4_Result(size_t))
+P4_PegEvalNumber(P4_Token* token) {
+    P4_String str = NULL, endstr = NULL;
 
-    if ((str = P4_CopyTokenString(token)) == NULL) {
-        *num = 0;
-        raise(
-            P4_MemoryError,
-            "Failed to copy number string. " TOKEN_ERROR_HINT_FMT,
-            TOKEN_ERROR_HINT
-        );
-    }
+    if ((str = P4_CopyTokenString(token)) == NULL)
+        return P4_ResultErr(size_t)("PegError: failed to copy number string");
 
-    *num = atol(str);
-finalize:
+    size_t number = strtoul(str, &endstr, 10);
+
+    if ((endstr - str) != P4_GetSliceSize(&token->slice))
+        return P4_ResultErr(size_t)("PegError: failed to eval number string");
+
     P4_FREE(str);
-    return err;
+
+    return P4_ResultOk(size_t)(number);
 }
 
 P4_PRIVATE(P4_Error)
@@ -3754,10 +3736,10 @@ P4_PegEvalChar(P4_Token* token, P4_Rune* rune) {
     size_t size = P4_ReadEscapedRune(token->text+token->slice.start.pos, rune);
 
     if (size == 0)
-        return P4_ValueError;
+        P4_Panicf("Invalid char. " TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
 
     if (token->slice.start.pos+size > token->slice.stop.pos)
-        return P4_ValueError;
+        P4_Panicf("Char overflow. " TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
 
     return P4_Ok;
 }
@@ -4152,7 +4134,7 @@ P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result) {
     for (child = token->head; child != NULL; child = child->next)
         switch (child->rule_id) {
             case P4_PegRuleRuleDecorators:
-                catch(P4_PegEvalRuleFlags(child, &rule_flag));
+                rule_flag = P4_PegEvalRuleFlags(child);
                 break;
             case P4_PegRuleRuleName:
                 catch(P4_PegEvalRuleName(child, &rule_name));
@@ -4260,11 +4242,21 @@ P4_PUBLIC P4_Error
 P4_PegEval(P4_Token* token, void* result) {
     switch (token->rule_id) {
         case P4_PegRuleDecorator:
-            return P4_PegEvalFlag(token, result);
+            *(P4_ExpressionFlag*)result = P4_PegEvalFlag(token);
+            return P4_Ok;
         case P4_PegRuleRuleDecorators:
-            return P4_PegEvalRuleFlags(token, result);
-        case P4_PegRuleNumber:
-            return P4_PegEvalNumber(token, result);
+            *(P4_ExpressionFlag*)result = P4_PegEvalRuleFlags(token);
+            return P4_Ok;
+        case P4_PegRuleNumber: {
+            P4_Result(size_t) r = P4_PegEvalNumber(token);
+            if (P4_ResultIsOk(size_t)(&r)) {
+                *(size_t*)result = P4_ResultUnwrap(size_t)(&r);
+                return P4_Ok;
+            } else {
+                fprintf(stderr, "%s\n", P4_ResultUnwrapErr(size_t)(&r));
+                return P4_PegError;
+            }
+        }
         case P4_PegRuleChar:
             return P4_PegEvalChar(token, result);
         case P4_PegRuleLiteral:
@@ -4291,6 +4283,7 @@ P4_PegEval(P4_Token* token, void* result) {
             return P4_PegEvalGrammar(token, result);
         default:
             UNREACHABLE();
+            P4_Panicf("Invalid rule id: " PRIu64 "\n", token->rule_id);
             return P4_ValueError;
     }
     return P4_Ok;

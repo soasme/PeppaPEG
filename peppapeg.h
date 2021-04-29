@@ -627,6 +627,7 @@ typedef struct P4_Grammar{
 typedef struct P4_Grammar* P4_GrammarPtr;
 
 P4_DeclareResult(P4_GrammarPtr);
+P4_DeclareResult(size_t);
 
 
 /*
@@ -2116,7 +2117,7 @@ P4_String      P4_StringifyPegGrammarRuleID(P4_RuleID id);
 /**
  * @brief       Load peg grammar from a string.
  * @param       rules   The rules string.
- * @return      Result<Ok(Grammar), Err(P4_String)>.
+ * @return      P4_Result<Ok(P4_GrammarPtr), Err(P4_String)>.
  *
  * Example:
  *
@@ -2124,7 +2125,7 @@ P4_String      P4_StringifyPegGrammarRuleID(P4_RuleID id);
  *          "entry = one one;\n"
  *          "one   = \"1\";\n"
  *      );
- *      P4_GrammarPtr grammar = P4_ResultUnwrap(P4_GrammarPtr)(&grammar);
+ *      P4_GrammarPtr grammar = P4_ResultUnwrap(P4_GrammarPtr)(&grammar_r);
  *      P4_Source* source = P4_CreateSource("11", 1);
  *      P4_Parse(grammar, source);
  */

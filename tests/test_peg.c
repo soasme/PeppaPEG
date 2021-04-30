@@ -4,7 +4,7 @@
 
 
 # define ASSERT_BAD_GRAMMAR(rule, err) do {\
-    P4_Result(P4_GrammarPtr) result = P4_LoadGrammar((rule)); \
+    P4_Result(P4_GrammarPtr) result = P4_LoadGrammarResult((rule)); \
     const char* actual_err = P4_ResultUnwrapErr(P4_GrammarPtr)(&result); \
     TEST_ASSERT_EQUAL_STRING((err), actual_err); \
 } while (0);
@@ -477,7 +477,7 @@ void test_eval_reference(void) {
 }
 
 #define ASSERT_EVAL_GRAMMAR(peg_rules, entry_name, source_code, parse_code, ast) do { \
-    P4_Grammar*     grammar = P4_LoadGrammarUnwrap((peg_rules)); \
+    P4_Grammar*     grammar = P4_LoadGrammar((peg_rules)); \
     P4_Expression*  entry = P4_GetGrammarRuleByName(grammar, (entry_name)); \
     TEST_ASSERT_NOT_NULL_MESSAGE(entry, "peg entry rule should created."); \
     P4_Source*      source  = P4_CreateSource((source_code), entry->id); \

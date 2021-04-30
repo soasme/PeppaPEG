@@ -632,6 +632,7 @@ typedef struct P4_Grammar{
 
 P4_DeclareResult(P4_GrammarPtr);
 P4_DeclareResult(P4_ExpressionPtr);
+P4_DeclareResult(P4_String);
 P4_DeclareResult(size_t);
 
 

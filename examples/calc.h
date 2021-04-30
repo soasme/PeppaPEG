@@ -65,8 +65,8 @@ typedef enum {
     P4_CalcEol          = 12,
 } P4_CalcRuleID;
 
-P4_Grammar*  P4_CreateCalcGrammar() {
-    return P4_LoadGrammarUnwrap(
+P4_GrammarPtr  P4_CreateCalcGrammar() {
+    return P4_LoadGrammar(
         "statement = term eol;\n"
 
         "@nonterminal\n"

@@ -224,8 +224,8 @@ P4_PRIVATE(P4_Result(P4_ExpressionPtr)) P4_PegEvalRepeat(P4_Token* token);
 P4_PRIVATE(P4_Result(P4_ExpressionPtr)) P4_PegEvalDot(P4_Token* token);
 P4_PRIVATE(P4_Result(P4_String)) P4_PegEvalRuleName(P4_Token* token);
 P4_PRIVATE(P4_Result(P4_ExpressionPtr)) P4_PegEvalReference(P4_Token* token);
-P4_PRIVATE(P4_Error)            P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result);
-P4_PRIVATE(P4_Error)            P4_PegEvalGrammarReferences(P4_GrammarPtr grammar, P4_Expression* expr);
+P4_PRIVATE(P4_Result(P4_ExpressionPtr)) P4_PegEvalGrammarRule(P4_Token* token);
+P4_PRIVATE(const char *)            P4_PegEvalGrammarReferences(P4_GrammarPtr grammar, P4_Expression* expr);
 P4_PRIVATE(P4_Result(P4_GrammarPtr)) P4_PegEvalGrammar(P4_Token* token);
 
 static P4_RuneRange _C[] = {
@@ -4150,14 +4150,13 @@ finalize:
     return P4_ResultErr(P4_ExpressionPtr)(errmsg);
 }
 
-P4_PRIVATE(P4_Error)
-P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result) {
+P4_PRIVATE(P4_Result(P4_ExpressionPtr))
+P4_PegEvalGrammarRule(P4_Token* token) {
     P4_String           rule_name = NULL;
     P4_ExpressionFlag   rule_flag = 0;
     P4_Token*           child     = NULL;
-    P4_Error            err       = P4_Ok;
-
-    *result = NULL;
+    const char*         errmsg    = NULL;
+    P4_ExpressionPtr    expr      = NULL;
 
     for (child = token->head; child != NULL; child = child->next)
         switch (child->rule_id) {
@@ -4168,60 +4167,78 @@ P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result) {
                 P4_Result(P4_String) rule_name_res = P4_PegEvalRuleName(child);
 
                 if (P4_ResultIsErr(P4_String)(&rule_name_res)) {
-                    err = P4_PegError;
+                    errmsg = P4_ResultUnwrapErr(P4_String)(&rule_name_res);
                     goto finalize;
                 }
 
                 rule_name = P4_ResultUnwrap (P4_String) (&rule_name_res);
                 break;
             }
-            default:
-                catch(P4_PegEval(child, result));
+            default: {
+                P4_Result(P4_ExpressionPtr) expr_res = P4_PegEvalExpression(child);
+
+                if (P4_ResultIsErr(P4_ExpressionPtr)(&expr_res)) {
+                    errmsg = P4_ResultUnwrapErr(P4_ExpressionPtr)(&expr_res);
+                    goto finalize;
+                }
+
+                expr = P4_ResultUnwrap (P4_ExpressionPtr) (&expr_res);
                 break;
+            }
         }
 
-    (*result)->name = rule_name;
-    (*result)->flag = rule_flag;
-    return P4_Ok;
+    expr->name = rule_name;
+    expr->flag = rule_flag;
+    return P4_ResultOk(P4_ExpressionPtr)(expr);
 
 finalize:
     if (rule_name) P4_FREE(rule_name);
-    if (*result)   P4_DeleteExpression(*result);
-    return err;
+    if (expr) P4_DeleteExpression(expr);
+
+    return P4_ResultErr(P4_ExpressionPtr)(errmsg);
 }
 
-P4_PRIVATE(P4_Error)
+P4_PRIVATE(const char *)
 P4_PegEvalGrammarReferences(P4_GrammarPtr grammar, P4_Expression* expr) {
     size_t   i   = 0;
-    P4_Error err = P4_Ok;
+    const char* errmsg = NULL;
 
-    if (expr == NULL)
-        raise(P4_NullError, "Failed to resolve references: %p.\n", expr);
+    if (expr == NULL) {
+        errmsg = "Failed to resolve references.";
+        goto finalize;
+    }
 
     switch (expr->kind) {
         case P4_Positive:
         case P4_Negative:
             if (expr->ref_expr)
-                catch(P4_PegEvalGrammarReferences(grammar, expr->ref_expr));
+                if ((errmsg = P4_PegEvalGrammarReferences(grammar, expr->ref_expr)) != NULL)
+                    goto finalize;
             break;
         case P4_Sequence:
         case P4_Choice:
             for (i = 0; i < expr->count; i++)
                 if (expr->members[i])
-                    catch(P4_PegEvalGrammarReferences(grammar, expr->members[i]));
+                    if ((errmsg = P4_PegEvalGrammarReferences(grammar, expr->members[i])) != NULL)
+                        goto finalize;
             break;
         case P4_Repeat:
             if (expr->repeat_expr)
-                catch(P4_PegEvalGrammarReferences(grammar, expr->repeat_expr));
+                if ((errmsg = P4_PegEvalGrammarReferences(grammar, expr->repeat_expr)) != NULL)
+                    goto finalize;
             break;
         case P4_Reference:
         {
-            if (expr->reference == NULL)
-                raise(P4_ValueError, "Reference name is not set: %p\n", expr->reference);
+            if (expr->reference == NULL) {
+                errmsg = "Reference name is not set.";
+                goto finalize;
+            }
 
             P4_Expression* ref = P4_GetGrammarRuleByName(grammar, expr->reference);
-            if (ref == NULL)
-                raise(P4_NameError, "Reference name is not resolved: %s\n", expr->reference);
+            if (ref == NULL) {
+                errmsg = "Reference name is not resolved.";
+                goto finalize;
+            }
 
             expr->ref_id = ref->id;
             break;
@@ -4231,7 +4248,7 @@ P4_PegEvalGrammarReferences(P4_GrammarPtr grammar, P4_Expression* expr) {
     }
 
 finalize:
-    return err;
+    return errmsg;
 }
 
 P4_PRIVATE(P4_Result(P4_GrammarPtr))
@@ -4240,6 +4257,7 @@ P4_PegEvalGrammar(P4_Token* token) {
     P4_GrammarPtr grammar = NULL;
     size_t      i = 0;
     P4_Expression* rule = NULL;
+    P4_Result(P4_ExpressionPtr) rule_res = {0};
     P4_Token*      child = NULL;
     P4_RuleID      id = 1;
 
@@ -4250,10 +4268,14 @@ P4_PegEvalGrammar(P4_Token* token) {
 
     /* Eval grammar rules. */
     for (child = token->head; child != NULL; child = child->next) {
-        if (P4_PegEvalGrammarRule(child, &rule) != P4_Ok) {
-            errmsg = "Failed to eval grammar rule.";
+        rule_res = P4_PegEvalGrammarRule(child);
+
+        if (P4_ResultIsErr(P4_ExpressionPtr)(&rule_res)) {
+            errmsg = P4_ResultUnwrapErr(P4_ExpressionPtr)(&rule_res);
             goto finalize;
         }
+
+        rule = P4_ResultUnwrap(P4_ExpressionPtr)(&rule_res);
 
         if (P4_AddGrammarRule(grammar, id, rule) != P4_Ok) {
             errmsg = "Failed to add grammar rule.";
@@ -4265,8 +4287,7 @@ P4_PegEvalGrammar(P4_Token* token) {
 
     /* Resolve named references. */
     for (i = 0; i < grammar->count; i++)
-        if (P4_PegEvalGrammarReferences(grammar, grammar->rules[i]) != P4_Ok) {
-            errmsg = "Failed to resolve grammar rule:.";
+        if ((errmsg = P4_PegEvalGrammarReferences(grammar, grammar->rules[i])) != NULL) {
             goto finalize;
         }
 

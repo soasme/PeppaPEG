@@ -590,15 +590,18 @@ typedef struct P4_Token {
     struct P4_Token*        tail;
 } P4_Token;
 
+typedef struct P4_Grammar* P4_GrammarPtr;
+
 /**
  * The callback for a successful match.
  */
-typedef P4_Error (*P4_MatchCallback)(struct P4_Grammar*, struct P4_Expression*, struct P4_Token*);
+typedef P4_Error (*P4_MatchCallback)(P4_GrammarPtr, struct P4_Expression*, struct P4_Token*);
 
 /**
  * The callback for a failure match.
  */
-typedef P4_Error (*P4_ErrorCallback)(struct P4_Grammar*, struct P4_Expression*);
+typedef P4_Error (*P4_ErrorCallback)(P4_GrammarPtr, struct P4_Expression*);
+
 
 /**
  * The grammar object that holds all grammar rules.
@@ -624,7 +627,6 @@ typedef struct P4_Grammar{
     P4_UserDataFreeFunc     free_func;
 } P4_Grammar;
 
-typedef struct P4_Grammar* P4_GrammarPtr;
 
 P4_DeclareResult(P4_GrammarPtr);
 P4_DeclareResult(size_t);
@@ -725,7 +727,7 @@ P4_Expression* P4_CreateLiteral(const P4_String, bool sensitive);
  *
  *      P4_AddLiteral(grammar, 1, "let", true);
  */
-P4_Error       P4_AddLiteral(P4_Grammar*, P4_RuleID, const P4_String, bool sensitive);
+P4_Error       P4_AddLiteral(P4_GrammarPtr, P4_RuleID, const P4_String, bool sensitive);
 
 /*
  * ██████╗░░█████╗░███╗░░██╗░██████╗░███████╗
@@ -788,7 +790,7 @@ P4_Expression* P4_CreateRanges(size_t count, P4_RuneRange* ranges);
  *
  *      P4_AddRange(grammar, 1, 0x4E00, 0x9FFF, 1);
  */
-P4_Error       P4_AddRange(P4_Grammar*, P4_RuleID, P4_Rune, P4_Rune, size_t);
+P4_Error       P4_AddRange(P4_GrammarPtr, P4_RuleID, P4_Rune, P4_Rune, size_t);
 
 /**
  * Add sub-ranges expression as grammar rule.
@@ -807,7 +809,7 @@ P4_Error       P4_AddRange(P4_Grammar*, P4_RuleID, P4_Rune, P4_Rune, size_t);
  *          alphadigits
  *      );
  */
-P4_Error       P4_AddRanges(P4_Grammar*, P4_RuleID, size_t count, P4_RuneRange* ranges);
+P4_Error       P4_AddRanges(P4_GrammarPtr, P4_RuleID, size_t count, P4_RuneRange* ranges);
 
 /*
  * ██████╗░███████╗███████╗███████╗██████╗░███████╗███╗░░██╗░█████╗░███████╗
@@ -844,7 +846,7 @@ P4_Expression* P4_CreateReference(P4_RuleID);
  *
  *      P4_AddReference(grammar, 1, 2);
  */
-P4_Error       P4_AddReference(P4_Grammar*, P4_RuleID, P4_RuleID);
+P4_Error       P4_AddReference(P4_GrammarPtr, P4_RuleID, P4_RuleID);
 
 /*
  * ██████╗░░█████╗░░██████╗██╗████████╗██╗██╗░░░██╗███████╗
@@ -882,7 +884,7 @@ P4_Expression* P4_CreatePositive(P4_Expression*);
  *
  *      P4_AddPositive(grammar, 1, P4_CreateLiteral("let", true));
  */
-P4_Error       P4_AddPositive(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_Error       P4_AddPositive(P4_GrammarPtr, P4_RuleID, P4_Expression*);
 
 /*
  * ███╗░░██╗███████╗░██████╗░░█████╗░████████╗██╗██╗░░░██╗███████╗
@@ -919,7 +921,7 @@ P4_Expression* P4_CreateNegative(P4_Expression*);
  *
  *      P4_AddNegative(grammar, 1, P4_CreateLiteral("let", true));
  */
-P4_Error       P4_AddNegative(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_Error       P4_AddNegative(P4_GrammarPtr, P4_RuleID, P4_Expression*);
 
 /*
  * ░██████╗███████╗░██████╗░██╗░░░██╗███████╗███╗░░██╗░█████╗░███████╗
@@ -984,7 +986,7 @@ P4_Expression* P4_CreateSequenceWithMembers(size_t, ...);
  *
  * This function can be useful if you need to add members dynamically.
  */
-P4_Error       P4_AddSequence(P4_Grammar*, P4_RuleID, size_t);
+P4_Error       P4_AddSequence(P4_GrammarPtr, P4_RuleID, size_t);
 
 /**
  * Add a sequence expression as grammar rule.
@@ -1003,7 +1005,7 @@ P4_Error       P4_AddSequence(P4_Grammar*, P4_RuleID, size_t);
  *          P4_CreateLiteral("}")
  *      );
  */
-P4_Error       P4_AddSequenceWithMembers(P4_Grammar*, P4_RuleID, size_t, ...);
+P4_Error       P4_AddSequenceWithMembers(P4_GrammarPtr, P4_RuleID, size_t, ...);
 
 /*
  * ░█████╗░██╗░░██╗░█████╗░██╗░█████╗░███████╗
@@ -1068,7 +1070,7 @@ P4_Expression* P4_CreateChoiceWithMembers(size_t, ...);
  *
  * This function can be useful if you need to add members dynamically.
  */
-P4_Error       P4_AddChoice(P4_Grammar*, P4_RuleID, size_t);
+P4_Error       P4_AddChoice(P4_GrammarPtr, P4_RuleID, size_t);
 
 /**
  * Add a choice expression as grammar rule.
@@ -1087,7 +1089,7 @@ P4_Error       P4_AddChoice(P4_Grammar*, P4_RuleID, size_t);
  *          P4_CreateLiteral("\n")
  *      );
  */
-P4_Error       P4_AddChoiceWithMembers(P4_Grammar*, P4_RuleID, size_t, ...);
+P4_Error       P4_AddChoiceWithMembers(P4_GrammarPtr, P4_RuleID, size_t, ...);
 
 /*
  * ██████╗░███████╗██████╗░███████╗░█████╗░████████╗
@@ -1134,7 +1136,7 @@ P4_Expression* P4_CreateRepeatMinMax(P4_Expression*, size_t, size_t);
  *          1, 3
  *      );
  */
-P4_Error       P4_AddRepeatMinMax(P4_Grammar*, P4_RuleID, P4_Expression*, size_t, size_t);
+P4_Error       P4_AddRepeatMinMax(P4_GrammarPtr, P4_RuleID, P4_Expression*, size_t, size_t);
 
 /*
  * ██████╗░███████╗██████╗░███████╗░█████╗░████████╗
@@ -1176,7 +1178,7 @@ P4_Expression* P4_CreateRepeatMin(P4_Expression*, size_t);
  *      // It can match string "a", "aa", "aaa", ....
  *      P4_AddRepeatMin(grammar, 1, P4_CreateLiteral("a", true), 1);
  */
-P4_Error       P4_AddRepeatMin(P4_Grammar*, P4_RuleID, P4_Expression*, size_t);
+P4_Error       P4_AddRepeatMin(P4_GrammarPtr, P4_RuleID, P4_Expression*, size_t);
 
 /*
  * ██████╗░███████╗██████╗░███████╗░█████╗░████████╗
@@ -1218,7 +1220,7 @@ P4_Expression* P4_CreateRepeatMax(P4_Expression*, size_t);
  *      // It can match string "", "a", "aa", "aaa".
  *      P4_AddRepeatMax(grammar, 1, P4_CreateLiteral("a", true), 3);
  */
-P4_Error       P4_AddRepeatMax(P4_Grammar*, P4_RuleID, P4_Expression*, size_t);
+P4_Error       P4_AddRepeatMax(P4_GrammarPtr, P4_RuleID, P4_Expression*, size_t);
 
 /*
  * ██████╗░███████╗██████╗░███████╗░█████╗░████████╗
@@ -1261,7 +1263,7 @@ P4_Expression* P4_CreateRepeatExact(P4_Expression*, size_t);
  *      // It can match string "aaa".
  *      P4_AddRepeatExact(P4_CreateLiteral("a", true), 3);
  */
-P4_Error       P4_AddRepeatExact(P4_Grammar*, P4_RuleID, P4_Expression*, size_t);
+P4_Error       P4_AddRepeatExact(P4_GrammarPtr, P4_RuleID, P4_Expression*, size_t);
 
 /*
  * ██████╗░███████╗██████╗░███████╗░█████╗░████████╗░█████╗░
@@ -1304,7 +1306,7 @@ P4_Expression* P4_CreateZeroOrOnce(P4_Expression*);
  *
  * It's equivalent to P4_CreateRepeatMinMax(expr, 0, 1);
  */
-P4_Error       P4_AddZeroOrOnce(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_Error       P4_AddZeroOrOnce(P4_GrammarPtr, P4_RuleID, P4_Expression*);
 
 /*
  * ██████╗░███████╗██████╗░███████╗░█████╗░████████╗██╗░░██╗
@@ -1345,7 +1347,7 @@ P4_Expression* P4_CreateZeroOrMore(P4_Expression*);
  *      // It can match string "" or "a".
  *      P4_AddZeroOrMore(grammar, 1, P4_CreateLiteral("a", true));
  */
-P4_Error       P4_AddZeroOrMore(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_Error       P4_AddZeroOrMore(P4_GrammarPtr, P4_RuleID, P4_Expression*);
 
 /*
  * ██████╗░███████╗██████╗░███████╗░█████╗░████████╗░░░░░░░
@@ -1386,7 +1388,7 @@ P4_Expression* P4_CreateOnceOrMore(P4_Expression*);
  *      // It can match string "a", "aa", "aaa", ....
  *      P4_AddOnceOrMore(grammar, 1, P4_CreateLiteral("a", true));
  */
-P4_Error       P4_AddOnceOrMore(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_Error       P4_AddOnceOrMore(P4_GrammarPtr, P4_RuleID, P4_Expression*);
 
 /*
  * ██████╗░░█████╗░░█████╗░██╗░░██╗██████╗░███████╗███████╗███████╗██████╗░███████╗███╗░░██╗░█████╗░███████╗
@@ -1531,7 +1533,7 @@ P4_Expression* P4_CreateEndOfInput();
  *
  *      P4_Expression* row = P4_AddJoin(grammar, 1, ",", Element);
  */
-P4_Error P4_AddJoin(P4_Grammar* grammar, P4_RuleID id, const P4_String joiner, P4_RuleID rule_id);
+P4_Error P4_AddJoin(P4_GrammarPtr grammar, P4_RuleID id, const P4_String joiner, P4_RuleID rule_id);
 
 /**
  * Create a Join expression.
@@ -1637,9 +1639,9 @@ void           P4_SetExpressionFlag(P4_Expression*, P4_ExpressionFlag);
  *
  * Example:
  *
- *      P4_Grammar*     grammar = P4_CreateGrammar();
+ *      P4_GrammarPtr     grammar = P4_CreateGrammar();
  */
-P4_Grammar*    P4_CreateGrammar(void);
+P4_GrammarPtr    P4_CreateGrammar(void);
 
 /**
  * @brief       Delete the grammar object.
@@ -1647,7 +1649,7 @@ P4_Grammar*    P4_CreateGrammar(void);
  *
  * It will also free all of the expression rules.
  */
-void           P4_DeleteGrammar(P4_Grammar*);
+void           P4_DeleteGrammar(P4_GrammarPtr);
 
 /**
  * Add a grammar rule.
@@ -1657,7 +1659,7 @@ void           P4_DeleteGrammar(P4_Grammar*);
  * @param   expr        The grammar rule expression.
  * @return  The error code.
  */
-P4_Error       P4_AddGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_Error       P4_AddGrammarRule(P4_GrammarPtr, P4_RuleID, P4_Expression*);
 
 /**
  * Set the name for a grammar rule.
@@ -1671,7 +1673,7 @@ P4_Error       P4_AddGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
  *
  *      P4_SetRuleName(grammar, ENTRY, "entry");
  */
-P4_Error       P4_SetGrammarRuleName(P4_Grammar* grammar, P4_RuleID id, P4_String name);
+P4_Error       P4_SetGrammarRuleName(P4_GrammarPtr grammar, P4_RuleID id, P4_String name);
 
 /**
  * Get the name for a grammar rule.
@@ -1685,7 +1687,7 @@ P4_Error       P4_SetGrammarRuleName(P4_Grammar* grammar, P4_RuleID id, P4_Strin
  *      P4_String name = P4_GetRuleName(grammar, ENTRY);
  *      printf("%s\n", name);
  */
-P4_String      P4_GetGrammarRuleName(P4_Grammar* grammar, P4_RuleID id);
+P4_String      P4_GetGrammarRuleName(P4_GrammarPtr grammar, P4_RuleID id);
 
 /**
  * Delete a grammar rule.
@@ -1695,7 +1697,7 @@ P4_String      P4_GetGrammarRuleName(P4_Grammar* grammar, P4_RuleID id);
  *
  * WARNING: NOT IMPLEMENTED.
  */
-void           P4_DeleteGrammarRule(P4_Grammar*, P4_RuleID);
+void           P4_DeleteGrammarRule(P4_GrammarPtr, P4_RuleID);
 
 /**
  * Get a grammar rule.
@@ -1709,7 +1711,7 @@ void           P4_DeleteGrammarRule(P4_Grammar*, P4_RuleID);
  *      P4_AddLiteral(grammar, 1, "a", true);
  *      P4_Expression* expr = P4_GetGrammarRule(grammar, 1); // The literal expression.
  */
-P4_Expression* P4_GetGrammarRule(P4_Grammar*, P4_RuleID);
+P4_Expression* P4_GetGrammarRule(P4_GrammarPtr, P4_RuleID);
 
 /**
  * Get a grammar rule by its name.
@@ -1722,7 +1724,7 @@ P4_Expression* P4_GetGrammarRule(P4_Grammar*, P4_RuleID);
  *      P4_SetGrammarRuleName(grammar, 1, "rule_a");
  *      P4_Expression* expr = P4_GetGrammarRule(grammar, "rule_a"); // The literal expression.
  */
-P4_Expression* P4_GetGrammarRuleByName(P4_Grammar* grammar, P4_String name);
+P4_Expression* P4_GetGrammarRuleByName(P4_GrammarPtr grammar, P4_String name);
 
 /**
  * @brief       Set the flag of a grammar rule.
@@ -1739,7 +1741,7 @@ P4_Expression* P4_GetGrammarRuleByName(P4_Grammar* grammar, P4_String name);
  *          exit(1);
  *      }
  */
-P4_Error       P4_SetGrammarRuleFlag(P4_Grammar*, P4_RuleID, P4_ExpressionFlag);
+P4_Error       P4_SetGrammarRuleFlag(P4_GrammarPtr, P4_RuleID, P4_ExpressionFlag);
 
 /**
  * @brief       Set the maximum allowed recursion calls.
@@ -1755,7 +1757,7 @@ P4_Error       P4_SetGrammarRuleFlag(P4_Grammar*, P4_RuleID, P4_ExpressionFlag);
  *      // on a machine with large memory.
  *      P4_SetRecursionLimit(grammar, 1024*20);
  */
-P4_Error       P4_SetRecursionLimit(P4_Grammar*, size_t limit);
+P4_Error       P4_SetRecursionLimit(P4_GrammarPtr, size_t limit);
 
 /**
  * @brief       Set free function for the user data.
@@ -1763,7 +1765,7 @@ P4_Error       P4_SetRecursionLimit(P4_Grammar*, size_t limit);
  * @param       free_func   The free function.
  * @return      The error code.
  */
-P4_Error       P4_SetUserDataFreeFunc(P4_Grammar* grammar, P4_UserDataFreeFunc free_func);
+P4_Error       P4_SetUserDataFreeFunc(P4_GrammarPtr grammar, P4_UserDataFreeFunc free_func);
 
 /**
  * @brief       Get the maximum allowed recursion calls.
@@ -1775,7 +1777,7 @@ P4_Error       P4_SetUserDataFreeFunc(P4_Grammar* grammar, P4_UserDataFreeFunc f
  *      size_t  limit = P4_GetRecursionLimit(grammar);
  *      printf("limit=%u\n", limit);
  */
-size_t         P4_GetRecursionLimit(P4_Grammar*);
+size_t         P4_GetRecursionLimit(P4_GrammarPtr);
 
 /**
  * @brief       Create a \ref P4_Source* object.
@@ -1885,7 +1887,7 @@ size_t          P4_GetSourcePosition(P4_Source*);
  *      P4_Token* root = P4_GetSourceAst(source);
  *      P4_JsonifySourceAst(grammar, stdout, root);
  */
-void           P4_JsonifySourceAst(P4_Grammar* grammar, FILE* stream, P4_Token* token);
+void           P4_JsonifySourceAst(P4_GrammarPtr grammar, FILE* stream, P4_Token* token);
 
 /**
  * @brief       Inspect the token tree.
@@ -1916,7 +1918,7 @@ P4_Error       P4_InspectSourceAst(P4_Token* token, void* userdata, P4_Error (*i
  *          // error handling ...
  *      }
  */
-P4_Error       P4_Parse(P4_Grammar*, P4_Source*);
+P4_Error       P4_Parse(P4_GrammarPtr, P4_Source*);
 
 /**
  * @brief       Determine whether the parse is failed.
@@ -2057,7 +2059,7 @@ P4_String      P4_CopyTokenString(P4_Token*);
  * @param       errcb       The callback on a failure match.
  * @return      The error code.
  */
-P4_Error       P4_SetGrammarCallback(P4_Grammar*, P4_MatchCallback, P4_ErrorCallback);
+P4_Error       P4_SetGrammarCallback(P4_GrammarPtr, P4_MatchCallback, P4_ErrorCallback);
 
 /**
  * @brief       Replace an existing grammar rule.
@@ -2068,7 +2070,7 @@ P4_Error       P4_SetGrammarCallback(P4_Grammar*, P4_MatchCallback, P4_ErrorCall
  *
  * The original grammar rule will be deleted.
  */
-P4_Error       P4_ReplaceGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_Error       P4_ReplaceGrammarRule(P4_GrammarPtr, P4_RuleID, P4_Expression*);
 
 /**
  * @brief       Create a grammar that can parse other grammars written in PEG syntax.
@@ -2076,10 +2078,10 @@ P4_Error       P4_ReplaceGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
  *
  * Example:
  *
- *      P4_Grammar* peg = P4_CreatePegGrammar();
+ *      P4_GrammarPtr peg = P4_CreatePegGrammar();
  *      P4_DeleteGrammar(peg);
  */
-P4_Grammar*    P4_CreatePegGrammar ();
+P4_GrammarPtr    P4_CreatePegGrammar ();
 
 /**
  * @brief       Evaluate the token ast parsed by P4_CreatePegGrammar.
@@ -2089,11 +2091,11 @@ P4_Grammar*    P4_CreatePegGrammar ();
  *
  * Example:
  *
- *      P4_Grammar* peg     = P4_CreatePegGrammar();
+ *      P4_GrammarPtr peg     = P4_CreatePegGrammar();
  *      P4_Source*  peggram = P4_CreateSource("my_grammar = \"abc\";", P4_PegGrammar);
  *      P4_Parse(peg, peggram);
  *
- *      P4_Grammar* my_grammar = NULL;
+ *      P4_GrammarPtr my_grammar = NULL;
  *
  *      if (P4_Ok != P4_PegEval(P4_GetSourceAst(peggram), &my_grammar))
  *          printf("invalid token tree.\n");
@@ -2138,7 +2140,7 @@ P4_Result(P4_GrammarPtr)   P4_LoadGrammar(P4_String rules);
  *
  * Example:
  *
- *      P4_Grammar* grammar = P4_LoadGrammar(
+ *      P4_GrammarPtr grammar = P4_LoadGrammar(
  *          "entry = one one;\n"
  *          "one   = \"1\";\n"
  *      );

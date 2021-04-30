@@ -211,8 +211,8 @@ P4_PRIVATE(P4_ExpressionFlag)   P4_PegEvalFlag(P4_Token* token);
 P4_PRIVATE(P4_ExpressionFlag)   P4_PegEvalRuleFlags(P4_Token* token);
 P4_PRIVATE(P4_Result(size_t))   P4_PegEvalNumber(P4_Token* token);
 P4_PRIVATE(P4_Error)            P4_PegEvalChar(P4_Token* token, P4_Rune* rune);
-P4_PRIVATE(P4_Error)            P4_PegEvalLiteral(P4_Token* token, P4_Expression** expr);
-P4_PRIVATE(P4_Error)            P4_PegEvalInsensitiveLiteral(P4_Token* token, P4_Expression** expr);
+P4_PRIVATE(P4_Result(P4_ExpressionPtr)) P4_PegEvalLiteral(P4_Token* token);
+P4_PRIVATE(P4_Result(P4_ExpressionPtr)) P4_PegEvalInsensitiveLiteral(P4_Token* token);
 P4_PRIVATE(P4_Error)            P4_PegEvalRange(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalMembers(P4_Token* token, P4_Expression* expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalSequence(P4_Token* token, P4_Expression** expr);
@@ -3746,30 +3746,28 @@ P4_PegEvalChar(P4_Token* token, P4_Rune* rune) {
     return P4_Ok;
 }
 
-P4_PRIVATE(P4_Error)
-P4_PegEvalLiteral(P4_Token* token, P4_Expression** expr) {
+P4_PRIVATE(P4_Result(P4_ExpressionPtr))
+P4_PegEvalLiteral(P4_Token* token) {
     size_t    i    = 0,
               size = 0,
               idx  = 0;
-    P4_Error  err  = 0;
     P4_Rune   rune = 0;
     P4_String lit  = NULL,
               cur  = NULL;
+    P4_ExpressionPtr expr = NULL;
+    const char* errmsg = NULL;
 
     size_t len = P4_GetSliceSize(&token->slice) - 2; /* - 2: remove two quotes */
-    if (len <= 0)
-        raise(P4_PegError,
-            "Literal rule should have at least one character. "
-            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT
-        );
+    if (len <= 0) {
+        errmsg = "Literal should have at least one character";
+        goto finalize;
+    }
 
     cur = lit = P4_MALLOC((len+1) * sizeof(char));
-    if (lit == NULL)
-        raise(P4_MemoryError,
-            "Failed to copy literal string. "
-            TOKEN_ERROR_HINT_FMT,
-            TOKEN_ERROR_HINT
-        );
+    if (lit == NULL) {
+        errmsg = "Failed to copy literal string.";
+        goto finalize;
+    }
 
     for (i = token->slice.start.pos+1, idx = 0; i < token->slice.stop.pos-1; i += size) {
         size = P4_ReadEscapedRune(token->text+i, &rune);
@@ -3777,37 +3775,37 @@ P4_PegEvalLiteral(P4_Token* token, P4_Expression** expr) {
         if ((rune > 0x10ffff) ||
                 (rune == 0) ||
                 (size == 0) ||
-                (i + size > token->slice.stop.pos-1))
-            raise(P4_PegError,
-                "Character %lu is invalid. "
-                TOKEN_ERROR_HINT_FMT, idx, TOKEN_ERROR_HINT
-            );
+                (i + size > token->slice.stop.pos-1)) {
+            errmsg = "Input has invalid character.";
+            goto finalize;
+        }
 
         cur = P4_ConcatRune(cur, rune, size);
         idx++;
     }
     *cur = '\0';
 
-    if ((*expr = P4_CreateLiteral(lit, true)) == NULL)
-        raise(P4_MemoryError, "Failed to create literal token. "
-                TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT)
+    if ((expr = P4_CreateLiteral(lit, true)) == NULL) {
+        errmsg = "Failed to create literal token.";
+        goto finalize;
+    }
+
+    return P4_ResultOk(P4_ExpressionPtr)(expr);
 
 finalize:
     P4_FREE(lit);
-    return err;
+    return P4_ResultErr(P4_ExpressionPtr)(errmsg);
 }
 
-P4_PRIVATE(P4_Error)
-P4_PegEvalInsensitiveLiteral(P4_Token* token, P4_Expression** expr) {
-    P4_Error err = P4_Ok;
+P4_PRIVATE(P4_Result(P4_ExpressionPtr))
+P4_PegEvalInsensitiveLiteral(P4_Token* token) {
+    P4_Result(P4_ExpressionPtr) result = P4_PegEvalLiteral(token->head);
 
-    catch(P4_PegEvalLiteral(token->head, expr));
+    if (P4_ResultIsOk(P4_ExpressionPtr)(&result)) {
+        P4_ResultUnwrap(P4_ExpressionPtr)(&result)->sensitive = false;
+    }
 
-    (*expr)->sensitive = false;
-    return P4_Ok;
-
-finalize:
-    return err;
+    return result;
 }
 
 P4_PRIVATE(P4_Error)
@@ -4276,10 +4274,26 @@ P4_PegEval(P4_Token* token, void* result) {
         }
         case P4_PegRuleChar:
             return P4_PegEvalChar(token, result);
-        case P4_PegRuleLiteral:
-            return P4_PegEvalLiteral(token, result);
-        case P4_PegRuleInsensitiveLiteral:
-            return P4_PegEvalInsensitiveLiteral(token, result);
+        case P4_PegRuleLiteral: {
+            P4_Result(P4_ExpressionPtr) r = P4_PegEvalLiteral(token);
+            if (P4_ResultIsOk(P4_ExpressionPtr)(&r)) {
+                *(P4_ExpressionPtr*)result = P4_ResultUnwrap(P4_ExpressionPtr)(&r);
+                return P4_Ok;
+            } else {
+                fprintf(stderr, "%s\n", P4_ResultUnwrapErr(P4_ExpressionPtr)(&r));
+                return P4_PegError;
+            }
+        }
+        case P4_PegRuleInsensitiveLiteral: {
+            P4_Result(P4_ExpressionPtr) r = P4_PegEvalInsensitiveLiteral(token);
+            if (P4_ResultIsOk(P4_ExpressionPtr)(&r)) {
+                *(P4_ExpressionPtr*)result = P4_ResultUnwrap(P4_ExpressionPtr)(&r);
+                return P4_Ok;
+            } else {
+                fprintf(stderr, "%s\n", P4_ResultUnwrapErr(P4_ExpressionPtr)(&r));
+                return P4_PegError;
+            }
+        }
         case P4_PegRuleRange:
             return P4_PegEvalRange(token, result);
         case P4_PegRuleSequence:

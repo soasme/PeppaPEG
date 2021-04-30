@@ -34,6 +34,7 @@
 #include "peppapeg.h"
 
 P4_DefineResult(P4_GrammarPtr);
+P4_DefineResult(P4_ExpressionPtr);
 P4_DefineResult(size_t);
 
 /** It indicates the function or type is for public use. */
@@ -218,7 +219,7 @@ P4_PRIVATE(P4_Error)            P4_PegEvalChoice(P4_Token* token, P4_Expression*
 P4_PRIVATE(P4_Error)            P4_PegEvalPositive(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalNegative(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr);
-P4_PRIVATE(P4_Error)            P4_PegEvalDot(P4_Token* token, P4_Expression** expr);
+P4_PRIVATE(P4_Result(P4_ExpressionPtr)) P4_PegEvalDot(P4_Token* token);
 P4_PRIVATE(P4_Error)            P4_PegEvalRuleName(P4_Token* token, P4_String* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalReference(P4_Token* token, P4_Expression** result);
 P4_PRIVATE(P4_Error)            P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result);
@@ -4055,17 +4056,14 @@ finalize:
     return err;
 }
 
-P4_PRIVATE(P4_Error)
-P4_PegEvalDot(P4_Token* token, P4_Expression** expr) {
-    P4_Error err = P4_Ok;
-    if ((*expr = P4_CreateRange(0x1, 0x10ffff, 1)) == NULL)
-        raise(
-            P4_MemoryError,
-            "Failed to create dot rule. "
-            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT
-        );
-finalize:
-    return err;
+P4_PRIVATE(P4_Result(P4_ExpressionPtr))
+P4_PegEvalDot(P4_Token* token) {
+    P4_ExpressionPtr expr = NULL;
+
+    if ((expr = P4_CreateRange(0x1, 0x10ffff, 1)) == NULL)
+        return P4_ResultErr(P4_ExpressionPtr)("Failed to create dot rule.");
+
+    return P4_ResultOk(P4_ExpressionPtr)(expr);
 }
 
 P4_PRIVATE(P4_Error)
@@ -4275,8 +4273,16 @@ P4_PegEval(P4_Token* token, void* result) {
             return P4_PegEvalNegative(token, result);
         case P4_PegRuleRepeat:
             return P4_PegEvalRepeat(token, result);
-        case P4_PegRuleDot:
-            return P4_PegEvalDot(token, result);
+        case P4_PegRuleDot: {
+            P4_Result(P4_ExpressionPtr) r = P4_PegEvalDot(token);
+            if (P4_ResultIsOk(P4_ExpressionPtr)(&r)) {
+                *(P4_ExpressionPtr*)result = P4_ResultUnwrap(P4_ExpressionPtr)(&r);
+                return P4_Ok;
+            } else {
+                fprintf(stderr, "%s\n", P4_ResultUnwrapErr(size_t)(&r));
+                return P4_PegError;
+            }
+        }
         case P4_PegRuleReference:
             return P4_PegEvalReference(token, result);
         case P4_PegGrammar:
@@ -4290,7 +4296,7 @@ P4_PegEval(P4_Token* token, void* result) {
 }
 
 P4_PUBLIC P4_Result(P4_GrammarPtr)
-P4_LoadGrammar(P4_String rules) {
+P4_LoadGrammarResult(P4_String rules) {
     P4_GrammarPtr bootstrap = NULL;
     P4_GrammarPtr grammar   = NULL;
     P4_Source*  rules_src = NULL;
@@ -4340,7 +4346,7 @@ finalize:
 }
 
 P4_PUBLIC P4_GrammarPtr
-P4_LoadGrammarUnwrap(P4_String rules) {
-    P4_Result(P4_GrammarPtr) result = P4_LoadGrammar(rules);
+P4_LoadGrammar(P4_String rules) {
+    P4_Result(P4_GrammarPtr) result = P4_LoadGrammarResult(rules);
     return P4_ResultUnwrap(P4_GrammarPtr) (&result);
 }

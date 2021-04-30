@@ -512,6 +512,8 @@ typedef struct P4_Source {
     size_t                  frame_stack_size;
 } P4_Source;
 
+typedef struct P4_Expression* P4_ExpressionPtr;
+
 /**
  * The grammar rule.
  */
@@ -629,6 +631,7 @@ typedef struct P4_Grammar{
 
 
 P4_DeclareResult(P4_GrammarPtr);
+P4_DeclareResult(P4_ExpressionPtr);
 P4_DeclareResult(size_t);
 
 
@@ -2123,7 +2126,7 @@ P4_String      P4_StringifyPegGrammarRuleID(P4_RuleID id);
  *
  * Example:
  *
- *      P4_Result(P4_GrammarPtr) grammar_r = P4_LoadGrammar(
+ *      P4_Result(P4_GrammarPtr) grammar_r = P4_LoadGrammarResult(
  *          "entry = one one;\n"
  *          "one   = \"1\";\n"
  *      );
@@ -2131,7 +2134,7 @@ P4_String      P4_StringifyPegGrammarRuleID(P4_RuleID id);
  *      P4_Source* source = P4_CreateSource("11", 1);
  *      P4_Parse(grammar, source);
  */
-P4_Result(P4_GrammarPtr)   P4_LoadGrammar(P4_String rules);
+P4_Result(P4_GrammarPtr)   P4_LoadGrammarResult(P4_String rules);
 
 /**
  * @brief       Load peg grammar from a string.
@@ -2147,7 +2150,7 @@ P4_Result(P4_GrammarPtr)   P4_LoadGrammar(P4_String rules);
  *      P4_Source* source = P4_CreateSource("11", 1);
  *      P4_Parse(grammar, source);
  */
-P4_GrammarPtr              P4_LoadGrammarUnwrap(P4_String rules);
+P4_GrammarPtr              P4_LoadGrammar(P4_String rules);
 
 
 #ifdef __cplusplus

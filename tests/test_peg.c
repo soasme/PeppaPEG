@@ -50,16 +50,6 @@
     P4_DeleteGrammar(grammar); \
 } while (0);
 
-# define SETUP_EVAL(entry, input) \
-    P4_Grammar* grammar = P4_CreatePegGrammar(); \
-    P4_Source* source = P4_CreateSource((input), (entry)); \
-    TEST_ASSERT_EQUAL(P4_Ok, P4_Parse(grammar, source)); \
-    P4_Token* root = P4_GetSourceAst(source);
-
-# define TEARDOWN_EVAL() \
-    P4_DeleteSource(source); \
-    P4_DeleteGrammar(grammar);
-
 void test_number(void) {
     ASSERT_PEG_PARSE(P4_PegRuleNumber, "0", P4_Ok, "[{\"slice\":[0,1],\"type\":\"number\"}]");
     ASSERT_PEG_PARSE(P4_PegRuleNumber, "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"number\"}]");
@@ -301,66 +291,6 @@ void test_grammar(void) {
     );
 }
 
-#define ASSERT_EVAL(entry, input, expect_t, expect) do { \
-        SETUP_EVAL((entry), (input)); \
-        expect_t value = 0; \
-        if (root) P4_PegEval(root, &value); \
-        TEST_ASSERT_EQUAL((expect), value); \
-        TEARDOWN_EVAL(); \
-} while (0);
-
-void test_eval_flag(void) {
-    ASSERT_EVAL(P4_PegRuleDecorator, "@squashed", P4_ExpressionFlag, P4_FLAG_SQUASHED);
-    ASSERT_EVAL(P4_PegRuleDecorator, "@scoped", P4_ExpressionFlag, P4_FLAG_SCOPED);
-    ASSERT_EVAL(P4_PegRuleDecorator, "@spaced", P4_ExpressionFlag, P4_FLAG_SPACED);
-    ASSERT_EVAL(P4_PegRuleDecorator, "@lifted", P4_ExpressionFlag, P4_FLAG_LIFTED);
-    ASSERT_EVAL(P4_PegRuleDecorator, "@tight", P4_ExpressionFlag, P4_FLAG_TIGHT);
-    ASSERT_EVAL(P4_PegRuleDecorator, "@nonterminal", P4_ExpressionFlag, P4_FLAG_NON_TERMINAL);
-}
-
-void test_eval_flags(void) {
-    ASSERT_EVAL(P4_PegRuleRuleDecorators, "@squashed @lifted", P4_ExpressionFlag, P4_FLAG_SQUASHED | P4_FLAG_LIFTED);
-    ASSERT_EVAL(P4_PegRuleRuleDecorators, "@squashed @lifted @squashed", P4_ExpressionFlag, P4_FLAG_SQUASHED | P4_FLAG_LIFTED);
-    ASSERT_EVAL(P4_PegRuleRuleDecorators, "@spaced", P4_ExpressionFlag, P4_FLAG_SPACED);
-    ASSERT_EVAL(P4_PegRuleRuleDecorators, "@spaced @squashed @lifted", P4_ExpressionFlag,
-            P4_FLAG_SPACED | P4_FLAG_SQUASHED | P4_FLAG_LIFTED);
-    ASSERT_EVAL(P4_PegRuleRuleDecorators, "@nonterminal", P4_ExpressionFlag, P4_FLAG_NON_TERMINAL);
-    ASSERT_EVAL(P4_PegRuleRuleDecorators, "@whatever", P4_ExpressionFlag, 0);
-}
-
-void test_eval_num(void) {
-    ASSERT_EVAL(P4_PegRuleNumber, "0", long, 0);
-    ASSERT_EVAL(P4_PegRuleNumber, "1", long, 1);
-    ASSERT_EVAL(P4_PegRuleNumber, "12", long, 12);
-    ASSERT_EVAL(P4_PegRuleNumber, "999", long, 999);
-    ASSERT_EVAL(P4_PegRuleNumber, "10000", long, 10000);
-}
-
-void test_eval_char(void) {
-    ASSERT_EVAL(P4_PegRuleChar, "a", P4_Rune, 'a');
-    ASSERT_EVAL(P4_PegRuleChar, "A", P4_Rune, 'A');
-    ASSERT_EVAL(P4_PegRuleChar, "\\b", P4_Rune, '\b');
-    ASSERT_EVAL(P4_PegRuleChar, "\\t", P4_Rune, '\t');
-    ASSERT_EVAL(P4_PegRuleChar, "\\n", P4_Rune, '\n');
-    ASSERT_EVAL(P4_PegRuleChar, "\\f", P4_Rune, '\f');
-    ASSERT_EVAL(P4_PegRuleChar, "\\r", P4_Rune, '\r');
-    ASSERT_EVAL(P4_PegRuleChar, "\\\\", P4_Rune, '\\');
-    ASSERT_EVAL(P4_PegRuleChar, "ç", P4_Rune, 0x00e7);
-    ASSERT_EVAL(P4_PegRuleChar, "Ç", P4_Rune, 0x00C7);
-    ASSERT_EVAL(P4_PegRuleChar, "你", P4_Rune, 0x4f60); /* https://www.compart.com/en/unicode/U+4F60 */
-    ASSERT_EVAL(P4_PegRuleChar, "🐷", P4_Rune, 0x1f437); /* https://www.compart.com/en/unicode/U+1F437 */
-    ASSERT_EVAL(P4_PegRuleChar, "\\u{4f60}", P4_Rune, 0x4f60);
-    ASSERT_EVAL(P4_PegRuleChar, "\\u{a}", P4_Rune, '\n');
-    ASSERT_EVAL(P4_PegRuleChar, "\\u{A}", P4_Rune, '\n');
-    ASSERT_EVAL(P4_PegRuleChar, "\\u{41}", P4_Rune, 'A');
-    ASSERT_EVAL(P4_PegRuleChar, "\\u{61}", P4_Rune, 'a');
-    ASSERT_EVAL(P4_PegRuleChar, "\\u{0041}", P4_Rune, 'A');
-    ASSERT_EVAL(P4_PegRuleChar, "\\u{0061}", P4_Rune, 'a');
-    ASSERT_EVAL(P4_PegRuleChar, "\\u{000a}", P4_Rune, '\n');
-    ASSERT_EVAL(P4_PegRuleChar, "\\u{000A}", P4_Rune, '\n');
-    ASSERT_EVAL(P4_PegRuleChar, "\\u{10ffff}", P4_Rune, 0x10ffff);
-}
-
 void test_eval_literal(void) {
     ASSERT_EVAL_GRAMMAR("R1 = \"1\";", "R1", "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\";", "R1", "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
@@ -441,110 +371,65 @@ void test_eval_range(void) {
     ASSERT_EVAL_GRAMMAR("R1 = [\\u{110000}-\\u{111111}];", "R1", "a", P4_MatchError, "Range lower and upper must be less than 0x10ffff.");
 }
 
-#define ASSERT_EVAL_CONTAINER(entry, input, expect_kind, expect_count) do { \
-    SETUP_EVAL((entry), (input)); \
-    P4_Expression* value = 0; \
-    if (root) P4_PegEval(root, &value); \
-    TEST_ASSERT_EQUAL( (expect_kind), value->kind ); \
-    TEST_ASSERT_EQUAL( (expect_count), value->count ); \
-    TEST_ASSERT_NOT_NULL( value->members ); \
-    size_t i = 0; \
-    for (i = 0; i < value->count; i++) { \
-        P4_Expression* member = P4_GetMember(value, i); \
-        TEST_ASSERT_NOT_NULL( member ); \
-    } \
-    P4_DeleteExpression(value); \
-    TEARDOWN_EVAL(); \
-} while (0);
-
 void test_eval_sequence(void) {
-    ASSERT_EVAL_CONTAINER(P4_PegRuleSequence, "\"a\" \"b\" \"c\"", P4_Sequence, 3);
-    ASSERT_EVAL_CONTAINER(P4_PegRuleSequence, "\"0x\" [1-9]", P4_Sequence, 2);
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\" \"b\" \"c\";", "R1", "abc", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"0x\" [1-9];", "R1", "0x1", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = R2 R2;R2 = \"a\";", "R1", "aa", P4_Ok, "[{\"slice\":[0,2],\"type\":\"R1\",\"children\":["
+        "{\"slice\":[0,1],\"type\":\"R2\"},"
+        "{\"slice\":[1,2],\"type\":\"R2\"}"
+    "]}]");
 }
 
 void test_eval_choice(void) {
-    ASSERT_EVAL_CONTAINER(P4_PegRuleChoice, "\"a\" / \"b\" / \"c\"", P4_Choice, 3);
-    ASSERT_EVAL_CONTAINER(P4_PegRuleChoice, "\"0x\" / [1-9]", P4_Choice, 2);
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\" / \"b\" / \"c\";", "R1", "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\" / \"b\" / \"c\";", "R1", "b", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\" / \"b\" / \"c\";", "R1", "c", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\" / \"b\" / \"c\";", "R1", "d", P4_MatchError, "[]");
 }
 
-#define ASSERT_EVAL_LOOKAHEAD(entry, input, expect_kind) do { \
-    SETUP_EVAL((entry), (input)); \
-    P4_Expression* value = 0; \
-    if (root) P4_PegEval(root, &value); \
-    TEST_ASSERT_EQUAL( (expect_kind), value->kind ); \
-    TEST_ASSERT_NOT_NULL( value->ref_expr ); \
-    P4_DeleteExpression(value); \
-    TEARDOWN_EVAL(); \
-} while (0);
-
 void test_eval_positive(void) {
-    ASSERT_EVAL_LOOKAHEAD(P4_PegRulePositive, "& \"a\"", P4_Positive);
-    ASSERT_EVAL_LOOKAHEAD(P4_PegRulePositive, "& [0-9]", P4_Positive);
+    ASSERT_EVAL_GRAMMAR("R1 = &\"a\" \"apple\";", "R1", "apple", P4_Ok, "[{\"slice\":[0,5],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = &\"b\" \"apple\";", "R1", "beef", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = &\"a\" i\"apple\";", "R1", "aPPLE", P4_Ok, "[{\"slice\":[0,5],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = &\"a\" i\"apple\";", "R1", "APPLE", P4_MatchError, "[]");
 }
 
 void test_eval_negative(void) {
-    ASSERT_EVAL_LOOKAHEAD(P4_PegRuleNegative, "! \"a\"", P4_Negative);
-    ASSERT_EVAL_LOOKAHEAD(P4_PegRuleNegative, "! [0-9]", P4_Negative);
+    ASSERT_EVAL_GRAMMAR("R1 = !\"a\" [a-f];", "R1", "b", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = !\"b\" [a-f];", "R1", "b", P4_MatchError, "[]");
 }
-
-#define ASSERT_EVAL_REPEAT(entry, input, min, max) do { \
-    SETUP_EVAL((entry), (input)); \
-    P4_Expression* value = 0; \
-    if (root) P4_PegEval(root, &value); \
-    TEST_ASSERT_EQUAL( P4_Repeat, value->kind ); \
-    TEST_ASSERT_NOT_NULL( value->repeat_expr ); \
-    TEST_ASSERT_EQUAL( (min), value->repeat_min ); \
-    TEST_ASSERT_EQUAL( (max), value->repeat_max ); \
-    P4_DeleteExpression(value); \
-    TEARDOWN_EVAL(); \
-} while (0);
 
 void test_eval_repeat(void) {
-    ASSERT_EVAL_REPEAT(P4_PegRuleRepeat, "\"a\"*", 0, SIZE_MAX);
-    ASSERT_EVAL_REPEAT(P4_PegRuleRepeat, "\"a\"?", 0, 1);
-    ASSERT_EVAL_REPEAT(P4_PegRuleRepeat, "\"a\"+", 1, SIZE_MAX);
-    ASSERT_EVAL_REPEAT(P4_PegRuleRepeat, "\"a\"{2,3}", 2, 3);
-    ASSERT_EVAL_REPEAT(P4_PegRuleRepeat, "\"a\"{2,}", 2, SIZE_MAX);
-    ASSERT_EVAL_REPEAT(P4_PegRuleRepeat, "\"a\"{,3}", 0, 3);
-    ASSERT_EVAL_REPEAT(P4_PegRuleRepeat, "\"a\"{3}", 3, 3);
-}
-
-#define ASSERT_EVAL_REFERENCE(entry, input, expect_ref_id) do { \
-    SETUP_EVAL((entry), (input)); \
-    P4_Expression* value = 0; \
-    if (root) P4_PegEval(root, &value); \
-    TEST_ASSERT_EQUAL( P4_Reference, value->kind ); \
-    TEST_ASSERT_EQUAL_STRING( (input), value->reference ); \
-    TEST_ASSERT_EQUAL( (expect_ref_id), value->ref_id); \
-    P4_DeleteExpression(value); \
-    TEARDOWN_EVAL(); \
-} while (0);
-
-void test_eval_reference(void) {
-    ASSERT_EVAL_REFERENCE(P4_PegRuleReference, "a", SIZE_MAX);
-    ASSERT_EVAL_REFERENCE(P4_PegRuleReference, "xyz", SIZE_MAX);
-    ASSERT_EVAL_REFERENCE(P4_PegRuleReference, "CONST", SIZE_MAX);
-}
-
-void test_eval_grammar(void) {
     ASSERT_EVAL_GRAMMAR("R1 = (\"\\n\" / \"\\r\")+;", "R1", "\r\n\r\n", P4_Ok, "[{\"slice\":[0,4],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "1A9F", P4_Ok, "[{\"slice\":[0,4],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "FFFFFF", P4_Ok, "[{\"slice\":[0,6],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "HHHH", P4_MatchError, "[]");
     ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "", P4_MatchError, "[]");
-    ASSERT_EVAL_GRAMMAR("R1 = !\"a\" [a-f];", "R1", "b", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = !\"b\" [a-f];", "R1", "b", P4_MatchError, "[]");
-    ASSERT_EVAL_GRAMMAR("R1 = &\"a\" \"apple\";", "R1", "apple", P4_Ok, "[{\"slice\":[0,5],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = &\"b\" \"apple\";", "R1", "beef", P4_MatchError, "[]");
-    ASSERT_EVAL_GRAMMAR("R1 = &\"a\" i\"apple\";", "R1", "aPPLE", P4_Ok, "[{\"slice\":[0,5],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = &\"a\" i\"apple\";", "R1", "APPLE", P4_MatchError, "[]");
-    ASSERT_EVAL_GRAMMAR("R1 = .;", "R1", "好", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = \"a\"* !.;", "R1", "aaab", P4_MatchError, "[]");
-    ASSERT_EVAL_GRAMMAR("R1 = \"a\"*;", "R1", "aaab", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = \"1\"# R1 = \"3\";\n;", "R1", "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("# R1 = \"2\";\nR1 = \"1\";", "R1", "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = \"1\";##", "R1", "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"*;", "R1", "aaaaa", P4_Ok, "[{\"slice\":[0,5],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"*;", "R1", "", P4_Ok, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"+;", "R1", "aaaaa", P4_Ok, "[{\"slice\":[0,5],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"+;", "R1", "", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"?;", "R1", "", P4_Ok, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"?;", "R1", "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"{2,3};", "R1", "a", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"{2,3};", "R1", "aa", P4_Ok, "[{\"slice\":[0,2],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"{2,3};", "R1", "aaa", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"{2,3};", "R1", "aaaa", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"{2,};", "R1", "a", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"{2,};", "R1", "aa", P4_Ok, "[{\"slice\":[0,2],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"{2,};", "R1", "aaa", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"{,3};", "R1", "", P4_Ok, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"{,3};", "R1", "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"{,3};", "R1", "aa", P4_Ok, "[{\"slice\":[0,2],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"{,3};", "R1", "aaa", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"{,3};", "R1", "aaaa", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"{3};", "R1", "aa", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"{3};", "R1", "aaa", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"{3};", "R1", "aaaa", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"{3,2};", "R1", "", P4_PegError, "Repeat min is greater than max.");
+}
 
+void test_eval_reference(void) {
     ASSERT_EVAL_GRAMMAR(
         "R1 = R2; "
         "R2 = \"1\";",
@@ -584,6 +469,7 @@ void test_eval_grammar(void) {
             "]}"
         "]"
     );
+
     ASSERT_EVAL_GRAMMAR(
         "R1 = R2 / R3;"
         "R2 = \"1\";"
@@ -597,7 +483,22 @@ void test_eval_grammar(void) {
             "]}"
         "]"
     );
+}
 
+void test_eval_dot(void) {
+    ASSERT_EVAL_GRAMMAR("R1 = .;", "R1", "好", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = .;", "R1", "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"* !.;", "R1", "aaab", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"* !.;", "R1", "aaa", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
+}
+
+void test_eval_comment(void) {
+    ASSERT_EVAL_GRAMMAR("R1 = \"1\"# R1 = \"3\";\n;", "R1", "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("# R1 = \"2\";\nR1 = \"1\";", "R1", "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"1\";##", "R1", "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+}
+
+void test_eval_flags(void) {
     ASSERT_EVAL_GRAMMAR(
         "@squashed\n"
         "R1 = R2 R2;"
@@ -737,24 +638,8 @@ void test_eval_grammar(void) {
 }
 
 void test_eval_bad_grammar(void) {
-    ASSERT_BAD_GRAMMAR(
-        "R1 = \"a\"",
-        "Failed to parse PEG rules."
-    );
-}
-
-void test_eval_bad_grammar_repeat(void) {
-    ASSERT_BAD_GRAMMAR(
-        "R1 = [0-9]{3,2};",
-        "PegError: Repeat min 3 is greater than max 2. char 5-15: [0-9]{3,2}\n"
-    );
-}
-
-void test_eval_bad_grammar_reference(void) {
-    ASSERT_BAD_GRAMMAR(
-        "R1 = R2;",
-        "NameError: Reference name is not resolved: R2\n"
-    );
+    ASSERT_BAD_GRAMMAR("R1 = \"a\"", "Failed to parse PEG rules.");
+    ASSERT_BAD_GRAMMAR("R1 = R2;", "Reference name is not resolved.");
 }
 
 int main(void) {
@@ -778,10 +663,6 @@ int main(void) {
     RUN_TEST(test_rule);
     RUN_TEST(test_grammar);
 
-    RUN_TEST(test_eval_flag);
-    RUN_TEST(test_eval_flags);
-    RUN_TEST(test_eval_num);
-    RUN_TEST(test_eval_char);
     RUN_TEST(test_eval_literal);
     RUN_TEST(test_eval_insensitive);
     RUN_TEST(test_eval_range);
@@ -791,13 +672,10 @@ int main(void) {
     RUN_TEST(test_eval_negative);
     RUN_TEST(test_eval_repeat);
     RUN_TEST(test_eval_reference);
-    RUN_TEST(test_eval_grammar);
-
+    RUN_TEST(test_eval_dot);
+    RUN_TEST(test_eval_comment);
+    RUN_TEST(test_eval_flags);
     RUN_TEST(test_eval_bad_grammar);
-    /*
-    RUN_TEST(test_eval_bad_grammar_repeat);
-    RUN_TEST(test_eval_bad_grammar_reference);
-    */
 
     return UNITY_END();
 }

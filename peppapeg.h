@@ -2088,29 +2088,6 @@ P4_Error       P4_ReplaceGrammarRule(P4_GrammarPtr, P4_RuleID, P4_Expression*);
 P4_GrammarPtr    P4_CreatePegGrammar ();
 
 /**
- * @brief       Evaluate the token ast parsed by P4_CreatePegGrammar.
- * @param       token   The token tree.
- * @param       result  Can be a reference several value kinds, such as size_t, P4_Grammar, P4_Expression, etc.
- * @return      The error code.
- *
- * Example:
- *
- *      P4_GrammarPtr peg     = P4_CreatePegGrammar();
- *      P4_Source*  peggram = P4_CreateSource("my_grammar = \"abc\";", P4_PegGrammar);
- *      P4_Parse(peg, peggram);
- *
- *      P4_GrammarPtr my_grammar = NULL;
- *
- *      if (P4_Ok != P4_PegEval(P4_GetSourceAst(peggram), &my_grammar))
- *          printf("invalid token tree.\n");
- *
- *      P4_DeleteGrammar(my_grammar);
- *      P4_DeleteSource(peggram);
- *      P4_DeleteGrammar(peg);
- */
-P4_Error       P4_PegEval(P4_Token* token, void* result);
-
-/**
  * @brief       Get the corresponding rule name for a peg grammar rule id.
  * @param       id      A P4_PegRuleID.
  * @return      The name.

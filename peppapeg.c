@@ -3761,7 +3761,7 @@ P4_PegEvalLiteral(P4_Token* token) {
 
     size_t len = P4_GetSliceSize(&token->slice) - 2; /* - 2: remove two quotes */
     if (len <= 0) {
-        errmsg = "Literal should have at least one character";
+        errmsg = "Literal should have at least one character.";
         goto finalize;
     }
 
@@ -3857,12 +3857,12 @@ P4_PegEvalRange(P4_Token* token) {
         }
 
         if ((lower == 0) || (upper == 0) || (stride == 0)) {
-            errmsg = "Range lower, upper, and stride must be all non-zeros.";
+            errmsg = "Range lower, upper and stride must be all non-zeros.";
             goto finalize;
         }
 
         if ((lower > 0x10ffff) || (upper > 0x10ffff)) {
-            errmsg = "Range lower must be less than 0x10ffff.";
+            errmsg = "Range lower and upper must be less than 0x10ffff.";
             goto finalize;
         }
 

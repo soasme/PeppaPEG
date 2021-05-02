@@ -35,7 +35,6 @@
 
 P4_DefineResult(P4_GrammarPtr);
 P4_DefineResult(P4_ExpressionPtr);
-P4_DefineResult(P4_TokenPtr);
 P4_DefineResult(P4_String);
 P4_DefineResult(size_t);
 
@@ -207,8 +206,6 @@ P4_PRIVATE(P4_Token*)           P4_MatchChoice(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchRepeat(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchSpacedExpressions(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchBackReference(P4_Source*, P4_Expression*, P4_Slice*, P4_Expression*);
-
-P4_PRIVATE(P4_TokenPtr)      P4_MatchDispatch(P4_SourcePtr, P4_ExpressionPtr);
 
 P4_PRIVATE(P4_ExpressionFlag)   P4_PegEvalFlag(P4_Token* token);
 P4_PRIVATE(P4_ExpressionFlag)   P4_PegEvalRuleFlags(P4_Token* token);
@@ -1184,6 +1181,11 @@ P4_NeedLift(P4_Source* s, P4_Expression* e) {
 P4_PRIVATE(void)
 P4_RaiseError(P4_Source* s, P4_Error err, P4_String errmsg) {
     s->err = err;
+
+    if (s->errmsg != NULL)
+        P4_FREE(s->errmsg);
+
+    s->errmsg = strdup(errmsg);
 }
 
 
@@ -1195,7 +1197,11 @@ P4_RaiseError(P4_Source* s, P4_Error err, P4_String errmsg) {
 P4_PRIVATE(void)
 P4_RescueError(P4_Source* s) {
     s->err = P4_Ok;
-    memset(s->errmsg, 0, sizeof(s->errmsg));
+    if (s->errmsg != NULL) {
+        P4_FREE(s->errmsg);
+        s->errmsg = NULL;
+        s->errmsg = strdup("");
+    }
 }
 
 
@@ -1781,37 +1787,38 @@ P4_MatchNegative(P4_Source* s, P4_Expression* e) {
     return NULL;
 }
 
-P4_PRIVATE(P4_TokenPtr)
-P4_MatchDispatch(P4_SourcePtr s, P4_ExpressionPtr e) {
-    P4_TokenPtr token = NULL;
+P4_Token*
+P4_Expression_dispatch(P4_Source* s, P4_Expression* e) {
+    P4_Token* result = NULL;
 
     switch (e->kind) {
         case P4_Literal:
-            token = P4_MatchLiteral(s, e);
+            result = P4_MatchLiteral(s, e);
             break;
         case P4_Range:
-            token = P4_MatchRange(s, e);
+            result = P4_MatchRange(s, e);
             break;
         case P4_Reference:
-            token = P4_MatchReference(s, e);
+            result = P4_MatchReference(s, e);
             break;
         case P4_Sequence:
-            token = P4_MatchSequence(s, e);
+            result = P4_MatchSequence(s, e);
             break;
         case P4_Choice:
-            token = P4_MatchChoice(s, e);
+            result = P4_MatchChoice(s, e);
             break;
         case P4_Positive:
-            token = P4_MatchPositive(s, e);
+            result = P4_MatchPositive(s, e);
             break;
         case P4_Negative:
-            token = P4_MatchNegative(s, e);
+            result = P4_MatchNegative(s, e);
             break;
         case P4_Repeat:
-            token = P4_MatchRepeat(s, e);
+            result = P4_MatchRepeat(s, e);
             break;
         case P4_BackReference:
             P4_RaiseError(s, P4_ValueError, "BackReference only works in Sequence.");
+            result = NULL;
             break;
         default:
             UNREACHABLE();
@@ -1819,10 +1826,7 @@ P4_MatchDispatch(P4_SourcePtr s, P4_ExpressionPtr e) {
             break;
     }
 
-    if (s->err != P4_Ok)
-        return NULL;
-
-    return token;
+    return result;
 }
 
 /*
@@ -1843,34 +1847,41 @@ P4_Match(P4_Source* s, P4_Expression* e) {
     }
 
     P4_Error     err = P4_Ok;
+    P4_Token* result = NULL;
 
     if (IS_RULE(e) && (err = P4_PushFrame(s, e)) != P4_Ok) {
         P4_RaiseError(s, err, "failed to push frame");
         goto finalize;
     }
 
-    P4_TokenPtr token = P4_MatchDispatch(s, e);
+    result = P4_Expression_dispatch(s, e);
 
     if (IS_RULE(e) && (err = P4_PopFrame(s, NULL)) != P4_Ok) {
         P4_RaiseError(s, err, "failed to pop frame");
-        P4_DeleteToken(token);
+        P4_DeleteToken(result);
         goto finalize;
     }
 
     if (s->err != P4_Ok) {
-        if (IS_RULE(e) && e->name && (s->errmsg[0] == '\0'))
-            sprintf(s->errmsg, "expect %s, char %zu", e->name, s->pos);
-        P4_DeleteToken(token);
+        P4_DeleteToken(result);
+        if (e->name != NULL && memcmp(s->errmsg, "expect", 6) != 0) {
+            size_t len = strlen(e->name);
+            P4_String errmsg = P4_MALLOC(sizeof(char) * (len+8));
+            memset(errmsg, 0, len);
+            sprintf(errmsg, "expect %s", e->name);
+            P4_RaiseError(s, s->err, errmsg);
+            P4_FREE(errmsg);
+        }
         goto finalize;
     }
 
-    if (s->grammar->on_match && (err = (s->grammar->on_match)(s->grammar, e, token)) != P4_Ok) {
+    if (s->grammar->on_match && (err = (s->grammar->on_match)(s->grammar, e, result)) != P4_Ok) {
         P4_RaiseError(s, err, "failed to run match callback.");
-        P4_DeleteToken(token);
+        P4_DeleteToken(result);
         goto finalize;
     }
 
-    return token;
+    return result;
 
 finalize:
     if (s->grammar->on_error && (err = (s->grammar->on_error)(s->grammar, e)) != P4_Ok) {
@@ -2468,13 +2479,13 @@ P4_CreateSource(P4_String content, P4_RuleID rule_id) {
     source->lineno = 0;
     source->offset = 0;
     source->err = P4_Ok;
+    source->errmsg = NULL;
     source->root = NULL;
     source->frame_stack = NULL;
     source->frame_stack_size = 0;
     source->whitespacing = false;
 
     P4_SetSourceSlice(source, 0, strlen(content));
-    memset(source->errmsg, 0, sizeof(source->errmsg));
 
     return source;
 }
@@ -2510,8 +2521,8 @@ P4_ResetSource(P4_Source* source) {
 
     source->err = P4_Ok;
 
-    if (strcmp(source->errmsg, "") == 0)
-        memset(source->errmsg, 0, sizeof(source->errmsg));
+    if (source->errmsg)
+        P4_FREE(source->errmsg);
 
     if (source->root) {
         P4_DeleteTokenUserData(source->grammar, source->root);
@@ -2613,7 +2624,7 @@ P4_GetErrorString(P4_Error err) {
 
 P4_PUBLIC P4_String
 P4_GetErrorMessage(P4_Source* source) {
-    if (source == NULL || source->errmsg[0] == '\0')
+    if (source == NULL || source->errmsg == NULL)
         return NULL;
 
     return source->errmsg;

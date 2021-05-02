@@ -1181,11 +1181,6 @@ P4_NeedLift(P4_Source* s, P4_Expression* e) {
 P4_PRIVATE(void)
 P4_RaiseError(P4_Source* s, P4_Error err, P4_String errmsg) {
     s->err = err;
-
-    if (s->errmsg != NULL)
-        P4_FREE(s->errmsg);
-
-    s->errmsg = strdup(errmsg);
 }
 
 
@@ -1200,7 +1195,6 @@ P4_RescueError(P4_Source* s) {
     if (s->errmsg != NULL) {
         P4_FREE(s->errmsg);
         s->errmsg = NULL;
-        s->errmsg = strdup("");
     }
 }
 
@@ -1864,13 +1858,17 @@ P4_Match(P4_Source* s, P4_Expression* e) {
 
     if (s->err != P4_Ok) {
         P4_DeleteToken(result);
-        if (e->name != NULL && memcmp(s->errmsg, "expect", 6) != 0) {
-            size_t len = strlen(e->name);
-            P4_String errmsg = P4_MALLOC(sizeof(char) * (len+8));
+        if (e->name != NULL && (e->kind == P4_Sequence || e->kind == P4_Choice) && s->errmsg) {
+            P4_FREE(s->errmsg);
+            s->errmsg = NULL;
+        }
+        if (e->name != NULL && s->errmsg == NULL) {
+            size_t len = strlen(e->name) + 100;
+            P4_String errmsg = P4_MALLOC(sizeof(char) * len);
             memset(errmsg, 0, len);
-            sprintf(errmsg, "expect %s", e->name);
-            P4_RaiseError(s, s->err, errmsg);
-            P4_FREE(errmsg);
+            sprintf(errmsg, "expect %s, line %zu:%zu, char %zu",
+                    e->name, s->lineno, s->offset, s->pos);
+            s->errmsg = errmsg;
         }
         goto finalize;
     }
@@ -2624,10 +2622,7 @@ P4_GetErrorString(P4_Error err) {
 
 P4_PUBLIC P4_String
 P4_GetErrorMessage(P4_Source* source) {
-    if (source == NULL || source->errmsg == NULL)
-        return NULL;
-
-    return source->errmsg;
+    return (source && source->errmsg) ? source->errmsg : "";
 }
 
 P4_PRIVATE(P4_Error)

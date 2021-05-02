@@ -543,7 +543,7 @@ void test_json_spec(char* json_spec) {
     P4_Error err = P4_Parse(grammar, source);
     static char errmsg[100] = "";
 
-    sprintf(errmsg, "%s:%d:%s", json_spec, err, P4_GetErrorMessage(source));
+    sprintf(errmsg, "%s:%s", json_spec, P4_GetErrorString(err));
 
     P4_DeleteSource(source);
     free(buf);
@@ -556,7 +556,6 @@ void test_json_spec(char* json_spec) {
     } else {
         TEST_IGNORE_MESSAGE(errmsg);
     }
-
 }
 
 

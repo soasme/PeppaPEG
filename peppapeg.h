@@ -451,6 +451,8 @@ typedef struct P4_Frame {
     struct P4_Frame*        next;
 } P4_Frame;
 
+typedef struct P4_Source* P4_SourcePtr;
+
 /**
  * The source.
  */
@@ -489,7 +491,7 @@ typedef struct P4_Source {
     /** The error code of the parse. */
     P4_Error                err;
     /** The error message of the parse. */
-    P4_String               errmsg;
+    char                    errmsg[120];
 
     /** The root of abstract syntax tree. */
     struct P4_Token*        root;
@@ -567,6 +569,8 @@ typedef struct P4_Expression {
     };
 } P4_Expression;
 
+typedef struct P4_Token* P4_TokenPtr;
+
 /**
  * The token object of abstract syntax tree.
  */
@@ -632,6 +636,7 @@ typedef struct P4_Grammar{
 
 P4_DeclareResult(P4_GrammarPtr);
 P4_DeclareResult(P4_ExpressionPtr);
+P4_DeclareResult(P4_TokenPtr);
 P4_DeclareResult(P4_String);
 P4_DeclareResult(size_t);
 

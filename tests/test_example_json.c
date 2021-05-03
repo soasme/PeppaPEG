@@ -541,9 +541,9 @@ void test_json_spec(char* json_spec) {
     P4_Source* source = P4_CreateSource(buf, P4_JSONEntry);
 
     P4_Error err = P4_Parse(grammar, source);
-    static char errmsg[100] = "";
+    char errmsg[256] = "";
 
-    sprintf(errmsg, "%s:%s", json_spec, P4_GetErrorString(err));
+    sprintf(errmsg, "%s:%s:%s", json_spec, P4_GetErrorString(err), P4_GetErrorMessage(source));
 
     P4_DeleteSource(source);
     free(buf);

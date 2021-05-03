@@ -1858,7 +1858,7 @@ P4_Match(P4_Source* s, P4_Expression* e) {
 
     if (s->err != P4_Ok) {
         P4_DeleteToken(result);
-        if (e->name != NULL && (e->kind == P4_Sequence || e->kind == P4_Choice) && s->errmsg) {
+        if (e->name != NULL && (e->kind == P4_Choice) && s->errmsg) {
             P4_FREE(s->errmsg);
             s->errmsg = NULL;
         }
@@ -4322,31 +4322,31 @@ P4_LoadGrammarResult(P4_String rules) {
     P4_Result(P4_GrammarPtr) grammar;
 
     if ((bootstrap = P4_CreatePegGrammar()) == NULL) {
-        errmsg = "Failed to create bootstrap grammar.";
+        errmsg = strdup("Failed to create bootstrap grammar.");
         goto finalize;
     }
 
     if ((rules_src = P4_CreateSource(rules, P4_PegGrammar)) == NULL) {
-        errmsg = "Failed to create source for PEG rules.";
+        errmsg = strdup("Failed to create source for PEG rules.");
         goto finalize;
     }
 
     if ((err = P4_Parse(bootstrap, rules_src)) != P4_Ok) {
         /* TBD: */
         /* errmsg = P4_GetErrorMessage(rules_src); */
-        errmsg = "Failed to parse PEG rules.";
+        errmsg = strdup(P4_GetErrorMessage(rules_src));
         goto finalize;
     }
 
     if ((rules_tok = P4_GetSourceAst(rules_src)) == NULL) {
-        errmsg = "Failed to get meta ast for PEG rules.";
+        errmsg = strdup("Failed to get meta ast for PEG rules.");
         goto finalize;
     }
 
     grammar = P4_PegEvalGrammar(rules_tok);
 
     if (P4_ResultIsErr(P4_GrammarPtr)(&grammar)) {
-        errmsg = P4_ResultUnwrapErr(P4_GrammarPtr)(&grammar);
+        errmsg = strdup(P4_ResultUnwrapErr(P4_GrammarPtr)(&grammar));
         goto finalize;
     }
 

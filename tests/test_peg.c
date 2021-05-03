@@ -7,6 +7,7 @@
     P4_Result(P4_GrammarPtr) result = P4_LoadGrammarResult((rule)); \
     const char* actual_err = P4_ResultUnwrapErr(P4_GrammarPtr)(&result); \
     TEST_ASSERT_EQUAL_STRING((err), actual_err); \
+    P4_FREE((void*)actual_err); \
 } while (0);
 
 # define ASSERT_PEG_PARSE(entry, input, code, output) do { \
@@ -113,7 +114,7 @@ void test_range(void) {
 {\"slice\":[3,4],\"type\":\"char\"},\
 {\"slice\":[6,7],\"type\":\"number\"}]}]");
 
-    ASSERT_PEG_PARSE(P4_PegRuleRange, "[\\p{__}]", P4_MatchError, "expect range, line 1:0, char 0")
+    ASSERT_PEG_PARSE(P4_PegRuleRange, "[\\p{__}]", P4_MatchError, "expect char, line 1:1, char 1")
     ASSERT_PEG_PARSE(P4_PegRuleRange, "[\\p{C}]", P4_Ok, "\
 [{\"slice\":[0,7],\"type\":\"range\",\"children\":[\
 {\"slice\":[4,5],\"type\":\"range_category\"}]}]");
@@ -638,7 +639,7 @@ void test_eval_flags(void) {
 }
 
 void test_eval_bad_grammar(void) {
-    ASSERT_BAD_GRAMMAR("R1 = \"a\"", "Failed to parse PEG rules.");
+    ASSERT_BAD_GRAMMAR("R1 = \"a\"", "expect rule, line 1:0, char 0");
     ASSERT_BAD_GRAMMAR("R1 = R2;", "Reference name is not resolved.");
 }
 

@@ -3756,13 +3756,13 @@ P4_PegEvalLiteral(P4_Token* token) {
 
     size_t len = P4_GetSliceSize(&token->slice) - 2; /* - 2: remove two quotes */
     if (len <= 0) {
-        errmsg = "Literal should have at least one character.";
+        errmsg = strdup("Literal should have at least one character.");
         goto finalize;
     }
 
     cur = lit = P4_MALLOC((len+1) * sizeof(char));
     if (lit == NULL) {
-        errmsg = "Failed to copy literal string.";
+        errmsg = strdup("Failed to copy literal string.");
         goto finalize;
     }
 
@@ -3773,7 +3773,7 @@ P4_PegEvalLiteral(P4_Token* token) {
                 (rune == 0) ||
                 (size == 0) ||
                 (i + size > token->slice.stop.pos-1)) {
-            errmsg = "Input has invalid character.";
+            errmsg = strdup("Input has invalid character.");
             goto finalize;
         }
 
@@ -3783,14 +3783,14 @@ P4_PegEvalLiteral(P4_Token* token) {
     *cur = '\0';
 
     if ((expr = P4_CreateLiteral(lit, true)) == NULL) {
-        errmsg = "Failed to create literal token.";
+        errmsg = strdup("Failed to create literal token.");
         goto finalize;
     }
 
     return P4_ResultOk(P4_ExpressionPtr)(expr);
 
 finalize:
-    P4_FREE(lit);
+    if (lit) P4_FREE(lit);
     return P4_ResultErr(P4_ExpressionPtr)(errmsg);
 }
 
@@ -3893,7 +3893,7 @@ P4_PegEvalMembers(P4_Token* token, P4_Expression* expr) {
         child_expr = P4_ResultUnwrap(P4_ExpressionPtr)(&result);
 
         if (P4_SetMember(expr, i, child_expr) != P4_Ok) {
-            errmsg = "Unable to set member.";
+            errmsg = strdup("Unable to set member.");
             goto finalize;
         }
 

@@ -34,7 +34,7 @@
     if (P4_ResultIsErr(P4_GrammarPtr)(&grammar_res)) { \
         const char* errmsg = P4_ResultUnwrapErr(P4_GrammarPtr)(&grammar_res); \
         TEST_ASSERT_EQUAL_STRING(ast, errmsg); \
-        P4_FREE((void*)errmsg); \
+        P4_FREE((char*)errmsg); \
         break; \
     }\
     P4_Grammar*     grammar = P4_ResultUnwrap(P4_GrammarPtr)(&grammar_res); \

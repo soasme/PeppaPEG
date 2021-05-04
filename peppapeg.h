@@ -175,7 +175,6 @@ static void P4_Panicf(const char * fmt, ...) { va_list args; va_start(args, fmt)
 #define P4_DeclareResult(type)      \
     typedef struct P4_Result(type) { \
         type value;               \
-        /* string literals only */\
         const char * err;         \
     } P4_Result(type);               \
     P4_Result(type)                 P4_ResultOk(type)(type value);        \

@@ -32,7 +32,9 @@
 #define ASSERT_EVAL_GRAMMAR(peg_rules, entry_name, source_code, parse_code, ast) do { \
     P4_Result(P4_GrammarPtr) grammar_res = P4_LoadGrammarResult((peg_rules)); \
     if (P4_ResultIsErr(P4_GrammarPtr)(&grammar_res)) { \
-        TEST_ASSERT_EQUAL_STRING(ast, P4_ResultUnwrapErr(P4_GrammarPtr)(&grammar_res)); \
+        const char* errmsg = P4_ResultUnwrapErr(P4_GrammarPtr)(&grammar_res); \
+        TEST_ASSERT_EQUAL_STRING(ast, errmsg); \
+        P4_FREE((void*)errmsg); \
         break; \
     }\
     P4_Grammar*     grammar = P4_ResultUnwrap(P4_GrammarPtr)(&grammar_res); \

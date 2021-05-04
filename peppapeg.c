@@ -220,6 +220,7 @@ P4_PRIVATE(P4_Error)            P4_PegEvalPositive(P4_Token* token, P4_Expressio
 P4_PRIVATE(P4_Error)            P4_PegEvalNegative(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalDot(P4_Token* token, P4_Expression** expr);
+P4_PRIVATE(P4_Error)            P4_PegEvalExpression(P4_Token* token, P4_Expression** expr);
 P4_PRIVATE(P4_Error)            P4_PegEvalRuleName(P4_Token* token, P4_String* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalReference(P4_Token* token, P4_Expression** result);
 P4_PRIVATE(P4_Error)            P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result);
@@ -3834,7 +3835,7 @@ P4_PegEvalRange(P4_Token* token, P4_Expression** expr) {
 
         catch(P4_PegEvalChar(lower_token, &lower));
         catch(P4_PegEvalChar(upper_token, &upper));
-        if (stride_token) catch(P4_PegEval(stride_token, &stride));
+        if (stride_token) catch(P4_PegEvalNumber(stride_token, &stride));
 
         if (lower > upper)
             P4_Panicf("PegError: range lower 0x%x is greater than upper 0x%x. "
@@ -3868,7 +3869,7 @@ P4_PegEvalMembers(P4_Token* token, P4_Expression* expr) {
 
     while (child != NULL) {
         P4_Expression* child_expr = NULL;
-        catch(P4_PegEval(child, &child_expr));
+        catch(P4_PegEvalExpression(child, &child_expr));
         catch(P4_SetMember(expr, i, child_expr));
         child = child->next;
         i++;
@@ -3922,7 +3923,7 @@ P4_PegEvalPositive(P4_Token* token, P4_Expression** expr) {
     P4_Error        err = P4_Ok;
     P4_Expression*  ref = NULL;
 
-    catch(P4_PegEval(token->head, &ref));
+    catch(P4_PegEvalExpression(token->head, &ref));
 
     if ((*expr = P4_CreatePositive(ref)) == NULL)
         P4_Panicf("MemoryError: failed to create positive rule. "
@@ -3943,7 +3944,7 @@ P4_PegEvalNegative(P4_Token* token, P4_Expression** expr) {
     P4_Error        err = P4_Ok;
     P4_Expression*  ref = NULL;
 
-    catch(P4_PegEval(token->head, &ref));
+    catch(P4_PegEvalExpression(token->head, &ref));
 
     if ((*expr = P4_CreateNegative(ref)) == NULL)
         P4_Panicf("MemoryError: failed to create negative rule. "
@@ -3966,7 +3967,7 @@ P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr) {
     size_t          min = 0,
                     max = SIZE_MAX;
 
-    catch(P4_PegEval(token->head, &ref));
+    catch(P4_PegEvalExpression(token->head, &ref));
 
     switch (token->head->next->rule_id) {
         case P4_PegRuleRepeatZeroOrMore:
@@ -3979,17 +3980,17 @@ P4_PegEvalRepeat(P4_Token* token, P4_Expression** expr) {
             min = 1; max = SIZE_MAX;
             break;
         case P4_PegRuleRepeatMin:
-            catch(P4_PegEval(token->head->next->head, &min));
+            catch(P4_PegEvalNumber(token->head->next->head, &min));
             break;
         case P4_PegRuleRepeatMax:
-            catch(P4_PegEval(token->head->next->head, &max));
+            catch(P4_PegEvalNumber(token->head->next->head, &max));
             break;
         case P4_PegRuleRepeatMinMax:
-            catch(P4_PegEval(token->head->next->head, &min));
-            catch(P4_PegEval(token->head->next->tail, &max));
+            catch(P4_PegEvalNumber(token->head->next->head, &min));
+            catch(P4_PegEvalNumber(token->head->next->tail, &max));
             break;
         case P4_PegRuleRepeatExact:
-            catch(P4_PegEval(token->head->next->head, &min));
+            catch(P4_PegEvalNumber(token->head->next->head, &min));
             max = min;
             break;
         default:
@@ -4087,7 +4088,7 @@ P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result) {
                 catch(P4_PegEvalRuleName(child, &rule_name));
                 break;
             default:
-                catch(P4_PegEval(child, result));
+                catch(P4_PegEvalExpression(child, result));
                 break;
         }
 
@@ -4194,6 +4195,7 @@ finalize:
 
 P4_PUBLIC P4_Error
 P4_PegEval(P4_Token* token, void* result) {
+    /* Deprecated. Only used in test. */
     switch (token->rule_id) {
         case P4_PegRuleDecorator:
             return P4_PegEvalFlag(token, result);
@@ -4232,6 +4234,36 @@ P4_PegEval(P4_Token* token, void* result) {
     return P4_Ok;
 }
 
+P4_PUBLIC P4_Error
+P4_PegEvalExpression(P4_Token* token, P4_Expression** result) {
+    switch (token->rule_id) {
+        case P4_PegRuleLiteral:
+            return P4_PegEvalLiteral(token, result);
+        case P4_PegRuleInsensitiveLiteral:
+            return P4_PegEvalInsensitiveLiteral(token, result);
+        case P4_PegRuleRange:
+            return P4_PegEvalRange(token, result);
+        case P4_PegRuleSequence:
+            return P4_PegEvalSequence(token, result);
+        case P4_PegRuleChoice:
+            return P4_PegEvalChoice(token, result);
+        case P4_PegRulePositive:
+            return P4_PegEvalPositive(token, result);
+        case P4_PegRuleNegative:
+            return P4_PegEvalNegative(token, result);
+        case P4_PegRuleRepeat:
+            return P4_PegEvalRepeat(token, result);
+        case P4_PegRuleDot:
+            return P4_PegEvalDot(token, result);
+        case P4_PegRuleReference:
+            return P4_PegEvalReference(token, result);
+        default:
+            UNREACHABLE();
+            P4_Panicf("PegError: token %p is not a peg expression", token);
+    }
+    return P4_Ok;
+}
+
 P4_PUBLIC P4_Grammar*
 P4_LoadGrammar(P4_String rules) {
     P4_Grammar* bootstrap = NULL;
@@ -4256,7 +4288,7 @@ P4_LoadGrammar(P4_String rules) {
     if ((rules_tok = P4_GetSourceAst(rules_src)) == NULL)
         P4_Panicf("PegError: failed to get meta-ast for peg rules.");
 
-    catch(P4_PegEval(rules_tok, &grammar));
+    catch(P4_PegEvalGrammar(rules_tok, &grammar));
 
 finalize:
     if (rules_src)

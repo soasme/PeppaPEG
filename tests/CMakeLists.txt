@@ -42,6 +42,7 @@ foreach(unity_testcase ${unity_testcases})
     target_link_libraries("${unity_testcase}" "${P4_LIB}" unity)
     target_compile_options("${unity_testcase}" PRIVATE "-g")
     target_compile_options("${unity_testcase}" PRIVATE "-ansi")
+    target_compile_options("${unity_testcase}" PRIVATE "-DDEBUG")
 
     if (VALGRIND)
         add_test(

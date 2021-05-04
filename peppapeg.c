@@ -39,18 +39,23 @@
 /** It indicates the function or type is not for public use. */
 # define P4_PRIVATE(type) static type
 
+static void P4_Panic(const char * str)     __attribute__((noreturn));
+static void P4_Panic(const char * str)     { fputs(str, stderr); exit(1); }
+static void P4_Panicf(const char * fmt, ...) __attribute__((noreturn));
+static void P4_Panicf(const char * fmt, ...) { va_list args; va_start(args, fmt); vfprintf(stderr, fmt, args); exit(1); }
+
 # ifdef  DEBUG
   #define ASSERT(condition, message)                                           \
       do {                                                                     \
         if (!(condition)) {                                                    \
-          fprintf(stderr, "[%s:%d] Assert failed in %s(): %s\n",               \
+          P4_Panicf("[%s:%d] Assert failed in %s(): %s\n",                     \
               __FILE__, __LINE__, __func__, message);                          \
           abort();                                                             \
         }                                                                      \
       } while (false)
   #define UNREACHABLE()                                                        \
       do {                                                                     \
-        fprintf(stderr, "[%s:%d] This code should not be reached in %s()\n",   \
+        P4_Panicf("[%s:%d] This code should not be reached in %s()\n",         \
             __FILE__, __LINE__, __func__);                                     \
         abort();                                                               \
       } while (false)

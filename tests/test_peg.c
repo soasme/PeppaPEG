@@ -283,6 +283,7 @@ void test_grammar(void) {
     );
 }
 
+/*
 #define ASSERT_EVAL(entry, input, expect_t, expect) do { \
         SETUP_EVAL((entry), (input)); \
         expect_t value = 0; \
@@ -329,8 +330,8 @@ void test_eval_char(void) {
     ASSERT_EVAL(P4_PegRuleChar, "\\\\", P4_Rune, '\\');
     ASSERT_EVAL(P4_PegRuleChar, "ç", P4_Rune, 0x00e7);
     ASSERT_EVAL(P4_PegRuleChar, "Ç", P4_Rune, 0x00C7);
-    ASSERT_EVAL(P4_PegRuleChar, "你", P4_Rune, 0x4f60); /* https://www.compart.com/en/unicode/U+4F60 */
-    ASSERT_EVAL(P4_PegRuleChar, "🐷", P4_Rune, 0x1f437); /* https://www.compart.com/en/unicode/U+1F437 */
+    ASSERT_EVAL(P4_PegRuleChar, "你", P4_Rune, 0x4f60);
+    ASSERT_EVAL(P4_PegRuleChar, "🐷", P4_Rune, 0x1f437);
     ASSERT_EVAL(P4_PegRuleChar, "\\u{4f60}", P4_Rune, 0x4f60);
     ASSERT_EVAL(P4_PegRuleChar, "\\u{a}", P4_Rune, '\n');
     ASSERT_EVAL(P4_PegRuleChar, "\\u{A}", P4_Rune, '\n');
@@ -479,6 +480,7 @@ void test_eval_reference(void) {
     ASSERT_EVAL_REFERENCE(P4_PegRuleReference, "xyz", SIZE_MAX);
     ASSERT_EVAL_REFERENCE(P4_PegRuleReference, "CONST", SIZE_MAX);
 }
+*/
 
 #define ASSERT_EVAL_GRAMMAR(peg_rules, entry_name, source_code, parse_code, ast) do { \
     P4_Grammar*     grammar = P4_LoadGrammar((peg_rules)); \
@@ -850,6 +852,7 @@ int main(void) {
     RUN_TEST(test_rule);
     RUN_TEST(test_grammar);
 
+    /*
     RUN_TEST(test_eval_flag);
     RUN_TEST(test_eval_flags);
     RUN_TEST(test_eval_num);
@@ -863,6 +866,7 @@ int main(void) {
     RUN_TEST(test_eval_negative);
     RUN_TEST(test_eval_repeat);
     RUN_TEST(test_eval_reference);
+    */
     RUN_TEST(test_eval_grammar);
 
     /*

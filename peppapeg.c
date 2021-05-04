@@ -44,37 +44,20 @@ static void P4_Panic(const char * str)     { fputs(str, stderr); exit(1); }
 static void P4_Panicf(const char * fmt, ...) __attribute__((noreturn));
 static void P4_Panicf(const char * fmt, ...) { va_list args; va_start(args, fmt); vfprintf(stderr, fmt, args); exit(1); }
 
-# ifdef  DEBUG
-  #define ASSERT(condition, message)                                           \
-      do {                                                                     \
-        if (!(condition)) {                                                    \
-          P4_Panicf("[%s:%d] Assert failed in %s(): %s\n",                     \
-              __FILE__, __LINE__, __func__, message);                          \
-          abort();                                                             \
-        }                                                                      \
-      } while (false)
-
-  #define UNREACHABLE()                                                        \
-      do {                                                                     \
-        P4_Panicf("[%s:%d] This code should not be reached in %s()\n",         \
-            __FILE__, __LINE__, __func__);                                     \
-        abort();                                                               \
-      } while (false)
-
+# if defined(DEBUG)
+#define UNREACHABLE() P4_Panicf("[%s:%d] This code should not be reached in %s()\n", __FILE__, __LINE__, __func__);
+# elif defined(_MSC_VER)
+#define UNREACHABLE() __assume(0)
+# elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
+#define UNREACHABLE() __builtin_unreachable()
 # else
+#define UNREACHABLE()
+# endif
 
-  #if defined( _MSC_VER )
-    #define UNREACHABLE() __assume(0)
-
-  #elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
-    #define UNREACHABLE() __builtin_unreachable()
-
-  #else
-    #define UNREACHABLE()
-  #endif
-
-  #define ASSERT(condition, message) do { } while (false)
-
+# if defined(DEBUG)
+#define ASSERT(c,m) if(!(c)) P4_Panicf("[%s:%d] Assert failed in %s(): %s\n", __FILE__, __LINE__, __func__, (m));
+# else
+#define ASSERT(condition, message) do { } while (false)
 # endif
 
 # define                        catch(s) \
@@ -205,6 +188,19 @@ P4_PRIVATE(P4_Token*)           P4_MatchChoice(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchRepeat(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchSpacedExpressions(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchBackReference(P4_Source*, P4_Expression*, P4_Slice*, P4_Expression*);
+
+typedef struct P4_PegEvalResult {
+    P4_Position                 pos;
+    union {
+        P4_String               str;
+        P4_Rune                 rune;
+        size_t                  num;
+        P4_ExpressionFlag       flag;
+        P4_Expression*          expr;
+        P4_Grammar*             grammar;
+    };
+    char                        errmsg[256];
+}                               P4_PegEvalResult;
 
 P4_PRIVATE(P4_Error)            P4_PegEvalFlag(P4_Token* token, P4_ExpressionFlag *flag);
 P4_PRIVATE(P4_Error)            P4_PegEvalRuleFlags(P4_Token* token, P4_ExpressionFlag* flag);
@@ -4194,47 +4190,6 @@ finalize:
 }
 
 P4_PUBLIC P4_Error
-P4_PegEval(P4_Token* token, void* result) {
-    /* Deprecated. Only used in test. */
-    switch (token->rule_id) {
-        case P4_PegRuleDecorator:
-            return P4_PegEvalFlag(token, result);
-        case P4_PegRuleRuleDecorators:
-            return P4_PegEvalRuleFlags(token, result);
-        case P4_PegRuleNumber:
-            return P4_PegEvalNumber(token, result);
-        case P4_PegRuleChar:
-            return P4_PegEvalChar(token, result);
-        case P4_PegRuleLiteral:
-            return P4_PegEvalLiteral(token, result);
-        case P4_PegRuleInsensitiveLiteral:
-            return P4_PegEvalInsensitiveLiteral(token, result);
-        case P4_PegRuleRange:
-            return P4_PegEvalRange(token, result);
-        case P4_PegRuleSequence:
-            return P4_PegEvalSequence(token, result);
-        case P4_PegRuleChoice:
-            return P4_PegEvalChoice(token, result);
-        case P4_PegRulePositive:
-            return P4_PegEvalPositive(token, result);
-        case P4_PegRuleNegative:
-            return P4_PegEvalNegative(token, result);
-        case P4_PegRuleRepeat:
-            return P4_PegEvalRepeat(token, result);
-        case P4_PegRuleDot:
-            return P4_PegEvalDot(token, result);
-        case P4_PegRuleReference:
-            return P4_PegEvalReference(token, result);
-        case P4_PegGrammar:
-            return P4_PegEvalGrammar(token, result);
-        default:
-            UNREACHABLE();
-            return P4_ValueError;
-    }
-    return P4_Ok;
-}
-
-P4_PUBLIC P4_Error
 P4_PegEvalExpression(P4_Token* token, P4_Expression** result) {
     switch (token->rule_id) {
         case P4_PegRuleLiteral:
@@ -4266,31 +4221,32 @@ P4_PegEvalExpression(P4_Token* token, P4_Expression** result) {
 
 P4_PUBLIC P4_Grammar*
 P4_LoadGrammar(P4_String rules) {
-    P4_Grammar* bootstrap = NULL;
-    P4_Grammar* grammar   = NULL;
-    P4_Source*  rules_src = NULL;
-    P4_Token*   rules_tok = NULL;
-    P4_Error    err       = P4_Ok;
+    P4_Grammar*      bootstrap = NULL;
+    P4_Grammar*      grammar   = NULL;
+    P4_Source*       rules_src = NULL;
+    P4_Token*        rules_tok = NULL;
+    P4_Error         err       = P4_Ok;
+    P4_PegEvalResult evalres   = {0};
 
     if ((bootstrap = P4_CreatePegGrammar()) == NULL)
-        P4_Panic("MemoryError: failed to peg grammar.");
+        P4_Panic("MemoryError: failed to create peg grammar.");
 
     if ((rules_src = P4_CreateSource(rules, P4_PegGrammar)) == NULL)
-        P4_Panicf("MemoryError: failed to create source.");
+        P4_Panicf("MemoryError: failed to create peg source.");
 
     if ((err = P4_Parse(bootstrap, rules_src)) != P4_Ok)
         P4_Panicf(
-            "%s: failed to parse rules: %s.",
+            "%s: failed to parse peg rules: %s.",
             P4_GetErrorString(err),
             P4_GetErrorMessage(rules_src)
         );
 
     if ((rules_tok = P4_GetSourceAst(rules_src)) == NULL)
-        P4_Panicf("PegError: failed to get meta-ast for peg rules.");
+        P4_Panicf("PegError: failed to get peg ast.");
 
-    catch(P4_PegEvalGrammar(rules_tok, &grammar));
+    if ((err = P4_PegEvalGrammar(rules_tok, &grammar)) != P4_Ok)
+        P4_Panicf("PegError: %s.", evalres.errmsg);
 
-finalize:
     if (rules_src)
         P4_DeleteSource(rules_src);
 

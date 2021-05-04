@@ -39,10 +39,30 @@
 /** It indicates the function or type is not for public use. */
 # define P4_PRIVATE(type) static type
 
+typedef struct P4_PegEvalResult {
+    P4_Token*                   token;
+    union {
+        P4_String               str;
+        P4_Rune                 rune;
+        size_t                  num;
+        P4_ExpressionFlag       flag;
+        P4_Expression*          expr;
+        P4_Grammar*             grammar;
+    };
+    char                        errmsg[256];
+}                               P4_PegEvalResult;
+
 static void P4_Panic(const char * str)     __attribute__((noreturn));
 static void P4_Panic(const char * str)     { fputs(str, stderr); exit(1); }
 static void P4_Panicf(const char * fmt, ...) __attribute__((noreturn));
 static void P4_Panicf(const char * fmt, ...) { va_list args; va_start(args, fmt); vfprintf(stderr, fmt, args); exit(1); }
+
+#define P4_EvalRaise(fmt, ...) \
+    do { \
+        memset(result->errmsg, 0, sizeof(result->errmsg)); \
+        sprintf(result->errmsg, (fmt), __VA_ARGS__); \
+        goto finalize; \
+    } while (0);
 
 # if defined(DEBUG)
 #define UNREACHABLE() P4_Panicf("[%s:%d] This code should not be reached in %s()\n", __FILE__, __LINE__, __func__);
@@ -189,19 +209,6 @@ P4_PRIVATE(P4_Token*)           P4_MatchRepeat(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchSpacedExpressions(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Token*)           P4_MatchBackReference(P4_Source*, P4_Expression*, P4_Slice*, P4_Expression*);
 
-typedef struct P4_PegEvalResult {
-    P4_Token*                   token;
-    union {
-        P4_String               str;
-        P4_Rune                 rune;
-        size_t                  num;
-        P4_ExpressionFlag       flag;
-        P4_Expression*          expr;
-        P4_Grammar*             grammar;
-    };
-    char                        errmsg[256];
-}                               P4_PegEvalResult;
-
 P4_PRIVATE(P4_Error)            P4_PegEvalFlag(P4_Token* token, P4_ExpressionFlag *flag);
 P4_PRIVATE(P4_Error)            P4_PegEvalRuleFlags(P4_Token* token, P4_ExpressionFlag* flag);
 P4_PRIVATE(P4_Error)            P4_PegEvalNumber(P4_Token* token, size_t* num);
@@ -220,7 +227,7 @@ P4_PRIVATE(P4_Error)            P4_PegEvalExpression(P4_Token* token, P4_Express
 P4_PRIVATE(P4_Error)            P4_PegEvalRuleName(P4_Token* token, P4_String* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalReference(P4_Token* token, P4_Expression** result);
 P4_PRIVATE(P4_Error)            P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result);
-P4_PRIVATE(P4_Error)            P4_PegEvalGrammarReferences(P4_Grammar* grammar, P4_Expression* expr);
+P4_PRIVATE(P4_Error)            P4_PegEvalGrammarReferences(P4_Grammar* grammar, P4_Expression* expr, P4_PegEvalResult* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalGrammar(P4_Token* token, P4_PegEvalResult* result);
 
 static P4_RuneRange _C[] = {
@@ -4099,45 +4106,46 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalGrammarReferences(P4_Grammar* grammar, P4_Expression* expr) {
+P4_PegEvalGrammarReferences(P4_Grammar* grammar, P4_Expression* expr, P4_PegEvalResult* result) {
     size_t   i   = 0;
     P4_Error err = P4_Ok;
 
-    if (expr == NULL)
-        P4_Panic("PegError: reference expr is NULL");
+    ASSERT(expr != NULL, "reference expr is NULL.");
 
     switch (expr->kind) {
         case P4_Positive:
         case P4_Negative:
             if (expr->ref_expr)
-                catch(P4_PegEvalGrammarReferences(grammar, expr->ref_expr));
+                catch(P4_PegEvalGrammarReferences(grammar, expr->ref_expr, result));
             break;
         case P4_Sequence:
         case P4_Choice:
             for (i = 0; i < expr->count; i++)
                 if (expr->members[i])
-                    catch(P4_PegEvalGrammarReferences(grammar, expr->members[i]));
+                    catch(P4_PegEvalGrammarReferences(grammar, expr->members[i], result));
             break;
         case P4_Repeat:
             if (expr->repeat_expr)
-                catch(P4_PegEvalGrammarReferences(grammar, expr->repeat_expr));
+                catch(P4_PegEvalGrammarReferences(grammar, expr->repeat_expr, result));
             break;
         case P4_Reference:
         {
-            if (expr->reference == NULL)
-                P4_Panicf(
-                    "%s: reference name is not set: %s",
-                    P4_GetErrorString(P4_NameError),
+            if (expr->reference == NULL) {
+                err = P4_NameError;
+                P4_EvalRaise(
+                    "reference name is not set: %s",
                     expr->reference
                 );
+            }
 
             P4_Expression* ref = P4_GetGrammarRuleByName(grammar, expr->reference);
-            if (ref == NULL)
-                P4_Panicf(
-                    "%s: reference name is not set: %s",
-                    P4_GetErrorString(P4_NameError),
+            if (ref == NULL) {
+                err = P4_NameError;
+                P4_EvalRaise(
+                    "reference %s is undefined",
                     expr->reference
                 );
+            }
 
             expr->ref_id = ref->id;
             break;
@@ -4153,12 +4161,18 @@ finalize:
 P4_PRIVATE(P4_Error)
 P4_PegEvalGrammar(P4_Token* token, P4_PegEvalResult* result) {
     P4_Error    err = P4_Ok;
+    P4_Grammar* grammar = NULL;
     size_t      i = 0;
 
-    result->grammar = NULL;
+    result->token   = token;
 
-    if ((result->grammar = P4_CreateGrammar()) == NULL)
-        P4_Panic("MemoryError: failed to create grammar.");
+    if ((grammar = P4_CreateGrammar()) == NULL) {
+        err = P4_MemoryError;
+        P4_EvalRaise(
+            "%s: failed to create grammar.\n",
+            P4_GetErrorString(P4_MemoryError)
+        );
+    }
 
     P4_Expression* rule = NULL;
     P4_Token*      child = NULL;
@@ -4168,22 +4182,26 @@ P4_PegEvalGrammar(P4_Token* token, P4_PegEvalResult* result) {
     for (child = token->head; child != NULL; child = child->next) {
         catch(P4_PegEvalGrammarRule(child, &rule));
 
-        if ((err = P4_AddGrammarRule(result->grammar, id, rule)) != P4_Ok)
-            P4_Panicf("%s: failed to add %" PRIu64 "th rule.",
-                P4_GetErrorString(P4_PegError), id);
+        if ((err = P4_AddGrammarRule(grammar, id, rule)) != P4_Ok)
+            P4_EvalRaise(
+                "%s: failed to add %" PRIu64 "th rule.",
+                P4_GetErrorString(P4_PegError), id
+            );
 
         id++;
     }
 
     /* Resolve named references. */
-    for (i = 0; i < result->grammar->count; i++)
-        catch(P4_PegEvalGrammarReferences(result->grammar, result->grammar->rules[i]));
+    for (i = 0; i < grammar->count; i++)
+        catch(P4_PegEvalGrammarReferences(grammar, grammar->rules[i], result));
 
 finalize:
 
     if (err) {
-        P4_DeleteGrammar(result->grammar);
+        P4_DeleteGrammar(grammar);
         result->grammar = NULL;
+    } else {
+        result->grammar = grammar;
     }
 
     return err;

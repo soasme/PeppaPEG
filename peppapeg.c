@@ -3665,12 +3665,12 @@ finalize:
     return NULL;
 }
 
-# define TOKEN_ERROR_HINT_FMT "char %zu-%zu: %*.*s"
+# define MIN(a,b) ((a) < (b) ? (a) : (b))
+# define TOKEN_ERROR_HINT_FMT "char %zu-%zu: %.*s"
 # define TOKEN_ERROR_HINT \
                 token->slice.start.pos, \
                 token->slice.stop.pos, \
-                (int)P4_GetSliceSize(&token->slice), \
-                (int)P4_GetSliceSize(&token->slice), \
+                MIN((int)P4_GetSliceSize(&token->slice), 50), \
                 token->text + token->slice.start.pos
 
 

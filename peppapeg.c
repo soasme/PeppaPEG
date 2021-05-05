@@ -3765,15 +3765,21 @@ P4_PegEvalLiteral(P4_Token* token, P4_Result* result) {
     size_t         i    = 0,
                    size = 0,
                    idx  = 0;
+    P4_Error       err  = P4_Ok;
     P4_Rune        rune = 0;
     P4_String      lit  = NULL,
                    cur  = NULL;
     P4_Expression* expr = NULL;
 
     size_t len = P4_GetSliceSize(&token->slice) - 2; /* - 2: remove two quotes */
-    if (len <= 0)
-        P4_Panicf("PegError: literal rule should have at least one character. "
-            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
+    if (len <= 0) {
+        err = P4_PegError;
+        P4_EvalRaise(
+            "%s: literal rule should have at least one character. " TOKEN_ERROR_HINT_FMT,
+            P4_GetErrorString(P4_PegError),
+            TOKEN_ERROR_HINT
+        );
+    }
 
     cur = lit = P4_MALLOC((len+1) * sizeof(char));
     if (lit == NULL)
@@ -3786,9 +3792,15 @@ P4_PegEvalLiteral(P4_Token* token, P4_Result* result) {
         if ((rune > 0x10ffff) ||
                 (rune == 0) ||
                 (size == 0) ||
-                (i + size > token->slice.stop.pos-1))
-            P4_Panicf("PegError: character %lu is invalid. "
-                TOKEN_ERROR_HINT_FMT, idx, TOKEN_ERROR_HINT);
+                (i + size > token->slice.stop.pos-1)) {
+            err = P4_PegError;
+            P4_EvalRaise(
+                "%s: char %lu is invalid, " TOKEN_ERROR_HINT_FMT,
+                P4_GetErrorString(P4_PegError),
+                idx,
+                TOKEN_ERROR_HINT
+            );
+        }
 
         cur = P4_ConcatRune(cur, rune, size);
         idx++;
@@ -3802,6 +3814,8 @@ P4_PegEvalLiteral(P4_Token* token, P4_Result* result) {
     P4_FREE(lit);
     result->expr = expr;
     return P4_Ok;
+finalize:
+    return err;
 }
 
 P4_PRIVATE(P4_Error)
@@ -3848,19 +3862,31 @@ P4_PegEvalRange(P4_Token* token, P4_Result* result) {
         catch(P4_PegEvalChar(upper_token, &upper));
         if (stride_token) catch(P4_PegEvalNumber(stride_token, &stride));
 
-        if (lower > upper)
-            P4_Panicf("PegError: range lower 0x%x is greater than upper 0x%x. "
-                TOKEN_ERROR_HINT_FMT, lower, upper, TOKEN_ERROR_HINT);
+        if (lower > upper) {
+            err = P4_PegError;
+            P4_EvalRaise(
+                "range lower 0x%x is greater than upper 0x%x. "
+                TOKEN_ERROR_HINT_FMT, lower, upper, TOKEN_ERROR_HINT
+            );
+        }
 
-        if ((lower == 0) || (upper == 0) || (stride == 0))
-            P4_Panicf("PegError: range lower 0x%x, upper 0x%x, stride 0x%lx "
-                    "must be all non-zeros. " TOKEN_ERROR_HINT_FMT,
-                    lower, upper, stride, TOKEN_ERROR_HINT);
+        if ((lower == 0) || (upper == 0) || (stride == 0)) {
+            err = P4_PegError;
+            P4_EvalRaise(
+                "range lower 0x%x, upper 0x%x, stride 0x%lx "
+                "must be all non-zeros. " TOKEN_ERROR_HINT_FMT,
+                lower, upper, stride, TOKEN_ERROR_HINT
+            );
+        }
 
-        if ((lower > 0x10ffff) || (upper > 0x10ffff))
-            P4_Panicf("PegError: range lower 0x%x, upper 0x%x must be "
-                    "less than 0x10ffff. " TOKEN_ERROR_HINT_FMT,
-                    lower, upper, TOKEN_ERROR_HINT);
+        if ((lower > 0x10ffff) || (upper > 0x10ffff)) {
+            err = P4_PegError;
+            P4_EvalRaise(
+                "range lower 0x%x, upper 0x%x must be "
+                "less than 0x10ffff. " TOKEN_ERROR_HINT_FMT,
+                lower, upper, TOKEN_ERROR_HINT
+            );
+        }
 
         if ((expr = P4_CreateRange(lower, upper, stride)) == NULL)
             P4_Panicf("MemoryError: failed to create range rule. "
@@ -4022,9 +4048,13 @@ P4_PegEvalRepeat(P4_Token* token, P4_Result* result) {
                 TOKEN_ERROR_HINT_FMT, token->head->next->rule_id, TOKEN_ERROR_HINT);
     }
 
-    if (min > max)
-        P4_Panicf("PegError: Repeat min %lu is greater than max %lu. "
-                TOKEN_ERROR_HINT_FMT, min, max, TOKEN_ERROR_HINT);
+    if (min > max) {
+        err = P4_PegError;
+        P4_EvalRaise(
+            "PegError: Repeat min %lu is greater than max %lu. "
+            TOKEN_ERROR_HINT_FMT, min, max, TOKEN_ERROR_HINT
+        );
+    }
 
     if ((expr = P4_CreateRepeatMinMax(ref, min, max)) == NULL)
         P4_Panicf("MemoryError: failed to create repeat rule. "

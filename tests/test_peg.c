@@ -312,9 +312,6 @@ void test_eval_literal(void) {
     ASSERT_EVAL_GRAMMAR("R1 = \"\\r\";", "R1", "\r", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"\\t\";", "R1", "\t", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"   \";", "R1", "   ", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
-    /* ASSERT_EVAL_GRAMMAR("R1 = \"\";", "R1", "  ", P4_MatchError, "Literal should have at least one character."); */
-    /* ASSERT_EVAL_GRAMMAR("R1 = \"\\u{110000}\";", "R1", "???", P4_MatchError, "Input has invalid character."); */
-    /* ASSERT_EVAL_GRAMMAR("R1 = \"\\u{0}\";", "R1", "???", P4_MatchError, "Input has invalid character."); */
 }
 
 void test_eval_insensitive(void) {
@@ -332,9 +329,6 @@ void test_eval_insensitive(void) {
     ASSERT_EVAL_GRAMMAR("R1 = i\"\\r\";", "R1", "\r", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = i\"\\t\";", "R1", "\t", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = i\"   \";", "R1", "   ", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
-    /* ASSERT_EVAL_GRAMMAR("R1 = i\"\";", "R1", "  ", P4_MatchError, "Literal should have at least one character."); */
-    /* ASSERT_EVAL_GRAMMAR("R1 = i\"\\u{110000}\";", "R1", "???", P4_MatchError, "Input has invalid character."); */
-    /* ASSERT_EVAL_GRAMMAR("R1 = i\"\\u{0}\";", "R1", "???", P4_MatchError, "Input has invalid character."); */
 }
 
 void test_eval_range(void) {
@@ -368,16 +362,6 @@ void test_eval_range(void) {
     ASSERT_EVAL_GRAMMAR("R1 = [\\p{N}];", "R1", "０", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [\\p{N}];", "R1", "Ⅵ", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [\\p{N}];", "R1", "¼", P4_Ok, "[{\"slice\":[0,2],\"type\":\"R1\"}]");
-    /*
-    ASSERT_EVAL_GRAMMAR("R1 = [9-0];", "R1", "0", P4_MatchError, "Range lower is greater than upper.");
-    ASSERT_EVAL_GRAMMAR("R1 = [z-a];", "R1", "a", P4_MatchError, "Range lower is greater than upper.");
-    ASSERT_EVAL_GRAMMAR("R1 = [\\u{10ffff}-\\u{0001}];", "R1", "a", P4_MatchError, "Range lower is greater than upper.");
-    ASSERT_EVAL_GRAMMAR("R1 = [\\u{0}-\\u{10ffff}];", "R1", "a", P4_MatchError, "Range lower, upper and stride must be all non-zeros.");
-    ASSERT_EVAL_GRAMMAR("R1 = [a-f..0];", "R1", "a", P4_MatchError, "Range lower, upper and stride must be all non-zeros.");
-    ASSERT_EVAL_GRAMMAR("R1 = [\\u{1}-\\u{10ffff}..0];", "R1", "a", P4_MatchError, "Range lower, upper and stride must be all non-zeros.");
-    ASSERT_EVAL_GRAMMAR("R1 = [\\u{1}-\\u{110000}];", "R1", "a", P4_MatchError, "Range lower and upper must be less than 0x10ffff.");
-    ASSERT_EVAL_GRAMMAR("R1 = [\\u{110000}-\\u{111111}];", "R1", "a", P4_MatchError, "Range lower and upper must be less than 0x10ffff.");
-    */
 }
 
 void test_eval_sequence(void) {
@@ -926,11 +910,6 @@ void test_eval_bad_grammar_range(void) {
     ASSERT_BAD_GRAMMAR(
         "R1 = [z-a];",
         "PegError: range lower 0x7a is greater than upper 0x61. char 5-10: [z-a]."
-    );
-
-    ASSERT_BAD_GRAMMAR(
-        "R1 = [\\u{10ffff}-\\u{0001}];",
-        "PegError: range lower 0x10ffff is greater than upper 0x1. char 5-26: [\\u{10ffff}-\\u{0001}]."
     );
 
     ASSERT_BAD_GRAMMAR(

@@ -230,10 +230,10 @@
 </pre></div>
 </div>
 <p>When parsing <cite>1,2,3</cite>, it will produce such a data structure:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Token</span><span class="p">(</span><span class="mf">0.</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="n">ROW</span><span class="p">):</span>
-    <span class="n">Token</span><span class="p">(</span><span class="mf">0.</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="n">NUM</span><span class="p">)</span>
-    <span class="n">Token</span><span class="p">(</span><span class="mf">2.</span><span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="n">NUM</span><span class="p">)</span>
-    <span class="n">Token</span><span class="p">(</span><span class="mf">4.</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="n">NUM</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Token</span><span class="p">(</span><span class="mf">0..5</span><span class="p">,</span> <span class="n">ROW</span><span class="p">):</span>
+    <span class="n">Token</span><span class="p">(</span><span class="mf">0..1</span><span class="p">,</span> <span class="n">NUM</span><span class="p">)</span>
+    <span class="n">Token</span><span class="p">(</span><span class="mf">2..3</span><span class="p">,</span> <span class="n">NUM</span><span class="p">)</span>
+    <span class="n">Token</span><span class="p">(</span><span class="mf">4..5</span><span class="p">,</span> <span class="n">NUM</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The separator will not have its corresponding token, while all joined members have their tokens.</p>

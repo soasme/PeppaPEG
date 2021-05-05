@@ -179,7 +179,7 @@
 <h2>Step 2: Create Grammar<a class="headerlink" href="#step-2-create-grammar" title="Permalink to this headline">¶</a></h2>
 <p>We’ll create the grammar using <a class="reference internal" href="api.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a>.</p>
 <p>The order of rules must be same with <cite>P4_CalcRuleID</cite>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">P4_GrammarPtr</span>  <span class="n">P4_CreateCalcGrammar</span><span class="p">()</span> <span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span>  <span class="n">P4_CreateCalcGrammar</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="n">P4_LoadGrammar</span><span class="p">(</span>
         <span class="s2">"statement = term eol;</span><span class="se">\n</span><span class="s2">"</span>
 

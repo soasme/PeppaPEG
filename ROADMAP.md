@@ -1,7 +1,6 @@
 # ROADMAP
 
 - [ ] api: add api to operate slice comparison, copy and length.
-- [ ] api: print error messages for Human.
 - [ ] api: Run in VERBOSE mode.
 - [ ] api: Add traverse functions for Tokens.
 - [ ] api: save backreference in source stack so it can be used outside a sequence.
@@ -44,7 +43,8 @@
 - [ ] Pratt parser: https://en.wikipedia.org/wiki/Operator-precedence_parser
 - [ ] build: static lib.
 - [ ] build: wasm. `docker run --rm -v $(pwd):/src -u $(id -u):$(id -g)   emscripten/emsdk emcc peppapeg.c -Os -s WASM=1 -s SIDE_MODULE=1 -o /src/peppapeg.wasm`.  https://gist.github.com/kripken/59c67556dc03bb6d57052fedef1e61ab https://github.com/mbasso/awesome-wasm
-- [ ] bug: eval grammar: when failed, should produce no grammar.
+- [x] bug: eval grammar: when failed, should produce no grammar. Fixed in v1.13.0
+- [x] api: print error messages for Human. Added in v1.13.0.
 - [x] api: support comment in peg grammar. Added in v1.12.0.
 - [x] peg: CharacterSet. can use range.
 - [x] peg: extend range: `[0-9..2] / [a-z] / [\p{L}] / [\u{1}-\u{10ffff}]`. Added in v1.12.0.

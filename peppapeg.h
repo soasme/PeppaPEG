@@ -555,6 +555,18 @@ typedef struct P4_Grammar{
     P4_UserDataFreeFunc     free_func;
 } P4_Grammar;
 
+typedef struct P4_Result {
+    P4_Token*                   token;
+    union {
+        P4_String               str;
+        P4_Rune                 rune;
+        size_t                  num;
+        P4_ExpressionFlag       flag;
+        P4_Expression*          expr;
+        P4_Grammar*             grammar;
+    };
+    char                        errmsg[256];
+}                               P4_Result;
 
 /*
  *
@@ -2008,29 +2020,6 @@ P4_Error       P4_ReplaceGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
 P4_Grammar*    P4_CreatePegGrammar ();
 
 /**
- * @brief       Evaluate the token ast parsed by P4_CreatePegGrammar.
- * @param       token   The token tree.
- * @param       result  Can be a reference several value kinds, such as size_t, P4_Grammar, P4_Expression, etc.
- * @return      The error code.
- *
- * Example:
- *
- *      P4_Grammar* peg     = P4_CreatePegGrammar();
- *      P4_Source*  peggram = P4_CreateSource("my_grammar = \"abc\";", P4_PegGrammar);
- *      P4_Parse(peg, peggram);
- *
- *      P4_Grammar* my_grammar = NULL;
- *
- *      if (P4_Ok != P4_PegEval(P4_GetSourceAst(peggram), &my_grammar))
- *          printf("invalid token tree.\n");
- *
- *      P4_DeleteGrammar(my_grammar);
- *      P4_DeleteSource(peggram);
- *      P4_DeleteGrammar(peg);
- */
-P4_Error       P4_PegEval(P4_Token* token, void* result);
-
-/**
  * @brief       Get the corresponding rule name for a peg grammar rule id.
  * @param       id      A P4_PegRuleID.
  * @return      The name.
@@ -2039,6 +2028,26 @@ P4_Error       P4_PegEval(P4_Token* token, void* result);
  */
 P4_String      P4_StringifyPegGrammarRuleID(P4_RuleID id);
 
+
+/**
+ * @brief       Load peg grammar result from a string.
+ * @param       rules   The rules string.
+ * @param       result  The P4_Result object.
+ * @return      The error code.
+ *
+ * To get the result grammar, if return P4_Ok, use result->grammar.
+ *
+ * Example:
+ *
+ *      P4_Result result = {0};
+ *
+ *      if (P4_Ok == P4_LoadGrammarResult(RULES, &result)) {
+ *          P4_Grammar* grammar = result.grammar;
+ *      } else {
+ *          printf("%s\n", result.errmsg);
+ *      }
+ */
+P4_Error P4_LoadGrammarResult(P4_String rules, P4_Result* result);
 
 /**
  * @brief       Load peg grammar from a string.

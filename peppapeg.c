@@ -3795,10 +3795,9 @@ P4_PegEvalLiteral(P4_Token* token, P4_Result* result) {
         P4_Panicf("MemoryError: failed to create literal token. "
                 TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
 
+finalize:
     P4_FREE(lit);
     result->expr = expr;
-    return P4_Ok;
-finalize:
     return err;
 }
 

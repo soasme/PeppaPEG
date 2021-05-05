@@ -39,7 +39,7 @@
 /** It indicates the function or type is not for public use. */
 # define P4_PRIVATE(type) static type
 
-typedef struct P4_PegEvalResult {
+typedef struct P4_Result {
     P4_Token*                   token;
     union {
         P4_String               str;
@@ -50,7 +50,7 @@ typedef struct P4_PegEvalResult {
         P4_Grammar*             grammar;
     };
     char                        errmsg[256];
-}                               P4_PegEvalResult;
+}                               P4_Result;
 
 static void P4_Panic(const char * str)     __attribute__((noreturn));
 static void P4_Panic(const char * str)     { fputs(str, stderr); exit(1); }
@@ -227,8 +227,8 @@ P4_PRIVATE(P4_Error)            P4_PegEvalExpression(P4_Token* token, P4_Express
 P4_PRIVATE(P4_Error)            P4_PegEvalRuleName(P4_Token* token, P4_String* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalReference(P4_Token* token, P4_Expression** result);
 P4_PRIVATE(P4_Error)            P4_PegEvalGrammarRule(P4_Token* token, P4_Expression** result);
-P4_PRIVATE(P4_Error)            P4_PegEvalGrammarReferences(P4_Grammar* grammar, P4_Expression* expr, P4_PegEvalResult* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalGrammar(P4_Token* token, P4_PegEvalResult* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalGrammarReferences(P4_Grammar* grammar, P4_Expression* expr, P4_Result* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalGrammar(P4_Token* token, P4_Result* result);
 
 static P4_RuneRange _C[] = {
     {0x0000, 0x001f, 1}, {0x007f, 0x009f, 1}, {0x00ad, 0x0600, 1363}, {0x0601, 0x0605, 1},
@@ -4106,7 +4106,7 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalGrammarReferences(P4_Grammar* grammar, P4_Expression* expr, P4_PegEvalResult* result) {
+P4_PegEvalGrammarReferences(P4_Grammar* grammar, P4_Expression* expr, P4_Result* result) {
     size_t   i   = 0;
     P4_Error err = P4_Ok;
 
@@ -4159,7 +4159,7 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalGrammar(P4_Token* token, P4_PegEvalResult* result) {
+P4_PegEvalGrammar(P4_Token* token, P4_Result* result) {
     P4_Error    err = P4_Ok;
     P4_Grammar* grammar = NULL;
     size_t      i = 0;
@@ -4237,37 +4237,50 @@ P4_PegEvalExpression(P4_Token* token, P4_Expression** result) {
     return P4_Ok;
 }
 
-P4_PUBLIC P4_Grammar*
-P4_LoadGrammar(P4_String rules) {
+P4_PUBLIC P4_Error
+P4_LoadGrammarResult(P4_String rules, P4_Result* result) {
     P4_Grammar*       bootstrap = NULL;
     P4_Source*        rules_src = NULL;
     P4_Token*         rules_tok = NULL;
     P4_Error          err       = P4_Ok;
-    P4_PegEvalResult* evalres   = &(P4_PegEvalResult){0};
+    P4_Result*        evalres   = &(P4_Result){0};
 
     if ((bootstrap = P4_CreatePegGrammar()) == NULL)
-        P4_Panic("MemoryError: failed to create peg grammar.\n");
+        P4_EvalRaise("%s: %s",
+            P4_GetErrorString(P4_MemoryError),
+            "failed to create peg grammar."
+        );
 
     if ((rules_src = P4_CreateSource(rules, P4_PegGrammar)) == NULL)
-        P4_Panicf("MemoryError: failed to create peg source.\n");
+        P4_EvalRaise("%s: %s",
+            P4_GetErrorString(P4_MemoryError),
+            "failed to create peg source."
+        );
 
     if ((err = P4_Parse(bootstrap, rules_src)) != P4_Ok)
-        P4_Panicf(
-            "%s: failed to parse peg rules: %s.\n",
+        P4_EvalRaise(
+            "%s: failed to parse peg rules: %s.",
             P4_GetErrorString(err),
             P4_GetErrorMessage(rules_src)
         );
 
     if ((rules_tok = P4_GetSourceAst(rules_src)) == NULL)
-        P4_Panicf("PegError: failed to get peg ast.\n");
+        P4_EvalRaise("%s: %s.",
+            P4_GetErrorString(P4_PegError),
+            "failed to get peg ast."
+        );
 
     if ((err = P4_PegEvalGrammar(rules_tok, evalres)) != P4_Ok)
-        P4_Panicf("%s: %s, line %zu:%zu (char %zu).\n",
-                P4_GetErrorString(err),
-                evalres->errmsg,
-                evalres->token->slice.start.lineno,
-                evalres->token->slice.start.offset,
-                evalres->token->slice.start.pos);
+        P4_EvalRaise(
+            "%s: %s, line %zu:%zu (char %zu).",
+            P4_GetErrorString(err),
+            evalres->errmsg,
+            evalres->token->slice.start.lineno,
+            evalres->token->slice.start.offset,
+            evalres->token->slice.start.pos
+        );
+
+finalize:
 
     if (rules_src)
         P4_DeleteSource(rules_src);
@@ -4275,5 +4288,19 @@ P4_LoadGrammar(P4_String rules) {
     if (bootstrap)
         P4_DeleteGrammar(bootstrap);
 
-    return evalres->grammar;
+    result->grammar = (err == P4_Ok) ? evalres->grammar : NULL;
+
+    return err;
+}
+
+P4_PUBLIC P4_Grammar*
+P4_LoadGrammar(P4_String rules) {
+    P4_Result* result = &(P4_Result){0};
+
+    if (P4_LoadGrammarResult(rules, result) != P4_Ok) {
+        P4_Panicf("%s\n", result->errmsg);
+        return NULL;
+    }
+
+    return result->grammar;
 }

@@ -39,19 +39,6 @@
 /** It indicates the function or type is not for public use. */
 # define P4_PRIVATE(type) static type
 
-typedef struct P4_Result {
-    P4_Token*                   token;
-    union {
-        P4_String               str;
-        P4_Rune                 rune;
-        size_t                  num;
-        P4_ExpressionFlag       flag;
-        P4_Expression*          expr;
-        P4_Grammar*             grammar;
-    };
-    char                        errmsg[256];
-}                               P4_Result;
-
 # define P4_UnwrapGrammar(r) ((r)->errmsg[0] == 0 ? (r)->grammar : NULL)
 # define P4_UnwrapExpression(r) ((r)->errmsg[0] == 0 ? (r)->expr : NULL)
 
@@ -3678,7 +3665,7 @@ finalize:
     return NULL;
 }
 
-# define TOKEN_ERROR_HINT_FMT "char %zu-%zu: %*.*s\n"
+# define TOKEN_ERROR_HINT_FMT "char %zu-%zu: %*.*s"
 # define TOKEN_ERROR_HINT \
                 token->slice.start.pos, \
                 token->slice.stop.pos, \
@@ -3775,9 +3762,8 @@ P4_PegEvalLiteral(P4_Token* token, P4_Result* result) {
     if (len <= 0) {
         err = P4_PegError;
         P4_EvalRaise(
-            "%s: literal rule should have at least one character. " TOKEN_ERROR_HINT_FMT,
-            P4_GetErrorString(P4_PegError),
-            TOKEN_ERROR_HINT
+            "literal rule should have at least one character. "
+            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT
         );
     }
 
@@ -3795,10 +3781,8 @@ P4_PegEvalLiteral(P4_Token* token, P4_Result* result) {
                 (i + size > token->slice.stop.pos-1)) {
             err = P4_PegError;
             P4_EvalRaise(
-                "%s: char %lu is invalid, " TOKEN_ERROR_HINT_FMT,
-                P4_GetErrorString(P4_PegError),
-                idx,
-                TOKEN_ERROR_HINT
+                "char %lu is invalid. " TOKEN_ERROR_HINT_FMT,
+                idx, TOKEN_ERROR_HINT
             );
         }
 
@@ -4051,7 +4035,7 @@ P4_PegEvalRepeat(P4_Token* token, P4_Result* result) {
     if (min > max) {
         err = P4_PegError;
         P4_EvalRaise(
-            "PegError: Repeat min %lu is greater than max %lu. "
+            "repeat min %lu is greater than max %lu. "
             TOKEN_ERROR_HINT_FMT, min, max, TOKEN_ERROR_HINT
         );
     }
@@ -4224,13 +4208,8 @@ P4_PegEvalGrammar(P4_Token* token, P4_Result* result) {
 
     result->token   = token;
 
-    if ((grammar = P4_CreateGrammar()) == NULL) {
-        err = P4_MemoryError;
-        P4_EvalRaise(
-            "%s: failed to create grammar.\n",
-            P4_GetErrorString(P4_MemoryError)
-        );
-    }
+    if ((grammar = P4_CreateGrammar()) == NULL)
+        P4_Panic("MemoryError: failed to create grammar");
 
     P4_Expression* rule = NULL;
     P4_Token*      child = NULL;
@@ -4243,10 +4222,7 @@ P4_PegEvalGrammar(P4_Token* token, P4_Result* result) {
         rule = P4_UnwrapExpression(result);
 
         if ((err = P4_AddGrammarRule(grammar, id, rule)) != P4_Ok)
-            P4_EvalRaise(
-                "%s: failed to add %" PRIu64 "th rule.",
-                P4_GetErrorString(P4_PegError), id
-            );
+            P4_EvalRaise("failed to add %" PRIu64 "th rule.", id);
 
         id++;
     }
@@ -4331,14 +4307,7 @@ P4_LoadGrammarResult(P4_String rules, P4_Result* result) {
         );
 
     if ((err = P4_PegEvalGrammar(rules_tok, evalres)) != P4_Ok)
-        P4_EvalRaise(
-            "%s: %s, line %zu:%zu (char %zu).",
-            P4_GetErrorString(err),
-            evalres->errmsg,
-            evalres->token->slice.start.lineno,
-            evalres->token->slice.start.offset,
-            evalres->token->slice.start.pos
-        );
+        P4_EvalRaise("%s: %s.", P4_GetErrorString(err), evalres->errmsg);
 
 finalize:
     result->grammar = (err == P4_Ok) ? evalres->grammar : NULL;

@@ -555,6 +555,18 @@ typedef struct P4_Grammar{
     P4_UserDataFreeFunc     free_func;
 } P4_Grammar;
 
+typedef struct P4_Result {
+    P4_Token*                   token;
+    union {
+        P4_String               str;
+        P4_Rune                 rune;
+        size_t                  num;
+        P4_ExpressionFlag       flag;
+        P4_Expression*          expr;
+        P4_Grammar*             grammar;
+    };
+    char                        errmsg[256];
+}                               P4_Result;
 
 /*
  *
@@ -2016,6 +2028,26 @@ P4_Grammar*    P4_CreatePegGrammar ();
  */
 P4_String      P4_StringifyPegGrammarRuleID(P4_RuleID id);
 
+
+/**
+ * @brief       Load peg grammar result from a string.
+ * @param       rules   The rules string.
+ * @param       result  The P4_Result object.
+ * @return      The error code.
+ *
+ * To get the result grammar, if return P4_Ok, use result->grammar.
+ *
+ * Example:
+ *
+ *      P4_Result result = {0};
+ *
+ *      if (P4_Ok == P4_LoadGrammarResult(RULES, &result)) {
+ *          P4_Grammar* grammar = result.grammar;
+ *      } else {
+ *          printf("%s\n", result.errmsg);
+ *      }
+ */
+P4_Error P4_LoadGrammarResult(P4_String rules, P4_Result* result);
 
 /**
  * @brief       Load peg grammar from a string.

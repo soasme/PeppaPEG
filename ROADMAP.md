@@ -1,24 +1,22 @@
 # ROADMAP
 
-- [ ] api: add api to operate slice comparison, copy and length.
-- [ ] api: Run in VERBOSE mode.
-- [ ] api: Add traverse functions for Tokens.
+- [ ] api: operate slice (copy string, get size, etc).
+- [ ] api: set source verbose mode.
 - [ ] api: save backreference in source stack so it can be used outside a sequence.
-- [ ] api: Except (Any but).
-- [ ] api: Until.
+- [ ] api: except (any but).
+- [ ] api: until.
 - [ ] api: take a look at ohm.
-- [ ] api: Sanitize `\u0000` to whitespace for the source input, this happens in creating the source/setting the source size.
-- [ ] api: left recursion. https://github.com/orlandohill/peg-left-recursion
+- [ ] api: Sanitize `\0` to whitespace for the source input, this happens in creating the source/setting the source size.
 - [ ] api: register a function for matching source. This should help dealing with some inputs difficult to parse.
-- [ ] api: Support UTF-8 BOM sequence (0xEF 0xBB 0xBF) at the start of source.
+- [ ] api: support UTF-8 BOM sequence (0xEF 0xBB 0xBF) at the start of source.
 - [ ] api: add `expect_rule_id`, instead of saving `errmsg`.
-- [ ] peg: Numeric.
-- [ ] peg: Complement.
-- [ ] peg: Panic.
-- [ ] peg: Function.
-- [ ] peg: Sub Grammar.
-- [ ] peg: Stop on first error v/s Recover from Panic.
-- [ ] peg: left recursive: https://tratt.net/laurie/research/pubs/html/tratt__direct_left_recursive_parsing_expression_grammars/
+- [ ] peg: numeric.
+- [ ] peg: complement.
+- [ ] peg: panic.
+- [ ] peg: function.
+- [ ] peg: sub grammar.
+- [ ] peg: stop on first error v/s recover from Panic.
+- [ ] peg: left recursive: https://tratt.net/laurie/research/pubs/html/tratt__direct_left_recursive_parsing_expression_grammars/ https://github.com/orlandohill/peg-left-recursion
 - [ ] peg: support Python-style INDENT rule.
 - [ ] peg: describe grammar AST using ADSL-style rules.
 - [ ] perf: pre-alloc tokens.
@@ -29,8 +27,8 @@
       https://github.com/orlandohill/peg-left-recursion
 - [ ] binding: python: example: cffi, misaka, parsimonious (api). <https://tomassetti.me/parsing-in-python/>.
 - [ ] tests: benchmark: example: json-c. `valgrind --tool=massif --massif-out-file=massif.out ./build/tests/test_example_json && ms_print massif.out ms_print.out`.
-- [ ] tests: Enable AddressSanitizer. Example: cJSON.
-- [ ] tests: Add a fuzzy testing framework.
+- [ ] tests: enable AddressSanitizer. Example: cJSON.
+- [ ] tests: add a fuzzy testing framework.
 - [ ] docs: read [A parsing machine for PEGs](http://www.inf.puc-rio.br/~roberto/docs/ry08-4.pdf).
 - [ ] docs: landing page for the project doc site.
 - [ ] docs: example: brainfuck https://en.wikipedia.org/wiki/Brainfuck
@@ -40,7 +38,7 @@
 - [ ] lang: awk grammar: https://github.com/onetrueawk/awk/blob/master/lex.c https://github.com/onetrueawk/awk/blob/master/awkgram.y
 - [ ] lang: sql grammar: https://tomassetti.me/parsing-sql/
 - [ ] lang: A binary executable for display parsed results in JSON output. The executable can support general programming languages, such as Mustache, Python, JSON, YAML, etc. Some other programs can then takes the input from stdin and do some fancy work. `p4 parse --lang=py38 source.py`
-- [ ] Pratt parser: https://en.wikipedia.org/wiki/Operator-precedence_parser
+- [ ] pratt parser: https://en.wikipedia.org/wiki/Operator-precedence_parser
 - [ ] build: static lib.
 - [ ] build: wasm. `docker run --rm -v $(pwd):/src -u $(id -u):$(id -g)   emscripten/emsdk emcc peppapeg.c -Os -s WASM=1 -s SIDE_MODULE=1 -o /src/peppapeg.wasm`.  https://gist.github.com/kripken/59c67556dc03bb6d57052fedef1e61ab https://github.com/mbasso/awesome-wasm
 - [x] bug: eval grammar: when failed, should produce no grammar. Fixed in v1.13.0

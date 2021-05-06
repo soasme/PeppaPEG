@@ -4,7 +4,14 @@ Change Log
 Not Yet Released
 ----------------
 
-Code change: <https://github.com/soasme/PeppaPEG/compare/v1.12.0..HEAD>.
+Code change: <https://github.com/soasme/PeppaPEG/compare/v1.13.0..HEAD>.
+
+1.13.0 (6 May, 2021)
+--------------------
+
+Code change: <https://github.com/soasme/PeppaPEG/compare/v1.12.0..v1.13.0>.
+
+* [Enhancement]: Explicitly specify the expected rule & the position where error occurs. `#70 <https://github.com/soasme/PeppaPEG/pull/70>`_ `#71 <https://github.com/soasme/PeppaPEG/pull/71>`_ `#72 <https://github.com/soasme/PeppaPEG/pull/72>`_ `#74 <https://github.com/soasme/PeppaPEG/pull/74>`_ `#75 <https://github.com/soasme/PeppaPEG/pull/75>`_
 
 1.12.0 (17 Apr, 2021)
 ---------------------

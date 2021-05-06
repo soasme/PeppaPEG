@@ -1173,11 +1173,8 @@ P4_NeedLift(P4_Source* s, P4_Expression* e) {
 P4_PRIVATE(void)
 P4_RaiseError(P4_Source* s, P4_Error err, P4_String errmsg) {
     s->err = err;
-
-    if (s->errmsg != NULL)
-        P4_FREE(s->errmsg);
-
-    s->errmsg = strdup(errmsg);
+    memset(s->errmsg, 0, sizeof(s->errmsg));
+    sprintf(s->errmsg, "%s", errmsg);
 }
 
 
@@ -1189,11 +1186,7 @@ P4_RaiseError(P4_Source* s, P4_Error err, P4_String errmsg) {
 P4_PRIVATE(void)
 P4_RescueError(P4_Source* s) {
     s->err = P4_Ok;
-    if (s->errmsg != NULL) {
-        P4_FREE(s->errmsg);
-        s->errmsg = NULL;
-        s->errmsg = strdup("");
-    }
+    memset(s->errmsg, 0, sizeof(s->errmsg));
 }
 
 
@@ -2470,14 +2463,13 @@ P4_CreateSource(P4_String content, P4_RuleID rule_id) {
     source->pos = 0;
     source->lineno = 0;
     source->offset = 0;
-    source->err = P4_Ok;
-    source->errmsg = NULL;
     source->root = NULL;
     source->frame_stack = NULL;
     source->frame_stack_size = 0;
     source->whitespacing = false;
 
     P4_SetSourceSlice(source, 0, strlen(content));
+    P4_RescueError(source);
 
     return source;
 }
@@ -2511,10 +2503,7 @@ P4_ResetSource(P4_Source* source) {
         source->frame_stack = tmp;
     }
 
-    source->err = P4_Ok;
-
-    if (source->errmsg)
-        P4_FREE(source->errmsg);
+    P4_RescueError(source);
 
     if (source->root) {
         P4_DeleteTokenUserData(source->grammar, source->root);

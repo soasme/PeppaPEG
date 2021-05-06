@@ -19,6 +19,12 @@
     TEST_ASSERT_EQUAL_MESSAGE( \
             (parse_code), P4_Parse(grammar, source), \
             "source code should be correctly parsed"); \
+    if ((parse_code) != P4_Ok) { \
+        TEST_ASSERT_EQUAL_STRING((ast), P4_GetErrorMessage(source)); \
+        P4_DeleteSource(source); \
+        P4_DeleteGrammar(grammar); \
+        break; \
+    } \
     P4_Token*       ast_token = P4_GetSourceAst(source); \
     FILE *f = fopen("check.json","w"); \
     P4_JsonifySourceAst(grammar, f, ast_token); \
@@ -338,21 +344,21 @@ void test_eval_range(void) {
     ASSERT_EVAL_GRAMMAR("R1 = [\\u{0001}-\\u{10ffff}];", "R1", "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [你-好];", "R1", "你", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [1-9..2];", "R1", "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = [1-9..2];", "R1", "2", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = [1-9..2];", "R1", "2", P4_MatchError, "expect R1");
     ASSERT_EVAL_GRAMMAR("R1 = [1-9..2];", "R1", "3", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = [1-9..2];", "R1", "4", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = [1-9..2];", "R1", "4", P4_MatchError, "expect R1");
     ASSERT_EVAL_GRAMMAR("R1 = [\\p{Cc}];", "R1", "\n", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [\\p{Cc}];", "R1", "\b", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [\\p{L}];", "R1", "A", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [\\p{L}]+;", "R1", "HELLOWORÌD", P4_Ok, "[{\"slice\":[0,11],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [\\p{Lu}];", "R1", "A", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = [\\p{Lu}];", "R1", "a", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = [\\p{Lu}];", "R1", "a", P4_MatchError, "expect R1");
     ASSERT_EVAL_GRAMMAR("R1 = [\\p{Ll}];", "R1", "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = [\\p{Ll}];", "R1", "A", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = [\\p{Ll}];", "R1", "A", P4_MatchError, "expect R1");
     ASSERT_EVAL_GRAMMAR("R1 = [\\p{Zl}];", "R1", "\xE2\x80\xA8", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = [\\p{Zl}];", "R1", " ", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = [\\p{Zl}];", "R1", " ", P4_MatchError, "expect R1");
     ASSERT_EVAL_GRAMMAR("R1 = [\\p{Zp}];", "R1", "\xE2\x80\xA9", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = [\\p{Zp}];", "R1", " ", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = [\\p{Zp}];", "R1", " ", P4_MatchError, "expect R1");
     ASSERT_EVAL_GRAMMAR("R1 = [\\p{Zs}];", "R1", "\xC2\xA0", P4_Ok, "[{\"slice\":[0,2],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [\\p{Zs}];", "R1", " ", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [\\p{Z}];", "R1", " ", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
@@ -377,38 +383,38 @@ void test_eval_choice(void) {
     ASSERT_EVAL_GRAMMAR("R1 = \"a\" / \"b\" / \"c\";", "R1", "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\" / \"b\" / \"c\";", "R1", "b", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\" / \"b\" / \"c\";", "R1", "c", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = \"a\" / \"b\" / \"c\";", "R1", "d", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\" / \"b\" / \"c\";", "R1", "d", P4_MatchError, "expect R1");
 }
 
 void test_eval_positive(void) {
     ASSERT_EVAL_GRAMMAR("R1 = &\"a\" \"apple\";", "R1", "apple", P4_Ok, "[{\"slice\":[0,5],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = &\"b\" \"apple\";", "R1", "beef", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = &\"b\" \"apple\";", "R1", "beef", P4_MatchError, "expect R1");
     ASSERT_EVAL_GRAMMAR("R1 = &\"a\" i\"apple\";", "R1", "aPPLE", P4_Ok, "[{\"slice\":[0,5],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = &\"a\" i\"apple\";", "R1", "APPLE", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = &\"a\" i\"apple\";", "R1", "APPLE", P4_MatchError, "expect R1");
 }
 
 void test_eval_negative(void) {
     ASSERT_EVAL_GRAMMAR("R1 = !\"a\" [a-f];", "R1", "b", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = !\"b\" [a-f];", "R1", "b", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = !\"b\" [a-f];", "R1", "b", P4_MatchError, "expect R1");
 }
 
 void test_eval_repeat(void) {
     ASSERT_EVAL_GRAMMAR("R1 = (\"\\n\" / \"\\r\")+;", "R1", "\r\n\r\n", P4_Ok, "[{\"slice\":[0,4],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "1A9F", P4_Ok, "[{\"slice\":[0,4],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "FFFFFF", P4_Ok, "[{\"slice\":[0,6],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "HHHH", P4_MatchError, "[]");
-    ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "HHHH", P4_MatchError, "expect R1");
+    ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "", P4_MatchError, "expect R1");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\"*;", "R1", "aaaaa", P4_Ok, "[{\"slice\":[0,5],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\"*;", "R1", "", P4_Ok, "[]");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\"+;", "R1", "aaaaa", P4_Ok, "[{\"slice\":[0,5],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = \"a\"+;", "R1", "", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"+;", "R1", "", P4_MatchError, "expect R1");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\"?;", "R1", "", P4_Ok, "[]");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\"?;", "R1", "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = \"a\"{2,3};", "R1", "a", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"{2,3};", "R1", "a", P4_MatchError, "expect R1");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\"{2,3};", "R1", "aa", P4_Ok, "[{\"slice\":[0,2],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\"{2,3};", "R1", "aaa", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\"{2,3};", "R1", "aaaa", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = \"a\"{2,};", "R1", "a", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"{2,};", "R1", "a", P4_MatchError, "expect R1");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\"{2,};", "R1", "aa", P4_Ok, "[{\"slice\":[0,2],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\"{2,};", "R1", "aaa", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\"{,3};", "R1", "", P4_Ok, "[]");
@@ -416,7 +422,7 @@ void test_eval_repeat(void) {
     ASSERT_EVAL_GRAMMAR("R1 = \"a\"{,3};", "R1", "aa", P4_Ok, "[{\"slice\":[0,2],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\"{,3};", "R1", "aaa", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\"{,3};", "R1", "aaaa", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = \"a\"{3};", "R1", "aa", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"{3};", "R1", "aa", P4_MatchError, "expect R1");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\"{3};", "R1", "aaa", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\"{3};", "R1", "aaaa", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
 }
@@ -480,7 +486,7 @@ void test_eval_reference(void) {
 void test_eval_dot(void) {
     ASSERT_EVAL_GRAMMAR("R1 = .;", "R1", "好", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = .;", "R1", "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = \"a\"* !.;", "R1", "aaab", P4_MatchError, "[]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\"* !.;", "R1", "aaab", P4_MatchError, "expect R1");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\"* !.;", "R1", "aaa", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
 }
 
@@ -590,7 +596,7 @@ void test_eval_flags(void) {
         "@spaced @lifted\n"
         "R2 = \" \" / \"\\t\" / \"\\r\" / \"\\n\";",
 
-        "R1", "x   x x\t\t\nx", P4_MatchError, "[]"
+        "R1", "x   x x\t\t\nx", P4_MatchError, "expect R1"
     );
 
     ASSERT_EVAL_GRAMMAR(

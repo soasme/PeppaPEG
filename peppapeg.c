@@ -4117,8 +4117,6 @@ P4_PegEvalGrammar(P4_Token* token, P4_Result* result) {
     P4_Grammar* grammar = NULL;
     size_t      i = 0;
 
-    result->token   = token;
-
     if ((grammar = P4_CreateGrammar()) == NULL)
         P4_Panic("failed to create grammar: out of memory.");
 

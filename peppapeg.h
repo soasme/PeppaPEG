@@ -555,16 +555,21 @@ typedef struct P4_Grammar{
     P4_UserDataFreeFunc     free_func;
 } P4_Grammar;
 
+/**
+ * The result object that holds either value or errors.
+ */
 typedef struct P4_Result {
-    P4_Token*                   token;
     union {
         P4_String               str;
         P4_Rune                 rune;
         size_t                  num;
         P4_ExpressionFlag       flag;
+        /* The expression result. */
         P4_Expression*          expr;
+        /* The grammar result. */
         P4_Grammar*             grammar;
     };
+    /* The error message. */
     char                        errmsg[256];
 }                               P4_Result;
 

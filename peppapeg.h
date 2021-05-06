@@ -420,7 +420,7 @@ typedef struct P4_Source {
     /** The error code of the parse. */
     P4_Error                err;
     /** The error message of the parse. */
-    P4_String               errmsg;
+    char                    errmsg[120];
 
     /** The root of abstract syntax tree. */
     struct P4_Token*        root;

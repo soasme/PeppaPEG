@@ -186,7 +186,7 @@ void test_lineno_offset(void) {
     TEST_ASSERT_NOT_NULL(token);
     ASSERT_EQUAL_TOKEN_RULE(R1, token);
     ASSERT_EQUAL_TOKEN_STRING("A\nBC\n", token);
-    ASSERT_EQUAL_TOKEN_LINE_OFFSET(1, 0, 2, 3, token);
+    ASSERT_EQUAL_TOKEN_LINE_OFFSET(1, 1, 2, 4, token);
 
     TEST_ASSERT_NULL(token->next);
     TEST_ASSERT_NULL(token->head);

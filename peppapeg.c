@@ -67,7 +67,7 @@ static void P4_Panicf(const char * fmt, ...) { va_list args; va_start(args, fmt)
 # if defined(DEBUG)
 #define ASSERT(c,m) if(!(c)) P4_Panicf("[%s:%d] Assert failed in %s(): %s\n", __FILE__, __LINE__, __func__, (m));
 # else
-#define ASSERT(condition, message) do { } while (false)
+#define ASSERT(c,m) do { } while (false)
 # endif
 
 # define                        catch(s) \
@@ -153,10 +153,8 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
             err = P4_NullError;     \
             goto end;               \
         }                           \
-        if ((expr = (rule)) == NULL) { \
-            err = P4_MemoryError;   \
-            goto end;               \
-        }                           \
+        if ((expr = (rule)) == NULL) \
+            P4_Panic("failed to create expression: out of memory"); \
                                     \
         if ((err=P4_AddGrammarRule(grammar, id, expr))!=P4_Ok) {\
             goto end;               \
@@ -1289,9 +1287,7 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
 
     P4_Frame* frame = P4_MALLOC(sizeof(P4_Frame));
 
-    if (frame == NULL) {
-        return P4_MemoryError;
-    }
+    if (frame == NULL) P4_Panic("failed to create frame: out of memory.");
 
     P4_Frame* top = s->frame_stack;
 
@@ -1339,8 +1335,7 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
  */
 P4_PRIVATE(P4_Error)
 P4_PopFrame(P4_Source* s, P4_Frame* f) {
-    if (s->frame_stack == NULL)
-        return P4_MemoryError;
+    ASSERT(s->frame_stack != NULL, "frame should not be empty");
 
     P4_Frame* oldtop = s->frame_stack;
 
@@ -1386,10 +1381,9 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
         return NULL;
 
     P4_Token* result = NULL;
-    if ((result=P4_CreateToken (s->content, startpos, endpos, e->id)) == NULL) {
-        P4_RaiseError(s, P4_MemoryError, "");
-        return NULL;
-    }
+
+    if ((result=P4_CreateToken (s->content, startpos, endpos, e->id)) == NULL)
+        P4_Panic("failed to create token: out of memory");
 
     return result;
 }
@@ -1433,10 +1427,9 @@ P4_MatchRange(P4_Source* s, P4_Expression* e) {
         return NULL;
 
     P4_Token* result = NULL;
-    if ((result=P4_CreateToken (s->content, startpos, endpos, e->id)) == NULL) {
-        P4_RaiseError(s, P4_MemoryError, "oom");
-        return NULL;
-    }
+
+    if ((result=P4_CreateToken (s->content, startpos, endpos, e->id)) == NULL)
+        P4_Panic("failed to create token: out of memory");
 
     return result;
 }
@@ -1483,10 +1476,8 @@ P4_MatchReference(P4_Source* s, P4_Expression* e) {
     /* */
     P4_Token* result = NULL;
 
-    if ((result=P4_CreateToken (s->content, startpos, endpos, e->id)) == NULL) {
-        P4_RaiseError(s, P4_MemoryError, "oom");
-        return NULL;
-    }
+    if ((result=P4_CreateToken (s->content, startpos, endpos, e->id)) == NULL)
+        P4_Panic("failed to create token: out of memory");
 
     P4_AdoptToken(result->head, result->tail, reftok);
     return result;
@@ -1503,10 +1494,8 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
              *whitespace = NULL;
 
     autofree P4_Slice* backrefs = P4_MALLOC(sizeof(P4_Slice) * e->count);
-    if (backrefs == NULL) {
-        P4_RaiseError(s, P4_MemoryError, "OOM");
-        return NULL;
-    }
+    if (backrefs == NULL)
+        P4_Panic("failed to create slices: out of memory");
 
     bool need_space = NEED_SPACE(s);
 
@@ -1556,10 +1545,8 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
     P4_MarkPosition(s, endpos);
 
     P4_Token* ret = P4_CreateToken (s->content, startpos, endpos, e->id);
-    if (ret == NULL) {
-        P4_RaiseError(s, P4_MemoryError, "oom");
-        return NULL;
-    }
+    if (ret == NULL)
+        P4_Panic("failed to create token: out of memory");
 
     ret->head = head;
     ret->tail = tail;
@@ -1602,10 +1589,8 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
         return tok;
 
     P4_Token* oneof = P4_CreateToken (s->content, startpos, endpos, e->id);
-    if (oneof == NULL) {
-        P4_RaiseError(s, P4_MemoryError, "oom");
-        goto finalize;
-    }
+    if (oneof == NULL)
+        P4_Panic("failed to create token: out of memory");
 
     P4_AdoptToken(oneof->head, oneof->tail, tok);
     return oneof;
@@ -1729,10 +1714,8 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     P4_MarkPosition(s, endpos);
 
     P4_Token* repetition = P4_CreateToken (s->content, startpos, endpos, e->id);
-    if (repetition == NULL) {
-        P4_RaiseError(s, P4_MemoryError, "oom");
-        return NULL;
-    }
+    if (repetition == NULL)
+        P4_Panic("failed to create token: out of memory");
 
     P4_AdoptToken(repetition->head, repetition->tail, head);
     return repetition;
@@ -1930,10 +1913,8 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
 
     autofree P4_String litstr = P4_CopySliceString(s->content, slice);
 
-    if (litstr == NULL) {
-        P4_RaiseError(s, P4_MemoryError, "OOM");
-        return NULL;
-    }
+    if (litstr == NULL)
+        P4_Panic("failed to create string: out of memory");
 
     P4_Expression* backref_expr = e->members[index];
 
@@ -1944,10 +1925,8 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
 
     P4_Expression* litexpr = P4_CreateLiteral(litstr, backref->sensitive);
 
-    if (litexpr == NULL) {
-        P4_RaiseError(s, P4_MemoryError, "OOM");
-        return NULL;
-    }
+    if (litexpr == NULL)
+        P4_Panic("failed to create expression: out of memory");
 
     if (backref_expr->kind == P4_Reference)
         litexpr->id = backref_expr->ref_id;
@@ -2422,7 +2401,7 @@ P4_AddGrammarRule(P4_Grammar* grammar, P4_RuleID id, P4_Expression* expr) {
     }
 
     if (rules == NULL)
-        return P4_MemoryError;
+        P4_Panic("failed to add grammar rule: out of memory");
 
     expr->id = id;
 
@@ -2620,6 +2599,7 @@ P4_GetErrorMessage(P4_Source* source) {
 P4_PRIVATE(P4_Error)
 P4_SetWhitespaces(P4_Grammar* grammar) {
     size_t          i = 0, j = 0;
+    P4_Error        err = P4_Ok;
 
     /* Get the total number of SPACED rules */
     size_t          count = 0;
@@ -2637,7 +2617,7 @@ P4_SetWhitespaces(P4_Grammar* grammar) {
     /* Create a wrapper repeat expression. */
     P4_Expression*  repeat = P4_CreateChoice(count);
     if (repeat == NULL)
-        return P4_MemoryError;
+        P4_Panic("failed to create expression: out of memory");
 
     /* Add all SPACED rules to the repeat expression. */
     P4_Expression *rule = NULL, *rule_ref = NULL;
@@ -2648,11 +2628,11 @@ P4_SetWhitespaces(P4_Grammar* grammar) {
             rule_ref = P4_CreateReference(rule->id);
 
             if (rule_ref == NULL)
-                goto finalize;
+                P4_Panic("failed to create expression: out of memory");
 
             rule_ref->ref_expr = rule;
 
-            if (P4_Ok != P4_SetMember(repeat, j, rule_ref))
+            if ((err = P4_SetMember(repeat, j, rule_ref)) != P4_Ok)
                 goto finalize;
 
             j++;
@@ -2661,7 +2641,7 @@ P4_SetWhitespaces(P4_Grammar* grammar) {
 
     /* Repeat the choice for zero or more times. */
     if ((grammar->spaced_rules = P4_CreateZeroOrMore(repeat))== NULL)
-        goto finalize;
+        P4_Panic("failed to create expression: out of memory");
 
     return P4_Ok;
 
@@ -2673,7 +2653,7 @@ finalize:
     grammar->spaced_rules = NULL;
     grammar->spaced_count = SIZE_MAX;
 
-    return P4_MemoryError;
+    return err;
 }
 
 P4_PRIVATE(P4_Expression*)
@@ -2779,6 +2759,7 @@ P4_AddSequence(P4_Grammar* grammar, P4_RuleID id, size_t size) {
 P4_PUBLIC P4_Error
 P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_RuleID id, size_t count, ...) {
     P4_AddSomeGrammarRule(grammar, id, P4_CreateSequence(count));
+
     size_t i = 0;
     P4_Expression* expr = P4_GetGrammarRule(grammar, id);
 
@@ -2788,19 +2769,13 @@ P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_RuleID id, size_t count, ...) 
     for (i = 0; i < count; i++) {
         expr->members[i] = va_arg(members, P4_Expression*);
 
-        if (expr->members[i] == NULL) {
-            goto finalize;
-        }
+        if (expr->members[i] == NULL)
+            P4_Panicf("failed to set %zuth expression.", i);
     }
 
     va_end (members);
 
     return P4_Ok;
-
-finalize:
-    P4_DeleteExpression(expr);
-
-    return P4_MemoryError;
 }
 
 P4_PUBLIC P4_Error
@@ -2813,6 +2788,7 @@ P4_AddChoice(P4_Grammar* grammar, P4_RuleID id, size_t size) {
 P4_PUBLIC P4_Error
 P4_AddChoiceWithMembers(P4_Grammar* grammar, P4_RuleID id, size_t count, ...) {
     P4_AddSomeGrammarRule(grammar, id, P4_CreateChoice(count));
+
     P4_Expression* expr = P4_GetGrammarRule(grammar, id);
     size_t i = 0;
 
@@ -2822,19 +2798,13 @@ P4_AddChoiceWithMembers(P4_Grammar* grammar, P4_RuleID id, size_t count, ...) {
     for (i = 0; i < count; i++) {
         expr->members[i] = va_arg(members, P4_Expression*);
 
-        if (expr->members[i] == NULL) {
-            goto finalize;
-        }
+        if (expr->members[i] == NULL)
+            P4_Panicf("failed to set %zuth expression.", i);
     }
 
     va_end (members);
 
     return P4_Ok;
-
-finalize:
-    P4_DeleteExpression(expr);
-
-    return P4_MemoryError;
 }
 
 P4_PUBLIC P4_Error
@@ -2863,9 +2833,8 @@ P4_SetMember(P4_Expression* expr, size_t offset, P4_Expression* member) {
 P4_PUBLIC P4_Error
 P4_SetReferenceMember(P4_Expression* expr, size_t offset, P4_RuleID ref) {
     P4_Expression* ref_expr = P4_CreateReference(ref);
-    if (ref_expr == NULL) {
-        return P4_MemoryError;
-    }
+    if (ref_expr == NULL)
+        P4_Panic("failed to create expression: out of memory.");
 
     P4_Error error = P4_SetMember(expr, offset, ref_expr);
     if (error != P4_Ok) {
@@ -3719,8 +3688,7 @@ P4_PegEvalNumber(P4_Token* token, size_t* num) {
 
     if ((str = P4_CopyTokenString(token)) == NULL) {
         *num = 0;
-        P4_Panicf("MemoryError: failed to copy number string. "
-                TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
+        P4_Panic("failed to create string: out of memory.");
     }
 
     *num = atol(str);
@@ -3764,8 +3732,7 @@ P4_PegEvalLiteral(P4_Token* token, P4_Result* result) {
 
     cur = lit = P4_MALLOC((len+1) * sizeof(char));
     if (lit == NULL)
-        P4_Panicf("MemoryError: failed to copy literal string. "
-            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
+        P4_Panic("failed to create string: out of memory.");
 
     for (i = token->slice.start.pos+1, idx = 0; i < token->slice.stop.pos-1; i += size) {
         size = P4_ReadEscapedRune(token->text+i, &rune);
@@ -3787,8 +3754,7 @@ P4_PegEvalLiteral(P4_Token* token, P4_Result* result) {
     *cur = '\0';
 
     if ((expr = P4_CreateLiteral(lit, true)) == NULL)
-        P4_Panicf("MemoryError: failed to create literal token. "
-                TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
+        P4_Panic("failed to create expression: out of memory.");
 
 finalize:
     P4_FREE(lit);
@@ -3825,8 +3791,7 @@ P4_PegEvalRange(P4_Token* token, P4_Result* result) {
                 TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
 
         if ((expr = P4_CreateRanges(count, ranges)) == NULL)
-            P4_Panicf("MemoryError: failed to create range rule. "
-                TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
+            P4_Panic("failed to create expression: out of memory.");
 
     } else { /* two to three children - [lower-upper] or [lower-upper..stride] */
         P4_Rune lower = 0, upper = 0;
@@ -3867,8 +3832,7 @@ P4_PegEvalRange(P4_Token* token, P4_Result* result) {
         }
 
         if ((expr = P4_CreateRange(lower, upper, stride)) == NULL)
-            P4_Panicf("MemoryError: failed to create range rule. "
-                TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
+            P4_Panic("failed to create expression: out of memory.");
     }
 
     result->expr = expr;
@@ -3906,8 +3870,7 @@ P4_PegEvalSequence(P4_Token* token, P4_Result* result) {
     P4_Expression*  expr = NULL;
 
     if ((expr = P4_CreateSequence(P4_GetTokenChildrenCount(token))) == NULL)
-        P4_Panicf("MemoryError: failed to create sequence rule. "
-            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
+        P4_Panic("failed to create expression: out of memory.");
 
     catch(P4_PegEvalMembers(token, expr, result));
 
@@ -3925,8 +3888,7 @@ P4_PegEvalChoice(P4_Token* token, P4_Result* result) {
     P4_Expression*  expr = NULL;
 
     if ((expr = P4_CreateChoice(P4_GetTokenChildrenCount(token))) == NULL)
-        P4_Panicf("MemoryError: failed to create choice rule. "
-            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
+        P4_Panic("failed to create expression: out of memory.");
 
     catch(P4_PegEvalMembers(token, expr, result));
 
@@ -3949,8 +3911,7 @@ P4_PegEvalPositive(P4_Token* token, P4_Result* result) {
     ref = P4_UnwrapExpression(result);
 
     if ((expr = P4_CreatePositive(ref)) == NULL)
-        P4_Panicf("MemoryError: failed to create positive rule. "
-            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
+        P4_Panic("failed to create expression: out of memory.");
 
     result->expr = expr;
     return P4_Ok;
@@ -3972,8 +3933,7 @@ P4_PegEvalNegative(P4_Token* token, P4_Result* result) {
     ref = P4_UnwrapExpression(result);
 
     if ((expr = P4_CreateNegative(ref)) == NULL)
-        P4_Panicf("MemoryError: failed to create negative rule. "
-            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
+        P4_Panic("failed to create expression: out of memory.");
 
     result->expr = expr;
     return P4_Ok;
@@ -4035,8 +3995,7 @@ P4_PegEvalRepeat(P4_Token* token, P4_Result* result) {
     }
 
     if ((expr = P4_CreateRepeatMinMax(ref, min, max)) == NULL)
-        P4_Panicf("MemoryError: failed to create repeat rule. "
-            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
+        P4_Panic("failed to create expression: out of memory.");
 
     result->expr = expr;
     return P4_Ok;
@@ -4052,8 +4011,7 @@ P4_PegEvalDot(P4_Token* token, P4_Result* result) {
     P4_Expression* expr = NULL;
 
     if ((expr = P4_CreateRange(0x1, 0x10ffff, 1)) == NULL)
-        P4_Panicf("MemoryError: failed to create dot rule. "
-            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
+        P4_Panic("failed to create expression: out of memory.");
 
     result->expr = expr;
     return P4_Ok;
@@ -4066,8 +4024,7 @@ P4_PegEvalRuleName(P4_Token* token, P4_String* result) {
     ASSERT(len > 0, "Token slice size should be greater than zero.");
 
     if ((*result = P4_MALLOC((len+1) * sizeof(char)))== NULL)
-        P4_Panicf("MemoryError: failed to allocate rule name string. "
-            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
+        P4_Panic("failed to create string: out of memory.");
 
     memcpy(*result, token->text + token->slice.start.pos, len);
     (*result)[len] = '\0';
@@ -4087,8 +4044,7 @@ P4_PegEvalReference(P4_Token* token, P4_Result* result) {
      * So, let's just simply create a placeholder with id=SIZE_MAX.
      */
     if ((expr = P4_CreateReference(SIZE_MAX)) == NULL)
-        P4_Panicf("MemoryError: failed to create reference rule. "
-            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
+        P4_Panic("failed to create expression: out of memory.");
 
     /* However, the string reference must be set.
      * When the full grammar is evaluated, we will refresh
@@ -4203,7 +4159,7 @@ P4_PegEvalGrammar(P4_Token* token, P4_Result* result) {
     result->token   = token;
 
     if ((grammar = P4_CreateGrammar()) == NULL)
-        P4_Panic("MemoryError: failed to create grammar");
+        P4_Panic("failed to create grammar: out of memory.");
 
     P4_Expression* rule = NULL;
     P4_Token*      child = NULL;
@@ -4276,16 +4232,10 @@ P4_LoadGrammarResult(P4_String rules, P4_Result* result) {
     P4_Result*        evalres   = &(P4_Result){0};
 
     if ((bootstrap = P4_CreatePegGrammar()) == NULL)
-        P4_EvalRaise("%s: %s",
-            P4_GetErrorString(P4_MemoryError),
-            "failed to create peg grammar."
-        );
+        P4_Panic("failed to create grammar: out of memory.");
 
     if ((rules_src = P4_CreateSource(rules, P4_PegGrammar)) == NULL)
-        P4_EvalRaise("%s: %s",
-            P4_GetErrorString(P4_MemoryError),
-            "failed to create peg source."
-        );
+        P4_Panic("failed to create source: out of memory.");
 
     if ((err = P4_Parse(bootstrap, rules_src)) != P4_Ok)
         P4_EvalRaise(

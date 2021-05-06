@@ -178,7 +178,8 @@
 <div class="section" id="step-2-create-source">
 <h2>Step 2: Create Source<a class="headerlink" href="#step-2-create-source" title="Permalink to this headline">¶</a></h2>
 <p>We create a <a class="reference internal" href="api.html#c.P4_Source" title="P4_Source"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Source</span></code></a> using <a class="reference internal" href="api.html#c.P4_CreateSource" title="P4_CreateSource"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateSource()</span></code></a>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">P4_Source</span><span class="o">*</span>  <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s2">"Hello</span><span class="se">\n</span><span class="s2">WORLD"</span><span class="p">,</span> <span class="n">ENTRY</span><span class="p">);</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># define ENTRY 1</span>
+    <span class="n">P4_Source</span><span class="o">*</span>  <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s2">"Hello</span><span class="se">\n</span><span class="s2">WORLD"</span><span class="p">,</span> <span class="n">ENTRY</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">source</span> <span class="o">==</span> <span class="n">NULL</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">printf</span><span class="p">(</span><span class="s2">"Error: CreateSource: MemoryError.</span><span class="se">\n</span><span class="s2">"</span><span class="p">);</span>
         <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
@@ -187,7 +188,7 @@
 </div>
 <p>The first parameter is the content of the source.
 The second parameter is the ID of the entry grammar rule, e.g. the numeric index of the rule in the loaded grammar (1-based).</p>
-<p>In this example, we have only single rule <cite>entry</cite>, so the ID is 1.</p>
+<p>In this example, we have only single rule <cite>entry</cite>, so the ID is 1. (If you have multiple rules, the rule IDs increments.)</p>
 </div>
 <div class="section" id="step-3-parse">
 <h2>Step 3: Parse<a class="headerlink" href="#step-3-parse" title="Permalink to this headline">¶</a></h2>
@@ -241,8 +242,8 @@ The second parameter is the ID of the entry grammar rule, e.g. the numeric index
 <li><p><a class="reference internal" href="api.html#c.P4_DeleteSource" title="P4_DeleteSource"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_DeleteSource()</span></code></a> deletes the source along with the entire token tree.</p></li>
 <li><p><a class="reference internal" href="api.html#c.P4_DeleteGrammar" title="P4_DeleteGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_DeleteGrammar()</span></code></a> deletes the grammar along with all the grammar rules.</p></li>
 </ul>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span>
-    <span class="n">P4_JsonifySourceAst</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">root</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span>    <span class="n">P4_DeleteSource</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
+    <span class="n">P4_DeleteGrammar</span><span class="p">(</span><span class="n">grammar</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>

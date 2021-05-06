@@ -41,12 +41,12 @@ Step 2: Create Source
 We create a :c:struct:`P4_Source` using :c:func:`P4_CreateSource()`.
 
 .. literalinclude:: ../example.c
-   :lines: 13-17
+   :lines: 4,13-17
 
 The first parameter is the content of the source.
 The second parameter is the ID of the entry grammar rule, e.g. the numeric index of the rule in the loaded grammar (1-based).
 
-In this example, we have only single rule `entry`, so the ID is 1.
+In this example, we have only single rule `entry`, so the ID is 1. (If you have multiple rules, the rule IDs increments.)
 
 Step 3: Parse
 -------------
@@ -88,7 +88,7 @@ Last but not least, don't forget to free all the allocated memory.
 
 .. literalinclude:: ../example.c
    :language: c
-   :lines: 40-41
+   :lines: 43-44
 
 Full Example Code
 -----------------

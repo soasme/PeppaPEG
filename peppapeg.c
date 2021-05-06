@@ -833,86 +833,35 @@ size_t P4_ReadEscapedRune(char* text, P4_Rune* rune) {
 size_t P4_ReadRuneRange(char* text, P4_Slice* slice, size_t* count, P4_RuneRange** ranges) {
     size_t len = P4_GetSliceSize(slice);
 
-    if (len == 2 && memcmp(text+slice->start.pos, "Cc", len) == 0) {
-        *ranges = _Cc;
-        *count = sizeof(_Cc) / sizeof(P4_RuneRange);
-        return 2;
-    } else if (len == 2 && memcmp(text+slice->start.pos, "Cf", len) == 0) {
-        *ranges = _Cf;
-        *count = sizeof(_Cf) / sizeof(P4_RuneRange);
-        return 2;
-    } else if (len == 2 && memcmp(text+slice->start.pos, "Co", len) == 0) {
-        *ranges = _Co;
-        *count = sizeof(_Co) / sizeof(P4_RuneRange);
-        return 2;
-    } else if (len == 2 && memcmp(text+slice->start.pos, "Cs", len) == 0) {
-        *ranges = _Cs;
-        *count = sizeof(_Cs) / sizeof(P4_RuneRange);
-        return 2;
-    } else if (len == 1 && memcmp(text+slice->start.pos, "C", len) == 0) {
-        *ranges = _C;
-        *count = sizeof(_C) / sizeof(P4_RuneRange);
-        return 1;
-    } else if (len == 2 && memcmp(text+slice->start.pos, "Ll", len) == 0) {
-        *ranges = _Ll;
-        *count = sizeof(_Ll) / sizeof(P4_RuneRange);
-        return 2;
-    } else if (len == 2 && memcmp(text+slice->start.pos, "Lm", len) == 0) {
-        *ranges = _Lm;
-        *count = sizeof(_Lm) / sizeof(P4_RuneRange);
-        return 2;
-    } else if (len == 2 && memcmp(text+slice->start.pos, "Lo", len) == 0) {
-        *ranges = _Lo;
-        *count = sizeof(_Lo) / sizeof(P4_RuneRange);
-        return 2;
-    } else if (len == 2 && memcmp(text+slice->start.pos, "Lt", len) == 0) {
-        *ranges = _Lt;
-        *count = sizeof(_Lt) / sizeof(P4_RuneRange);
-        return 2;
-    } else if (len == 2 && memcmp(text+slice->start.pos, "Lu", len) == 0) {
-        *ranges = _Lu;
-        *count = sizeof(_Lu) / sizeof(P4_RuneRange);
-        return 2;
-    } else if (len == 1 && memcmp(text+slice->start.pos, "L", len) == 0) {
-        *ranges = _L;
-        *count = sizeof(_L) / sizeof(P4_RuneRange);
-        return 1;
-    } else if (len == 2 && memcmp(text+slice->start.pos, "Nd", len) == 0) {
-        *ranges = _Nd;
-        *count = sizeof(_Nd) / sizeof(P4_RuneRange);
-        return 2;
-    } else if (len == 2 && memcmp(text+slice->start.pos, "Nl", len) == 0) {
-        *ranges = _Nl;
-        *count = sizeof(_Nl) / sizeof(P4_RuneRange);
-        return 2;
-    } else if (len == 2 && memcmp(text+slice->start.pos, "No", len) == 0) {
-        *ranges = _No;
-        *count = sizeof(_No) / sizeof(P4_RuneRange);
-        return 2;
-    } else if (len == 1 && memcmp(text+slice->start.pos, "N", len) == 0) {
-        *ranges = _N;
-        *count = sizeof(_N) / sizeof(P4_RuneRange);
-        return 1;
-    } else if (len == 2 && memcmp(text+slice->start.pos, "Zl", len) == 0) {
-        *ranges = _Zl;
-        *count = sizeof(_Zl) / sizeof(P4_RuneRange);
-        return 2;
-    } else if (len == 2 && memcmp(text+slice->start.pos, "Zp", len) == 0) {
-        *ranges = _Zp;
-        *count = sizeof(_Zp) / sizeof(P4_RuneRange);
-        return 2;
-    } else if (len == 2 && memcmp(text+slice->start.pos, "Zs", len) == 0) {
-        *ranges = _Zs;
-        *count = sizeof(_Zs) / sizeof(P4_RuneRange);
-        return 2;
-    } else if (len == 1 && memcmp(text+slice->start.pos, "Z", len) == 0) {
-        *ranges = _Z;
-        *count = sizeof(_Z) / sizeof(P4_RuneRange);
-        return 1;
-    } else {
-        *count = 0;
-        return 0;
+# define READ_RUNE_RANGE(p,l) \
+    if (len == (l) && memcmp(text+slice->start.pos, #p , len) == 0) {\
+        *ranges = _ ## p; \
+        *count = sizeof(_ ## p) / sizeof(P4_RuneRange); \
+        return (l); \
     }
+
+    READ_RUNE_RANGE(Cc, 2);
+    READ_RUNE_RANGE(Cf, 2);
+    READ_RUNE_RANGE(Co, 2);
+    READ_RUNE_RANGE(Cs, 2);
+    READ_RUNE_RANGE(C, 1);
+    READ_RUNE_RANGE(Ll, 2);
+    READ_RUNE_RANGE(Lm, 2);
+    READ_RUNE_RANGE(Lo, 2);
+    READ_RUNE_RANGE(Lt, 2);
+    READ_RUNE_RANGE(Lu, 2);
+    READ_RUNE_RANGE(L, 1);
+    READ_RUNE_RANGE(Nd, 2);
+    READ_RUNE_RANGE(Nl, 2);
+    READ_RUNE_RANGE(No, 2);
+    READ_RUNE_RANGE(N, 1);
+    READ_RUNE_RANGE(Zl, 2);
+    READ_RUNE_RANGE(Zp, 2);
+    READ_RUNE_RANGE(Zs, 2);
+    READ_RUNE_RANGE(Z, 1);
+
+    *count = 0;
+    return 0;
 }
 
 /**
@@ -2590,7 +2539,7 @@ P4_GetErrorString(P4_Error err) {
 
 P4_PUBLIC P4_String
 P4_GetErrorMessage(P4_Source* source) {
-    if (source == NULL || source->errmsg == NULL)
+    if (source == NULL || source->errmsg[0] == 0)
         return NULL;
 
     return source->errmsg;

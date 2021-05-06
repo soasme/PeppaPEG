@@ -117,43 +117,6 @@ cleanup_freep (void *p)
     P4_FREE(*pp);
 }
 
-# define                        P4_AdoptToken(head, tail, list) do { \
-                                    if ((list) != NULL) {\
-                                        if ((head) == NULL) (head) = (list); \
-                                        if ((tail) == NULL) (tail) = (list); \
-                                        else (tail)->next = (list); \
-                                        if ((tail) != NULL) {\
-                                            while ((tail)->next != NULL) \
-                                                (tail) = (tail)->next; \
-                                        } \
-                                    } \
-                                } while (0)
-
-# define                        P4_AddSomeGrammarRule(g, id, rule) do { \
-                                    P4_Error err = P4_Ok;       \
-                                    P4_Expression* expr = NULL; \
-                                                                \
-                                    if (grammar == NULL || id == 0) { \
-                                        err = P4_NullError;     \
-                                        goto end;               \
-                                    }                           \
-                                    if ((expr = (rule)) == NULL) { \
-                                        err = P4_MemoryError;   \
-                                        goto end;               \
-                                    }                           \
-                                                                \
-                                    if ((err=P4_AddGrammarRule(grammar, id, expr))!=P4_Ok) {\
-                                        goto end;               \
-                                    }                           \
-                                                                \
-                                    break;                      \
-                                    end:                        \
-                                    if (expr != NULL) {         \
-                                        P4_DeleteExpression(expr); \
-                                    }                           \
-                                    return err;                 \
-} while (0)
-
 P4_PRIVATE(size_t)       P4_GetRuneSize(P4_Rune ch);
 P4_PRIVATE(P4_Rune)      P4_GetRuneLower(P4_Rune ch);
 P4_PRIVATE(P4_Rune)      P4_GetRuneUpper(P4_Rune ch);
@@ -168,12 +131,51 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
                              .offset = (s)->offset \
                          };
 
-P4_PRIVATE(P4_String)    P4_RemainingText(P4_Source*);
+# define P4_AdoptToken(head, tail, list) \
+    do { \
+        if ((list) != NULL) {\
+            if ((head) == NULL) (head) = (list); \
+            if ((tail) == NULL) (tail) = (list); \
+            else (tail)->next = (list); \
+            if ((tail) != NULL) {\
+                while ((tail)->next != NULL) \
+                    (tail) = (tail)->next; \
+            } \
+        } \
+    } while (0)
 
-P4_PRIVATE(bool)         P4_NeedLift(P4_Source*, P4_Expression*);
+# define P4_AddSomeGrammarRule(g, id, rule) \
+    do { \
+        P4_Error err = P4_Ok;       \
+        P4_Expression* expr = NULL; \
+                                    \
+        if (grammar == NULL || id == 0) { \
+            err = P4_NullError;     \
+            goto end;               \
+        }                           \
+        if ((expr = (rule)) == NULL) { \
+            err = P4_MemoryError;   \
+            goto end;               \
+        }                           \
+                                    \
+        if ((err=P4_AddGrammarRule(grammar, id, expr))!=P4_Ok) {\
+            goto end;               \
+        }                           \
+                                    \
+        break;                      \
+        end:                        \
+        if (expr != NULL) {         \
+            P4_DeleteExpression(expr); \
+        }                           \
+        return err;                 \
+    } while (0)
 
-P4_PRIVATE(void)         P4_RaiseError(P4_Source*, P4_Error, P4_String);
-P4_PRIVATE(void)         P4_RescueError(P4_Source*);
+P4_PRIVATE(P4_String)           P4_RemainingText(P4_Source*);
+
+P4_PRIVATE(bool)                P4_NeedLift(P4_Source*, P4_Expression*);
+
+P4_PRIVATE(void)                P4_RaiseError(P4_Source*, P4_Error, P4_String);
+P4_PRIVATE(void)                P4_RescueError(P4_Source*);
 
 P4_PRIVATE(P4_Error)            P4_PushFrame(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Error)            P4_PopFrame(P4_Source*, P4_Frame*);

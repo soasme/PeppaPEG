@@ -110,7 +110,7 @@ You can traverse the AST and do whatever you can. For example, the below functio
 outputs the source AST into JSON format:
 
 ```
-P4_JsonifySourceAst(source, stdout, root);
+P4_JsonifySourceAst(grammar, stdout, root);
 ```
 
 ```

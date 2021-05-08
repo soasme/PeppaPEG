@@ -1,6 +1,6 @@
-# Peppa PEG
+# ✨ Peppa PEG 🐷 ✨
 
-Ultra lightweight PEG Parser in ANSI C. ✨ 🐷 ✨.
+Ultra lightweight PEG Parser in ANSI C. .
 
 ```
   ____                          ____  _____ ____
@@ -189,6 +189,10 @@ The outputs are stored on `build/docs`.
 * Write a JSON Parser using Peppa PEG: [json.h](examples/json.h).
 * Write a Calculator Parser using Peppa PEG: [calc.h](examples/calc.h), [calc.c](examples/calc.c).
 * Write a [Dot](https://graphviz.org/doc/info/lang.html) parser using Peppa PEG: [dot.h](examples/dot.h).
+
+# Projects Using Peppa PEG
+
+* [toast](https://github.com/soasme/toast)
 
 Made with ❤️  by [Ju](https://github.com/soasme).
 

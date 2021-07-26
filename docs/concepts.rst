@@ -36,7 +36,7 @@ For example, the grammar snippet below defines how to parse arithmetic expressio
    factor = number (("*"/"/") number);
    number = [0-9] / [1-9] [0-9]+;
 
-A parser generator can read a grammar in such a (or similar) notion and produce a parser. The produced parser then reads input and produces AST.
+A parser generator can read a grammar in such a (or similar) notion and produce a parser. The produced parser then reads input and produces a tree.
 
 Peppa PEG provides its own dialect of PEG for describing a grammar. It was inspired by `Pest <https://pest.rs>`_ but is more powerful and more readable.
 
@@ -86,4 +86,4 @@ Unlike one of Peppa PEG alternatives - peg/leg, Peppa PEG doesn't end up with pr
 
 1. Load Grammar. Load your grammar using :c:func:`P4_LoadGrammar` . Alternatively, you can create your grammar using :c:func:`P4_CreateGrammar` and then add grammar rules using :ref:`lowlevel`.
 2. Parse Source. Wrap source string using :c:func:`P4_CreateSource` and then parse it using :c:func:`P4_Parse`.
-3. Traverse AST. It's up to you what to do when traversing the tree. You may inspect the tree, produce bytecodes, trim the tree, etc.
+3. Traverse Tree. It's up to you what to do when traversing the tree. You may inspect the tree, produce bytecodes, trim the tree, etc.

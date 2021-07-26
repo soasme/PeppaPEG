@@ -25,7 +25,7 @@ Let's learn some basic P4 data structures:
 * :c:struct:`P4_Grammar`: The grammar object that defines all grammar rules.
 * :c:struct:`P4_Expression`: The grammar rule object.
 * :c:struct:`P4_Source`: The content to parse.
-* :c:struct:`P4_Token`. The building block of an AST (abstract syntax tree), e.g. the final parsing result of a grammar given the source.
+* :c:struct:`P4_Node`. The node of an AST (abstract syntax tree), e.g. the final parsing result of a grammar given the source.
 
 Step 1: Create Grammar
 ----------------------
@@ -59,16 +59,16 @@ Now the stage is setup; call :c:func:`P4_Parse`. If everything is okay, it retur
 Step 4: Traverse AST
 ---------------------------
 
-P4_Source contains a token tree if parse successfully. We get the root node of such a token tree using :c:func:`P4_GetSourceAst()`.
+P4_Source contains a tree if parse successfully. We get the root node of such a tree using :c:func:`P4_GetSourceAst()`.
 
 To traverse the AST,
 
 * `node->head` is the first children.
 * `node->tail` is the last children.
 * `node->next` is the next sibling.
-* `node->slice.start` is the start position in the source string that the token slice covers.
-* `node->slice.stop` is the end position in the source string that the token slice covers.
-* :c:func:`P4_CopyTokenString()` returns the string the AST node covers.
+* `node->slice.start` is the start position in the source string that the slice covers.
+* `node->slice.stop` is the end position in the source string that the slice covers.
+* :c:func:`P4_CopyNodeString()` returns the string the AST node covers.
 
 .. literalinclude:: ../example.c
    :lines: 28-39
@@ -83,7 +83,7 @@ Step 5: Clean Up
 
 Last but not least, don't forget to free all the allocated memory.
 
-* :c:func:`P4_DeleteSource()` deletes the source along with the entire token tree.
+* :c:func:`P4_DeleteSource()` deletes the source along with the entire tree.
 * :c:func:`P4_DeleteGrammar()` deletes the grammar along with all the grammar rules.
 
 .. literalinclude:: ../example.c
@@ -116,6 +116,6 @@ The output of the example looks like:
 Conclusion
 ----------
 
-In this tutorial, we walk through the basic data structures and combine them in one example. The example parses nothing but "Hello World" to a single token.
+In this tutorial, we walk through the basic data structures and combine them in one example. The example parses nothing but "Hello World" to a single node.
 
 I hope this example can get you a basic understanding of Peppa PEG. Now you can go back to :ref:`main` and pick more docs to read!

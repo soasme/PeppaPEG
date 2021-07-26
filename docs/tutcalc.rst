@@ -40,14 +40,14 @@ To extend a little bit,
 * Rule `term` can parse inputs like `a + b - c + d ...` or `a`.
 * Rule `factor` can parse inputs like `a * b / c * d ...` or `a`.
 * Rule `unary` can parse inputs like `+a`, `++a`, `-a`, `a`, etc.
-* Rule `primary` will have no corresponding token in the ast.
-* Rule `integer` are some squashed digits, which avoids creating tokens for each digit.
+* Rule `primary` will have no corresponding node in the ast.
+* Rule `integer` are some squashed digits, which avoids creating nodes for each digit.
 * Rule `whitespace` allows arbitrary number of whitespace or tab in between expressions.
 
 Step 3: Eval Ast
 ----------------
 
-Next, let's evaluate the token tree. We traverse the AST and calculate the result.
+Next, let's evaluate the tree. We traverse the AST and calculate the result.
 
 .. literalinclude:: ../examples/calc.h
    :lines: 99-164

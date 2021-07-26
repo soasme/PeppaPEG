@@ -101,12 +101,12 @@ When parsing `1,2,3`, it will produce such a data structure:
 
 .. code-block::
 
-    Token(0..5, ROW):
-        Token(0..1, NUM)
-        Token(2..3, NUM)
-        Token(4..5, NUM)
+    Node(0..5, ROW):
+        Node(0..1, NUM)
+        Node(2..3, NUM)
+        Node(4..5, NUM)
 
-The separator will not have its corresponding token, while all joined members have their tokens.
+The separator will not have its corresponding node, while all joined members have their nodes.
 
 How to Replace Malloc/Free/Realloc?
 -----------------------------------
@@ -134,8 +134,8 @@ Say you want to get AST while do not want to keep track of the source, you can:
 
 .. code-block::
 
-    P4_Token* root = P4_AcquireSourceAst(source);
+    P4_Node* root = P4_AcquireSourceAst(source);
     P4_DeleteSource(source);
 
     // do something.
-    P4_DeleteToken(root);
+    P4_DeleteNode(root);

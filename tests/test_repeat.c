@@ -27,8 +27,8 @@ void test_match_zeroormore_at_least_zero(void) {
     );
     TEST_ASSERT_EQUAL(0, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NULL(token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NULL(node);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -58,14 +58,14 @@ void test_match_zeroormore_multiple_times(void) {
     );
     TEST_ASSERT_EQUAL(5, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_STRING("00000", token);
-    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_STRING("00000", node);
+    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -95,14 +95,14 @@ void test_match_onceormore_at_least_once(void) {
     );
     TEST_ASSERT_EQUAL(1, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
-    ASSERT_EQUAL_TOKEN_STRING("0", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_STRING("0", node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -132,14 +132,14 @@ void test_match_onceormore_multiple_times(void) {
     );
     TEST_ASSERT_EQUAL(5, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
-    ASSERT_EQUAL_TOKEN_STRING("00000", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_STRING("00000", node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -171,8 +171,8 @@ void test_match_onceormore_zero_raise_match_error(void) {
     );
     TEST_ASSERT_EQUAL(0, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NULL(token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NULL(node);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -202,8 +202,8 @@ void test_match_zerooronce_match_empty(void) {
     );
     TEST_ASSERT_EQUAL(0, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NULL(token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NULL(node);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -233,14 +233,14 @@ void test_match_zerooronce_exact_once(void) {
     );
     TEST_ASSERT_EQUAL(1, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_STRING("0", token);
-    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_STRING("0", node);
+    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -270,14 +270,14 @@ void test_match_zerooronce_at_most_once(void) {
     );
     TEST_ASSERT_EQUAL(1, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_STRING("0", token);
-    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_STRING("0", node);
+    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -307,14 +307,14 @@ void test_match_repeat_exact_successfully(void) {
     );
     TEST_ASSERT_EQUAL(5, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_STRING("00000", token);
-    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_STRING("00000", node);
+    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -346,8 +346,8 @@ void test_match_repeat_exact_no_less(void) {
     );
     TEST_ASSERT_EQUAL(0, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NULL(token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NULL(node);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -379,8 +379,8 @@ void test_match_repeat_exact_insufficient_attaching_unmatch(void) {
     );
     TEST_ASSERT_EQUAL(0, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NULL(token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NULL(node);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -410,14 +410,14 @@ void test_match_repeat_exact_no_more(void) {
     );
     TEST_ASSERT_EQUAL(5, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_STRING("00000", token);
-    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_STRING("00000", node);
+    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

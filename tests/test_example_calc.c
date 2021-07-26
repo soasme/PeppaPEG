@@ -15,7 +15,7 @@
             (parse_code), P4_Parse(grammar, source), \
             "source code should be correctly parsed"); \
     if ( (parse_code) == P4_Ok ) { \
-        P4_Token*   root = P4_GetSourceAst(source); \
+        P4_Node*   root = P4_GetSourceAst(source); \
         long result = 0; \
         TEST_ASSERT_EQUAL_MESSAGE( P4_Ok, P4_CalcEval(root, &result), "invalid eval"); \
         TEST_ASSERT_EQUAL_MESSAGE( (r), result, "invalid eval result" ); \

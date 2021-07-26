@@ -25,9 +25,9 @@
         P4_DeleteGrammar(grammar); \
         break; \
     } \
-    P4_Token*       ast_token = P4_GetSourceAst(source); \
+    P4_Node*       ast_node = P4_GetSourceAst(source); \
     FILE *f = fopen("check.json","w"); \
-    P4_JsonifySourceAst(grammar, f, ast_token); \
+    P4_JsonifySourceAst(grammar, f, ast_node); \
     fclose(f); \
     P4_String s = read_file("check.json"); TEST_ASSERT_EQUAL_STRING((ast), s); free(s); \
     P4_DeleteSource(source); \
@@ -39,7 +39,7 @@
     P4_Source* source = P4_CreateSource((input), (entry)); \
     TEST_ASSERT_EQUAL_MESSAGE((code), P4_Parse(grammar, source), "unexpected parse grammar return code"); \
     if ((code) == P4_Ok) { \
-        P4_Token* root = P4_GetSourceAst(source); \
+        P4_Node* root = P4_GetSourceAst(source); \
         FILE *f = fopen("check.json","w"); \
         P4_JsonifySourceAst(grammar, f, root); \
         fclose(f); \
@@ -57,7 +57,7 @@
     P4_Grammar* grammar = P4_CreatePegGrammar(); \
     P4_Source* source = P4_CreateSource((input), (entry)); \
     TEST_ASSERT_EQUAL(P4_Ok, P4_Parse(grammar, source)); \
-    P4_Token* root = P4_GetSourceAst(source);
+    P4_Node* root = P4_GetSourceAst(source);
 
 # define TEARDOWN_EVAL() \
     P4_DeleteSource(source); \

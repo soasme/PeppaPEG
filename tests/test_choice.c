@@ -29,13 +29,13 @@ void test_match_literal_choices_successfully(void) {
     );
     TEST_ASSERT_EQUAL(14, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
-    ASSERT_EQUAL_TOKEN_RULE(R1, token);
-    ASSERT_EQUAL_TOKEN_STRING("你好, 世界", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
+    ASSERT_EQUAL_NODE_RULE(R1, node);
+    ASSERT_EQUAL_NODE_STRING("你好, 世界", node);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -69,13 +69,13 @@ void test_match_literal_choices_successfully2(void) {
     );
     TEST_ASSERT_EQUAL(11, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
-    ASSERT_EQUAL_TOKEN_RULE(R1, token);
-    ASSERT_EQUAL_TOKEN_STRING("HELLO WORLD", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
+    ASSERT_EQUAL_NODE_RULE(R1, node);
+    ASSERT_EQUAL_NODE_STRING("HELLO WORLD", node);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -111,8 +111,8 @@ void test_match_literal_choices_no_option_raise_match_error(void) {
     );
     TEST_ASSERT_EQUAL(0, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NULL(token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NULL(node);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

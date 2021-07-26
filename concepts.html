@@ -144,66 +144,73 @@
         </label>
         <section id="concepts">
 <h1>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">¶</a></h1>
-<section id="what-s-a-parser">
-<h2>What’s a Parser?<a class="headerlink" href="#what-s-a-parser" title="Permalink to this headline">¶</a></h2>
-<p>A parser is usually part of a compiler. Considering a statement <cite>print(“hello world”)</cite>, a parser builds an abstract syntax tree (AST) like:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Node</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleStatement</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">],</span> <span class="n">children</span><span class="o">=</span><span class="p">[</span>
-    <span class="n">Node</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleFunction</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">]),</span>
-    <span class="n">Node</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleFunctionArgs</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">19</span><span class="p">],</span> <span class="n">children</span><span class="o">=</span><span class="p">[</span>
-        <span class="n">Node</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleString</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">19</span><span class="p">])</span>
+<section id="what-is-a-parser">
+<h2>What is a Parser?<a class="headerlink" href="#what-is-a-parser" title="Permalink to this headline">¶</a></h2>
+<p>A parser is a program that takes string as input and produces a parse tree as output.</p>
+<p>For example, given input <cite>print(“hello world”)</cite>, a parser can produce a tree like below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Node</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">"statement"</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">],</span> <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+    <span class="n">Node</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">"func_call"</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">],</span> <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">Node</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">"identifier"</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">]),</span>
+        <span class="n">Node</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">"func_args"</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">19</span><span class="p">],</span> <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">Node</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="s2">"string_literal"</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">19</span><span class="p">])</span>
+        <span class="p">])</span>
     <span class="p">])</span>
 <span class="p">])</span>
 </pre></div>
 </div>
-<p>Some parser has an additional tokenizing step before building an AST, while PEG parser can directly build such an AST from the input.</p>
-<p>The compiler takes over the rest and compiles the AST to either bytecode for interpreter language or assembly code for compiled languages.</p>
-<p>But that’s far beyond what we’re discussing here. As a parser, we only care about how to build an AST from a string input.</p>
-<p>A parser is code, a lot of code. You can use Peppa PEG, Lex/Yacc, flex/bison, antlr, or even parse from scratch.</p>
+<p>Some parsers have an additional step called “tokenize” before constructing the parse tree, while PEG parser can directly build the tree from the input.</p>
+<p>You can use Peppa PEG, Lex/Yacc, flex/bison, antlr, or even parse from scratch.</p>
 </section>
-<section id="what-s-a-grammar">
-<h2>What’s a Grammar?<a class="headerlink" href="#what-s-a-grammar" title="Permalink to this headline">¶</a></h2>
-<p>A grammar is a set of RULES instructing a parser how to parse from the input, e.g, it is definition of parsing. For example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">term</span> <span class="o">=</span> <span class="n">factor</span> <span class="p">((</span><span class="n">plus</span><span class="o">/</span><span class="n">minus</span><span class="p">)</span> <span class="n">factor</span><span class="p">)</span><span class="o">*</span><span class="p">;</span>
-<span class="n">factor</span> <span class="o">=</span> <span class="n">number</span> <span class="p">((</span><span class="n">mul</span><span class="o">/</span><span class="n">div</span><span class="p">)</span> <span class="n">number</span><span class="p">);</span>
+<section id="what-is-a-grammar">
+<h2>What is a Grammar?<a class="headerlink" href="#what-is-a-grammar" title="Permalink to this headline">¶</a></h2>
+<p>A grammar is a set of RULES instructing a parser how to parse from the input, e.g, it is the definition of the parsing process.</p>
+<p>For example, the grammar snippet below defines how to parse arithmetic expression.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">term</span> <span class="o">=</span> <span class="n">factor</span> <span class="p">((</span><span class="s2">"+"</span><span class="o">/</span><span class="s2">"-"</span><span class="p">)</span> <span class="n">factor</span><span class="p">)</span><span class="o">*</span><span class="p">;</span>
+<span class="n">factor</span> <span class="o">=</span> <span class="n">number</span> <span class="p">((</span><span class="s2">"*"</span><span class="o">/</span><span class="s2">"/"</span><span class="p">)</span> <span class="n">number</span><span class="p">);</span>
 <span class="n">number</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span> <span class="o">/</span> <span class="p">[</span><span class="mi">1</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span> <span class="p">[</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="p">;</span>
 </pre></div>
 </div>
 <p>A parser generator can read a grammar in such a (or similar) notion and produce a parser. The produced parser then reads input and produces AST.</p>
-<p>Peppa PEG provides its own dialect of PEG for describing a grammar. It was inspired by <a class="reference external" href="https://pest.rs">Pest</a> but is more powerful, faster, and more readable.</p>
-<p>See <a class="reference internal" href="peg.html#peg"><span class="std std-ref">PEG APIs</span></a> for a full specification.</p>
-</section>
-<section id="overview-of-process">
-<h2>Overview of Process<a class="headerlink" href="#overview-of-process" title="Permalink to this headline">¶</a></h2>
-<ol class="arabic simple">
-<li><p>Load Grammar. Load your grammar using <a class="reference internal" href="api.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a> . Alternatively, you can create your grammar using <a class="reference internal" href="api.html#c.P4_CreateGrammar" title="P4_CreateGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateGrammar()</span></code></a> and then add grammar rules using <a class="reference internal" href="lowlevel.html#lowlevel"><span class="std std-ref">Low Level APIs</span></a>.</p></li>
-<li><p>Parse Source. Wrap source string using <a class="reference internal" href="api.html#c.P4_CreateSource" title="P4_CreateSource"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateSource()</span></code></a> and then parse it using <a class="reference internal" href="api.html#c.P4_Parse" title="P4_Parse"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_Parse()</span></code></a>.</p></li>
-<li><p>Traverse AST. It’s up to you what to do when traversing the tree. You may inspect the tree, produce bytecodes, trim the tree, etc.</p></li>
-</ol>
-<p>Unlike one of Peppa PEG alternatives - peg/leg, Peppa PEG doesn’t end up with producing C code for the grammar. It holds the grammar and the parser generator in memory so you don’t need an extra compilation step.</p>
+<p>Peppa PEG provides its own dialect of PEG for describing a grammar. It was inspired by <a class="reference external" href="https://pest.rs">Pest</a> but is more powerful and more readable.</p>
+<p>See <a class="reference internal" href="peg.html#peg"><span class="std std-ref">PEG APIs</span></a> for all of the grammar rules you can use.</p>
 </section>
 <section id="parse-tree-v-s-abstract-syntax-tree">
 <h2>Parse Tree v/s Abstract Syntax Tree<a class="headerlink" href="#parse-tree-v-s-abstract-syntax-tree" title="Permalink to this headline">¶</a></h2>
-<p>Parse Tree and Abstract Syntax Tree are often used interchangeably but they’re different. Both are trees. But Parse Tree is closer to the source, while Abstract Syntax Tree is closer to the actual meaning of code.</p>
+<p>Parse Tree and Abstract Syntax Tree are often used interchangeably but they’re different. Both are trees. But Parse Tree is closer to the source, while Abstract Syntax Tree is closer to the semantic.</p>
 <p>Considering <cite>[1,2]</cite>, a parse tree looks like:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Node</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleArray</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="n">children</span><span class="o">=</span><span class="p">[</span>
-    <span class="n">Node</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleLeftParen</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]),</span>
-    <span class="n">Node</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleNumber</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]),</span>
-    <span class="n">Node</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleComma</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]),</span>
-    <span class="n">Node</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleNumber</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]),</span>
-    <span class="n">Node</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleRightParen</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">]),</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Node</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">"array"</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+    <span class="n">Node</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">"left_paren"</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]),</span>
+    <span class="n">Node</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">"number"</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]),</span>
+    <span class="n">Node</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">"comma"</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]),</span>
+    <span class="n">Node</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">"number"</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]),</span>
+    <span class="n">Node</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">"right_paren"</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">]),</span>
 <span class="p">])</span>
 </pre></div>
 </div>
 <p>While an abstract syntax tree looks like:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Node</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleArray</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="n">children</span><span class="o">=</span><span class="p">[</span>
-    <span class="n">Node</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleNumber</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]),</span>
-    <span class="n">Node</span><span class="p">(</span><span class="n">rule_id</span><span class="o">=</span><span class="n">RuleNumber</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]),</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Node</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">"array"</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+    <span class="n">Node</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">"number"</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]),</span>
+    <span class="n">Node</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">"number"</span><span class="p">,</span> <span class="nb">slice</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]),</span>
 <span class="p">])</span>
 </pre></div>
 </div>
 <p>e.g, left paren, comma, right paren are ignored as they’re not part of the semantic of array.</p>
 <p>You can consider abstract syntax tree as a polished version of parse tree.</p>
-<p>Peppa PEG provides some decorators allowing you to dropping some tokens; it also allows you reshaping part of the tree by setting callbacks.</p>
+<p>Peppa PEG provides two approaches to modify the tree:</p>
+<ul class="simple">
+<li><p>Use decorators <cite>@</cite> to drop, lift, squash nodes when providing the grammar.</p></li>
+<li><p>Use callbacks to manipulate nodes after the tree is produced.</p></li>
+</ul>
+<p>By reshaping the tree, you can produce whichever kind of tree.</p>
+</section>
+<section id="runtime-v-s-compile-time">
+<h2>Runtime v/s Compile-time<a class="headerlink" href="#runtime-v-s-compile-time" title="Permalink to this headline">¶</a></h2>
+<p>Unlike one of Peppa PEG alternatives - peg/leg, Peppa PEG doesn’t end up with producing C code for the grammar. It holds the grammar and the parser generator in memory so you don’t need an extra compilation step. You will use Peppa PEG in a tree-steps:</p>
+<ol class="arabic simple">
+<li><p>Load Grammar. Load your grammar using <a class="reference internal" href="api.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a> . Alternatively, you can create your grammar using <a class="reference internal" href="api.html#c.P4_CreateGrammar" title="P4_CreateGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateGrammar()</span></code></a> and then add grammar rules using <a class="reference internal" href="lowlevel.html#lowlevel"><span class="std std-ref">Low Level APIs</span></a>.</p></li>
+<li><p>Parse Source. Wrap source string using <a class="reference internal" href="api.html#c.P4_CreateSource" title="P4_CreateSource"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateSource()</span></code></a> and then parse it using <a class="reference internal" href="api.html#c.P4_Parse" title="P4_Parse"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_Parse()</span></code></a>.</p></li>
+<li><p>Traverse AST. It’s up to you what to do when traversing the tree. You may inspect the tree, produce bytecodes, trim the tree, etc.</p></li>
+</ol>
 </section>
 </section>
 
@@ -262,10 +269,10 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Concepts</a><ul>
-<li><a class="reference internal" href="#what-s-a-parser">What’s a Parser?</a></li>
-<li><a class="reference internal" href="#what-s-a-grammar">What’s a Grammar?</a></li>
-<li><a class="reference internal" href="#overview-of-process">Overview of Process</a></li>
+<li><a class="reference internal" href="#what-is-a-parser">What is a Parser?</a></li>
+<li><a class="reference internal" href="#what-is-a-grammar">What is a Grammar?</a></li>
 <li><a class="reference internal" href="#parse-tree-v-s-abstract-syntax-tree">Parse Tree v/s Abstract Syntax Tree</a></li>
+<li><a class="reference internal" href="#runtime-v-s-compile-time">Runtime v/s Compile-time</a></li>
 </ul>
 </li>
 </ul>

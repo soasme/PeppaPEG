@@ -35,13 +35,13 @@ void test_match_negative_successfully(void) {
     );
     TEST_ASSERT_EQUAL(11, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
-    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
-    ASSERT_EQUAL_TOKEN_STRING("HELLO WORLD", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
+    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_STRING("HELLO WORLD", node);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -94,19 +94,19 @@ void test_match_negative_consumes_no_input(void) {
     );
     TEST_ASSERT_EQUAL(11, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
-    ASSERT_EQUAL_TOKEN_STRING("HELLO WORLD", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_STRING("HELLO WORLD", node);
 
-    TEST_ASSERT_NULL(token->next);
+    TEST_ASSERT_NULL(node->next);
 
-    /* R1(Positive) has no token produced. */
+    /* R1(Positive) has no node produced. */
 
-    TEST_ASSERT_NOT_NULL(token->head);
-    TEST_ASSERT_EQUAL(token->head, token->tail);
-    ASSERT_EQUAL_TOKEN_RULE(R2, token->head);
-    ASSERT_EQUAL_TOKEN_STRING("HELLO WORLD", token->head);
+    TEST_ASSERT_NOT_NULL(node->head);
+    TEST_ASSERT_EQUAL(node->head, node->tail);
+    ASSERT_EQUAL_NODE_RULE(R2, node->head);
+    ASSERT_EQUAL_NODE_STRING("HELLO WORLD", node->head);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -148,8 +148,8 @@ void test_match_negative_failed(void) {
     );
     TEST_ASSERT_EQUAL(0, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NULL(token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NULL(node);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

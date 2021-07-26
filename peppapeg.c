@@ -131,7 +131,7 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
                              .offset = (s)->offset \
                          };
 
-# define P4_AdoptToken(head, tail, list) \
+# define P4_AdoptNode(head, tail, list) \
     do { \
         if ((list) != NULL) {\
             if ((head) == NULL) (head) = (list); \
@@ -200,38 +200,38 @@ P4_PRIVATE(P4_Expression*)      P4_GetWhitespaces(P4_Grammar*);
 
 P4_PRIVATE(P4_Error)            P4_RefreshReference(P4_Expression*, P4_RuleID);
 
-P4_PRIVATE(P4_Token*)           P4_Match(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchLiteral(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchRange(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchReference(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchPositive(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchNegative(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchSequence(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchChoice(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchRepeat(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchSpacedExpressions(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Token*)           P4_MatchBackReference(P4_Source*, P4_Expression*, P4_Slice*, P4_Expression*);
+P4_PRIVATE(P4_Node*)           P4_Match(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*)           P4_MatchLiteral(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*)           P4_MatchRange(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*)           P4_MatchReference(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*)           P4_MatchPositive(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*)           P4_MatchNegative(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*)           P4_MatchSequence(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*)           P4_MatchChoice(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*)           P4_MatchRepeat(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*)           P4_MatchSpacedExpressions(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*)           P4_MatchBackReference(P4_Source*, P4_Expression*, P4_Slice*, P4_Expression*);
 
-P4_PRIVATE(P4_Error)            P4_PegEvalFlag(P4_Token* token, P4_ExpressionFlag *flag);
-P4_PRIVATE(P4_Error)            P4_PegEvalRuleFlags(P4_Token* token, P4_ExpressionFlag* flag);
-P4_PRIVATE(P4_Error)            P4_PegEvalNumber(P4_Token* token, size_t* num);
-P4_PRIVATE(P4_Error)            P4_PegEvalChar(P4_Token* token, P4_Rune* rune);
-P4_PRIVATE(P4_Error)            P4_PegEvalLiteral(P4_Token* token, P4_Result* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalInsensitiveLiteral(P4_Token* token, P4_Result* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalRange(P4_Token* token, P4_Result* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalMembers(P4_Token* token, P4_Expression* expr, P4_Result* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalSequence(P4_Token* token, P4_Result* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalChoice(P4_Token* token, P4_Result* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalPositive(P4_Token* token, P4_Result* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalNegative(P4_Token* token, P4_Result* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalRepeat(P4_Token* token, P4_Result* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalDot(P4_Token* token, P4_Result* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalReference(P4_Token* token, P4_Result* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalExpression(P4_Token* token, P4_Result* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalGrammarRule(P4_Token* token, P4_Result* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalRuleName(P4_Token* token, P4_String* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalFlag(P4_Node* node, P4_ExpressionFlag *flag);
+P4_PRIVATE(P4_Error)            P4_PegEvalRuleFlags(P4_Node* node, P4_ExpressionFlag* flag);
+P4_PRIVATE(P4_Error)            P4_PegEvalNumber(P4_Node* node, size_t* num);
+P4_PRIVATE(P4_Error)            P4_PegEvalChar(P4_Node* node, P4_Rune* rune);
+P4_PRIVATE(P4_Error)            P4_PegEvalLiteral(P4_Node* node, P4_Result* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalInsensitiveLiteral(P4_Node* node, P4_Result* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalRange(P4_Node* node, P4_Result* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalMembers(P4_Node* node, P4_Expression* expr, P4_Result* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalSequence(P4_Node* node, P4_Result* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalChoice(P4_Node* node, P4_Result* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalPositive(P4_Node* node, P4_Result* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalNegative(P4_Node* node, P4_Result* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalRepeat(P4_Node* node, P4_Result* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalDot(P4_Node* node, P4_Result* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalReference(P4_Node* node, P4_Result* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalExpression(P4_Node* node, P4_Result* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalGrammarRule(P4_Node* node, P4_Result* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalRuleName(P4_Node* node, P4_String* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalGrammarReferences(P4_Grammar* grammar, P4_Expression* expr, P4_Result* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalGrammar(P4_Token* token, P4_Result* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalGrammar(P4_Node* node, P4_Result* result);
 
 static P4_RuneRange _C[] = {
     {0x0000, 0x001f, 1}, {0x007f, 0x009f, 1}, {0x00ad, 0x0600, 1363}, {0x0601, 0x0605, 1},
@@ -1114,7 +1114,7 @@ P4_CaseCmpInsensitive(const void* src1, const void* src2, size_t n) {
 }
 
 /*
- * Determine if the corresponding token to `e` should be ignored.
+ * Determine if the corresponding node to `e` should be ignored.
  *
  * 1. Intermediate expr.
  * 2. Bareness expr.
@@ -1139,87 +1139,87 @@ P4_RescueError(P4_Source* s) {
 
 
 /*
- * Initialize a token.
+ * Initialize a node.
  */
-P4_Token*
-P4_CreateToken (const P4_String     str,
+P4_Node*
+P4_CreateNode (const P4_String     str,
                 P4_Position*        start,
                 P4_Position*        stop,
                 P4_RuleID           rule_id) {
-    P4_Token* token;
+    P4_Node* node;
 
-    if ((token=P4_MALLOC(sizeof(P4_Token))) == NULL)
+    if ((node=P4_MALLOC(sizeof(P4_Node))) == NULL)
         return NULL;
 
-    token->text         = str;
-    token->rule_id      = rule_id;
-    token->next         = NULL;
-    token->head         = NULL;
-    token->tail         = NULL;
+    node->text         = str;
+    node->rule_id      = rule_id;
+    node->next         = NULL;
+    node->head         = NULL;
+    node->tail         = NULL;
 
-    P4_SetSlicePositions(&token->slice, start, stop);
+    P4_SetSlicePositions(&node->slice, start, stop);
 
-    return token;
+    return node;
 }
 
 
 /*
- * Free the token.
+ * Free the node.
  *
  * DANGER: this function does not free children nodes.
  */
 P4_PRIVATE(void)
-P4_DeleteTokenNode(P4_Token* token) {
-    if (token) P4_FREE(token);
+P4_DeleteNodeNode(P4_Node* node) {
+    if (node) P4_FREE(node);
 }
 
 
 /*
- * Free all of the children tokens of the token.
+ * Free all of the children nodes of the node.
  */
 P4_PRIVATE(void)
-P4_DeleteTokenChildren(P4_Token* token) {
-    if (token == NULL)
+P4_DeleteNodeChildren(P4_Node* node) {
+    if (node == NULL)
         return;
 
-    P4_Token*   child   = token->head;
-    P4_Token*   tmp     = NULL;
+    P4_Node*   child   = node->head;
+    P4_Node*   tmp     = NULL;
 
     while (child) {
         tmp = child->next;
         if (child->head)
-            P4_DeleteTokenChildren(child);
-        P4_DeleteTokenNode(child);
+            P4_DeleteNodeChildren(child);
+        P4_DeleteNodeNode(child);
         child = tmp;
     }
 }
 
 
 /*
- * Free the token list and all the children nodes of each
- * node in the token list.
+ * Free the node list and all the children nodes of each
+ * node in the node list.
  */
 P4_PUBLIC void
-P4_DeleteToken(P4_Token* token) {
-    P4_Token* tmp = NULL;
-    while (token) {
-        tmp     = token->next;
-        P4_DeleteTokenChildren(token);
-        P4_DeleteTokenNode(token);
-        token   = tmp;
+P4_DeleteNode(P4_Node* node) {
+    P4_Node* tmp = NULL;
+    while (node) {
+        tmp     = node->next;
+        P4_DeleteNodeChildren(node);
+        P4_DeleteNodeNode(node);
+        node   = tmp;
     }
 }
 
 P4_PRIVATE(void)
-P4_DeleteTokenUserData(P4_Grammar* grammar, P4_Token* token) {
+P4_DeleteNodeUserData(P4_Grammar* grammar, P4_Node* node) {
     if (grammar->free_func == NULL)
         return;
 
-    P4_Token* tmp = token;
+    P4_Node* tmp = node;
     while (tmp != NULL) {
         if (tmp->userdata != NULL)
             grammar->free_func(tmp->userdata);
-        P4_DeleteTokenUserData(grammar, tmp->head);
+        P4_DeleteNodeUserData(grammar, tmp->head);
         tmp = tmp->next;
     }
 }
@@ -1297,7 +1297,7 @@ P4_PopFrame(P4_Source* s, P4_Frame* f) {
 }
 
 
-P4_PRIVATE(P4_Token*)
+P4_PRIVATE(P4_Node*)
 P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
     assert(NO_ERROR(s));
 
@@ -1331,15 +1331,15 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
     if (P4_NeedLift(s, e))
         return NULL;
 
-    P4_Token* result = NULL;
+    P4_Node* result = NULL;
 
-    if ((result=P4_CreateToken (s->content, startpos, endpos, e->id)) == NULL)
-        P4_Panic("failed to create token: out of memory");
+    if ((result=P4_CreateNode (s->content, startpos, endpos, e->id)) == NULL)
+        P4_Panic("failed to create node: out of memory");
 
     return result;
 }
 
-P4_PRIVATE(P4_Token*)
+P4_PRIVATE(P4_Node*)
 P4_MatchRange(P4_Source* s, P4_Expression* e) {
     assert(NO_ERROR(s));
 
@@ -1379,10 +1379,10 @@ P4_MatchRange(P4_Source* s, P4_Expression* e) {
     if (P4_NeedLift(s, e))
         return NULL;
 
-    P4_Token* result = NULL;
+    P4_Node* result = NULL;
 
-    if ((result=P4_CreateToken (s->content, startpos, endpos, e->id)) == NULL)
-        P4_Panic("failed to create token: out of memory");
+    if ((result=P4_CreateNode (s->content, startpos, endpos, e->id)) == NULL)
+        P4_Panic("failed to create node: out of memory");
 
     return result;
 }
@@ -1399,7 +1399,7 @@ P4_GetReference(P4_Source* s, P4_Expression* e) {
     return e->ref_expr;
 }
 
-P4_PRIVATE(P4_Token*)
+P4_PRIVATE(P4_Node*)
 P4_MatchReference(P4_Source* s, P4_Expression* e) {
     assert(NO_ERROR(s));
 
@@ -1413,35 +1413,35 @@ P4_MatchReference(P4_Source* s, P4_Expression* e) {
     }
 
     P4_MarkPosition(s, startpos);
-    P4_Token* reftok = P4_Match(s, e->ref_expr);
+    P4_Node* reftok = P4_Match(s, e->ref_expr);
     P4_MarkPosition(s, endpos);
 
     /* Ref matching is terminated when error occurred. */
     if (!NO_ERROR(s))
         return NULL;
 
-    /* The referenced token is returned when silenced. */
+    /* The referenced node is returned when silenced. */
     if (P4_NeedLift(s, e))
         return reftok;
 
     /* A single reference expr can be a rule: `e = { ref }` */
-    /* In such a case, a token for `e` with single child `ref` is created. */
+    /* In such a case, a node for `e` with single child `ref` is created. */
     /* */
-    P4_Token* result = NULL;
+    P4_Node* result = NULL;
 
-    if ((result=P4_CreateToken (s->content, startpos, endpos, e->id)) == NULL)
-        P4_Panic("failed to create token: out of memory");
+    if ((result=P4_CreateNode (s->content, startpos, endpos, e->id)) == NULL)
+        P4_Panic("failed to create node: out of memory");
 
-    P4_AdoptToken(result->head, result->tail, reftok);
+    P4_AdoptNode(result->head, result->tail, reftok);
     return result;
 }
 
-P4_PRIVATE(P4_Token*)
+P4_PRIVATE(P4_Node*)
 P4_MatchSequence(P4_Source* s, P4_Expression* e) {
     assert(NO_ERROR(s));
 
     P4_Expression *member = NULL;
-    P4_Token *head = NULL,
+    P4_Node *head = NULL,
              *tail = NULL,
              *tok = NULL,
              *whitespace = NULL;
@@ -1463,7 +1463,7 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
         if (need_space && i > 0) {
             whitespace = P4_MatchSpacedExpressions(s, NULL);
             if (!NO_ERROR(s)) goto finalize;
-            P4_AdoptToken(head, tail, whitespace);
+            P4_AdoptNode(head, tail, whitespace);
         }
 
         P4_MarkPosition(s, member_startpos);
@@ -1476,12 +1476,12 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
         }
 
         /* If any of the sequence members fails, the entire sequence fails. */
-        /* Puke the eaten text and free all created tokens. */
+        /* Puke the eaten text and free all created nodes. */
         if (!NO_ERROR(s)) {
             goto finalize;
         }
 
-        P4_AdoptToken(head, tail, tok);
+        P4_AdoptNode(head, tail, tok);
 
         P4_MarkPosition(s, member_endpos);
         P4_SetSlicePositions(&backrefs[i], member_startpos, member_endpos);
@@ -1496,9 +1496,9 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
 
     P4_MarkPosition(s, endpos);
 
-    P4_Token* ret = P4_CreateToken (s->content, startpos, endpos, e->id);
+    P4_Node* ret = P4_CreateNode (s->content, startpos, endpos, e->id);
     if (ret == NULL)
-        P4_Panic("failed to create token: out of memory");
+        P4_Panic("failed to create node: out of memory");
 
     ret->head = head;
     ret->tail = tail;
@@ -1506,13 +1506,13 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
 
 finalize:
     P4_SetPosition(s, startpos);
-    P4_DeleteToken(head);
+    P4_DeleteNode(head);
     return NULL;
 }
 
-P4_PRIVATE(P4_Token*)
+P4_PRIVATE(P4_Node*)
 P4_MatchChoice(P4_Source* s, P4_Expression* e) {
-    P4_Token* tok = NULL;
+    P4_Node* tok = NULL;
     P4_Expression* member = NULL;
 
     /* A member is attempted if previous yields no match. */
@@ -1541,11 +1541,11 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
     if (P4_NeedLift(s, e))
         return tok;
 
-    P4_Token* oneof = P4_CreateToken (s->content, startpos, endpos, e->id);
+    P4_Node* oneof = P4_CreateNode (s->content, startpos, endpos, e->id);
     if (oneof == NULL)
-        P4_Panic("failed to create token: out of memory");
+        P4_Panic("failed to create node: out of memory");
 
-    P4_AdoptToken(oneof->head, oneof->tail, tok);
+    P4_AdoptNode(oneof->head, oneof->tail, tok);
     return oneof;
 
 finalize:
@@ -1557,11 +1557,11 @@ finalize:
 /*
  * Repetition matcher function.
  *
- * Returns a token in a greedy fashion.
+ * Returns a node in a greedy fashion.
  *
  * There are seven repetition mode: zeroormore, zerooronce,
  */
-P4_PRIVATE(P4_Token*)
+P4_PRIVATE(P4_Node*)
 P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     size_t min = SIZE_MAX, max = SIZE_MAX, repeated = 0;
 
@@ -1589,7 +1589,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
 
     bool need_space = NEED_SPACE(s);
     P4_MarkPosition(s, startpos);
-    P4_Token *head = NULL, *tail = NULL, *tok = NULL, *whitespace = NULL;
+    P4_Node *head = NULL, *tail = NULL, *tok = NULL, *whitespace = NULL;
 
     while (!IS_END(s)) {
         P4_MarkPosition(s, whitespace_startpos);
@@ -1598,7 +1598,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         if (need_space && repeated > 0 ) {
             whitespace = P4_MatchSpacedExpressions(s, NULL);
             if (!NO_ERROR(s)) goto finalize;
-            P4_AdoptToken(head, tail, whitespace);
+            P4_AdoptNode(head, tail, whitespace);
         }
 
         tok = P4_Match(s, e->repeat_expr);
@@ -1637,7 +1637,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         }
 
         repeated++;
-        P4_AdoptToken(head, tail, tok);
+        P4_AdoptNode(head, tail, tok);
 
         if (max != SIZE_MAX && repeated == max) { /* enough attempts */
             P4_RescueError(s);
@@ -1664,7 +1664,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         goto finalize;
     }
 
-    if (P4_GetPosition(s) == startpos->pos) /* success but no token is produced. */
+    if (P4_GetPosition(s) == startpos->pos) /* success but no node is produced. */
         goto finalize;
 
     if (P4_NeedLift(s, e))
@@ -1676,46 +1676,46 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
 
     P4_MarkPosition(s, endpos);
 
-    P4_Token* repetition = P4_CreateToken (s->content, startpos, endpos, e->id);
+    P4_Node* repetition = P4_CreateNode (s->content, startpos, endpos, e->id);
     if (repetition == NULL)
-        P4_Panic("failed to create token: out of memory");
+        P4_Panic("failed to create node: out of memory");
 
-    P4_AdoptToken(repetition->head, repetition->tail, head);
+    P4_AdoptNode(repetition->head, repetition->tail, head);
     return repetition;
 
 /* cleanup before returning NULL. */
-/* tokens between head..tail should be freed. */
+/* nodes between head..tail should be freed. */
 finalize:
     P4_SetPosition(s, startpos);
-    P4_DeleteToken(head);
+    P4_DeleteNode(head);
     return NULL;
 }
 
-P4_PRIVATE(P4_Token*)
+P4_PRIVATE(P4_Node*)
 P4_MatchPositive(P4_Source* s, P4_Expression* e) {
     assert(NO_ERROR(s) && e->ref_expr != NULL);
 
     P4_MarkPosition(s, startpos);
 
-    P4_Token* token = P4_Match(s, e->ref_expr);
-    if (token != NULL)
-        P4_DeleteToken(token);
+    P4_Node* node = P4_Match(s, e->ref_expr);
+    if (node != NULL)
+        P4_DeleteNode(node);
 
     P4_SetPosition(s, startpos);
 
     return NULL;
 }
 
-P4_PRIVATE(P4_Token*)
+P4_PRIVATE(P4_Node*)
 P4_MatchNegative(P4_Source* s, P4_Expression* e) {
     assert(NO_ERROR(s) && e->ref_expr != NULL);
 
     P4_MarkPosition(s, startpos);
-    P4_Token* token = P4_Match(s, e->ref_expr);
+    P4_Node* node = P4_Match(s, e->ref_expr);
     P4_SetPosition(s, startpos);
 
     if (NO_ERROR(s)) {
-        P4_DeleteToken(token);
+        P4_DeleteNode(node);
         P4_RaiseErrorf(s, P4_MatchError, "expect %s, line %zu:%zu (char %zu)",
             e->name?e->name:s->frame_stack->expr->name, startpos->lineno, startpos->offset, startpos->pos);
     } else if (s->err == P4_MatchError) {
@@ -1725,9 +1725,9 @@ P4_MatchNegative(P4_Source* s, P4_Expression* e) {
     return NULL;
 }
 
-P4_Token*
+P4_Node*
 P4_MatchDispatch(P4_Source* s, P4_Expression* e) {
-    P4_Token* result = NULL;
+    P4_Node* result = NULL;
 
     switch (e->kind) {
         case P4_Literal:
@@ -1767,13 +1767,13 @@ P4_MatchDispatch(P4_Source* s, P4_Expression* e) {
 /*
  * The match function updates the state given an expression.
  *
- * It returns a token linked list, NULL if no token is generated.
+ * It returns a node linked list, NULL if no node is generated.
  * State pos will advance if needed.
- * Not-advancing pos / NULL returning token list do not indicate a failed match.
+ * Not-advancing pos / NULL returning node list do not indicate a failed match.
  * It fails when state err/errmsg are set.
  * It propagate the failed match up to the top level.
  */
-P4_Token*
+P4_Node*
 P4_Match(P4_Source* s, P4_Expression* e) {
     assert(e != NULL);
 
@@ -1782,7 +1782,7 @@ P4_Match(P4_Source* s, P4_Expression* e) {
     }
 
     P4_Error     err = P4_Ok;
-    P4_Token* result = NULL;
+    P4_Node* result = NULL;
 
     if (IS_RULE(e) && (err = P4_PushFrame(s, e)) != P4_Ok) {
         P4_RaiseError(s, err, "failed to push frame");
@@ -1793,12 +1793,12 @@ P4_Match(P4_Source* s, P4_Expression* e) {
 
     if (IS_RULE(e) && (err = P4_PopFrame(s, NULL)) != P4_Ok) {
         P4_RaiseError(s, err, "failed to pop frame");
-        P4_DeleteToken(result);
+        P4_DeleteNode(result);
         goto finalize;
     }
 
     if (s->err != P4_Ok) {
-        P4_DeleteToken(result);
+        P4_DeleteNode(result);
         if (e->name != NULL && s->errmsg[0] == 0) {
             size_t len = strlen(e->name);
             P4_String errmsg = P4_MALLOC(sizeof(char) * (len+8));
@@ -1812,7 +1812,7 @@ P4_Match(P4_Source* s, P4_Expression* e) {
 
     if (s->grammar->on_match && (err = (s->grammar->on_match)(s->grammar, e, result)) != P4_Ok) {
         P4_RaiseError(s, err, "failed to run match callback.");
-        P4_DeleteToken(result);
+        P4_DeleteNode(result);
         goto finalize;
     }
 
@@ -1825,7 +1825,7 @@ finalize:
     return NULL;
 }
 
-P4_PRIVATE(P4_Token*)
+P4_PRIVATE(P4_Node*)
 P4_MatchSpacedExpressions(P4_Source* s, P4_Expression* e) {
     /* implicit whitespace is guaranteed to be an unnamed rule. */
     /* state flag is guaranteed to be none. */
@@ -1842,7 +1842,7 @@ P4_MatchSpacedExpressions(P4_Source* s, P4_Expression* e) {
 
     /* (2) Perform implicit whitespace checks. */
     /*     We won't do implicit whitespace inside an implicit whitespace expr. */
-    P4_Token* result = P4_Match(s, implicit_whitespace);
+    P4_Node* result = P4_Match(s, implicit_whitespace);
     if (NO_MATCH(s))
         P4_RescueError(s);
 
@@ -1852,7 +1852,7 @@ P4_MatchSpacedExpressions(P4_Source* s, P4_Expression* e) {
     return result;
 }
 
-P4_PRIVATE(P4_Token*)
+P4_PRIVATE(P4_Node*)
 P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Expression* backref) {
     if (backrefs == NULL) {
         P4_RaiseError(s, P4_NullError, "");
@@ -1894,7 +1894,7 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
     else
         litexpr->id = backref_expr->id;
 
-    P4_Token* tok = P4_MatchLiteral(s, litexpr);
+    P4_Node* tok = P4_MatchLiteral(s, litexpr);
 
     if (tok != NULL) {
         if (backref_expr->kind == P4_Reference) { /* TODO: other cases? */
@@ -1910,8 +1910,8 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
 }
 
 void
-P4_JsonifySourceAst(P4_Grammar* grammar, FILE* stream, P4_Token* token) {
-    P4_Token* tmp = token;
+P4_JsonifySourceAst(P4_Grammar* grammar, FILE* stream, P4_Node* node) {
+    P4_Node* tmp = node;
     P4_Expression* expr = NULL;
 
     fprintf(stream, "[");
@@ -1935,8 +1935,8 @@ P4_JsonifySourceAst(P4_Grammar* grammar, FILE* stream, P4_Token* token) {
 
 
 P4_PUBLIC P4_Error
-P4_InspectSourceAst(P4_Token* token, void* userdata, P4_Error (*inspector)(P4_Token*, void*)) {
-    P4_Token* tmp = token;
+P4_InspectSourceAst(P4_Node* node, void* userdata, P4_Error (*inspector)(P4_Node*, void*)) {
+    P4_Node* tmp = node;
     P4_Error err = P4_Ok;
 
     while (tmp != NULL) {
@@ -2452,8 +2452,8 @@ P4_ResetSource(P4_Source* source) {
     P4_RescueError(source);
 
     if (source->root) {
-        P4_DeleteTokenUserData(source->grammar, source->root);
-        P4_DeleteToken(source->root);
+        P4_DeleteNodeUserData(source->grammar, source->root);
+        P4_DeleteNode(source->root);
     }
 
 }
@@ -2464,14 +2464,14 @@ P4_DeleteSource(P4_Source* source) {
     P4_FREE(source);
 }
 
-P4_PUBLIC P4_Token*
+P4_PUBLIC P4_Node*
 P4_GetSourceAst(P4_Source* source) {
     return source == NULL ? NULL : source->root;
 }
 
-P4_PUBLIC P4_Token*
+P4_PUBLIC P4_Node*
 P4_AcquireSourceAst(P4_Source* source) {
-    P4_Token* root = P4_GetSourceAst(source);
+    P4_Node* root = P4_GetSourceAst(source);
     source->root = NULL;
     P4_ResetSource(source);
     return root;
@@ -2493,7 +2493,7 @@ P4_Parse(P4_Grammar* grammar, P4_Source* source) {
     source->grammar = grammar;
 
     P4_Expression* expr     = P4_GetGrammarRule(grammar, source->rule_id);
-    P4_Token*      tok      = P4_Match(source, expr);
+    P4_Node*      tok      = P4_Match(source, expr);
 
     source->root            = tok;
 
@@ -2990,16 +2990,16 @@ P4_AddJoin(P4_Grammar* grammar, P4_RuleID id, const P4_String joiner, P4_RuleID 
 }
 
 P4_PUBLIC P4_Slice*
-P4_GetTokenSlice(P4_Token* token) {
-    if (token == NULL)
+P4_GetNodeSlice(P4_Node* node) {
+    if (node == NULL)
         return NULL;
 
-    return &(token->slice);
+    return &(node->slice);
 }
 
 P4_PUBLIC size_t
-P4_GetTokenChildrenCount(P4_Token* token) {
-    P4_Token* child = token->head;
+P4_GetNodeChildrenCount(P4_Node* node) {
+    P4_Node* child = node->head;
 
     size_t    child_count = 0;
     while (child != NULL) {
@@ -3022,11 +3022,11 @@ P4_CopySliceString(P4_String s, P4_Slice* slice) {
 }
 
 P4_PUBLIC P4_String
-P4_CopyTokenString(P4_Token* token) {
-    if (token == NULL)
+P4_CopyNodeString(P4_Node* node) {
+    if (node == NULL)
         return NULL;
 
-    return P4_CopySliceString(token->text, &(token->slice));
+    return P4_CopySliceString(node->text, &(node->slice));
 }
 
 /*
@@ -3591,48 +3591,48 @@ finalize:
 }
 
 # define MIN(a,b) ((a) < (b) ? (a) : (b))
-# define TOKEN_ERROR_HINT_FMT "char %zu-%zu: %.*s"
-# define TOKEN_ERROR_HINT \
-                token->slice.start.pos, \
-                token->slice.stop.pos, \
-                MIN((int)P4_GetSliceSize(&token->slice), 50), \
-                token->text + token->slice.start.pos
+# define node_ERROR_HINT_FMT "char %zu-%zu: %.*s"
+# define node_ERROR_HINT \
+                node->slice.start.pos, \
+                node->slice.stop.pos, \
+                MIN((int)P4_GetSliceSize(&node->slice), 50), \
+                node->text + node->slice.start.pos
 
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalFlag(P4_Token* token, P4_ExpressionFlag *flag) {
-    P4_String token_str = token->text + token->slice.start.pos;
-    size_t    token_len = P4_GetSliceSize(&token->slice);
+P4_PegEvalFlag(P4_Node* node, P4_ExpressionFlag *flag) {
+    P4_String node_str = node->text + node->slice.start.pos;
+    size_t    node_len = P4_GetSliceSize(&node->slice);
 
-    if (memcmp("@squashed", token_str, token_len) == 0)
+    if (memcmp("@squashed", node_str, node_len) == 0)
         *flag = P4_FLAG_SQUASHED;
-    else if (memcmp("@scoped", token_str, token_len) == 0)
+    else if (memcmp("@scoped", node_str, node_len) == 0)
         *flag = P4_FLAG_SCOPED;
-    else if (memcmp("@spaced", token_str, token_len) == 0)
+    else if (memcmp("@spaced", node_str, node_len) == 0)
         *flag = P4_FLAG_SPACED;
-    else if (memcmp("@lifted", token_str, token_len) == 0)
+    else if (memcmp("@lifted", node_str, node_len) == 0)
         *flag = P4_FLAG_LIFTED;
-    else if (memcmp("@tight", token_str, token_len) == 0)
+    else if (memcmp("@tight", node_str, node_len) == 0)
         *flag = P4_FLAG_TIGHT;
-    else if (memcmp("@nonterminal", token_str, token_len) == 0)
+    else if (memcmp("@nonterminal", node_str, node_len) == 0)
         *flag = P4_FLAG_NON_TERMINAL;
     else {
         /* P4_CreatePegRule() guarantees only 6 kinds of strings are possible. */
         UNREACHABLE();
-        P4_Panicf("InternalError: invalid flag: %s" TOKEN_ERROR_HINT_FMT,
-            token_str, TOKEN_ERROR_HINT);
+        P4_Panicf("InternalError: invalid flag: %s" node_ERROR_HINT_FMT,
+            node_str, node_ERROR_HINT);
     }
 
     return P4_Ok;
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalRuleFlags(P4_Token* token, P4_ExpressionFlag* flag) {
+P4_PegEvalRuleFlags(P4_Node* node, P4_ExpressionFlag* flag) {
     P4_Error          err        = P4_Ok;
-    P4_Token*         child      = NULL;
+    P4_Node*         child      = NULL;
     P4_ExpressionFlag child_flag = 0;
 
-    for (child = token->head; child != NULL; child = child->next) {
+    for (child = node->head; child != NULL; child = child->next) {
         catch(P4_PegEvalFlag(child, &child_flag));
         *flag |= child_flag;
     }
@@ -3644,10 +3644,10 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalNumber(P4_Token* token, size_t* num) {
+P4_PegEvalNumber(P4_Node* node, size_t* num) {
     P4_String str = NULL;
 
-    if ((str = P4_CopyTokenString(token)) == NULL) {
+    if ((str = P4_CopyNodeString(node)) == NULL) {
         *num = 0;
         P4_Panic("failed to create string: out of memory.");
     }
@@ -3659,20 +3659,20 @@ P4_PegEvalNumber(P4_Token* token, size_t* num) {
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalChar(P4_Token* token, P4_Rune* rune) {
-    size_t size = P4_ReadEscapedRune(token->text+token->slice.start.pos, rune);
+P4_PegEvalChar(P4_Node* node, P4_Rune* rune) {
+    size_t size = P4_ReadEscapedRune(node->text+node->slice.start.pos, rune);
 
     if (size == 0)
         return P4_ValueError;
 
-    if (token->slice.start.pos+size > token->slice.stop.pos)
+    if (node->slice.start.pos+size > node->slice.stop.pos)
         return P4_ValueError;
 
     return P4_Ok;
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalLiteral(P4_Token* token, P4_Result* result) {
+P4_PegEvalLiteral(P4_Node* node, P4_Result* result) {
     size_t         i    = 0,
                    size = 0,
                    idx  = 0;
@@ -3682,12 +3682,12 @@ P4_PegEvalLiteral(P4_Token* token, P4_Result* result) {
                    cur  = NULL;
     P4_Expression* expr = NULL;
 
-    size_t len = P4_GetSliceSize(&token->slice) - 2; /* - 2: remove two quotes */
+    size_t len = P4_GetSliceSize(&node->slice) - 2; /* - 2: remove two quotes */
     if (len <= 0) {
         err = P4_PegError;
         P4_EvalRaise(
             "literal rule should have at least one character. "
-            TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT
+            node_ERROR_HINT_FMT, node_ERROR_HINT
         );
     }
 
@@ -3695,17 +3695,17 @@ P4_PegEvalLiteral(P4_Token* token, P4_Result* result) {
     if (lit == NULL)
         P4_Panic("failed to create string: out of memory.");
 
-    for (i = token->slice.start.pos+1, idx = 0; i < token->slice.stop.pos-1; i += size) {
-        size = P4_ReadEscapedRune(token->text+i, &rune);
+    for (i = node->slice.start.pos+1, idx = 0; i < node->slice.stop.pos-1; i += size) {
+        size = P4_ReadEscapedRune(node->text+i, &rune);
 
         if ((rune > 0x10ffff) ||
                 (rune == 0) ||
                 (size == 0) ||
-                (i + size > token->slice.stop.pos-1)) {
+                (i + size > node->slice.stop.pos-1)) {
             err = P4_PegError;
             P4_EvalRaise(
-                "char %lu is invalid. " TOKEN_ERROR_HINT_FMT,
-                idx, TOKEN_ERROR_HINT
+                "char %lu is invalid. " node_ERROR_HINT_FMT,
+                idx, node_ERROR_HINT
             );
         }
 
@@ -3724,10 +3724,10 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalInsensitiveLiteral(P4_Token* token, P4_Result* result) {
+P4_PegEvalInsensitiveLiteral(P4_Node* node, P4_Result* result) {
     P4_Error err = P4_Ok;
 
-    catch(P4_PegEvalLiteral(token->head, result));
+    catch(P4_PegEvalLiteral(node->head, result));
 
     P4_Expression* expr = P4_UnwrapExpression(result);
     expr->sensitive = false;
@@ -3739,17 +3739,17 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalRange(P4_Token* token, P4_Result* result) {
+P4_PegEvalRange(P4_Node* node, P4_Result* result) {
     P4_Error       err  = P4_Ok;
     P4_Expression* expr = NULL;
 
-    if (token->head == token->tail) { /* one single child - [\\p{XX}] */
+    if (node->head == node->tail) { /* one single child - [\\p{XX}] */
         P4_RuneRange* ranges = NULL;
         size_t count = 0;
 
-        if (0 == P4_ReadRuneRange(token->head->text, &token->head->slice, &count, &ranges))
+        if (0 == P4_ReadRuneRange(node->head->text, &node->head->slice, &count, &ranges))
             P4_Panicf("ValueError: failed to read code point from source. "
-                TOKEN_ERROR_HINT_FMT, TOKEN_ERROR_HINT);
+                node_ERROR_HINT_FMT, node_ERROR_HINT);
 
         if ((expr = P4_CreateRanges(count, ranges)) == NULL)
             P4_Panic("failed to create expression: out of memory.");
@@ -3758,19 +3758,19 @@ P4_PegEvalRange(P4_Token* token, P4_Result* result) {
         P4_Rune lower = 0, upper = 0;
         size_t stride = 1;
 
-        P4_Token* lower_token = token->head;
-        P4_Token* upper_token = lower_token->next;
-        P4_Token* stride_token = upper_token->next;
+        P4_Node* lower_node = node->head;
+        P4_Node* upper_node = lower_node->next;
+        P4_Node* stride_node = upper_node->next;
 
-        catch(P4_PegEvalChar(lower_token, &lower));
-        catch(P4_PegEvalChar(upper_token, &upper));
-        if (stride_token) catch(P4_PegEvalNumber(stride_token, &stride));
+        catch(P4_PegEvalChar(lower_node, &lower));
+        catch(P4_PegEvalChar(upper_node, &upper));
+        if (stride_node) catch(P4_PegEvalNumber(stride_node, &stride));
 
         if (lower > upper) {
             err = P4_PegError;
             P4_EvalRaise(
                 "range lower 0x%x is greater than upper 0x%x. "
-                TOKEN_ERROR_HINT_FMT, lower, upper, TOKEN_ERROR_HINT
+                node_ERROR_HINT_FMT, lower, upper, node_ERROR_HINT
             );
         }
 
@@ -3778,8 +3778,8 @@ P4_PegEvalRange(P4_Token* token, P4_Result* result) {
             err = P4_PegError;
             P4_EvalRaise(
                 "range lower 0x%x, upper 0x%x, stride 0x%lx "
-                "must be all non-zeros. " TOKEN_ERROR_HINT_FMT,
-                lower, upper, stride, TOKEN_ERROR_HINT
+                "must be all non-zeros. " node_ERROR_HINT_FMT,
+                lower, upper, stride, node_ERROR_HINT
             );
         }
 
@@ -3787,8 +3787,8 @@ P4_PegEvalRange(P4_Token* token, P4_Result* result) {
             err = P4_PegError;
             P4_EvalRaise(
                 "range lower 0x%x, upper 0x%x must be "
-                "less than 0x10ffff. " TOKEN_ERROR_HINT_FMT,
-                lower, upper, TOKEN_ERROR_HINT
+                "less than 0x10ffff. " node_ERROR_HINT_FMT,
+                lower, upper, node_ERROR_HINT
             );
         }
 
@@ -3804,10 +3804,10 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalMembers(P4_Token* token, P4_Expression* expr, P4_Result* result) {
+P4_PegEvalMembers(P4_Node* node, P4_Expression* expr, P4_Result* result) {
     size_t         i         = 0;
     P4_Error       err       = P4_Ok;
-    P4_Token*      child     = token->head;
+    P4_Node*      child     = node->head;
     P4_Expression* childexpr = NULL;
 
     while (child != NULL) {
@@ -3820,20 +3820,20 @@ P4_PegEvalMembers(P4_Token* token, P4_Expression* expr, P4_Result* result) {
 
 finalize:
     if (err)
-        P4_Panicf("%s: failed to set %zuth member. " TOKEN_ERROR_HINT_FMT,
-            P4_GetErrorString(err), i, TOKEN_ERROR_HINT);
+        P4_Panicf("%s: failed to set %zuth member. " node_ERROR_HINT_FMT,
+            P4_GetErrorString(err), i, node_ERROR_HINT);
     return err;
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalSequence(P4_Token* token, P4_Result* result) {
+P4_PegEvalSequence(P4_Node* node, P4_Result* result) {
     P4_Error        err = P4_Ok;
     P4_Expression*  expr = NULL;
 
-    if ((expr = P4_CreateSequence(P4_GetTokenChildrenCount(token))) == NULL)
+    if ((expr = P4_CreateSequence(P4_GetNodeChildrenCount(node))) == NULL)
         P4_Panic("failed to create expression: out of memory.");
 
-    catch(P4_PegEvalMembers(token, expr, result));
+    catch(P4_PegEvalMembers(node, expr, result));
 
     result->expr = expr;
     return P4_Ok;
@@ -3844,14 +3844,14 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalChoice(P4_Token* token, P4_Result* result) {
+P4_PegEvalChoice(P4_Node* node, P4_Result* result) {
     P4_Error  err = P4_Ok;
     P4_Expression*  expr = NULL;
 
-    if ((expr = P4_CreateChoice(P4_GetTokenChildrenCount(token))) == NULL)
+    if ((expr = P4_CreateChoice(P4_GetNodeChildrenCount(node))) == NULL)
         P4_Panic("failed to create expression: out of memory.");
 
-    catch(P4_PegEvalMembers(token, expr, result));
+    catch(P4_PegEvalMembers(node, expr, result));
 
     result->expr = expr;
     return P4_Ok;
@@ -3862,12 +3862,12 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalPositive(P4_Token* token, P4_Result* result) {
+P4_PegEvalPositive(P4_Node* node, P4_Result* result) {
     P4_Error        err  = P4_Ok;
     P4_Expression*  ref  = NULL;
     P4_Expression*  expr = NULL;
 
-    catch(P4_PegEvalExpression(token->head, result));
+    catch(P4_PegEvalExpression(node->head, result));
 
     ref = P4_UnwrapExpression(result);
 
@@ -3884,12 +3884,12 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalNegative(P4_Token* token, P4_Result* result) {
+P4_PegEvalNegative(P4_Node* node, P4_Result* result) {
     P4_Error        err  = P4_Ok;
     P4_Expression*  ref  = NULL;
     P4_Expression*  expr = NULL;
 
-    catch(P4_PegEvalExpression(token->head, result));
+    catch(P4_PegEvalExpression(node->head, result));
 
     ref = P4_UnwrapExpression(result);
 
@@ -3906,18 +3906,18 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalRepeat(P4_Token* token, P4_Result* result) {
+P4_PegEvalRepeat(P4_Node* node, P4_Result* result) {
     P4_Error        err  = P4_Ok;
     P4_Expression*  ref  = NULL;
     P4_Expression*  expr = NULL;
     size_t          min  = 0,
                     max  = SIZE_MAX;
 
-    catch(P4_PegEvalExpression(token->head, result));
+    catch(P4_PegEvalExpression(node->head, result));
 
     ref = P4_UnwrapExpression(result);
 
-    switch (token->head->next->rule_id) {
+    switch (node->head->next->rule_id) {
         case P4_PegRuleRepeatZeroOrMore:
             min = 0; max = SIZE_MAX;
             break;
@@ -3928,30 +3928,30 @@ P4_PegEvalRepeat(P4_Token* token, P4_Result* result) {
             min = 1; max = SIZE_MAX;
             break;
         case P4_PegRuleRepeatMin:
-            catch(P4_PegEvalNumber(token->head->next->head, &min));
+            catch(P4_PegEvalNumber(node->head->next->head, &min));
             break;
         case P4_PegRuleRepeatMax:
-            catch(P4_PegEvalNumber(token->head->next->head, &max));
+            catch(P4_PegEvalNumber(node->head->next->head, &max));
             break;
         case P4_PegRuleRepeatMinMax:
-            catch(P4_PegEvalNumber(token->head->next->head, &min));
-            catch(P4_PegEvalNumber(token->head->next->tail, &max));
+            catch(P4_PegEvalNumber(node->head->next->head, &min));
+            catch(P4_PegEvalNumber(node->head->next->tail, &max));
             break;
         case P4_PegRuleRepeatExact:
-            catch(P4_PegEvalNumber(token->head->next->head, &min));
+            catch(P4_PegEvalNumber(node->head->next->head, &min));
             max = min;
             break;
         default:
             UNREACHABLE();
             P4_Panicf("InternalError: unknown repeat kind: %" PRIu64
-                TOKEN_ERROR_HINT_FMT, token->head->next->rule_id, TOKEN_ERROR_HINT);
+                node_ERROR_HINT_FMT, node->head->next->rule_id, node_ERROR_HINT);
     }
 
     if (min > max) {
         err = P4_PegError;
         P4_EvalRaise(
             "repeat min %lu is greater than max %lu. "
-            TOKEN_ERROR_HINT_FMT, min, max, TOKEN_ERROR_HINT
+            node_ERROR_HINT_FMT, min, max, node_ERROR_HINT
         );
     }
 
@@ -3968,7 +3968,7 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalDot(P4_Token* token, P4_Result* result) {
+P4_PegEvalDot(P4_Node* node, P4_Result* result) {
     P4_Expression* expr = NULL;
 
     if ((expr = P4_CreateRange(0x1, 0x10ffff, 1)) == NULL)
@@ -3979,27 +3979,27 @@ P4_PegEvalDot(P4_Token* token, P4_Result* result) {
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalRuleName(P4_Token* token, P4_String* result) {
-    size_t   len = P4_GetSliceSize(&token->slice);
+P4_PegEvalRuleName(P4_Node* node, P4_String* result) {
+    size_t   len = P4_GetSliceSize(&node->slice);
 
-    ASSERT(len > 0, "Token slice size should be greater than zero.");
+    ASSERT(len > 0, "Node slice size should be greater than zero.");
 
     if ((*result = P4_MALLOC((len+1) * sizeof(char)))== NULL)
         P4_Panic("failed to create string: out of memory.");
 
-    memcpy(*result, token->text + token->slice.start.pos, len);
+    memcpy(*result, node->text + node->slice.start.pos, len);
     (*result)[len] = '\0';
 
     return P4_Ok;
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalReference(P4_Token* token, P4_Result* result) {
+P4_PegEvalReference(P4_Node* node, P4_Result* result) {
     P4_Error       err  = P4_Ok;
     P4_String      ref  = NULL;
     P4_Expression* expr = NULL;
 
-    catch(P4_PegEvalRuleName(token, &ref));
+    catch(P4_PegEvalRuleName(node, &ref));
 
     /* We can't know the ref_id at this stage.
      * So, let's just simply create a placeholder with id=SIZE_MAX.
@@ -4023,14 +4023,14 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalGrammarRule(P4_Token* token, P4_Result* result) {
+P4_PegEvalGrammarRule(P4_Node* node, P4_Result* result) {
     P4_String           rule_name = NULL;
     P4_ExpressionFlag   rule_flag = 0;
-    P4_Token*           child     = NULL;
+    P4_Node*           child     = NULL;
     P4_Error            err       = P4_Ok;
     P4_Expression*      expr      = NULL;
 
-    for (child = token->head; child != NULL; child = child->next)
+    for (child = node->head; child != NULL; child = child->next)
         switch (child->rule_id) {
             case P4_PegRuleRuleDecorators:
                 catch(P4_PegEvalRuleFlags(child, &rule_flag));
@@ -4112,7 +4112,7 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalGrammar(P4_Token* token, P4_Result* result) {
+P4_PegEvalGrammar(P4_Node* node, P4_Result* result) {
     P4_Error    err = P4_Ok;
     P4_Grammar* grammar = NULL;
     size_t      i = 0;
@@ -4121,11 +4121,11 @@ P4_PegEvalGrammar(P4_Token* token, P4_Result* result) {
         P4_Panic("failed to create grammar: out of memory.");
 
     P4_Expression* rule = NULL;
-    P4_Token*      child = NULL;
+    P4_Node*      child = NULL;
     P4_RuleID      id = 1;
 
     /* Eval grammar rules. */
-    for (child = token->head; child != NULL; child = child->next) {
+    for (child = node->head; child != NULL; child = child->next) {
         catch(P4_PegEvalGrammarRule(child, result));
 
         rule = P4_UnwrapExpression(result);
@@ -4153,31 +4153,31 @@ finalize:
 }
 
 P4_PUBLIC P4_Error
-P4_PegEvalExpression(P4_Token* token, P4_Result* result) {
-    switch (token->rule_id) {
+P4_PegEvalExpression(P4_Node* node, P4_Result* result) {
+    switch (node->rule_id) {
     case P4_PegRuleLiteral:
-        return P4_PegEvalLiteral(token, result);
+        return P4_PegEvalLiteral(node, result);
     case P4_PegRuleInsensitiveLiteral:
-        return P4_PegEvalInsensitiveLiteral(token, result);
+        return P4_PegEvalInsensitiveLiteral(node, result);
     case P4_PegRuleRange:
-        return P4_PegEvalRange(token, result);
+        return P4_PegEvalRange(node, result);
     case P4_PegRuleSequence:
-        return P4_PegEvalSequence(token, result);
+        return P4_PegEvalSequence(node, result);
     case P4_PegRuleChoice:
-        return P4_PegEvalChoice(token, result);
+        return P4_PegEvalChoice(node, result);
     case P4_PegRulePositive:
-        return P4_PegEvalPositive(token, result);
+        return P4_PegEvalPositive(node, result);
     case P4_PegRuleNegative:
-        return P4_PegEvalNegative(token, result);
+        return P4_PegEvalNegative(node, result);
     case P4_PegRuleRepeat:
-        return P4_PegEvalRepeat(token, result);
+        return P4_PegEvalRepeat(node, result);
     case P4_PegRuleDot:
-        return P4_PegEvalDot(token, result);
+        return P4_PegEvalDot(node, result);
     case P4_PegRuleReference:
-        return P4_PegEvalReference(token, result);
+        return P4_PegEvalReference(node, result);
     default:
         UNREACHABLE();
-        P4_Panicf("PegError: token %p is not a peg expression", token);
+        P4_Panicf("PegError: node %p is not a peg expression", node);
     }
     return P4_Ok;
 }
@@ -4186,7 +4186,7 @@ P4_PUBLIC P4_Error
 P4_LoadGrammarResult(P4_String rules, P4_Result* result) {
     P4_Grammar*       bootstrap = NULL;
     P4_Source*        rules_src = NULL;
-    P4_Token*         rules_tok = NULL;
+    P4_Node*          rules_tok = NULL;
     P4_Error          err       = P4_Ok;
     P4_Result*        evalres   = &(P4_Result){0};
 

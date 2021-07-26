@@ -26,13 +26,13 @@ void test_match_ascii_digits_successfully(void) {
     );
     TEST_ASSERT_EQUAL(1, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
-    ASSERT_EQUAL_TOKEN_RULE(R1, token);
-    ASSERT_EQUAL_TOKEN_STRING("0", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
+    ASSERT_EQUAL_NODE_RULE(R1, node);
+    ASSERT_EQUAL_NODE_STRING("0", node);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -63,13 +63,13 @@ void test_match_utf8_code_point_successfully(void) {
     );
     TEST_ASSERT_EQUAL(3, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
-    ASSERT_EQUAL_TOKEN_RULE(R1, token);
-    ASSERT_EQUAL_TOKEN_STRING("好", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
+    ASSERT_EQUAL_NODE_RULE(R1, node);
+    ASSERT_EQUAL_NODE_STRING("好", node);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -102,8 +102,8 @@ void test_match_code_points_outside_range_cause_match_error(void) {
     );
     TEST_ASSERT_EQUAL(0, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NULL(token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NULL(node);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

@@ -19,14 +19,14 @@ void test_null(void) {
     );
     TEST_ASSERT_EQUAL(4, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(P4_JSONNull, token);
-    ASSERT_EQUAL_TOKEN_STRING("null", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(P4_JSONNull, node);
+    ASSERT_EQUAL_NODE_STRING("null", node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -46,14 +46,14 @@ void test_true(void) {
     );
     TEST_ASSERT_EQUAL(4, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(P4_JSONTrue, token);
-    ASSERT_EQUAL_TOKEN_STRING("true", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(P4_JSONTrue, node);
+    ASSERT_EQUAL_NODE_STRING("true", node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -73,14 +73,14 @@ void test_false(void) {
     );
     TEST_ASSERT_EQUAL(5, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(P4_JSONFalse, token);
-    ASSERT_EQUAL_TOKEN_STRING("false", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(P4_JSONFalse, node);
+    ASSERT_EQUAL_NODE_STRING("false", node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -100,14 +100,14 @@ void test_number_integer_0(void) {
     );
     TEST_ASSERT_EQUAL(1, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(P4_JSONNumber, token);
-    ASSERT_EQUAL_TOKEN_STRING("0", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(P4_JSONNumber, node);
+    ASSERT_EQUAL_NODE_STRING("0", node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -127,14 +127,14 @@ void test_number_integer_1234567890(void) {
     );
     TEST_ASSERT_EQUAL(10, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(P4_JSONNumber, token);
-    ASSERT_EQUAL_TOKEN_STRING("1234567890", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(P4_JSONNumber, node);
+    ASSERT_EQUAL_NODE_STRING("1234567890", node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -154,14 +154,14 @@ void test_number_float(void) {
     );
     TEST_ASSERT_EQUAL(3, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(P4_JSONNumber, token);
-    ASSERT_EQUAL_TOKEN_STRING("0.1", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(P4_JSONNumber, node);
+    ASSERT_EQUAL_NODE_STRING("0.1", node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -181,14 +181,14 @@ void test_number_exp(void) {
     );
     TEST_ASSERT_EQUAL(4, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(P4_JSONNumber, token);
-    ASSERT_EQUAL_TOKEN_STRING("1e+1", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(P4_JSONNumber, node);
+    ASSERT_EQUAL_NODE_STRING("1e+1", node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -208,14 +208,14 @@ void test_string_xyz(void) {
     );
     TEST_ASSERT_EQUAL(5, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(P4_JSONString, token);
-    ASSERT_EQUAL_TOKEN_STRING("\"xyz\"", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(P4_JSONString, node);
+    ASSERT_EQUAL_NODE_STRING("\"xyz\"", node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -235,14 +235,14 @@ void test_string_pi(void) {
     );
     TEST_ASSERT_EQUAL(4, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(P4_JSONString, token);
-    ASSERT_EQUAL_TOKEN_STRING("\"π\"", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(P4_JSONString, node);
+    ASSERT_EQUAL_NODE_STRING("\"π\"", node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -263,14 +263,14 @@ void test_string_empty(void) {
     );
     TEST_ASSERT_EQUAL(2, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(P4_JSONString, token);
-    ASSERT_EQUAL_TOKEN_STRING("\"\"", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(P4_JSONString, node);
+    ASSERT_EQUAL_NODE_STRING("\"\"", node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -290,14 +290,14 @@ void test_array_empty(void) {
     );
     TEST_ASSERT_EQUAL(3, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(P4_JSONArray, token);
-    ASSERT_EQUAL_TOKEN_STRING("[ ]", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(P4_JSONArray, node);
+    ASSERT_EQUAL_NODE_STRING("[ ]", node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -317,14 +317,14 @@ void test_array_one_item(void) {
     );
     TEST_ASSERT_EQUAL(5, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(P4_JSONArray, token);
-    ASSERT_EQUAL_TOKEN_STRING("[ 1 ]", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(P4_JSONArray, node);
+    ASSERT_EQUAL_NODE_STRING("[ 1 ]", node);
 
-    TEST_ASSERT_NULL(token->next);
+    TEST_ASSERT_NULL(node->next);
 
-    TEST_ASSERT_NOT_NULL(token->head);
+    TEST_ASSERT_NOT_NULL(node->head);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -355,14 +355,14 @@ void test_array_deep_nesting(void) {
     );
     TEST_ASSERT_EQUAL(NESTING_DEPTH*2, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(P4_JSONArray, token);
-    ASSERT_EQUAL_TOKEN_STRING(input, token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(P4_JSONArray, node);
+    ASSERT_EQUAL_NODE_STRING(input, node);
 
-    TEST_ASSERT_NULL(token->next);
+    TEST_ASSERT_NULL(node->next);
 
-    TEST_ASSERT_NOT_NULL(token->head);
+    TEST_ASSERT_NOT_NULL(node->head);
 
     free(input);
     P4_DeleteSource(source);
@@ -383,14 +383,14 @@ void test_array_multiple_items(void) {
     );
     TEST_ASSERT_EQUAL(5, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(P4_JSONArray, token);
-    ASSERT_EQUAL_TOKEN_STRING("[1,2]", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(P4_JSONArray, node);
+    ASSERT_EQUAL_NODE_STRING("[1,2]", node);
 
-    TEST_ASSERT_NULL(token->next);
+    TEST_ASSERT_NULL(node->next);
 
-    TEST_ASSERT_NOT_NULL(token->head);
+    TEST_ASSERT_NOT_NULL(node->head);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -409,14 +409,14 @@ void test_array_multiple_items_with_empty_spaces(void) {
     );
     TEST_ASSERT_EQUAL(9, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(P4_JSONArray, token);
-    ASSERT_EQUAL_TOKEN_STRING("[1,    2]", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(P4_JSONArray, node);
+    ASSERT_EQUAL_NODE_STRING("[1,    2]", node);
 
-    TEST_ASSERT_NULL(token->next);
+    TEST_ASSERT_NULL(node->next);
 
-    TEST_ASSERT_NOT_NULL(token->head);
+    TEST_ASSERT_NOT_NULL(node->head);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -437,14 +437,14 @@ void test_object_empty(void) {
     );
     TEST_ASSERT_EQUAL(3, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(P4_JSONObject, token);
-    ASSERT_EQUAL_TOKEN_STRING("{ }", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(P4_JSONObject, node);
+    ASSERT_EQUAL_NODE_STRING("{ }", node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -464,14 +464,14 @@ void test_object_one_item(void) {
     );
     TEST_ASSERT_EQUAL(7, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(P4_JSONObject, token);
-    ASSERT_EQUAL_TOKEN_STRING("{\"k\":1}", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(P4_JSONObject, node);
+    ASSERT_EQUAL_NODE_STRING("{\"k\":1}", node);
 
-    TEST_ASSERT_NULL(token->next);
+    TEST_ASSERT_NULL(node->next);
 
-    TEST_ASSERT_NOT_NULL(token->head);
+    TEST_ASSERT_NOT_NULL(node->head);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -491,14 +491,14 @@ void test_object_multiple_items(void) {
     );
     TEST_ASSERT_EQUAL(13, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(P4_JSONObject, token);
-    ASSERT_EQUAL_TOKEN_STRING("{\"k\":1,\"v\":2}", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(P4_JSONObject, node);
+    ASSERT_EQUAL_NODE_STRING("{\"k\":1,\"v\":2}", node);
 
-    TEST_ASSERT_NULL(token->next);
+    TEST_ASSERT_NULL(node->next);
 
-    TEST_ASSERT_NOT_NULL(token->head);
+    TEST_ASSERT_NOT_NULL(node->head);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -518,14 +518,14 @@ void test_objectitem(void) {
     );
     TEST_ASSERT_EQUAL(9, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(P4_JSONObjectItem, token);
-    ASSERT_EQUAL_TOKEN_STRING("\"k\":    1", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(P4_JSONObjectItem, node);
+    ASSERT_EQUAL_NODE_STRING("\"k\":    1", node);
 
-    TEST_ASSERT_NULL(token->next);
+    TEST_ASSERT_NULL(node->next);
 
-    TEST_ASSERT_NOT_NULL(token->head);
+    TEST_ASSERT_NOT_NULL(node->head);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

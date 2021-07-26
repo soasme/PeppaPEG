@@ -65,9 +65,9 @@ void test_replace_grammar_rule(void) {
         P4_Parse(grammar, source)
     );
     TEST_ASSERT_EQUAL(2, P4_GetSourcePosition(source));
-    P4_Token* root = P4_GetSourceAst(source);
+    P4_Node* root = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(root);
-    ASSERT_EQUAL_TOKEN_STRING("<%", root);
+    ASSERT_EQUAL_NODE_STRING("<%", root);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -87,9 +87,9 @@ void test_replace_grammar_rule_refreshing_references(void) {
     );
     TEST_ASSERT_EQUAL(2, P4_GetSourcePosition(source));
 
-    P4_Token* root = P4_GetSourceAst(source);
+    P4_Node* root = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(root);
-    ASSERT_EQUAL_TOKEN_STRING("<%", root);
+    ASSERT_EQUAL_NODE_STRING("<%", root);
 
     P4_Expression* ref = P4_GetGrammarRule(grammar, ENTRY);
     TEST_ASSERT_EQUAL(ref->ref_expr, P4_GetGrammarRule(grammar, REFERENCE));
@@ -108,23 +108,23 @@ void test_join(void) {
     P4_Source* source = P4_CreateSource("1,2,3", ROW);
     TEST_ASSERT_EQUAL(P4_Ok, P4_Parse(grammar, source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_STRING("1,2,3", token);
-    ASSERT_EQUAL_TOKEN_RULE(ROW, token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_STRING("1,2,3", node);
+    ASSERT_EQUAL_NODE_RULE(ROW, node);
 
-    TEST_ASSERT_NOT_NULL(token->head);
-    ASSERT_EQUAL_TOKEN_STRING("1", token->head);
-    ASSERT_EQUAL_TOKEN_RULE(NUM, token->head);
+    TEST_ASSERT_NOT_NULL(node->head);
+    ASSERT_EQUAL_NODE_STRING("1", node->head);
+    ASSERT_EQUAL_NODE_RULE(NUM, node->head);
 
-    TEST_ASSERT_NOT_NULL(token->head->next);
-    ASSERT_EQUAL_TOKEN_STRING("2", token->head->next);
-    ASSERT_EQUAL_TOKEN_RULE(NUM, token->head->next);
+    TEST_ASSERT_NOT_NULL(node->head->next);
+    ASSERT_EQUAL_NODE_STRING("2", node->head->next);
+    ASSERT_EQUAL_NODE_RULE(NUM, node->head->next);
 
-    TEST_ASSERT_NOT_NULL(token->head->next->next);
-    TEST_ASSERT_EQUAL(token->tail, token->head->next->next);
-    ASSERT_EQUAL_TOKEN_STRING("3", token->head->next->next);
-    ASSERT_EQUAL_TOKEN_RULE(NUM, token->head->next->next);
+    TEST_ASSERT_NOT_NULL(node->head->next->next);
+    TEST_ASSERT_EQUAL(node->tail, node->head->next->next);
+    ASSERT_EQUAL_NODE_STRING("3", node->head->next->next);
+    ASSERT_EQUAL_NODE_RULE(NUM, node->head->next->next);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -157,14 +157,14 @@ void test_source_slice(void) {
     TEST_ASSERT_EQUAL(P4_Ok, P4_Parse(grammar, source));
     TEST_ASSERT_EQUAL(4, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(R1, token);
-    ASSERT_EQUAL_TOKEN_STRING("XXX", token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(R1, node);
+    ASSERT_EQUAL_NODE_STRING("XXX", node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -182,15 +182,15 @@ void test_lineno_offset(void) {
     TEST_ASSERT_EQUAL(P4_Ok, P4_Parse(grammar, source));
     TEST_ASSERT_EQUAL(5, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_RULE(R1, token);
-    ASSERT_EQUAL_TOKEN_STRING("A\nBC\n", token);
-    ASSERT_EQUAL_TOKEN_LINE_OFFSET(1, 1, 2, 4, token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_RULE(R1, node);
+    ASSERT_EQUAL_NODE_STRING("A\nBC\n", node);
+    ASSERT_EQUAL_NODE_LINE_OFFSET(1, 1, 2, 4, node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -213,7 +213,7 @@ void test_name(void) {
 }
 
 static int my_inspect_refcnt = 0;
-P4_Error my_inspect(P4_Token* token, void* userdata) {
+P4_Error my_inspect(P4_Node* node, void* userdata) {
     my_inspect_refcnt++;
     return P4_Ok;
 }
@@ -235,8 +235,8 @@ void test_inspect(void) {
 }
 
 static int my_inspect_refcnt2 = 0;
-P4_Error my_inspect2(P4_Token* token, void* userdata) {
-    if (token->rule_id != (P4_RuleID)userdata)
+P4_Error my_inspect2(P4_Node* node, void* userdata) {
+    if (node->rule_id != (P4_RuleID)userdata)
         my_inspect_refcnt2++;
     return P4_Ok;
 }
@@ -266,11 +266,11 @@ void test_acquire_source_ast(void) {
 
     TEST_ASSERT_EQUAL( P4_Ok, P4_Parse(grammar, source));
 
-    P4_Token* root = P4_AcquireSourceAst(source);
+    P4_Node* root = P4_AcquireSourceAst(source);
     TEST_ASSERT_NOT_NULL(root);
     TEST_ASSERT_NULL(P4_GetSourceAst(source));
 
-    P4_DeleteToken(root);
+    P4_DeleteNode(root);
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
 }

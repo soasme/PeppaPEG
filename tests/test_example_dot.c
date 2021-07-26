@@ -8,7 +8,7 @@
     P4_Grammar* grammar = P4_CreateDotGrammar(); \
     P4_Source* source = P4_CreateSource((input), (entry)); \
     TEST_ASSERT_EQUAL_MESSAGE((code), P4_Parse(grammar, source), "unexpected parse grammar return code"); \
-    P4_Token* root = P4_GetSourceAst(source); \
+    P4_Node* root = P4_GetSourceAst(source); \
     FILE *f = fopen("check.json","w"); \
     P4_JsonifySourceAst(grammar, f, root); \
     fclose(f); \

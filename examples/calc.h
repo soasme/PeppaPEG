@@ -96,22 +96,22 @@ P4_Grammar*  P4_CreateCalcGrammar() {
     );
 }
 
-P4_Error P4_CalcEval(P4_Token* token, long* result) {
+P4_Error P4_CalcEval(P4_Node* node, long* result) {
     P4_Error err = P4_Ok;
-    P4_Token* tmp = NULL;
+    P4_Node* tmp = NULL;
     char sign   = '+';
     long val = 0;
     char* intstr = NULL;
 
-    switch (token->rule_id) {
+    switch (node->rule_id) {
         case P4_CalcStatement:
-            return P4_CalcEval(token->head, result);
+            return P4_CalcEval(node->head, result);
         case  P4_CalcTerm:
         case  P4_CalcFactor:
-            if ((err = P4_CalcEval(token->head, &val)) != P4_Ok)
+            if ((err = P4_CalcEval(node->head, &val)) != P4_Ok)
                 return err;
             *result = val;
-            for (tmp = token->head->next; tmp != NULL; tmp = tmp->next) {
+            for (tmp = node->head->next; tmp != NULL; tmp = tmp->next) {
                 switch (tmp->rule_id) {
                     case P4_CalcAddSign:
                         sign = '+'; break;
@@ -139,22 +139,22 @@ P4_Error P4_CalcEval(P4_Token* token, long* result) {
             }
             return P4_Ok;
         case P4_CalcUnary:
-            if (token->head == token->tail)
-                return P4_CalcEval(token->head, result);
+            if (node->head == node->tail)
+                return P4_CalcEval(node->head, result);
             else {
                 long val = 0;
-                if ((err = P4_CalcEval(token->tail, &val)) != P4_Ok)
+                if ((err = P4_CalcEval(node->tail, &val)) != P4_Ok)
                     return err;
-                if (token->head->rule_id == P4_CalcAddSign)
+                if (node->head->rule_id == P4_CalcAddSign)
                     *result = val;
-                else if (token->head->rule_id == P4_CalcMinusSign)
+                else if (node->head->rule_id == P4_CalcMinusSign)
                     *result = -val;
                 else
                     return P4_ValueError;
                 return P4_Ok;
             }
         case P4_CalcInteger:
-            intstr = P4_CopyTokenString(token);
+            intstr = P4_CopyNodeString(node);
             *result = atol(intstr);
             free(intstr);
             return P4_Ok;

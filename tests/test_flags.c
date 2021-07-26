@@ -37,14 +37,14 @@ void test_spaced_rule_should_loosen_sequence(void) {
     );
     TEST_ASSERT_EQUAL(15, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_STRING("HELLO \t\n\t WORLD", token);
-    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_STRING("HELLO \t\n\t WORLD", node);
+    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -82,14 +82,14 @@ void test_spaced_rule_should_be_ignored_in_tight_sequence(void) {
     );
     TEST_ASSERT_EQUAL(10, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_STRING("HELLOWORLD", token);
-    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_STRING("HELLOWORLD", node);
+    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -136,10 +136,10 @@ void test_spaced_rule_should_loosen_sequence_despite_member_is_tight(void) {
     );
     TEST_ASSERT_EQUAL(9, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_STRING("12  :  12", token);
-    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_STRING("12  :  12", node);
+    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -177,8 +177,8 @@ void test_spaced_rule_should_be_ignored_in_tight_sequence2(void) {
     );
     TEST_ASSERT_EQUAL(0, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NULL(token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NULL(node);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -213,14 +213,14 @@ void test_spaced_rule_should_be_applied_in_repeat(void) {
     );
     TEST_ASSERT_EQUAL(11, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_STRING("0 0\t0\n0\t0 0", token);
-    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_STRING("0 0\t0\n0\t0 0", node);
+    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -256,8 +256,8 @@ void test_spaced_rule_should_be_ignored_in_tight_repeat(void) {
     );
     TEST_ASSERT_EQUAL(0, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NULL(token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NULL(node);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -290,14 +290,14 @@ void test_spaced_rule_should_be_ignored_in_tight_repeat2(void) {
     );
     TEST_ASSERT_EQUAL(6, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_STRING("000000", token);
-    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_STRING("000000", node);
+    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -341,14 +341,14 @@ void test_squashed_rule_should_generate_no_children(void) {
     );
     TEST_ASSERT_EQUAL(2, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_STRING("00", token);
-    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_STRING("00", node);
+    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -386,14 +386,14 @@ void test_squashed_repeat_should_generate_no_children(void) {
     );
     TEST_ASSERT_EQUAL(6, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_STRING("000000", token);
-    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_STRING("000000", node);
+    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
 
-    TEST_ASSERT_NULL(token->next);
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->next);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -412,7 +412,7 @@ void test_squashed_repeat_should_generate_no_children(void) {
  * Output:
  *  NULL
  */
-void test_lifted_literal_should_generate_no_token(void) {
+void test_lifted_literal_should_generate_no_node(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -429,8 +429,8 @@ void test_lifted_literal_should_generate_no_token(void) {
     );
     TEST_ASSERT_EQUAL(1, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NULL(token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NULL(node);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -445,7 +445,7 @@ void test_lifted_literal_should_generate_no_token(void) {
  * Output:
  *  NULL
  */
-void test_lifted_range_should_generate_no_token(void) {
+void test_lifted_range_should_generate_no_node(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -462,8 +462,8 @@ void test_lifted_range_should_generate_no_token(void) {
     );
     TEST_ASSERT_EQUAL(1, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NULL(token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NULL(node);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -478,7 +478,7 @@ void test_lifted_range_should_generate_no_token(void) {
  * Output:
  *  NULL
  */
-void test_lifted_choice_should_generate_no_token(void) {
+void test_lifted_choice_should_generate_no_node(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -501,8 +501,8 @@ void test_lifted_choice_should_generate_no_token(void) {
     );
     TEST_ASSERT_EQUAL(7, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NULL(token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NULL(node);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -510,7 +510,7 @@ void test_lifted_choice_should_generate_no_token(void) {
 /* Reference # LIFT */
 
 /* Repeat # LIFT */
-void test_lifted_repeat_should_generate_no_token(void) {
+void test_lifted_repeat_should_generate_no_node(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
@@ -527,8 +527,8 @@ void test_lifted_repeat_should_generate_no_token(void) {
     );
     TEST_ASSERT_EQUAL(5, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NULL(token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NULL(node);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -579,21 +579,21 @@ void test_squashed_sequence_should_not_hide_scoped_literal(void) {
     );
     TEST_ASSERT_EQUAL(2, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
+    P4_Node* node = P4_GetSourceAst(source);
 
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_STRING("11", token);
-    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_STRING("11", node);
+    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
 
-    TEST_ASSERT_NOT_NULL(token->head);
-    ASSERT_EQUAL_TOKEN_STRING("1", token->head);
-    ASSERT_EQUAL_TOKEN_RULE(R1, token->head);
+    TEST_ASSERT_NOT_NULL(node->head);
+    ASSERT_EQUAL_NODE_STRING("1", node->head);
+    ASSERT_EQUAL_NODE_RULE(R1, node->head);
 
-    TEST_ASSERT_EQUAL(token->head->next, token->tail);
+    TEST_ASSERT_EQUAL(node->head->next, node->tail);
 
-    TEST_ASSERT_NOT_NULL(token->tail);
-    ASSERT_EQUAL_TOKEN_STRING("1", token->tail);
-    ASSERT_EQUAL_TOKEN_RULE(R1, token->tail);
+    TEST_ASSERT_NOT_NULL(node->tail);
+    ASSERT_EQUAL_NODE_STRING("1", node->tail);
+    ASSERT_EQUAL_NODE_RULE(R1, node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -636,18 +636,18 @@ void test_squashed_lifted_sequence_should_not_hide_scoped_literal(void) {
     );
     TEST_ASSERT_EQUAL(2, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
+    P4_Node* node = P4_GetSourceAst(source);
 
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_STRING("1", token);
-    ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_STRING("1", node);
+    ASSERT_EQUAL_NODE_RULE(R1, node);
 
-    TEST_ASSERT_NOT_NULL(token->next);
-    ASSERT_EQUAL_TOKEN_STRING("1", token->next);
-    ASSERT_EQUAL_TOKEN_RULE(R1, token->next);
+    TEST_ASSERT_NOT_NULL(node->next);
+    ASSERT_EQUAL_NODE_STRING("1", node->next);
+    ASSERT_EQUAL_NODE_RULE(R1, node->next);
 
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -688,21 +688,21 @@ void test_squashed_repeat_should_not_hide_scoped_literal(void) {
     );
     TEST_ASSERT_EQUAL(2, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
+    P4_Node* node = P4_GetSourceAst(source);
 
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_STRING("11", token);
-    ASSERT_EQUAL_TOKEN_RULE(ENTRY, token);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_STRING("11", node);
+    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
 
-    TEST_ASSERT_NOT_NULL(token->head);
-    ASSERT_EQUAL_TOKEN_STRING("1", token->head);
-    ASSERT_EQUAL_TOKEN_RULE(R1, token->head);
+    TEST_ASSERT_NOT_NULL(node->head);
+    ASSERT_EQUAL_NODE_STRING("1", node->head);
+    ASSERT_EQUAL_NODE_RULE(R1, node->head);
 
-    TEST_ASSERT_EQUAL(token->head->next, token->tail);
+    TEST_ASSERT_EQUAL(node->head->next, node->tail);
 
-    TEST_ASSERT_NOT_NULL(token->tail);
-    ASSERT_EQUAL_TOKEN_STRING("1", token->tail);
-    ASSERT_EQUAL_TOKEN_RULE(R1, token->tail);
+    TEST_ASSERT_NOT_NULL(node->tail);
+    ASSERT_EQUAL_NODE_STRING("1", node->tail);
+    ASSERT_EQUAL_NODE_RULE(R1, node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -742,18 +742,18 @@ void test_squashed_lifted_repeat_should_not_hide_scoped_literal(void) {
     );
     TEST_ASSERT_EQUAL(2, P4_GetSourcePosition(source));
 
-    P4_Token* token = P4_GetSourceAst(source);
+    P4_Node* node = P4_GetSourceAst(source);
 
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_STRING("1", token);
-    ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_STRING("1", node);
+    ASSERT_EQUAL_NODE_RULE(R1, node);
 
-    TEST_ASSERT_NOT_NULL(token->next);
-    ASSERT_EQUAL_TOKEN_STRING("1", token->next);
-    ASSERT_EQUAL_TOKEN_RULE(R1, token->next);
+    TEST_ASSERT_NOT_NULL(node->next);
+    ASSERT_EQUAL_NODE_STRING("1", node->next);
+    ASSERT_EQUAL_NODE_RULE(R1, node->next);
 
-    TEST_ASSERT_NULL(token->head);
-    TEST_ASSERT_NULL(token->tail);
+    TEST_ASSERT_NULL(node->head);
+    TEST_ASSERT_NULL(node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -768,10 +768,10 @@ void test_lift_repeat_for_single_child(void) {
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(P4_Ok, P4_Parse(grammar, source));
     TEST_ASSERT_EQUAL(1, P4_GetSourcePosition(source));
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_STRING("a", token);
-    ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_STRING("a", node);
+    ASSERT_EQUAL_NODE_RULE(R1, node);
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
 }
@@ -786,10 +786,10 @@ void test_lift_sequence_for_single_child(void) {
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(P4_Ok, P4_Parse(grammar, source));
     TEST_ASSERT_EQUAL(3, P4_GetSourcePosition(source));
-    P4_Token* token = P4_GetSourceAst(source);
-    TEST_ASSERT_NOT_NULL(token);
-    ASSERT_EQUAL_TOKEN_STRING("a", token);
-    ASSERT_EQUAL_TOKEN_RULE(R1, token);
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_STRING("a", node);
+    ASSERT_EQUAL_NODE_RULE(R1, node);
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
 }
@@ -806,10 +806,10 @@ int main(void) {
     RUN_TEST(test_spaced_rule_should_be_ignored_in_tight_repeat2);
     RUN_TEST(test_squashed_rule_should_generate_no_children);
     RUN_TEST(test_squashed_repeat_should_generate_no_children);
-    RUN_TEST(test_lifted_literal_should_generate_no_token);
-    RUN_TEST(test_lifted_range_should_generate_no_token);
-    RUN_TEST(test_lifted_choice_should_generate_no_token);
-    RUN_TEST(test_lifted_repeat_should_generate_no_token);
+    RUN_TEST(test_lifted_literal_should_generate_no_node);
+    RUN_TEST(test_lifted_range_should_generate_no_node);
+    RUN_TEST(test_lifted_choice_should_generate_no_node);
+    RUN_TEST(test_lifted_repeat_should_generate_no_node);
     RUN_TEST(test_lift_repeat_for_single_child);
     RUN_TEST(test_lift_sequence_for_single_child);
 

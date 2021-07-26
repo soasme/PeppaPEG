@@ -81,12 +81,12 @@ extern "C"
 
 /**
  * When the flag is set, the grammar rule will have squash all
- * children tokens.
+ * children nodes.
  *
- * `token->head`, `token->tail` will be NULL.
+ * `node->head`, `node->tail` will be NULL.
  *
  * For example, rule b has P4_FLAG_SQUASHED. After parsing,
- * the children tokens d and e are gone:
+ * the children nodes d and e are gone:
  *
  *          a   ===>   a
  *        (b) c ===>  b c
@@ -98,10 +98,10 @@ extern "C"
 
 /**
  * When the flag is set, the grammar rule will replace the
- * token with its children tokens.
+ * node with its children nodes.
  *
  * For example, rule b has P4_FLAG_SQUASHED. After parsing,
- * the token (b) is gone, and its children d and e become
+ * the node (b) is gone, and its children d and e become
  * the children of a:
  *
  *          a   ===>   a
@@ -124,13 +124,13 @@ extern "C"
  *
  * Regardless if the ancestor expression has SQUASHED or TIGHT
  * flag, starting from this expression, Peppa PEG will start
- * creating tokens and apply SPACED rules for sequences and repetitions.
+ * creating nodes and apply SPACED rules for sequences and repetitions.
  */
 # define P4_FLAG_SCOPED                 ((uint32_t)(0x1000))
 
 /**
  * When the flag is set, the expression will be inserted
- * between every token inside the sequences and repetitions
+ * between every node inside the sequences and repetitions
  *
  * If there are multiple SPACED expressions, Peppa PEG will
  * iterate through all SPACED expressions.
@@ -141,8 +141,8 @@ extern "C"
 # define P4_FLAG_SPACED                 ((uint32_t)(0x10000))
 
 /**
- * When the flag is set and a sequence/repetition token tree
- * has only one child, the child token will replace the parent.
+ * When the flag is set and a sequence/repetition node tree
+ * has only one child, the child node will replace the parent.
  */
 # define P4_FLAG_NON_TERMINAL           ((uint32_t)(0x100000))
 
@@ -423,7 +423,7 @@ typedef struct P4_Source {
     char                    errmsg[120];
 
     /** The root of abstract syntax tree. */
-    struct P4_Token*        root;
+    struct P4_Node*        root;
 
     /** Reserved: whether to enable DEBUG logs. */
     bool                    verbose;
@@ -497,9 +497,9 @@ typedef struct P4_Expression {
 } P4_Expression;
 
 /**
- * The token object of abstract syntax tree.
+ * The node object of abstract syntax tree.
  */
-typedef struct P4_Token {
+typedef struct P4_Node {
     /** the full text. */
     P4_String               text;
     /** The matched substring.
@@ -513,18 +513,18 @@ typedef struct P4_Token {
     /** The user data. */
     P4_UserData             userdata;
 
-    /** the sibling token. NULL if not exists. */
-    struct P4_Token*        next;
-    /** the first child of inner tokens. NULL if not exists. */
-    struct P4_Token*        head;
-    /** the last child of inner tokens. NULL if not exists. */
-    struct P4_Token*        tail;
-} P4_Token;
+    /** the sibling node. NULL if not exists. */
+    struct P4_Node*        next;
+    /** the first child of inner nodes. NULL if not exists. */
+    struct P4_Node*        head;
+    /** the last child of inner nodes. NULL if not exists. */
+    struct P4_Node*        tail;
+} P4_Node;
 
 /**
  * The callback for a successful match.
  */
-typedef P4_Error (*P4_MatchCallback)(struct P4_Grammar*, struct P4_Expression*, struct P4_Token*);
+typedef P4_Error (*P4_MatchCallback)(struct P4_Grammar*, struct P4_Expression*, struct P4_Node*);
 
 /**
  * The callback for a failure match.
@@ -1786,17 +1786,17 @@ void           P4_ResetSource(P4_Source* source);
 P4_Error       P4_SetSourceSlice(P4_Source* source, size_t start, size_t stop);
 
 /**
- * @brief       Get the root token of abstract syntax tree of the source.
+ * @brief       Get the root node of abstract syntax tree of the source.
  * @param       source  The source.
- * @return      The root token. If the parse is failed or the root token is lifted, return NULL.
+ * @return      The root node. If the parse is failed or the root node is lifted, return NULL.
  */
-P4_Token*      P4_GetSourceAst(P4_Source*);
+P4_Node*      P4_GetSourceAst(P4_Source*);
 
 
 /**
  * @brief       Transfer the ownership of source ast to the caller.
  * @param       source  The source.
- * @return      The root token. If the parse is failed or the root token is lifted, return NULL.
+ * @return      The root node. If the parse is failed or the root node is lifted, return NULL.
  *
  * You're on your own now to manage the de-allocation of the source ast.
  *
@@ -1804,11 +1804,11 @@ P4_Token*      P4_GetSourceAst(P4_Source*);
  *
  * Example:
  *
- *      P4_Token* root = P4_AcquireSourceAst(source);
+ *      P4_Node* root = P4_AcquireSourceAst(source);
  *      // ...
- *      P4_DeleteToken(root);
+ *      P4_DeleteNode(root);
  */
-P4_Token*      P4_AcquireSourceAst(P4_Source* source);
+P4_Node*      P4_AcquireSourceAst(P4_Source* source);
 
 /**
  * @brief       Get the last position in the input after a parse.
@@ -1818,34 +1818,34 @@ P4_Token*      P4_AcquireSourceAst(P4_Source* source);
 size_t          P4_GetSourcePosition(P4_Source*);
 
 /**
- * @brief       Print the token tree.
+ * @brief       Print the node tree.
  * @param       grammar     The grammar.
  * @param       stream      The output stream.
- * @param       token       The root node of source ast.
+ * @param       node       The root node of source ast.
  *
  * Example:
  *
- *      P4_Token* root = P4_GetSourceAst(source);
+ *      P4_Node* root = P4_GetSourceAst(source);
  *      P4_JsonifySourceAst(grammar, stdout, root);
  */
-void           P4_JsonifySourceAst(P4_Grammar* grammar, FILE* stream, P4_Token* token);
+void           P4_JsonifySourceAst(P4_Grammar* grammar, FILE* stream, P4_Node* node);
 
 /**
- * @brief       Inspect the token tree.
- * @param       token       The root node of source ast.
+ * @brief       Inspect the node tree.
+ * @param       node       The root node of source ast.
  * @param       userdata    Any additional information you want to pass in.
  * @param       inspector   The inspecting function. It should return P4_Ok for a successful inspection.
  *
  * Example:
  *
- *      void MyInspector(P4_Token* token, void* userdata) {
- *          printf("%lu\t%lu\t%p\n", token->slice.start.pos, token->rule_id, userdata);
+ *      void MyInspector(P4_Node* node, void* userdata) {
+ *          printf("%lu\t%lu\t%p\n", node->slice.start.pos, node->rule_id, userdata);
  *          return P4_Ok;
  *      }
  *
  *      P4_Error err = P4_InspectSourceAst(root, NULL, MyInspector);
  */
-P4_Error       P4_InspectSourceAst(P4_Token* token, void* userdata, P4_Error (*inspector)(P4_Token*, void*));
+P4_Error       P4_InspectSourceAst(P4_Node* node, void* userdata, P4_Error (*inspector)(P4_Node*, void*));
 
 /**
  * @brief       Parse the source given a grammar.
@@ -1916,12 +1916,12 @@ P4_String      P4_GetErrorString(P4_Error err);
 P4_String      P4_GetErrorMessage(P4_Source*);
 
 /**
- * @brief       Create a token.
+ * @brief       Create a node.
  * @param       str     The text.
  * @param       start   The starting position of the text.
  * @param       stop    The stopping position of the text.
  * @param       expr    The expression that matches to the slice of the text.
- * @return      The token.
+ * @return      The node.
  *
  * Example:
  *
@@ -1930,67 +1930,67 @@ P4_String      P4_GetErrorMessage(P4_Source*);
  *      size_t          stop    = 11;
  *      P4_Expression*  expr    = P4_GetGrammarRule(grammar, ENTRY);
  *
- *      P4_Token* token = P4_CreateToken(text, start, stop, expr);
+ *      P4_Node* node = P4_CreateNode(text, start, stop, expr);
  *
  *      // do something.
  *
- *      P4_DeleteToken(token);
+ *      P4_DeleteNode(node);
  */
-P4_Token*      P4_CreateToken(P4_String, P4_Position*, P4_Position*, P4_RuleID);
+P4_Node*      P4_CreateNode(P4_String, P4_Position*, P4_Position*, P4_RuleID);
 
 /**
- * @brief       Delete the token.
- *              This will free the occupied memory for token.
- *              The str of the token won't be free-ed since the token only owns not the string but the slice of a string.
- * @param       token   The token.
+ * @brief       Delete the node.
+ *              This will free the occupied memory for node.
+ *              The str of the node won't be free-ed since the node only owns not the string but the slice of a string.
+ * @param       node   The node.
  *
  * Example:
  *
- *      P4_DeleteToken(token);
+ *      P4_DeleteNode(node);
  */
-void           P4_DeleteToken(P4_Token*);
+void           P4_DeleteNode(P4_Node*);
 
 /**
- * @brief       Get the slice that the token covers.
- *              The slice is owned by the token so don't free it.
- * @param       token   The token.
+ * @brief       Get the slice that the node covers.
+ *              The slice is owned by the node so don't free it.
+ * @param       node   The node.
  * @return      The slice.
  *
  * Example:
  *
- *      P4_Slice* slice = P4_GetTokenSlice(token);
- *      printf("token slice=[%u..%u]\n", slice->i, slice->j);
+ *      P4_Slice* slice = P4_GetNodeSlice(node);
+ *      printf("node slice=[%u..%u]\n", slice->i, slice->j);
  */
-P4_Slice*      P4_GetTokenSlice(P4_Token*);
+P4_Slice*      P4_GetNodeSlice(P4_Node*);
 
 
 /**
- * @brief       Get the total number of token children.
- * @param       token   The token.
- * @return      The total number of token children.
+ * @brief       Get the total number of node children.
+ * @param       node   The node.
+ * @return      The total number of node children.
  *
  * Example:
  *
- *      P4_Token* root = P4_GetSourceAst(source);
- *      size_t count = P4_GetTokenChildrenCount(root);
+ *      P4_Node* root = P4_GetSourceAst(source);
+ *      size_t count = P4_GetNodeChildrenCount(root);
  *      printf("There are %lu children for root node\n", count);
  */
-size_t         P4_GetTokenChildrenCount(P4_Token* token);
+size_t         P4_GetNodeChildrenCount(P4_Node* node);
 
 /**
- * @brief       Copy the string that the token covers.
+ * @brief       Copy the string that the node covers.
  *              The caller is responsible for freeing the string.
  *
- * @param       token   The token.
+ * @param       node   The node.
  * @return      The string.
  *
  * Example:
  *
- *      P4_String* str = P4_CopyTokenString(token);
- *      printf("token str=%s\n", str);
+ *      P4_String* str = P4_CopyNodeString(node);
+ *      printf("node str=%s\n", str);
  *      free(str);
  */
-P4_String      P4_CopyTokenString(P4_Token*);
+P4_String      P4_CopyNodeString(P4_Node*);
 
 
 /**

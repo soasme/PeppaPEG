@@ -303,9 +303,9 @@ For example, my_another_sequence can only match "helloworld".
 @lifted
 ```````
 
-If a rule has `@lifted` decorator, its children tokens will replace the parent token.
+If a rule has `@lifted` decorator, its children will replace the parent.
 
-In this example, the parsed token tree has no token mapping to primary rule, but rather either digit or char.
+In this example, the parsed tree has no node mapping to primary rule, but rather either digit or char.
 
 .. code-block::
 
@@ -318,9 +318,9 @@ In this example, the parsed token tree has no token mapping to primary rule, but
 @nonterminal
 ````````````
 
-If a rule has `nonterminal` decorator, and it has only one single child token, the child token will replace the parent token.
+If a rule has `nonterminal` decorator, and it has only one single child node, the child node will replace the parent node.
 
-If it produces multiple children tokens, this decorator has no effect.
+If it produces multiple children, this decorator has no effect.
 
 In this example,
 
@@ -331,13 +331,13 @@ In this example,
 
     number = [0-9];
 
-If we feed the input "1", the token tree is like:
+If we feed the input "1", the tree is like:
 
 .. code-block::
 
     Number(0,1)
 
-If we feed the input "1+1", the token tree is like:
+If we feed the input "1+1", the tree is like:
 
 .. code-block::
 
@@ -348,9 +348,9 @@ If we feed the input "1+1", the token tree is like:
 @squashed
 `````````
 
-If a rule has `@squashed` decorator, its children tokens will be trimmed.
+If a rule has `@squashed` decorator, its children will be trimmed.
 
-In this example, the rule `float` will drop all `number` tokens, leaving only one single node in the ast.
+In this example, the rule `float` will drop all `number` nodes, leaving only one single node in the ast.
 
 .. code-block::
 
@@ -411,15 +411,15 @@ Cheatsheet
    * - `foo = ...;`
      - grammar rule
    * - `@lifted foo = ...;`
-     - drop token
+     - drop node
    * - `@spaced foo = ...;`
      - mark as space
    * - `@squashed foo = ...;`
-     - ignore children tokens
+     - ignore children
    * - `@tight foo = ...;`
      - ignore spaced rules
    * - `@non_terminal foo = ...;`
-     - ignore single child token
+     - ignore single child node
    * - `@scoped foo = ...;`
      - cancle effects
    * - `"literal"`

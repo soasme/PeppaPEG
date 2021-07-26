@@ -21,23 +21,23 @@ cleanup_freep (void *p)
     TEST_ASSERT_EQUAL_UINT_MESSAGE((j),   (s)->start.pos, "unexpected slice stop"); \
 } while (0);
 
-# define ASSERT_EQUAL_TOKEN_STRING(s, token) do { \
-    TEST_ASSERT_NOT_NULL((token)); \
-    autofree P4_String tokenstr = P4_CopyTokenString((token)); \
-    TEST_ASSERT_EQUAL_STRING((s), tokenstr); \
+# define ASSERT_EQUAL_NODE_STRING(s, node) do { \
+    TEST_ASSERT_NOT_NULL((node)); \
+    autofree P4_String nodestr = P4_CopyNodeString((node)); \
+    TEST_ASSERT_EQUAL_STRING((s), nodestr); \
 } while (0);
 
-# define ASSERT_EQUAL_TOKEN_RULE(id, token) do { \
-    TEST_ASSERT_NOT_NULL((token)); \
-    TEST_ASSERT_EQUAL_UINT_MESSAGE((id), (token)->rule_id, "invalid token rule"); \
+# define ASSERT_EQUAL_NODE_RULE(id, node) do { \
+    TEST_ASSERT_NOT_NULL((node)); \
+    TEST_ASSERT_EQUAL_UINT_MESSAGE((id), (node)->rule_id, "invalid node rule"); \
 } while (0);
 
-# define ASSERT_EQUAL_TOKEN_LINE_OFFSET(startline, startoffset, stopline, stopoffset, token) do { \
-    TEST_ASSERT_NOT_NULL(token); \
-    TEST_ASSERT_EQUAL_UINT(startline, token->slice.start.lineno); \
-    TEST_ASSERT_EQUAL_UINT(startoffset, token->slice.start.offset); \
-    TEST_ASSERT_EQUAL_UINT(stopline, token->slice.stop.lineno); \
-    TEST_ASSERT_EQUAL_UINT(stopoffset, token->slice.stop.offset); \
+# define ASSERT_EQUAL_NODE_LINE_OFFSET(startline, startoffset, stopline, stopoffset, node) do { \
+    TEST_ASSERT_NOT_NULL(node); \
+    TEST_ASSERT_EQUAL_UINT(startline, node->slice.start.lineno); \
+    TEST_ASSERT_EQUAL_UINT(startoffset, node->slice.start.offset); \
+    TEST_ASSERT_EQUAL_UINT(stopline, node->slice.stop.lineno); \
+    TEST_ASSERT_EQUAL_UINT(stopoffset, node->slice.stop.offset); \
 } while (0);
 
 void TEST_ADD_WHITESPACE(P4_Grammar* grammar, P4_RuleID id) {

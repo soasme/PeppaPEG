@@ -8,10 +8,10 @@ A parser is usually part of a compiler. Considering a statement `print("hello wo
 
 .. code-block::
 
-    Token(rule_id=RuleStatement, slice=[0,20], children=[
-        Token(rule_id=RuleFunction, slice=[0, 5]),
-        Token(rule_id=RuleFunctionArgs, slice=[7, 19], children=[
-            Token(rule_id=RuleString, slice=[7, 19])
+    Node(rule_id=RuleStatement, slice=[0,20], children=[
+        Node(rule_id=RuleFunction, slice=[0, 5]),
+        Node(rule_id=RuleFunctionArgs, slice=[7, 19], children=[
+            Node(rule_id=RuleString, slice=[7, 19])
         ])
     ])
 
@@ -46,7 +46,7 @@ Overview of Process
 
 1. Load Grammar. Load your grammar using :c:func:`P4_LoadGrammar` . Alternatively, you can create your grammar using :c:func:`P4_CreateGrammar` and then add grammar rules using :ref:`lowlevel`.
 2. Parse Source. Wrap source string using :c:func:`P4_CreateSource` and then parse it using :c:func:`P4_Parse`.
-3. Traverse AST. It's up to you what to do when traversing the tree. You may inspect the token tree, produce bytecodes, trim the tree, etc.
+3. Traverse AST. It's up to you what to do when traversing the tree. You may inspect the tree, produce bytecodes, trim the tree, etc.
 
 Unlike one of Peppa PEG alternatives - peg/leg, Peppa PEG doesn't end up with producing C code for the grammar. It holds the grammar and the parser generator in memory so you don't need an extra compilation step.
 
@@ -59,21 +59,21 @@ Considering `[1,2]`, a parse tree looks like:
 
 .. code-block::
 
-    Token(rule_id=RuleArray, slice=[0,5], children=[
-        Token(rule_id=RuleLeftParen, slice=[0,1]),
-        Token(rule_id=RuleNumber, slice=[1,2]),
-        Token(rule_id=RuleComma, slice=[2,3]),
-        Token(rule_id=RuleNumber, slice=[3,4]),
-        Token(rule_id=RuleRightParen, slice=[4,5]),
+    Node(rule_id=RuleArray, slice=[0,5], children=[
+        Node(rule_id=RuleLeftParen, slice=[0,1]),
+        Node(rule_id=RuleNumber, slice=[1,2]),
+        Node(rule_id=RuleComma, slice=[2,3]),
+        Node(rule_id=RuleNumber, slice=[3,4]),
+        Node(rule_id=RuleRightParen, slice=[4,5]),
     ])
 
 While an abstract syntax tree looks like:
 
 .. code-block::
 
-    Token(rule_id=RuleArray, slice=[0,5], children=[
-        Token(rule_id=RuleNumber, slice=[1,2]),
-        Token(rule_id=RuleNumber, slice=[3,4]),
+    Node(rule_id=RuleArray, slice=[0,5], children=[
+        Node(rule_id=RuleNumber, slice=[1,2]),
+        Node(rule_id=RuleNumber, slice=[3,4]),
     ])
 
 e.g, left paren, comma, right paren are ignored as they're not part of the semantic of array.

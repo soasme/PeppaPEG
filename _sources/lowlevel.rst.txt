@@ -353,12 +353,12 @@ Expression Flags
 
 Flags can only be used in the grammar rule expression itself. It can not be used in any sub-expression of the grammar rule expression.
 
-Usually, a grammar rule creates a token. The expression flags modify the behavior of the token generation.
+Usually, a grammar rule creates a node. The expression flags modify the behavior of the node generation.
 
 `P4_FLAG_SQUASHED`
 ``````````````````
 
-Flag `P4_FLAG_SQUASHED` **prevents generating children tokens**.
+Flag `P4_FLAG_SQUASHED` **prevents generating children nodes**.
 
 For example,
 
@@ -372,7 +372,7 @@ For example,
     );
     P4_AddLiteral(grammar, Text, "x", false);
 
-This grammar parses the text "xx" into three tokens:
+This grammar parses the text "xx" into three nodes:
 
 .. code-block::
 
@@ -380,7 +380,7 @@ This grammar parses the text "xx" into three tokens:
       Token(0..1) "X"
       Token(1..2) "x"
 
-If the grammar rule `Entry` has flag `P4_FLAG_SQUASHED`, the children tokens disappear:
+If the grammar rule `Entry` has flag `P4_FLAG_SQUASHED`, the children nodes disappear:
 
 .. code-block:: c
 
@@ -395,7 +395,7 @@ Flag `P4_FLAG_SQUASHED` takes effects not only on the expression but its all des
 `P4_FLAG_LIFTED`
 ``````````````````
 
-`P4_FLAG_LIFTED` **replaces the token with its children tokens**.
+`P4_FLAG_LIFTED` **replaces the node with its children nodes**.
 
 For example,
 
@@ -409,7 +409,7 @@ For example,
     );
     P4_AddLiteral(grammar, Text, "x", false);
 
-This grammar can match text "xx" into three tokens:
+This grammar can match text "xx" into three nodes:
 
 .. code-block::
 
@@ -417,7 +417,7 @@ This grammar can match text "xx" into three tokens:
       Token(0..1) "X"
       Token(1..2) "x"
 
-If the grammar rule `Entry` has flag `P4_FLAG_LIFTED`, the token is lifted and replaced by its children:
+If the grammar rule `Entry` has flag `P4_FLAG_LIFTED`, the node is lifted and replaced by its children:
 
 .. code-block:: c
 
@@ -431,7 +431,7 @@ If the grammar rule `Entry` has flag `P4_FLAG_LIFTED`, the token is lifted and r
 `P4_FLAG_NON_TERMINAL`
 ``````````````````````
 
-`P4_FLAG_NON_TERMINAL` **replaces the token with its single child token or does nothing.**.
+`P4_FLAG_NON_TERMINAL` **replaces the node with its single child node or does nothing.**.
 
 For example,
 
@@ -446,14 +446,14 @@ For example,
     );
     P4_AddLiteral(grammar, Text, "x", false);
 
-This grammar can match text "(x)" into two tokens:
+This grammar can match text "(x)" into two nodes:
 
 .. code-block::
 
     Token(0..3): "(x)"
       Token(1..2) "x"
 
-If the grammar rule `Entry` has flag `P4_FLAG_NON_TERMINAL`, the token is lifted and replaced by its single child token:
+If the grammar rule `Entry` has flag `P4_FLAG_NON_TERMINAL`, the node is lifted and replaced by its single child node:
 
 .. code-block:: c
 
@@ -465,7 +465,7 @@ If the grammar rule `Entry` has flag `P4_FLAG_NON_TERMINAL`, the token is lifted
 
 This flag only works for Sequence and Repeat expressions.
 
-This flag has no effect if the Sequence or Repeat expressions produces over one token, e.g, the parent token will not be lifted.
+This flag has no effect if the Sequence or Repeat expressions produces over one node, e.g, the parent node will not be lifted.
 
 `P4_FLAG_SPACED`
 ``````````````````````
@@ -482,7 +482,7 @@ For example,
 
     P4_SetGrammarRuleFlag(grammar, Whitespace, P4_FLAG_SPACED);
 
-Often, we don't want the whitespace having tokens, so it's usually combined with `P4_FLAG_LIFTED`.
+Often, we don't want the whitespace having nodes, so it's usually combined with `P4_FLAG_LIFTED`.
 
 .. code-block:: c
 
@@ -534,4 +534,4 @@ Flag `P4_FLAG_TIGHT` takes effects not only on the expression but its all descen
 
     P4_SetGrammarRuleFlag(grammar, Entry, P4_FLAG_SCOPED);
 
-Starting from the SCOPED grammar rule, the token are not squashed; the implicit whitespaces are enabled as well.
+Starting from the SCOPED grammar rule, the nodes are not squashed; the implicit whitespace is enabled as well.

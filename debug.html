@@ -2,13 +2,14 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Change Log" href="whatsnew.html" /><link rel="prev" title="Build" href="build.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Change Log" href="whatsnew.html" /><link rel="prev" title="Build" href="build.html" />
 
-    <meta name="generator" content="sphinx-3.5.4, furo 2021.04.11.beta34"/>
+    <meta name="generator" content="sphinx-4.1.1, furo 2021.07.05.beta38"/>
         <title>Debug - Peppa PEG 1.13.0 documentation</title>
-      <link rel="stylesheet" href="_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
-    <link rel="stylesheet" href="_static/pygments.css">
-    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css" />
     
 
 
@@ -37,7 +38,7 @@
   --color-code-foreground: #d0d0d0;
   
   }
-</style><link rel="stylesheet" href="_static/styles/furo-extensions.css?digest=d391b54134226e4196576da3bdb6dddb7e05ba2b"></head>
+</style><link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css"></head>
   <body dir="">
     
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -141,11 +142,11 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <div class="section" id="debug">
+        <section id="debug">
 <h1>Debug<a class="headerlink" href="#debug" title="Permalink to this headline">¶</a></h1>
 <p>If you encounter segfaults or memory leaks, please check with your grammar implementation.
 If you believe the issue origins from Peppa PEG and want to debug it, this document can be helpful.</p>
-<div class="section" id="checking-segfaults">
+<section id="checking-segfaults">
 <h2>Checking Segfaults<a class="headerlink" href="#checking-segfaults" title="Permalink to this headline">¶</a></h2>
 <p>Assuming your operation system has gdb or lldb installed. Depending on your toolchain, use gdb if using gcc, use lldb if using llvm. After installing a debugger, you can create a simple program that recurs the segfault problem.</p>
 <p>For example,</p>
@@ -177,46 +178,13 @@ If you believe the issue origins from Peppa PEG and want to debug it, this docum
 </pre></div>
 </div>
 <p>In this case, it’s <cite>0x0</cite> so a segfault occurred. To fix it, create the grammar using <cite>P4_CreateGrammar()</cite>.</p>
-</div>
-<div class="section" id="checking-memory-leaks">
-<h2>Checking Memory Leaks<a class="headerlink" href="#checking-memory-leaks" title="Permalink to this headline">¶</a></h2>
-<p>Assuming your operation system has gdb or lldb installed. Depending on your toolchain, use gdb if using gcc, use lldb if using llvm. After installing a debugger, you can create a simple program that recurs the segfault problem.</p>
-<p>For example,</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">"peppapeg.h"</span><span class="cp"></span>
-<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
-    <span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s">"%lu</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">grammar</span><span class="o">-&gt;</span><span class="n">count</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Compile the program with debugging option enabled:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gcc -g peppapeg.c debug.c
-</pre></div>
-</div>
-<p>Run the program with a debugger. Gdb directive <cite>run</cite> can run the program, <cite>where</cite> can output where the program stops, and <cite>p</cite> can print the value of the variable.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gdb ./a.out
-<span class="gp gp-VirtualEnv">(gdb)</span> <span class="go">run</span>
-<span class="go">Starting program: /app/a.out</span>
-<span class="go">warning: Error disabling address space randomization: Operation not permitted</span>
-
-<span class="go">Program received signal SIGSEGV, Segmentation fault.</span>
-<span class="go">0x000055c62cc11e6e in main () at debug.c:4</span>
-<span class="go">4       printf("count: %u\n", grammar-&gt;count);</span>
-<span class="gp gp-VirtualEnv">(gdb)</span> <span class="go">where</span>
-<span class="gp">#</span><span class="m">0</span>  0x000055c62cc11e6e <span class="k">in</span> main <span class="o">()</span> at debug.c:4
-<span class="gp gp-VirtualEnv">(gdb)</span> <span class="go">p grammar</span>
-<span class="gp">$</span><span class="nv">1</span> <span class="o">=</span> <span class="o">(</span>P4_Grammar *<span class="o">)</span> 0x0
-<span class="gp gp-VirtualEnv">(gdb)</span> <span class="go">quit</span>
-</pre></div>
-</div>
-<p>In this case, it’s <cite>0x0</cite> so a segfault occurred. To fix it, create the grammar using <cite>P4_CreateGrammar()</cite>.</p>
-</div>
-<div class="section" id="conclusion">
+</section>
+<section id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
 <p>Programs are not always correct as human makes mistakes.
 By crafting the debugging skills using tools like gdb/lldb/valgrind, we will follow the trace, pin point the problem, and fix the bug 🐛.</p>
-</div>
-</div>
+</section>
+</section>
 
       </article>
       <footer>
@@ -274,7 +242,6 @@ By crafting the debugging skills using tools like gdb/lldb/valgrind, we will fol
             <ul>
 <li><a class="reference internal" href="#">Debug</a><ul>
 <li><a class="reference internal" href="#checking-segfaults">Checking Segfaults</a></li>
-<li><a class="reference internal" href="#checking-memory-leaks">Checking Memory Leaks</a></li>
 <li><a class="reference internal" href="#conclusion">Conclusion</a></li>
 </ul>
 </li>
@@ -287,10 +254,10 @@ By crafting the debugging skills using tools like gdb/lldb/valgrind, we will fol
       
     </aside>
   </main>
-</div>
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+    <script src="_static/scripts/main.js"></script>
+    </body>
 </html>

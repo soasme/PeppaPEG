@@ -2,13 +2,14 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Low Level APIs" href="lowlevel.html" /><link rel="prev" title="Concepts" href="concepts.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Low Level APIs" href="lowlevel.html" /><link rel="prev" title="Concepts" href="concepts.html" />
 
-    <meta name="generator" content="sphinx-3.5.4, furo 2021.04.11.beta34"/>
+    <meta name="generator" content="sphinx-4.1.1, furo 2021.07.05.beta38"/>
         <title>PEG APIs - Peppa PEG 1.13.0 documentation</title>
-      <link rel="stylesheet" href="_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
-    <link rel="stylesheet" href="_static/pygments.css">
-    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css" />
     
 
 
@@ -37,7 +38,7 @@
   --color-code-foreground: #d0d0d0;
   
   }
-</style><link rel="stylesheet" href="_static/styles/furo-extensions.css?digest=d391b54134226e4196576da3bdb6dddb7e05ba2b"></head>
+</style><link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css"></head>
   <body dir="">
     
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -141,9 +142,9 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <div class="section" id="peg-apis">
+        <section id="peg-apis">
 <span id="peg"></span><h1>PEG APIs<a class="headerlink" href="#peg-apis" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="grammar-rules">
+<section id="grammar-rules">
 <h2>Grammar Rules<a class="headerlink" href="#grammar-rules" title="Permalink to this headline">¶</a></h2>
 <p>The grammar is simply a list of rules with names. Rules are defined like this:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rule_1</span> <span class="o">=</span> <span class="o">...</span> <span class="p">;</span>
@@ -160,8 +161,8 @@
 The ids for the rest increase one by one.</p>
 <p>The grammar rule names must start with an alphabet or underscore,
 followed by a sequence of either alphabets or digits or underscores <cite>_</cite>.</p>
-</div>
-<div class="section" id="literal">
+</section>
+<section id="literal">
 <h2>Literal<a class="headerlink" href="#literal" title="Permalink to this headline">¶</a></h2>
 <p>The literal matches an exact same string surrounded by double quotes.</p>
 <p>For example,</p>
@@ -188,8 +189,8 @@ followed by a sequence of either alphabets or digits or underscores <cite>_</cit
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">greeting</span> <span class="o">=</span> <span class="s2">"\u</span><span class="si">{4f60}</span><span class="s2">\u</span><span class="si">{597D}</span><span class="s2">, world\u</span><span class="si">{0c}</span><span class="s2">"</span><span class="p">;</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="range">
+</section>
+<section id="range">
 <h2>Range<a class="headerlink" href="#range" title="Permalink to this headline">¶</a></h2>
 <p>Range <strong>matches a single character in range</strong>.</p>
 <p>In this example, any character between <cite>‘0’</cite> to <cite>‘9’</cite> can match.</p>
@@ -226,15 +227,15 @@ They’re wrapped via <cite>\p{}</cite>, for example:</p>
 <span class="n">unicode_digit</span>  <span class="o">=</span> <span class="p">[</span>\<span class="n">p</span><span class="p">{</span><span class="n">Nd</span><span class="p">}];</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="dot">
+</section>
+<section id="dot">
 <h2>Dot<a class="headerlink" href="#dot" title="Permalink to this headline">¶</a></h2>
 <p>Single dot <cite>.</cite> can match any UTF-8 code point. It’s a syntax sugar for <cite>[\u{1}-\u{10ffff}]</cite>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">any</span> <span class="o">=</span> <span class="o">.</span><span class="p">;</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="sequence">
+</section>
+<section id="sequence">
 <h2>Sequence<a class="headerlink" href="#sequence" title="Permalink to this headline">¶</a></h2>
 <p>Sequence <strong>matches a sequence of sub-expressions in order</strong>.</p>
 <p>When parsing, the first sequence member is attempted. If succeeds, the second is attempted, so on and on.
@@ -243,8 +244,8 @@ If any one of the attempts fails, the match fails.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">greeter</span> <span class="o">=</span> <span class="s2">"Hello"</span> <span class="s2">" "</span> <span class="s2">"world"</span><span class="p">;</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="choice">
+</section>
+<section id="choice">
 <h2>Choice<a class="headerlink" href="#choice" title="Permalink to this headline">¶</a></h2>
 <p>Choice <strong>matches one of the sub-expression.</strong></p>
 <p>When parsing, the first sequence member is attempted. If fails, the second is attempted, so on and on.
@@ -253,8 +254,8 @@ If any one of the attempts succeeds, the match succeeds. If all attempts fail, t
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">greeter</span> <span class="o">=</span> <span class="s2">"Hello World"</span> <span class="o">/</span> <span class="s2">"你好，世界"</span> <span class="o">/</span> <span class="s2">"Kia Ora"</span><span class="p">;</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="reference">
+</section>
+<section id="reference">
 <h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
 <p>Reference <strong>matches a string based on the referenced grammar rule</strong>.</p>
 <p>For example, <cite>greeter</cite> is just a reference rule in <cite>greeting</cite>. When matching <cite>greeting</cite>, it will use the referenced grammar rule <cite>greeter</cite> first, e.g. <cite>“Hello” / “你好”</cite>, then match ” world”.</p>
@@ -268,8 +269,8 @@ If any one of the attempts succeeds, the match succeeds. If all attempts fail, t
 </pre></div>
 </div>
 <p>One should ensure all references must have corresponding rule defined, otherwise, the parse will fail with <a class="reference internal" href="api.html#c.P4_Error.P4_MatchError" title="P4_MatchError"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_MatchError</span></code></a>.</p>
-</div>
-<div class="section" id="positive">
+</section>
+<section id="positive">
 <h2>Positive<a class="headerlink" href="#positive" title="Permalink to this headline">¶</a></h2>
 <p>Positive <strong>tests if the sub-expression matches</strong>.</p>
 <p>Positive attempts to match the sub-expression. If succeeds, the test passes. Positive does not “consume” any text.</p>
@@ -277,8 +278,8 @@ If any one of the attempts succeeds, the match succeeds. If all attempts fail, t
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">greeting</span> <span class="o">=</span> <span class="o">&amp;</span><span class="s2">"Hello"</span> <span class="n">i</span><span class="s2">"hello world"</span><span class="p">;</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="negative">
+</section>
+<section id="negative">
 <h2>Negative<a class="headerlink" href="#negative" title="Permalink to this headline">¶</a></h2>
 <p>Negative <strong>tests if the sub-expression does not match</strong>.</p>
 <p>Negative expects the sub-expression doesn’t match. If fails, the test passes. Negative does not “consume” any text.</p>
@@ -286,8 +287,8 @@ If any one of the attempts succeeds, the match succeeds. If all attempts fail, t
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>greeting = !"Hello" i"hello world";
 </pre></div>
 </div>
-</div>
-<div class="section" id="repeat">
+</section>
+<section id="repeat">
 <h2>Repeat<a class="headerlink" href="#repeat" title="Permalink to this headline">¶</a></h2>
 <p>Repeat <strong>matches the sub-expression several times</strong>.</p>
 <p><cite>+</cite> match string one or more times.</p>
@@ -314,8 +315,8 @@ If any one of the attempts succeeds, the match succeeds. If all attempts fail, t
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">hex</span> <span class="o">=</span> <span class="s2">"\u{"</span> <span class="p">([</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span> <span class="o">/</span> <span class="p">[</span><span class="n">a</span><span class="o">-</span><span class="n">z</span><span class="p">]</span> <span class="o">/</span> <span class="p">[</span><span class="n">A</span><span class="o">-</span><span class="n">Z</span><span class="p">]){</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">}</span> <span class="s2">"}"</span><span class="p">;</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="comment">
+</section>
+<section id="comment">
 <h2>Comment<a class="headerlink" href="#comment" title="Permalink to this headline">¶</a></h2>
 <p>Comment are any characters followed by a # (included) in a line.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># THIS IS A COMMENT.</span>
@@ -323,8 +324,8 @@ If any one of the attempts succeeds, the match succeeds. If all attempts fail, t
 </pre></div>
 </div>
 <p>Comments are ignored.</p>
-</div>
-<div class="section" id="grammar-rule-flags">
+</section>
+<section id="grammar-rule-flags">
 <h2>Grammar Rule Flags<a class="headerlink" href="#grammar-rule-flags" title="Permalink to this headline">¶</a></h2>
 <p>The grammar rule allows setting flags by inserting some <cite>@decorator</cite> (s) before the names.
 The supported decorators include: <cite>@spaced</cite>, <cite>@squashed</cite>, <cite>@scoped</cite>, <cite>@tight</cite>, <cite>@lifted</cite> and <cite>@nonterminal</cite>.
@@ -338,7 +339,7 @@ For example,</p>
 <dd class="field-odd"><p><a class="reference internal" href="api.html#c.P4_FLAG_SPACED" title="P4_FLAG_SPACED"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_FLAG_SPACED</span></code></a>, <a class="reference internal" href="api.html#c.P4_FLAG_SQUASHED" title="P4_FLAG_SQUASHED"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_FLAG_SQUASHED</span></code></a>, <a class="reference internal" href="api.html#c.P4_FLAG_SCOPED" title="P4_FLAG_SCOPED"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_FLAG_SCOPED</span></code></a>, <a class="reference internal" href="api.html#c.P4_FLAG_TIGHT" title="P4_FLAG_TIGHT"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_FLAG_TIGHT</span></code></a>, <a class="reference internal" href="api.html#c.P4_FLAG_LIFTED" title="P4_FLAG_LIFTED"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_FLAG_LIFTED</span></code></a>, <a class="reference internal" href="api.html#c.P4_FLAG_NON_TERMINAL" title="P4_FLAG_NON_TERMINAL"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_FLAG_NON_TERMINAL</span></code></a>.</p>
 </dd>
 </dl>
-<div class="section" id="spaced">
+<section id="spaced">
 <h3>@spaced<a class="headerlink" href="#spaced" title="Permalink to this headline">¶</a></h3>
 <p>If a rule has <cite>@spaced</cite> decorator, it will be auto-inserted in between every element of sequences and repetitions.</p>
 <p>For example, my sequence can match “helloworld”, “hello world”, “hello  t  n world”, etc.</p>
@@ -348,8 +349,8 @@ For example,</p>
 <span class="n">ws</span> <span class="o">=</span> <span class="s2">" "</span> <span class="o">/</span> <span class="s2">"</span><span class="se">\t</span><span class="s2">"</span> <span class="o">/</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="tight">
+</section>
+<section id="tight">
 <h3>@tight<a class="headerlink" href="#tight" title="Permalink to this headline">¶</a></h3>
 <p>If a sequence or repetition rule has <cite>@tight</cite> decorator, no <cite>@spaced</cite> rules will be applied.</p>
 <p>For example, my_another_sequence can only match “helloworld”.</p>
@@ -359,11 +360,11 @@ For example,</p>
 <span class="n">ws</span> <span class="o">=</span> <span class="s2">" "</span> <span class="o">/</span> <span class="s2">"</span><span class="se">\t</span><span class="s2">"</span> <span class="o">/</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="lifted">
+</section>
+<section id="lifted">
 <h3>@lifted<a class="headerlink" href="#lifted" title="Permalink to this headline">¶</a></h3>
-<p>If a rule has <cite>@lifted</cite> decorator, its children tokens will replace the parent token.</p>
-<p>In this example, the parsed token tree has no token mapping to primary rule, but rather either digit or char.</p>
+<p>If a rule has <cite>@lifted</cite> decorator, its children will replace the parent.</p>
+<p>In this example, the parsed tree has no node mapping to primary rule, but rather either digit or char.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@lifted</span>
 <span class="n">primary</span> <span class="o">=</span> <span class="n">digit</span> <span class="o">/</span> <span class="n">char</span><span class="p">;</span>
 
@@ -371,11 +372,11 @@ For example,</p>
 <span class="n">char</span>   <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">-</span><span class="n">z</span><span class="p">]</span> <span class="o">/</span> <span class="p">[</span><span class="n">A</span><span class="o">-</span><span class="n">Z</span><span class="p">];</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="nonterminal">
+</section>
+<section id="nonterminal">
 <h3>@nonterminal<a class="headerlink" href="#nonterminal" title="Permalink to this headline">¶</a></h3>
-<p>If a rule has <cite>nonterminal</cite> decorator, and it has only one single child token, the child token will replace the parent token.</p>
-<p>If it produces multiple children tokens, this decorator has no effect.</p>
+<p>If a rule has <cite>nonterminal</cite> decorator, and it has only one single child node, the child node will replace the parent node.</p>
+<p>If it produces multiple children, this decorator has no effect.</p>
 <p>In this example,</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>@lifted
 add = number ("+" number)?;
@@ -383,30 +384,30 @@ add = number ("+" number)?;
 number = [0-9];
 </pre></div>
 </div>
-<p>If we feed the input “1”, the token tree is like:</p>
+<p>If we feed the input “1”, the tree is like:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Number</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>If we feed the input “1+1”, the token tree is like:</p>
+<p>If we feed the input “1+1”, the tree is like:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Add</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
     <span class="n">Number</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">Number</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="squashed">
+</section>
+<section id="squashed">
 <h3>@squashed<a class="headerlink" href="#squashed" title="Permalink to this headline">¶</a></h3>
-<p>If a rule has <cite>@squashed</cite> decorator, its children tokens will be trimmed.</p>
-<p>In this example, the rule <cite>float</cite> will drop all <cite>number</cite> tokens, leaving only one single node in the ast.</p>
+<p>If a rule has <cite>@squashed</cite> decorator, its children will be trimmed.</p>
+<p>In this example, the rule <cite>float</cite> will drop all <cite>number</cite> nodes, leaving only one single node in the ast.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>@squashed
 float = number ("." number)?;
 
 number = [0-9];
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="use-peg-api">
+</section>
+</section>
+<section id="use-peg-api">
 <h2>Use Peg API<a class="headerlink" href="#use-peg-api" title="Permalink to this headline">¶</a></h2>
 <p>Function <a class="reference internal" href="api.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a> can load a grammar from a string.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_LoadGrammar</span><span class="p">(</span>
@@ -441,8 +442,8 @@ number = [0-9];
     <span class="n">goto</span> <span class="n">finalize</span><span class="p">;</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="cheatsheet">
+</section>
+<section id="cheatsheet">
 <h2>Cheatsheet<a class="headerlink" href="#cheatsheet" title="Permalink to this headline">¶</a></h2>
 <div class="table-wrapper"><table class="docutils align-default" id="id1">
 <caption><span class="caption-text">Cheatsheet</span><a class="headerlink" href="#id1" title="Permalink to this table">¶</a></caption>
@@ -460,19 +461,19 @@ number = [0-9];
 <td><p>grammar rule</p></td>
 </tr>
 <tr class="row-odd"><td><p><cite>@lifted foo = …;</cite></p></td>
-<td><p>drop token</p></td>
+<td><p>drop node</p></td>
 </tr>
 <tr class="row-even"><td><p><cite>@spaced foo = …;</cite></p></td>
 <td><p>mark as space</p></td>
 </tr>
 <tr class="row-odd"><td><p><cite>@squashed foo = …;</cite></p></td>
-<td><p>ignore children tokens</p></td>
+<td><p>ignore children</p></td>
 </tr>
 <tr class="row-even"><td><p><cite>@tight foo = …;</cite></p></td>
 <td><p>ignore spaced rules</p></td>
 </tr>
 <tr class="row-odd"><td><p><cite>@non_terminal foo = …;</cite></p></td>
-<td><p>ignore single child token</p></td>
+<td><p>ignore single child node</p></td>
 </tr>
 <tr class="row-even"><td><p><cite>@scoped foo = …;</cite></p></td>
 <td><p>cancle effects</p></td>
@@ -536,8 +537,8 @@ number = [0-9];
 </tr>
 </tbody>
 </table></div>
-</div>
-</div>
+</section>
+</section>
 
       </article>
       <footer>
@@ -626,10 +627,10 @@ number = [0-9];
       
     </aside>
   </main>
-</div>
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+    <script src="_static/scripts/main.js"></script>
+    </body>
 </html>

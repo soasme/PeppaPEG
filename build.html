@@ -2,13 +2,14 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Debug" href="debug.html" /><link rel="prev" title="All APIs &amp; References" href="api.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Debug" href="debug.html" /><link rel="prev" title="All APIs &amp; References" href="api.html" />
 
-    <meta name="generator" content="sphinx-3.5.4, furo 2021.04.11.beta34"/>
+    <meta name="generator" content="sphinx-4.1.1, furo 2021.07.05.beta38"/>
         <title>Build - Peppa PEG 1.13.0 documentation</title>
-      <link rel="stylesheet" href="_static/styles/furo.css?digest=59ab60ac09ea94ccfe6deddff6d715cce948a6fc">
-    <link rel="stylesheet" href="_static/pygments.css">
-    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css" />
     
 
 
@@ -37,7 +38,7 @@
   --color-code-foreground: #d0d0d0;
   
   }
-</style><link rel="stylesheet" href="_static/styles/furo-extensions.css?digest=d391b54134226e4196576da3bdb6dddb7e05ba2b"></head>
+</style><link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css"></head>
   <body dir="">
     
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -141,9 +142,9 @@
         <label class="toc-overlay-icon toc-content-icon" for="__toc">
           <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
         </label>
-        <div class="section" id="build">
+        <section id="build">
 <h1>Build<a class="headerlink" href="#build" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="build-peppa-peg">
+<section id="build-peppa-peg">
 <h2>Build Peppa PEG<a class="headerlink" href="#build-peppa-peg" title="Permalink to this headline">¶</a></h2>
 <p>Assume you have cmake and gcc installed.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>cmake -E make_directory ./build
@@ -152,8 +153,8 @@
 <span class="gp">$ </span>make
 </pre></div>
 </div>
-</div>
-<div class="section" id="development">
+</section>
+<section id="development">
 <h2>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
 <p>If you have a difficulty having a complete development environment for Peppa PEG, try Docker:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>docker run --rm -v <span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>:/app -it ubuntu:latest bash
@@ -162,33 +163,35 @@
 </pre></div>
 </div>
 <p>Testing Peppa PEG requires downloading the test framework <cite>Unity</cite>:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git submodule init
-<span class="gp">$ </span>git submodule update
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span><span class="nb">cd</span> /app
+<span class="gp"># </span>git submodule init
+<span class="gp"># </span>git submodule update
 </pre></div>
 </div>
 <p>If you have Valgrind installed, you can enable <cite>ENABLE_VALGRIND</cite>.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>cmake -DENABLE_VALGRIND<span class="o">=</span>On ..
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span><span class="nb">cd</span> build
+<span class="gp"># </span>cmake -DENABLE_VALGRIND<span class="o">=</span>On ..
 </pre></div>
 </div>
 <p>If you have doxygen and Python3 installed, you can enable <cite>ENABLE_DOCS</cite>.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>cmake -DENABLE_DOCS<span class="o">=</span>On ..
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>cmake -DENABLE_DOCS<span class="o">=</span>On ..
 </pre></div>
 </div>
 <p>To build test,</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>cmake --build . --target check
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>cmake --build . --target check
 </pre></div>
 </div>
 <p>To build docs,</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>cmake --build . --target docs
 </pre></div>
 </div>
-</div>
-<div class="section" id="github-actions">
+</section>
+<section id="github-actions">
 <h2>GitHub Actions<a class="headerlink" href="#github-actions" title="Permalink to this headline">¶</a></h2>
 <p>Peppa PEG uses GitHub Actions building docs whenever a change is pushed to the main branch.</p>
 <p>The docs site is pushed to gh-pages branch and published to &lt;<a class="reference external" href="https://www.soasme.com/PeppaPEG/">https://www.soasme.com/PeppaPEG/</a>&gt;.</p>
-</div>
-</div>
+</section>
+</section>
 
       </article>
       <footer>
@@ -259,10 +262,10 @@
       
     </aside>
   </main>
-</div>
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></body>
+    <script src="_static/scripts/main.js"></script>
+    </body>
 </html>

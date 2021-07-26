@@ -28,26 +28,28 @@ Testing Peppa PEG requires downloading the test framework `Unity`:
 
 .. code-block:: console
 
-    $ git submodule init
-    $ git submodule update
+    # cd /app
+    # git submodule init
+    # git submodule update
 
 If you have Valgrind installed, you can enable `ENABLE_VALGRIND`.
 
 .. code-block:: console
 
-    $ cmake -DENABLE_VALGRIND=On ..
+    # cd build
+    # cmake -DENABLE_VALGRIND=On ..
 
 If you have doxygen and Python3 installed, you can enable `ENABLE_DOCS`.
 
 .. code-block:: console
 
-    $ cmake -DENABLE_DOCS=On ..
+    # cmake -DENABLE_DOCS=On ..
 
 To build test,
 
 .. code-block:: console
 
-    $ cmake --build . --target check
+    # cmake --build . --target check
 
 To build docs,
 

@@ -196,12 +196,11 @@
 </div>
 <p>e.g, left paren, comma, right paren are ignored as they’re not part of the semantic of array.</p>
 <p>You can consider abstract syntax tree as a polished version of parse tree.</p>
-<p>Peppa PEG provides two approaches to modify the tree:</p>
+<p>Peppa PEG provides two approaches to polish the tree:</p>
 <ul class="simple">
 <li><p>Use decorators <cite>@</cite> to drop, lift, squash nodes when providing the grammar.</p></li>
 <li><p>Use callbacks to manipulate nodes after the tree is produced.</p></li>
 </ul>
-<p>By reshaping the tree, you can produce whichever kind of tree.</p>
 </section>
 <section id="runtime-v-s-compile-time">
 <h2>Runtime v/s Compile-time<a class="headerlink" href="#runtime-v-s-compile-time" title="Permalink to this headline">¶</a></h2>

@@ -72,12 +72,10 @@ e.g, left paren, comma, right paren are ignored as they're not part of the seman
 
 You can consider abstract syntax tree as a polished version of parse tree. 
 
-Peppa PEG provides two approaches to modify the tree:
+Peppa PEG provides two approaches to polish the tree:
 
 * Use decorators `@` to drop, lift, squash nodes when providing the grammar.
 * Use callbacks to manipulate nodes after the tree is produced.
-
-By reshaping the tree, you can produce whichever kind of tree.
 
 Runtime v/s Compile-time
 ------------------------

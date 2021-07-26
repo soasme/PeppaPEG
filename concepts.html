@@ -170,7 +170,7 @@
 <span class="n">number</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span> <span class="o">/</span> <span class="p">[</span><span class="mi">1</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span> <span class="p">[</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">]</span><span class="o">+</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>A parser generator can read a grammar in such a (or similar) notion and produce a parser. The produced parser then reads input and produces AST.</p>
+<p>A parser generator can read a grammar in such a (or similar) notion and produce a parser. The produced parser then reads input and produces a tree.</p>
 <p>Peppa PEG provides its own dialect of PEG for describing a grammar. It was inspired by <a class="reference external" href="https://pest.rs">Pest</a> but is more powerful and more readable.</p>
 <p>See <a class="reference internal" href="peg.html#peg"><span class="std std-ref">PEG APIs</span></a> for all of the grammar rules you can use.</p>
 </section>
@@ -209,7 +209,7 @@
 <ol class="arabic simple">
 <li><p>Load Grammar. Load your grammar using <a class="reference internal" href="api.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a> . Alternatively, you can create your grammar using <a class="reference internal" href="api.html#c.P4_CreateGrammar" title="P4_CreateGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateGrammar()</span></code></a> and then add grammar rules using <a class="reference internal" href="lowlevel.html#lowlevel"><span class="std std-ref">Low Level APIs</span></a>.</p></li>
 <li><p>Parse Source. Wrap source string using <a class="reference internal" href="api.html#c.P4_CreateSource" title="P4_CreateSource"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateSource()</span></code></a> and then parse it using <a class="reference internal" href="api.html#c.P4_Parse" title="P4_Parse"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_Parse()</span></code></a>.</p></li>
-<li><p>Traverse AST. It’s up to you what to do when traversing the tree. You may inspect the tree, produce bytecodes, trim the tree, etc.</p></li>
+<li><p>Traverse Tree. It’s up to you what to do when traversing the tree. You may inspect the tree, produce bytecodes, trim the tree, etc.</p></li>
 </ol>
 </section>
 </section>

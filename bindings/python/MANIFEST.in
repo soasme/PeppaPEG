@@ -1,1 +1,0 @@
-include README.md setup.py build_ffi.py peppapeg.py *.so

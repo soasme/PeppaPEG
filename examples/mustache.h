@@ -66,22 +66,22 @@ typedef enum {
     P4_MustacheWhitespace       = 22,
 } P4_MustacheRuleID;
 
-P4_Error P4_MustacheCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Token* token) {
+P4_Error P4_MustacheCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
     if (rule
             && rule->id == P4_MustacheTag
-            && token
-            && token->head
-            && token->head->next
-            && token->head->next->rule_id == P4_MustacheSetDelimiter) {
+            && node
+            && node->head
+            && node->head->next
+            && node->head->next->rule_id == P4_MustacheSetDelimiter) {
         P4_String opener = NULL, closer = NULL;
         P4_Expression* opener_expr = NULL;
         P4_Expression* closer_expr = NULL;
 
-        opener = P4_CopyTokenString(token->head->next->head);
+        opener = P4_CopyNodeString(node->head->next->head);
         if (opener == NULL)
             goto finalize_set_delimiter;
 
-        closer = P4_CopyTokenString(token->head->next->tail);
+        closer = P4_CopyNodeString(node->head->next->tail);
         if (closer == NULL)
             goto finalize_set_delimiter;
 
@@ -100,8 +100,8 @@ P4_Error P4_MustacheCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Token*
         if ((err = P4_ReplaceGrammarRule(grammar, P4_MustacheCloser, closer_expr)) != P4_Ok)
             goto finalize_set_delimiter;
 
-        token->head->rule_id = opener_expr->id;
-        token->tail->rule_id = closer_expr->id;
+        node->head->rule_id = opener_expr->id;
+        node->tail->rule_id = closer_expr->id;
 
         free(opener);
         free(closer);
@@ -121,7 +121,7 @@ finalize_set_delimiter:
 
 /*
  * Entry = SOI Line*
- * Line = (Tag / Text)* (NewLine / EOI) # FLAG: TIGHT, Callback: UpdateIndent, TrimTokens
+ * Line = (Tag / Text)* (NewLine / EOI) # FLAG: TIGHT, Callback: UpdateIndent, TrimNodes
  * Text = (NEGATIVE(Opener / NewLine) ANY)* Newline? # FLAG: ATOMIC, TIGHT
  * NewLine = "\n" / "\r\n"
  * Tag = Opener TagContent Closer # Callback: SetDelimiter.

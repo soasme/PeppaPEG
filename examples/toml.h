@@ -53,18 +53,24 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         "@lifted key = dotted_key / simple_key;\n"
         "@lifted simple_key = quoted_key / unquoted_key;\n"
         "@squashed unquoted_key = (ALPHA / DIGIT / \"-\" / \"_\"){1,};\n"
-        "@squashed quoted_key = basic_string;\n"
+        "@squashed quoted_key = basic_string / literal_string;\n"
         "dotted_key = simple_key (dot_sep simple_key)+;\n"
         "@lifted dot_sep = ws \".\" ws;\n"
 
         /* Value */
         "@lifted val = boolean / string;\n"
 
-        "@lifted string = basic_string;\n"
+        "@lifted string = basic_string / literal_string;\n"
+
+        /* Basic String */
         "basic_string = \"\\\"\" basic_char* \"\\\"\";\n"
         "@lifted basic_char = basic_unescaped / escaped;\n"
         "@lifted basic_unescaped = wschar / \"!\" / [\\u{0023}-\\u{005B}] / [\\u{005D}-\\u{007E}] / non_ascii;\n"
         "@scoped @squashed escaped = \"\\\\\" (\"\\\"\" / \"\\\\\" / \"b\" / \"f\" / \"n\" / \"r\" / \"t\" / \"u\" HEXDIG{4} / \"U\" HEXDIG{8});\n"
+
+        /* Literal String */
+        "literal_string = \"'\" literal_char* \"'\";\n"
+        "@lifted literal_char = \"\\t\" / [\\u{0020}-\\u{0026}] / [\\u{0028}-\\u{007E}] / non_ascii;\n"
 
         /* Boolean */
         "boolean = \"true\" / \"false\";\n"

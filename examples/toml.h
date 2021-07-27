@@ -50,8 +50,11 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         "keyval_sep = ws \"=\" ws;\n"
 
         /* Key */
-        "@lifted key = unquoted_key;\n"
+        "@lifted key = dotted_key / simple_key;\n"
+        "@lifted simple_key = unquoted_key;\n"
         "@squashed unquoted_key = (ALPHA / DIGIT / \"-\" / \"_\"){1,};\n"
+        "dotted_key = simple_key (dot_sep simple_key)+;\n"
+        "dot_sep = ws \".\" ws;\n"
 
         /* Value */
         "@lifted val = boolean;\n"

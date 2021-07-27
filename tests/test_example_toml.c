@@ -24,6 +24,9 @@ void test_valid(void) {
     ASSERT_TOML(1,
         "abc = true\n"
         "xyz = false", P4_Ok, "[]");
+    ASSERT_TOML(1,
+        "a.b.c = true\n"
+        "x.y.z = false", P4_Ok, "[]");
 }
 
 int main(void) {

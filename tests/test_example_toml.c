@@ -27,6 +27,12 @@ void test_valid(void) {
     ASSERT_TOML(1,
         "a.b.c = true\n"
         "x.y.z = false", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = \"xyz\"", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = \"\"", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = \"a\\u0031\\U00000032\\n\"", P4_Ok, "[]");
+    ASSERT_TOML(1, "\"abc\" = \"\"", P4_Ok, "[]");
+    ASSERT_TOML(1, "\"a\\u0031c\" = \"\"", P4_Ok, "[]");
+    ASSERT_TOML(1, "a.\"b\".c = \"\"", P4_Ok, "[]");
 }
 
 int main(void) {

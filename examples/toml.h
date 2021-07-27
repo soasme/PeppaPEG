@@ -47,17 +47,24 @@ P4_Grammar*  P4_CreateTomlGrammar() {
 
         /* Key-Value pairs */
         "keyval = key keyval_sep val;\n"
-        "keyval_sep = ws \"=\" ws;\n"
+        "@lifted keyval_sep = ws \"=\" ws;\n"
 
         /* Key */
         "@lifted key = dotted_key / simple_key;\n"
-        "@lifted simple_key = unquoted_key;\n"
+        "@lifted simple_key = quoted_key / unquoted_key;\n"
         "@squashed unquoted_key = (ALPHA / DIGIT / \"-\" / \"_\"){1,};\n"
+        "@squashed quoted_key = basic_string;\n"
         "dotted_key = simple_key (dot_sep simple_key)+;\n"
-        "dot_sep = ws \".\" ws;\n"
+        "@lifted dot_sep = ws \".\" ws;\n"
 
         /* Value */
-        "@lifted val = boolean;\n"
+        "@lifted val = boolean / string;\n"
+
+        "@lifted string = basic_string;\n"
+        "basic_string = \"\\\"\" basic_char* \"\\\"\";\n"
+        "@lifted basic_char = basic_unescaped / escaped;\n"
+        "@lifted basic_unescaped = wschar / \"!\" / [\\u{0023}-\\u{005B}] / [\\u{005D}-\\u{007E}] / non_ascii;\n"
+        "@scoped @squashed escaped = \"\\\\\" (\"\\\"\" / \"\\\\\" / \"b\" / \"f\" / \"n\" / \"r\" / \"t\" / \"u\" HEXDIG{4} / \"U\" HEXDIG{8});\n"
 
         /* Boolean */
         "boolean = \"true\" / \"false\";\n"

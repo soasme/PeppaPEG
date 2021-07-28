@@ -17,13 +17,11 @@
 
 # Hello, There!
 
-[PEG] stands for parsing expression grammar. Peppa PEG is an ultra lightweight PEG parser in ANSI C.
+Peppa PEG is an ultra lightweight [PEG] (parsing expression grammar) parser in ANSI C.
 
-References:
-
-* [GitHub](https://github.com/soasme/PeppaPEG)
-* [Project Home Page](https://www.soasme.com/PeppaPEG/landing.html).
-* [Project Documentation Pages](https://www.soasme.com/PeppaPEG/).
+References: [GitHub](https://github.com/soasme/PeppaPEG)
+| [Project Home Page](https://soasme.com/PeppaPEG/landing.html)
+| [Project Documentation Pages](https://soasme.com/PeppaPEG/).
 
 # Usage
 
@@ -127,7 +125,7 @@ P4_JsonifySourceAst(grammar, stdout, root);
 ```
 
 
-Read the documentation here: <https://www.soasme.com/PeppaPEG/>.
+Read the documentation here: <https://soasme.com/PeppaPEG/>.
 
 # Peppy Hacking Peppa PEG!
 

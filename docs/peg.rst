@@ -64,7 +64,13 @@ Emoji is supported:
 
     greeting = "Peppa 🐷";
 
-You can encode UTF-8 code points via `\\u` followed by 4 hex digits or `\\U` followed by 8 hex digits.
+You can encode ASCII characters via `\\x` followed by 2 hex digits.
+
+.. code-block::
+
+    greeting = "\x48\x65\x6c\x6c\x6f, world";
+
+You can encode UTF-8 characters via `\\u` followed by 4 hex digits or `\\U` followed by 8 hex digits.
 
 .. code-block::
 
@@ -360,6 +366,24 @@ In this example, the rule `float` will drop all `number` nodes, leaving only one
 
     number = [0-9];
 
+@scoped
+```````
+
+Ignore all the decorators set by upstream rules.
+
+For example, despite `greeting2` set to not using spaced rule `ws`, `greeting` can still apply to `ws` since it's under its own scope.
+
+.. code-block::
+
+    @tight
+    greeting2 = greeting greeting;
+
+    @scoped
+    greeting = "hello" "world";
+
+    @spaced
+    ws = " ";
+
 
 Use Peg API
 ------------
@@ -425,6 +449,10 @@ Cheatsheet
      - cancle effects
    * - `"literal"`
      - exact match
+   * - `"\x0d\x0a"`
+     - exact match by using ascii digits
+   * - `"\u4f60\u597D"`
+     - exact match utf-8 characters
    * - `i"literal"`
      - case-insensitive match
    * - `[a-z]`

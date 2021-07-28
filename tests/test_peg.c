@@ -311,7 +311,9 @@ void test_eval_literal(void) {
     ASSERT_EVAL_GRAMMAR("R1 = \"你好, World\";", "R1", "你好, World", P4_Ok, "[{\"slice\":[0,13],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"نامهای\";", "R1", "نامهای", P4_Ok, "[{\"slice\":[0,12],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"Peppa PEG 🐷\";", "R1", "Peppa PEG 🐷", P4_Ok, "[{\"slice\":[0,14],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"\\x48\\x65\\x6c\\x6c\\x6f, world\";", "R1", "Hello, world", P4_Ok, "[{\"slice\":[0,12],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"\\u4f60\\u597d, world\";", "R1", "你好, world", P4_Ok, "[{\"slice\":[0,13],\"type\":\"R1\"}]");
+    /* ASSERT_EVAL_GRAMMAR("R1 = \"\\xe4\\xbd\\xa0\\xe5\\xa5\\xbd, world\";", "R1", "你好, world", P4_Ok, "[{\"slice\":[0,13],\"type\":\"R1\"}]"); */ /* Not sure if this one should be the expected behavior. */
     ASSERT_EVAL_GRAMMAR("R1 = \"\\n\";", "R1", "\n", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"\\r\";", "R1", "\r", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"\\t\";", "R1", "\t", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
@@ -327,6 +329,7 @@ void test_eval_insensitive(void) {
     ASSERT_EVAL_GRAMMAR("R1 = i\"你好, World\";", "R1", "你好, WORLD", P4_Ok, "[{\"slice\":[0,13],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = i\"نامهای\";", "R1", "نامهای", P4_Ok, "[{\"slice\":[0,12],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = i\"Peppa PEG 🐷\";", "R1", "peppa peg 🐷", P4_Ok, "[{\"slice\":[0,14],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = i\"\\x48\\x65\\x6c\\x6c\\x6f, world\";", "R1", "HELLO, WORLD", P4_Ok, "[{\"slice\":[0,12],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = i\"\\u4f60\\u597d, world\";", "R1", "你好, WORLD", P4_Ok, "[{\"slice\":[0,13],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = i\"Hello Worìd\";", "R1", "HELLO WORÌD", P4_Ok, "[{\"slice\":[0,12],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = i\"\\n\";", "R1", "\n", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
@@ -339,6 +342,9 @@ void test_eval_range(void) {
     ASSERT_EVAL_GRAMMAR("R1 = [0-9];", "R1", "0", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [a-z];", "R1", "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [A-Z];", "R1", "A", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = [\\x30-\\x39];", "R1", "0", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = [\\x41-\\x5A];", "R1", "A", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = [\\x61-\\x7A];", "R1", "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [\\u0001-\\U0010ffff];", "R1", "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [你-好];", "R1", "你", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [1-9..2];", "R1", "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");

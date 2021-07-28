@@ -832,12 +832,16 @@ size_t P4_ReadEscapedRune(char* text, P4_Rune* rune) {
         case '/': *rune = 0x2f; return 2;
         case '\\': *rune = 0x5c; return 2;
         case 'u': { /* TODO: may not have enough chars. */
-            char* end = strchr(text, '}');
-            size_t size = end - text;
-            char chs[7] = {0, 0, 0, 0, 0, 0, 0};
-            memcpy(chs, text + 3, size - 3);
+            char chs[5] = {0, 0, 0, 0, 0};
+            memcpy(chs, text + 2, 4);
             *rune = strtoul(chs, NULL, 16);
-            return size + 1;
+            return 6;
+        }
+        case 'U': { /* TODO: may not have enough chars. */
+            char chs[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+            memcpy(chs, text + 2, 8);
+            *rune = strtoul(chs, NULL, 16);
+            return 10;
         }
         default: UNREACHABLE(); return 0;
     }
@@ -3214,7 +3218,7 @@ P4_Grammar* P4_CreatePegGrammar () {
         P4_CreateRange(0x5d, 0x10ffff, 1),
         P4_CreateSequenceWithMembers(2,
             P4_CreateLiteral("\\", true),
-            P4_CreateChoiceWithMembers(9,
+            P4_CreateChoiceWithMembers(10,
                 P4_CreateLiteral("\"", true),
                 P4_CreateLiteral("/", true),
                 P4_CreateLiteral("\\", true),
@@ -3223,17 +3227,25 @@ P4_Grammar* P4_CreatePegGrammar () {
                 P4_CreateLiteral("n", true),
                 P4_CreateLiteral("r", true),
                 P4_CreateLiteral("t", true),
-                P4_CreateSequenceWithMembers(4,
+                P4_CreateSequenceWithMembers(2,
                     P4_CreateLiteral("u", true),
-                    P4_CreateLiteral("{", true),
-                    P4_CreateRepeatMinMax(
+                    P4_CreateRepeatExact(
                         P4_CreateChoiceWithMembers(3,
                             P4_CreateRange('0', '9', 1),
                             P4_CreateRange('a', 'f', 1),
                             P4_CreateRange('A', 'F', 1)
-                        ), 1, 6
-                    ),
-                    P4_CreateLiteral("}", true)
+                        ), 4
+                    )
+                ),
+                P4_CreateSequenceWithMembers(2,
+                    P4_CreateLiteral("U", true),
+                    P4_CreateRepeatExact(
+                        P4_CreateChoiceWithMembers(3,
+                            P4_CreateRange('0', '9', 1),
+                            P4_CreateRange('a', 'f', 1),
+                            P4_CreateRange('A', 'F', 1)
+                        ), 8
+                    )
                 )
             )
         )

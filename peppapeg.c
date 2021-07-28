@@ -831,6 +831,12 @@ size_t P4_ReadEscapedRune(char* text, P4_Rune* rune) {
         case '"': *rune = 0x22; return 2;
         case '/': *rune = 0x2f; return 2;
         case '\\': *rune = 0x5c; return 2;
+        case 'x': { /* TODO: may not have enough chars. */
+            char chs[3] = {0, 0, 0};
+            memcpy(chs, text + 2, 2);
+            *rune = strtoul(chs, NULL, 16);
+            return 4;
+        }
         case 'u': { /* TODO: may not have enough chars. */
             char chs[5] = {0, 0, 0, 0, 0};
             memcpy(chs, text + 2, 4);
@@ -3218,7 +3224,7 @@ P4_Grammar* P4_CreatePegGrammar () {
         P4_CreateRange(0x5d, 0x10ffff, 1),
         P4_CreateSequenceWithMembers(2,
             P4_CreateLiteral("\\", true),
-            P4_CreateChoiceWithMembers(10,
+            P4_CreateChoiceWithMembers(11,
                 P4_CreateLiteral("\"", true),
                 P4_CreateLiteral("/", true),
                 P4_CreateLiteral("\\", true),
@@ -3227,6 +3233,16 @@ P4_Grammar* P4_CreatePegGrammar () {
                 P4_CreateLiteral("n", true),
                 P4_CreateLiteral("r", true),
                 P4_CreateLiteral("t", true),
+                P4_CreateSequenceWithMembers(2,
+                    P4_CreateLiteral("x", true),
+                    P4_CreateRepeatExact(
+                        P4_CreateChoiceWithMembers(3,
+                            P4_CreateRange('0', '9', 1),
+                            P4_CreateRange('a', 'f', 1),
+                            P4_CreateRange('A', 'F', 1)
+                        ), 2
+                    )
+                ),
                 P4_CreateSequenceWithMembers(2,
                     P4_CreateLiteral("u", true),
                     P4_CreateRepeatExact(

@@ -58,7 +58,7 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         "@lifted dot_sep = ws \".\" ws;\n"
 
         /* Value */
-        "@lifted val = boolean / datetime / string;\n"
+        "@lifted val = boolean / datetime / array / string;\n"
 
         "@lifted string = basic_string / literal_string;\n"
 
@@ -94,6 +94,14 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         "local_date = full_date;\n"
         "local_time = partial_time;\n"
         "datetime = offset_date_time / local_date_time / local_date / local_time;\n"
+
+        /* Array */
+        "array = array_open array_ws array_values? array_ws array_close;\n"
+        "@lifted array_values = val (array_ws array_sep array_ws val)*;\n"
+        "@lifted array_open = \"[\";\n"
+        "@lifted array_close = \"]\";\n"
+        "@lifted array_sep = \",\";\n"
+        "@lifted @squashed array_ws = (wschar / comment? newline)*;\n"
 
         /* Comment */
         "comment = comment_start comment_body;\n"

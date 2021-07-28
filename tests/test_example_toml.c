@@ -50,6 +50,12 @@ void test_valid(void) {
     ASSERT_TOML(1, "abc = 2000-01-01T00:00:00.0000Z", P4_Ok, "[]");
     ASSERT_TOML(1, "abc = 2000-01-01T00:00:00+12:00", P4_Ok, "[]");
     ASSERT_TOML(1, "abc = 2000-01-01T00:00:00.0000+12:00", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = []", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = [ # comment\n ]", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = [true]", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = [true,false]", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = [true, false]", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = [ true, false ]", P4_Ok, "[]");
 }
 
 int main(void) {

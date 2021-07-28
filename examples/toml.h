@@ -58,7 +58,7 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         "@lifted dot_sep = ws \".\" ws;\n"
 
         /* Value */
-        "@lifted val = boolean / datetime / array / string;\n"
+        "@lifted val = boolean / datetime / array / inline_table / string;\n"
 
         "@lifted string = basic_string / literal_string;\n"
 
@@ -102,6 +102,13 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         "@lifted array_close = \"]\";\n"
         "@lifted array_sep = \",\";\n"
         "@lifted @squashed array_ws = (wschar / comment? newline)*;\n"
+
+        /* Inline Table */
+        "inline_table = inline_table_open ws inline_table_values? ws inline_table_close;\n"
+        "@lifted inline_table_values = keyval (ws inline_table_sep ws keyval)*;\n"
+        "@lifted inline_table_open = \"{\";\n"
+        "@lifted inline_table_close = \"}\";\n"
+        "@lifted inline_table_sep = \",\";\n"
 
         /* Comment */
         "comment = comment_start comment_body;\n"

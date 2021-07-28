@@ -56,6 +56,7 @@ void test_valid(void) {
     ASSERT_TOML(1, "abc = [true,false]", P4_Ok, "[]");
     ASSERT_TOML(1, "abc = [true, false]", P4_Ok, "[]");
     ASSERT_TOML(1, "abc = [ true, false ]", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = { abc=true, xyz=false }", P4_Ok, "[]");
 }
 
 int main(void) {

@@ -185,7 +185,11 @@ followed by a sequence of either alphabets or digits or underscores <cite>_</cit
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">greeting</span> <span class="o">=</span> <span class="s2">"Peppa 🐷"</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>You can encode UTF-8 code points via <cite>\u</cite> followed by 4 hex digits or <cite>\U</cite> followed by 8 hex digits.</p>
+<p>You can encode ASCII characters via <cite>\x</cite> followed by 2 hex digits.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">greeting</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\x48\x65\x6c\x6c\x6f</span><span class="s2">, world"</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>You can encode UTF-8 characters via <cite>\u</cite> followed by 4 hex digits or <cite>\U</cite> followed by 8 hex digits.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">greeting</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\u4f60\u597D</span><span class="s2">, world</span><span class="se">\u000c</span><span class="s2">"</span><span class="p">;</span>
 </pre></div>
 </div>
@@ -407,6 +411,21 @@ number = [0-9];
 </pre></div>
 </div>
 </section>
+<section id="scoped">
+<h3>@scoped<a class="headerlink" href="#scoped" title="Permalink to this headline">¶</a></h3>
+<p>Ignore all the decorators set by upstream rules.</p>
+<p>For example, despite <cite>greeting2</cite> set to not using spaced rule <cite>ws</cite>, <cite>greeting</cite> can still apply to <cite>ws</cite> since it’s under its own scope.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@tight</span>
+<span class="n">greeting2</span> <span class="o">=</span> <span class="n">greeting</span> <span class="n">greeting</span><span class="p">;</span>
+
+<span class="nd">@scoped</span>
+<span class="n">greeting</span> <span class="o">=</span> <span class="s2">"hello"</span> <span class="s2">"world"</span><span class="p">;</span>
+
+<span class="nd">@spaced</span>
+<span class="n">ws</span> <span class="o">=</span> <span class="s2">" "</span><span class="p">;</span>
+</pre></div>
+</div>
+</section>
 </section>
 <section id="use-peg-api">
 <h2>Use Peg API<a class="headerlink" href="#use-peg-api" title="Permalink to this headline">¶</a></h2>
@@ -481,6 +500,12 @@ number = [0-9];
 </tr>
 <tr class="row-odd"><td><p><cite>“literal”</cite></p></td>
 <td><p>exact match</p></td>
+</tr>
+<tr class="row-even"><td><p><cite>“x0dx0a”</cite></p></td>
+<td><p>exact match by using ascii digits</p></td>
+</tr>
+<tr class="row-odd"><td><p><cite>“u4f60u597D”</cite></p></td>
+<td><p>exact match utf-8 characters</p></td>
 </tr>
 <tr class="row-even"><td><p><cite>i”literal”</cite></p></td>
 <td><p>case-insensitive match</p></td>
@@ -613,6 +638,7 @@ number = [0-9];
 <li><a class="reference internal" href="#lifted">&#64;lifted</a></li>
 <li><a class="reference internal" href="#nonterminal">&#64;nonterminal</a></li>
 <li><a class="reference internal" href="#squashed">&#64;squashed</a></li>
+<li><a class="reference internal" href="#scoped">&#64;scoped</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#use-peg-api">Use Peg API</a></li>

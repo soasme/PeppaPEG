@@ -77,9 +77,8 @@ void test_char(void) {
     ASSERT_PEG_PARSE(P4_PegRuleChar, "👌", P4_Ok, "[{\"slice\":[0,4],\"type\":\"char\"}]");
     ASSERT_PEG_PARSE(P4_PegRuleChar, "\\t", P4_Ok, "[{\"slice\":[0,2],\"type\":\"char\"}]");
     ASSERT_PEG_PARSE(P4_PegRuleChar, "\\\"", P4_Ok, "[{\"slice\":[0,2],\"type\":\"char\"}]");
-    ASSERT_PEG_PARSE(P4_PegRuleChar, "\\u{20}", P4_Ok, "[{\"slice\":[0,6],\"type\":\"char\"}]");
-    ASSERT_PEG_PARSE(P4_PegRuleChar, "\\u{0020}", P4_Ok, "[{\"slice\":[0,8],\"type\":\"char\"}]");
-    ASSERT_PEG_PARSE(P4_PegRuleChar, "\\u{10ffff}", P4_Ok, "[{\"slice\":[0,10],\"type\":\"char\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleChar, "\\u0020", P4_Ok, "[{\"slice\":[0,6],\"type\":\"char\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleChar, "\\U0010ffff", P4_Ok, "[{\"slice\":[0,10],\"type\":\"char\"}]");
     ASSERT_PEG_PARSE(P4_PegRuleChar, "\"", P4_MatchError, "expect char, line 1:1 (char 0)");
 }
 
@@ -90,9 +89,8 @@ void test_literal(void) {
     ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"👌\"", P4_Ok, "[{\"slice\":[0,6],\"type\":\"literal\"}]");
     ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"\\t\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"literal\"}]");
     ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"\\\"\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"literal\"}]");
-    ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"\\u{20}\"", P4_Ok, "[{\"slice\":[0,8],\"type\":\"literal\"}]");
-    ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"\\u{0020}\"", P4_Ok, "[{\"slice\":[0,10],\"type\":\"literal\"}]");
-    ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"\\u{10ffff}\"", P4_Ok, "[{\"slice\":[0,12],\"type\":\"literal\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"\\u0020\"", P4_Ok, "[{\"slice\":[0,8],\"type\":\"literal\"}]");
+    ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"\\U0010ffff\"", P4_Ok, "[{\"slice\":[0,12],\"type\":\"literal\"}]");
     ASSERT_PEG_PARSE(P4_PegRuleLiteral, "\"hello world\"", P4_Ok, "[{\"slice\":[0,13],\"type\":\"literal\"}]");
 }
 
@@ -103,7 +101,7 @@ void test_insensitive(void) {
     ASSERT_PEG_PARSE(P4_PegRuleInsensitiveLiteral, "i\"👌\"", P4_Ok, "[{\"slice\":[0,7],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,7],\"type\":\"literal\"}]}]");
     ASSERT_PEG_PARSE(P4_PegRuleInsensitiveLiteral, "i\"\\t\"", P4_Ok, "[{\"slice\":[0,5],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,5],\"type\":\"literal\"}]}]");
     ASSERT_PEG_PARSE(P4_PegRuleInsensitiveLiteral, "i\"\\\"\"", P4_Ok, "[{\"slice\":[0,5],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,5],\"type\":\"literal\"}]}]");
-    ASSERT_PEG_PARSE(P4_PegRuleInsensitiveLiteral, "i\"\\u{0020}\"", P4_Ok, "[{\"slice\":[0,11],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,11],\"type\":\"literal\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleInsensitiveLiteral, "i\"\\u0020\"", P4_Ok, "[{\"slice\":[0,9],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,9],\"type\":\"literal\"}]}]");
     ASSERT_PEG_PARSE(P4_PegRuleInsensitiveLiteral, "i\"hello world\"", P4_Ok, "[{\"slice\":[0,14],\"type\":\"insensitive\",\"children\":[{\"slice\":[1,14],\"type\":\"literal\"}]}]");
 }
 
@@ -116,10 +114,10 @@ void test_range(void) {
 [{\"slice\":[0,5],\"type\":\"range\",\"children\":[\
 {\"slice\":[1,2],\"type\":\"char\"},\
 {\"slice\":[3,4],\"type\":\"char\"}]}]");
-    ASSERT_PEG_PARSE(P4_PegRuleRange, "[\\u{0020}-\\u{0030}]", P4_Ok, "\
-[{\"slice\":[0,19],\"type\":\"range\",\"children\":[\
-{\"slice\":[1,9],\"type\":\"char\"},\
-{\"slice\":[10,18],\"type\":\"char\"}]}]");
+    ASSERT_PEG_PARSE(P4_PegRuleRange, "[\\u0020-\\u0030]", P4_Ok, "\
+[{\"slice\":[0,15],\"type\":\"range\",\"children\":[\
+{\"slice\":[1,7],\"type\":\"char\"},\
+{\"slice\":[8,14],\"type\":\"char\"}]}]");
     ASSERT_PEG_PARSE(P4_PegRuleRange, "[1-9..2]", P4_Ok, "\
 [{\"slice\":[0,8],\"type\":\"range\",\"children\":[\
 {\"slice\":[1,2],\"type\":\"char\"},\
@@ -313,7 +311,7 @@ void test_eval_literal(void) {
     ASSERT_EVAL_GRAMMAR("R1 = \"你好, World\";", "R1", "你好, World", P4_Ok, "[{\"slice\":[0,13],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"نامهای\";", "R1", "نامهای", P4_Ok, "[{\"slice\":[0,12],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"Peppa PEG 🐷\";", "R1", "Peppa PEG 🐷", P4_Ok, "[{\"slice\":[0,14],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = \"\\u{4f60}\\u{597d}, world\";", "R1", "你好, world", P4_Ok, "[{\"slice\":[0,13],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"\\u4f60\\u597d, world\";", "R1", "你好, world", P4_Ok, "[{\"slice\":[0,13],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"\\n\";", "R1", "\n", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"\\r\";", "R1", "\r", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"\\t\";", "R1", "\t", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
@@ -329,7 +327,7 @@ void test_eval_insensitive(void) {
     ASSERT_EVAL_GRAMMAR("R1 = i\"你好, World\";", "R1", "你好, WORLD", P4_Ok, "[{\"slice\":[0,13],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = i\"نامهای\";", "R1", "نامهای", P4_Ok, "[{\"slice\":[0,12],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = i\"Peppa PEG 🐷\";", "R1", "peppa peg 🐷", P4_Ok, "[{\"slice\":[0,14],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = i\"\\u{4f60}\\u{597d}, world\";", "R1", "你好, WORLD", P4_Ok, "[{\"slice\":[0,13],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = i\"\\u4f60\\u597d, world\";", "R1", "你好, WORLD", P4_Ok, "[{\"slice\":[0,13],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = i\"Hello Worìd\";", "R1", "HELLO WORÌD", P4_Ok, "[{\"slice\":[0,12],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = i\"\\n\";", "R1", "\n", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = i\"\\r\";", "R1", "\r", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
@@ -341,7 +339,7 @@ void test_eval_range(void) {
     ASSERT_EVAL_GRAMMAR("R1 = [0-9];", "R1", "0", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [a-z];", "R1", "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [A-Z];", "R1", "A", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = [\\u{0001}-\\u{10ffff}];", "R1", "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = [\\u0001-\\U0010ffff];", "R1", "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [你-好];", "R1", "你", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [1-9..2];", "R1", "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [1-9..2];", "R1", "2", P4_MatchError, "expect R1, line 1:1 (char 0)");
@@ -897,13 +895,13 @@ void test_eval_bad_grammar_literal(void) {
     );
 
     ASSERT_BAD_GRAMMAR(
-        "R1 = \"\\u{110000}\";",
-        "PegError: char 0 is invalid. char 5-17: \"\\u{110000}\"."
+        "R1 = \"\\U00110000\";",
+        "PegError: char 0 is invalid. char 5-17: \"\\U00110000\"."
     );
 
     ASSERT_BAD_GRAMMAR(
-        "R1 = \"\\u{0}\";",
-        "PegError: char 0 is invalid. char 5-12: \"\\u{0}\"."
+        "R1 = \"\\u0000\";",
+        "PegError: char 0 is invalid. char 5-13: \"\\u0000\"."
     );
 }
 
@@ -921,15 +919,15 @@ void test_eval_bad_grammar_range(void) {
     );
 
     ASSERT_BAD_GRAMMAR(
-        "R1 = [\\u{10ffff}-\\u{0001}];",
-        "PegError: range lower 0x10ffff is greater than upper 0x1. char 5-26: [\\u{10ffff}-\\u{0001}]."
+        "R1 = [\\U0010ffff-\\u0001];",
+        "PegError: range lower 0x10ffff is greater than upper 0x1. char 5-24: [\\U0010ffff-\\u0001]."
     );
 
     /* lower / upper / stride is zero. */
 
     ASSERT_BAD_GRAMMAR(
-        "R1 = [\\u{0}-\\u{10ffff}];",
-        "PegError: range lower 0x0, upper 0x10ffff, stride 0x1 must be all non-zeros. char 5-23: [\\u{0}-\\u{10ffff}]."
+        "R1 = [\\u0000-\\U0010ffff];",
+        "PegError: range lower 0x0, upper 0x10ffff, stride 0x1 must be all non-zeros. char 5-24: [\\u0000-\\U0010ffff]."
     );
 
     ASSERT_BAD_GRAMMAR(
@@ -938,13 +936,13 @@ void test_eval_bad_grammar_range(void) {
     );
 
     ASSERT_BAD_GRAMMAR(
-        "R1 = [\\u{1}-\\u{10ffff}..0];",
-        "PegError: range lower 0x1, upper 0x10ffff, stride 0x0 must be all non-zeros. char 5-26: [\\u{1}-\\u{10ffff}..0]."
+        "R1 = [\\u0001-\\U0010ffff..0];",
+        "PegError: range lower 0x1, upper 0x10ffff, stride 0x0 must be all non-zeros. char 5-27: [\\u0001-\\U0010ffff..0]."
     );
 
     ASSERT_BAD_GRAMMAR(
-        "R1 = [\\u{1}-\\u{110000}];",
-        "PegError: range lower 0x1, upper 0x110000 must be less than 0x10ffff. char 5-23: [\\u{1}-\\u{110000}]."
+        "R1 = [\\u0001-\\U00110000];",
+        "PegError: range lower 0x1, upper 0x110000 must be less than 0x10ffff. char 5-24: [\\u0001-\\U00110000]."
     );
 
 }

@@ -74,7 +74,7 @@ P4_Grammar*  P4_CreateJSONGrammar() {
         "array = \"[\" (value (\",\" value)*)? \"]\";\n"
 
         "@tight\n"
-        "string = \"\\\"\" ([\\u{20}-\\u{21}] / [\\u{23}-\\u{5b}] / [\\u{5d}-\\u{10ffff}] / escape )* \"\\\"\";\n"
+        "string = \"\\\"\" ([\\u0020-\\u0021] / [\\u0023-\\u005b] / [\\u005d-\\U0010ffff] / escape )* \"\\\"\";\n"
 
         "true = \"true\";\n"
         "false = \"false\";\n"

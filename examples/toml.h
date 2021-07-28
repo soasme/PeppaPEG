@@ -43,7 +43,7 @@ P4_Grammar*  P4_CreateTomlGrammar() {
     return P4_LoadGrammar(
 
         "toml = expression (newline expression)*;\n"
-        "expression = ws keyval? ws comment?;\n"
+        "expression = ws (keyval / table)? ws comment?;\n"
 
         /* Key-Value pairs */
         "keyval = key keyval_sep val;\n"
@@ -109,6 +109,19 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         "@lifted inline_table_open = \"{\";\n"
         "@lifted inline_table_close = \"}\";\n"
         "@lifted inline_table_sep = \",\";\n"
+
+        /* Table */
+        "@lifted table = array_table / std_table;\n"
+
+        /* Standard Table */
+        "std_table = std_table_open ws key ws std_table_close;\n"
+        "@lifted std_table_open = \"[\";\n"
+        "@lifted std_table_close = \"]\";\n"
+
+        /* Array Table */
+        "array_table = array_table_open ws key ws array_table_close;\n"
+        "@lifted array_table_open = \"[[\";\n"
+        "@lifted array_table_close = \"]]\";\n"
 
         /* Comment */
         "comment = comment_start comment_body;\n"

@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="How-To Guides" href="howto.html" /><link rel="prev" title="Tutorial: Calculator" href="tutcalc.html" />
 
-    <meta name="generator" content="sphinx-4.1.1, furo 2021.07.05.beta38"/>
+    <meta name="generator" content="sphinx-4.1.2, furo 2021.07.05.beta38"/>
         <title>Tutorial: JSON - Peppa PEG 1.13.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css" />
@@ -194,7 +194,7 @@
         <span class="s2">"array = </span><span class="se">\"</span><span class="s2">[</span><span class="se">\"</span><span class="s2"> (value (</span><span class="se">\"</span><span class="s2">,</span><span class="se">\"</span><span class="s2"> value)*)? </span><span class="se">\"</span><span class="s2">]</span><span class="se">\"</span><span class="s2">;</span><span class="se">\n</span><span class="s2">"</span>
 
         <span class="s2">"@tight</span><span class="se">\n</span><span class="s2">"</span>
-        <span class="s2">"string = </span><span class="se">\"\\\"\"</span><span class="s2"> ([</span><span class="se">\\</span><span class="s2">u</span><span class="si">{20}</span><span class="s2">-</span><span class="se">\\</span><span class="s2">u</span><span class="si">{21}</span><span class="s2">] / [</span><span class="se">\\</span><span class="s2">u</span><span class="si">{23}</span><span class="s2">-</span><span class="se">\\</span><span class="s2">u</span><span class="si">{5b}</span><span class="s2">] / [</span><span class="se">\\</span><span class="s2">u</span><span class="si">{5d}</span><span class="s2">-</span><span class="se">\\</span><span class="s2">u</span><span class="si">{10ffff}</span><span class="s2">] / escape )* </span><span class="se">\"\\\"\"</span><span class="s2">;</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"string = </span><span class="se">\"\\\"\"</span><span class="s2"> ([</span><span class="se">\\</span><span class="s2">u0020-</span><span class="se">\\</span><span class="s2">u0021] / [</span><span class="se">\\</span><span class="s2">u0023-</span><span class="se">\\</span><span class="s2">u005b] / [</span><span class="se">\\</span><span class="s2">u005d-</span><span class="se">\\</span><span class="s2">U0010ffff] / escape )* </span><span class="se">\"\\\"\"</span><span class="s2">;</span><span class="se">\n</span><span class="s2">"</span>
 
         <span class="s2">"true = </span><span class="se">\"</span><span class="s2">true</span><span class="se">\"</span><span class="s2">;</span><span class="se">\n</span><span class="s2">"</span>
         <span class="s2">"false = </span><span class="se">\"</span><span class="s2">false</span><span class="se">\"</span><span class="s2">;</span><span class="se">\n</span><span class="s2">"</span>

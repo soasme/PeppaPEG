@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Low Level APIs" href="lowlevel.html" /><link rel="prev" title="Concepts" href="concepts.html" />
 
-    <meta name="generator" content="sphinx-4.1.1, furo 2021.07.05.beta38"/>
+    <meta name="generator" content="sphinx-4.1.2, furo 2021.07.05.beta38"/>
         <title>PEG APIs - Peppa PEG 1.13.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css" />
@@ -185,8 +185,8 @@ followed by a sequence of either alphabets or digits or underscores <cite>_</cit
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">greeting</span> <span class="o">=</span> <span class="s2">"Peppa 🐷"</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>You can encode UTF-8 code points via <cite>u</cite> followed by hex digits.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">greeting</span> <span class="o">=</span> <span class="s2">"\u</span><span class="si">{4f60}</span><span class="s2">\u</span><span class="si">{597D}</span><span class="s2">, world\u</span><span class="si">{0c}</span><span class="s2">"</span><span class="p">;</span>
+<p>You can encode UTF-8 code points via <cite>\u</cite> followed by 4 hex digits or <cite>\U</cite> followed by 8 hex digits.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">greeting</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\u4f60\u597D</span><span class="s2">, world</span><span class="se">\u000c</span><span class="s2">"</span><span class="p">;</span>
 </pre></div>
 </div>
 </section>
@@ -197,18 +197,19 @@ followed by a sequence of either alphabets or digits or underscores <cite>_</cit
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">digits</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">];</span>
 </pre></div>
 </div>
-<p>The lower and upper character of the range can be not only ASCII characters but also UTF-8 code points.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">digits</span> <span class="o">=</span> <span class="p">[</span>\<span class="n">u</span><span class="p">{</span><span class="mf">4e00</span><span class="p">}</span><span class="o">-</span>\<span class="n">u</span><span class="p">{</span><span class="mi">9</span><span class="n">fff</span><span class="p">}];</span>
+<p>The lower and upper character of the range can be not only ASCII characters but also UTF-8 code points.
+The syntax can be <cite>\uXXXX</cite> or <cite>\uXXXXXXXX</cite>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">digits</span> <span class="o">=</span> <span class="p">[</span>\<span class="n">u4e00</span><span class="o">-</span>\<span class="n">u9fff</span><span class="p">];</span>
 </pre></div>
 </div>
-<p>A small trick to match any character is to specify the range from <cite>\u{1}</cite> to <cite>\u{10ffff}</cite>,
+<p>A small trick to match any character is to specify the range from <cite>\u0001</cite> to <cite>\U0010ffff</cite>,
 which are the minimum and the maximum code point in UTF-8 encoding.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">any</span> <span class="o">=</span> <span class="p">[</span>\<span class="n">u</span><span class="p">{</span><span class="mi">1</span><span class="p">}</span><span class="o">-</span>\<span class="n">u</span><span class="p">{</span><span class="mi">10</span><span class="n">ffff</span><span class="p">}];</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">any</span> <span class="o">=</span> <span class="p">[</span>\<span class="n">u0001</span><span class="o">-</span>\<span class="n">U0010ffff</span><span class="p">];</span>
 </pre></div>
 </div>
 <p>The value of lower must be less or equal than the upper.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">//</span> <span class="n">INVALID</span>
-<span class="nb">any</span> <span class="o">=</span> <span class="p">[</span>\<span class="n">u</span><span class="p">{</span><span class="mi">10</span><span class="n">ffff</span><span class="p">}</span><span class="o">-</span>\<span class="n">u</span><span class="p">{</span><span class="mi">1</span><span class="p">}];</span>
+<span class="nb">any</span> <span class="o">=</span> <span class="p">[</span>\<span class="n">U0010ffff</span><span class="o">-</span>\<span class="n">u0001</span><span class="p">];</span>
 </pre></div>
 </div>
 <p>Range supports an optional <cite>stride</cite> to skip certain amount of characters in the range.
@@ -230,7 +231,7 @@ They’re wrapped via <cite>\p{}</cite>, for example:</p>
 </section>
 <section id="dot">
 <h2>Dot<a class="headerlink" href="#dot" title="Permalink to this headline">¶</a></h2>
-<p>Single dot <cite>.</cite> can match any UTF-8 code point. It’s a syntax sugar for <cite>[\u{1}-\u{10ffff}]</cite>.</p>
+<p>Single dot <cite>.</cite> can match any UTF-8 code point. It’s a syntax sugar for <cite>[\u0001-\U0010ffff]</cite>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">any</span> <span class="o">=</span> <span class="o">.</span><span class="p">;</span>
 </pre></div>
 </div>
@@ -490,7 +491,7 @@ number = [0-9];
 <tr class="row-even"><td><p><cite>[0-9..2]</cite></p></td>
 <td><p>range with stride</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>[\u{1}-\u{10ffff}]</cite></p></td>
+<tr class="row-odd"><td><p><cite>[\u0001-\U0010ffff]</cite></p></td>
 <td><p>range using unicode runes</p></td>
 </tr>
 <tr class="row-even"><td><p><cite>[\p{L}]</cite></p></td>

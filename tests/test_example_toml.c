@@ -37,6 +37,19 @@ void test_valid(void) {
     ASSERT_TOML(1, "abc = 'a\\u0031\\U00000032\\n'", P4_Ok, "[]");
     ASSERT_TOML(1, "'abc' = ''", P4_Ok, "[]");
     ASSERT_TOML(1, "a.'b'.c = ''", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = 2000-01-01", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = 00:00:00", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = 00:00:00.000000", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = 2000-01-01T00:00:00", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = 2000-01-01T00:00:00.0000", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = 2000-01-01t00:00:00", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = 2000-01-01t00:00:00.0000", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = 2000-01-01 00:00:00", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = 2000-01-01 00:00:00.0000", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = 2000-01-01T00:00:00Z", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = 2000-01-01T00:00:00.0000Z", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = 2000-01-01T00:00:00+12:00", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = 2000-01-01T00:00:00.0000+12:00", P4_Ok, "[]");
 }
 
 int main(void) {

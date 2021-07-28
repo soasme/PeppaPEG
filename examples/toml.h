@@ -58,7 +58,7 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         "@lifted dot_sep = ws \".\" ws;\n"
 
         /* Value */
-        "@lifted val = boolean / string;\n"
+        "@lifted val = boolean / datetime / string;\n"
 
         "@lifted string = basic_string / literal_string;\n"
 
@@ -74,6 +74,26 @@ P4_Grammar*  P4_CreateTomlGrammar() {
 
         /* Boolean */
         "boolean = \"true\" / \"false\";\n"
+
+        /* Date and Time */
+        "@squashed date_fullyear = DIGIT{4};\n"
+        "@squashed date_month = \"0\" [1-9] / \"1\" [0-2];\n"
+        "@squashed date_mday = DIGIT{2};\n"
+        "time_delim = i\"t\" / \" \";\n"
+        "@squashed time_hour = DIGIT{2};\n"
+        "@squashed time_minute = DIGIT{2};\n"
+        "@squashed time_second = DIGIT{2};\n"
+        "@squashed time_secfrac = DIGIT+;\n"
+        "time_numoffset = (\"+\" / \"-\") time_hour \":\" time_minute;\n"
+        "time_offset = i\"z\" / time_numoffset;\n"
+        "partial_time = time_hour \":\" time_minute \":\" time_second (\".\" time_secfrac)?;\n"
+        "full_date = date_fullyear \"-\" date_month \"-\" date_mday;\n"
+        "full_time = partial_time time_offset;\n"
+        "offset_date_time = full_date time_delim full_time;\n"
+        "local_date_time = full_date time_delim partial_time;\n"
+        "local_date = full_date;\n"
+        "local_time = partial_time;\n"
+        "datetime = offset_date_time / local_date_time / local_date / local_time;\n"
 
         /* Comment */
         "comment = comment_start comment_body;\n"

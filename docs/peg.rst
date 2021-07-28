@@ -366,6 +366,24 @@ In this example, the rule `float` will drop all `number` nodes, leaving only one
 
     number = [0-9];
 
+@scoped
+```````
+
+Ignore all the decorators set by upstream rules.
+
+For example, despite `greeting2` set to not using spaced rule `ws`, `greeting` can still apply to `ws` since it's under its own scope.
+
+.. code-block::
+
+    @tight
+    greeting2 = greeting greeting;
+
+    @scoped
+    greeting = "hello" "world";
+
+    @spaced
+    ws = " ";
+
 
 Use Peg API
 ------------

@@ -43,7 +43,7 @@ P4_Grammar*  P4_CreateTomlGrammar() {
     return P4_LoadGrammar(
 
         "toml = expression (newline expression)*;\n"
-        "expression = ws (keyval / table)? ws comment?;\n"
+        "@lifted expression = ws (keyval / table)? ws comment?;\n"
 
         /* Key-Value pairs */
         "keyval = key keyval_sep val;\n"
@@ -166,7 +166,7 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         "@lifted array_table_close = \"]]\";\n"
 
         /* Comment */
-        "comment = comment_start comment_body;\n"
+        "@lifted @squashed comment = comment_start comment_body;\n"
 
         "comment_start = \"#\";\n"
         "@squashed comment_body = non_eol*;\n"
@@ -186,6 +186,58 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         "HEXDIG = [a-f] / [A-F] / [0-9];\n"
     );
 }
+
+typedef struct P4_TomlDateTime P4_TomlDateTime;
+typedef struct P4_TomlArray P4_TomlArray;
+typedef struct P4_TomlTable P4_TomlTable;
+typedef struct P4_TomlKeyVal P4_TomlKeyVal;
+typedef struct P4_TomlValue P4_TomlValue;
+
+struct P4_TomlDateTime {
+    int *year, *month, *day;
+    int *hour, *minute, *second, *millisecond;
+    char *timezone;
+    struct {
+        int year, month, day;
+        int hour, minute, second, millisecond;
+        char timezone[10];
+    } __internal__;
+};
+
+struct P4_TomlValue {
+    char kind; /* 's', 'b', 'i', 'f', 'd', 'a', 't' */
+    union {
+        P4_String           s;
+        bool                b;
+        int64_t             i;
+        double              f;
+        P4_TomlDateTime*    d;
+        P4_TomlArray*       a;
+        P4_TomlTable*       t;
+    } v;
+};
+
+struct P4_TomlKeyVal {
+    const char*     key;
+    P4_TomlValue*   val;
+};
+
+struct P4_TomlTable {
+    size_t          count;
+    P4_TomlKeyVal*  items;
+};
+
+struct P4_TomlArray {
+    size_t          count;
+    P4_TomlValue*   items;
+};
+
+/*
+ * toml         => P4_TomlTable.
+ * keyval       => P4_TomlKeyVal.
+ * unquoted_key => P4_TomlKeyVal.key.
+ * integer      => P4_TomlValue.i.
+ */
 
 #ifdef __cplusplus
 }

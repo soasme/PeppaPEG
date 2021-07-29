@@ -232,11 +232,89 @@ struct P4_TomlArray {
     P4_TomlValue*   items;
 };
 
+P4_Error
+P4_TransformTomlBoolean(P4_Node* node, P4_TomlValue* v) {
+    v->kind = 'b';
+    v->v.b = node->content + node->slice.start.pos == 't';
+    printf("transform: kind='b', b=%d\n", v->v.b);
+    return P4_Ok;
+}
+
+P4_Error
+P4_TransformTomlValue(P4_Node* node, P4_TomlValue* v) {
+    return P4_TransformTomlBoolean(node, v);
+}
+
+P4_Error
+P4_TransformTomlUnquotedKey(P4_Node* node, const char* key) {
+    *key = P4_CopyNodeString(node);
+    printf("transform: unquoted_key=%s\n", key);
+    return P4_Ok;
+}
+
+P4_Error
+P4_TransformTomlKeyVal(P4_Node* node, P4_TomlKeyVal* kv) {
+    P4_Error err = P4_Ok;
+    if ((err = P4_TransformTomlUnquotedKey(node->head, kv->key)) != P4_Ok)
+        return err;
+
+    if ((kv->val = P4_MALLOC(sizeof(P4_TomlValue))) == NULL)
+        return P4_MemoryError;
+
+    if ((err = P4_TransformTomlValue(node->tail, kv->val)) != P4_Ok) {
+        P4_FREE(kv->val);
+        return err;
+    }
+
+    return P4_Ok;
+}
+
+P4_Error
+P4_TransformToml(P4_Node* node, P4_TomlTable* table) {
+    table->count = P4_GetNodeChildrenCount(node);
+    printf("transform: count=%d\n", table->count);
+    if ((table->items = P4_MALLOC(table->count * sizeof(P4_TomlKeyVal))) == NULL) {
+        return P4_MemoryError;
+    };
+
+    P4_Error err = P4_Ok;
+    P4_Node* child = node->head;
+    size_t i = 0;
+
+    while (child != NULL) {
+        if ((err = P4_TransformTomlKeyVal(child, &table->items[i])) != P4_Ok)
+            goto finalize;
+        child = node->next;
+    }
+
+    return P4_Ok;
+finalize:
+    table->count = 0;
+    P4_FREE(table->items);
+    table->items = NULL;
+    return err;
+}
+
+
 /*
  * toml         => P4_TomlTable.
  * keyval       => P4_TomlKeyVal.
  * unquoted_key => P4_TomlKeyVal.key.
  * integer      => P4_TomlValue.i.
+ * ml_basic_string => P4_TomlValue.s.
+ * basic_string => P4_TomlValue.s.
+ * literal_string => P4_TomlValue.s.
+ * ml_literal_string => P4_TomlValue.s.
+ * float => P4_TomlValue.f.
+ * boolean => P4_TomlValue.b.
+ * boolean => P4_TomlValue.b.
+ * local_date => P4_TomlValue.d.
+ * local_time => P4_TomlValue.d.
+ * local_date_time => P4_TomlValue.d.
+ * offset_date_time => P4_TomlValue.d.
+ * std_table => P4_TomlValue.t
+ * array_table => P4_TomlValue.t
+ * array => P4_TomlValue.a
  */
 
 #ifdef __cplusplus

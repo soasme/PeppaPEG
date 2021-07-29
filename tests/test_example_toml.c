@@ -79,8 +79,25 @@ void test_valid(void) {
     /* ASSERT_TOML(1, "abc = \"\"\"abc\"\"\"\"\"", P4_Ok, "[]"); */
 }
 
+# define ASSERT_TOML_AST(input, code) do { \
+    P4_Grammar* grammar = P4_CreateTomlGrammar(); \
+    P4_Source* source = P4_CreateSource((input), 1); \
+    TEST_ASSERT_EQUAL_MESSAGE((code), P4_Parse(grammar, source), "unexpected parse grammar return code"); \
+    P4_Node* root = P4_GetSourceAst(source); \
+    P4_TomlTable table = {0}; \
+    P4_Error err = P4_TransformToml(root, &table); \
+    TEST_ASSERT_EQUAL_MESSAGE(err, code, "transform failed"); \
+    P4_DeleteSource(source); \
+    P4_DeleteGrammar(grammar); \
+} while (0);
+
+void test_ast(void) {
+    ASSERT_TOML_AST("a=1", P4_Ok);
+}
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_valid);
+    RUN_TEST(test_ast);
     return UNITY_END();
 }

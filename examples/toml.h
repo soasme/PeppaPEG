@@ -60,13 +60,22 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         /* Value */
         "@lifted val = boolean / datetime / array / inline_table / string / float / integer;\n"
 
-        "@lifted string = ml_literal_string / basic_string / literal_string;\n"
+        "@lifted string = ml_literal_string / ml_basic_string / basic_string / literal_string;\n"
 
         /* Basic String */
         "basic_string = \"\\\"\" basic_char* \"\\\"\";\n"
         "@lifted basic_char = basic_unescaped / escaped;\n"
         "@lifted basic_unescaped = wschar / \"!\" / [\\u0023-\\u005B] / [\\u005D-\\u007E] / non_ascii;\n"
         "@scoped @squashed escaped = \"\\\\\" (\"\\\"\" / \"\\\\\" / \"b\" / \"f\" / \"n\" / \"r\" / \"t\" / \"u\" HEXDIG{4} / \"U\" HEXDIG{8});\n"
+
+        /* Multi-line Basic String */
+        "@squashed ml_basic_string = \"\\x22\\x22\\x22\" newline? ml_basic_body \"\\x22\\x22\\x22\";\n"
+        "ml_basic_body = mlb_content* (mlb_quotes mlb_content+)*;\n"
+        "mlb_content = mlb_char / newline / mlb_escaped_nl;\n"
+        "mlb_char = mlb_unescaped / escaped;\n"
+        "mlb_quotes = \"\\x22\";\n"
+        "mlb_unescaped = wschar / \"\\x21\" / [\\x23-\\x5B] / [\\x5D-\\x7E] / non_ascii;\n"
+        "mlb_escaped_nl = escaped ws newline *( wschar / newline );\n"
 
         /* Literal String */
         "literal_string = \"'\" literal_char* \"'\";\n"

@@ -61,6 +61,16 @@ void test_valid(void) {
     ASSERT_TOML(1, "[ a.\"b\".c ]", P4_Ok, "[]");
     ASSERT_TOML(1, "[[abc]]", P4_Ok, "[]");
     ASSERT_TOML(1, "[[ a.\"b\".c ]]", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = 0", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = 1", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = 123_456_789", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = +123_456_789", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = -123_456_789", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = 0x123", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = 0b0001", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = 0o123", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = 1.0", P4_Ok, "[]");
+    ASSERT_TOML(1, "abc = -1.0", P4_Ok, "[]");
 }
 
 int main(void) {

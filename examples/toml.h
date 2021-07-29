@@ -58,7 +58,7 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         "@lifted dot_sep = ws \".\" ws;\n"
 
         /* Value */
-        "@lifted val = boolean / datetime / array / inline_table / string;\n"
+        "@lifted val = boolean / datetime / array / inline_table / string / float / integer;\n"
 
         "@lifted string = basic_string / literal_string;\n"
 
@@ -74,6 +74,32 @@ P4_Grammar*  P4_CreateTomlGrammar() {
 
         /* Boolean */
         "boolean = \"true\" / \"false\";\n"
+
+        /* Integer */
+        "minus = \"-\";\n"
+        "plus = \"+\";\n"
+        "underscore = \"_\";\n"
+        "one_nine = [1-9];\n"
+        "zero_seven = [0-7];\n"
+        "zero_one = [0-1];\n"
+        "hex_prefix = i\"0x\";\n"
+        "oct_prefix = i\"0o\";\n"
+        "bin_prefix = i\"0b\";\n"
+        "dec_int = (minus / plus)? unsigned_dec_int;\n"
+        "unsigned_dec_int = \"0\" / one_nine (DIGIT / underscore DIGIT)*;\n"
+        "hex_int = hex_prefix HEXDIG (HEXDIG / underscore HEXDIG)*;\n"
+        "oct_int = oct_prefix zero_seven (zero_seven / underscore zero_seven)*;\n"
+        "bin_int = bin_prefix zero_one (zero_one / underscore zero_one)*;\n"
+        "@squashed integer = hex_int / oct_int / bin_int / dec_int;\n"
+
+        /* Float */
+        "@squashed float = special_float / dec_int (exp / frac exp?);"
+        "zero_prefixed_int = DIGIT (underscore DIGIT / DIGIT)*;\n"
+        "frac = \".\" zero_prefixed_int;\n"
+        "exp = i\"e\" (minus / plus)? zero_prefixed_int;\n"
+        "special_float = (minus / plus)? (inf / nan);\n"
+        "inf = \"inf\";\n"
+        "nan = \"nan\";\n"
 
         /* Date and Time */
         "@squashed date_fullyear = DIGIT{4};\n"

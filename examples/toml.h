@@ -60,17 +60,24 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         /* Value */
         "@lifted val = boolean / datetime / array / inline_table / string / float / integer;\n"
 
-        "@lifted string = basic_string / literal_string;\n"
+        "@lifted string = ml_literal_string / basic_string / literal_string;\n"
 
         /* Basic String */
         "basic_string = \"\\\"\" basic_char* \"\\\"\";\n"
         "@lifted basic_char = basic_unescaped / escaped;\n"
-        "@lifted basic_unescaped = wschar / \"!\" / [\\u{0023}-\\u{005B}] / [\\u{005D}-\\u{007E}] / non_ascii;\n"
+        "@lifted basic_unescaped = wschar / \"!\" / [\\u0023-\\u005B] / [\\u005D-\\u007E] / non_ascii;\n"
         "@scoped @squashed escaped = \"\\\\\" (\"\\\"\" / \"\\\\\" / \"b\" / \"f\" / \"n\" / \"r\" / \"t\" / \"u\" HEXDIG{4} / \"U\" HEXDIG{8});\n"
 
         /* Literal String */
         "literal_string = \"'\" literal_char* \"'\";\n"
-        "@lifted literal_char = \"\\t\" / [\\u{0020}-\\u{0026}] / [\\u{0028}-\\u{007E}] / non_ascii;\n"
+        "@lifted literal_char = \"\\t\" / [\\u0020-\\u0026] / [\\u0028-\\u007E] / non_ascii;\n"
+
+        /* Multi-line literal String */
+        "@squashed ml_literal_string = \"'''\" newline? ml_literal_body \"'''\";\n"
+        "ml_literal_body = mll_content* (mll_quotes mll_content+)*;\n"
+        "mll_content = mll_char / newline;\n"
+        "mll_char = \"\\x09\" / [\\x20-\\x26] / [\\x28-\\x7e] / non_ascii;\n"
+        "mll_quotes = \"''\" / \"'\";\n"
 
         /* Boolean */
         "boolean = \"true\" / \"false\";\n"
@@ -155,8 +162,8 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         "comment_start = \"#\";\n"
         "@squashed comment_body = non_eol*;\n"
 
-        "non_eol = \"\\t\" / [\\u{0020}-\\u{007F}] / non_ascii;\n"
-        "non_ascii = [\\u{0080}-\\u{D7FF}] / [\\u{E000}-\\u{10FFFF}];\n"
+        "non_eol = \"\\t\" / [\\u0020-\\u007F] / non_ascii;\n"
+        "non_ascii = [\\u0080-\\uD7FF] / [\\uE000-\\U0010FFFF];\n"
 
         /* Newline */
         "newline = \"\\n\" / \"\\r\\n\";\n"

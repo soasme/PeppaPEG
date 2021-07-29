@@ -64,11 +64,17 @@ Emoji is supported:
 
     greeting = "Peppa 🐷";
 
-You can encode UTF-8 code points via `\u` followed by hex digits.
+You can encode ASCII characters via `\\x` followed by 2 hex digits.
 
 .. code-block::
 
-    greeting = "\u{4f60}\u{597D}, world\u{0c}";
+    greeting = "\x48\x65\x6c\x6c\x6f, world";
+
+You can encode UTF-8 characters via `\\u` followed by 4 hex digits or `\\U` followed by 8 hex digits.
+
+.. code-block::
+
+    greeting = "\u4f60\u597D, world\u000c";
 
 Range
 ------
@@ -82,24 +88,25 @@ In this example, any character between `'0'` to `'9'` can match.
     digits = [0-9];
 
 The lower and upper character of the range can be not only ASCII characters but also UTF-8 code points.
+The syntax can be `\\uXXXX` or `\\uXXXXXXXX`.
 
 .. code-block::
 
-    digits = [\u{4e00}-\u{9fff}];
+    digits = [\u4e00-\u9fff];
 
-A small trick to match any character is to specify the range from `\\u{1}` to `\\u{10ffff}`,
+A small trick to match any character is to specify the range from `\\u0001` to `\\U0010ffff`,
 which are the minimum and the maximum code point in UTF-8 encoding.
 
 .. code-block::
 
-    any = [\u{1}-\u{10ffff}];
+    any = [\u0001-\U0010ffff];
 
 The value of lower must be less or equal than the upper.
 
 .. code-block::
 
     // INVALID
-    any = [\u{10ffff}-\u{1}];
+    any = [\U0010ffff-\u0001];
 
 Range supports an optional `stride` to skip certain amount of characters in the range.
 In this example, only odd number between `'0'` to `'9'` can match.
@@ -123,7 +130,7 @@ They're wrapped via `\\p{}`, for example:
 Dot
 ---
 
-Single dot `.` can match any UTF-8 code point. It's a syntax sugar for `[\\u{1}-\\u{10ffff}]`.
+Single dot `.` can match any UTF-8 code point. It's a syntax sugar for `[\\u0001-\\U0010ffff]`.
 
 .. code-block::
 
@@ -359,6 +366,24 @@ In this example, the rule `float` will drop all `number` nodes, leaving only one
 
     number = [0-9];
 
+@scoped
+```````
+
+Ignore all the decorators set by upstream rules.
+
+For example, despite `greeting2` set to not using spaced rule `ws`, `greeting` can still apply to `ws` since it's under its own scope.
+
+.. code-block::
+
+    @tight
+    greeting2 = greeting greeting;
+
+    @scoped
+    greeting = "hello" "world";
+
+    @spaced
+    ws = " ";
+
 
 Use Peg API
 ------------
@@ -424,13 +449,17 @@ Cheatsheet
      - cancle effects
    * - `"literal"`
      - exact match
+   * - `"\x0d\x0a"`
+     - exact match by using ascii digits
+   * - `"\u4f60\u597D"`
+     - exact match utf-8 characters
    * - `i"literal"`
      - case-insensitive match
    * - `[a-z]`
      - range
    * - `[0-9..2]`
      - range with stride
-   * - `[\\u{1}-\\u{10ffff}]`
+   * - `[\\u0001-\\U0010ffff]`
      - range using unicode runes
    * - `[\\p{L}]`
      - range using unicode categories

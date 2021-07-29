@@ -17,13 +17,11 @@
 
 # Hello, There!
 
-[PEG] stands for parsing expression grammar. Peppa PEG is an ultra lightweight PEG parser in ANSI C.
+Peppa PEG is an ultra lightweight [PEG] (parsing expression grammar) parser in ANSI C.
 
-References:
-
-* [GitHub](https://github.com/soasme/PeppaPEG)
-* [Project Home Page](https://www.soasme.com/PeppaPEG/landing.html).
-* [Project Documentation Pages](https://www.soasme.com/PeppaPEG/).
+References: [GitHub](https://github.com/soasme/PeppaPEG)
+| [Project Home Page](https://soasme.com/PeppaPEG/landing.html)
+| [Project Documentation Pages](https://soasme.com/PeppaPEG/).
 
 # Usage
 
@@ -47,7 +45,7 @@ In Peppa PEG, grammar syntax can be loaded from a string. Below is an example of
 ```c
 P4_Grammar* json = P4_LoadGrammar(
     "@lifted\n"
-    "entry = &[\\u{1}-\\u{10ffff}] value ![\\u{1}-\\u{10ffff}];\n"
+    "entry = &[\\u0001-\\U0010ffff] value ![\\u0001-\\u0010ffff];\n"
 
     "@lifted\n"
     "value = object / array / string / number / true / false / null;\n"
@@ -58,7 +56,7 @@ P4_Grammar* json = P4_LoadGrammar(
     "array = \"[\" (value (\",\" value)*)? \"]\";\n"
 
     "@tight\n"
-    "string = \"\\\"\" ([\\u{20}-\\u{21}] / [\\u{23}-\\u{5b}] / [\\u{5d}-\\u{10ffff}] / escape )* \"\\\"\";\n"
+    "string = \"\\\"\" ([\\u0020-\\u0021] / [\\u0023-\\u005b] / [\\u005d-\\U0010ffff] / escape )* \"\\\"\";\n"
 
     "true = \"true\";\n"
     "false = \"false\";\n"
@@ -127,7 +125,7 @@ P4_JsonifySourceAst(grammar, stdout, root);
 ```
 
 
-Read the documentation here: <https://www.soasme.com/PeppaPEG/>.
+Read the documentation here: <https://soasme.com/PeppaPEG/>.
 
 # Peppy Hacking Peppa PEG!
 

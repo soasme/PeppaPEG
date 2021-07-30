@@ -94,6 +94,16 @@ void test_valid(void) {
 void test_ast(void) {
     ASSERT_TOML_AST("a=true", P4_Ok);
     ASSERT_TOML_AST("a=false", P4_Ok);
+    ASSERT_TOML_AST("a=123456", P4_Ok);
+    ASSERT_TOML_AST("a=123_456", P4_Ok);
+    ASSERT_TOML_AST("a=-123", P4_Ok);
+    ASSERT_TOML_AST("a=0x123abc", P4_Ok);
+    ASSERT_TOML_AST("a=0o123", P4_Ok);
+    ASSERT_TOML_AST("a=0b010101", P4_Ok);
+    ASSERT_TOML_AST("a=0X123abc", P4_Ok);
+    ASSERT_TOML_AST("a=0O123", P4_Ok);
+    ASSERT_TOML_AST("a=0B010101", P4_Ok);
+    /* TODO: need deal with -0x, -0o, -ob */
 }
 
 int main(void) {

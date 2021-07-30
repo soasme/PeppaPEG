@@ -37,6 +37,7 @@ extern "C"
 {
 #endif
 
+#include <stdlib.h>
 #include "../peppapeg.h"
 
 P4_Grammar*  P4_CreateTomlGrammar() {
@@ -241,8 +242,58 @@ P4_TransformTomlBoolean(P4_Node* node, P4_TomlValue* v) {
 }
 
 P4_Error
+P4_TransformTomlInteger(P4_Node* node, P4_TomlValue* v) {
+    P4_String s = P4_CopyNodeString(node);
+    if (s == NULL)
+        return P4_ValueError;
+
+    size_t i, offset;
+    size_t len = strlen(s);
+    int base;
+
+    if (s[0] == '0' && (s[1] == 'x' || s[1] == 'X')) {
+        offset = 2;
+        base = 16;
+    } else if (s[0] == '0' && (s[1] == 'b' || s[1] == 'B')) {
+        offset = 2;
+        base = 2;
+    } else if (s[0] == '0' && (s[1] == 'o' || s[1] == 'O')) {
+        offset = 2;
+        base = 8;
+    } else {
+        offset = 0;
+        base = 10;
+    }
+
+    for (i = 0; i + offset <= len; ) {
+        if (s[i + offset] == '_') {
+            offset++;
+            continue;
+        } else {
+            s[i] = s[i + offset];
+            i++;
+        }
+    }
+
+    v->kind = 'i';
+    v->v.i = strtoul(s, NULL, base);
+    printf("transform: kind='i', i=%lld\n", v->v.i);
+
+    P4_FREE(s);
+
+    return P4_Ok;
+}
+
+P4_Error
 P4_TransformTomlValue(P4_Node* node, P4_TomlValue* v) {
-    return P4_TransformTomlBoolean(node, v);
+    switch (node->rule_id) {
+        case 31: /* boolean */
+            return P4_TransformTomlBoolean(node, v);
+        case 46: /* */
+            return P4_TransformTomlInteger(node, v);
+        default:
+            return P4_ValueError;
+    }
 }
 
 P4_Error

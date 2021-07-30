@@ -235,7 +235,7 @@ struct P4_TomlArray {
 P4_Error
 P4_TransformTomlBoolean(P4_Node* node, P4_TomlValue* v) {
     v->kind = 'b';
-    v->v.b = node->content + node->slice.start.pos == 't';
+    v->v.b = node->text[node->slice.start.pos] == 't';
     printf("transform: kind='b', b=%d\n", v->v.b);
     return P4_Ok;
 }
@@ -246,17 +246,21 @@ P4_TransformTomlValue(P4_Node* node, P4_TomlValue* v) {
 }
 
 P4_Error
-P4_TransformTomlUnquotedKey(P4_Node* node, const char* key) {
+P4_TransformTomlUnquotedKey(P4_Node* node, P4_String* key) {
     *key = P4_CopyNodeString(node);
-    printf("transform: unquoted_key=%s\n", key);
+    printf("transform: unquoted_key=%s\n", *key);
     return P4_Ok;
 }
 
 P4_Error
 P4_TransformTomlKeyVal(P4_Node* node, P4_TomlKeyVal* kv) {
     P4_Error err = P4_Ok;
-    if ((err = P4_TransformTomlUnquotedKey(node->head, kv->key)) != P4_Ok)
+
+    char* key = NULL;
+    if ((err = P4_TransformTomlUnquotedKey(node->head, &key)) != P4_Ok)
         return err;
+
+    kv->key = key;
 
     if ((kv->val = P4_MALLOC(sizeof(P4_TomlValue))) == NULL)
         return P4_MemoryError;
@@ -272,7 +276,7 @@ P4_TransformTomlKeyVal(P4_Node* node, P4_TomlKeyVal* kv) {
 P4_Error
 P4_TransformToml(P4_Node* node, P4_TomlTable* table) {
     table->count = P4_GetNodeChildrenCount(node);
-    printf("transform: count=%d\n", table->count);
+    printf("transform: count=%lu\n", table->count);
     if ((table->items = P4_MALLOC(table->count * sizeof(P4_TomlKeyVal))) == NULL) {
         return P4_MemoryError;
     };

@@ -92,7 +92,8 @@ void test_valid(void) {
 } while (0);
 
 void test_ast(void) {
-    ASSERT_TOML_AST("a=1", P4_Ok);
+    ASSERT_TOML_AST("a=true", P4_Ok);
+    ASSERT_TOML_AST("a=false", P4_Ok);
 }
 
 int main(void) {

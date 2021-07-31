@@ -298,6 +298,16 @@ typedef void*   P4_UserData;
  */
 typedef void    (*P4_UserDataFreeFunc)(P4_UserData);
 
+/**
+ * The grammar object that holds all grammar rules.
+ */
+typedef struct P4_Grammar P4_Grammar;
+
+/**
+ * The grammar rule expression.
+ */
+typedef struct P4_Expression P4_Expression;
+
 
 /*
  *
@@ -373,7 +383,7 @@ typedef struct P4_Slice {
  */
 typedef struct P4_Frame {
     /** The current matching expression for the frame. */
-    struct P4_Expression*   expr;
+    P4_Expression*          expr;
     /** Whether spacing is applicable to frame & frame dependents. */
     bool                    space;
     /** Whether silencing is applicable to frame & frame dependents. */
@@ -444,59 +454,6 @@ typedef struct P4_Source {
 } P4_Source;
 
 /**
- * The grammar rule.
- */
-typedef struct P4_Expression {
-    /* The name of expression. */
-    P4_String               name;
-    /** The id of expression. */
-    P4_RuleID               id;
-    /** The kind of expression. */
-    P4_ExpressionKind       kind;
-    /** The flag of expression. */
-    P4_ExpressionFlag       flag;
-
-    union {
-        /** Used by P4_Numeric. */
-        size_t                      num;
-
-        /** Used by P4_Literal and P4_BackReference. */
-        struct {
-            P4_String               literal;
-            bool                    sensitive;
-            size_t                  backref_index;
-        };
-
-        /** Used by P4_Reference..P4_Negative. */
-        struct {
-            P4_String               reference;
-            P4_RuleID               ref_id;
-            struct P4_Expression*   ref_expr;
-        };
-
-        /** Used by P4_Range. */
-        struct {
-            size_t                  ranges_count;
-            struct P4_RuneRange*    ranges;
-        };
-
-        /** Used by P4_Sequence..P4_Choice. */
-        struct {
-            struct P4_Expression**  members;
-            size_t                  count;
-        };
-
-        /** Used by P4_ZeroOrOnce..P4_RepeatExact.
-         * repeat the expr for n times, n >= min and n <= max. */
-        struct {
-            struct P4_Expression*   repeat_expr; /* maybe we can merge it with ref_expr? */
-            size_t                  repeat_min;
-            size_t                  repeat_max;
-        };
-    };
-} P4_Expression;
-
-/**
  * The node object of abstract syntax tree.
  */
 typedef struct P4_Node {
@@ -524,17 +481,13 @@ typedef struct P4_Node {
 /**
  * The callback for a successful match.
  */
-typedef P4_Error (*P4_MatchCallback)(struct P4_Grammar*, struct P4_Expression*, struct P4_Node*);
+typedef P4_Error (*P4_MatchCallback)(P4_Grammar*, P4_Expression*, struct P4_Node*);
 
 /**
  * The callback for a failure match.
  */
-typedef P4_Error (*P4_ErrorCallback)(struct P4_Grammar*, struct P4_Expression*);
+typedef P4_Error (*P4_ErrorCallback)(P4_Grammar*, P4_Expression*);
 
-/**
- * The grammar object that holds all grammar rules.
- */
-typedef struct P4_Grammar P4_Grammar;
 
 /**
  * The result object that holds either value or errors.
@@ -1916,6 +1869,16 @@ P4_Error P4_LoadGrammarResult(P4_String rules, P4_Result* result);
  */
 P4_Grammar*    P4_LoadGrammar(P4_String rules);
 
+/**
+ * @brief       Get the rule id.
+ * @param       expr    The rule expression.
+ * @return      The rule id.
+ *
+ * Example:
+ *
+ *      P4_RuleID id = P4_GetRuleID(expr);
+ */
+P4_RuleID P4_GetRuleID(P4_Expression*);
 
 #ifdef __cplusplus
 }

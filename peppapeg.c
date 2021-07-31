@@ -54,6 +54,56 @@ struct P4_Grammar {
     P4_UserDataFreeFunc     free_func;
 };
 
+struct P4_Expression {
+    /* The name of expression. */
+    P4_String               name;
+    /** The id of expression. */
+    P4_RuleID               id;
+    /** The kind of expression. */
+    P4_ExpressionKind       kind;
+    /** The flag of expression. */
+    P4_ExpressionFlag       flag;
+
+    union {
+        /** Used by P4_Numeric. */
+        size_t                      num;
+
+        /** Used by P4_Literal and P4_BackReference. */
+        struct {
+            P4_String               literal;
+            bool                    sensitive;
+            size_t                  backref_index;
+        };
+
+        /** Used by P4_Reference..P4_Negative. */
+        struct {
+            P4_String               reference;
+            P4_RuleID               ref_id;
+            P4_Expression*          ref_expr;
+        };
+
+        /** Used by P4_Range. */
+        struct {
+            size_t                  ranges_count;
+            struct P4_RuneRange*    ranges;
+        };
+
+        /** Used by P4_Sequence..P4_Choice. */
+        struct {
+            P4_Expression**  members;
+            size_t                  count;
+        };
+
+        /** Used by P4_ZeroOrOnce..P4_RepeatExact.
+         * repeat the expr for n times, n >= min and n <= max. */
+        struct {
+            P4_Expression*   repeat_expr; /* maybe we can merge it with ref_expr? */
+            size_t                  repeat_min;
+            size_t                  repeat_max;
+        };
+    };
+};
+
 /** It indicates the function or type is for public use. */
 # define P4_PUBLIC
 
@@ -4283,4 +4333,9 @@ P4_LoadGrammar(P4_String rules) {
     }
 
     return result->grammar;
+}
+
+P4_PUBLIC P4_RuleID
+P4_GetRuleID(P4_Expression* expr) {
+    return expr->id;
 }

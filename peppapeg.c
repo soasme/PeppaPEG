@@ -365,11 +365,15 @@ typedef const char *kh_cstr_t;
 
 #include "peppapeg.h"
 
+KHASH_MAP_INIT_STR(rules, P4_Expression*)
+
 struct P4_Grammar {
     /** The rules, e.g. the expressions with IDs. */
     struct P4_Expression**  rules;
     /** The total number of rules. */
     size_t                  count;
+    /** A map associating names with expressions. Type: Map<str, P4_Expression*>. */
+    khash_t(rules)*         rules2;
     /** The maximum number of rules. */
     int                     cap;
     /** The total number of spaced rules. */
@@ -2740,6 +2744,7 @@ P4_PUBLIC P4_Grammar*    P4_CreateGrammar(void) {
     P4_Grammar* grammar = P4_MALLOC(sizeof(P4_Grammar));
     grammar->rules = NULL;
     grammar->count = 0;
+    grammar->rules2 = kh_init(rules);
     grammar->cap = 0;
     grammar->spaced_count = SIZE_MAX;
     grammar->spaced_rules = NULL;
@@ -2761,6 +2766,7 @@ P4_DeleteGrammar(P4_Grammar* grammar) {
         }
         if (grammar->spaced_rules)
             P4_DeleteExpression(grammar->spaced_rules);
+        kh_destroy(rules, grammar->rules2);
         P4_FREE(grammar->rules);
         P4_FREE(grammar);
     }

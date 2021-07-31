@@ -323,6 +323,21 @@ typedef struct P4_Node P4_Node;
  */
 typedef struct P4_Source P4_Source;
 
+/**
+ * The slice of a string.
+ */
+typedef struct P4_Slice P4_Slice;
+
+/**
+ * The callback for a successful match.
+ */
+typedef P4_Error (*P4_MatchCallback)(P4_Grammar*, P4_Expression*, P4_Node*);
+
+/**
+ * The callback for a failure match.
+ */
+typedef P4_Error (*P4_ErrorCallback)(P4_Grammar*, P4_Expression*);
+
 /*
  *
  * ░██████╗████████╗██████╗░██╗░░░██╗░█████╗░████████╗░██████╗
@@ -369,10 +384,9 @@ typedef struct P4_RuneRange {
 } P4_RuneRange;
 
 /**
- * The slice of a string.
  *
- * P4_Slice does not hold a pointer to the string.
- * It only has the start and stop position of the string.
+ * P4_Slice does not hold the pointer to the string.
+ * It only stores the start and stop position of the string.
  *
  * Example:
  *
@@ -382,12 +396,12 @@ typedef struct P4_RuneRange {
  *      };
  *      printf("%u..%u\n", slice.i, slice.j);
  **/
-typedef struct P4_Slice {
+struct P4_Slice {
     /** The start position of the slice. */
     P4_Position         start;
     /** The stop position of the slice. */
     P4_Position         stop;
-}                       P4_Slice;
+};
 
 struct P4_Node {
     /** the full text. */
@@ -410,17 +424,6 @@ struct P4_Node {
     /** the last child of inner nodes. NULL if not exists. */
     struct P4_Node*        tail;
 };
-
-/**
- * The callback for a successful match.
- */
-typedef P4_Error (*P4_MatchCallback)(P4_Grammar*, P4_Expression*, struct P4_Node*);
-
-/**
- * The callback for a failure match.
- */
-typedef P4_Error (*P4_ErrorCallback)(P4_Grammar*, P4_Expression*);
-
 
 /**
  * The result object that holds either value or errors.

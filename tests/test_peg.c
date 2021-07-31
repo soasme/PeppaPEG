@@ -47,7 +47,7 @@
         TEST_ASSERT_EQUAL_STRING((output), s); \
         free(s); \
     } else { \
-        TEST_ASSERT_EQUAL_STRING((output), source->errmsg); \
+        TEST_ASSERT_EQUAL_STRING((output), P4_GetErrorMessage(source)); \
     } \
     P4_DeleteSource(source); \
     P4_DeleteGrammar(grammar); \

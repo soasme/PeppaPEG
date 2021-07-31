@@ -115,6 +115,64 @@ struct P4_Frame {
     P4_Frame*       next;
 };
 
+struct P4_Source {
+    /** The grammar used to parse the source. */
+    P4_Grammar*     grammar;
+    /** The ID of entry rule in the grammar used to parse the source. */
+    P4_RuleID       rule_id;
+
+    /** The content of the source. */
+    P4_String       content;
+    /** The length of the source. */
+    P4_Slice        slice;
+
+    /**
+     * The position of the consumed input. Min: 0, Max: strlen(content).
+     *
+     * It's possible the pos is less then length of content when the Source
+     * is successfully parsed. It's called a partial parse.
+     *
+     * To avoid that, the rule will need to be wrapped with an EOI and SOI.
+     * An SOI is Positive(Range(1, 0x10ffff))
+     * and An EOI is Negative(Range(1, 0x10ffff)). When the rule is wrapped,
+     * the input is guaranteed to be parsed until all bits are consumed.
+     * */
+    size_t          pos;
+    /**
+     * The line number of the unconsumed input. Min: 1, Max: countlines(content).
+     */
+    size_t          lineno;
+    /**
+     * The bytes offset of the line in the unconsumed input.
+     */
+    size_t          offset;
+
+    /** The error code of the parse. */
+    P4_Error        err;
+    /** The error message of the parse. */
+    char            errmsg[120];
+
+    /** The root of abstract syntax tree. */
+    P4_Node*        root;
+
+    /** Reserved: whether to enable DEBUG logs. */
+    bool            verbose;
+
+    /** The flag for checking if the parse is matching SPACED rules.
+     *
+     * Since we're wrapping SPACED rules into a repetition rule internally,
+     * it's important to prevent matching SPACED rules in P4_MatchRepeat.
+     *
+     * XXX: Maybe there are some better ways to prevent that?
+     */
+    bool            whitespacing;
+
+    /** The top frame in the stack. */
+    P4_Frame*       frame_stack;
+    /** The size of frame stack. */
+    size_t          frame_stack_size;
+};
+
 /** It indicates the function or type is for public use. */
 # define P4_PUBLIC
 

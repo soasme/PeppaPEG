@@ -104,6 +104,17 @@ struct P4_Expression {
     };
 };
 
+struct P4_Frame {
+    /** The current matching expression for the frame. */
+    P4_Expression*  expr;
+    /** Whether spacing is applicable to frame & frame dependents. */
+    bool            space;
+    /** Whether silencing is applicable to frame & frame dependents. */
+    bool            silent;
+    /** The next frame in the stack. */
+    P4_Frame*       next;
+};
+
 /** It indicates the function or type is for public use. */
 # define P4_PUBLIC
 

@@ -308,6 +308,10 @@ typedef struct P4_Grammar P4_Grammar;
  */
 typedef struct P4_Expression P4_Expression;
 
+/**
+ * The stack frame.
+ */
+typedef struct P4_Frame P4_Frame;
 
 /*
  *
@@ -374,23 +378,6 @@ typedef struct P4_Slice {
     /** The stop position of the slice. */
     P4_Position         stop;
 }                       P4_Slice;
-
-/**
- * The stack frame.
- *
- * This data structure is used by Peppa PEG internally.
- * You generally would not use it.
- */
-typedef struct P4_Frame {
-    /** The current matching expression for the frame. */
-    P4_Expression*          expr;
-    /** Whether spacing is applicable to frame & frame dependents. */
-    bool                    space;
-    /** Whether silencing is applicable to frame & frame dependents. */
-    bool                    silent;
-    /** The next frame in the stack. */
-    struct P4_Frame*        next;
-} P4_Frame;
 
 /**
  * The source.
@@ -1867,7 +1854,7 @@ P4_Error P4_LoadGrammarResult(P4_String rules, P4_Result* result);
  *      P4_Source* source = P4_CreateSource("11", 1);
  *      P4_Parse(grammar, source);
  */
-P4_Grammar*    P4_LoadGrammar(P4_String rules);
+P4_Grammar*     P4_LoadGrammar(P4_String rules);
 
 /**
  * @brief       Get the rule id.
@@ -1878,7 +1865,7 @@ P4_Grammar*    P4_LoadGrammar(P4_String rules);
  *
  *      P4_RuleID id = P4_GetRuleID(expr);
  */
-P4_RuleID P4_GetRuleID(P4_Expression*);
+P4_RuleID       P4_GetRuleID(P4_Expression*);
 
 #ifdef __cplusplus
 }

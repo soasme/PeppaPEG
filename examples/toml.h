@@ -40,8 +40,122 @@ extern "C"
 #include <stdlib.h>
 #include "../peppapeg.h"
 
+typedef struct P4_TomlDateTime P4_TomlDateTime;
+typedef struct P4_TomlArray P4_TomlArray;
+typedef struct P4_TomlTable P4_TomlTable;
+typedef struct P4_TomlKeyVal P4_TomlKeyVal;
+typedef struct P4_TomlValue P4_TomlValue;
+typedef enum {
+    P4_TomlRuleEntry = 1,
+    P4_TomlRuleExpression,
+    P4_TomlRuleKeyVal,
+    P4_TomlRuleKeyValSep,
+    P4_TomlRuleKey,
+    P4_TomlRuleSimpleKey,
+    P4_TomlRuleUnquotedKey,
+    P4_TomlRuleQuotedKey,
+    P4_TomlRuleDottedKey,
+    P4_TomlRuleDotSep,
+    P4_TomlRuleVal,
+    P4_TomlRuleString,
+    P4_TomlRuleBasicString,
+    P4_TomlRuleBasicChar,
+    P4_TomlRuleBasicUnescaped,
+    P4_TomlRuleEscaped,
+    P4_TomlRuleMlBasicString,
+    P4_TomlRuleMlBasicBody,
+    P4_TomlRuleMlbContent,
+    P4_TomlRuleMlbChar,
+    P4_TomlRuleMlbQuotes,
+    P4_TomlRuleMlbUnescaped,
+    P4_TomlRuleMlbEscapedNl,
+    P4_TomlRuleLiteralString,
+    P4_TomlRuleLiteralChar,
+    P4_TomlRuleMlLiteralString,
+    P4_TomlRuleMlLiteralBody,
+    P4_TomlRuleMllContent,
+    P4_TomlRuleMllChar,
+    P4_TomlRuleMllQuotes,
+    P4_TomlRuleBoolean,
+    P4_TomlRuleMinus,
+    P4_TomlRulePlus,
+    P4_TomlRuleUnderscore,
+    P4_TomlRuleOneNine,
+    P4_TomlRuleZeroSeven,
+    P4_TomlRuleZeroOne,
+    P4_TomlRuleHexPrefix,
+    P4_TomlRuleOctPrefix,
+    P4_TomlRuleBinPrefix,
+    P4_TomlRuleDecInt,
+    P4_TomlRuleUnsignedDecInt,
+    P4_TomlRuleHexInt,
+    P4_TomlRuleOctInt,
+    P4_TomlRuleBinInt,
+    P4_TomlRuleInteger,
+    P4_TomlRuleFloat,
+    P4_TomlRuleZeroPrefixedInt,
+    P4_TomlRuleFrac,
+    P4_TomlRuleExp,
+    P4_TomlRuleSpecialFloat,
+    P4_TomlRuleInf,
+    P4_TomlRuleNan,
+    P4_TomlRuleDateFullYear,
+    P4_TomlRuleDateMonth,
+    P4_TomlRuleDateMday,
+    P4_TomlRuleTimeDelim,
+    P4_TomlRuleTimeHour,
+    P4_TomlRuleTimeMinute,
+    P4_TomlRuleTimeSecond,
+    P4_TomlRuleTimeSecFrac,
+    P4_TomlRuleTimeNumOffset,
+    P4_TomlRuleTimeOffset,
+    P4_TomlRulePartialTime,
+    P4_TomlRuleFullDate,
+    P4_TomlRuleFullTime,
+    P4_TomlRuleOffsetDateTime,
+    P4_TomlRuleLocalDateTime,
+    P4_TomlRuleLocalDate,
+    P4_TomlRuleDateTime,
+    P4_TomlRuleArray,
+    P4_TomlRuleArrayValues,
+    P4_TomlRuleArrayOpen,
+    P4_TomlRuleArrayClose,
+    P4_TomlRuleArraySep,
+    P4_TomlRuleArrayWs,
+    P4_TomlRuleInlineTable,
+    P4_TomlRuleInlineTableValues,
+    P4_TomlRuleInlineTableOpen,
+    P4_TomlRuleInlineTableClose,
+    P4_TomlRuleInlineTableSep,
+    P4_TomlRuleTable,
+    P4_TomlRuleStdTable,
+    P4_TomlRuleStdTableOpen,
+    P4_TomlRuleStdTableClose,
+    P4_TomlRuleArrayTable,
+    P4_TomlRuleArrayTableOpen,
+    P4_TomlRuleArrayTableClose,
+    P4_TomlRuleComment,
+    P4_TomlRuleCommentStart,
+    P4_TomlRuleCommentBody,
+    P4_TomlRuleNonEol,
+    P4_TomlRuleNonAscii,
+    P4_TomlRuleNewline,
+    P4_TomlRuleWs,
+    P4_TomlRuleWsChar,
+    P4_TomlRuleAlpha,
+    P4_TomlRuleDigit,
+    P4_TomlRuleHexdig,
+} P4_TomlRule;
+
+void P4_FreeTomlUserData(void* p) {
+}
+
+P4_Error P4_OnMatchTomlNode(P4_Grammar* grammar, P4_Expression* expr, P4_Node* node) {
+    return P4_Ok;
+}
+
 P4_Grammar*  P4_CreateTomlGrammar() {
-    return P4_LoadGrammar(
+    P4_Grammar* grammar = P4_LoadGrammar(
 
         "toml = expression (newline expression)*;\n"
         "@lifted expression = ws (keyval / table)? ws comment?;\n"
@@ -186,13 +300,13 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         "DIGIT = [0-9];\n"
         "HEXDIG = [a-f] / [A-F] / [0-9];\n"
     );
+
+    P4_SetUserDataFreeFunc(grammar, P4_FreeTomlUserData);
+    P4_SetGrammarCallback(grammar, P4_OnMatchTomlNode, NULL);
+
+    return grammar;
 }
 
-typedef struct P4_TomlDateTime P4_TomlDateTime;
-typedef struct P4_TomlArray P4_TomlArray;
-typedef struct P4_TomlTable P4_TomlTable;
-typedef struct P4_TomlKeyVal P4_TomlKeyVal;
-typedef struct P4_TomlValue P4_TomlValue;
 
 struct P4_TomlDateTime {
     int *year, *month, *day;

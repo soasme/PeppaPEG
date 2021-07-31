@@ -33,6 +33,27 @@
 
 #include "peppapeg.h"
 
+struct P4_Grammar {
+    /** The rules, e.g. the expressions with IDs. */
+    struct P4_Expression**  rules;
+    /** The total number of rules. */
+    size_t                  count;
+    /** The maximum number of rules. */
+    int                     cap;
+    /** The total number of spaced rules. */
+    size_t                  spaced_count;
+    /** The repetition rule for spaced rules. */
+    struct P4_Expression*   spaced_rules;
+    /** The recursion limit, or maximum allowed nested rules. */
+    size_t                  depth;
+    /** The callback after a match for an expression is successful. */
+    P4_MatchCallback        on_match;
+    /** The callback after a match for an expression is failed. */
+    P4_ErrorCallback        on_error;
+    /** The callback to free user data. */
+    P4_UserDataFreeFunc     free_func;
+};
+
 /** It indicates the function or type is for public use. */
 # define P4_PUBLIC
 

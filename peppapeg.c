@@ -33,6 +33,146 @@
 
 #include "peppapeg.h"
 
+struct P4_Grammar {
+    /** The rules, e.g. the expressions with IDs. */
+    struct P4_Expression**  rules;
+    /** The total number of rules. */
+    size_t                  count;
+    /** The maximum number of rules. */
+    int                     cap;
+    /** The total number of spaced rules. */
+    size_t                  spaced_count;
+    /** The repetition rule for spaced rules. */
+    struct P4_Expression*   spaced_rules;
+    /** The recursion limit, or maximum allowed nested rules. */
+    size_t                  depth;
+    /** The callback after a match for an expression is successful. */
+    P4_MatchCallback        on_match;
+    /** The callback after a match for an expression is failed. */
+    P4_ErrorCallback        on_error;
+    /** The callback to free user data. */
+    P4_UserDataFreeFunc     free_func;
+};
+
+struct P4_Expression {
+    /* The name of expression. */
+    P4_String               name;
+    /** The id of expression. */
+    P4_RuleID               id;
+    /** The kind of expression. */
+    P4_ExpressionKind       kind;
+    /** The flag of expression. */
+    P4_ExpressionFlag       flag;
+
+    union {
+        /** Used by P4_Numeric. */
+        size_t                      num;
+
+        /** Used by P4_Literal and P4_BackReference. */
+        struct {
+            P4_String               literal;
+            bool                    sensitive;
+            size_t                  backref_index;
+        };
+
+        /** Used by P4_Reference..P4_Negative. */
+        struct {
+            P4_String               reference;
+            P4_RuleID               ref_id;
+            P4_Expression*          ref_expr;
+        };
+
+        /** Used by P4_Range. */
+        struct {
+            size_t                  ranges_count;
+            struct P4_RuneRange*    ranges;
+        };
+
+        /** Used by P4_Sequence..P4_Choice. */
+        struct {
+            P4_Expression**  members;
+            size_t                  count;
+        };
+
+        /** Used by P4_ZeroOrOnce..P4_RepeatExact.
+         * repeat the expr for n times, n >= min and n <= max. */
+        struct {
+            P4_Expression*   repeat_expr; /* maybe we can merge it with ref_expr? */
+            size_t                  repeat_min;
+            size_t                  repeat_max;
+        };
+    };
+};
+
+struct P4_Frame {
+    /** The current matching expression for the frame. */
+    P4_Expression*  expr;
+    /** Whether spacing is applicable to frame & frame dependents. */
+    bool            space;
+    /** Whether silencing is applicable to frame & frame dependents. */
+    bool            silent;
+    /** The next frame in the stack. */
+    P4_Frame*       next;
+};
+
+struct P4_Source {
+    /** The grammar used to parse the source. */
+    P4_Grammar*     grammar;
+    /** The ID of entry rule in the grammar used to parse the source. */
+    P4_RuleID       rule_id;
+
+    /** The content of the source. */
+    P4_String       content;
+    /** The length of the source. */
+    P4_Slice        slice;
+
+    /**
+     * The position of the consumed input. Min: 0, Max: strlen(content).
+     *
+     * It's possible the pos is less then length of content when the Source
+     * is successfully parsed. It's called a partial parse.
+     *
+     * To avoid that, the rule will need to be wrapped with an EOI and SOI.
+     * An SOI is Positive(Range(1, 0x10ffff))
+     * and An EOI is Negative(Range(1, 0x10ffff)). When the rule is wrapped,
+     * the input is guaranteed to be parsed until all bits are consumed.
+     * */
+    size_t          pos;
+    /**
+     * The line number of the unconsumed input. Min: 1, Max: countlines(content).
+     */
+    size_t          lineno;
+    /**
+     * The bytes offset of the line in the unconsumed input.
+     */
+    size_t          offset;
+
+    /** The error code of the parse. */
+    P4_Error        err;
+    /** The error message of the parse. */
+    char            errmsg[120];
+
+    /** The root of abstract syntax tree. */
+    P4_Node*        root;
+
+    /** Reserved: whether to enable DEBUG logs. */
+    bool            verbose;
+
+    /** The flag for checking if the parse is matching SPACED rules.
+     *
+     * Since we're wrapping SPACED rules into a repetition rule internally,
+     * it's important to prevent matching SPACED rules in P4_MatchRepeat.
+     *
+     * XXX: Maybe there are some better ways to prevent that?
+     */
+    bool            whitespacing;
+
+    /** The top frame in the stack. */
+    P4_Frame*       frame_stack;
+    /** The size of frame stack. */
+    size_t          frame_stack_size;
+};
+
 /** It indicates the function or type is for public use. */
 # define P4_PUBLIC
 
@@ -4262,4 +4402,9 @@ P4_LoadGrammar(P4_String rules) {
     }
 
     return result->grammar;
+}
+
+P4_PUBLIC P4_RuleID
+P4_GetRuleID(P4_Expression* expr) {
+    return expr->id;
 }

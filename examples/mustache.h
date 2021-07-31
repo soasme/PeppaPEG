@@ -68,7 +68,7 @@ typedef enum {
 
 P4_Error P4_MustacheCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
     if (rule
-            && rule->id == P4_MustacheTag
+            && P4_GetRuleID(rule) == P4_MustacheTag
             && node
             && node->head
             && node->head->next
@@ -100,8 +100,8 @@ P4_Error P4_MustacheCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* 
         if ((err = P4_ReplaceGrammarRule(grammar, P4_MustacheCloser, closer_expr)) != P4_Ok)
             goto finalize_set_delimiter;
 
-        node->head->rule_id = opener_expr->id;
-        node->tail->rule_id = closer_expr->id;
+        node->head->rule_id = P4_GetRuleID(opener_expr);
+        node->tail->rule_id = P4_GetRuleID(closer_expr);
 
         free(opener);
         free(closer);

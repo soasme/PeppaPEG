@@ -298,6 +298,45 @@ typedef void*   P4_UserData;
  */
 typedef void    (*P4_UserDataFreeFunc)(P4_UserData);
 
+/**
+ * The grammar object that holds all grammar rules.
+ */
+typedef struct P4_Grammar P4_Grammar;
+
+/**
+ * The grammar rule expression.
+ */
+typedef struct P4_Expression P4_Expression;
+
+/**
+ * The stack frame.
+ */
+typedef struct P4_Frame P4_Frame;
+
+/**
+ * The node object of abstract syntax tree.
+ */
+typedef struct P4_Node P4_Node;
+
+/**
+ * The source object that holds text to parse.
+ */
+typedef struct P4_Source P4_Source;
+
+/**
+ * The slice of a string.
+ */
+typedef struct P4_Slice P4_Slice;
+
+/**
+ * The callback for a successful match.
+ */
+typedef P4_Error (*P4_MatchCallback)(P4_Grammar*, P4_Expression*, P4_Node*);
+
+/**
+ * The callback for a failure match.
+ */
+typedef P4_Error (*P4_ErrorCallback)(P4_Grammar*, P4_Expression*);
 
 /*
  *
@@ -345,10 +384,9 @@ typedef struct P4_RuneRange {
 } P4_RuneRange;
 
 /**
- * The slice of a string.
  *
- * P4_Slice does not hold a pointer to the string.
- * It only has the start and stop position of the string.
+ * P4_Slice does not hold the pointer to the string.
+ * It only stores the start and stop position of the string.
  *
  * Example:
  *
@@ -358,148 +396,14 @@ typedef struct P4_RuneRange {
  *      };
  *      printf("%u..%u\n", slice.i, slice.j);
  **/
-typedef struct P4_Slice {
+struct P4_Slice {
     /** The start position of the slice. */
     P4_Position         start;
     /** The stop position of the slice. */
     P4_Position         stop;
-}                       P4_Slice;
+};
 
-/**
- * The stack frame.
- *
- * This data structure is used by Peppa PEG internally.
- * You generally would not use it.
- */
-typedef struct P4_Frame {
-    /** The current matching expression for the frame. */
-    struct P4_Expression*   expr;
-    /** Whether spacing is applicable to frame & frame dependents. */
-    bool                    space;
-    /** Whether silencing is applicable to frame & frame dependents. */
-    bool                    silent;
-    /** The next frame in the stack. */
-    struct P4_Frame*        next;
-} P4_Frame;
-
-/**
- * The source.
- */
-typedef struct P4_Source {
-    /** The grammar used to parse the source. */
-    struct P4_Grammar*      grammar;
-    /** The ID of entry rule in the grammar used to parse the source. */
-    P4_RuleID               rule_id;
-
-    /** The content of the source. */
-    P4_String               content;
-    /** The length of the source. */
-    P4_Slice                slice;
-
-    /**
-     * The position of the consumed input. Min: 0, Max: strlen(content).
-     *
-     * It's possible the pos is less then length of content when the Source
-     * is successfully parsed. It's called a partial parse.
-     *
-     * To avoid that, the rule will need to be wrapped with an EOI and SOI.
-     * An SOI is Positive(Range(1, 0x10ffff))
-     * and An EOI is Negative(Range(1, 0x10ffff)). When the rule is wrapped,
-     * the input is guaranteed to be parsed until all bits are consumed.
-     * */
-    size_t                  pos;
-    /**
-     * The line number of the unconsumed input. Min: 1, Max: countlines(content).
-     */
-    size_t                  lineno;
-    /**
-     * The bytes offset of the line in the unconsumed input.
-     */
-    size_t                  offset;
-
-    /** The error code of the parse. */
-    P4_Error                err;
-    /** The error message of the parse. */
-    char                    errmsg[120];
-
-    /** The root of abstract syntax tree. */
-    struct P4_Node*        root;
-
-    /** Reserved: whether to enable DEBUG logs. */
-    bool                    verbose;
-
-    /** The flag for checking if the parse is matching SPACED rules.
-     *
-     * Since we're wrapping SPACED rules into a repetition rule internally,
-     * it's important to prevent matching SPACED rules in P4_MatchRepeat.
-     *
-     * XXX: Maybe there are some better ways to prevent that?
-     */
-    bool                    whitespacing;
-
-    /** The top frame in the stack. */
-    struct P4_Frame*        frame_stack;
-    /** The size of frame stack. */
-    size_t                  frame_stack_size;
-} P4_Source;
-
-/**
- * The grammar rule.
- */
-typedef struct P4_Expression {
-    /* The name of expression. */
-    P4_String               name;
-    /** The id of expression. */
-    P4_RuleID               id;
-    /** The kind of expression. */
-    P4_ExpressionKind       kind;
-    /** The flag of expression. */
-    P4_ExpressionFlag       flag;
-
-    union {
-        /** Used by P4_Numeric. */
-        size_t                      num;
-
-        /** Used by P4_Literal and P4_BackReference. */
-        struct {
-            P4_String               literal;
-            bool                    sensitive;
-            size_t                  backref_index;
-        };
-
-        /** Used by P4_Reference..P4_Negative. */
-        struct {
-            P4_String               reference;
-            P4_RuleID               ref_id;
-            struct P4_Expression*   ref_expr;
-        };
-
-        /** Used by P4_Range. */
-        struct {
-            size_t                  ranges_count;
-            struct P4_RuneRange*    ranges;
-        };
-
-        /** Used by P4_Sequence..P4_Choice. */
-        struct {
-            struct P4_Expression**  members;
-            size_t                  count;
-        };
-
-        /** Used by P4_ZeroOrOnce..P4_RepeatExact.
-         * repeat the expr for n times, n >= min and n <= max. */
-        struct {
-            struct P4_Expression*   repeat_expr; /* maybe we can merge it with ref_expr? */
-            size_t                  repeat_min;
-            size_t                  repeat_max;
-        };
-    };
-} P4_Expression;
-
-/**
- * The node object of abstract syntax tree.
- */
-typedef struct P4_Node {
+struct P4_Node {
     /** the full text. */
     P4_String               text;
     /** The matched substring.
@@ -519,41 +423,7 @@ typedef struct P4_Node {
     struct P4_Node*        head;
     /** the last child of inner nodes. NULL if not exists. */
     struct P4_Node*        tail;
-} P4_Node;
-
-/**
- * The callback for a successful match.
- */
-typedef P4_Error (*P4_MatchCallback)(struct P4_Grammar*, struct P4_Expression*, struct P4_Node*);
-
-/**
- * The callback for a failure match.
- */
-typedef P4_Error (*P4_ErrorCallback)(struct P4_Grammar*, struct P4_Expression*);
-
-/**
- * The grammar object that holds all grammar rules.
- */
-typedef struct P4_Grammar{
-    /** The rules, e.g. the expressions with IDs. */
-    struct P4_Expression**  rules;
-    /** The total number of rules. */
-    size_t                  count;
-    /** The maximum number of rules. */
-    int                     cap;
-    /** The total number of spaced rules. */
-    size_t                  spaced_count;
-    /** The repetition rule for spaced rules. */
-    struct P4_Expression*   spaced_rules;
-    /** The recursion limit, or maximum allowed nested rules. */
-    size_t                  depth;
-    /** The callback after a match for an expression is successful. */
-    P4_MatchCallback        on_match;
-    /** The callback after a match for an expression is failed. */
-    P4_ErrorCallback        on_error;
-    /** The callback to free user data. */
-    P4_UserDataFreeFunc     free_func;
-} P4_Grammar;
+};
 
 /**
  * The result object that holds either value or errors.
@@ -625,15 +495,6 @@ size_t         P4_ReadEscapedRune(char* text, P4_Rune* rune);
  */
 void*          P4_ConcatRune(void* str, P4_Rune chr, size_t n);
 
-/*
- * ██╗░░░░░██╗████████╗███████╗██████╗░░█████╗░██╗░░░░░
- * ██║░░░░░██║╚══██╔══╝██╔════╝██╔══██╗██╔══██╗██║░░░░░
- * ██║░░░░░██║░░░██║░░░█████╗░░██████╔╝███████║██║░░░░░
- * ██║░░░░░██║░░░██║░░░██╔══╝░░██╔══██╗██╔══██║██║░░░░░
- * ███████╗██║░░░██║░░░███████╗██║░░██║██║░░██║███████╗
- * ╚══════╝╚═╝░░░╚═╝░░░╚══════╝╚═╝░░╚═╝╚═╝░░╚═╝╚══════╝
- */
-
 /**
  * Create a P4_Literal expression.
  *
@@ -669,15 +530,6 @@ P4_Expression* P4_CreateLiteral(const P4_String, bool sensitive);
  *      P4_AddLiteral(grammar, 1, "let", true);
  */
 P4_Error       P4_AddLiteral(P4_Grammar*, P4_RuleID, const P4_String, bool sensitive);
-
-/*
- * ██████╗░░█████╗░███╗░░██╗░██████╗░███████╗
- * ██╔══██╗██╔══██╗████╗░██║██╔════╝░██╔════╝
- * ██████╔╝███████║██╔██╗██║██║░░██╗░█████╗░░
- * ██╔══██╗██╔══██║██║╚████║██║░░╚██╗██╔══╝░░
- * ██║░░██║██║░░██║██║░╚███║╚██████╔╝███████╗
- * ╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░╚══╝░╚═════╝░╚══════╝
- */
 
 /**
  * Create a P4_Range expression.
@@ -752,15 +604,6 @@ P4_Error       P4_AddRange(P4_Grammar*, P4_RuleID, P4_Rune, P4_Rune, size_t);
  */
 P4_Error       P4_AddRanges(P4_Grammar*, P4_RuleID, size_t count, P4_RuneRange* ranges);
 
-/*
- * ██████╗░███████╗███████╗███████╗██████╗░███████╗███╗░░██╗░█████╗░███████╗
- * ██╔══██╗██╔════╝██╔════╝██╔════╝██╔══██╗██╔════╝████╗░██║██╔══██╗██╔════╝
- * ██████╔╝█████╗░░█████╗░░█████╗░░██████╔╝█████╗░░██╔██╗██║██║░░╚═╝█████╗░░
- * ██╔══██╗██╔══╝░░██╔══╝░░██╔══╝░░██╔══██╗██╔══╝░░██║╚████║██║░░██╗██╔══╝░░
- * ██║░░██║███████╗██║░░░░░███████╗██║░░██║███████╗██║░╚███║╚█████╔╝███████╗
- * ╚═╝░░╚═╝╚══════╝╚═╝░░░░░╚══════╝╚═╝░░╚═╝╚══════╝╚═╝░░╚══╝░╚════╝░╚══════╝
- */
-
 /**
  * Create a P4_Reference expression.
  *
@@ -788,15 +631,6 @@ P4_Expression* P4_CreateReference(P4_RuleID);
  *      P4_AddReference(grammar, 1, 2);
  */
 P4_Error       P4_AddReference(P4_Grammar*, P4_RuleID, P4_RuleID);
-
-/*
- * ██████╗░░█████╗░░██████╗██╗████████╗██╗██╗░░░██╗███████╗
- * ██╔══██╗██╔══██╗██╔════╝██║╚══██╔══╝██║██║░░░██║██╔════╝
- * ██████╔╝██║░░██║╚█████╗░██║░░░██║░░░██║╚██╗░██╔╝█████╗░░
- * ██╔═══╝░██║░░██║░╚═══██╗██║░░░██║░░░██║░╚████╔╝░██╔══╝░░
- * ██║░░░░░╚█████╔╝██████╔╝██║░░░██║░░░██║░░╚██╔╝░░███████╗
- * ╚═╝░░░░░░╚════╝░╚═════╝░╚═╝░░░╚═╝░░░╚═╝░░░╚═╝░░░╚══════╝
- */
 
 /**
  * Create a P4_Positive expression.
@@ -827,15 +661,6 @@ P4_Expression* P4_CreatePositive(P4_Expression*);
  */
 P4_Error       P4_AddPositive(P4_Grammar*, P4_RuleID, P4_Expression*);
 
-/*
- * ███╗░░██╗███████╗░██████╗░░█████╗░████████╗██╗██╗░░░██╗███████╗
- * ████╗░██║██╔════╝██╔════╝░██╔══██╗╚══██╔══╝██║██║░░░██║██╔════╝
- * ██╔██╗██║█████╗░░██║░░██╗░███████║░░░██║░░░██║╚██╗░██╔╝█████╗░░
- * ██║╚████║██╔══╝░░██║░░╚██╗██╔══██║░░░██║░░░██║░╚████╔╝░██╔══╝░░
- * ██║░╚███║███████╗╚██████╔╝██║░░██║░░░██║░░░██║░░╚██╔╝░░███████╗
- * ╚═╝░░╚══╝╚══════╝░╚═════╝░╚═╝░░╚═╝░░░╚═╝░░░╚═╝░░░╚═╝░░░╚══════╝
- */
-
 /**
  * Create a P4_Negative expression.
  *
@@ -863,15 +688,6 @@ P4_Expression* P4_CreateNegative(P4_Expression*);
  *      P4_AddNegative(grammar, 1, P4_CreateLiteral("let", true));
  */
 P4_Error       P4_AddNegative(P4_Grammar*, P4_RuleID, P4_Expression*);
-
-/*
- * ░██████╗███████╗░██████╗░██╗░░░██╗███████╗███╗░░██╗░█████╗░███████╗
- * ██╔════╝██╔════╝██╔═══██╗██║░░░██║██╔════╝████╗░██║██╔══██╗██╔════╝
- * ╚█████╗░█████╗░░██║██╗██║██║░░░██║█████╗░░██╔██╗██║██║░░╚═╝█████╗░░
- * ░╚═══██╗██╔══╝░░╚██████╔╝██║░░░██║██╔══╝░░██║╚████║██║░░██╗██╔══╝░░
- * ██████╔╝███████╗░╚═██╔═╝░╚██████╔╝███████╗██║░╚███║╚█████╔╝███████╗
- * ╚═════╝░╚══════╝░░░╚═╝░░░░╚═════╝░╚══════╝╚═╝░░╚══╝░╚════╝░╚══════╝
- */
 
 /**
  * Create a P4_Sequence expression.
@@ -948,15 +764,6 @@ P4_Error       P4_AddSequence(P4_Grammar*, P4_RuleID, size_t);
  */
 P4_Error       P4_AddSequenceWithMembers(P4_Grammar*, P4_RuleID, size_t, ...);
 
-/*
- * ░█████╗░██╗░░██╗░█████╗░██╗░█████╗░███████╗
- * ██╔══██╗██║░░██║██╔══██╗██║██╔══██╗██╔════╝
- * ██║░░╚═╝███████║██║░░██║██║██║░░╚═╝█████╗░░
- * ██║░░██╗██╔══██║██║░░██║██║██║░░██╗██╔══╝░░
- * ╚█████╔╝██║░░██║╚█████╔╝██║╚█████╔╝███████╗
- * ░╚════╝░╚═╝░░╚═╝░╚════╝░╚═╝░╚════╝░╚══════╝
- */
-
 /**
  * Create a P4_Choice expression.
  *
@@ -1032,15 +839,6 @@ P4_Error       P4_AddChoice(P4_Grammar*, P4_RuleID, size_t);
  */
 P4_Error       P4_AddChoiceWithMembers(P4_Grammar*, P4_RuleID, size_t, ...);
 
-/*
- * ██████╗░███████╗██████╗░███████╗░█████╗░████████╗
- * ██╔══██╗██╔════╝██╔══██╗██╔════╝██╔══██╗╚══██╔══╝
- * ██████╔╝█████╗░░██████╔╝█████╗░░███████║░░░██║░░░
- * ██╔══██╗██╔══╝░░██╔═══╝░██╔══╝░░██╔══██║░░░██║░░░
- * ██║░░██║███████╗██║░░░░░███████╗██║░░██║░░░██║░░░ █▀ █▀▄▀█ █ █▄░█ ░ █▀▄▀█ ▄▀█ ▀▄▀ ▀█
- * ╚═╝░░╚═╝╚══════╝╚═╝░░░░░╚══════╝╚═╝░░╚═╝░░░╚═╝░░░ █▄ █░▀░█ █ █░▀█ █ █░▀░█ █▀█ █░█ ▄█
- */
-
 /**
  * Create a P4_Repeat expression minimal min times and maximal max times.
  *
@@ -1079,15 +877,6 @@ P4_Expression* P4_CreateRepeatMinMax(P4_Expression*, size_t, size_t);
  */
 P4_Error       P4_AddRepeatMinMax(P4_Grammar*, P4_RuleID, P4_Expression*, size_t, size_t);
 
-/*
- * ██████╗░███████╗██████╗░███████╗░█████╗░████████╗
- * ██╔══██╗██╔════╝██╔══██╗██╔════╝██╔══██╗╚══██╔══╝
- * ██████╔╝█████╗░░██████╔╝█████╗░░███████║░░░██║░░░
- * ██╔══██╗██╔══╝░░██╔═══╝░██╔══╝░░██╔══██║░░░██║░░░
- * ██║░░██║███████╗██║░░░░░███████╗██║░░██║░░░██║░░░ █▀ █▀▄▀█ █ █▄░█ ░ ▀█
- * ╚═╝░░╚═╝╚══════╝╚═╝░░░░░╚══════╝╚═╝░░╚═╝░░░╚═╝░░░ █▄ █░▀░█ █ █░▀█ █ ▄█
- */
-
 /**
  * Create a P4_Repeat expression minimal min times and maximal SIZE_MAX times.
  *
@@ -1121,15 +910,6 @@ P4_Expression* P4_CreateRepeatMin(P4_Expression*, size_t);
  */
 P4_Error       P4_AddRepeatMin(P4_Grammar*, P4_RuleID, P4_Expression*, size_t);
 
-/*
- * ██████╗░███████╗██████╗░███████╗░█████╗░████████╗
- * ██╔══██╗██╔════╝██╔══██╗██╔════╝██╔══██╗╚══██╔══╝
- * ██████╔╝█████╗░░██████╔╝█████╗░░███████║░░░██║░░░
- * ██╔══██╗██╔══╝░░██╔═══╝░██╔══╝░░██╔══██║░░░██║░░░
- * ██║░░██║███████╗██║░░░░░███████╗██║░░██║░░░██║░░░ █▀ ░ █▀▄▀█ ▄▀█ ▀▄▀ ▀█
- * ╚═╝░░╚═╝╚══════╝╚═╝░░░░░╚══════╝╚═╝░░╚═╝░░░╚═╝░░░ █▄ █ █░▀░█ █▀█ █░█ ▄█
- */
-
 /**
  * Create a P4_Repeat expression maximal max times.
  *
@@ -1162,15 +942,6 @@ P4_Expression* P4_CreateRepeatMax(P4_Expression*, size_t);
  *      P4_AddRepeatMax(grammar, 1, P4_CreateLiteral("a", true), 3);
  */
 P4_Error       P4_AddRepeatMax(P4_Grammar*, P4_RuleID, P4_Expression*, size_t);
-
-/*
- * ██████╗░███████╗██████╗░███████╗░█████╗░████████╗
- * ██╔══██╗██╔════╝██╔══██╗██╔════╝██╔══██╗╚══██╔══╝
- * ██████╔╝█████╗░░██████╔╝█████╗░░███████║░░░██║░░░
- * ██╔══██╗██╔══╝░░██╔═══╝░██╔══╝░░██╔══██║░░░██║░░░
- * ██║░░██║███████╗██║░░░░░███████╗██║░░██║░░░██║░░░ █▀ █▄░█ ▀█
- * ╚═╝░░╚═╝╚══════╝╚═╝░░░░░╚══════╝╚═╝░░╚═╝░░░╚═╝░░░ █▄ █░▀█ ▄█
- */
 
 /**
  * Create a P4_Repeat expression exact N times.
@@ -1206,15 +977,6 @@ P4_Expression* P4_CreateRepeatExact(P4_Expression*, size_t);
  */
 P4_Error       P4_AddRepeatExact(P4_Grammar*, P4_RuleID, P4_Expression*, size_t);
 
-/*
- * ██████╗░███████╗██████╗░███████╗░█████╗░████████╗░█████╗░
- * ██╔══██╗██╔════╝██╔══██╗██╔════╝██╔══██╗╚══██╔══╝██╔══██╗
- * ██████╔╝█████╗░░██████╔╝█████╗░░███████║░░░██║░░░╚═╝███╔╝
- * ██╔══██╗██╔══╝░░██╔═══╝░██╔══╝░░██╔══██║░░░██║░░░░░░╚══╝░
- * ██║░░██║███████╗██║░░░░░███████╗██║░░██║░░░██║░░░░░░██╗░░
- * ╚═╝░░╚═╝╚══════╝╚═╝░░░░░╚══════╝╚═╝░░╚═╝░░░╚═╝░░░░░░╚═╝░░
- */
-
 /**
  * Create a P4_Repeat expression zero or once.
  *
@@ -1249,15 +1011,6 @@ P4_Expression* P4_CreateZeroOrOnce(P4_Expression*);
  */
 P4_Error       P4_AddZeroOrOnce(P4_Grammar*, P4_RuleID, P4_Expression*);
 
-/*
- * ██████╗░███████╗██████╗░███████╗░█████╗░████████╗██╗░░██╗
- * ██╔══██╗██╔════╝██╔══██╗██╔════╝██╔══██╗╚══██╔══╝╚██╗██╔╝
- * ██████╔╝█████╗░░██████╔╝█████╗░░███████║░░░██║░░█████████
- * ██╔══██╗██╔══╝░░██╔═══╝░██╔══╝░░██╔══██║░░░██║░░░░██╔██╗░
- * ██║░░██║███████╗██║░░░░░███████╗██║░░██║░░░██║░░░██╔╝╚██╗
- * ╚═╝░░╚═╝╚══════╝╚═╝░░░░░╚══════╝╚═╝░░╚═╝░░░╚═╝░░░╚═╝░░╚═╝
- */
-
 /**
  * Create a P4_Repeat expression zero or more times.
  *
@@ -1290,15 +1043,6 @@ P4_Expression* P4_CreateZeroOrMore(P4_Expression*);
  */
 P4_Error       P4_AddZeroOrMore(P4_Grammar*, P4_RuleID, P4_Expression*);
 
-/*
- * ██████╗░███████╗██████╗░███████╗░█████╗░████████╗░░░░░░░
- * ██╔══██╗██╔════╝██╔══██╗██╔════╝██╔══██╗╚══██╔══╝░░██╗░░
- * ██████╔╝█████╗░░██████╔╝█████╗░░███████║░░░██║░░░██████╗
- * ██╔══██╗██╔══╝░░██╔═══╝░██╔══╝░░██╔══██║░░░██║░░░╚═██╔═╝
- * ██║░░██║███████╗██║░░░░░███████╗██║░░██║░░░██║░░░░░╚═╝░░
- * ╚═╝░░╚═╝╚══════╝╚═╝░░░░░╚══════╝╚═╝░░╚═╝░░░╚═╝░░░░░░░░░░
- */
-
 /**
  * Create a P4_Repeat expression once or more times.
  *
@@ -1330,15 +1074,6 @@ P4_Expression* P4_CreateOnceOrMore(P4_Expression*);
  *      P4_AddOnceOrMore(grammar, 1, P4_CreateLiteral("a", true));
  */
 P4_Error       P4_AddOnceOrMore(P4_Grammar*, P4_RuleID, P4_Expression*);
-
-/*
- * ██████╗░░█████╗░░█████╗░██╗░░██╗██████╗░███████╗███████╗███████╗██████╗░███████╗███╗░░██╗░█████╗░███████╗
- * ██╔══██╗██╔══██╗██╔══██╗██║░██╔╝██╔══██╗██╔════╝██╔════╝██╔════╝██╔══██╗██╔════╝████╗░██║██╔══██╗██╔════╝
- * ██████╦╝███████║██║░░╚═╝█████═╝░██████╔╝█████╗░░█████╗░░█████╗░░██████╔╝█████╗░░██╔██╗██║██║░░╚═╝█████╗░░
- * ██╔══██╗██╔══██║██║░░██╗██╔═██╗░██╔══██╗██╔══╝░░██╔══╝░░██╔══╝░░██╔══██╗██╔══╝░░██║╚████║██║░░██╗██╔══╝░░
- * ██████╦╝██║░░██║╚█████╔╝██║░╚██╗██║░░██║███████╗██║░░░░░███████╗██║░░██║███████╗██║░╚███║╚█████╔╝███████╗
- * ╚═════╝░╚═╝░░╚═╝░╚════╝░╚═╝░░╚═╝╚═╝░░╚═╝╚══════╝╚═╝░░░░░╚══════╝╚═╝░░╚═╝╚══════╝╚═╝░░╚══╝░╚════╝░╚══════╝
- */
 
 /**
  * Create a P4_BackReference expression.
@@ -2068,8 +1803,18 @@ P4_Error P4_LoadGrammarResult(P4_String rules, P4_Result* result);
  *      P4_Source* source = P4_CreateSource("11", 1);
  *      P4_Parse(grammar, source);
  */
-P4_Grammar*    P4_LoadGrammar(P4_String rules);
+P4_Grammar*     P4_LoadGrammar(P4_String rules);
 
+/**
+ * @brief       Get the rule id.
+ * @param       expr    The rule expression.
+ * @return      The rule id.
+ *
+ * Example:
+ *
+ *      P4_RuleID id = P4_GetRuleID(expr);
+ */
+P4_RuleID       P4_GetRuleID(P4_Expression*);
 
 #ifdef __cplusplus
 }

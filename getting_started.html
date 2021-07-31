@@ -203,15 +203,15 @@
 (Count the number of character “P” in <strong>P</strong> e <strong>p</strong> <strong>p</strong> a <strong>P</strong> E G).</p>
 <p>Let’s learn some basic P4 data structures:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="api.html#c.P4_Grammar" title="P4_Grammar"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Grammar</span></code></a>: The grammar object that defines all grammar rules.</p></li>
-<li><p><a class="reference internal" href="api.html#c.P4_Expression" title="P4_Expression"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Expression</span></code></a>: The grammar rule object.</p></li>
-<li><p><a class="reference internal" href="api.html#c.P4_Source" title="P4_Source"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Source</span></code></a>: The content to parse.</p></li>
+<li><p><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Grammar</span></code>: The grammar object that defines all grammar rules.</p></li>
+<li><p><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Expression</span></code>: The grammar rule object.</p></li>
+<li><p><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Source</span></code>: The content to parse.</p></li>
 <li><p><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Node</span></code>. The node of an AST (abstract syntax tree), e.g. the final parsing result of a grammar given the source.</p></li>
 </ul>
 </section>
 <section id="step-1-create-grammar">
 <h2>Step 1: Create Grammar<a class="headerlink" href="#step-1-create-grammar" title="Permalink to this headline">¶</a></h2>
-<p>In Peppa PEG, we always start with creating a <a class="reference internal" href="api.html#c.P4_Grammar" title="P4_Grammar"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Grammar</span></code></a>. We create such a data structure using <a class="reference internal" href="api.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a>.</p>
+<p>In Peppa PEG, we always start with creating a <code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Grammar</span></code>. We create such a data structure using <a class="reference internal" href="api.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_LoadGrammar</span><span class="p">(</span><span class="s2">"entry = i</span><span class="se">\"</span><span class="s2">hello</span><span class="se">\\</span><span class="s2">nworld</span><span class="se">\"</span><span class="s2">;"</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">grammar</span> <span class="o">==</span> <span class="n">NULL</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">printf</span><span class="p">(</span><span class="s2">"Error: CreateGrammar: Error.</span><span class="se">\n</span><span class="s2">"</span><span class="p">);</span>
@@ -222,7 +222,7 @@
 </section>
 <section id="step-2-create-source">
 <h2>Step 2: Create Source<a class="headerlink" href="#step-2-create-source" title="Permalink to this headline">¶</a></h2>
-<p>We create a <a class="reference internal" href="api.html#c.P4_Source" title="P4_Source"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Source</span></code></a> using <a class="reference internal" href="api.html#c.P4_CreateSource" title="P4_CreateSource"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateSource()</span></code></a>.</p>
+<p>We create a <code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Source</span></code> using <a class="reference internal" href="api.html#c.P4_CreateSource" title="P4_CreateSource"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateSource()</span></code></a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># define ENTRY 1</span>
     <span class="n">P4_Source</span><span class="o">*</span>  <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s2">"Hello</span><span class="se">\n</span><span class="s2">WORLD"</span><span class="p">,</span> <span class="n">ENTRY</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">source</span> <span class="o">==</span> <span class="n">NULL</span><span class="p">)</span> <span class="p">{</span>

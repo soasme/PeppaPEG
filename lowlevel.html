@@ -387,7 +387,7 @@ Choice: failure!
 <section id="reference">
 <h3>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h3>
 <p>Reference <strong>matches a string based on the referenced grammar rule</strong>.</p>
-<p>A grammar includes a set of grammar rules.  Each grammar rule is built from <a class="reference internal" href="api.html#c.P4_Expression" title="P4_Expression"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Expression</span></code></a> and is associated with an id.  A grammar rule can then be referenced in other grammar rules.</p>
+<p>A grammar includes a set of grammar rules.  Each grammar rule is built from <code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Expression</span></code> and is associated with an id.  A grammar rule can then be referenced in other grammar rules.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">typedef</span> <span class="k">enum</span> <span class="p">{</span> <span class="n">Entry</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="p">...</span> <span class="p">};</span>
 
 <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="s">"Hello,WORLD"</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>

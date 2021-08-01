@@ -12,5 +12,22 @@ target_compile_options("${P4_LIB}" PRIVATE "-ansi")
 target_compile_options("${P4_LIB}" PRIVATE "-Wall")
 # target_compile_options("${P4_LIB}" PRIVATE "-fsanitize=address")
 
+option(ENABLE_SANITIZERS "Enables AddressSanitizer and UndefinedBehaviorSanitizer." OFF)
+if (ENABLE_SANITIZERS)
+    list(APPEND custom_compiler_flags
+        -fno-omit-frame-pointer
+        -fsanitize=address
+        -fsanitize=undefined
+        -fsanitize=float-cast-overflow
+        -fsanitize-address-use-after-scope
+        -fsanitize=integer
+        -fno-sanitize-recover
+        )
+endif()
+
+foreach(compiler_flag ${custom_compiler_flags})
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${compiler_flag}")
+endforeach()
+
 add_subdirectory(tests)
 add_subdirectory(docs)

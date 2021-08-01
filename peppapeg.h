@@ -1347,7 +1347,7 @@ P4_Error       P4_AddGrammarRule(P4_Grammar*, P4_RuleID, P4_String, P4_Expressio
  *
  * WARNING: NOT IMPLEMENTED.
  */
-void           P4_DeleteGrammarRule(P4_Grammar*, P4_RuleID);
+void           P4_DeleteGrammarRule(P4_Grammar*, const P4_String);
 
 /**
  * Get a grammar rule by its name.
@@ -1717,16 +1717,6 @@ P4_Error       P4_ReplaceGrammarRule(P4_Grammar*, P4_String, P4_Expression*);
  *      P4_DeleteGrammar(peg);
  */
 P4_Grammar*    P4_CreatePegGrammar ();
-
-/**
- * @brief       Get the corresponding rule name for a peg grammar rule id.
- * @param       id      A P4_PegRuleID.
- * @return      The name.
- *
- *      printf("%s\n", P4_StringifyPegGrammarRuleID(P4_PegRuleRule));
- */
-P4_String      P4_StringifyPegGrammarRuleID(P4_RuleID id);
-
 
 /**
  * @brief       Load peg grammar result from a string.

@@ -15,7 +15,7 @@ void test_match_literal_sequence_successfully(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddSequenceWithMembers(grammar, ENTRY, "entry", 3,
+        P4_AddSequenceWithMembers(grammar, "entry", 3,
             P4_CreateLiteral("你好", true),
             P4_CreateLiteral(" ", true),
             P4_CreateLiteral("WORLD", true)
@@ -58,7 +58,7 @@ void test_match_literal_sequence_partially_raise_match_error(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddSequenceWithMembers(grammar, ENTRY, "entry", 3,
+        P4_AddSequenceWithMembers(grammar, "entry", 3,
             P4_CreateLiteral("你好", true),
             P4_CreateLiteral(" ", true),
             P4_CreateLiteral("WORLD", true)
@@ -96,7 +96,7 @@ void test_match_literal_sequence_having_member_nomatch_raise_match_error(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddSequenceWithMembers(grammar, ENTRY, "entry", 3,
+        P4_AddSequenceWithMembers(grammar, "entry", 3,
             P4_CreateLiteral("你好", true),
             P4_CreateLiteral(" ", true),
             P4_CreateLiteral("WORLD", true)
@@ -136,14 +136,14 @@ void test_match_reference_in_sequence_successfully(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddSequenceWithMembers(grammar, ENTRY, "entry", 2,
+        P4_AddSequenceWithMembers(grammar, "entry", 2,
             P4_CreateReference("r1"),
             P4_CreateReference("r1")
         )
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddLiteral(grammar, R1, "r1", "OLA", false)
+        P4_AddLiteral(grammar, "r1", "OLA", false)
     );
 
     P4_Source* source = P4_CreateSource("OLAola", "entry");

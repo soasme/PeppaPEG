@@ -15,7 +15,7 @@ void test_match_literal_choices_successfully(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddChoiceWithMembers(grammar, R1, "r1", 2,
+        P4_AddChoiceWithMembers(grammar, "r1", 2,
             P4_CreateLiteral("HELLO WORLD", true),
             P4_CreateLiteral("你好, 世界", true)
         )
@@ -55,7 +55,7 @@ void test_match_literal_choices_successfully2(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddChoiceWithMembers(grammar, R1, "r1", 2,
+        P4_AddChoiceWithMembers(grammar, "r1", 2,
             P4_CreateLiteral("HELLO WORLD", true),
             P4_CreateLiteral("你好, 世界", true)
         )
@@ -97,7 +97,7 @@ void test_match_literal_choices_no_option_raise_match_error(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddChoiceWithMembers(grammar, R1, "r1", 2,
+        P4_AddChoiceWithMembers(grammar, "r1", 2,
             P4_CreateLiteral("HELLO WORLD", true),
             P4_CreateLiteral("你好, 世界", true)
         )

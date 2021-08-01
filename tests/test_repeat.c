@@ -16,7 +16,7 @@ void test_match_zeroormore_at_least_zero(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddZeroOrMore(grammar, ENTRY, "entry", P4_CreateLiteral("0", true))
+        P4_AddZeroOrMore(grammar, "entry", P4_CreateLiteral("0", true))
     );
 
     P4_Source* source = P4_CreateSource("", "entry");
@@ -47,7 +47,7 @@ void test_match_zeroormore_multiple_times(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddZeroOrMore(grammar, ENTRY, "entry", P4_CreateLiteral("0", true))
+        P4_AddZeroOrMore(grammar, "entry", P4_CreateLiteral("0", true))
     );
 
     P4_Source* source = P4_CreateSource("00000", "entry");
@@ -84,7 +84,7 @@ void test_match_onceormore_at_least_once(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddOnceOrMore(grammar, ENTRY, "entry", P4_CreateLiteral("0", true))
+        P4_AddOnceOrMore(grammar, "entry", P4_CreateLiteral("0", true))
     );
 
     P4_Source* source = P4_CreateSource("0", "entry");
@@ -121,7 +121,7 @@ void test_match_onceormore_multiple_times(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddOnceOrMore(grammar, ENTRY, "entry", P4_CreateLiteral("0", true))
+        P4_AddOnceOrMore(grammar, "entry", P4_CreateLiteral("0", true))
     );
 
     P4_Source* source = P4_CreateSource("00000", "entry");
@@ -160,7 +160,7 @@ void test_match_onceormore_zero_raise_match_error(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddOnceOrMore(grammar, ENTRY, "entry", P4_CreateLiteral("0", true))
+        P4_AddOnceOrMore(grammar, "entry", P4_CreateLiteral("0", true))
     );
 
     P4_Source* source = P4_CreateSource("1", "entry");
@@ -191,7 +191,7 @@ void test_match_zerooronce_match_empty(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddZeroOrOnce(grammar, ENTRY, "entry", P4_CreateLiteral("0", true))
+        P4_AddZeroOrOnce(grammar, "entry", P4_CreateLiteral("0", true))
     );
 
     P4_Source* source = P4_CreateSource("", "entry");
@@ -222,7 +222,7 @@ void test_match_zerooronce_exact_once(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddZeroOrOnce(grammar, ENTRY, "entry", P4_CreateLiteral("0", true))
+        P4_AddZeroOrOnce(grammar, "entry", P4_CreateLiteral("0", true))
     );
 
     P4_Source* source = P4_CreateSource("0", "entry");
@@ -259,7 +259,7 @@ void test_match_zerooronce_at_most_once(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddZeroOrOnce(grammar, ENTRY, "entry", P4_CreateLiteral("0", true))
+        P4_AddZeroOrOnce(grammar, "entry", P4_CreateLiteral("0", true))
     );
 
     P4_Source* source = P4_CreateSource("00000", "entry");
@@ -296,7 +296,7 @@ void test_match_repeat_exact_successfully(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddRepeatExact(grammar, ENTRY, "entry", P4_CreateLiteral("0", true), 5)
+        P4_AddRepeatExact(grammar, "entry", P4_CreateLiteral("0", true), 5)
     );
 
     P4_Source* source = P4_CreateSource("00000", "entry");
@@ -335,7 +335,7 @@ void test_match_repeat_exact_no_less(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddRepeatExact(grammar, ENTRY, "entry", P4_CreateLiteral("0", true), 5)
+        P4_AddRepeatExact(grammar, "entry", P4_CreateLiteral("0", true), 5)
     );
 
     P4_Source* source = P4_CreateSource("0000", "entry");
@@ -368,7 +368,7 @@ void test_match_repeat_exact_insufficient_attaching_unmatch(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddRepeatExact(grammar, ENTRY, "entry", P4_CreateLiteral("0", true), 5)
+        P4_AddRepeatExact(grammar, "entry", P4_CreateLiteral("0", true), 5)
     );
 
     P4_Source* source = P4_CreateSource("00001", "entry");
@@ -399,7 +399,7 @@ void test_match_repeat_exact_no_more(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddRepeatExact(grammar, ENTRY, "entry", P4_CreateLiteral("0", true), 5)
+        P4_AddRepeatExact(grammar, "entry", P4_CreateLiteral("0", true), 5)
     );
 
     P4_Source* source = P4_CreateSource("000000", "entry");

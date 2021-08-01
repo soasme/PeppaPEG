@@ -168,14 +168,14 @@ P4_Grammar*  P4_CreateCalcGrammarLowLevel() {
 
     P4_Error err = P4_Ok;
 
-    if ((err = P4_AddSequenceWithMembers(grammar, P4_CalcStatement, "statement", 3,
+    if ((err = P4_AddSequenceWithMembers(grammar, "statement", 3,
         P4_CreateStartOfInput(),
         P4_CreateReference("term"),
         P4_CreateEndOfInput()
     )) != P4_Ok)
         goto finalize;
 
-    if ((err = P4_AddSequenceWithMembers(grammar, P4_CalcTerm, "term", 2,
+    if ((err = P4_AddSequenceWithMembers(grammar, "term", 2,
         P4_CreateReference("factor"),
         P4_CreateZeroOrMore(
             P4_CreateSequenceWithMembers(2,
@@ -189,7 +189,7 @@ P4_Grammar*  P4_CreateCalcGrammarLowLevel() {
     )) != P4_Ok)
         goto finalize;
 
-    if ((err = P4_AddSequenceWithMembers(grammar, P4_CalcFactor, "factor", 2,
+    if ((err = P4_AddSequenceWithMembers(grammar, "factor", 2,
         P4_CreateReference("unary"),
         P4_CreateZeroOrMore(
             P4_CreateSequenceWithMembers(2,
@@ -203,26 +203,26 @@ P4_Grammar*  P4_CreateCalcGrammarLowLevel() {
     )) != P4_Ok)
         goto finalize;
 
-    if ((err = P4_AddChoiceWithMembers(grammar, P4_CalcUnary, "unary", 3,
+    if ((err = P4_AddChoiceWithMembers(grammar, "unary", 3,
         P4_CreateSequenceWithMembers(2, P4_CreateReference("add"), P4_CreateReference("unary")),
         P4_CreateSequenceWithMembers(2, P4_CreateReference("minus"), P4_CreateReference("unary")),
         P4_CreateReference("primary")
     )) != P4_Ok)
         goto finalize;
 
-    if ((err = P4_AddLiteral(grammar, P4_CalcMinusSign, "minus", "-", true)) != P4_Ok)
+    if ((err = P4_AddLiteral(grammar, "minus", "-", true)) != P4_Ok)
         goto finalize;
 
-    if ((err = P4_AddLiteral(grammar, P4_CalcAddSign, "add", "+", true)) != P4_Ok)
+    if ((err = P4_AddLiteral(grammar, "add", "+", true)) != P4_Ok)
         goto finalize;
 
-    if ((err = P4_AddLiteral(grammar, P4_CalcMulSign, "mul", "*", true)) != P4_Ok)
+    if ((err = P4_AddLiteral(grammar, "mul", "*", true)) != P4_Ok)
         goto finalize;
 
-    if ((err = P4_AddLiteral(grammar, P4_CalcDivSign, "div", "/", true)) != P4_Ok)
+    if ((err = P4_AddLiteral(grammar, "div", "/", true)) != P4_Ok)
         goto finalize;
 
-    if ((err = P4_AddChoiceWithMembers(grammar, P4_CalcPrimary, "primary", 2,
+    if ((err = P4_AddChoiceWithMembers(grammar, "primary", 2,
         P4_CreateReference("integer"),
         P4_CreateSequenceWithMembers(3,
             P4_CreateLiteral("(", true),
@@ -232,17 +232,17 @@ P4_Grammar*  P4_CreateCalcGrammarLowLevel() {
     )) != P4_Ok)
         goto finalize;
 
-    if ((err = P4_AddOnceOrMore(grammar, P4_CalcInteger, "integer", P4_CreateRange('0', '9', 1))) != P4_Ok)
+    if ((err = P4_AddOnceOrMore(grammar, "integer", P4_CreateRange('0', '9', 1))) != P4_Ok)
         goto finalize;
 
-    if ((err = P4_AddChoiceWithMembers(grammar, P4_CalcEol, "eol", 3,
+    if ((err = P4_AddChoiceWithMembers(grammar, "eol", 3,
         P4_CreateLiteral("\n", true),
         P4_CreateLiteral("\r", true),
         P4_CreateLiteral(";", true)
     )) != P4_Ok)
         goto finalize;
 
-    if ((err = P4_AddChoiceWithMembers(grammar, P4_CalcWhitespace, "whitespace", 2,
+    if ((err = P4_AddChoiceWithMembers(grammar, "whitespace", 2,
         P4_CreateLiteral(" ", true),
         P4_CreateLiteral("\t", true)
     )) != P4_Ok)

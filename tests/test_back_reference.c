@@ -20,7 +20,7 @@ void test_match_back_reference_successfully(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddSequenceWithMembers(grammar, ENTRY, "entry", 3,
+        P4_AddSequenceWithMembers(grammar, "entry", 3,
             P4_CreateReference("marker"),
             P4_CreateLiteral("...", true),
             P4_CreateBackReference(0, true)
@@ -28,7 +28,7 @@ void test_match_back_reference_successfully(void) {
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddChoiceWithMembers(grammar, MARKER, "marker", 2,
+        P4_AddChoiceWithMembers(grammar, "marker", 2,
             P4_CreateLiteral("'", true),
             P4_CreateLiteral("\"", true)
         )
@@ -79,7 +79,7 @@ void test_match_back_reference_latter_not_match(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddSequenceWithMembers(grammar, ENTRY, "entry", 3,
+        P4_AddSequenceWithMembers(grammar, "entry", 3,
             P4_CreateReference("marker"),
             P4_CreateLiteral("...", true),
             P4_CreateBackReference(0, true)
@@ -87,7 +87,7 @@ void test_match_back_reference_latter_not_match(void) {
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddChoiceWithMembers(grammar, MARKER, "marker", 2,
+        P4_AddChoiceWithMembers(grammar, "marker", 2,
             P4_CreateLiteral("'", true),
             P4_CreateLiteral("\"", true)
         )
@@ -124,7 +124,7 @@ void test_match_back_reference_insensitive_match(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddSequenceWithMembers(grammar, ENTRY, "entry", 3,
+        P4_AddSequenceWithMembers(grammar, "entry", 3,
             P4_CreateReference("marker"),
             P4_CreateLiteral("...", true),
             P4_CreateBackReference(0, false)
@@ -132,7 +132,7 @@ void test_match_back_reference_insensitive_match(void) {
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddLiteral(grammar, MARKER, "marker", "TAG", true)
+        P4_AddLiteral(grammar, "marker", "TAG", true)
     );
 
     P4_Source* source = P4_CreateSource("TAG...tag", "entry");

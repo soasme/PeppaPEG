@@ -618,19 +618,19 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
         } \
     } while (0)
 
-# define P4_AddSomeGrammarRule(g, id, name, rule) \
+# define P4_AddSomeGrammarRule(g, name, rule) \
     do { \
         P4_Error err = P4_Ok;       \
         P4_Expression* expr = NULL; \
                                     \
-        if (grammar == NULL || id == 0) { \
+        if (grammar == NULL || name == NULL) { \
             err = P4_NullError;     \
             goto end;               \
         }                           \
         if ((expr = (rule)) == NULL) \
             P4_Panic("failed to create expression: out of memory"); \
                                     \
-        if ((err=P4_AddGrammarRule(grammar, id, name, expr))!=P4_Ok) {\
+        if ((err=P4_AddGrammarRule(grammar, name, expr))!=P4_Ok) {\
             goto end;               \
         }                           \
                                     \
@@ -2789,11 +2789,11 @@ P4_SetUserDataFreeFunc(P4_Grammar* grammar, P4_UserDataFreeFunc free_func) {
 }
 
 P4_PUBLIC P4_Error
-P4_AddGrammarRule(P4_Grammar* grammar, P4_RuleID id, P4_String name, P4_Expression* expr) {
+P4_AddGrammarRule(P4_Grammar* grammar, P4_String name, P4_Expression* expr) {
     size_t          cap   = grammar->cap;
     P4_Expression** rules = grammar->rules;
 
-    if (grammar == NULL || id == 0 || expr == NULL)
+    if (grammar == NULL || name == NULL || expr == NULL)
         return P4_NullError;
 
     if (cap == 0) {
@@ -3096,50 +3096,50 @@ P4_RemainingText(P4_Source* s) {
 }
 
 P4_PUBLIC P4_Error
-P4_AddLiteral(P4_Grammar* grammar, P4_RuleID id, P4_String name, const P4_String literal, bool sensitive) {
-    P4_AddSomeGrammarRule(grammar, id, name, P4_CreateLiteral(literal, sensitive));
+P4_AddLiteral(P4_Grammar* grammar, P4_String name, const P4_String literal, bool sensitive) {
+    P4_AddSomeGrammarRule(grammar, name, P4_CreateLiteral(literal, sensitive));
     return P4_Ok;
 }
 
 P4_PUBLIC P4_Error
-P4_AddRange(P4_Grammar* grammar, P4_RuleID id, P4_String name, P4_Rune lower, P4_Rune upper, size_t stride) {
-    P4_AddSomeGrammarRule(grammar, id, name, P4_CreateRange(lower, upper, stride));
+P4_AddRange(P4_Grammar* grammar, P4_String name, P4_Rune lower, P4_Rune upper, size_t stride) {
+    P4_AddSomeGrammarRule(grammar, name, P4_CreateRange(lower, upper, stride));
     return P4_Ok;
 }
 
 P4_PUBLIC P4_Error
-P4_AddRanges(P4_Grammar* grammar, P4_RuleID id, P4_String name, size_t count, P4_RuneRange* ranges) {
-    P4_AddSomeGrammarRule(grammar, id, name, P4_CreateRanges(count, ranges));
+P4_AddRanges(P4_Grammar* grammar, P4_String name, size_t count, P4_RuneRange* ranges) {
+    P4_AddSomeGrammarRule(grammar, name, P4_CreateRanges(count, ranges));
     return P4_Ok;
 }
 
 
 P4_PUBLIC P4_Error
-P4_AddPositive(P4_Grammar* grammar, P4_RuleID id, P4_String name, P4_Expression* ref_expr) {
+P4_AddPositive(P4_Grammar* grammar, P4_String name, P4_Expression* ref_expr) {
     if (ref_expr == NULL)
         return P4_NullError;
-    P4_AddSomeGrammarRule(grammar, id, name, P4_CreatePositive(ref_expr));
+    P4_AddSomeGrammarRule(grammar, name, P4_CreatePositive(ref_expr));
     return P4_Ok;
 }
 
 P4_PUBLIC P4_Error
-P4_AddNegative(P4_Grammar* grammar, P4_RuleID id, P4_String name, P4_Expression* ref_expr) {
+P4_AddNegative(P4_Grammar* grammar, P4_String name, P4_Expression* ref_expr) {
     if (ref_expr == NULL)
         return P4_NullError;
-    P4_AddSomeGrammarRule(grammar, id, name, P4_CreateNegative(ref_expr));
+    P4_AddSomeGrammarRule(grammar, name, P4_CreateNegative(ref_expr));
     return P4_Ok;
 }
 
 P4_PUBLIC P4_Error
-P4_AddSequence(P4_Grammar* grammar, P4_RuleID id, P4_String name, size_t size) {
-    P4_AddSomeGrammarRule(grammar, id, name, P4_CreateContainer(size));
+P4_AddSequence(P4_Grammar* grammar, P4_String name, size_t size) {
+    P4_AddSomeGrammarRule(grammar, name, P4_CreateContainer(size));
     P4_GetGrammarRuleByName(grammar, name)->kind = P4_Sequence;
     return P4_Ok;
 }
 
 P4_PUBLIC P4_Error
-P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_RuleID id, P4_String name, size_t count, ...) {
-    P4_AddSomeGrammarRule(grammar, id, name, P4_CreateSequence(count));
+P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_String name, size_t count, ...) {
+    P4_AddSomeGrammarRule(grammar, name, P4_CreateSequence(count));
 
     size_t i = 0;
     P4_Expression* expr = P4_GetGrammarRuleByName(grammar, name);
@@ -3160,15 +3160,15 @@ P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_RuleID id, P4_String name, siz
 }
 
 P4_PUBLIC P4_Error
-P4_AddChoice(P4_Grammar* grammar, P4_RuleID id, P4_String name, size_t size) {
-    P4_AddSomeGrammarRule(grammar, id, name, P4_CreateContainer(size));
+P4_AddChoice(P4_Grammar* grammar, P4_String name, size_t size) {
+    P4_AddSomeGrammarRule(grammar, name, P4_CreateContainer(size));
     P4_GetGrammarRuleByName(grammar, name)->kind = P4_Choice;
     return P4_Ok;
 }
 
 P4_PUBLIC P4_Error
-P4_AddChoiceWithMembers(P4_Grammar* grammar, P4_RuleID id, P4_String name, size_t count, ...) {
-    P4_AddSomeGrammarRule(grammar, id, name, P4_CreateChoice(count));
+P4_AddChoiceWithMembers(P4_Grammar* grammar, P4_String name, size_t count, ...) {
+    P4_AddSomeGrammarRule(grammar, name, P4_CreateChoice(count));
 
     P4_Expression* expr = P4_GetGrammarRuleByName(grammar, name);
     size_t i = 0;
@@ -3327,85 +3327,85 @@ P4_DeleteExpression(P4_Expression* expr) {
 }
 
 P4_PUBLIC P4_Error
-P4_AddReference(P4_Grammar* grammar, P4_RuleID id, P4_String name, P4_String ref) {
+P4_AddReference(P4_Grammar* grammar, P4_String name, P4_String ref) {
     if (ref == 0) {
         return P4_NullError;
     }
 
-    P4_AddSomeGrammarRule(grammar, id, name, P4_CreateReference(ref));
+    P4_AddSomeGrammarRule(grammar, name, P4_CreateReference(ref));
     return P4_Ok;
 }
 
 P4_PUBLIC P4_Error
-P4_AddZeroOrOnce(P4_Grammar* grammar, P4_RuleID id, P4_String name, P4_Expression* repeat) {
+P4_AddZeroOrOnce(P4_Grammar* grammar, P4_String name, P4_Expression* repeat) {
     if (repeat == NULL)
         return P4_NullError;
 
-    P4_AddSomeGrammarRule(grammar, id, name, P4_CreateZeroOrOnce(repeat));
+    P4_AddSomeGrammarRule(grammar, name, P4_CreateZeroOrOnce(repeat));
     return P4_Ok;
 }
 
 P4_PUBLIC P4_Error
-P4_AddZeroOrMore(P4_Grammar* grammar, P4_RuleID id, P4_String name, P4_Expression* repeat) {
+P4_AddZeroOrMore(P4_Grammar* grammar, P4_String name, P4_Expression* repeat) {
     if (repeat == NULL)
         return P4_NullError;
 
-    P4_AddSomeGrammarRule(grammar, id, name, P4_CreateZeroOrMore(repeat));
+    P4_AddSomeGrammarRule(grammar, name, P4_CreateZeroOrMore(repeat));
     return P4_Ok;
 }
 
 P4_PUBLIC P4_Error
-P4_AddOnceOrMore(P4_Grammar* grammar, P4_RuleID id, P4_String name, P4_Expression* repeat) {
+P4_AddOnceOrMore(P4_Grammar* grammar, P4_String name, P4_Expression* repeat) {
     if (repeat == NULL)
         return P4_NullError;
 
-    P4_AddSomeGrammarRule(grammar, id, name, P4_CreateOnceOrMore(repeat));
+    P4_AddSomeGrammarRule(grammar, name, P4_CreateOnceOrMore(repeat));
     return P4_Ok;
 }
 
 P4_PUBLIC P4_Error
-P4_AddRepeatMin(P4_Grammar* grammar, P4_RuleID id, P4_String name, P4_Expression* repeat, size_t min) {
+P4_AddRepeatMin(P4_Grammar* grammar, P4_String name, P4_Expression* repeat, size_t min) {
     if (repeat == NULL)
         return P4_NullError;
 
-    P4_AddSomeGrammarRule(grammar, id, name, P4_CreateRepeatMin(repeat, min));
+    P4_AddSomeGrammarRule(grammar, name, P4_CreateRepeatMin(repeat, min));
     return P4_Ok;
 }
 
 P4_PUBLIC P4_Error
-P4_AddRepeatMax(P4_Grammar* grammar, P4_RuleID id, P4_String name, P4_Expression* repeat, size_t max) {
+P4_AddRepeatMax(P4_Grammar* grammar, P4_String name, P4_Expression* repeat, size_t max) {
     if (repeat == NULL)
         return P4_NullError;
 
-    P4_AddSomeGrammarRule(grammar, id, name, P4_CreateRepeatMax(repeat, max));
+    P4_AddSomeGrammarRule(grammar, name, P4_CreateRepeatMax(repeat, max));
     return P4_Ok;
 }
 
 P4_PUBLIC P4_Error
-P4_AddRepeatMinMax(P4_Grammar* grammar, P4_RuleID id, P4_String name, P4_Expression* repeat, size_t min, size_t max) {
+P4_AddRepeatMinMax(P4_Grammar* grammar, P4_String name, P4_Expression* repeat, size_t min, size_t max) {
     if (repeat == NULL)
         return P4_NullError;
 
-    P4_AddSomeGrammarRule(grammar, id, name, P4_CreateRepeatMinMax(repeat, min, max));
+    P4_AddSomeGrammarRule(grammar, name, P4_CreateRepeatMinMax(repeat, min, max));
     return P4_Ok;
 }
 
 P4_PUBLIC P4_Error
-P4_AddRepeatExact(P4_Grammar* grammar, P4_RuleID id, P4_String name, P4_Expression* repeat, size_t num) {
+P4_AddRepeatExact(P4_Grammar* grammar, P4_String name, P4_Expression* repeat, size_t num) {
     if (repeat == NULL)
         return P4_NullError;
 
-    P4_AddSomeGrammarRule(grammar, id, name, P4_CreateRepeatExact(repeat, num));
+    P4_AddSomeGrammarRule(grammar, name, P4_CreateRepeatExact(repeat, num));
     return P4_Ok;
 }
 
 P4_PUBLIC P4_Error
-P4_AddJoin(P4_Grammar* grammar, P4_RuleID id, P4_String name, const P4_String joiner, P4_String ref) {
+P4_AddJoin(P4_Grammar* grammar, P4_String name, const P4_String joiner, P4_String ref) {
     if (ref == 0 || strcmp(name, ref) == 0) {
         return P4_NullError;
     }
 
-    P4_AddSomeGrammarRule(grammar, id, name, P4_CreateJoin(joiner, ref));
+    P4_AddSomeGrammarRule(grammar, name, P4_CreateJoin(joiner, ref));
     return P4_Ok;
 }
 
@@ -3620,7 +3620,7 @@ P4_ReplaceGrammarRule(P4_Grammar* grammar, P4_String name, P4_Expression* expr) 
 P4_Grammar* P4_CreatePegGrammar () {
     P4_Grammar* grammar = P4_CreateGrammar();
 
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_PegRuleNumber, "number", 2,
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, "number", 2,
         P4_CreateLiteral("0", true),
         P4_CreateSequenceWithMembers(2,
             P4_CreateRange('1', '9', 1),
@@ -3632,7 +3632,7 @@ P4_Grammar* P4_CreatePegGrammar () {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, "number", P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
         goto finalize;
 
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_PegRuleChar, "char", 4,
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, "char", 4,
         P4_CreateRange(0x20, 0x21, 1), /* Can't be 0x22: double quote " */
         P4_CreateRange(0x23, 0x5b, 1), /* Can't be 0x5c: escape leading \ */
         P4_CreateRange(0x5d, 0x10ffff, 1),
@@ -3685,7 +3685,7 @@ P4_Grammar* P4_CreatePegGrammar () {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, "char", P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleLiteral, "literal", 3,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, "literal", 3,
         P4_CreateLiteral("\"", true),
         P4_CreateZeroOrMore(P4_CreateReference("char")),
         P4_CreateLiteral("\"", true)
@@ -3695,7 +3695,7 @@ P4_Grammar* P4_CreatePegGrammar () {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, "literal", P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleRange, "range", 3,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, "range", 3,
         P4_CreateLiteral("[", true),
         P4_CreateChoiceWithMembers(2,
             P4_CreateSequenceWithMembers(3,
@@ -3717,7 +3717,7 @@ P4_Grammar* P4_CreatePegGrammar () {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_PegRuleRangeCategory, "range_category", 19,
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, "range_category", 19,
         P4_CreateLiteral("Cc", true),
         P4_CreateLiteral("Cf", true),
         P4_CreateLiteral("Co", true),
@@ -3740,7 +3740,7 @@ P4_Grammar* P4_CreatePegGrammar () {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleReference, "reference", 2,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, "reference", 2,
         P4_CreateChoiceWithMembers(3,
             P4_CreateRange('a', 'z', 1),
             P4_CreateRange('A', 'Z', 1),
@@ -3760,28 +3760,28 @@ P4_Grammar* P4_CreatePegGrammar () {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, "reference", P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRulePositive, "positive", 2,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, "positive", 2,
         P4_CreateLiteral("&", true),
         P4_CreateReference("primary")
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleNegative, "negative", 2,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, "negative", 2,
         P4_CreateLiteral("!", true),
         P4_CreateReference("primary")
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddLiteral(grammar, P4_PegRuleRepeatOnceOrMore, "onceormore", "+", true))
+    if (P4_Ok != P4_AddLiteral(grammar, "onceormore", "+", true))
         goto finalize;
 
-    if (P4_Ok != P4_AddLiteral(grammar, P4_PegRuleRepeatZeroOrMore, "zeroormore", "*", true))
+    if (P4_Ok != P4_AddLiteral(grammar, "zeroormore", "*", true))
         goto finalize;
 
-    if (P4_Ok != P4_AddLiteral(grammar, P4_PegRuleRepeatZeroOrOnce, "zerooronce", "?", true))
+    if (P4_Ok != P4_AddLiteral(grammar, "zerooronce", "?", true))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleRepeatMin, "repeatmin", 4,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, "repeatmin", 4,
         P4_CreateLiteral("{", true),
         P4_CreateReference("number"),
         P4_CreateLiteral(",", true),
@@ -3789,7 +3789,7 @@ P4_Grammar* P4_CreatePegGrammar () {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleRepeatMax, "repeatmax", 4,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, "repeatmax", 4,
         P4_CreateLiteral("{", true),
         P4_CreateLiteral(",", true),
         P4_CreateReference("number"),
@@ -3797,7 +3797,7 @@ P4_Grammar* P4_CreatePegGrammar () {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleRepeatMinMax, "repeatminmax", 5,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, "repeatminmax", 5,
         P4_CreateLiteral("{", true),
         P4_CreateReference("number"),
         P4_CreateLiteral(",", true),
@@ -3806,14 +3806,14 @@ P4_Grammar* P4_CreatePegGrammar () {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleRepeatExact, "repeatexact", 3,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, "repeatexact", 3,
         P4_CreateLiteral("{", true),
         P4_CreateReference("number"),
         P4_CreateLiteral("}", true)
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleRepeat, "repeat", 2,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, "repeat", 2,
         P4_CreateReference("primary"),
         P4_CreateZeroOrOnce(
             P4_CreateChoiceWithMembers(7,
@@ -3832,10 +3832,10 @@ P4_Grammar* P4_CreatePegGrammar () {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, "repeat", P4_FLAG_NON_TERMINAL))
         goto finalize;
 
-    if (P4_Ok != P4_AddLiteral(grammar, P4_PegRuleDot, "dot", ".", true))
+    if (P4_Ok != P4_AddLiteral(grammar, "dot", ".", true))
         goto finalize;
 
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_PegRulePrimary, "primary", 8,
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, "primary", 8,
         P4_CreateReference("literal"),
         P4_CreateReference("insensitive"),
         P4_CreateReference("range"),
@@ -3857,7 +3857,7 @@ P4_Grammar* P4_CreatePegGrammar () {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, "primary", P4_FLAG_LIFTED))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleInsensitiveLiteral, "insensitive", 2,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, "insensitive", 2,
         P4_CreateLiteral("i", true),
         P4_CreateReference("literal")
     ))
@@ -3866,32 +3866,32 @@ P4_Grammar* P4_CreatePegGrammar () {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, "insensitive", P4_FLAG_TIGHT))
         goto finalize;
 
-    if (P4_Ok != P4_AddJoin(grammar, P4_PegRuleChoice, "choice", "/", "sequence"))
+    if (P4_Ok != P4_AddJoin(grammar, "choice", "/", "sequence"))
         goto finalize;
 
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, "choice", P4_FLAG_NON_TERMINAL))
         goto finalize;
 
-    if (P4_Ok != P4_AddOnceOrMore(grammar, P4_PegRuleSequence, "sequence",
+    if (P4_Ok != P4_AddOnceOrMore(grammar, "sequence",
                 P4_CreateReference("repeat")))
         goto finalize;
 
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, "sequence", P4_FLAG_NON_TERMINAL))
         goto finalize;
 
-    if (P4_Ok != P4_AddReference(grammar, P4_PegRuleExpression, "expression", "choice"))
+    if (P4_Ok != P4_AddReference(grammar, "expression", "choice"))
         goto finalize;
 
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, "expression", P4_FLAG_LIFTED))
         goto finalize;
 
-    if (P4_Ok != P4_AddReference(grammar, P4_PegRuleRuleName, "name", "reference"))
+    if (P4_Ok != P4_AddReference(grammar, "name", "reference"))
         goto finalize;
 
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, "name", P4_FLAG_SQUASHED))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleDecorator, "decorator", 2,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, "decorator", 2,
         P4_CreateLiteral("@", true),
         P4_CreateChoiceWithMembers(6,
             P4_CreateLiteral("squashed", true),
@@ -3904,12 +3904,12 @@ P4_Grammar* P4_CreatePegGrammar () {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddZeroOrMore(grammar, P4_PegRuleRuleDecorators, "decorators",
+    if (P4_Ok != P4_AddZeroOrMore(grammar, "decorators",
             P4_CreateReference("decorator")
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleRule, "rule", 5,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, "rule", 5,
         P4_CreateReference("decorators"),
         P4_CreateReference("name"),
         P4_CreateLiteral("=", true),
@@ -3918,14 +3918,14 @@ P4_Grammar* P4_CreatePegGrammar () {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegGrammar, "grammar", 3,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, "grammar", 3,
         P4_CreateStartOfInput(),
         P4_CreateOnceOrMore(P4_CreateReference("rule")),
         P4_CreateEndOfInput()
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_PegRuleWhitespace, "whitespace", 4,
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, "whitespace", 4,
         P4_CreateLiteral(" ", true),
         P4_CreateLiteral("\t", true),
         P4_CreateLiteral("\r", true),
@@ -3937,7 +3937,7 @@ P4_Grammar* P4_CreatePegGrammar () {
                 P4_FLAG_LIFTED | P4_FLAG_SPACED))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_PegRuleComment, "comment", 3,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, "comment", 3,
         P4_CreateLiteral("#", true),
         P4_CreateZeroOrMore(
             P4_CreateSequenceWithMembers(2,
@@ -4491,8 +4491,8 @@ P4_PegEvalGrammar(P4_Node* node, P4_Result* result) {
 
         rule = P4_UnwrapExpression(result);
 
-        if ((err = P4_AddGrammarRule(grammar, id, rule->name, rule)) != P4_Ok)
-            P4_EvalRaise("failed to add %" PRIu64 "th rule.", id);
+        if ((err = P4_AddGrammarRule(grammar, rule->name, rule)) != P4_Ok)
+            P4_EvalRaise("failed to add rule %s.", rule->name);
 
         id++;
     }

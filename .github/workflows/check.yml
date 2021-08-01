@@ -46,7 +46,7 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: |
         export CC=${{ matrix.compiler }}
-        cmake $GITHUB_WORKSPACE -DENABLE_VALGRIND=Off
+        cmake $GITHUB_WORKSPACE -DENABLE_VALGRIND=Off -DENABLE_SANITIZERS
       if: "contains( matrix.compiler, 'clang')"
 
     - name: Configure CMake (GCC)

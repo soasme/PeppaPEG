@@ -61,7 +61,7 @@ void test_match_zeroormore_multiple_times(void) {
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("00000", node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
 
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);
@@ -97,7 +97,7 @@ void test_match_onceormore_at_least_once(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
     ASSERT_EQUAL_NODE_STRING("0", node);
 
     TEST_ASSERT_NULL(node->next);
@@ -134,7 +134,7 @@ void test_match_onceormore_multiple_times(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
     ASSERT_EQUAL_NODE_STRING("00000", node);
 
     TEST_ASSERT_NULL(node->next);
@@ -236,7 +236,7 @@ void test_match_zerooronce_exact_once(void) {
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("0", node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
 
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);
@@ -273,7 +273,7 @@ void test_match_zerooronce_at_most_once(void) {
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("0", node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
 
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);
@@ -310,7 +310,7 @@ void test_match_repeat_exact_successfully(void) {
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("00000", node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
 
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);
@@ -413,7 +413,7 @@ void test_match_repeat_exact_no_more(void) {
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("00000", node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
 
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);

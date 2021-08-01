@@ -1629,9 +1629,10 @@ P4_RescueError(P4_Source* s) {
  */
 P4_Node*
 P4_CreateNode (const P4_String     str,
-                P4_Position*        start,
-                P4_Position*        stop,
-                P4_RuleID           rule_id) {
+               P4_Position*        start,
+               P4_Position*        stop,
+               P4_RuleID           rule_id,
+               P4_String           rule_name) {
     P4_Node* node;
 
     if ((node=P4_MALLOC(sizeof(P4_Node))) == NULL)
@@ -1639,6 +1640,7 @@ P4_CreateNode (const P4_String     str,
 
     node->text         = str;
     node->rule_id      = rule_id;
+    node->rule_name    = rule_name;
     node->next         = NULL;
     node->head         = NULL;
     node->tail         = NULL;
@@ -1819,7 +1821,7 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
 
     P4_Node* result = NULL;
 
-    if ((result=P4_CreateNode (s->content, startpos, endpos, e->id)) == NULL)
+    if ((result=P4_CreateNode (s->content, startpos, endpos, e->id, e->name)) == NULL)
         P4_Panic("failed to create node: out of memory");
 
     return result;
@@ -1867,7 +1869,7 @@ P4_MatchRange(P4_Source* s, P4_Expression* e) {
 
     P4_Node* result = NULL;
 
-    if ((result=P4_CreateNode (s->content, startpos, endpos, e->id)) == NULL)
+    if ((result=P4_CreateNode (s->content, startpos, endpos, e->id, e->name)) == NULL)
         P4_Panic("failed to create node: out of memory");
 
     return result;
@@ -1915,7 +1917,7 @@ P4_MatchReference(P4_Source* s, P4_Expression* e) {
     /* */
     P4_Node* result = NULL;
 
-    if ((result=P4_CreateNode (s->content, startpos, endpos, e->id)) == NULL)
+    if ((result=P4_CreateNode (s->content, startpos, endpos, e->id, e->name)) == NULL)
         P4_Panic("failed to create node: out of memory");
 
     P4_AdoptNode(result->head, result->tail, reftok);
@@ -1982,7 +1984,7 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
 
     P4_MarkPosition(s, endpos);
 
-    P4_Node* ret = P4_CreateNode (s->content, startpos, endpos, e->id);
+    P4_Node* ret = P4_CreateNode (s->content, startpos, endpos, e->id, e->name);
     if (ret == NULL)
         P4_Panic("failed to create node: out of memory");
 
@@ -2027,7 +2029,7 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
     if (P4_NeedLift(s, e))
         return tok;
 
-    P4_Node* oneof = P4_CreateNode (s->content, startpos, endpos, e->id);
+    P4_Node* oneof = P4_CreateNode (s->content, startpos, endpos, e->id, e->name);
     if (oneof == NULL)
         P4_Panic("failed to create node: out of memory");
 
@@ -2162,7 +2164,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
 
     P4_MarkPosition(s, endpos);
 
-    P4_Node* repetition = P4_CreateNode (s->content, startpos, endpos, e->id);
+    P4_Node* repetition = P4_CreateNode (s->content, startpos, endpos, e->id, e->name);
     if (repetition == NULL)
         P4_Panic("failed to create node: out of memory");
 
@@ -2385,8 +2387,10 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
     if (tok != NULL) {
         if (backref_expr->kind == P4_Reference) { /* TODO: other cases? */
             tok->rule_id = backref_expr->ref_expr->id;
+            tok->rule_name = backref_expr->ref_expr->name;
         } else {
             tok->rule_id = backref_expr->id;
+            tok->rule_name = backref_expr->name;
         }
     }
 
@@ -2398,16 +2402,11 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
 void
 P4_JsonifySourceAst(P4_Grammar* grammar, FILE* stream, P4_Node* node) {
     P4_Node* tmp = node;
-    P4_Expression* expr = NULL;
 
     fprintf(stream, "[");
     while (tmp != NULL) {
         fprintf(stream, "{\"slice\":[%lu,%lu]", tmp->slice.start.pos, tmp->slice.stop.pos);
-        expr = P4_GetGrammarRule(grammar, tmp->rule_id);
-        if (expr->name)
-            fprintf(stream, ",\"type\":\"%s\"", expr->name);
-        else
-            fprintf(stream, ",\"type\":\"R%" PRIu64 "\"", tmp->rule_id);
+        fprintf(stream, ",\"type\":\"%s\"", tmp->rule_name);
         if (tmp->head != NULL) {
             fprintf(stream, ",\"children\":");
             P4_JsonifySourceAst(grammar, stream, tmp->head);
@@ -4327,34 +4326,28 @@ P4_PegEvalRepeat(P4_Node* node, P4_Result* result) {
 
     ref = P4_UnwrapExpression(result);
 
-    switch (node->head->next->rule_id) {
-        case P4_PegRuleRepeatZeroOrMore:
-            min = 0; max = SIZE_MAX;
-            break;
-        case P4_PegRuleRepeatZeroOrOnce:
-            min = 0; max = 1;
-            break;
-        case P4_PegRuleRepeatOnceOrMore:
-            min = 1; max = SIZE_MAX;
-            break;
-        case P4_PegRuleRepeatMin:
-            catch(P4_PegEvalNumber(node->head->next->head, &min));
-            break;
-        case P4_PegRuleRepeatMax:
-            catch(P4_PegEvalNumber(node->head->next->head, &max));
-            break;
-        case P4_PegRuleRepeatMinMax:
-            catch(P4_PegEvalNumber(node->head->next->head, &min));
-            catch(P4_PegEvalNumber(node->head->next->tail, &max));
-            break;
-        case P4_PegRuleRepeatExact:
-            catch(P4_PegEvalNumber(node->head->next->head, &min));
-            max = min;
-            break;
-        default:
-            UNREACHABLE();
-            P4_Panicf("InternalError: unknown repeat kind: %" PRIu64
-                node_ERROR_HINT_FMT, node->head->next->rule_id, node_ERROR_HINT);
+    P4_String       rule_name = node->head->next->rule_name;
+
+    if (strcmp(rule_name, "zeroormore") == 0) {
+        min = 0; max = SIZE_MAX;
+    } else if (strcmp(rule_name, "zerooronce") == 0) {
+        min = 0; max = 1;
+    } else if (strcmp(rule_name, "onceormore") == 0) {
+        min = 1; max = SIZE_MAX;
+    } else if (strcmp(rule_name, "repeatmin") == 0) {
+        catch(P4_PegEvalNumber(node->head->next->head, &min));
+    } else if (strcmp(rule_name, "repeatmax") == 0) {
+        catch(P4_PegEvalNumber(node->head->next->head, &max));
+    } else if (strcmp(rule_name, "repeatminmax") == 0) {
+        catch(P4_PegEvalNumber(node->head->next->head, &min));
+        catch(P4_PegEvalNumber(node->head->next->tail, &max));
+    } else if (strcmp(rule_name, "repeatexact") == 0) {
+        catch(P4_PegEvalNumber(node->head->next->head, &min));
+        max = min;
+    } else {
+        UNREACHABLE();
+        P4_Panicf("InternalError: unknown repeat kind: %s"
+            node_ERROR_HINT_FMT, node->head->next->rule_name, node_ERROR_HINT);
     }
 
     if (min > max) {
@@ -4440,18 +4433,15 @@ P4_PegEvalGrammarRule(P4_Node* node, P4_Result* result) {
     P4_Error            err       = P4_Ok;
     P4_Expression*      expr      = NULL;
 
-    for (child = node->head; child != NULL; child = child->next)
-        switch (child->rule_id) {
-            case P4_PegRuleRuleDecorators:
-                catch(P4_PegEvalRuleFlags(child, &rule_flag));
-                break;
-            case P4_PegRuleRuleName:
-                catch(P4_PegEvalRuleName(child, &rule_name));
-                break;
-            default:
-                catch(P4_PegEvalExpression(child, result));
-                break;
+    for (child = node->head; child != NULL; child = child->next) {
+        if (strcmp(child->rule_name, "decorators") == 0) {
+            catch(P4_PegEvalRuleFlags(child, &rule_flag));
+        } else if (strcmp(child->rule_name, "name") == 0) {
+            catch(P4_PegEvalRuleName(child, &rule_name));
+        } else {
+            catch(P4_PegEvalExpression(child, result));
         }
+    }
 
     expr = P4_UnwrapExpression(result);
 
@@ -4565,32 +4555,31 @@ finalize:
 
 P4_PUBLIC P4_Error
 P4_PegEvalExpression(P4_Node* node, P4_Result* result) {
-    switch (node->rule_id) {
-    case P4_PegRuleLiteral:
+    if (strcmp(node->rule_name, "literal") == 0)
         return P4_PegEvalLiteral(node, result);
-    case P4_PegRuleInsensitiveLiteral:
+    else if (strcmp(node->rule_name, "insensitive") == 0)
         return P4_PegEvalInsensitiveLiteral(node, result);
-    case P4_PegRuleRange:
+    else if (strcmp(node->rule_name, "range") == 0)
         return P4_PegEvalRange(node, result);
-    case P4_PegRuleSequence:
+    else if (strcmp(node->rule_name, "sequence") == 0)
         return P4_PegEvalSequence(node, result);
-    case P4_PegRuleChoice:
+    else if (strcmp(node->rule_name, "choice") == 0)
         return P4_PegEvalChoice(node, result);
-    case P4_PegRulePositive:
+    else if (strcmp(node->rule_name, "positive") == 0)
         return P4_PegEvalPositive(node, result);
-    case P4_PegRuleNegative:
+    else if (strcmp(node->rule_name, "negative") == 0)
         return P4_PegEvalNegative(node, result);
-    case P4_PegRuleRepeat:
+    else if (strcmp(node->rule_name, "repeat") == 0)
         return P4_PegEvalRepeat(node, result);
-    case P4_PegRuleDot:
+    else if (strcmp(node->rule_name, "dot") == 0)
         return P4_PegEvalDot(node, result);
-    case P4_PegRuleReference:
+    else if (strcmp(node->rule_name, "reference") == 0)
         return P4_PegEvalReference(node, result);
-    default:
+    else {
         UNREACHABLE();
         P4_Panicf("PegError: node %p is not a peg expression", node);
+        return P4_Ok;
     }
-    return P4_Ok;
 }
 
 P4_PUBLIC P4_Error
@@ -4650,4 +4639,9 @@ P4_LoadGrammar(P4_String rules) {
 P4_PUBLIC P4_RuleID
 P4_GetRuleID(P4_Expression* expr) {
     return expr->id;
+}
+
+P4_PUBLIC const P4_String
+P4_GetRuleName(P4_Expression* expr) {
+    return expr->name;
 }

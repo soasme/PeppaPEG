@@ -32,7 +32,7 @@ void test_match_same_insensitive_literal_successfully(void) {
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);
     TEST_ASSERT_NULL(node->tail);
-    ASSERT_EQUAL_NODE_RULE(R1, node);
+    ASSERT_EQUAL_NODE_RULE("R1", node);
     ASSERT_EQUAL_NODE_STRING("Hello World", node);
 
     P4_DeleteSource(source);
@@ -69,7 +69,7 @@ void test_match_insensitive_literal_successfully(void) {
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);
     TEST_ASSERT_NULL(node->tail);
-    ASSERT_EQUAL_NODE_RULE(R1, node);
+    ASSERT_EQUAL_NODE_RULE("R1", node);
     ASSERT_EQUAL_NODE_STRING("HeLlO WoRlD", node);
 
     P4_DeleteSource(source);
@@ -140,7 +140,7 @@ void test_match_same_sensitive_literal_successfully(void) {
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);
     TEST_ASSERT_NULL(node->tail);
-    ASSERT_EQUAL_NODE_RULE(R1, node);
+    ASSERT_EQUAL_NODE_RULE("R1", node);
     ASSERT_EQUAL_NODE_STRING("Hello World", node);
 
     P4_DeleteSource(source);
@@ -245,7 +245,7 @@ void test_match_unicode_literal_successfully(void) {
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);
     TEST_ASSERT_NULL(node->tail);
-    ASSERT_EQUAL_NODE_RULE(R1, node);
+    ASSERT_EQUAL_NODE_RULE("R1", node);
     ASSERT_EQUAL_NODE_STRING("你好, WORLD", node);
 
     P4_DeleteSource(source);
@@ -279,7 +279,7 @@ void test_match_emoji_literal_successfully(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(R1, node);
+    ASSERT_EQUAL_NODE_RULE("R1", node);
     ASSERT_EQUAL_NODE_STRING("PEPPA 🐷", node);
 
     TEST_ASSERT_NULL(node->next);
@@ -317,7 +317,7 @@ void test_case_insensitive_literal_for_nonascii_chars(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(R1, node);
+    ASSERT_EQUAL_NODE_RULE("R1", node);
     ASSERT_EQUAL_NODE_STRING("HELLO WORÌD", node);
 
     TEST_ASSERT_NULL(node->next);

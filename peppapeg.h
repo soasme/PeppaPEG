@@ -413,6 +413,7 @@ struct P4_Node {
 
     /** The id for matched grammar rule. */
     P4_RuleID               rule_id;
+    P4_String               rule_name;
 
     /** The user data. */
     P4_UserData             userdata;
@@ -1658,7 +1659,7 @@ P4_String      P4_GetErrorMessage(P4_Source*);
  *
  *      P4_DeleteNode(node);
  */
-P4_Node*      P4_CreateNode(P4_String, P4_Position*, P4_Position*, P4_RuleID);
+P4_Node*      P4_CreateNode(P4_String, P4_Position*, P4_Position*, P4_RuleID, P4_String);
 
 /**
  * @brief       Delete the node.
@@ -1802,6 +1803,17 @@ P4_Grammar*     P4_LoadGrammar(P4_String rules);
  *      P4_RuleID id = P4_GetRuleID(expr);
  */
 P4_RuleID       P4_GetRuleID(P4_Expression*);
+
+/**
+ * @brief       Get the rule name.
+ * @param       expr    The rule expression.
+ * @return      The rule name.
+ *
+ * Example:
+ *
+ *      const P4_String name = P4_GetRuleName(expr);
+ */
+const P4_String P4_GetRuleName(P4_Expression*);
 
 #ifdef __cplusplus
 }

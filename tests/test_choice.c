@@ -34,7 +34,7 @@ void test_match_literal_choices_successfully(void) {
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);
     TEST_ASSERT_NULL(node->tail);
-    ASSERT_EQUAL_NODE_RULE(R1, node);
+    ASSERT_EQUAL_NODE_RULE("r1", node);
     ASSERT_EQUAL_NODE_STRING("你好, 世界", node);
 
     P4_DeleteSource(source);
@@ -74,7 +74,7 @@ void test_match_literal_choices_successfully2(void) {
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);
     TEST_ASSERT_NULL(node->tail);
-    ASSERT_EQUAL_NODE_RULE(R1, node);
+    ASSERT_EQUAL_NODE_RULE("r1", node);
     ASSERT_EQUAL_NODE_STRING("HELLO WORLD", node);
 
     P4_DeleteSource(source);

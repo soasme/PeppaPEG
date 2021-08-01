@@ -37,12 +37,12 @@ void test_match_reference_successfully(void) {
 
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("HELLO", node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
 
     TEST_ASSERT_NOT_NULL(node->head);
     TEST_ASSERT_EQUAL(node->head, node->tail);
     ASSERT_EQUAL_NODE_STRING("HELLO", node);
-    ASSERT_EQUAL_NODE_RULE(R1, node->head);
+    ASSERT_EQUAL_NODE_RULE("r1", node->head);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

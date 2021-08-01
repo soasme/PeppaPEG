@@ -46,18 +46,18 @@ void test_match_back_reference_successfully(void) {
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("'...'", node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
 
     P4_Node* head = node->head;
     TEST_ASSERT_NOT_NULL(head);
     ASSERT_EQUAL_NODE_STRING("'", head);
-    ASSERT_EQUAL_NODE_RULE(MARKER, head);
+    ASSERT_EQUAL_NODE_RULE("marker", head);
 
     P4_Node* tail = node->tail;
     TEST_ASSERT_NOT_NULL(tail);
     TEST_ASSERT_NOT_EQUAL(head, tail);
     ASSERT_EQUAL_NODE_STRING("'", tail);
-    ASSERT_EQUAL_NODE_RULE(MARKER, tail);
+    ASSERT_EQUAL_NODE_RULE("marker", tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -147,18 +147,18 @@ void test_match_back_reference_insensitive_match(void) {
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("TAG...tag", node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
 
     P4_Node* head = node->head;
     TEST_ASSERT_NOT_NULL(head);
     ASSERT_EQUAL_NODE_STRING("TAG", head);
-    ASSERT_EQUAL_NODE_RULE(MARKER, head);
+    ASSERT_EQUAL_NODE_RULE("marker", head);
 
     P4_Node* tail = node->tail;
     TEST_ASSERT_NOT_NULL(tail);
     TEST_ASSERT_NOT_EQUAL(head, tail);
     ASSERT_EQUAL_NODE_STRING("tag", tail);
-    ASSERT_EQUAL_NODE_RULE(MARKER, tail);
+    ASSERT_EQUAL_NODE_RULE("marker", tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

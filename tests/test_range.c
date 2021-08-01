@@ -31,7 +31,7 @@ void test_match_ascii_digits_successfully(void) {
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);
     TEST_ASSERT_NULL(node->tail);
-    ASSERT_EQUAL_NODE_RULE(R1, node);
+    ASSERT_EQUAL_NODE_RULE("r1", node);
     ASSERT_EQUAL_NODE_STRING("0", node);
 
     P4_DeleteSource(source);
@@ -68,7 +68,7 @@ void test_match_utf8_code_point_successfully(void) {
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);
     TEST_ASSERT_NULL(node->tail);
-    ASSERT_EQUAL_NODE_RULE(R1, node);
+    ASSERT_EQUAL_NODE_RULE("r1", node);
     ASSERT_EQUAL_NODE_STRING("好", node);
 
     P4_DeleteSource(source);

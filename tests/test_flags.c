@@ -40,7 +40,7 @@ void test_spaced_rule_should_loosen_sequence(void) {
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("HELLO \t\n\t WORLD", node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
 
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);
@@ -85,7 +85,7 @@ void test_spaced_rule_should_be_ignored_in_tight_sequence(void) {
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("HELLOWORLD", node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
 
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);
@@ -139,7 +139,7 @@ void test_spaced_rule_should_loosen_sequence_despite_member_is_tight(void) {
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("12  :  12", node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -216,7 +216,7 @@ void test_spaced_rule_should_be_applied_in_repeat(void) {
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("0 0\t0\n0\t0 0", node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
 
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);
@@ -293,7 +293,7 @@ void test_spaced_rule_should_be_ignored_in_tight_repeat2(void) {
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("000000", node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
 
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);
@@ -344,7 +344,7 @@ void test_squashed_rule_should_generate_no_children(void) {
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("00", node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
 
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);
@@ -389,7 +389,7 @@ void test_squashed_repeat_should_generate_no_children(void) {
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("000000", node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
 
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);
@@ -583,17 +583,17 @@ void test_squashed_sequence_should_not_hide_scoped_literal(void) {
 
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("11", node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
 
     TEST_ASSERT_NOT_NULL(node->head);
     ASSERT_EQUAL_NODE_STRING("1", node->head);
-    ASSERT_EQUAL_NODE_RULE(R1, node->head);
+    ASSERT_EQUAL_NODE_RULE("r1", node->head);
 
     TEST_ASSERT_EQUAL(node->head->next, node->tail);
 
     TEST_ASSERT_NOT_NULL(node->tail);
     ASSERT_EQUAL_NODE_STRING("1", node->tail);
-    ASSERT_EQUAL_NODE_RULE(R1, node->tail);
+    ASSERT_EQUAL_NODE_RULE("r1", node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -640,11 +640,11 @@ void test_squashed_lifted_sequence_should_not_hide_scoped_literal(void) {
 
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("1", node);
-    ASSERT_EQUAL_NODE_RULE(R1, node);
+    ASSERT_EQUAL_NODE_RULE("r1", node);
 
     TEST_ASSERT_NOT_NULL(node->next);
     ASSERT_EQUAL_NODE_STRING("1", node->next);
-    ASSERT_EQUAL_NODE_RULE(R1, node->next);
+    ASSERT_EQUAL_NODE_RULE("r1", node->next);
 
     TEST_ASSERT_NULL(node->head);
     TEST_ASSERT_NULL(node->tail);
@@ -692,17 +692,17 @@ void test_squashed_repeat_should_not_hide_scoped_literal(void) {
 
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("11", node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
 
     TEST_ASSERT_NOT_NULL(node->head);
     ASSERT_EQUAL_NODE_STRING("1", node->head);
-    ASSERT_EQUAL_NODE_RULE(R1, node->head);
+    ASSERT_EQUAL_NODE_RULE("r1", node->head);
 
     TEST_ASSERT_EQUAL(node->head->next, node->tail);
 
     TEST_ASSERT_NOT_NULL(node->tail);
     ASSERT_EQUAL_NODE_STRING("1", node->tail);
-    ASSERT_EQUAL_NODE_RULE(R1, node->tail);
+    ASSERT_EQUAL_NODE_RULE("r1", node->tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -746,11 +746,11 @@ void test_squashed_lifted_repeat_should_not_hide_scoped_literal(void) {
 
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("1", node);
-    ASSERT_EQUAL_NODE_RULE(R1, node);
+    ASSERT_EQUAL_NODE_RULE("r1", node);
 
     TEST_ASSERT_NOT_NULL(node->next);
     ASSERT_EQUAL_NODE_STRING("1", node->next);
-    ASSERT_EQUAL_NODE_RULE(R1, node->next);
+    ASSERT_EQUAL_NODE_RULE("r1", node->next);
 
     TEST_ASSERT_NULL(node->head);
     TEST_ASSERT_NULL(node->tail);
@@ -771,7 +771,7 @@ void test_lift_repeat_for_single_child(void) {
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("a", node);
-    ASSERT_EQUAL_NODE_RULE(R1, node);
+    ASSERT_EQUAL_NODE_RULE("r1", node);
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
 }
@@ -789,7 +789,7 @@ void test_lift_sequence_for_single_child(void) {
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("a", node);
-    ASSERT_EQUAL_NODE_RULE(R1, node);
+    ASSERT_EQUAL_NODE_RULE("r1", node);
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
 }

@@ -35,7 +35,7 @@ void test_match_literal_sequence_successfully(void) {
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);
     TEST_ASSERT_NULL(node->tail);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
     ASSERT_EQUAL_NODE_STRING("你好 WORLD", node);
 
     P4_DeleteSource(source);
@@ -157,15 +157,15 @@ void test_match_reference_in_sequence_successfully(void) {
     P4_Node* node = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
     ASSERT_EQUAL_NODE_STRING("OLAola", node);
 
     TEST_ASSERT_NOT_NULL(node->head);
-    ASSERT_EQUAL_NODE_RULE(R1, node->head);
+    ASSERT_EQUAL_NODE_RULE("r1", node->head);
     ASSERT_EQUAL_NODE_STRING("OLA", node->head);
 
     TEST_ASSERT_NOT_NULL(node->tail);
-    ASSERT_EQUAL_NODE_RULE(R1, node->tail);
+    ASSERT_EQUAL_NODE_RULE("r1", node->tail);
     ASSERT_EQUAL_NODE_STRING("ola", node->tail);
 
     P4_DeleteSource(source);

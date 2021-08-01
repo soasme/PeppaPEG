@@ -113,20 +113,20 @@ void test_join(void) {
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("1,2,3", node);
-    ASSERT_EQUAL_NODE_RULE(ROW, node);
+    ASSERT_EQUAL_NODE_RULE("row", node);
 
     TEST_ASSERT_NOT_NULL(node->head);
     ASSERT_EQUAL_NODE_STRING("1", node->head);
-    ASSERT_EQUAL_NODE_RULE(NUM, node->head);
+    ASSERT_EQUAL_NODE_RULE("num", node->head);
 
     TEST_ASSERT_NOT_NULL(node->head->next);
     ASSERT_EQUAL_NODE_STRING("2", node->head->next);
-    ASSERT_EQUAL_NODE_RULE(NUM, node->head->next);
+    ASSERT_EQUAL_NODE_RULE("num", node->head->next);
 
     TEST_ASSERT_NOT_NULL(node->head->next->next);
     TEST_ASSERT_EQUAL(node->tail, node->head->next->next);
     ASSERT_EQUAL_NODE_STRING("3", node->head->next->next);
-    ASSERT_EQUAL_NODE_RULE(NUM, node->head->next->next);
+    ASSERT_EQUAL_NODE_RULE("num", node->head->next->next);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -161,7 +161,7 @@ void test_source_slice(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(R1, node);
+    ASSERT_EQUAL_NODE_RULE("r1", node);
     ASSERT_EQUAL_NODE_STRING("XXX", node);
 
     TEST_ASSERT_NULL(node->next);
@@ -186,7 +186,7 @@ void test_lineno_offset(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(R1, node);
+    ASSERT_EQUAL_NODE_RULE("r1", node);
     ASSERT_EQUAL_NODE_STRING("A\nBC\n", node);
     ASSERT_EQUAL_NODE_LINE_OFFSET(1, 1, 2, 4, node);
 

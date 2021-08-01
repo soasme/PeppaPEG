@@ -39,7 +39,7 @@ void test_match_positive_successfully(void) {
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);
     TEST_ASSERT_NULL(node->tail);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
     ASSERT_EQUAL_NODE_STRING("Hello WORLD", node);
 
     P4_DeleteSource(source);
@@ -95,14 +95,14 @@ void test_match_positive_consumes_no_input(void) {
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
     TEST_ASSERT_NULL(node->next);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
     ASSERT_EQUAL_NODE_STRING("Hello WORLD", node);
 
     /* R1(Positive) has no node produced. */
 
     TEST_ASSERT_NOT_NULL(node->head);
     TEST_ASSERT_EQUAL(node->head, node->tail);
-    ASSERT_EQUAL_NODE_RULE(R2, node->head);
+    ASSERT_EQUAL_NODE_RULE("r2", node->head);
     ASSERT_EQUAL_NODE_STRING("Hello WORLD", node->head);
 
     P4_DeleteSource(source);

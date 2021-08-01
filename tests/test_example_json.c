@@ -21,7 +21,7 @@ void test_null(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(P4_JSONNull, node);
+    ASSERT_EQUAL_NODE_RULE("null", node);
     ASSERT_EQUAL_NODE_STRING("null", node);
 
     TEST_ASSERT_NULL(node->next);
@@ -48,7 +48,7 @@ void test_true(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(P4_JSONTrue, node);
+    ASSERT_EQUAL_NODE_RULE("true", node);
     ASSERT_EQUAL_NODE_STRING("true", node);
 
     TEST_ASSERT_NULL(node->next);
@@ -75,7 +75,7 @@ void test_false(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(P4_JSONFalse, node);
+    ASSERT_EQUAL_NODE_RULE("false", node);
     ASSERT_EQUAL_NODE_STRING("false", node);
 
     TEST_ASSERT_NULL(node->next);
@@ -102,7 +102,7 @@ void test_number_integer_0(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(P4_JSONNumber, node);
+    ASSERT_EQUAL_NODE_RULE("number", node);
     ASSERT_EQUAL_NODE_STRING("0", node);
 
     TEST_ASSERT_NULL(node->next);
@@ -129,7 +129,7 @@ void test_number_integer_1234567890(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(P4_JSONNumber, node);
+    ASSERT_EQUAL_NODE_RULE("number", node);
     ASSERT_EQUAL_NODE_STRING("1234567890", node);
 
     TEST_ASSERT_NULL(node->next);
@@ -156,7 +156,7 @@ void test_number_float(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(P4_JSONNumber, node);
+    ASSERT_EQUAL_NODE_RULE("number", node);
     ASSERT_EQUAL_NODE_STRING("0.1", node);
 
     TEST_ASSERT_NULL(node->next);
@@ -183,7 +183,7 @@ void test_number_exp(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(P4_JSONNumber, node);
+    ASSERT_EQUAL_NODE_RULE("number", node);
     ASSERT_EQUAL_NODE_STRING("1e+1", node);
 
     TEST_ASSERT_NULL(node->next);
@@ -210,7 +210,7 @@ void test_string_xyz(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(P4_JSONString, node);
+    ASSERT_EQUAL_NODE_RULE("string", node);
     ASSERT_EQUAL_NODE_STRING("\"xyz\"", node);
 
     TEST_ASSERT_NULL(node->next);
@@ -237,7 +237,7 @@ void test_string_pi(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(P4_JSONString, node);
+    ASSERT_EQUAL_NODE_RULE("string", node);
     ASSERT_EQUAL_NODE_STRING("\"π\"", node);
 
     TEST_ASSERT_NULL(node->next);
@@ -265,7 +265,7 @@ void test_string_empty(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(P4_JSONString, node);
+    ASSERT_EQUAL_NODE_RULE("string", node);
     ASSERT_EQUAL_NODE_STRING("\"\"", node);
 
     TEST_ASSERT_NULL(node->next);
@@ -292,7 +292,7 @@ void test_array_empty(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(P4_JSONArray, node);
+    ASSERT_EQUAL_NODE_RULE("array", node);
     ASSERT_EQUAL_NODE_STRING("[ ]", node);
 
     TEST_ASSERT_NULL(node->next);
@@ -319,7 +319,7 @@ void test_array_one_item(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(P4_JSONArray, node);
+    ASSERT_EQUAL_NODE_RULE("array", node);
     ASSERT_EQUAL_NODE_STRING("[ 1 ]", node);
 
     TEST_ASSERT_NULL(node->next);
@@ -357,7 +357,7 @@ void test_array_deep_nesting(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(P4_JSONArray, node);
+    ASSERT_EQUAL_NODE_RULE("array", node);
     ASSERT_EQUAL_NODE_STRING(input, node);
 
     TEST_ASSERT_NULL(node->next);
@@ -385,7 +385,7 @@ void test_array_multiple_items(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(P4_JSONArray, node);
+    ASSERT_EQUAL_NODE_RULE("array", node);
     ASSERT_EQUAL_NODE_STRING("[1,2]", node);
 
     TEST_ASSERT_NULL(node->next);
@@ -411,7 +411,7 @@ void test_array_multiple_items_with_empty_spaces(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(P4_JSONArray, node);
+    ASSERT_EQUAL_NODE_RULE("array", node);
     ASSERT_EQUAL_NODE_STRING("[1,    2]", node);
 
     TEST_ASSERT_NULL(node->next);
@@ -439,7 +439,7 @@ void test_object_empty(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(P4_JSONObject, node);
+    ASSERT_EQUAL_NODE_RULE("object", node);
     ASSERT_EQUAL_NODE_STRING("{ }", node);
 
     TEST_ASSERT_NULL(node->next);
@@ -466,7 +466,7 @@ void test_object_one_item(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(P4_JSONObject, node);
+    ASSERT_EQUAL_NODE_RULE("object", node);
     ASSERT_EQUAL_NODE_STRING("{\"k\":1}", node);
 
     TEST_ASSERT_NULL(node->next);
@@ -493,7 +493,7 @@ void test_object_multiple_items(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(P4_JSONObject, node);
+    ASSERT_EQUAL_NODE_RULE("object", node);
     ASSERT_EQUAL_NODE_STRING("{\"k\":1,\"v\":2}", node);
 
     TEST_ASSERT_NULL(node->next);
@@ -520,7 +520,7 @@ void test_objectitem(void) {
 
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(P4_JSONObjectItem, node);
+    ASSERT_EQUAL_NODE_RULE("item", node);
     ASSERT_EQUAL_NODE_STRING("\"k\":    1", node);
 
     TEST_ASSERT_NULL(node->next);

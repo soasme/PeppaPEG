@@ -101,7 +101,9 @@ P4_Error P4_MustacheCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* 
             goto finalize_set_delimiter;
 
         node->head->rule_id = P4_GetRuleID(opener_expr);
+        node->head->rule_name  = P4_GetRuleName(opener_expr);
         node->tail->rule_id = P4_GetRuleID(closer_expr);
+        node->tail->rule_name  = P4_GetRuleName(closer_expr);
 
         free(opener);
         free(closer);

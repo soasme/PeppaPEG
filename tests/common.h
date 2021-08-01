@@ -27,9 +27,9 @@ cleanup_freep (void *p)
     TEST_ASSERT_EQUAL_STRING((s), nodestr); \
 } while (0);
 
-# define ASSERT_EQUAL_NODE_RULE(id, node) do { \
+# define ASSERT_EQUAL_NODE_RULE(name, node) do { \
     TEST_ASSERT_NOT_NULL((node)); \
-    TEST_ASSERT_EQUAL_UINT_MESSAGE((id), (node)->rule_id, "invalid node rule"); \
+    TEST_ASSERT_EQUAL_STRING_MESSAGE((name), (node)->rule_name, "invalid node rule"); \
 } while (0);
 
 # define ASSERT_EQUAL_NODE_LINE_OFFSET(startline, startoffset, stopline, stopoffset, node) do { \

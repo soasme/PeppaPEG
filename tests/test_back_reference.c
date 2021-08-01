@@ -21,7 +21,7 @@ void test_match_back_reference_successfully(void) {
     TEST_ASSERT_EQUAL(
         P4_Ok,
         P4_AddSequenceWithMembers(grammar, ENTRY, "entry", 3,
-            P4_CreateReference(MARKER),
+            P4_CreateReference("marker"),
             P4_CreateLiteral("...", true),
             P4_CreateBackReference(0, true)
         )
@@ -80,7 +80,7 @@ void test_match_back_reference_latter_not_match(void) {
     TEST_ASSERT_EQUAL(
         P4_Ok,
         P4_AddSequenceWithMembers(grammar, ENTRY, "entry", 3,
-            P4_CreateReference(MARKER),
+            P4_CreateReference("marker"),
             P4_CreateLiteral("...", true),
             P4_CreateBackReference(0, true)
         )
@@ -125,7 +125,7 @@ void test_match_back_reference_insensitive_match(void) {
     TEST_ASSERT_EQUAL(
         P4_Ok,
         P4_AddSequenceWithMembers(grammar, ENTRY, "entry", 3,
-            P4_CreateReference(MARKER),
+            P4_CreateReference("marker"),
             P4_CreateLiteral("...", true),
             P4_CreateBackReference(0, false)
         )

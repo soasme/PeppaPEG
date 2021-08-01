@@ -70,11 +70,11 @@ void test_match_positive_consumes_no_input(void) {
     P4_Expression* entry = P4_GetGrammarRuleByName(grammar, "entry");
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_SetReferenceMember(entry, 0, R1)
+        P4_SetReferenceMember(entry, 0, "r1")
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_SetReferenceMember(entry, 1, R2)
+        P4_SetReferenceMember(entry, 1, "r2")
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,

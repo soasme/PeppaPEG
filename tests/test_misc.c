@@ -25,7 +25,7 @@ void test_maximum_recursion_limit(void) {
             P4_CreateLiteral("x", true),
             P4_CreateSequenceWithMembers(2,
                 P4_CreateLiteral("-", true),
-                P4_CreateReference(ENTRY)
+                P4_CreateReference("entry")
             )
         )
     );
@@ -57,7 +57,7 @@ void test_replace_grammar_rule(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(P4_Ok, P4_AddLiteral(grammar, ENTRY, "entry", "{{", true));
-    TEST_ASSERT_EQUAL(P4_Ok, P4_ReplaceGrammarRule(grammar, ENTRY, P4_CreateLiteral("<%", true)));
+    TEST_ASSERT_EQUAL(P4_Ok, P4_ReplaceGrammarRule(grammar, "entry", P4_CreateLiteral("<%", true)));
     P4_Source* source = P4_CreateSource("<%", ENTRY);
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
@@ -77,8 +77,8 @@ void test_replace_grammar_rule_refreshing_references(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(P4_Ok, P4_AddLiteral(grammar, REFERENCE, "reference", "{{", true));
-    TEST_ASSERT_EQUAL(P4_Ok, P4_AddReference(grammar, ENTRY, "entry", REFERENCE));
-    TEST_ASSERT_EQUAL(P4_Ok, P4_ReplaceGrammarRule(grammar, REFERENCE, P4_CreateLiteral("<%", true)));
+    TEST_ASSERT_EQUAL(P4_Ok, P4_AddReference(grammar, ENTRY, "entry", "reference"));
+    TEST_ASSERT_EQUAL(P4_Ok, P4_ReplaceGrammarRule(grammar, "reference", P4_CreateLiteral("<%", true)));
     P4_Source* source = P4_CreateSource("<%", ENTRY);
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
@@ -104,7 +104,7 @@ void test_join(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     const int ROW = 1;
     const int NUM = 2;
-    TEST_ASSERT_EQUAL(P4_Ok, P4_AddJoin(grammar, ROW, "row", ",", NUM));
+    TEST_ASSERT_EQUAL(P4_Ok, P4_AddJoin(grammar, ROW, "row", ",", "num"));
     TEST_ASSERT_EQUAL(P4_Ok, P4_AddRange(grammar, NUM, "num", '0', '9', 1));
 
     P4_Source* source = P4_CreateSource("1,2,3", ROW);

@@ -610,16 +610,16 @@ P4_Error       P4_AddRanges(P4_Grammar*, P4_RuleID, P4_String, size_t count, P4_
 /**
  * Create a P4_Reference expression.
  *
- * @param   ref_id      The ID of referenced grammar rule.
+ * @param   reference   The grammar rule name.
  * @return  A P4_Expression.
  *
  * Example:
  *
- *      P4_Expression* expr = P4_CreateReference(1);
+ *      P4_Expression* expr = P4_CreateReference("entry");
  *
  *
  */
-P4_Expression* P4_CreateReference(P4_RuleID);
+P4_Expression* P4_CreateReference(P4_String);
 
 /**
  * Add a reference expression as grammar rule.
@@ -634,7 +634,7 @@ P4_Expression* P4_CreateReference(P4_RuleID);
  *
  *      P4_AddReference(grammar, 1, "R1", 2);
  */
-P4_Error       P4_AddReference(P4_Grammar*, P4_RuleID, P4_String, P4_RuleID);
+P4_Error       P4_AddReference(P4_Grammar*, P4_RuleID, P4_String, P4_String);
 
 /**
  * Create a P4_Positive expression.
@@ -1144,7 +1144,7 @@ P4_Error       P4_SetMember(P4_Expression*, size_t, P4_Expression*);
  *
  *      P4_SetMember(expr, index, P4_CreateReference(member_rule_id));
  */
-P4_Error       P4_SetReferenceMember(P4_Expression*, size_t, P4_RuleID);
+P4_Error       P4_SetReferenceMember(P4_Expression*, size_t, P4_String);
 
 /**
  * Get the total number members for sequence/choice.
@@ -1221,31 +1221,31 @@ P4_Expression* P4_CreateEndOfInput();
  * @param   id          The grammar rule id.
  * @param   name        The grammar rule name.
  * @param   joiner  A joiner literal.
- * @param   pattern The repeated pattern rule id.
+ * @param   pattern The repeated pattern rule name.
  * @return  The error code.
  *
  * Example:
  *
- *      P4_Expression* row = P4_AddJoin(grammar, 1, "R1", ",", Element);
+ *      P4_Expression* row = P4_AddJoin(grammar, 1, "R1", ",", "element");
  */
-P4_Error P4_AddJoin(P4_Grammar* grammar, P4_RuleID id, P4_String, const P4_String joiner, P4_RuleID rule_id);
+P4_Error P4_AddJoin(P4_Grammar* grammar, P4_RuleID id, P4_String, const P4_String joiner, P4_String reference);
 
 /**
  * Create a Join expression.
  *
  * @param   joiner  A joiner literal.
- * @param   pattern The repeated pattern rule id.
+ * @param   pattern The repeated pattern rule name.
  * @return  A P4_Expression.
  *
  * Example:
  *
- *      P4_Expression* row = P4_CreateJoin(",", Element);
+ *      P4_Expression* row = P4_CreateJoin(",", "element");
  *
  * Join is a syntax sugar to the below structure:
  *
  *      Sequence(pattern, ZeroOrMore(Sequence(Literal(joiner), pattern)))
  */
-P4_Expression* P4_CreateJoin(const P4_String joiner, P4_RuleID rule_id);
+P4_Expression* P4_CreateJoin(const P4_String joiner, P4_String reference);
 
 
 /**
@@ -1759,13 +1759,13 @@ P4_Error       P4_SetGrammarCallback(P4_Grammar*, P4_MatchCallback, P4_ErrorCall
 /**
  * @brief       Replace an existing grammar rule.
  * @param       grammar     The grammar.
- * @param       id          The rule id.
+ * @param       name        The rule name.
  * @param       expr        The rule expression to replace.
  * @return      The error code.
  *
  * The original grammar rule will be deleted.
  */
-P4_Error       P4_ReplaceGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_Error       P4_ReplaceGrammarRule(P4_Grammar*, P4_String, P4_Expression*);
 
 /**
  * @brief       Create a grammar that can parse other grammars written in PEG syntax.

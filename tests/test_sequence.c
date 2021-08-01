@@ -137,8 +137,8 @@ void test_match_reference_in_sequence_successfully(void) {
     TEST_ASSERT_EQUAL(
         P4_Ok,
         P4_AddSequenceWithMembers(grammar, ENTRY, "entry", 2,
-            P4_CreateReference(R1),
-            P4_CreateReference(R1)
+            P4_CreateReference("r1"),
+            P4_CreateReference("r1")
         )
     );
     TEST_ASSERT_EQUAL(

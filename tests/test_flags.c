@@ -113,9 +113,9 @@ void test_spaced_rule_should_loosen_sequence_despite_member_is_tight(void) {
     TEST_ASSERT_EQUAL(
         P4_Ok,
         P4_AddSequenceWithMembers(grammar, ENTRY, "entry", 3,
-            P4_CreateReference(R1),
+            P4_CreateReference("r1"),
             P4_CreateLiteral(":", true),
-            P4_CreateReference(R1)
+            P4_CreateReference("r1")
         )
     );
     TEST_ADD_WHITESPACE(grammar, WHITESPACE);
@@ -323,8 +323,8 @@ void test_squashed_rule_should_generate_no_children(void) {
     TEST_ASSERT_EQUAL(
         P4_Ok,
         P4_AddSequenceWithMembers(grammar, ENTRY, "entry", 2,
-            P4_CreateReference(Z),
-            P4_CreateReference(Z)
+            P4_CreateReference("z"),
+            P4_CreateReference("z")
         )
     );
     TEST_ASSERT_EQUAL(P4_Ok, P4_SetGrammarRuleFlag(grammar, ENTRY, P4_FLAG_SQUASHED));
@@ -370,7 +370,7 @@ void test_squashed_repeat_should_generate_no_children(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddZeroOrMore(grammar, ENTRY, "entry", P4_CreateReference(Z))
+        P4_AddZeroOrMore(grammar, ENTRY, "entry", P4_CreateReference("z"))
     );
     TEST_ASSERT_EQUAL(P4_Ok, P4_SetGrammarRuleFlag(grammar, ENTRY, P4_FLAG_SQUASHED));
     TEST_ASSERT_EQUAL(
@@ -559,8 +559,8 @@ void test_squashed_sequence_should_not_hide_scoped_literal(void) {
     TEST_ASSERT_EQUAL(
         P4_Ok,
         P4_AddSequenceWithMembers(grammar, ENTRY, "entry", 2,
-            P4_CreateReference(R1),
-            P4_CreateReference(R1)
+            P4_CreateReference("r1"),
+            P4_CreateReference("r1")
         )
     );
     P4_Expression* entry = P4_GetGrammarRuleByName(grammar, "entry");
@@ -617,8 +617,8 @@ void test_squashed_lifted_sequence_should_not_hide_scoped_literal(void) {
     TEST_ASSERT_EQUAL(
         P4_Ok,
         P4_AddSequenceWithMembers(grammar, ENTRY, "entry", 2,
-            P4_CreateReference(R1),
-            P4_CreateReference(R1)
+            P4_CreateReference("r1"),
+            P4_CreateReference("r1")
         )
     );
     TEST_ASSERT_EQUAL(P4_Ok, P4_SetGrammarRuleFlag(grammar, ENTRY, P4_FLAG_SQUASHED | P4_FLAG_LIFTED));
@@ -671,7 +671,7 @@ void test_squashed_repeat_should_not_hide_scoped_literal(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddRepeatExact(grammar, ENTRY, "entry", P4_CreateReference(R1), 2)
+        P4_AddRepeatExact(grammar, ENTRY, "entry", P4_CreateReference("r1"), 2)
     );
     TEST_ASSERT_EQUAL(P4_Ok, P4_SetGrammarRuleFlag(grammar, ENTRY, P4_FLAG_SQUASHED));
     TEST_ASSERT_EQUAL(
@@ -725,7 +725,7 @@ void test_squashed_lifted_repeat_should_not_hide_scoped_literal(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddRepeatExact(grammar, ENTRY, "entry", P4_CreateReference(R1), 2)
+        P4_AddRepeatExact(grammar, ENTRY, "entry", P4_CreateReference("r1"), 2)
     );
     TEST_ASSERT_EQUAL(P4_Ok, P4_SetGrammarRuleFlag(grammar, ENTRY, P4_FLAG_LIFTED | P4_FLAG_SQUASHED));
     TEST_ASSERT_EQUAL(
@@ -761,7 +761,7 @@ void test_squashed_lifted_repeat_should_not_hide_scoped_literal(void) {
 
 void test_lift_repeat_for_single_child(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
-    TEST_ASSERT_EQUAL(P4_Ok, P4_AddOnceOrMore(grammar, ENTRY, "entry", P4_CreateReference(R1)));
+    TEST_ASSERT_EQUAL(P4_Ok, P4_AddOnceOrMore(grammar, ENTRY, "entry", P4_CreateReference("r1")));
     TEST_ASSERT_EQUAL(P4_Ok, P4_SetGrammarRuleFlag(grammar, ENTRY, P4_FLAG_NON_TERMINAL));
     TEST_ASSERT_EQUAL(P4_Ok, P4_AddLiteral(grammar, R1, "r1", "a", true));
     P4_Source* source = P4_CreateSource("a", ENTRY);
@@ -779,7 +779,7 @@ void test_lift_repeat_for_single_child(void) {
 void test_lift_sequence_for_single_child(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_EQUAL(P4_Ok, P4_AddSequenceWithMembers(grammar, ENTRY, "entry", 3,
-            P4_CreateLiteral("(", true), P4_CreateReference(R1), P4_CreateLiteral(")", true)));
+            P4_CreateLiteral("(", true), P4_CreateReference("r1"), P4_CreateLiteral(")", true)));
     TEST_ASSERT_EQUAL(P4_Ok, P4_AddLiteral(grammar, R1, "r1", "a", true));
     TEST_ASSERT_EQUAL(P4_Ok, P4_SetGrammarRuleFlag(grammar, ENTRY, P4_FLAG_NON_TERMINAL));
     P4_Source* source = P4_CreateSource("(a)", ENTRY);

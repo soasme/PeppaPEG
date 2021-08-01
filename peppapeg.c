@@ -2786,15 +2786,9 @@ P4_GetGrammarRule(P4_Grammar* grammar, P4_RuleID id) {
 
 P4_PUBLIC P4_Expression*
 P4_GetGrammarRuleByName(P4_Grammar* grammar, P4_String name) {
-    size_t i;
-    P4_Expression* rule = NULL;
-    for (i = 0; i < grammar->count; i++) {
-        rule = grammar->rules[i];
-        if (rule && rule->name && strcmp(rule->name, name) == 0) {
-            return rule;
-        }
-    }
-    return NULL;
+    khint_t k = kh_get(rules, grammar->rules2, name);
+    bool is_missing = (k == kh_end(grammar->rules2));
+    return is_missing ? NULL : kh_val(grammar->rules2, k);
 }
 
 P4_PUBLIC P4_Error

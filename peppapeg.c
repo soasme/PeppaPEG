@@ -2758,7 +2758,6 @@ P4_PUBLIC P4_Grammar*    P4_CreateGrammar(void) {
 P4_PUBLIC void
 P4_DeleteGrammar(P4_Grammar* grammar) {
     size_t i;
-    khint_t k;
     if (grammar) {
         for (i = 0; i < grammar->count; i++) {
             if (grammar->rules[i])
@@ -2767,9 +2766,6 @@ P4_DeleteGrammar(P4_Grammar* grammar) {
         }
         if (grammar->spaced_rules)
             P4_DeleteExpression(grammar->spaced_rules);
-        for (k = 0; k < kh_end(grammar->rules2); k++)
-            if (kh_exist(grammar->rules2, k))
-                P4_FREE((P4_String)kh_key(grammar->rules2, k));
         kh_destroy(rules, grammar->rules2);
         P4_FREE(grammar->rules);
         P4_FREE(grammar);
@@ -2862,6 +2858,10 @@ P4_AddGrammarRule(P4_Grammar* grammar, P4_RuleID id, P4_String name, P4_Expressi
     grammar->cap = cap;
     grammar->rules = rules;
     grammar->rules[grammar->count++] = expr;
+
+    int absent;
+    khint_t k = kh_put(rules, grammar->rules2, expr->name, &absent);
+    kh_value(grammar->rules2, k) = expr;
 
     return P4_Ok;
 }

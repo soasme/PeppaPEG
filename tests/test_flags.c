@@ -489,7 +489,7 @@ void test_lifted_choice_should_generate_no_node(void) {
         )
     );
 
-    P4_Expression* entry = P4_GetGrammarRule(grammar, ENTRY);
+    P4_Expression* entry = P4_GetGrammarRuleByName(grammar, "entry");
     TEST_ASSERT_NOT_NULL(entry);
     TEST_ASSERT_EQUAL(P4_Ok, P4_SetGrammarRuleFlag(grammar, ENTRY, P4_FLAG_LIFTED));
 
@@ -563,7 +563,7 @@ void test_squashed_sequence_should_not_hide_scoped_literal(void) {
             P4_CreateReference(R1)
         )
     );
-    P4_Expression* entry = P4_GetGrammarRule(grammar, ENTRY);
+    P4_Expression* entry = P4_GetGrammarRuleByName(grammar, "entry");
     TEST_ASSERT_EQUAL(P4_Ok, P4_SetGrammarRuleFlag(grammar, ENTRY, P4_FLAG_SQUASHED));
     TEST_ASSERT_EQUAL(
         P4_Ok,

@@ -2848,24 +2848,6 @@ P4_AddGrammarRule(P4_Grammar* grammar, P4_RuleID id, P4_String name, P4_Expressi
     return P4_Ok;
 }
 
-P4_PUBLIC P4_Error
-P4_SetGrammarRuleName(P4_Grammar* grammar, P4_RuleID id, P4_String name) {
-    P4_Expression* expr = P4_GetGrammarRule(grammar, id);
-
-    if (expr == NULL)
-        return P4_NullError;
-
-    if (strlen(name) >= P4_MAX_RULE_NAME_LEN)
-        return P4_ValueError;
-
-    if (expr->name != NULL)
-        P4_FREE(expr->name);
-
-    expr->name = strdup(name);
-
-    return P4_Ok;
-}
-
 P4_PUBLIC P4_String
 P4_GetGrammarRuleName(P4_Grammar* grammar, P4_RuleID id) {
     P4_Expression* expr = P4_GetGrammarRule(grammar, id);
@@ -3189,7 +3171,7 @@ P4_AddNegative(P4_Grammar* grammar, P4_RuleID id, P4_String name, P4_Expression*
 P4_PUBLIC P4_Error
 P4_AddSequence(P4_Grammar* grammar, P4_RuleID id, P4_String name, size_t size) {
     P4_AddSomeGrammarRule(grammar, id, name, P4_CreateContainer(size));
-    P4_GetGrammarRule(grammar, id)->kind = P4_Sequence;
+    P4_GetGrammarRuleByName(grammar, name)->kind = P4_Sequence;
     return P4_Ok;
 }
 
@@ -3198,7 +3180,7 @@ P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_RuleID id, P4_String name, siz
     P4_AddSomeGrammarRule(grammar, id, name, P4_CreateSequence(count));
 
     size_t i = 0;
-    P4_Expression* expr = P4_GetGrammarRule(grammar, id);
+    P4_Expression* expr = P4_GetGrammarRuleByName(grammar, name);
 
     va_list members;
     va_start (members, count);
@@ -3218,7 +3200,7 @@ P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_RuleID id, P4_String name, siz
 P4_PUBLIC P4_Error
 P4_AddChoice(P4_Grammar* grammar, P4_RuleID id, P4_String name, size_t size) {
     P4_AddSomeGrammarRule(grammar, id, name, P4_CreateContainer(size));
-    P4_GetGrammarRule(grammar, id)->kind = P4_Choice;
+    P4_GetGrammarRuleByName(grammar, name)->kind = P4_Choice;
     return P4_Ok;
 }
 
@@ -3226,7 +3208,7 @@ P4_PUBLIC P4_Error
 P4_AddChoiceWithMembers(P4_Grammar* grammar, P4_RuleID id, P4_String name, size_t count, ...) {
     P4_AddSomeGrammarRule(grammar, id, name, P4_CreateChoice(count));
 
-    P4_Expression* expr = P4_GetGrammarRule(grammar, id);
+    P4_Expression* expr = P4_GetGrammarRuleByName(grammar, name);
     size_t i = 0;
 
     va_list members;

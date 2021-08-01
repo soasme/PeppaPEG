@@ -1340,20 +1340,6 @@ void           P4_DeleteGrammar(P4_Grammar*);
 P4_Error       P4_AddGrammarRule(P4_Grammar*, P4_RuleID, P4_String, P4_Expression*);
 
 /**
- * Set the name for a grammar rule.
- *
- * @param   grammar     The grammar.
- * @param   id          The grammar rule id.
- * @param   name        The grammar rule name.
- * @return  The error code.
- *
- * Example:
- *
- *      P4_SetRuleName(grammar, ENTRY, "entry");
- */
-P4_Error       P4_SetGrammarRuleName(P4_Grammar* grammar, P4_RuleID id, P4_String name);
-
-/**
  * Get the name for a grammar rule.
  *
  * @param   grammar     The grammar.

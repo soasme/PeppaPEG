@@ -1793,17 +1793,6 @@ P4_Error P4_LoadGrammarResult(P4_String rules, P4_Result* result);
 P4_Grammar*     P4_LoadGrammar(P4_String rules);
 
 /**
- * @brief       Get the rule id.
- * @param       expr    The rule expression.
- * @return      The rule id.
- *
- * Example:
- *
- *      P4_RuleID id = P4_GetRuleID(expr);
- */
-P4_RuleID       P4_GetRuleID(P4_Expression*);
-
-/**
  * @brief       Get the rule name.
  * @param       expr    The rule expression.
  * @return      The rule name.

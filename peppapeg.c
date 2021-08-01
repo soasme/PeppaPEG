@@ -4633,11 +4633,6 @@ P4_LoadGrammar(P4_String rules) {
     return result->grammar;
 }
 
-P4_PUBLIC P4_RuleID
-P4_GetRuleID(P4_Expression* expr) {
-    return expr->id;
-}
-
 P4_PUBLIC const P4_String
 P4_GetRuleName(P4_Expression* expr) {
     return expr->name;

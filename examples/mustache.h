@@ -68,7 +68,8 @@ typedef enum {
 
 P4_Error P4_MustacheCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
     if (rule
-            && P4_GetRuleID(rule) == P4_MustacheTag
+            && P4_GetRuleName(rule)
+            && strcmp(P4_GetRuleName(rule), "tag") == 0
             && node
             && node->head
             && node->head->next

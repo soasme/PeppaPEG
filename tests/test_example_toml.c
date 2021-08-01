@@ -20,63 +20,63 @@
 } while (0);
 
 void test_valid(void) {
-    ASSERT_TOML(1, "abc = true # comment", P4_Ok, "[]");
-    ASSERT_TOML(1,
+    ASSERT_TOML("toml", "abc = true # comment", P4_Ok, "[]");
+    ASSERT_TOML("toml",
         "abc = true\n"
         "xyz = false", P4_Ok, "[]");
-    ASSERT_TOML(1,
+    ASSERT_TOML("toml",
         "a.b.c = true\n"
         "x.y.z = false", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = \"xyz\"", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = \"\"", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = \"a\\u0031\\U00000032\\n\"", P4_Ok, "[]");
-    ASSERT_TOML(1, "\"abc\" = \"\"", P4_Ok, "[]");
-    ASSERT_TOML(1, "\"a\\u0031c\" = \"\"", P4_Ok, "[]");
-    ASSERT_TOML(1, "a.\"b\".c = \"\"", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = ''", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = 'a\\u0031\\U00000032\\n'", P4_Ok, "[]");
-    ASSERT_TOML(1, "'abc' = ''", P4_Ok, "[]");
-    ASSERT_TOML(1, "a.'b'.c = ''", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = 2000-01-01", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = 00:00:00", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = 00:00:00.000000", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = 2000-01-01T00:00:00", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = 2000-01-01T00:00:00.0000", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = 2000-01-01t00:00:00", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = 2000-01-01t00:00:00.0000", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = 2000-01-01 00:00:00", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = 2000-01-01 00:00:00.0000", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = 2000-01-01T00:00:00Z", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = 2000-01-01T00:00:00.0000Z", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = 2000-01-01T00:00:00+12:00", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = 2000-01-01T00:00:00.0000+12:00", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = []", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = [ # comment\n ]", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = [true]", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = [true,false]", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = [true, false]", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = [ true, false ]", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = { abc=true, xyz=false }", P4_Ok, "[]");
-    ASSERT_TOML(1, "[abc]", P4_Ok, "[]");
-    ASSERT_TOML(1, "[ a.\"b\".c ]", P4_Ok, "[]");
-    ASSERT_TOML(1, "[[abc]]", P4_Ok, "[]");
-    ASSERT_TOML(1, "[[ a.\"b\".c ]]", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = 0", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = 1", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = 123_456_789", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = +123_456_789", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = -123_456_789", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = 0x123", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = 0b0001", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = 0o123", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = 1.0", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = -1.0", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = '''abc'''", P4_Ok, "[]");
-    /* ASSERT_TOML(1, "abc = '''abc'''''", P4_Ok, "[]"); */
-    ASSERT_TOML(1, "abc = '''a'b'c'''", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = \"\"\"abc\"\"\"", P4_Ok, "[]");
-    ASSERT_TOML(1, "abc = \"\"\"a\"b\"c\"\"\"", P4_Ok, "[]");
-    /* ASSERT_TOML(1, "abc = \"\"\"abc\"\"\"\"\"", P4_Ok, "[]"); */
+    ASSERT_TOML("toml", "abc = \"xyz\"", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = \"\"", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = \"a\\u0031\\U00000032\\n\"", P4_Ok, "[]");
+    ASSERT_TOML("toml", "\"abc\" = \"\"", P4_Ok, "[]");
+    ASSERT_TOML("toml", "\"a\\u0031c\" = \"\"", P4_Ok, "[]");
+    ASSERT_TOML("toml", "a.\"b\".c = \"\"", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = ''", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = 'a\\u0031\\U00000032\\n'", P4_Ok, "[]");
+    ASSERT_TOML("toml", "'abc' = ''", P4_Ok, "[]");
+    ASSERT_TOML("toml", "a.'b'.c = ''", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = 2000-01-01", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = 00:00:00", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = 00:00:00.000000", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = 2000-01-01T00:00:00", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = 2000-01-01T00:00:00.0000", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = 2000-01-01t00:00:00", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = 2000-01-01t00:00:00.0000", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = 2000-01-01 00:00:00", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = 2000-01-01 00:00:00.0000", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = 2000-01-01T00:00:00Z", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = 2000-01-01T00:00:00.0000Z", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = 2000-01-01T00:00:00+12:00", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = 2000-01-01T00:00:00.0000+12:00", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = []", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = [ # comment\n ]", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = [true]", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = [true,false]", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = [true, false]", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = [ true, false ]", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = { abc=true, xyz=false }", P4_Ok, "[]");
+    ASSERT_TOML("toml", "[abc]", P4_Ok, "[]");
+    ASSERT_TOML("toml", "[ a.\"b\".c ]", P4_Ok, "[]");
+    ASSERT_TOML("toml", "[[abc]]", P4_Ok, "[]");
+    ASSERT_TOML("toml", "[[ a.\"b\".c ]]", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = 0", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = 1", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = 123_456_789", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = +123_456_789", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = -123_456_789", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = 0x123", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = 0b0001", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = 0o123", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = 1.0", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = -1.0", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = '''abc'''", P4_Ok, "[]");
+    /* ASSERT_TOML("toml", "abc = '''abc'''''", P4_Ok, "[]"); */
+    ASSERT_TOML("toml", "abc = '''a'b'c'''", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = \"\"\"abc\"\"\"", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = \"\"\"a\"b\"c\"\"\"", P4_Ok, "[]");
+    /* ASSERT_TOML("toml", "abc = \"\"\"abc\"\"\"\"\"", P4_Ok, "[]"); */
 }
 
 int main(void) {

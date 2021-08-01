@@ -21,7 +21,7 @@ void test_match_literal_choices_successfully(void) {
         )
     );
 
-    P4_Source* source = P4_CreateSource("你好, 世界", R1);
+    P4_Source* source = P4_CreateSource("你好, 世界", "r1");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -61,7 +61,7 @@ void test_match_literal_choices_successfully2(void) {
         )
     );
 
-    P4_Source* source = P4_CreateSource("HELLO WORLD", R1);
+    P4_Source* source = P4_CreateSource("HELLO WORLD", "r1");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -103,7 +103,7 @@ void test_match_literal_choices_no_option_raise_match_error(void) {
         )
     );
 
-    P4_Source* source = P4_CreateSource("HELLO WORL", R1);
+    P4_Source* source = P4_CreateSource("HELLO WORL", "r1");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_MatchError,

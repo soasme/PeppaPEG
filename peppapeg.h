@@ -1477,21 +1477,20 @@ size_t         P4_GetRecursionLimit(P4_Grammar*);
 /**
  * @brief       Create a \ref P4_Source* object.
  * @param       content     The content of input.
- * @param       rule_id     The id of entry grammar rule.
+ * @param       entry_name  The entry grammar rule name.
  * @return      A source object.
  *
  * Example:
  *
  *      char*       content = ... // read from some files.
- *      P4_RuleID   rule_id = My_EntryRule;
  *
- *      P4_Source*  source  = P4_CreateSource(content, rule_id);
+ *      P4_Source*  source  = P4_CreateSource(content, "entry");
  *
  *      // do something...
  *
  *      P4_DeleteSource(source);
  */
-P4_Source*     P4_CreateSource(P4_String, P4_RuleID);
+P4_Source*     P4_CreateSource(P4_String, P4_String);
 
 /**
  * @brief       Free the allocated memory of a source.
@@ -1533,7 +1532,7 @@ void           P4_ResetSource(P4_Source* source);
  * Example:
  *
  *      P4_String  input = "(a)"
- *      P4_Source* source = P4_CreateSource(input, RuleA);
+ *      P4_Source* source = P4_CreateSource(input, "a");
  *      if (P4_Ok != P4_SetSourceSlice(source, 1, 2)) // only parse "a"
  *          printf("set buf size error\n");
  */
@@ -1819,7 +1818,7 @@ P4_Error P4_LoadGrammarResult(P4_String rules, P4_Result* result);
  *          "entry = one one;\n"
  *          "one   = \"1\";\n"
  *      );
- *      P4_Source* source = P4_CreateSource("11", 1);
+ *      P4_Source* source = P4_CreateSource("11", "entry");
  *      P4_Parse(grammar, source);
  */
 P4_Grammar*     P4_LoadGrammar(P4_String rules);

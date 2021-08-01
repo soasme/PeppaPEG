@@ -27,7 +27,7 @@ void test_match_positive_successfully(void) {
         P4_SetMember(entry, 1, P4_CreateLiteral("HELLO WORLD", false))
     );
 
-    P4_Source* source = P4_CreateSource("Hello WORLD", ENTRY);
+    P4_Source* source = P4_CreateSource("Hello WORLD", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -85,7 +85,7 @@ void test_match_positive_consumes_no_input(void) {
         P4_AddLiteral(grammar, R2, "r2", "HELLO WORLD", false)
     );
 
-    P4_Source* source = P4_CreateSource("Hello WORLD", ENTRY);
+    P4_Source* source = P4_CreateSource("Hello WORLD", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -137,7 +137,7 @@ void test_match_positive_failed(void) {
         P4_SetMember(entry, 1, P4_CreateLiteral("HELLO WORLD", false))
     );
 
-    P4_Source* source = P4_CreateSource("HELLO WORLD", ENTRY);
+    P4_Source* source = P4_CreateSource("HELLO WORLD", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_MatchError,

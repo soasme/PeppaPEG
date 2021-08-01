@@ -11,7 +11,7 @@ void test_null(void) {
 
     P4_Source* source;
 
-    source = P4_CreateSource("null", P4_JSONEntry);
+    source = P4_CreateSource("null", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -38,7 +38,7 @@ void test_true(void) {
 
     P4_Source* source;
 
-    source = P4_CreateSource("true", P4_JSONEntry);
+    source = P4_CreateSource("true", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -65,7 +65,7 @@ void test_false(void) {
 
     P4_Source* source;
 
-    source = P4_CreateSource("false", P4_JSONEntry);
+    source = P4_CreateSource("false", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -92,7 +92,7 @@ void test_number_integer_0(void) {
 
     P4_Source* source;
 
-    source = P4_CreateSource("0", P4_JSONEntry);
+    source = P4_CreateSource("0", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -119,7 +119,7 @@ void test_number_integer_1234567890(void) {
 
     P4_Source* source;
 
-    source = P4_CreateSource("1234567890", P4_JSONEntry);
+    source = P4_CreateSource("1234567890", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -146,7 +146,7 @@ void test_number_float(void) {
 
     P4_Source* source;
 
-    source = P4_CreateSource("0.1", P4_JSONEntry);
+    source = P4_CreateSource("0.1", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -173,7 +173,7 @@ void test_number_exp(void) {
 
     P4_Source* source;
 
-    source = P4_CreateSource("1e+1", P4_JSONEntry);
+    source = P4_CreateSource("1e+1", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -200,7 +200,7 @@ void test_string_xyz(void) {
 
     P4_Source* source;
 
-    source = P4_CreateSource("\"xyz\"", P4_JSONEntry);
+    source = P4_CreateSource("\"xyz\"", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -227,7 +227,7 @@ void test_string_pi(void) {
 
     P4_Source* source;
 
-    source = P4_CreateSource("\"π\"", P4_JSONEntry);
+    source = P4_CreateSource("\"π\"", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -255,7 +255,7 @@ void test_string_empty(void) {
 
     P4_Source* source;
 
-    source = P4_CreateSource("\"\"", P4_JSONEntry);
+    source = P4_CreateSource("\"\"", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -282,7 +282,7 @@ void test_array_empty(void) {
 
     P4_Source* source;
 
-    source = P4_CreateSource("[ ]", P4_JSONEntry);
+    source = P4_CreateSource("[ ]", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -309,7 +309,7 @@ void test_array_one_item(void) {
 
     P4_Source* source;
 
-    source = P4_CreateSource("[ 1 ]", P4_JSONEntry);
+    source = P4_CreateSource("[ 1 ]", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -347,7 +347,7 @@ void test_array_deep_nesting(void) {
     }
     input[NESTING_DEPTH*2] = '\0';
 
-    source = P4_CreateSource(input, P4_JSONEntry);
+    source = P4_CreateSource(input, "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -375,7 +375,7 @@ void test_array_multiple_items(void) {
 
     P4_Source* source;
 
-    source = P4_CreateSource("[1,2]", P4_JSONEntry);
+    source = P4_CreateSource("[1,2]", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -401,7 +401,7 @@ void test_array_multiple_items_with_empty_spaces(void) {
 
     P4_Source* source;
 
-    source = P4_CreateSource("[1,    2]", P4_JSONEntry);
+    source = P4_CreateSource("[1,    2]", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -429,7 +429,7 @@ void test_object_empty(void) {
 
     P4_Source* source;
 
-    source = P4_CreateSource("{ }", P4_JSONEntry);
+    source = P4_CreateSource("{ }", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -456,7 +456,7 @@ void test_object_one_item(void) {
 
     P4_Source* source;
 
-    source = P4_CreateSource("{\"k\":1}", P4_JSONEntry);
+    source = P4_CreateSource("{\"k\":1}", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -483,7 +483,7 @@ void test_object_multiple_items(void) {
 
     P4_Source* source;
 
-    source = P4_CreateSource("{\"k\":1,\"v\":2}", P4_JSONEntry);
+    source = P4_CreateSource("{\"k\":1,\"v\":2}", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -510,7 +510,7 @@ void test_objectitem(void) {
 
     P4_Source* source;
 
-    source = P4_CreateSource("\"k\":    1", P4_JSONObjectItem);
+    source = P4_CreateSource("\"k\":    1", "item");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -538,7 +538,7 @@ void test_json_spec(char* json_spec) {
 
     char* buf = read_file(json_spec);
 
-    P4_Source* source = P4_CreateSource(buf, P4_JSONEntry);
+    P4_Source* source = P4_CreateSource(buf, "entry");
 
     P4_Error err = P4_Parse(grammar, source);
     static char errmsg[256] = "";

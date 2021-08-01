@@ -454,8 +454,8 @@ struct P4_Frame {
 struct P4_Source {
     /** The grammar used to parse the source. */
     P4_Grammar*     grammar;
-    /** The ID of entry rule in the grammar used to parse the source. */
-    P4_RuleID       rule_id;
+    /** The entry rule name in the grammar used to parse the source. */
+    P4_String       entry_name;
 
     /** The content of the source. */
     P4_String       content;
@@ -2889,10 +2889,10 @@ P4_GetGrammarRuleName(P4_Grammar* grammar, P4_RuleID id) {
 }
 
 P4_PUBLIC P4_Source*
-P4_CreateSource(P4_String content, P4_RuleID rule_id) {
+P4_CreateSource(P4_String content, P4_String entry_name) {
     P4_Source* source = P4_MALLOC(sizeof(P4_Source));
     source->content = content;
-    source->rule_id = rule_id;
+    source->entry_name = strdup(entry_name);
     source->pos = 0;
     source->lineno = 1;
     source->offset = 1;
@@ -2948,6 +2948,7 @@ P4_ResetSource(P4_Source* source) {
 P4_PUBLIC void
 P4_DeleteSource(P4_Source* source) {
     P4_ResetSource(source);
+    P4_FREE(source->entry_name);
     P4_FREE(source);
 }
 
@@ -2979,7 +2980,7 @@ P4_Parse(P4_Grammar* grammar, P4_Source* source) {
 
     source->grammar = grammar;
 
-    P4_Expression* expr     = P4_GetGrammarRule(grammar, source->rule_id);
+    P4_Expression* expr     = P4_GetGrammarRuleByName(grammar, source->entry_name);
     P4_Node*      tok      = P4_Match(source, expr);
 
     source->root            = tok;
@@ -4633,7 +4634,7 @@ P4_LoadGrammarResult(P4_String rules, P4_Result* result) {
     if ((bootstrap = P4_CreatePegGrammar()) == NULL)
         P4_Panic("failed to create grammar: out of memory.");
 
-    if ((rules_src = P4_CreateSource(rules, P4_PegGrammar)) == NULL)
+    if ((rules_src = P4_CreateSource(rules, "grammar")) == NULL)
         P4_Panic("failed to create source: out of memory.");
 
     if ((err = P4_Parse(bootstrap, rules_src)) != P4_Ok)

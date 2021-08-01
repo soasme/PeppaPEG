@@ -34,7 +34,7 @@ void test_match_back_reference_successfully(void) {
         )
     );
 
-    P4_Source* source = P4_CreateSource("'...'", ENTRY);
+    P4_Source* source = P4_CreateSource("'...'", "entry");
     TEST_ASSERT_NOT_NULL(source);
 
     TEST_ASSERT_EQUAL_MESSAGE(
@@ -93,7 +93,7 @@ void test_match_back_reference_latter_not_match(void) {
         )
     );
 
-    P4_Source* source = P4_CreateSource("\"...'", ENTRY);
+    P4_Source* source = P4_CreateSource("\"...'", "entry");
     TEST_ASSERT_NOT_NULL(source);
 
     TEST_ASSERT_EQUAL(
@@ -135,7 +135,7 @@ void test_match_back_reference_insensitive_match(void) {
         P4_AddLiteral(grammar, MARKER, "marker", "TAG", true)
     );
 
-    P4_Source* source = P4_CreateSource("TAG...tag", ENTRY);
+    P4_Source* source = P4_CreateSource("TAG...tag", "entry");
     TEST_ASSERT_NOT_NULL(source);
 
     TEST_ASSERT_EQUAL_MESSAGE(

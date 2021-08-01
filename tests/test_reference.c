@@ -25,7 +25,7 @@ void test_match_reference_successfully(void) {
         P4_AddLiteral(grammar, R1, "r1", "HELLO", true)
     );
 
-    P4_Source* source = P4_CreateSource("HELLO", ENTRY);
+    P4_Source* source = P4_CreateSource("HELLO", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -68,7 +68,7 @@ void test_match_reference_not_defined_raise_name_error(void) {
         P4_AddReference(grammar, ENTRY, "entry", "r1")
     );
 
-    P4_Source* source = P4_CreateSource("HELLO", ENTRY);
+    P4_Source* source = P4_CreateSource("HELLO", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_NameError,

@@ -30,7 +30,7 @@ void test_maximum_recursion_limit(void) {
         )
     );
 
-    P4_Source* source = P4_CreateSource("----------x", ENTRY);
+    P4_Source* source = P4_CreateSource("----------x", "entry");
     TEST_ASSERT_NOT_NULL(source);
 
     TEST_ASSERT_EQUAL(
@@ -58,7 +58,7 @@ void test_replace_grammar_rule(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(P4_Ok, P4_AddLiteral(grammar, ENTRY, "entry", "{{", true));
     TEST_ASSERT_EQUAL(P4_Ok, P4_ReplaceGrammarRule(grammar, "entry", P4_CreateLiteral("<%", true)));
-    P4_Source* source = P4_CreateSource("<%", ENTRY);
+    P4_Source* source = P4_CreateSource("<%", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -79,7 +79,7 @@ void test_replace_grammar_rule_refreshing_references(void) {
     TEST_ASSERT_EQUAL(P4_Ok, P4_AddLiteral(grammar, REFERENCE, "reference", "{{", true));
     TEST_ASSERT_EQUAL(P4_Ok, P4_AddReference(grammar, ENTRY, "entry", "reference"));
     TEST_ASSERT_EQUAL(P4_Ok, P4_ReplaceGrammarRule(grammar, "reference", P4_CreateLiteral("<%", true)));
-    P4_Source* source = P4_CreateSource("<%", ENTRY);
+    P4_Source* source = P4_CreateSource("<%", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -107,7 +107,7 @@ void test_join(void) {
     TEST_ASSERT_EQUAL(P4_Ok, P4_AddJoin(grammar, ROW, "row", ",", "num"));
     TEST_ASSERT_EQUAL(P4_Ok, P4_AddRange(grammar, NUM, "num", '0', '9', 1));
 
-    P4_Source* source = P4_CreateSource("1,2,3", ROW);
+    P4_Source* source = P4_CreateSource("1,2,3", "row");
     TEST_ASSERT_EQUAL(P4_Ok, P4_Parse(grammar, source));
 
     P4_Node* node = P4_GetSourceAst(source);
@@ -153,7 +153,7 @@ void test_source_slice(void) {
     TEST_ASSERT_EQUAL( P4_Ok, P4_AddLiteral(grammar, R1, "r1", "XXX", false));
 
     P4_String input = "YXXXY";
-    P4_Source* source = P4_CreateSource(input, R1);
+    P4_Source* source = P4_CreateSource(input, "r1");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(P4_Ok, P4_SetSourceSlice(source, 1, 4));
     TEST_ASSERT_EQUAL(P4_Ok, P4_Parse(grammar, source));
@@ -179,7 +179,7 @@ void test_lineno_offset(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL( P4_Ok, P4_AddLiteral(grammar, R1, "r1", "A\nBC\n", false));
 
-    P4_Source* source = P4_CreateSource("A\nBC\n", R1);
+    P4_Source* source = P4_CreateSource("A\nBC\n", "r1");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(P4_Ok, P4_Parse(grammar, source));
     TEST_ASSERT_EQUAL(5, P4_GetSourcePosition(source));
@@ -222,7 +222,7 @@ void test_inspect(void) {
     P4_Grammar* grammar = P4_LoadGrammar("entry = any any; any = .;");
     TEST_ASSERT_NOT_NULL(grammar);
 
-    P4_Source* source = P4_CreateSource("XX", 1);
+    P4_Source* source = P4_CreateSource("XX", "entry");
     TEST_ASSERT_NOT_NULL(source);
 
     TEST_ASSERT_EQUAL( P4_Ok, P4_Parse(grammar, source));
@@ -245,7 +245,7 @@ void test_inspect2(void) {
     P4_Grammar* grammar = P4_LoadGrammar("entry = any any; any = .;");
     TEST_ASSERT_NOT_NULL(grammar);
 
-    P4_Source* source = P4_CreateSource("XX", 1);
+    P4_Source* source = P4_CreateSource("XX", "entry");
     TEST_ASSERT_NOT_NULL(source);
 
     TEST_ASSERT_EQUAL( P4_Ok, P4_Parse(grammar, source));
@@ -261,7 +261,7 @@ void test_acquire_source_ast(void) {
     P4_Grammar* grammar = P4_LoadGrammar("entry = .;");
     TEST_ASSERT_NOT_NULL(grammar);
 
-    P4_Source* source = P4_CreateSource("X", 1);
+    P4_Source* source = P4_CreateSource("X", "entry");
     TEST_ASSERT_NOT_NULL(source);
 
     TEST_ASSERT_EQUAL( P4_Ok, P4_Parse(grammar, source));

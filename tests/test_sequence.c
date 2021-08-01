@@ -22,7 +22,7 @@ void test_match_literal_sequence_successfully(void) {
         )
     );
 
-    P4_Source* source = P4_CreateSource("你好 WORLD", ENTRY);
+    P4_Source* source = P4_CreateSource("你好 WORLD", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -65,7 +65,7 @@ void test_match_literal_sequence_partially_raise_match_error(void) {
         )
     );
 
-    P4_Source* source = P4_CreateSource("你好 ", ENTRY);
+    P4_Source* source = P4_CreateSource("你好 ", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_MatchError,
@@ -103,7 +103,7 @@ void test_match_literal_sequence_having_member_nomatch_raise_match_error(void) {
         )
     );
 
-    P4_Source* source = P4_CreateSource("你好 WORL", ENTRY);
+    P4_Source* source = P4_CreateSource("你好 WORL", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_MatchError,
@@ -146,7 +146,7 @@ void test_match_reference_in_sequence_successfully(void) {
         P4_AddLiteral(grammar, R1, "r1", "OLA", false)
     );
 
-    P4_Source* source = P4_CreateSource("OLAola", ENTRY);
+    P4_Source* source = P4_CreateSource("OLAola", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,

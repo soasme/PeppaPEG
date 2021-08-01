@@ -1249,27 +1249,27 @@ void* P4_ConcatRune(void *str, P4_Rune chr, size_t n) {
     if (n < 2) {
       return 0;
     }
-    s[0] = 0xc0 | (char)((chr >> 6) & 0x1f);
-    s[1] = 0x80 | (char)(chr & 0x3f);
+    s[0] = (char) 0xc0 | (char)((chr >> 6) & 0x1f);
+    s[1] = (char) 0x80 | (char)(chr & 0x3f);
     s += 2;
   } else if (0 == ((P4_Rune)0xffff0000 & chr)) {
     /* 3-byte/16-bit utf8 code point (0b1110xxxx 0b10xxxxxx 0b10xxxxxx) */
     if (n < 3) {
       return 0;
     }
-    s[0] = 0xe0 | (char)((chr >> 12) & 0x0f);
-    s[1] = 0x80 | (char)((chr >> 6) & 0x3f);
-    s[2] = 0x80 | (char)(chr & 0x3f);
+    s[0] = (char) 0xe0 | (char)((chr >> 12) & 0x0f);
+    s[1] = (char) 0x80 | (char)((chr >> 6) & 0x3f);
+    s[2] = (char) 0x80 | (char)(chr & 0x3f);
     s += 3;
   } else { /* if (0 == ((int)0xffe00000 & chr)) { */
     /* 4-byte/21-bit utf8 code point (0b11110xxx 0b10xxxxxx 0b10xxxxxx 0b10xxxxxx) */
     if (n < 4) {
       return 0;
     }
-    s[0] = 0xf0 | (char)((chr >> 18) & 0x07);
-    s[1] = 0x80 | (char)((chr >> 12) & 0x3f);
-    s[2] = 0x80 | (char)((chr >> 6) & 0x3f);
-    s[3] = 0x80 | (char)(chr & 0x3f);
+    s[0] = (char) 0xf0 | (char)((chr >> 18) & 0x07);
+    s[1] = (char) 0x80 | (char)((chr >> 12) & 0x3f);
+    s[2] = (char) 0x80 | (char)((chr >> 6) & 0x3f);
+    s[3] = (char) 0x80 | (char)(chr & 0x3f);
     s += 4;
   }
 
@@ -1556,14 +1556,14 @@ P4_CaseCmpInsensitive(const void* src1, const void* src2, size_t n) {
             const P4_Rune c1 = (0xf0 & *s1);
             const P4_Rune c2 = (0xf0 & *s2);
 
-            if (c1 < c2) return c1 - c2;
+            if (c1 < c2) return (int) c1 - (int) c2;
             else return 0;
         }
 
         if ((3 >= n) && ((0xf0 == (0xf8 & *s1)) || (0xf0 == (0xf8 & *s2)))) {
             const P4_Rune c1 = (0xf8 & *s1);
             const P4_Rune c2 = (0xf8 & *s2);
-            if (c1 < c2) return c1 - c2;
+            if (c1 < c2) return (int) c1 - (int) c2;
             else return 0;
         }
 
@@ -1584,7 +1584,7 @@ P4_CaseCmpInsensitive(const void* src1, const void* src2, size_t n) {
             continue;
 
         /* if they don't match, then we return the difference between the characters */
-        return src1_lwr_cp - src2_lwr_cp;
+        return (int) src1_lwr_cp - (int) src2_lwr_cp;
     } while ( 0 < n );
 
     return 0; /* match! */
@@ -1791,6 +1791,13 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
     }
 
     size_t len = strlen(e->literal);
+    size_t slen = strlen(str);
+    if (slen < len) {
+        P4_RaiseErrorf(s, P4_MatchError, "expect %s (len %zu), line %zu:%zu (char %zu)",
+                s->frame_stack->expr->name,
+                len, startpos->lineno, startpos->offset, startpos->pos);
+        return NULL;
+    }
 
     if ((!e->sensitive && P4_CaseCmpInsensitive(e->literal, str, len) != 0)
             || (e->sensitive && memcmp(e->literal, str, len) != 0)) {
@@ -3864,17 +3871,17 @@ P4_PegEvalFlag(P4_Node* node, P4_ExpressionFlag *flag) {
     P4_String node_str = node->text + node->slice.start.pos;
     size_t    node_len = P4_GetSliceSize(&node->slice);
 
-    if (memcmp("@squashed", node_str, node_len) == 0)
+    if (node_len == 9 && memcmp("@squashed", node_str, node_len) == 0)
         *flag = P4_FLAG_SQUASHED;
-    else if (memcmp("@scoped", node_str, node_len) == 0)
+    else if (node_len == 7 && memcmp("@scoped", node_str, node_len) == 0)
         *flag = P4_FLAG_SCOPED;
-    else if (memcmp("@spaced", node_str, node_len) == 0)
+    else if (node_len == 7 && memcmp("@spaced", node_str, node_len) == 0)
         *flag = P4_FLAG_SPACED;
-    else if (memcmp("@lifted", node_str, node_len) == 0)
+    else if (node_len == 7 && memcmp("@lifted", node_str, node_len) == 0)
         *flag = P4_FLAG_LIFTED;
-    else if (memcmp("@tight", node_str, node_len) == 0)
+    else if (node_len == 6 && memcmp("@tight", node_str, node_len) == 0)
         *flag = P4_FLAG_TIGHT;
-    else if (memcmp("@nonterminal", node_str, node_len) == 0)
+    else if (node_len == 12 && memcmp("@nonterminal", node_str, node_len) == 0)
         *flag = P4_FLAG_NON_TERMINAL;
     else {
         /* P4_CreatePegRule() guarantees only 6 kinds of strings are possible. */

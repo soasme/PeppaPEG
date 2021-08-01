@@ -1266,23 +1266,6 @@ P4_Expression* P4_CreateJoin(const P4_String joiner, P4_String reference);
 void           P4_DeleteExpression(P4_Expression*);
 
 /**
- * Set the rule id for the expression.
- *
- * @param   expr        The expression.
- * @param   rule_id     The rule id to set.
- * @return  The error code.
- *
- * Example:
- *
- *      P4_Expression* expr = P4_CreateLiteral("a", true);
- *      P4_SetRuleID(expr, 1);
- *
- * Note that `P4_SetRuleID` only changes the `expr->id` field.
- * It does not add expr to the P4_Grammar object.
- */
-P4_Error       P4_SetRuleID(P4_Expression*, P4_RuleID);
-
-/**
  * Check if an expression is a grammar rule.
  *
  * @param   expr        The expression.

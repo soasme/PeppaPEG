@@ -2720,24 +2720,12 @@ P4_CreateBackReference(size_t index, bool sensitive) {
     return expr;
 }
 
-P4_PUBLIC P4_Error
-P4_SetRuleID(P4_Expression* e, P4_RuleID id) {
-    if (e == NULL)
-        return P4_NullError;
-
-    if (e->id != 0 || id == 0)
-        return P4_ValueError;
-
-    e->id = id;
-    return P4_Ok;
-}
-
 P4_PUBLIC bool
 P4_IsRule(P4_Expression* e) {
     if (e == NULL)
         return false;
 
-    return e->id != 0;
+    return e->name != NULL;
 }
 
 P4_PUBLIC P4_Grammar*    P4_CreateGrammar(void) {

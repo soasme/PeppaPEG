@@ -15,7 +15,7 @@ void test_match_ascii_digits_successfully(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddRange(grammar, R1, '0', '9', 1)
+        P4_AddRange(grammar, R1, "r1", '0', '9', 1)
     );
 
     P4_Source* source = P4_CreateSource("0", R1);
@@ -52,7 +52,7 @@ void test_match_utf8_code_point_successfully(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddRange(grammar, R1, 0x4E00, 0X9FCC, 1)
+        P4_AddRange(grammar, R1, "r1", 0x4E00, 0X9FCC, 1)
     );
 
     P4_Source* source = P4_CreateSource("好", R1);
@@ -91,7 +91,7 @@ void test_match_code_points_outside_range_cause_match_error(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddRange(grammar, R1, 0x4E00, 0X9FCC, 1)
+        P4_AddRange(grammar, R1, "r1", 0x4E00, 0X9FCC, 1)
     );
 
     P4_Source* source = P4_CreateSource("Good", R1);

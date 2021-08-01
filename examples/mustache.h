@@ -148,7 +148,7 @@ P4_Grammar*  P4_CreateMustacheGrammar() {
         return NULL;
     }
 
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_MustacheWhitespace, 2,
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_MustacheWhitespace, "whitespace", 2,
         P4_CreateLiteral(" ", true),
         P4_CreateLiteral("\t", true)
     ))
@@ -159,13 +159,13 @@ P4_Grammar*  P4_CreateMustacheGrammar() {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddLiteral(grammar, P4_MustacheOpener, "{{", true))
+    if (P4_Ok != P4_AddLiteral(grammar, P4_MustacheOpener, "opener", "{{", true))
         goto finalize;
 
-    if (P4_Ok != P4_AddLiteral(grammar, P4_MustacheCloser, "}}", true))
+    if (P4_Ok != P4_AddLiteral(grammar, P4_MustacheCloser, "closer", "}}", true))
         goto finalize;
 
-    if (P4_Ok != P4_AddZeroOrMore(grammar, P4_MustacheNonCloser,
+    if (P4_Ok != P4_AddZeroOrMore(grammar, P4_MustacheNonCloser, "non_closer",
         P4_CreateSequenceWithMembers(2,
             P4_CreateNegative(
                 P4_CreateChoiceWithMembers(2,
@@ -181,7 +181,7 @@ P4_Grammar*  P4_CreateMustacheGrammar() {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_MustacheNonCloser, P4_FLAG_SQUASHED))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheTag, 3,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheTag, "tag", 3,
         P4_CreateReference(P4_MustacheOpener),
         P4_CreateReference(P4_MustacheTagContent),
         P4_CreateReference(P4_MustacheCloser)
@@ -191,7 +191,7 @@ P4_Grammar*  P4_CreateMustacheGrammar() {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_MustacheTag, P4_FLAG_SCOPED))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheSetDelimiter, 4,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheSetDelimiter, "set_delimiter", 4,
         P4_CreateLiteral("=", true),
         P4_CreateReference(P4_MustacheNewOpener),
         P4_CreateReference(P4_MustacheNewCloser),
@@ -199,7 +199,7 @@ P4_Grammar*  P4_CreateMustacheGrammar() {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddOnceOrMore(grammar, P4_MustacheNewOpener,
+    if (P4_Ok != P4_AddOnceOrMore(grammar, P4_MustacheNewOpener, "new_opener",
         P4_CreateSequenceWithMembers(2,
             P4_CreateNegative(
                 P4_CreateChoiceWithMembers(2,
@@ -215,7 +215,7 @@ P4_Grammar*  P4_CreateMustacheGrammar() {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_MustacheNewOpener, P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
         goto finalize;
 
-    if (P4_Ok != P4_AddOnceOrMore(grammar, P4_MustacheNewCloser,
+    if (P4_Ok != P4_AddOnceOrMore(grammar, P4_MustacheNewCloser, "new_closer",
         P4_CreateSequenceWithMembers(2,
             P4_CreateNegative(
                 P4_CreateChoiceWithMembers(3,
@@ -232,26 +232,26 @@ P4_Grammar*  P4_CreateMustacheGrammar() {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_MustacheNewCloser, P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheComment, 2,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheComment, "comment", 2,
         P4_CreateLiteral("!", true),
         P4_CreateReference(P4_MustacheNonCloser)
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheUnescaped, 2,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheUnescaped, "unescaped", 2,
         P4_CreateLiteral("&", true),
         P4_CreateReference(P4_MustacheNonCloser)
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheTripleUnescaped, 3,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheTripleUnescaped, "triple_unescaped", 3,
         P4_CreateLiteral("{", true),
         P4_CreateReference(P4_MustacheNonCloser),
         P4_CreateLiteral("}", true)
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheSectionOpen, 2,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheSectionOpen, "section_open", 2,
         P4_CreateChoiceWithMembers(2,
             P4_CreateLiteral("#", true),
             P4_CreateLiteral("^", true)
@@ -260,22 +260,22 @@ P4_Grammar*  P4_CreateMustacheGrammar() {
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheSectionClose, 2,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheSectionClose, "section_close", 2,
         P4_CreateLiteral("/", true),
         P4_CreateReference(P4_MustacheNonCloser)
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustachePartial, 2,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustachePartial, "partial", 2,
         P4_CreateLiteral(">", true),
         P4_CreateReference(P4_MustacheNonCloser)
     ))
         goto finalize;
 
-    if (P4_Ok != P4_AddReference(grammar, P4_MustacheVariable, P4_MustacheNonCloser))
+    if (P4_Ok != P4_AddReference(grammar, P4_MustacheVariable, "variable", P4_MustacheNonCloser))
         goto finalize;
 
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_MustacheTagContent, 8,
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_MustacheTagContent, "tag_content", 8,
         P4_CreateReference(P4_MustacheSetDelimiter),
         P4_CreateReference(P4_MustacheComment),
         P4_CreateReference(P4_MustacheUnescaped),
@@ -290,7 +290,7 @@ P4_Grammar*  P4_CreateMustacheGrammar() {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_MustacheTagContent, P4_FLAG_LIFTED))
         goto finalize;
 
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_MustacheNewLine, 2,
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_MustacheNewLine, "newline", 2,
         P4_CreateLiteral("\n", true),
         P4_CreateLiteral("\r\n", true)
     ))
@@ -299,7 +299,7 @@ P4_Grammar*  P4_CreateMustacheGrammar() {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_MustacheNewLine, P4_FLAG_LIFTED))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheText, 2,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheText, "text", 2,
         P4_CreateZeroOrMore(
             P4_CreateSequenceWithMembers(2,
                 P4_CreateNegative(
@@ -318,7 +318,7 @@ P4_Grammar*  P4_CreateMustacheGrammar() {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_MustacheNewCloser, P4_FLAG_SQUASHED | P4_FLAG_TIGHT))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheLine, 2,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheLine, "line", 2,
         P4_CreateZeroOrMore(
             P4_CreateChoiceWithMembers(2,
                 P4_CreateReference(P4_MustacheTag),
@@ -335,13 +335,13 @@ P4_Grammar*  P4_CreateMustacheGrammar() {
     if (P4_Ok != P4_SetGrammarRuleFlag(grammar, P4_MustacheLine, P4_FLAG_TIGHT | P4_FLAG_LIFTED))
         goto finalize;
 
-    if (P4_Ok != P4_AddGrammarRule(grammar, P4_MustacheSOI, P4_CreateStartOfInput()))
+    if (P4_Ok != P4_AddGrammarRule(grammar, P4_MustacheSOI, "soi", P4_CreateStartOfInput()))
         goto finalize;
 
-    if (P4_Ok != P4_AddGrammarRule(grammar, P4_MustacheEOI, P4_CreateEndOfInput()))
+    if (P4_Ok != P4_AddGrammarRule(grammar, P4_MustacheEOI, "eoi", P4_CreateEndOfInput()))
         goto finalize;
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheEntry, 2,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_MustacheEntry, "entry", 2,
         P4_CreateReference(P4_MustacheSOI),
         P4_CreateZeroOrMore(P4_CreateReference(P4_MustacheLine))
     ))

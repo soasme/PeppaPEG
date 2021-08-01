@@ -15,7 +15,7 @@ void test_match_negative_successfully(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddSequence(grammar, ENTRY, 2)
+        P4_AddSequence(grammar, ENTRY, "entry", 2)
     );
     P4_Expression* entry = P4_GetGrammarRule(grammar, ENTRY);
     TEST_ASSERT_EQUAL(
@@ -66,7 +66,7 @@ void test_match_negative_consumes_no_input(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddSequence(grammar, ENTRY, 2)
+        P4_AddSequence(grammar, ENTRY, "entry", 2)
     );
     P4_Expression* entry = P4_GetGrammarRule(grammar, ENTRY);
     TEST_ASSERT_EQUAL(
@@ -79,11 +79,11 @@ void test_match_negative_consumes_no_input(void) {
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddNegative(grammar, R1, P4_CreateLiteral("Hello", true))
+        P4_AddNegative(grammar, R1, "r1", P4_CreateLiteral("Hello", true))
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddLiteral(grammar, R2, "HELLO WORLD", false)
+        P4_AddLiteral(grammar, R2, "r2", "HELLO WORLD", false)
     );
 
     P4_Source* source = P4_CreateSource("HELLO WORLD", ENTRY);
@@ -128,7 +128,7 @@ void test_match_negative_failed(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddSequence(grammar, ENTRY, 2)
+        P4_AddSequence(grammar, ENTRY, "entry", 2)
     );
     P4_Expression* entry = P4_GetGrammarRule(grammar, ENTRY);
     TEST_ASSERT_EQUAL(

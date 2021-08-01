@@ -103,63 +103,60 @@ P4_Error P4_CalcEval(P4_Node* node, long* result) {
     long val = 0;
     char* intstr = NULL;
 
-    switch (node->rule_id) {
-        case P4_CalcStatement:
-            return P4_CalcEval(node->head, result);
-        case  P4_CalcTerm:
-        case  P4_CalcFactor:
-            if ((err = P4_CalcEval(node->head, &val)) != P4_Ok)
-                return err;
-            *result = val;
-            for (tmp = node->head->next; tmp != NULL; tmp = tmp->next) {
-                switch (tmp->rule_id) {
-                    case P4_CalcAddSign:
-                        sign = '+'; break;
-                    case P4_CalcMinusSign:
-                        sign = '-'; break;
-                    case P4_CalcMulSign:
-                        sign = '*'; break;
-                    case P4_CalcDivSign:
-                        sign = '/'; break;
-                    default:
-                        if ((err = P4_CalcEval(tmp, &val)) != P4_Ok)
-                            return err;
-                        if (sign == '+')
-                            *result += val;
-                        else if (sign == '-')
-                            *result -= val;
-                        else if (sign == '*')
-                            *result *= val;
-                        else if (sign == '/') {
-                            if (val == 0) return P4_ValueError;
-                            *result /= val;
-                        }
-                        break;
+    if (strcmp(node->rule_name, "statement") == 0) {
+        return P4_CalcEval(node->head, result);
+    } else if (strcmp(node->rule_name, "term") == 0 || strcmp(node->rule_name, "factor") == 0) {
+        if ((err = P4_CalcEval(node->head, &val)) != P4_Ok)
+            return err;
+        *result = val;
+        for (tmp = node->head->next; tmp != NULL; tmp = tmp->next) {
+            if (strcmp(tmp->rule_name, "add") == 0)
+                sign = '+';
+            else if (strcmp(tmp->rule_name, "minus") == 0)
+                sign = '-';
+            else if (strcmp(tmp->rule_name, "mul") == 0)
+                sign = '*';
+            else if (strcmp(tmp->rule_name, "div") == 0)
+                sign = '/';
+            else {
+                if ((err = P4_CalcEval(tmp, &val)) != P4_Ok)
+                    return err;
+                if (sign == '+')
+                    *result += val;
+                else if (sign == '-')
+                    *result -= val;
+                else if (sign == '*')
+                    *result *= val;
+                else if (sign == '/') {
+                    if (val == 0) return P4_ValueError;
+                    *result /= val;
                 }
             }
+        }
+        return P4_Ok;
+    } else if (strcmp(node->rule_name, "unary") == 0) {
+        if (node->head == node->tail)
+            return P4_CalcEval(node->head, result);
+        else {
+            long val = 0;
+            if ((err = P4_CalcEval(node->tail, &val)) != P4_Ok)
+                return err;
+            if (strcmp(node->head->rule_name, "add") == 0)
+                *result = val;
+            else if (strcmp(node->head->rule_name, "minus") == 0)
+                *result = -val;
+            else
+                return P4_ValueError;
             return P4_Ok;
-        case P4_CalcUnary:
-            if (node->head == node->tail)
-                return P4_CalcEval(node->head, result);
-            else {
-                long val = 0;
-                if ((err = P4_CalcEval(node->tail, &val)) != P4_Ok)
-                    return err;
-                if (node->head->rule_id == P4_CalcAddSign)
-                    *result = val;
-                else if (node->head->rule_id == P4_CalcMinusSign)
-                    *result = -val;
-                else
-                    return P4_ValueError;
-                return P4_Ok;
-            }
-        case P4_CalcInteger:
-            intstr = P4_CopyNodeString(node);
-            *result = atol(intstr);
-            free(intstr);
-            return P4_Ok;
-        default:
-            return P4_ValueError;
+        }
+    } else if (strcmp(node->rule_name, "integer") == 0) {
+        intstr = P4_CopyNodeString(node);
+        *result = atol(intstr);
+        free(intstr);
+        return P4_Ok;
+    } else {
+        return P4_ValueError;
+
     }
 }
 

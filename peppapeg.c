@@ -1631,7 +1631,6 @@ P4_Node*
 P4_CreateNode (const P4_String     str,
                P4_Position*        start,
                P4_Position*        stop,
-               P4_RuleID           rule_id,
                P4_String           rule_name) {
     P4_Node* node;
 
@@ -1639,7 +1638,6 @@ P4_CreateNode (const P4_String     str,
         return NULL;
 
     node->text         = str;
-    node->rule_id      = rule_id;
     node->rule_name    = rule_name;
     node->next         = NULL;
     node->head         = NULL;
@@ -1821,7 +1819,7 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
 
     P4_Node* result = NULL;
 
-    if ((result=P4_CreateNode (s->content, startpos, endpos, e->id, e->name)) == NULL)
+    if ((result=P4_CreateNode (s->content, startpos, endpos, e->name)) == NULL)
         P4_Panic("failed to create node: out of memory");
 
     return result;
@@ -1869,7 +1867,7 @@ P4_MatchRange(P4_Source* s, P4_Expression* e) {
 
     P4_Node* result = NULL;
 
-    if ((result=P4_CreateNode (s->content, startpos, endpos, e->id, e->name)) == NULL)
+    if ((result=P4_CreateNode (s->content, startpos, endpos, e->name)) == NULL)
         P4_Panic("failed to create node: out of memory");
 
     return result;
@@ -1917,7 +1915,7 @@ P4_MatchReference(P4_Source* s, P4_Expression* e) {
     /* */
     P4_Node* result = NULL;
 
-    if ((result=P4_CreateNode (s->content, startpos, endpos, e->id, e->name)) == NULL)
+    if ((result=P4_CreateNode (s->content, startpos, endpos, e->name)) == NULL)
         P4_Panic("failed to create node: out of memory");
 
     P4_AdoptNode(result->head, result->tail, reftok);
@@ -1984,7 +1982,7 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
 
     P4_MarkPosition(s, endpos);
 
-    P4_Node* ret = P4_CreateNode (s->content, startpos, endpos, e->id, e->name);
+    P4_Node* ret = P4_CreateNode (s->content, startpos, endpos, e->name);
     if (ret == NULL)
         P4_Panic("failed to create node: out of memory");
 
@@ -2029,7 +2027,7 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
     if (P4_NeedLift(s, e))
         return tok;
 
-    P4_Node* oneof = P4_CreateNode (s->content, startpos, endpos, e->id, e->name);
+    P4_Node* oneof = P4_CreateNode (s->content, startpos, endpos, e->name);
     if (oneof == NULL)
         P4_Panic("failed to create node: out of memory");
 
@@ -2164,7 +2162,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
 
     P4_MarkPosition(s, endpos);
 
-    P4_Node* repetition = P4_CreateNode (s->content, startpos, endpos, e->id, e->name);
+    P4_Node* repetition = P4_CreateNode (s->content, startpos, endpos, e->name);
     if (repetition == NULL)
         P4_Panic("failed to create node: out of memory");
 
@@ -2386,10 +2384,8 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
 
     if (tok != NULL) {
         if (backref_expr->kind == P4_Reference) { /* TODO: other cases? */
-            tok->rule_id = backref_expr->ref_expr->id;
             tok->rule_name = backref_expr->ref_expr->name;
         } else {
-            tok->rule_id = backref_expr->id;
             tok->rule_name = backref_expr->name;
         }
     }

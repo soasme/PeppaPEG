@@ -236,7 +236,7 @@ void test_inspect(void) {
 
 static int my_inspect_refcnt2 = 0;
 P4_Error my_inspect2(P4_Node* node, void* userdata) {
-    if (node->rule_id != (P4_RuleID)userdata)
+    if (strcmp(node->rule_name, "entry") != 0)
         my_inspect_refcnt2++;
     return P4_Ok;
 }

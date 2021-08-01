@@ -72,7 +72,7 @@ P4_Error P4_MustacheCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* 
             && node
             && node->head
             && node->head->next
-            && node->head->next->rule_id == P4_MustacheSetDelimiter) {
+            && strcmp(node->head->next->rule_name, "set_delimiter") == 0) {
         P4_String opener = NULL, closer = NULL;
         P4_Expression* opener_expr = NULL;
         P4_Expression* closer_expr = NULL;
@@ -100,9 +100,7 @@ P4_Error P4_MustacheCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* 
         if ((err = P4_ReplaceGrammarRule(grammar, "closer", closer_expr)) != P4_Ok)
             goto finalize_set_delimiter;
 
-        node->head->rule_id = P4_GetRuleID(opener_expr);
         node->head->rule_name  = P4_GetRuleName(opener_expr);
-        node->tail->rule_id = P4_GetRuleID(closer_expr);
         node->tail->rule_name  = P4_GetRuleName(closer_expr);
 
         free(opener);

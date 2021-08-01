@@ -411,8 +411,7 @@ struct P4_Node {
      */
     P4_Slice                slice;
 
-    /** The id for matched grammar rule. */
-    P4_RuleID               rule_id;
+    /** The matched grammar rule name. */
     P4_String               rule_name;
 
     /** The user data. */
@@ -1138,12 +1137,12 @@ P4_Error       P4_SetMember(P4_Expression*, size_t, P4_Expression*);
  *
  * @param   expr                The sequence/choice expression.
  * @param   index               The index of member.
- * @param   member_rule_id      The rule id of member.
+ * @param   member              The member expr.
  * @return  The error code.
  *
  * It's equivalent to:
  *
- *      P4_SetMember(expr, index, P4_CreateReference(member_rule_id));
+ *      P4_SetMember(expr, index, P4_CreateReference("member_n"));
  */
 P4_Error       P4_SetReferenceMember(P4_Expression*, size_t, P4_String);
 
@@ -1562,7 +1561,7 @@ void           P4_JsonifySourceAst(P4_Grammar* grammar, FILE* stream, P4_Node* n
  * Example:
  *
  *      void MyInspector(P4_Node* node, void* userdata) {
- *          printf("%lu\t%lu\t%p\n", node->slice.start.pos, node->rule_id, userdata);
+ *          printf("%lu\t%lu\t%p\n", node->slice.start.pos, P4_GetRuleName(node), userdata);
  *          return P4_Ok;
  *      }
  *
@@ -1643,7 +1642,7 @@ P4_String      P4_GetErrorMessage(P4_Source*);
  * @param       str     The text.
  * @param       start   The starting position of the text.
  * @param       stop    The stopping position of the text.
- * @param       expr    The expression that matches to the slice of the text.
+ * @param       rule    The name of rule expression that matches to the slice of the text.
  * @return      The node.
  *
  * Example:
@@ -1651,15 +1650,15 @@ P4_String      P4_GetErrorMessage(P4_Source*);
  *      P4_String       str     = "Hello world";
  *      size_t          start   = 0;
  *      size_t          stop    = 11;
- *      P4_Expression*  expr    = P4_GetGrammarRule(grammar, ENTRY);
+ *      P4_String       rule    = "entry"
  *
- *      P4_Node* node = P4_CreateNode(text, start, stop, expr);
+ *      P4_Node* node = P4_CreateNode(text, start, stop, rule);
  *
  *      // do something.
  *
  *      P4_DeleteNode(node);
  */
-P4_Node*      P4_CreateNode(P4_String, P4_Position*, P4_Position*, P4_RuleID, P4_String);
+P4_Node*      P4_CreateNode(P4_String, P4_Position*, P4_Position*, P4_String);
 
 /**
  * @brief       Delete the node.

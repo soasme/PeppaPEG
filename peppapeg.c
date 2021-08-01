@@ -560,7 +560,7 @@ static void P4_Panicf(const char * fmt, ...) { va_list args; va_start(args, fmt)
 # define                        IS_SQUASHED(e) (((e)->flag & P4_FLAG_SQUASHED) != 0)
 # define                        IS_LIFTED(e) (((e)->flag & P4_FLAG_LIFTED) != 0)
 # define                        IS_NON_TERMINAL(e) (((e)->flag & P4_FLAG_NON_TERMINAL) != 0)
-# define                        IS_RULE(e) ((e)->id != 0)
+# define                        IS_RULE(e) ((e)->name != NULL)
 # define                        NEED_SILENT(s) ((s)->frame_stack ? (s)->frame_stack->silent : false)
 # define                        NEED_SPACE(s) (!(s)->whitespacing && ((s)->frame_stack ? (s)->frame_stack->space : false))
 # define                        NO_ERROR(s) ((s)->err == P4_Ok)
@@ -2375,10 +2375,11 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
     if (litexpr == NULL)
         P4_Panic("failed to create expression: out of memory");
 
-    if (backref_expr->kind == P4_Reference)
-        litexpr->id = backref_expr->ref_expr->id;
-    else
-        litexpr->id = backref_expr->id;
+    if (backref_expr->kind == P4_Reference) {
+        litexpr->name = strdup(backref_expr->ref_expr->name);
+    } else {
+        litexpr->name = strdup(backref_expr->name);
+    }
 
     P4_Node* tok = P4_MatchLiteral(s, litexpr);
 

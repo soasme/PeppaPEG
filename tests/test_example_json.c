@@ -336,7 +336,7 @@ void test_array_deep_nesting(void) {
 
     P4_Source* source;
 
-    const int NESTING_DEPTH = 500;
+    const int NESTING_DEPTH = 50;
 
     P4_String input = malloc(sizeof(char) * (NESTING_DEPTH*2 + 1));
     int i;

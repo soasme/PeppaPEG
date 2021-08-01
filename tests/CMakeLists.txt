@@ -52,6 +52,7 @@ foreach(unity_testcase ${unity_testcases})
             COMMAND "${VALGRIND}" ${VALGRIND_OPTIONS} "${CMAKE_CURRENT_BINARY_DIR}/${unity_testcase}"
         )
     else()
+        set(ASAN_OPTIONS "detect_leaks=1")
         add_test(
             NAME "${unity_testcase}"
             COMMAND "./${unity_testcase}"

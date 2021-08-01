@@ -1424,19 +1424,19 @@ P4_Expression* P4_GetGrammarRuleByName(P4_Grammar* grammar, P4_String name);
 /**
  * @brief       Set the flag of a grammar rule.
  * @param       grammar     The grammar.
- * @param       id          The ID.
+ * @param       name        The grammar rule name.
  * @param       flag        The bits of \ref P4_ExpressionFlag.
  * @return      The error code. If successful, return \ref P4_Ok.
  *
  * Example:
  *
- *      P4_Error err = P4_SetGrammarRuleFlag(grammar, Entry, P4_FLAG_SQUASHED | P4_FLAG_LIFTED | P4_FLAG_TIGHT);
+ *      P4_Error err = P4_SetGrammarRuleFlag(grammar, "entry", P4_FLAG_SQUASHED | P4_FLAG_LIFTED | P4_FLAG_TIGHT);
  *      if (err != P4_Ok) {
  *          printf("err=%u\n", err);
  *          exit(1);
  *      }
  */
-P4_Error       P4_SetGrammarRuleFlag(P4_Grammar*, P4_RuleID, P4_ExpressionFlag);
+P4_Error       P4_SetGrammarRuleFlag(P4_Grammar*, P4_String, P4_ExpressionFlag);
 
 /**
  * @brief       Set the maximum allowed recursion calls.

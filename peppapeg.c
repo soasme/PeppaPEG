@@ -369,7 +369,7 @@ KHASH_MAP_INIT_STR(rules, P4_Expression*)
 
 struct P4_Grammar {
     /** The rules, e.g. the expressions with IDs. */
-    struct P4_Expression**  rules;
+    P4_Expression**         rules;
     /** The total number of rules. */
     size_t                  count;
     /** A map associating names with expressions. Type: Map<str, P4_Expression*>. */
@@ -379,7 +379,7 @@ struct P4_Grammar {
     /** The total number of spaced rules. */
     size_t                  spaced_count;
     /** The repetition rule for spaced rules. */
-    struct P4_Expression*   spaced_rules;
+    P4_Expression*          spaced_rules;
     /** The recursion limit, or maximum allowed nested rules. */
     size_t                  depth;
     /** The callback after a match for an expression is successful. */
@@ -393,8 +393,6 @@ struct P4_Grammar {
 struct P4_Expression {
     /* The name of expression. */
     P4_String               name;
-    /** The id of expression. */
-    P4_RuleID               id;
     /** The kind of expression. */
     P4_ExpressionKind       kind;
     /** The flag of expression. */
@@ -2461,7 +2459,6 @@ P4_CreateLiteral(const P4_String literal, bool sensitive) {
         return NULL;
 
     P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
-    expr->id = 0;
     expr->kind = P4_Literal;
     expr->flag = 0;
     expr->name = NULL;
@@ -2476,7 +2473,6 @@ P4_CreateRange(P4_Rune lower, P4_Rune upper, size_t stride) {
         return NULL;
 
     P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
-    expr->id = 0;
     expr->kind = P4_Range;
     expr->flag = 0;
     expr->name = NULL;
@@ -2491,7 +2487,6 @@ P4_CreateRange(P4_Rune lower, P4_Rune upper, size_t stride) {
 P4_PUBLIC P4_Expression*
 P4_CreateRanges(size_t count, P4_RuneRange* ranges) {
     P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
-    expr->id = 0;
     expr->kind = P4_Range;
     expr->flag = 0;
     expr->name = NULL;
@@ -2514,7 +2509,6 @@ P4_CreateReference(P4_String reference) {
         return NULL;
 
     P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
-    expr->id = 0;
     expr->kind = P4_Reference;
     expr->flag = 0;
     expr->name = NULL;
@@ -2530,7 +2524,6 @@ P4_CreatePositive(P4_Expression* refexpr) {
         return NULL;
 
     P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
-    expr->id = 0;
     expr->kind = P4_Positive;
     expr->flag = 0;
     expr->name = NULL;
@@ -2544,7 +2537,6 @@ P4_CreateNegative(P4_Expression* refexpr) {
         return NULL;
 
     P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
-    expr->id = 0;
     expr->kind = P4_Negative;
     expr->flag = 0;
     expr->name = NULL;
@@ -2558,7 +2550,6 @@ P4_CreateContainer(size_t count) {
         return NULL;
 
     P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
-    expr->id = 0;
     expr->flag = 0;
     expr->name = NULL;
     expr->count = count;
@@ -2664,7 +2655,6 @@ P4_CreateRepeatMinMax(P4_Expression* repeat, size_t min, size_t max) {
         return NULL;
 
     P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
-    expr->id = 0;
     expr->flag = 0;
     expr->name = NULL;
     expr->kind = P4_Repeat;
@@ -2707,7 +2697,6 @@ P4_CreateOnceOrMore(P4_Expression* repeat) {
 P4_PUBLIC P4_Expression*
 P4_CreateBackReference(size_t index, bool sensitive) {
     P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
-    expr->id = 0;
     expr->kind = P4_BackReference;
     expr->flag = 0;
     expr->name = NULL;
@@ -2754,18 +2743,6 @@ P4_DeleteGrammar(P4_Grammar* grammar) {
         P4_FREE(grammar->rules);
         P4_FREE(grammar);
     }
-}
-
-P4_PUBLIC P4_Expression*
-P4_GetGrammarRule(P4_Grammar* grammar, P4_RuleID id) {
-    size_t i;
-    P4_Expression* rule = NULL;
-    for (i = 0; i < grammar->count; i++) {
-        rule = grammar->rules[i];
-        if (rule && rule->id == id)
-            return rule;
-    }
-    return NULL;
 }
 
 P4_PUBLIC P4_Expression*
@@ -2830,7 +2807,6 @@ P4_AddGrammarRule(P4_Grammar* grammar, P4_RuleID id, P4_String name, P4_Expressi
     if (rules == NULL)
         P4_Panic("failed to add grammar rule: out of memory");
 
-    expr->id = id;
     expr->name = strdup(name);
 
     grammar->cap = cap;
@@ -2842,16 +2818,6 @@ P4_AddGrammarRule(P4_Grammar* grammar, P4_RuleID id, P4_String name, P4_Expressi
     kh_value(grammar->rules2, k) = expr;
 
     return P4_Ok;
-}
-
-P4_PUBLIC P4_String
-P4_GetGrammarRuleName(P4_Grammar* grammar, P4_RuleID id) {
-    P4_Expression* expr = P4_GetGrammarRule(grammar, id);
-
-    if (expr == NULL)
-        return NULL;
-
-    return expr->name;
 }
 
 P4_PUBLIC P4_Source*
@@ -3626,11 +3592,9 @@ P4_ReplaceGrammarRule(P4_Grammar* grammar, P4_String name, P4_Expression* expr) 
 
     for (i = 0; i < grammar->count; i++) {
         if (strcmp(grammar->rules[i]->name, name) == 0) {
-            P4_RuleID id = oldexpr->id;
             P4_DeleteExpression(oldexpr);
 
             grammar->rules[i] = expr;
-            expr->id = id;
             expr->name = strdup(name);
 
             break;
@@ -4497,7 +4461,6 @@ P4_PegEvalGrammarReferences(P4_Grammar* grammar, P4_Expression* expr, P4_Result*
                 );
             }
 
-            expr->ref_id = ref->id;
             expr->reference = strdup(ref->name);
             break;
         }

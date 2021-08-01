@@ -1340,20 +1340,6 @@ void           P4_DeleteGrammar(P4_Grammar*);
 P4_Error       P4_AddGrammarRule(P4_Grammar*, P4_RuleID, P4_String, P4_Expression*);
 
 /**
- * Get the name for a grammar rule.
- *
- * @param   grammar     The grammar.
- * @param   id          The grammar rule id.
- * @return  The grammar rule name.
- *
- * Example:
- *
- *      P4_String name = P4_GetRuleName(grammar, ENTRY);
- *      printf("%s\n", name);
- */
-P4_String      P4_GetGrammarRuleName(P4_Grammar* grammar, P4_RuleID id);
-
-/**
  * Delete a grammar rule.
  *
  * @param   grammar     The grammar.
@@ -1362,20 +1348,6 @@ P4_String      P4_GetGrammarRuleName(P4_Grammar* grammar, P4_RuleID id);
  * WARNING: NOT IMPLEMENTED.
  */
 void           P4_DeleteGrammarRule(P4_Grammar*, P4_RuleID);
-
-/**
- * Get a grammar rule.
- *
- * @param   grammar     The grammar.
- * @param   id          The grammar rule id.
- * @return  The grammar rule expression. Returns NULL if not found.
- *
- * Example:
- *
- *      P4_AddLiteral(grammar, 1, "a", true);
- *      P4_Expression* expr = P4_GetGrammarRule(grammar, 1); // The literal expression.
- */
-P4_Expression* P4_GetGrammarRule(P4_Grammar*, P4_RuleID);
 
 /**
  * Get a grammar rule by its name.

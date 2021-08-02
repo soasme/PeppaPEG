@@ -3053,14 +3053,18 @@ P4_DiffPosition(P4_String str, P4_Position* start, size_t offset, P4_Position* s
         if (str[n] == '\n') {
             stop_offset++;
             eol = true;
+        } else if (eol) {
+            stop_lineno++;
+            stop_offset = 1;
+            eol = false;
         } else {
-            if (eol) {
-                stop_lineno++;
-                stop_offset = 1;
-                eol = false;
-            }
             stop_offset++;
         }
+    }
+    if (eol) {
+        stop_lineno++;
+        stop_offset = 1;
+        eol = false;
     }
 
     stop->pos = stop_pos;

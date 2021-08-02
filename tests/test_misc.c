@@ -188,7 +188,7 @@ void test_lineno_offset(void) {
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_RULE("r1", node);
     ASSERT_EQUAL_NODE_STRING("A\nBC\n", node);
-    ASSERT_EQUAL_NODE_LINE_OFFSET(1, 1, 2, 4, node);
+    ASSERT_EQUAL_NODE_LINE_OFFSET(1, 1, 3, 1, node);
 
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);

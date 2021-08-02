@@ -43,7 +43,7 @@ Once copied, add include macro and start using the library!
 In Peppa PEG, grammar syntax can be loaded from a string. Below is an example of JSON grammar syntax.
 
 ```c
-P4_Grammar* json = P4_LoadGrammar(
+P4_Grammar* grammar = P4_LoadGrammar(
     "@lifted\n"
     "entry = &[\\u0001-\\U0010ffff] value ![\\u0001-\\u0010ffff];\n"
 
@@ -93,18 +93,19 @@ P4_Grammar* json = P4_LoadGrammar(
 In Peppa PEG, the input can be parsed via `P4_Parse`:
 
 ```
-P4_Source* source = P4_CreateSource("[1,2.0,3e1,true,false,null,\"xyz\",{},[]]" , 1);
-P4_Parse(json, source);
+P4_Source* source = P4_CreateSource("[1,2.0,3e1,true,false,null,\"xyz\",{},[]]", "entry");
+P4_Parse(grammar, source);
 ```
 
 If success, the parsed source will contain an AST:
 
 ![Example JSON AST](docs/_static/readme-json-ast.svg)
 
-You can traverse the AST and do whatever you can. For example, the below function
-outputs the source AST into JSON format:
+You can traverse the parse tree. For example, the below function
+outputs the parse tree into JSON format:
 
 ```
+P4_Node* root = P4_GetSourceAST(source);
 P4_JsonifySourceAst(grammar, stdout, root);
 ```
 

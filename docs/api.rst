@@ -4,26 +4,6 @@ All APIs & References
 .. doxygenfile:: peppapeg.h
    :sections: detaileddescription
 
-STRUCTS
--------
-.. doxygenstruct:: P4_Slice
-   :members:
-
-.. doxygenstruct:: P4_Frame
-   :members:
-
-.. doxygenstruct:: P4_Source
-   :members:
-
-.. doxygenstruct:: P4_Expression
-   :members:
-
-.. doxygenstruct:: P4_Token
-   :members:
-
-.. doxygenstruct:: P4_Grammar
-   :members:
-
 DEFINES
 -------
 .. doxygenfile:: peppapeg.h
@@ -33,6 +13,18 @@ ENUMS
 ---------
 .. doxygenfile:: peppapeg.h
    :sections: enum
+
+STRUCTS
+-------
+
+.. doxygenstruct:: P4_Position
+   :members:
+
+.. doxygenstruct:: P4_Slice
+   :members:
+
+.. doxygenstruct:: P4_Node
+   :members:
 
 FUNCTIONS
 ---------

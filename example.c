@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    P4_Source*  source = P4_CreateSource("Hello\nWORLD", ENTRY);
+    P4_Source*  source = P4_CreateSource("Hello\nWORLD", "entry");
     if (source == NULL) {
         printf("Error: CreateSource: MemoryError.\n");
         return 1;

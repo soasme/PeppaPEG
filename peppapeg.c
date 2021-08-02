@@ -4423,8 +4423,6 @@ P4_PegEvalGrammarReferences(P4_Grammar* grammar, P4_Expression* expr, P4_Result*
                     expr->reference
                 );
             }
-
-            expr->reference = strdup(ref->name);
             break;
         }
         default:

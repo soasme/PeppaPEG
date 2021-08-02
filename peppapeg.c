@@ -305,17 +305,6 @@ static kh_inline khint_t __ac_X31_hash_string(const char *s)
 }
 #define kh_str_hash_func(key) __ac_X31_hash_string(key)
 #define kh_str_hash_equal(a, b) (strcmp(a, b) == 0)
-static kh_inline khint_t __ac_Wang_hash(khint_t key)
-{
-    key += ~(key << 15);
-    key ^=  (key >> 10);
-    key +=  (key << 3);
-    key ^=  (key >> 6);
-    key += ~(key << 11);
-    key ^=  (key >> 16);
-    return key;
-}
-#define kh_int_hash_func2(key) __ac_Wang_hash((khint_t)key)
 #define khash_t(name) kh_##name##_t
 #define kh_init(name) kh_init_##name()
 #define kh_destroy(name, h) kh_destroy_##name(h)
@@ -538,6 +527,20 @@ static void P4_Panicf(const char * fmt, ...) { va_list args; va_start(args, fmt)
 #define ASSERT(c,m) do { } while (false)
 # endif
 
+# define                        catch_oom(s) \
+    do { \
+        if ((s) == NULL) { \
+            P4_Panic("out of memory."); \
+        } \
+    } while (0);
+
+# define                        catch_err(s) \
+    do { \
+        if ((err = (s)) != P4_Ok) { \
+            goto finalize; \
+        } \
+    } while (0);
+
 # define                        catch(s) \
     do { \
         if ((err = (s)) != P4_Ok) { \
@@ -568,9 +571,14 @@ static void P4_Panicf(const char * fmt, ...) { va_list args; va_start(args, fmt)
     P4_SetPosition(&((s)->stop), (b)); \
 } while (0)
 
+#define P4_EachChild(node, child, code) \
+    for ((child) = (node)->head; (child) != NULL; (child) = (child)->next) { code; }
+
 # define                        autofree __attribute__ ((cleanup (cleanup_freep)))
 
-char *strdup(const char *src) { /* strdup is not ANSI. Copy source here. */
+#define strdup(x) P4_Panic("Do not use strdup(). Use STRDUP() instead.")
+
+static char *STRDUP(const char *src) { /* STRDUP is not ANSI. Copy source here. */
     char *dst = P4_MALLOC(strlen (src) + 1);
     if (dst == NULL) return NULL;
     strcpy(dst, src);
@@ -640,14 +648,14 @@ P4_PRIVATE(P4_String)           P4_RemainingText(P4_Source*);
 
 P4_PRIVATE(bool)                P4_NeedLift(P4_Source*, P4_Expression*);
 
-# define P4_RaiseError(s,e,m) \
+# define P4_MatchRaise(s,e,m) \
     do { \
         (s)->err = (e); \
         memset((s)->errmsg, 0, sizeof((s)->errmsg)); \
         sprintf((s)->errmsg, "%s", (m)); \
     } while (0);
 
-# define P4_RaiseErrorf(s,e,m,...) \
+# define P4_MatchRaisef(s,e,m,...) \
     do { \
         (s)->err = (e); \
         memset((s)->errmsg, 0, sizeof((s)->errmsg)); \
@@ -1786,7 +1794,7 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
     P4_ReadRune(e->literal, rune);
 
     if (IS_END(s)) {
-        P4_RaiseErrorf(s, P4_MatchError, "expect %s (char '%s'), line %zu:%zu (char %zu)",
+        P4_MatchRaisef(s, P4_MatchError, "expect %s (char '%s'), line %zu:%zu (char %zu)",
                 s->frame_stack->expr->name,
                 (char*)rune, startpos->lineno, startpos->offset, startpos->pos);
         return NULL;
@@ -1796,7 +1804,7 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
 
     if ((!e->sensitive && P4_CaseCmpInsensitive(e->literal, str, len) != 0)
             || (e->sensitive && memcmp(e->literal, str, len) != 0)) {
-        P4_RaiseErrorf(s, P4_MatchError, "expect %s (char '%s'), line %zu:%zu (char %zu)",
+        P4_MatchRaisef(s, P4_MatchError, "expect %s (char '%s'), line %zu:%zu (char %zu)",
                 s->frame_stack->expr->name,
                 (char*)rune, startpos->lineno, startpos->offset, startpos->pos);
         return NULL;
@@ -1823,7 +1831,7 @@ P4_MatchRange(P4_Source* s, P4_Expression* e) {
 
     P4_String str = P4_RemainingText(s);
     if (IS_END(s)) {
-        P4_RaiseErrorf(s, P4_MatchError, "expect %s, line %zu:%zu (char %zu)",
+        P4_MatchRaisef(s, P4_MatchError, "expect %s, line %zu:%zu (char %zu)",
             e->name?e->name:s->frame_stack->expr->name, s->lineno, s->offset, s->pos);
         return NULL;
     }
@@ -1845,7 +1853,7 @@ P4_MatchRange(P4_Source* s, P4_Expression* e) {
     }
 
     if (!found) {
-        P4_RaiseErrorf(s, P4_MatchError, "expect %s, line %zu:%zu (char %zu)",
+        P4_MatchRaisef(s, P4_MatchError, "expect %s, line %zu:%zu (char %zu)",
             e->name?e->name:s->frame_stack->expr->name, s->lineno, s->offset, s->pos);
         return NULL;
     }
@@ -1886,7 +1894,7 @@ P4_MatchReference(P4_Source* s, P4_Expression* e) {
     }
 
     if (e->ref_expr == NULL) {
-        P4_RaiseError(s, P4_NameError, "");
+        P4_MatchRaise(s, P4_NameError, "");
         return NULL;
     }
 
@@ -2008,7 +2016,7 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
                 P4_SetPosition(s, startpos);
             /* fail when the last one is a no-match. */
             } else {
-                P4_RaiseErrorf(s, P4_MatchError, "expect %s, line %zu:%zu (char %zu)",
+                P4_MatchRaisef(s, P4_MatchError, "expect %s, line %zu:%zu (char %zu)",
                     e->name?e->name:s->frame_stack->expr->name, s->lineno, s->offset, s->pos);
                 goto finalize;
             }
@@ -2058,7 +2066,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     if (IS_PROGRESSING(e->repeat_expr->kind) ||
             (IS_REF(e->repeat_expr)
              && IS_PROGRESSING(P4_GetReference(s, e->repeat_expr)->kind))) {
-        P4_RaiseError(s, P4_AdvanceError, "no progressing in repetition");
+        P4_MatchRaise(s, P4_AdvanceError, "no progressing in repetition");
         return NULL;
     }
 
@@ -2095,7 +2103,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
             }
 
             if (min != SIZE_MAX && repeated < min) {
-                P4_RaiseErrorf(s, P4_MatchError, "expect %s, line %zu:%zu (char %zu)",
+                P4_MatchRaisef(s, P4_MatchError, "expect %s, line %zu:%zu (char %zu)",
                     e->name?e->name:s->frame_stack->expr->name, s->lineno, s->offset, s->pos);
                 goto finalize;
             } else {                       /* sufficient repetitions. */
@@ -2108,7 +2116,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
             goto finalize;
 
         if (P4_GetPosition(s) == whitespace_startpos->pos) {
-            P4_RaiseErrorf(s, P4_MatchError,
+            P4_MatchRaisef(s, P4_MatchError,
                     "expect %s (repetition not advancing), line %zu:%zu (char %zu)",
                     e->name?e->name:s->frame_stack->expr->name, s->lineno, s->offset, s->pos);
             goto finalize;
@@ -2129,14 +2137,14 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
 
     /* fails when attempts are excessive, e.g. repeated > max. */
     if (max != SIZE_MAX && repeated > max) {
-        P4_RaiseErrorf(s, P4_MatchError,
+        P4_MatchRaisef(s, P4_MatchError,
             "expect %s (at most %zu repetitions), line %zu:%zu (char %zu)",
             e->name?e->name:s->frame_stack->expr->name, max, s->lineno, s->offset, s->pos);
         goto finalize;
     }
 
     if (min != SIZE_MAX && repeated < min) {
-        P4_RaiseErrorf(s, P4_MatchError,
+        P4_MatchRaisef(s, P4_MatchError,
             "expect %s (at least %zu repetitions), line %zu:%zu (char %zu)",
             e->name?e->name:s->frame_stack->expr->name, min, s->lineno, s->offset, s->pos);
         goto finalize;
@@ -2194,7 +2202,7 @@ P4_MatchNegative(P4_Source* s, P4_Expression* e) {
 
     if (NO_ERROR(s)) {
         P4_DeleteNode(node);
-        P4_RaiseErrorf(s, P4_MatchError, "expect %s, line %zu:%zu (char %zu)",
+        P4_MatchRaisef(s, P4_MatchError, "expect %s, line %zu:%zu (char %zu)",
             e->name?e->name:s->frame_stack->expr->name, startpos->lineno, startpos->offset, startpos->pos);
     } else if (s->err == P4_MatchError) {
         P4_RescueError(s);
@@ -2263,14 +2271,14 @@ P4_Match(P4_Source* s, P4_Expression* e) {
     P4_Node* result = NULL;
 
     if (IS_RULE(e) && (err = P4_PushFrame(s, e)) != P4_Ok) {
-        P4_RaiseError(s, err, "failed to push frame");
+        P4_MatchRaise(s, err, "failed to push frame");
         goto finalize;
     }
 
     result = P4_MatchDispatch(s, e);
 
     if (IS_RULE(e) && (err = P4_PopFrame(s, NULL)) != P4_Ok) {
-        P4_RaiseError(s, err, "failed to pop frame");
+        P4_MatchRaise(s, err, "failed to pop frame");
         P4_DeleteNode(result);
         goto finalize;
     }
@@ -2282,14 +2290,14 @@ P4_Match(P4_Source* s, P4_Expression* e) {
             P4_String errmsg = P4_MALLOC(sizeof(char) * (len+8));
             memset(errmsg, 0, len);
             sprintf(errmsg, "expect %s", e->name);
-            P4_RaiseError(s, s->err, errmsg);
+            P4_MatchRaise(s, s->err, errmsg);
             P4_FREE(errmsg);
         }
         goto finalize;
     }
 
     if (s->grammar->on_match && (err = (s->grammar->on_match)(s->grammar, e, result)) != P4_Ok) {
-        P4_RaiseError(s, err, "failed to run match callback.");
+        P4_MatchRaise(s, err, "failed to run match callback.");
         P4_DeleteNode(result);
         goto finalize;
     }
@@ -2298,7 +2306,7 @@ P4_Match(P4_Source* s, P4_Expression* e) {
 
 finalize:
     if (s->grammar->on_error && (err = (s->grammar->on_error)(s->grammar, e)) != P4_Ok) {
-        P4_RaiseError(s, err, "failed to run error callback.");
+        P4_MatchRaise(s, err, "failed to run error callback.");
     }
     return NULL;
 }
@@ -2333,20 +2341,20 @@ P4_MatchSpacedExpressions(P4_Source* s, P4_Expression* e) {
 P4_PRIVATE(P4_Node*)
 P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Expression* backref) {
     if (backrefs == NULL) {
-        P4_RaiseError(s, P4_NullError, "");
+        P4_MatchRaise(s, P4_NullError, "");
         return NULL;
     }
 
     size_t index = backref->backref_index;
 
     if (index > e->count) {
-        P4_RaiseError(s, P4_IndexError, "BackReference Index OutOfBound");
+        P4_MatchRaise(s, P4_IndexError, "BackReference Index OutOfBound");
         return NULL;
     }
 
     P4_Slice* slice = &(backrefs[index]);
     if (slice == NULL) {
-        P4_RaiseError(s, P4_IndexError, "BackReference Index OutOfBound");
+        P4_MatchRaise(s, P4_IndexError, "BackReference Index OutOfBound");
         return NULL;
     }
 
@@ -2358,7 +2366,7 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
     P4_Expression* backref_expr = e->members[index];
 
     if (backref_expr == NULL) {
-        P4_RaiseError(s, P4_NullError, "Member NULL");
+        P4_MatchRaise(s, P4_NullError, "Member NULL");
         return NULL;
     }
 
@@ -2368,9 +2376,9 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
         P4_Panic("failed to create expression: out of memory");
 
     if (backref_expr->kind == P4_Reference) {
-        litexpr->name = strdup(backref_expr->ref_expr->name);
+        litexpr->name = STRDUP(backref_expr->ref_expr->name);
     } else {
-        litexpr->name = strdup(backref_expr->name);
+        litexpr->name = STRDUP(backref_expr->name);
     }
 
     P4_Node* tok = P4_MatchLiteral(s, litexpr);
@@ -2456,7 +2464,7 @@ P4_CreateLiteral(const P4_String literal, bool sensitive) {
     expr->kind = P4_Literal;
     expr->flag = 0;
     expr->name = NULL;
-    expr->literal = strdup(literal);
+    expr->literal = STRDUP(literal);
     expr->sensitive = sensitive;
     return expr;
 }
@@ -2506,7 +2514,7 @@ P4_CreateReference(P4_String reference) {
     expr->kind = P4_Reference;
     expr->flag = 0;
     expr->name = NULL;
-    expr->reference = strdup(reference);
+    expr->reference = STRDUP(reference);
     expr->ref_id = 0;
     expr->ref_expr = NULL;
     return expr;
@@ -2783,11 +2791,11 @@ P4_AddGrammarRule(P4_Grammar* grammar, P4_String name, P4_Expression* expr) {
         return P4_NullError;
 
     if (expr->name == NULL) {
-        expr->name = strdup(name);
+        expr->name = STRDUP(name);
     } else if (expr->name != NULL) {
         if (strcmp(name, expr->name) != 0) {
             P4_FREE(expr->name);
-            expr->name = strdup(name);
+            expr->name = STRDUP(name);
         }
     }
 
@@ -2801,7 +2809,7 @@ P4_PUBLIC P4_Source*
 P4_CreateSource(P4_String content, P4_String entry_name) {
     P4_Source* source = P4_MALLOC(sizeof(P4_Source));
     source->content = content;
-    source->entry_name = strdup(entry_name);
+    source->entry_name = STRDUP(entry_name);
     source->pos = 0;
     source->lineno = 1;
     source->offset = 1;
@@ -3565,7 +3573,7 @@ P4_ReplaceGrammarRule(P4_Grammar* grammar, P4_String name, P4_Expression* expr) 
     kh_del(rules, grammar->rules, k);
     P4_DeleteExpression(oldexpr);
 
-    expr->name = strdup(name);
+    expr->name = STRDUP(name);
 
     P4_Expression* rule;
     kh_foreach_value(grammar->rules, rule, {
@@ -4064,11 +4072,11 @@ P4_PRIVATE(P4_Error)
 P4_PegEvalInsensitiveLiteral(P4_Node* node, P4_Result* result) {
     P4_Error err = P4_Ok;
 
-    catch(P4_PegEvalLiteral(node->head, result));
-
+    /* eval literal and set it as insensitive. */
+    catch_err(P4_PegEvalLiteral(node->head, result));
     P4_Expression* expr = P4_UnwrapExpression(result);
+    ASSERT(expr != NULL, "insensitive literal expr should not be null.");
     expr->sensitive = false;
-
     return P4_Ok;
 
 finalize:
@@ -4142,23 +4150,24 @@ finalize:
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalMembers(P4_Node* node, P4_Expression* expr, P4_Result* result) {
-    size_t         i         = 0;
-    P4_Error       err       = P4_Ok;
-    P4_Node*      child     = node->head;
-    P4_Expression* childexpr = NULL;
+    size_t   i     = 0;
+    P4_Error err   = P4_Ok;
+    P4_Node* child = NULL;
 
-    while (child != NULL) {
-        catch(P4_PegEvalExpression(child, result));
-        childexpr = P4_UnwrapExpression(result);
-        catch(P4_SetMember(expr, i, childexpr));
-        child = child->next;
+    /* for each child, eval expr and set it as ith member. */
+    P4_EachChild(node, child, {
+        catch_err(P4_PegEvalExpression(child, result));
+        catch_err(P4_SetMember(expr, i, P4_UnwrapExpression(result)));
         i++;
-    }
+    });
 
 finalize:
+    /* crash if failed to eval & set members. */
     if (err)
-        P4_Panicf("%s: failed to set %zuth member. " node_ERROR_HINT_FMT,
-            P4_GetErrorString(err), i, node_ERROR_HINT);
+        P4_Panicf(
+            "%s: failed to set %zuth member. " node_ERROR_HINT_FMT,
+            P4_GetErrorString(err), i, node_ERROR_HINT
+        );
     return err;
 }
 
@@ -4167,16 +4176,15 @@ P4_PegEvalSequence(P4_Node* node, P4_Result* result) {
     P4_Error        err = P4_Ok;
     P4_Expression*  expr = NULL;
 
-    if ((expr = P4_CreateSequence(P4_GetNodeChildrenCount(node))) == NULL)
-        P4_Panic("failed to create expression: out of memory.");
-
-    catch(P4_PegEvalMembers(node, expr, result));
-
+    /* create a sequence expr and then eval all members. */
+    catch_oom(expr = P4_CreateSequence(P4_GetNodeChildrenCount(node)));
+    catch_err(P4_PegEvalMembers(node, expr, result));
     result->expr = expr;
     return P4_Ok;
 
 finalize:
-    P4_DeleteExpression(expr);
+    /* free resources. */
+    if (expr) P4_DeleteExpression(expr);
     return err;
 }
 
@@ -4185,16 +4193,15 @@ P4_PegEvalChoice(P4_Node* node, P4_Result* result) {
     P4_Error  err = P4_Ok;
     P4_Expression*  expr = NULL;
 
-    if ((expr = P4_CreateChoice(P4_GetNodeChildrenCount(node))) == NULL)
-        P4_Panic("failed to create expression: out of memory.");
-
-    catch(P4_PegEvalMembers(node, expr, result));
-
+    /* create a choice expr and then eval all members. */
+    catch_oom(expr = P4_CreateChoice(P4_GetNodeChildrenCount(node)));
+    catch_err(P4_PegEvalMembers(node, expr, result));
     result->expr = expr;
     return P4_Ok;
 
 finalize:
-    P4_DeleteExpression(P4_UnwrapExpression(result));
+    /* free resources. */
+    if (expr) P4_DeleteExpression(expr);
     return err;
 }
 
@@ -4204,19 +4211,19 @@ P4_PegEvalPositive(P4_Node* node, P4_Result* result) {
     P4_Expression*  ref  = NULL;
     P4_Expression*  expr = NULL;
 
-    catch(P4_PegEvalExpression(node->head, result));
-
+    /* eval positive->ref_expr. */
+    catch_err(P4_PegEvalExpression(node->head, result));
     ref = P4_UnwrapExpression(result);
 
-    if ((expr = P4_CreatePositive(ref)) == NULL)
-        P4_Panic("failed to create expression: out of memory.");
-
+    /* create a positive expr. */
+    catch_oom(expr = P4_CreatePositive(ref));
     result->expr = expr;
     return P4_Ok;
 
 finalize:
-    P4_DeleteExpression(ref);
-    P4_DeleteExpression(P4_UnwrapExpression(result));
+    /* free resources. */
+    if (ref)  P4_DeleteExpression(ref);
+    if (expr) P4_DeleteExpression(expr);
     return err;
 }
 
@@ -4226,19 +4233,19 @@ P4_PegEvalNegative(P4_Node* node, P4_Result* result) {
     P4_Expression*  ref  = NULL;
     P4_Expression*  expr = NULL;
 
-    catch(P4_PegEvalExpression(node->head, result));
-
+    /* eval negative->ref_expr. */
+    catch_err(P4_PegEvalExpression(node->head, result));
     ref = P4_UnwrapExpression(result);
 
-    if ((expr = P4_CreateNegative(ref)) == NULL)
-        P4_Panic("failed to create expression: out of memory.");
-
+    /* create a negative expr. */
+    catch_oom(expr = P4_CreateNegative(ref));
     result->expr = expr;
     return P4_Ok;
 
 finalize:
-    P4_DeleteExpression(ref);
-    P4_DeleteExpression(P4_UnwrapExpression(result));
+    /* free resources. */
+    if (ref)  P4_DeleteExpression(ref);
+    if (expr) P4_DeleteExpression(expr);
     return err;
 }
 
@@ -4250,12 +4257,12 @@ P4_PegEvalRepeat(P4_Node* node, P4_Result* result) {
     size_t          min  = 0,
                     max  = SIZE_MAX;
 
-    catch(P4_PegEvalExpression(node->head, result));
-
+    /* eval repeated expr. */
+    catch_err(P4_PegEvalExpression(node->head, result));
     ref = P4_UnwrapExpression(result);
 
+    /* eval repeat min/max. */
     P4_String       rule_name = node->head->next->rule_name;
-
     if (strcmp(rule_name, "zeroormore") == 0) {
         min = 0; max = SIZE_MAX;
     } else if (strcmp(rule_name, "zerooronce") == 0) {
@@ -4263,14 +4270,14 @@ P4_PegEvalRepeat(P4_Node* node, P4_Result* result) {
     } else if (strcmp(rule_name, "onceormore") == 0) {
         min = 1; max = SIZE_MAX;
     } else if (strcmp(rule_name, "repeatmin") == 0) {
-        catch(P4_PegEvalNumber(node->head->next->head, &min));
+        catch_err(P4_PegEvalNumber(node->head->next->head, &min));
     } else if (strcmp(rule_name, "repeatmax") == 0) {
-        catch(P4_PegEvalNumber(node->head->next->head, &max));
+        catch_err(P4_PegEvalNumber(node->head->next->head, &max));
     } else if (strcmp(rule_name, "repeatminmax") == 0) {
-        catch(P4_PegEvalNumber(node->head->next->head, &min));
-        catch(P4_PegEvalNumber(node->head->next->tail, &max));
+        catch_err(P4_PegEvalNumber(node->head->next->head, &min));
+        catch_err(P4_PegEvalNumber(node->head->next->tail, &max));
     } else if (strcmp(rule_name, "repeatexact") == 0) {
-        catch(P4_PegEvalNumber(node->head->next->head, &min));
+        catch_err(P4_PegEvalNumber(node->head->next->head, &min));
         max = min;
     } else {
         UNREACHABLE();
@@ -4278,6 +4285,7 @@ P4_PegEvalRepeat(P4_Node* node, P4_Result* result) {
             node_ERROR_HINT_FMT, node->head->next->rule_name, node_ERROR_HINT);
     }
 
+    /* repeat min should be greater than max. */
     if (min > max) {
         err = P4_PegError;
         P4_EvalRaise(
@@ -4286,38 +4294,32 @@ P4_PegEvalRepeat(P4_Node* node, P4_Result* result) {
         );
     }
 
-    if ((expr = P4_CreateRepeatMinMax(ref, min, max)) == NULL)
-        P4_Panic("failed to create expression: out of memory.");
-
+    /* create repeat expr. */
+    catch_oom(expr = P4_CreateRepeatMinMax(ref, min, max));
     result->expr = expr;
     return P4_Ok;
 
 finalize:
-    P4_DeleteExpression(ref);
-    P4_DeleteExpression(expr);
+    /* free resources. */
+    if (ref)  P4_DeleteExpression(ref);
+    if (expr) P4_DeleteExpression(expr);
     return err;
 }
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalDot(P4_Node* node, P4_Result* result) {
-    P4_Expression* expr = NULL;
-
-    if ((expr = P4_CreateRange(0x1, 0x10ffff, 1)) == NULL)
-        P4_Panic("failed to create expression: out of memory.");
-
-    result->expr = expr;
+    catch_oom(result->expr = P4_CreateRange(0x1, 0x10ffff, 1));
     return P4_Ok;
 }
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalRuleName(P4_Node* node, P4_String* result) {
-    size_t   len = P4_GetSliceSize(&node->slice);
-
+    /* get the rule name string length. */
+    size_t len = P4_GetSliceSize(&node->slice);
     ASSERT(len > 0, "Node slice size should be greater than zero.");
 
-    if ((*result = P4_MALLOC((len+1) * sizeof(char)))== NULL)
-        P4_Panic("failed to create string: out of memory.");
-
+    /* malloc a new string for the rule name. */
+    catch_oom(*result = P4_MALLOC((len+1) * sizeof(char)));
     memcpy(*result, node->text + node->slice.start.pos, len);
     (*result)[len] = '\0';
 
@@ -4330,21 +4332,18 @@ P4_PegEvalReference(P4_Node* node, P4_Result* result) {
     P4_String      ref  = NULL;
     P4_Expression* expr = NULL;
 
-    catch(P4_PegEvalRuleName(node, &ref));
-
-    if ((expr = P4_CreateReference(ref)) == NULL)
-        P4_Panic("failed to create expression: out of memory.");
-
+    /* first, eval ref string, then, create ref expr. */
+    catch_err(P4_PegEvalRuleName(node, &ref));
+    catch_oom(expr = P4_CreateReference(ref));
     result->expr = expr;
-
     P4_FREE(ref);
+
     return P4_Ok;
 
 finalize:
-    if (ref)
-        P4_FREE(ref);
-    if (expr)
-        P4_DeleteExpression(expr);
+    /* free resources. */
+    if (ref)    P4_FREE(ref);
+    if (expr)   P4_DeleteExpression(expr);
 
     return err;
 }
@@ -4357,76 +4356,74 @@ P4_PegEvalGrammarRule(P4_Node* node, P4_Result* result) {
     P4_Error            err       = P4_Ok;
     P4_Expression*      expr      = NULL;
 
-    for (child = node->head; child != NULL; child = child->next) {
-        if (strcmp(child->rule_name, "decorators") == 0) {
-            catch(P4_PegEvalRuleFlags(child, &rule_flag));
-        } else if (strcmp(child->rule_name, "name") == 0) {
-            catch(P4_PegEvalRuleName(child, &rule_name));
-        } else {
-            catch(P4_PegEvalExpression(child, result));
-        }
-    }
+    /* eval rule decorators, rule name, and rule expression
+     * from node children. */
+
+    P4_EachChild(node, child, {
+        if (strcmp(child->rule_name, "decorators") == 0)
+            catch (P4_PegEvalRuleFlags(child, &rule_flag))
+        else if (strcmp(child->rule_name, "name") == 0)
+            catch (P4_PegEvalRuleName(child, &rule_name))
+        else
+            catch (P4_PegEvalExpression(child, result))
+    });
+
+    /* we can now unwrap an expr from the result.
+     * next, let's set rule name and rule flags. */
 
     expr = P4_UnwrapExpression(result);
-
     ASSERT(expr != NULL, "failed to eval grammar rule expression");
-
     expr->name = rule_name;
     expr->flag = rule_flag;
 
     return P4_Ok;
 
 finalize:
-    if (rule_name) P4_FREE(rule_name);
-    if (expr)   P4_DeleteExpression(expr);
+    /* free resources. */
+    if (rule_name)  P4_FREE(rule_name);
+    if (expr)       P4_DeleteExpression(expr);
     return err;
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalGrammarReferences(P4_Grammar* grammar, P4_Expression* expr, P4_Result* result) {
+P4_PegEvalGrammarReferences(
+        P4_Grammar* grammar,
+        P4_Expression* expr,
+        P4_Result* result) {
+# define recursive(e) \
+    if ((e)) \
+        return P4_PegEvalGrammarReferences(grammar, (e), result);
+
     size_t   i   = 0;
     P4_Error err = P4_Ok;
 
     ASSERT(expr != NULL, "reference expr is NULL.");
 
     switch (expr->kind) {
+        /* detect if references are all "resolvable".
+         * raise an error if can't find a grammar rule for the reference. */
+        case P4_Reference:
+            if (!expr->reference ||
+                    !P4_GetGrammarRuleByName(grammar, expr->reference)) {
+                err = P4_NameError;
+                P4_EvalRaise("reference %s is undefined", expr->reference);
+            }
+            break;
+
+        /* recursively check non-reference expressions. */
         case P4_Positive:
         case P4_Negative:
-            if (expr->ref_expr)
-                catch(P4_PegEvalGrammarReferences(grammar, expr->ref_expr, result));
+            recursive(expr->ref_expr);
             break;
         case P4_Sequence:
         case P4_Choice:
             for (i = 0; i < expr->count; i++)
-                if (expr->members[i])
-                    catch(P4_PegEvalGrammarReferences(grammar, expr->members[i], result));
+                recursive(expr->members[i])
             break;
         case P4_Repeat:
-            if (expr->repeat_expr)
-                catch(P4_PegEvalGrammarReferences(grammar, expr->repeat_expr, result));
+            recursive(expr->repeat_expr);
             break;
-        case P4_Reference:
-        {
-            if (expr->reference == NULL) {
-                err = P4_NameError;
-                P4_EvalRaise(
-                    "reference name is not set: %s",
-                    expr->reference
-                );
-            }
-
-            P4_Expression* ref = P4_GetGrammarRuleByName(grammar, expr->reference);
-            if (ref == NULL) {
-                err = P4_NameError;
-                P4_EvalRaise(
-                    "reference %s is undefined",
-                    expr->reference
-                );
-            }
-            break;
-        }
-        default:
-            break;
+        default: break;
     }
 
 finalize:
@@ -4435,72 +4432,77 @@ finalize:
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalGrammar(P4_Node* node, P4_Result* result) {
-    P4_Error    err = P4_Ok;
-    P4_Grammar* grammar = NULL;
+    P4_Error        err     = P4_Ok;
+    P4_Grammar*     grammar = NULL;
+    P4_Expression*  rule = NULL;
+    P4_Node*        child = NULL;
 
+    /* create a grammar object. */
     if ((grammar = P4_CreateGrammar()) == NULL)
         P4_Panic("failed to create grammar: out of memory.");
 
-    P4_Expression* rule = NULL;
-    P4_Node*      child = NULL;
-    P4_RuleID      id = 1;
-
-    /* Eval grammar rules. */
-    for (child = node->head; child != NULL; child = child->next) {
-        catch(P4_PegEvalGrammarRule(child, result));
+    /* eval each child to a grammar rule,
+     * and then add the rule to grammar object. */
+    P4_EachChild(node, child, {
+        catch_err(P4_PegEvalGrammarRule(child, result));
 
         rule = P4_UnwrapExpression(result);
-
         if ((err = P4_AddGrammarRule(grammar, rule->name, rule)) != P4_Ok)
             P4_EvalRaise("failed to add rule %s.", rule->name);
+    });
 
-        id++;
-    }
-
-    /* Resolve named references. */
+    /* traverse all grammar rules to resolve references. */
     kh_foreach_value(grammar->rules, rule, {
-        catch(P4_PegEvalGrammarReferences(grammar, rule, result));
+        catch_err(P4_PegEvalGrammarReferences(grammar, rule, result));
     });
 
 finalize:
+    /* free resources. */
+    if (err) P4_DeleteGrammar(grammar);
 
-    if (err) {
-        P4_DeleteGrammar(grammar);
-        result->grammar = NULL;
-    } else {
-        result->grammar = grammar;
-    }
+    /* set either the grammar object or NULL to result.*/
+    result->grammar = err ? NULL : grammar;
 
     return err;
 }
 
 P4_PUBLIC P4_Error
 P4_PegEvalExpression(P4_Node* node, P4_Result* result) {
-    if (strcmp(node->rule_name, "literal") == 0)
+    /* entry function for eval peg ast. this function dispatch (node)
+     * to specific functions based on its rule name. */
+
+    if (strcmp(node->rule_name, "literal")      == 0)
         return P4_PegEvalLiteral(node, result);
-    else if (strcmp(node->rule_name, "insensitive") == 0)
+
+    if (strcmp(node->rule_name, "insensitive")  == 0)
         return P4_PegEvalInsensitiveLiteral(node, result);
-    else if (strcmp(node->rule_name, "range") == 0)
+
+    if (strcmp(node->rule_name, "range")        == 0)
         return P4_PegEvalRange(node, result);
-    else if (strcmp(node->rule_name, "sequence") == 0)
+
+    if (strcmp(node->rule_name, "sequence")     == 0)
         return P4_PegEvalSequence(node, result);
-    else if (strcmp(node->rule_name, "choice") == 0)
+
+    if (strcmp(node->rule_name, "choice")       == 0)
         return P4_PegEvalChoice(node, result);
-    else if (strcmp(node->rule_name, "positive") == 0)
+
+    if (strcmp(node->rule_name, "positive")     == 0)
         return P4_PegEvalPositive(node, result);
-    else if (strcmp(node->rule_name, "negative") == 0)
+
+    if (strcmp(node->rule_name, "negative")     == 0)
         return P4_PegEvalNegative(node, result);
-    else if (strcmp(node->rule_name, "repeat") == 0)
+
+    if (strcmp(node->rule_name, "repeat")       == 0)
         return P4_PegEvalRepeat(node, result);
-    else if (strcmp(node->rule_name, "dot") == 0)
+
+    if (strcmp(node->rule_name, "dot")          == 0)
         return P4_PegEvalDot(node, result);
-    else if (strcmp(node->rule_name, "reference") == 0)
+
+    if (strcmp(node->rule_name, "reference")    == 0)
         return P4_PegEvalReference(node, result);
-    else {
-        UNREACHABLE();
-        P4_Panicf("PegError: node %p is not a peg expression", node);
-        return P4_Ok;
-    }
+
+    UNREACHABLE();
+    P4_Panicf("Unreachable: node %p is not a peg expression", node);
 }
 
 P4_PUBLIC P4_Error
@@ -4511,12 +4513,21 @@ P4_LoadGrammarResult(P4_String rules, P4_Result* result) {
     P4_Error          err       = P4_Ok;
     P4_Result*        evalres   = &(P4_Result){0};
 
+    /* load PEG bootstrap grammar object. */
     if ((bootstrap = P4_CreatePegGrammar()) == NULL)
-        P4_Panic("failed to create grammar: out of memory.");
+        P4_EvalRaise(
+            "failed to create bootstrap grammar: %s.",
+            "out of grammar"
+        );
 
+    /* load grammar rule source object. */
     if ((rules_src = P4_CreateSource(rules, "grammar")) == NULL)
-        P4_Panic("failed to create source: out of memory.");
+        P4_EvalRaise(
+            "failed to create rules source: %s.",
+            "out of grammar"
+        );
 
+    /* parse grammar rule source */
     if ((err = P4_Parse(bootstrap, rules_src)) != P4_Ok)
         P4_EvalRaise(
             "%s: failed to parse peg rules: %s.",
@@ -4524,37 +4535,45 @@ P4_LoadGrammarResult(P4_String rules, P4_Result* result) {
             P4_GetErrorMessage(rules_src)
         );
 
+    /* get grammar rule parse tree. */
     if ((rules_tok = P4_GetSourceAst(rules_src)) == NULL)
-        P4_EvalRaise("%s: %s.",
-            P4_GetErrorString(P4_PegError),
-            "failed to get peg ast."
+        P4_EvalRaise(
+            "%s: failed to create parse tree.",
+            P4_GetErrorString(P4_PegError)
         );
 
+    /* eval grammar rule parse tree to grammar object. */
     if ((err = P4_PegEvalGrammar(rules_tok, evalres)) != P4_Ok)
-        P4_EvalRaise("%s: %s.", P4_GetErrorString(err), evalres->errmsg);
+        P4_EvalRaise(
+            "%s: %s.",
+            P4_GetErrorString(err),
+            evalres->errmsg
+        );
 
 finalize:
+    /* set the grammar object to the result,
+     * regardless of evaluated successfully or not. */
     result->grammar = (err == P4_Ok) ? evalres->grammar : NULL;
 
-    if (rules_src)
-        P4_DeleteSource(rules_src);
-
-    if (bootstrap)
-        P4_DeleteGrammar(bootstrap);
+    /* free resources. */
+    if (rules_src) P4_DeleteSource(rules_src);
+    if (bootstrap) P4_DeleteGrammar(bootstrap);
 
     return err;
 }
 
 P4_PUBLIC P4_Grammar*
 P4_LoadGrammar(P4_String rules) {
-    P4_Result* result = &(P4_Result){0};
+    P4_Error    err     = P4_Ok;
+    P4_Result*  result  = &(P4_Result){0};
 
-    if (P4_LoadGrammarResult(rules, result) != P4_Ok) {
-        P4_Panicf("%s\n", result->errmsg);
-        return NULL;
-    }
-
+    /* attempts to load the grammar object from rules string. */
+    catch_err(P4_LoadGrammarResult(rules, result));
     return result->grammar;
+
+finalize:
+    /* terminates the program if failed to load grammar object. */
+    P4_Panicf("%s\n", result->errmsg);
 }
 
 P4_PUBLIC const P4_String

@@ -1739,8 +1739,8 @@ P4_Grammar*    P4_CreatePegGrammar ();
 P4_Error P4_LoadGrammarResult(P4_String rules, P4_Result* result);
 
 /**
- * @brief       Load peg grammar from a string.
- * @param       rules   The rules string.
+ * @brief       Load PEG grammar written in string.
+ * @param       rules   The grammar rules string.
  * @return      The grammar object.
  *
  * Example:
@@ -1749,8 +1749,14 @@ P4_Error P4_LoadGrammarResult(P4_String rules, P4_Result* result);
  *          "entry = one one;\n"
  *          "one   = \"1\";\n"
  *      );
- *      P4_Source* source = P4_CreateSource("11", "entry");
- *      P4_Parse(grammar, source);
+ *      P4_Source* source1 = P4_CreateSource("11", "entry");
+ *      P4_Parse(grammar, source1);
+ *
+ *      P4_Source* source2 = P4_CreateSource("1", "one");
+ *      P4_Parse(grammar, source2);
+ *
+ * This function exits the program when an error occurs.
+ *
  */
 P4_Grammar*     P4_LoadGrammar(P4_String rules);
 

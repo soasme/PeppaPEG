@@ -364,8 +364,6 @@ For example,
 
 .. code-block:: c
 
-    typedef enum { Entry, Text } MyRuleID;
-
     P4_AddSequenceWithMembers(grammar, Entry, 2
         P4_CreateReference(Text),
         P4_CreateReference(Text)
@@ -436,8 +434,6 @@ If the grammar rule `Entry` has flag `P4_FLAG_LIFTED`, the node is lifted and re
 For example,
 
 .. code-block:: c
-
-    typedef enum { Entry, Text } MyRuleID;
 
     P4_AddSequenceWithMembers(grammar, Entry, 2
         P4_CreateLiteral("(", true),

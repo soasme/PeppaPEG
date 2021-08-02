@@ -44,9 +44,9 @@ We create a :c:struct:`P4_Source` using :c:func:`P4_CreateSource()`.
    :lines: 4,13-17
 
 The first parameter is the content of the source.
-The second parameter is the ID of the entry grammar rule, e.g. the numeric index of the rule in the loaded grammar (1-based).
+The second parameter is the name of entry grammar rule.
 
-In this example, we have only single rule `entry`, so the ID is 1. (If you have multiple rules, the rule IDs increments.)
+In this example, we have only single rule `entry`, so the name can only be "entry".
 
 Step 3: Parse
 -------------
@@ -104,11 +104,11 @@ The output of the example looks like:
     $ gcc -o example ../example.c ../peppapeg.c
     $ ./example
     root span: [0 11]
-    root start: line=1 offset=0
-    root stop: line=2 offset=5
-    root next: (nil)
-    root head: (nil)
-    root tail: (nil)
+    root start: line=1 offset=1
+    root stop: line=2 offset=6
+    root next: 0x0
+    root head: 0x0
+    root tail: 0x0
     root text: Hello
     WORLD
     [{"slice":[0,11],"type":"entry"}]

@@ -5,11 +5,12 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Tutorial: Calculator" href="tutcalc.html" /><link rel="prev" title="Peppa PEG’s Documentation" href="index.html" />
 
-    <meta name="generator" content="sphinx-4.1.2, furo 2021.07.28.beta40"/>
+    <meta name="generator" content="sphinx-4.1.2, furo 2021.07.31.beta41"/>
         <title>Getting Started - Peppa PEG 1.13.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=daa650a7760fac3eee23aa959745d2c866b74cb3" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=93475b62d1c3bc01323a0eefdc14a62d77b12690" />
+    
     
 
 
@@ -31,7 +32,8 @@
   
     }
   }
-</style><link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css"></head>
+</style>
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css"></head>
   <body>
     
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -101,8 +103,12 @@
 
 <input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
 <input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
-<label class="overlay sidebar-overlay" for="__navigation"></label>
-<label class="overlay toc-overlay" for="__toc"></label>
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
 
 
 
@@ -110,6 +116,7 @@
   <header class="mobile-header">
     <div class="header-left">
       <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
         <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
       </label>
     </div>
@@ -119,12 +126,14 @@
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
         <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
           <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
           <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
       <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
     </div>
@@ -137,8 +146,8 @@
   
   <span class="sidebar-brand-text">Peppa PEG 1.13.0 documentation</span>
   
-</a><form class="sidebar-search-container" method="get" action="search.html">
-  <input class="sidebar-search" placeholder=Search name="q">
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form>
@@ -171,18 +180,20 @@
       
     </div>
   </aside>
-  <main class="main">
+  <div class="main">
     <div class="content">
       <article role="main">
         <div class="content-icon-container">
           <div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
               <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
           <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
@@ -206,7 +217,7 @@
 <li><p><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Grammar</span></code>: The grammar object that defines all grammar rules.</p></li>
 <li><p><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Expression</span></code>: The grammar rule object.</p></li>
 <li><p><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Source</span></code>: The content to parse.</p></li>
-<li><p><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Node</span></code>. The node of an AST (abstract syntax tree), e.g. the final parsing result of a grammar given the source.</p></li>
+<li><p><a class="reference internal" href="api.html#c.P4_Node" title="P4_Node"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Node</span></code></a>. The node of an AST (abstract syntax tree), e.g. the final parsing result of a grammar given the source.</p></li>
 </ul>
 </section>
 <section id="step-1-create-grammar">
@@ -224,7 +235,7 @@
 <h2>Step 2: Create Source<a class="headerlink" href="#step-2-create-source" title="Permalink to this headline">¶</a></h2>
 <p>We create a <code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Source</span></code> using <a class="reference internal" href="api.html#c.P4_CreateSource" title="P4_CreateSource"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateSource()</span></code></a>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># define ENTRY 1</span>
-    <span class="n">P4_Source</span><span class="o">*</span>  <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s2">"Hello</span><span class="se">\n</span><span class="s2">WORLD"</span><span class="p">,</span> <span class="n">ENTRY</span><span class="p">);</span>
+    <span class="n">P4_Source</span><span class="o">*</span>  <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s2">"Hello</span><span class="se">\n</span><span class="s2">WORLD"</span><span class="p">,</span> <span class="s2">"entry"</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">source</span> <span class="o">==</span> <span class="n">NULL</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">printf</span><span class="p">(</span><span class="s2">"Error: CreateSource: MemoryError.</span><span class="se">\n</span><span class="s2">"</span><span class="p">);</span>
         <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
@@ -232,8 +243,8 @@
 </pre></div>
 </div>
 <p>The first parameter is the content of the source.
-The second parameter is the ID of the entry grammar rule, e.g. the numeric index of the rule in the loaded grammar (1-based).</p>
-<p>In this example, we have only single rule <cite>entry</cite>, so the ID is 1. (If you have multiple rules, the rule IDs increments.)</p>
+The second parameter is the name of entry grammar rule.</p>
+<p>In this example, we have only single rule <cite>entry</cite>, so the name can only be “entry”.</p>
 </section>
 <section id="step-3-parse">
 <h2>Step 3: Parse<a class="headerlink" href="#step-3-parse" title="Permalink to this headline">¶</a></h2>
@@ -307,7 +318,7 @@ The second parameter is the ID of the entry grammar rule, e.g. the numeric index
         <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
     <span class="p">}</span>
 
-    <span class="n">P4_Source</span><span class="o">*</span>  <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s2">"Hello</span><span class="se">\n</span><span class="s2">WORLD"</span><span class="p">,</span> <span class="n">ENTRY</span><span class="p">);</span>
+    <span class="n">P4_Source</span><span class="o">*</span>  <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s2">"Hello</span><span class="se">\n</span><span class="s2">WORLD"</span><span class="p">,</span> <span class="s2">"entry"</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">source</span> <span class="o">==</span> <span class="n">NULL</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">printf</span><span class="p">(</span><span class="s2">"Error: CreateSource: MemoryError.</span><span class="se">\n</span><span class="s2">"</span><span class="p">);</span>
         <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
@@ -348,11 +359,11 @@ The second parameter is the ID of the entry grammar rule, e.g. the numeric index
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ gcc -o example ../example.c ../peppapeg.c
 $ ./example
 root span: [0 11]
-root start: line=1 offset=0
-root stop: line=2 offset=5
-root next: (nil)
-root head: (nil)
-root tail: (nil)
+root start: line=1 offset=1
+root stop: line=2 offset=6
+root next: 0x0
+root head: 0x0
+root tail: 0x0
 root text: Hello
 WORLD
 [{"slice":[0,11],"type":"entry"}]
@@ -440,7 +451,7 @@ WORLD
       
       
     </aside>
-  </main>
+  </div>
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>

@@ -5,11 +5,12 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Concepts" href="concepts.html" /><link rel="prev" title="Tutorial: JSON" href="tutjson.html" />
 
-    <meta name="generator" content="sphinx-4.1.2, furo 2021.07.28.beta40"/>
+    <meta name="generator" content="sphinx-4.1.2, furo 2021.07.31.beta41"/>
         <title>How-To Guides - Peppa PEG 1.13.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=daa650a7760fac3eee23aa959745d2c866b74cb3" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=93475b62d1c3bc01323a0eefdc14a62d77b12690" />
+    
     
 
 
@@ -31,7 +32,8 @@
   
     }
   }
-</style><link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css"></head>
+</style>
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css"></head>
   <body>
     
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -101,8 +103,12 @@
 
 <input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
 <input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
-<label class="overlay sidebar-overlay" for="__navigation"></label>
-<label class="overlay toc-overlay" for="__toc"></label>
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
 
 
 
@@ -110,6 +116,7 @@
   <header class="mobile-header">
     <div class="header-left">
       <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
         <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
       </label>
     </div>
@@ -119,12 +126,14 @@
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
         <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
           <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
           <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
       <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
     </div>
@@ -137,8 +146,8 @@
   
   <span class="sidebar-brand-text">Peppa PEG 1.13.0 documentation</span>
   
-</a><form class="sidebar-search-container" method="get" action="search.html">
-  <input class="sidebar-search" placeholder=Search name="q">
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form>
@@ -171,18 +180,20 @@
       
     </div>
   </aside>
-  <main class="main">
+  <div class="main">
     <div class="content">
       <article role="main">
         <div class="content-icon-container">
           <div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
               <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
           <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
@@ -210,7 +221,7 @@
 <p>Peppa PEG supports parsing a subset of source input. By default, all source content are attempted.</p>
 <p>One can use <cite>P4_SetSourceSlice</cite> to set the start position and stop position in the source input.</p>
 <p>In this example, Peppa PEG only parses the substring “YXXXY”[1:4], e.g. “XXX”.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">P4_Source</span><span class="o">*</span> <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s">"YXXXY"</span><span class="p">,</span> <span class="n">ENTRY</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">P4_Source</span><span class="o">*</span> <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s">"YXXXY"</span><span class="p">,</span> <span class="s">"entry"</span><span class="p">);</span>
 <span class="o">&gt;&gt;</span> <span class="n">P4_SetSourceSlice</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
 <span class="n">P4_Ok</span>
 <span class="o">&gt;&gt;</span> <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">);</span>
@@ -227,9 +238,9 @@
 <h2>How to Prevent Partial Parse?<a class="headerlink" href="#how-to-prevent-partial-parse" title="Permalink to this headline">¶</a></h2>
 <p>Considering below case,</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span> <span class="o">==</span> <span class="n">P4_AddZeroOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span> <span class="nb">true</span><span class="p">)));</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span> <span class="o">==</span> <span class="n">P4_AddZeroOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s">"entry"</span><span class="p">,</span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span> <span class="nb">true</span><span class="p">)));</span>
 
-<span class="n">P4_Source</span><span class="o">*</span> <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s">"aaab"</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="n">P4_Source</span><span class="o">*</span> <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s">"aaab"</span><span class="p">,</span> <span class="s">"entry"</span><span class="p">);</span>
 <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">);</span> <span class="c1">// P4_Ok!</span>
 </pre></div>
 </div>
@@ -237,19 +248,19 @@
 <p>The expression of Start-of-Input and End-of-Input match the start and end of the input. They don’t consume text.</p>
 <p>To make “aaab” as a whole, we need to add Start-of-Input and End-of-Input before and after the ZeroOrMore rule:</p>
 <p>If you use using PEG API, use <cite>&amp;.</cite> and <cite>!.</cite>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>grammar = &amp;. a*  !. ;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>entry = &amp;. a*  !. ;
 </pre></div>
 </div>
 <p>If you are using low level API, use <a class="reference internal" href="api.html#c.P4_CreateStartOfInput" title="P4_CreateStartOfInput"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateStartOfInput()</span></code></a> and <a class="reference internal" href="api.html#c.P4_CreateEndOfInput" title="P4_CreateEndOfInput"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateEndOfInput()</span></code></a>.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span> <span class="o">==</span> <span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span> <span class="o">==</span> <span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s">"entry"</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span>
     <span class="n">P4_CreateStartOfInput</span><span class="p">(),</span>
     <span class="n">P4_CreateZeroOrMore</span><span class="p">(</span><span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span> <span class="nb">true</span><span class="p">)),</span>
     <span class="n">P4_CreateEndOfInput</span><span class="p">()</span>
 <span class="p">));</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span> <span class="o">==</span> <span class="n">P4_AddZeroOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span> <span class="nb">true</span><span class="p">)));</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span> <span class="o">==</span> <span class="n">P4_AddZeroOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s">"a"</span><span class="p">,</span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span> <span class="nb">true</span><span class="p">)));</span>
 
-<span class="n">P4_Source</span><span class="o">*</span> <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s">"aaab"</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="n">P4_Source</span><span class="o">*</span> <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s">"aaab"</span><span class="p">,</span> <span class="s">"entry"</span><span class="p">);</span>
 <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">);</span> <span class="c1">// P4_MatchError</span>
 </pre></div>
 </div>
@@ -381,7 +392,7 @@
       
       
     </aside>
-  </main>
+  </div>
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>

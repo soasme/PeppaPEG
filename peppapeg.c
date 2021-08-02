@@ -2979,13 +2979,13 @@ P4_GetErrorMessage(P4_Source* source) {
 
 P4_PRIVATE(P4_Error)
 P4_SetWhitespaces(P4_Grammar* grammar) {
-    size_t          i = 0, j = 0;
     P4_Error        err = P4_Ok;
 
     /* Get the total number of SPACED rules */
     size_t          count = 0;
-    for (i = 0; i < grammar->count; i++)
-        if (IS_SPACED(grammar->rules[i]))
+    khint_t         k = 0;
+    for (k = kh_begin(grammar->rules2); k != kh_end(grammar->rules2); k++)
+        if (kh_exist(grammar->rules2, k) && IS_SPACED(kh_value(grammar->rules2, k)))
             count++;
 
     /* Set the total number of SPACED rules */
@@ -3002,8 +3002,9 @@ P4_SetWhitespaces(P4_Grammar* grammar) {
 
     /* Add all SPACED rules to the repeat expression. */
     P4_Expression *rule = NULL, *rule_ref = NULL;
-    for (i = 0, j = 0; i < grammar->count; i++) {
-        rule = grammar->rules[i];
+    for (k = kh_begin(grammar->rules2); k != kh_end(grammar->rules2); k++) {
+        if (!kh_exist(grammar->rules2, k)) continue;
+        rule = kh_value(grammar->rules2, k);
 
         if (IS_SPACED(rule)) {
             rule_ref = P4_CreateReference(rule->name);

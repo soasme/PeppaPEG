@@ -368,14 +368,8 @@ typedef const char *kh_cstr_t;
 KHASH_MAP_INIT_STR(rules, P4_Expression*)
 
 struct P4_Grammar {
-    /** The rules, e.g. the expressions with IDs. */
-    P4_Expression**         rules;
-    /** The total number of rules. */
-    size_t                  count;
     /** A map associating names with expressions. Type: Map<str, P4_Expression*>. */
     khash_t(rules)*         rules2;
-    /** The maximum number of rules. */
-    int                     cap;
     /** The total number of spaced rules. */
     size_t                  spaced_count;
     /** The repetition rule for spaced rules. */
@@ -2715,10 +2709,7 @@ P4_IsRule(P4_Expression* e) {
 
 P4_PUBLIC P4_Grammar*    P4_CreateGrammar(void) {
     P4_Grammar* grammar = P4_MALLOC(sizeof(P4_Grammar));
-    grammar->rules = NULL;
-    grammar->count = 0;
     grammar->rules2 = kh_init(rules);
-    grammar->cap = 0;
     grammar->spaced_count = SIZE_MAX;
     grammar->spaced_rules = NULL;
     grammar->depth = P4_DEFAULT_RECURSION_LIMIT;
@@ -2730,17 +2721,15 @@ P4_PUBLIC P4_Grammar*    P4_CreateGrammar(void) {
 
 P4_PUBLIC void
 P4_DeleteGrammar(P4_Grammar* grammar) {
-    size_t i;
+    const char* name;
+    P4_Expression*  rule;
     if (grammar) {
-        for (i = 0; i < grammar->count; i++) {
-            if (grammar->rules[i])
-                P4_DeleteExpression(grammar->rules[i]);
-            grammar->rules[i] = NULL;
-        }
-        if (grammar->spaced_rules)
-            P4_DeleteExpression(grammar->spaced_rules);
+        if (grammar->spaced_rules) P4_DeleteExpression(grammar->spaced_rules);
+        kh_foreach(grammar->rules2, name, rule, {
+            P4_DeleteExpression(rule);
+            kh_del(rules, grammar->rules2, __i);
+        });
         kh_destroy(rules, grammar->rules2);
-        P4_FREE(grammar->rules);
         P4_FREE(grammar);
     }
 }
@@ -2790,31 +2779,14 @@ P4_SetUserDataFreeFunc(P4_Grammar* grammar, P4_UserDataFreeFunc free_func) {
 
 P4_PUBLIC P4_Error
 P4_AddGrammarRule(P4_Grammar* grammar, P4_String name, P4_Expression* expr) {
-    size_t          cap   = grammar->cap;
-    P4_Expression** rules = grammar->rules;
+    int kret;
 
     if (grammar == NULL || name == NULL || expr == NULL)
         return P4_NullError;
 
-    if (cap == 0) {
-        cap = 32;
-        rules = P4_MALLOC(sizeof(P4_Expression*) * cap);
-    } else if (grammar->count >= cap) {
-        cap <<= 1;
-        rules = P4_REALLOC(rules, sizeof(P4_Expression*) * cap);
-    }
-
-    if (rules == NULL)
-        P4_Panic("failed to add grammar rule: out of memory");
-
     expr->name = strdup(name);
 
-    grammar->cap = cap;
-    grammar->rules = rules;
-    grammar->rules[grammar->count++] = expr;
-
-    int absent;
-    khint_t k = kh_put(rules, grammar->rules2, expr->name, &absent);
+    khint_t k = kh_put(rules, grammar->rules2, expr->name, &kret);
     kh_value(grammar->rules2, k) = expr;
 
     return P4_Ok;
@@ -3583,30 +3555,22 @@ P4_ReplaceGrammarRule(P4_Grammar* grammar, P4_String name, P4_Expression* expr) 
         return P4_NameError;
 
     P4_Error err = P4_Ok;
-    size_t i;
 
     khint_t k = kh_get(rules, grammar->rules2, name);
     kh_del(rules, grammar->rules2, k);
+    P4_DeleteExpression(oldexpr);
 
-    for (i = 0; i < grammar->count; i++) {
-        if (strcmp(grammar->rules[i]->name, name) == 0) {
-            P4_DeleteExpression(oldexpr);
+    expr->name = strdup(name);
 
-            grammar->rules[i] = expr;
-            expr->name = strdup(name);
-
-            break;
-        }
-    }
-
-    for (i = 0; i < grammar->count; i++) {
-        if (strcmp(grammar->rules[i]->name, name) != 0) {
-            err = P4_RefreshReference(grammar->rules[i], name);
+    P4_Expression* rule;
+    kh_foreach_value(grammar->rules2, rule, {
+        if (strcmp(rule->name, name) != 0) {
+            err = P4_RefreshReference(rule, name);
 
             if (err != P4_Ok)
                 return err;
         }
-    }
+    });
 
     int kret;
     k = kh_put(rules, grammar->rules2, name, &kret);
@@ -4474,7 +4438,6 @@ P4_PRIVATE(P4_Error)
 P4_PegEvalGrammar(P4_Node* node, P4_Result* result) {
     P4_Error    err = P4_Ok;
     P4_Grammar* grammar = NULL;
-    size_t      i = 0;
 
     if ((grammar = P4_CreateGrammar()) == NULL)
         P4_Panic("failed to create grammar: out of memory.");
@@ -4497,7 +4460,7 @@ P4_PegEvalGrammar(P4_Node* node, P4_Result* result) {
 
     /* Resolve named references. */
     kh_foreach_value(grammar->rules2, rule, {
-        catch(P4_PegEvalGrammarReferences(grammar, grammar->rules[i], result));
+        catch(P4_PegEvalGrammarReferences(grammar, rule, result));
     });
 
 finalize:

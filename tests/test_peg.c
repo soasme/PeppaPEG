@@ -290,6 +290,7 @@ void test_grammar(void) {
             "]}"
         "]"
     );
+    ASSERT_PEG_PARSE("grammar", "a = \"1\";\nb = \"2\"", P4_MatchError, "expect grammar, line 2:1 (char 9)");
 }
 
 void test_eval_literal(void) {

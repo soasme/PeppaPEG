@@ -411,8 +411,8 @@ struct P4_Node {
      */
     P4_Slice                slice;
 
-    /** The id for matched grammar rule. */
-    P4_RuleID               rule_id;
+    /** The matched grammar rule name. */
+    P4_String               rule_name;
 
     /** The user data. */
     P4_UserData             userdata;
@@ -521,15 +521,16 @@ P4_Expression* P4_CreateLiteral(const P4_String, bool sensitive);
  *
  * @param   grammar     The grammar.
  * @param   id          The grammar rule id.
+ * @param   name        The grammar rule name.
  * @param   literal     The exact string to match.
  * @param   sensitive   Whether the string is case-sensitive.
  * @return  The error code.
  *
  * Example:
  *
- *      P4_AddLiteral(grammar, 1, "let", true);
+ *      P4_AddLiteral(grammar, 1, "R1", "let", true);
  */
-P4_Error       P4_AddLiteral(P4_Grammar*, P4_RuleID, const P4_String, bool sensitive);
+P4_Error       P4_AddLiteral(P4_Grammar*, P4_String, const P4_String, bool sensitive);
 
 /**
  * Create a P4_Range expression.
@@ -572,6 +573,7 @@ P4_Expression* P4_CreateRanges(size_t count, P4_RuneRange* ranges);
  *
  * @param   grammar     The grammar.
  * @param   id          The grammar rule id.
+ * @param   name        The grammar rule name.
  * @param   lower       The lower bound of UTF-8 rule to match (inclusive).
  * @param   upper       The upper bound of UTF-8 rule to match (inclusive).
  * @param   stride      The stride when iterating the characters in range.
@@ -579,16 +581,17 @@ P4_Expression* P4_CreateRanges(size_t count, P4_RuneRange* ranges);
  *
  * Example:
  *
- *      P4_AddRange(grammar, 1, '0', '9', 1);
+ *      P4_AddRange(grammar, 1, "R1", '0', '9', 1);
  *
- *      P4_AddRange(grammar, 1, 0x4E00, 0x9FFF, 1);
+ *      P4_AddRange(grammar, 1, "R1", 0x4E00, 0x9FFF, 1);
  */
-P4_Error       P4_AddRange(P4_Grammar*, P4_RuleID, P4_Rune, P4_Rune, size_t);
+P4_Error       P4_AddRange(P4_Grammar*, P4_String, P4_Rune, P4_Rune, size_t);
 
 /**
  * Add sub-ranges expression as grammar rule.
  * @param   grammar     The grammar.
  * @param   id          The grammar rule id.
+ * @param   name        The grammar rule name.
  * @param   count       The total number of ranges.
  * @param   ranges      A list of P4_RuneRange.
  * @return  The error code.
@@ -597,40 +600,41 @@ P4_Error       P4_AddRange(P4_Grammar*, P4_RuleID, P4_Rune, P4_Rune, size_t);
  *
  *      P4_RuneRange alphadigits[] = {{'a', 'Z', 1}, {'0', '9', 1}};
  *      P4_Error err = P4_AddRanges(
- *          grammar, 1,
+ *          grammar, 1, "R1",
  *          sizeof(alphadigits) / sizeof(P4_RuneRange),
  *          alphadigits
  *      );
  */
-P4_Error       P4_AddRanges(P4_Grammar*, P4_RuleID, size_t count, P4_RuneRange* ranges);
+P4_Error       P4_AddRanges(P4_Grammar*, P4_String, size_t count, P4_RuneRange* ranges);
 
 /**
  * Create a P4_Reference expression.
  *
- * @param   ref_id      The ID of referenced grammar rule.
+ * @param   reference   The grammar rule name.
  * @return  A P4_Expression.
  *
  * Example:
  *
- *      P4_Expression* expr = P4_CreateReference(1);
+ *      P4_Expression* expr = P4_CreateReference("entry");
  *
  *
  */
-P4_Expression* P4_CreateReference(P4_RuleID);
+P4_Expression* P4_CreateReference(P4_String);
 
 /**
  * Add a reference expression as grammar rule.
  *
  * @param   grammar     The grammar.
  * @param   id          The grammar rule id.
+ * @param   name        The grammar rule name.
  * @param   ref_id      The ID of referenced grammar rule.
  * @return  The error code.
  *
  * Example:
  *
- *      P4_AddReference(grammar, 1, 2);
+ *      P4_AddReference(grammar, 1, "R1", 2);
  */
-P4_Error       P4_AddReference(P4_Grammar*, P4_RuleID, P4_RuleID);
+P4_Error       P4_AddReference(P4_Grammar*, P4_String, P4_String);
 
 /**
  * Create a P4_Positive expression.
@@ -652,14 +656,16 @@ P4_Expression* P4_CreatePositive(P4_Expression*);
  *
  * @param   grammar     The grammar.
  * @param   id          The grammar rule id.
+ * @param   name        The grammar rule name.
+ * @param   name        The grammar rule name.
  * @param   refexpr     The positive pattern to check.
  * @return  The error code.
  *
  * Example:
  *
- *      P4_AddPositive(grammar, 1, P4_CreateLiteral("let", true));
+ *      P4_AddPositive(grammar, 1, "R1", P4_CreateLiteral("let", true));
  */
-P4_Error       P4_AddPositive(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_Error       P4_AddPositive(P4_Grammar*, P4_String, P4_Expression*);
 
 /**
  * Create a P4_Negative expression.
@@ -680,14 +686,15 @@ P4_Expression* P4_CreateNegative(P4_Expression*);
  *
  * @param   grammar     The grammar.
  * @param   id          The grammar rule id.
+ * @param   name        The grammar rule name.
  * @param   refexpr     The negative pattern to check.
  * @return  The error code.
  *
  * Example:
  *
- *      P4_AddNegative(grammar, 1, P4_CreateLiteral("let", true));
+ *      P4_AddNegative(grammar, 1, "R1", P4_CreateLiteral("let", true));
  */
-P4_Error       P4_AddNegative(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_Error       P4_AddNegative(P4_Grammar*, P4_String, P4_Expression*);
 
 /**
  * Create a P4_Sequence expression.
@@ -731,38 +738,40 @@ P4_Expression* P4_CreateSequenceWithMembers(size_t, ...);
  *
  * @param   grammar     The grammar.
  * @param   id          The grammar rule id.
+ * @param   name        The grammar rule name.
  * @param   count       The number of sequence members.
  * @return  The error code.
  *
  * Example:
  *
- *      P4_AddSequence(grammar, 1, 3);
+ *      P4_AddSequence(grammar, 1, "R1", 3);
  *
  * Note that such an expression is useless as its members are all empty.
  * Please set members using P4_SetMembers.
  *
  * This function can be useful if you need to add members dynamically.
  */
-P4_Error       P4_AddSequence(P4_Grammar*, P4_RuleID, size_t);
+P4_Error       P4_AddSequence(P4_Grammar*, P4_String, size_t);
 
 /**
  * Add a sequence expression as grammar rule.
  *
  * @param   grammar     The grammar.
  * @param   id          The grammar rule id.
+ * @param   name        The grammar rule name.
  * @param   count       The number of sequence members.
  * @param   ...         The members.
  * @return  The error code.
  *
  * Example:
  *
- *      P4_AddSequenceWithMembers(grammar, 1, 3,
+ *      P4_AddSequenceWithMembers(grammar, 1, "R1", 3,
  *          P4_CreateLiteral("{"),
  *          P4_CreateReference(BODY),
  *          P4_CreateLiteral("}")
  *      );
  */
-P4_Error       P4_AddSequenceWithMembers(P4_Grammar*, P4_RuleID, size_t, ...);
+P4_Error       P4_AddSequenceWithMembers(P4_Grammar*, P4_String, size_t, ...);
 
 /**
  * Create a P4_Choice expression.
@@ -806,38 +815,40 @@ P4_Expression* P4_CreateChoiceWithMembers(size_t, ...);
  *
  * @param   grammar     The grammar.
  * @param   id          The grammar rule id.
+ * @param   name        The grammar rule name.
  * @param   count       The number of choice members.
  * @return  The error code.
  *
  * Example:
  *
- *      P4_AddChoice(grammar, 1, 3);
+ *      P4_AddChoice(grammar, 1, "R1", 3);
  *
  * Note that such an expression is useless as its members are all empty.
  * Please set members using P4_SetMembers.
  *
  * This function can be useful if you need to add members dynamically.
  */
-P4_Error       P4_AddChoice(P4_Grammar*, P4_RuleID, size_t);
+P4_Error       P4_AddChoice(P4_Grammar*, P4_String, size_t);
 
 /**
  * Add a choice expression as grammar rule.
  *
  * @param   grammar     The grammar.
  * @param   id          The grammar rule id.
+ * @param   name        The grammar rule name.
  * @param   count       The number of choice members.
  * @param   ...         The members.
  * @return  The error code.
  *
  * Example:
  *
- *      P4_AddChoiceWithMembers(grammar, 1, 3,
+ *      P4_AddChoiceWithMembers(grammar, 1, "R1", 3,
  *          P4_CreateLiteral(" "),
  *          P4_CreateReference(\t),
  *          P4_CreateLiteral("\n")
  *      );
  */
-P4_Error       P4_AddChoiceWithMembers(P4_Grammar*, P4_RuleID, size_t, ...);
+P4_Error       P4_AddChoiceWithMembers(P4_Grammar*, P4_String, size_t, ...);
 
 /**
  * Create a P4_Repeat expression minimal min times and maximal max times.
@@ -862,6 +873,7 @@ P4_Expression* P4_CreateRepeatMinMax(P4_Expression*, size_t, size_t);
  *
  * @param   grammar     The grammar.
  * @param   id          The grammar rule id.
+ * @param   name        The grammar rule name.
  * @param   repeat_expr The repeated expression.
  * @param   min         The minimum repeat times.
  * @param   max         The maximum repeat times.
@@ -870,12 +882,12 @@ P4_Expression* P4_CreateRepeatMinMax(P4_Expression*, size_t, size_t);
  * Example:
  *
  *      // It can match string "a", "aa", or "aaa".
- *      P4_AddRepeatMinMax(
+ *      P4_AddRepeatMinMax(grammar, 1, "R1",
  *          P4_CreateLiteral("a", true),
  *          1, 3
  *      );
  */
-P4_Error       P4_AddRepeatMinMax(P4_Grammar*, P4_RuleID, P4_Expression*, size_t, size_t);
+P4_Error       P4_AddRepeatMinMax(P4_Grammar*, P4_String, P4_Expression*, size_t, size_t);
 
 /**
  * Create a P4_Repeat expression minimal min times and maximal SIZE_MAX times.
@@ -899,6 +911,7 @@ P4_Expression* P4_CreateRepeatMin(P4_Expression*, size_t);
  *
  * @param   grammar     The grammar.
  * @param   id          The grammar rule id.
+ * @param   name        The grammar rule name.
  * @param   repeat_expr The repeated expression.
  * @param   min         The minimum repeat times.
  * @return  The error code.
@@ -906,9 +919,9 @@ P4_Expression* P4_CreateRepeatMin(P4_Expression*, size_t);
  * Example:
  *
  *      // It can match string "a", "aa", "aaa", ....
- *      P4_AddRepeatMin(grammar, 1, P4_CreateLiteral("a", true), 1);
+ *      P4_AddRepeatMin(grammar, 1, "R1", P4_CreateLiteral("a", true), 1);
  */
-P4_Error       P4_AddRepeatMin(P4_Grammar*, P4_RuleID, P4_Expression*, size_t);
+P4_Error       P4_AddRepeatMin(P4_Grammar*, P4_String, P4_Expression*, size_t);
 
 /**
  * Create a P4_Repeat expression maximal max times.
@@ -932,6 +945,7 @@ P4_Expression* P4_CreateRepeatMax(P4_Expression*, size_t);
  *
  * @param   grammar     The grammar.
  * @param   id          The grammar rule id.
+ * @param   name        The grammar rule name.
  * @param   repeat_expr The repeated expression.
  * @param   max         The maximum repeat times.
  * @return  A P4_Expression.
@@ -939,9 +953,9 @@ P4_Expression* P4_CreateRepeatMax(P4_Expression*, size_t);
  * Example:
  *
  *      // It can match string "", "a", "aa", "aaa".
- *      P4_AddRepeatMax(grammar, 1, P4_CreateLiteral("a", true), 3);
+ *      P4_AddRepeatMax(grammar, 1, "name", P4_CreateLiteral("a", true), 3);
  */
-P4_Error       P4_AddRepeatMax(P4_Grammar*, P4_RuleID, P4_Expression*, size_t);
+P4_Error       P4_AddRepeatMax(P4_Grammar*, P4_String, P4_Expression*, size_t);
 
 /**
  * Create a P4_Repeat expression exact N times.
@@ -966,6 +980,7 @@ P4_Expression* P4_CreateRepeatExact(P4_Expression*, size_t);
  *
  * @param   grammar     The grammar.
  * @param   id          The grammar rule id.
+ * @param   name        The grammar rule name.
  * @param   repeat_expr The repeated expression.
  * @param   N           The repeat times.
  * @return  The error code.
@@ -973,9 +988,9 @@ P4_Expression* P4_CreateRepeatExact(P4_Expression*, size_t);
  * Example:
  *
  *      // It can match string "aaa".
- *      P4_AddRepeatExact(P4_CreateLiteral("a", true), 3);
+ *      P4_AddRepeatExact(grammar, 1, "R1", P4_CreateLiteral("a", true), 3);
  */
-P4_Error       P4_AddRepeatExact(P4_Grammar*, P4_RuleID, P4_Expression*, size_t);
+P4_Error       P4_AddRepeatExact(P4_Grammar*, P4_String, P4_Expression*, size_t);
 
 /**
  * Create a P4_Repeat expression zero or once.
@@ -999,17 +1014,18 @@ P4_Expression* P4_CreateZeroOrOnce(P4_Expression*);
  *
  * @param   grammar     The grammar.
  * @param   id          The grammar rule id.
+ * @param   name        The grammar rule name.
  * @param   repeat_expr The repeated expression.
  * @return  The error code.
  *
  * Example:
  *
  *      // It can match string "" or "a".
- *      P4_AddZeroOrOnce(grammar, 1, P4_CreateLiteral("a", true));
+ *      P4_AddZeroOrOnce(grammar, 1, "R1", P4_CreateLiteral("a", true));
  *
  * It's equivalent to P4_CreateRepeatMinMax(expr, 0, 1);
  */
-P4_Error       P4_AddZeroOrOnce(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_Error       P4_AddZeroOrOnce(P4_Grammar*, P4_String, P4_Expression*);
 
 /**
  * Create a P4_Repeat expression zero or more times.
@@ -1033,15 +1049,16 @@ P4_Expression* P4_CreateZeroOrMore(P4_Expression*);
  *
  * @param   grammar     The grammar.
  * @param   id          The grammar rule id.
+ * @param   name        The grammar rule name.
  * @param   repeat_expr The repeated expression.
  * @return  The error code.
  *
  * Example:
  *
  *      // It can match string "" or "a".
- *      P4_AddZeroOrMore(grammar, 1, P4_CreateLiteral("a", true));
+ *      P4_AddZeroOrMore(grammar, 1, "R1", P4_CreateLiteral("a", true));
  */
-P4_Error       P4_AddZeroOrMore(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_Error       P4_AddZeroOrMore(P4_Grammar*, P4_String, P4_Expression*);
 
 /**
  * Create a P4_Repeat expression once or more times.
@@ -1065,15 +1082,16 @@ P4_Expression* P4_CreateOnceOrMore(P4_Expression*);
  *
  * @param   grammar     The grammar.
  * @param   id          The grammar rule id.
+ * @param   name        The grammar rule name.
  * @param   repeat_expr The repeated expression.
  * @return  The error code.
  *
  * Example:
  *
  *      // It can match string "a", "aa", "aaa", ....
- *      P4_AddOnceOrMore(grammar, 1, P4_CreateLiteral("a", true));
+ *      P4_AddOnceOrMore(grammar, 1, "R1", P4_CreateLiteral("a", true));
  */
-P4_Error       P4_AddOnceOrMore(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_Error       P4_AddOnceOrMore(P4_Grammar*, P4_String, P4_Expression*);
 
 /**
  * Create a P4_BackReference expression.
@@ -1119,14 +1137,14 @@ P4_Error       P4_SetMember(P4_Expression*, size_t, P4_Expression*);
  *
  * @param   expr                The sequence/choice expression.
  * @param   index               The index of member.
- * @param   member_rule_id      The rule id of member.
+ * @param   member              The member expr.
  * @return  The error code.
  *
  * It's equivalent to:
  *
- *      P4_SetMember(expr, index, P4_CreateReference(member_rule_id));
+ *      P4_SetMember(expr, index, P4_CreateReference("member_n"));
  */
-P4_Error       P4_SetReferenceMember(P4_Expression*, size_t, P4_RuleID);
+P4_Error       P4_SetReferenceMember(P4_Expression*, size_t, P4_String);
 
 /**
  * Get the total number members for sequence/choice.
@@ -1165,7 +1183,7 @@ P4_Expression* P4_GetMember(P4_Expression*, size_t);
  *
  * Example:
  *
- *      P4_AddSequenceWithMembers(grammar, 1, 2,
+ *      P4_AddSequenceWithMembers(grammar, 1, "R1", 2,
  *          P4_CreateStartOfInput(),
  *          P4_CreateLiteral("HELLO", true)
  *      );
@@ -1187,7 +1205,7 @@ P4_Expression* P4_CreateStartOfInput();
  *
  * Example:
  *
- *      P4_AddSequenceWithMembers(grammar, 1, 2,
+ *      P4_AddSequenceWithMembers(grammar, 1, "R1", 2,
  *          P4_CreateLiteral("HELLO", true),
  *          P4_CreateEndOfInput()
  *      );
@@ -1201,32 +1219,33 @@ P4_Expression* P4_CreateEndOfInput();
  *
  * @param   grammar     The grammar.
  * @param   id          The grammar rule id.
+ * @param   name        The grammar rule name.
  * @param   joiner  A joiner literal.
- * @param   pattern The repeated pattern rule id.
+ * @param   pattern The repeated pattern rule name.
  * @return  The error code.
  *
  * Example:
  *
- *      P4_Expression* row = P4_AddJoin(grammar, 1, ",", Element);
+ *      P4_Expression* row = P4_AddJoin(grammar, 1, "R1", ",", "element");
  */
-P4_Error P4_AddJoin(P4_Grammar* grammar, P4_RuleID id, const P4_String joiner, P4_RuleID rule_id);
+P4_Error P4_AddJoin(P4_Grammar* grammar, P4_String, const P4_String joiner, P4_String reference);
 
 /**
  * Create a Join expression.
  *
  * @param   joiner  A joiner literal.
- * @param   pattern The repeated pattern rule id.
+ * @param   pattern The repeated pattern rule name.
  * @return  A P4_Expression.
  *
  * Example:
  *
- *      P4_Expression* row = P4_CreateJoin(",", Element);
+ *      P4_Expression* row = P4_CreateJoin(",", "element");
  *
  * Join is a syntax sugar to the below structure:
  *
  *      Sequence(pattern, ZeroOrMore(Sequence(Literal(joiner), pattern)))
  */
-P4_Expression* P4_CreateJoin(const P4_String joiner, P4_RuleID rule_id);
+P4_Expression* P4_CreateJoin(const P4_String joiner, P4_String reference);
 
 
 /**
@@ -1247,29 +1266,12 @@ P4_Expression* P4_CreateJoin(const P4_String joiner, P4_RuleID rule_id);
 void           P4_DeleteExpression(P4_Expression*);
 
 /**
- * Set the rule id for the expression.
- *
- * @param   expr        The expression.
- * @param   rule_id     The rule id to set.
- * @return  The error code.
- *
- * Example:
- *
- *      P4_Expression* expr = P4_CreateLiteral("a", true);
- *      P4_SetRuleID(expr, 1);
- *
- * Note that `P4_SetRuleID` only changes the `expr->id` field.
- * It does not add expr to the P4_Grammar object.
- */
-P4_Error       P4_SetRuleID(P4_Expression*, P4_RuleID);
-
-/**
  * Check if an expression is a grammar rule.
  *
  * @param   expr        The expression.
  * @return  if an expression is a grammar rule.
  *
- *      P4_AddLiteral(grammar, 1, "a", true);
+ *      P4_AddLiteral(grammar, 1, "R1", "a", true);
  *      P4_IsRule(P4_GetGrammarRule(grammar, 1)); // true
  */
 bool           P4_IsRule(P4_Expression*);
@@ -1335,35 +1337,7 @@ void           P4_DeleteGrammar(P4_Grammar*);
  * @param   expr        The grammar rule expression.
  * @return  The error code.
  */
-P4_Error       P4_AddGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
-
-/**
- * Set the name for a grammar rule.
- *
- * @param   grammar     The grammar.
- * @param   id          The grammar rule id.
- * @param   name        The grammar rule name.
- * @return  The error code.
- *
- * Example:
- *
- *      P4_SetRuleName(grammar, ENTRY, "entry");
- */
-P4_Error       P4_SetGrammarRuleName(P4_Grammar* grammar, P4_RuleID id, P4_String name);
-
-/**
- * Get the name for a grammar rule.
- *
- * @param   grammar     The grammar.
- * @param   id          The grammar rule id.
- * @return  The grammar rule name.
- *
- * Example:
- *
- *      P4_String name = P4_GetRuleName(grammar, ENTRY);
- *      printf("%s\n", name);
- */
-P4_String      P4_GetGrammarRuleName(P4_Grammar* grammar, P4_RuleID id);
+P4_Error       P4_AddGrammarRule(P4_Grammar*, P4_String, P4_Expression*);
 
 /**
  * Delete a grammar rule.
@@ -1373,21 +1347,7 @@ P4_String      P4_GetGrammarRuleName(P4_Grammar* grammar, P4_RuleID id);
  *
  * WARNING: NOT IMPLEMENTED.
  */
-void           P4_DeleteGrammarRule(P4_Grammar*, P4_RuleID);
-
-/**
- * Get a grammar rule.
- *
- * @param   grammar     The grammar.
- * @param   id          The grammar rule id.
- * @return  The grammar rule expression. Returns NULL if not found.
- *
- * Example:
- *
- *      P4_AddLiteral(grammar, 1, "a", true);
- *      P4_Expression* expr = P4_GetGrammarRule(grammar, 1); // The literal expression.
- */
-P4_Expression* P4_GetGrammarRule(P4_Grammar*, P4_RuleID);
+void           P4_DeleteGrammarRule(P4_Grammar*, const P4_String);
 
 /**
  * Get a grammar rule by its name.
@@ -1405,19 +1365,19 @@ P4_Expression* P4_GetGrammarRuleByName(P4_Grammar* grammar, P4_String name);
 /**
  * @brief       Set the flag of a grammar rule.
  * @param       grammar     The grammar.
- * @param       id          The ID.
+ * @param       name        The grammar rule name.
  * @param       flag        The bits of \ref P4_ExpressionFlag.
  * @return      The error code. If successful, return \ref P4_Ok.
  *
  * Example:
  *
- *      P4_Error err = P4_SetGrammarRuleFlag(grammar, Entry, P4_FLAG_SQUASHED | P4_FLAG_LIFTED | P4_FLAG_TIGHT);
+ *      P4_Error err = P4_SetGrammarRuleFlag(grammar, "entry", P4_FLAG_SQUASHED | P4_FLAG_LIFTED | P4_FLAG_TIGHT);
  *      if (err != P4_Ok) {
  *          printf("err=%u\n", err);
  *          exit(1);
  *      }
  */
-P4_Error       P4_SetGrammarRuleFlag(P4_Grammar*, P4_RuleID, P4_ExpressionFlag);
+P4_Error       P4_SetGrammarRuleFlag(P4_Grammar*, P4_String, P4_ExpressionFlag);
 
 /**
  * @brief       Set the maximum allowed recursion calls.
@@ -1458,21 +1418,20 @@ size_t         P4_GetRecursionLimit(P4_Grammar*);
 /**
  * @brief       Create a \ref P4_Source* object.
  * @param       content     The content of input.
- * @param       rule_id     The id of entry grammar rule.
+ * @param       entry_name  The entry grammar rule name.
  * @return      A source object.
  *
  * Example:
  *
  *      char*       content = ... // read from some files.
- *      P4_RuleID   rule_id = My_EntryRule;
  *
- *      P4_Source*  source  = P4_CreateSource(content, rule_id);
+ *      P4_Source*  source  = P4_CreateSource(content, "entry");
  *
  *      // do something...
  *
  *      P4_DeleteSource(source);
  */
-P4_Source*     P4_CreateSource(P4_String, P4_RuleID);
+P4_Source*     P4_CreateSource(P4_String, P4_String);
 
 /**
  * @brief       Free the allocated memory of a source.
@@ -1514,7 +1473,7 @@ void           P4_ResetSource(P4_Source* source);
  * Example:
  *
  *      P4_String  input = "(a)"
- *      P4_Source* source = P4_CreateSource(input, RuleA);
+ *      P4_Source* source = P4_CreateSource(input, "a");
  *      if (P4_Ok != P4_SetSourceSlice(source, 1, 2)) // only parse "a"
  *          printf("set buf size error\n");
  */
@@ -1574,7 +1533,7 @@ void           P4_JsonifySourceAst(P4_Grammar* grammar, FILE* stream, P4_Node* n
  * Example:
  *
  *      void MyInspector(P4_Node* node, void* userdata) {
- *          printf("%lu\t%lu\t%p\n", node->slice.start.pos, node->rule_id, userdata);
+ *          printf("%lu\t%lu\t%p\n", node->slice.start.pos, P4_GetRuleName(node), userdata);
  *          return P4_Ok;
  *      }
  *
@@ -1655,7 +1614,7 @@ P4_String      P4_GetErrorMessage(P4_Source*);
  * @param       str     The text.
  * @param       start   The starting position of the text.
  * @param       stop    The stopping position of the text.
- * @param       expr    The expression that matches to the slice of the text.
+ * @param       rule    The name of rule expression that matches to the slice of the text.
  * @return      The node.
  *
  * Example:
@@ -1663,15 +1622,15 @@ P4_String      P4_GetErrorMessage(P4_Source*);
  *      P4_String       str     = "Hello world";
  *      size_t          start   = 0;
  *      size_t          stop    = 11;
- *      P4_Expression*  expr    = P4_GetGrammarRule(grammar, ENTRY);
+ *      P4_String       rule    = "entry"
  *
- *      P4_Node* node = P4_CreateNode(text, start, stop, expr);
+ *      P4_Node* node = P4_CreateNode(text, start, stop, rule);
  *
  *      // do something.
  *
  *      P4_DeleteNode(node);
  */
-P4_Node*      P4_CreateNode(P4_String, P4_Position*, P4_Position*, P4_RuleID);
+P4_Node*      P4_CreateNode(P4_String, P4_Position*, P4_Position*, P4_String);
 
 /**
  * @brief       Delete the node.
@@ -1740,13 +1699,13 @@ P4_Error       P4_SetGrammarCallback(P4_Grammar*, P4_MatchCallback, P4_ErrorCall
 /**
  * @brief       Replace an existing grammar rule.
  * @param       grammar     The grammar.
- * @param       id          The rule id.
+ * @param       name        The rule name.
  * @param       expr        The rule expression to replace.
  * @return      The error code.
  *
  * The original grammar rule will be deleted.
  */
-P4_Error       P4_ReplaceGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
+P4_Error       P4_ReplaceGrammarRule(P4_Grammar*, P4_String, P4_Expression*);
 
 /**
  * @brief       Create a grammar that can parse other grammars written in PEG syntax.
@@ -1758,16 +1717,6 @@ P4_Error       P4_ReplaceGrammarRule(P4_Grammar*, P4_RuleID, P4_Expression*);
  *      P4_DeleteGrammar(peg);
  */
 P4_Grammar*    P4_CreatePegGrammar ();
-
-/**
- * @brief       Get the corresponding rule name for a peg grammar rule id.
- * @param       id      A P4_PegRuleID.
- * @return      The name.
- *
- *      printf("%s\n", P4_StringifyPegGrammarRuleID(P4_PegRuleRule));
- */
-P4_String      P4_StringifyPegGrammarRuleID(P4_RuleID id);
-
 
 /**
  * @brief       Load peg grammar result from a string.
@@ -1790,8 +1739,8 @@ P4_String      P4_StringifyPegGrammarRuleID(P4_RuleID id);
 P4_Error P4_LoadGrammarResult(P4_String rules, P4_Result* result);
 
 /**
- * @brief       Load peg grammar from a string.
- * @param       rules   The rules string.
+ * @brief       Load PEG grammar written in string.
+ * @param       rules   The grammar rules string.
  * @return      The grammar object.
  *
  * Example:
@@ -1800,21 +1749,27 @@ P4_Error P4_LoadGrammarResult(P4_String rules, P4_Result* result);
  *          "entry = one one;\n"
  *          "one   = \"1\";\n"
  *      );
- *      P4_Source* source = P4_CreateSource("11", 1);
- *      P4_Parse(grammar, source);
+ *      P4_Source* source1 = P4_CreateSource("11", "entry");
+ *      P4_Parse(grammar, source1);
+ *
+ *      P4_Source* source2 = P4_CreateSource("1", "one");
+ *      P4_Parse(grammar, source2);
+ *
+ * This function exits the program when an error occurs.
+ *
  */
 P4_Grammar*     P4_LoadGrammar(P4_String rules);
 
 /**
- * @brief       Get the rule id.
+ * @brief       Get the rule name.
  * @param       expr    The rule expression.
- * @return      The rule id.
+ * @return      The rule name.
  *
  * Example:
  *
- *      P4_RuleID id = P4_GetRuleID(expr);
+ *      const P4_String name = P4_GetRuleName(expr);
  */
-P4_RuleID       P4_GetRuleID(P4_Expression*);
+const P4_String P4_GetRuleName(P4_Expression*);
 
 #ifdef __cplusplus
 }

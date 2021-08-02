@@ -63,14 +63,14 @@ While an abstract syntax tree looks like:
 
 .. code-block::
 
-    Node(type="array", slice=[0,5], children=[
-        Node(type="number", slice=[1,2]),
-        Node(type="number", slice=[3,4]),
-    ])
+    JsonArray(
+        JsonNumber(type=int, value=1),
+        JsonNumber(type=int, value=2),
+    )
 
-e.g, left paren, comma, right paren are ignored as they're not part of the semantic of array.
+e.g, left paren, comma, right paren are ignored as they're not part of the semantic of array. The values in the AST often also have type determined in static-typed programming language.
 
-You can consider abstract syntax tree as a polished version of parse tree. 
+Generally, you can consider abstract syntax tree as a polished version of parse tree.
 
 Peppa PEG provides two approaches to polish the tree:
 

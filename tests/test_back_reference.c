@@ -20,21 +20,21 @@ void test_match_back_reference_successfully(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddSequenceWithMembers(grammar, ENTRY, 3,
-            P4_CreateReference(MARKER),
+        P4_AddSequenceWithMembers(grammar, "entry", 3,
+            P4_CreateReference("marker"),
             P4_CreateLiteral("...", true),
             P4_CreateBackReference(0, true)
         )
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddChoiceWithMembers(grammar, MARKER, 2,
+        P4_AddChoiceWithMembers(grammar, "marker", 2,
             P4_CreateLiteral("'", true),
             P4_CreateLiteral("\"", true)
         )
     );
 
-    P4_Source* source = P4_CreateSource("'...'", ENTRY);
+    P4_Source* source = P4_CreateSource("'...'", "entry");
     TEST_ASSERT_NOT_NULL(source);
 
     TEST_ASSERT_EQUAL_MESSAGE(
@@ -46,18 +46,18 @@ void test_match_back_reference_successfully(void) {
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("'...'", node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
 
     P4_Node* head = node->head;
     TEST_ASSERT_NOT_NULL(head);
     ASSERT_EQUAL_NODE_STRING("'", head);
-    ASSERT_EQUAL_NODE_RULE(MARKER, head);
+    ASSERT_EQUAL_NODE_RULE("marker", head);
 
     P4_Node* tail = node->tail;
     TEST_ASSERT_NOT_NULL(tail);
     TEST_ASSERT_NOT_EQUAL(head, tail);
     ASSERT_EQUAL_NODE_STRING("'", tail);
-    ASSERT_EQUAL_NODE_RULE(MARKER, tail);
+    ASSERT_EQUAL_NODE_RULE("marker", tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -79,21 +79,21 @@ void test_match_back_reference_latter_not_match(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddSequenceWithMembers(grammar, ENTRY, 3,
-            P4_CreateReference(MARKER),
+        P4_AddSequenceWithMembers(grammar, "entry", 3,
+            P4_CreateReference("marker"),
             P4_CreateLiteral("...", true),
             P4_CreateBackReference(0, true)
         )
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddChoiceWithMembers(grammar, MARKER, 2,
+        P4_AddChoiceWithMembers(grammar, "marker", 2,
             P4_CreateLiteral("'", true),
             P4_CreateLiteral("\"", true)
         )
     );
 
-    P4_Source* source = P4_CreateSource("\"...'", ENTRY);
+    P4_Source* source = P4_CreateSource("\"...'", "entry");
     TEST_ASSERT_NOT_NULL(source);
 
     TEST_ASSERT_EQUAL(
@@ -124,18 +124,18 @@ void test_match_back_reference_insensitive_match(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddSequenceWithMembers(grammar, ENTRY, 3,
-            P4_CreateReference(MARKER),
+        P4_AddSequenceWithMembers(grammar, "entry", 3,
+            P4_CreateReference("marker"),
             P4_CreateLiteral("...", true),
             P4_CreateBackReference(0, false)
         )
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddLiteral(grammar, MARKER, "TAG", true)
+        P4_AddLiteral(grammar, "marker", "TAG", true)
     );
 
-    P4_Source* source = P4_CreateSource("TAG...tag", ENTRY);
+    P4_Source* source = P4_CreateSource("TAG...tag", "entry");
     TEST_ASSERT_NOT_NULL(source);
 
     TEST_ASSERT_EQUAL_MESSAGE(
@@ -147,18 +147,18 @@ void test_match_back_reference_insensitive_match(void) {
     P4_Node* node = P4_GetSourceAst(source);
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("TAG...tag", node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
 
     P4_Node* head = node->head;
     TEST_ASSERT_NOT_NULL(head);
     ASSERT_EQUAL_NODE_STRING("TAG", head);
-    ASSERT_EQUAL_NODE_RULE(MARKER, head);
+    ASSERT_EQUAL_NODE_RULE("marker", head);
 
     P4_Node* tail = node->tail;
     TEST_ASSERT_NOT_NULL(tail);
     TEST_ASSERT_NOT_EQUAL(head, tail);
     ASSERT_EQUAL_NODE_STRING("tag", tail);
-    ASSERT_EQUAL_NODE_RULE(MARKER, tail);
+    ASSERT_EQUAL_NODE_RULE("marker", tail);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

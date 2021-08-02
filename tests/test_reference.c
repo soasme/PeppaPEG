@@ -18,14 +18,14 @@ void test_match_reference_successfully(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddReference(grammar, ENTRY, R1)
+        P4_AddReference(grammar, "entry", "r1")
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddLiteral(grammar, R1, "HELLO", true)
+        P4_AddLiteral(grammar, "r1", "HELLO", true)
     );
 
-    P4_Source* source = P4_CreateSource("HELLO", ENTRY);
+    P4_Source* source = P4_CreateSource("HELLO", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -37,12 +37,12 @@ void test_match_reference_successfully(void) {
 
     TEST_ASSERT_NOT_NULL(node);
     ASSERT_EQUAL_NODE_STRING("HELLO", node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
 
     TEST_ASSERT_NOT_NULL(node->head);
     TEST_ASSERT_EQUAL(node->head, node->tail);
     ASSERT_EQUAL_NODE_STRING("HELLO", node);
-    ASSERT_EQUAL_NODE_RULE(R1, node->head);
+    ASSERT_EQUAL_NODE_RULE("r1", node->head);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -65,10 +65,10 @@ void test_match_reference_not_defined_raise_name_error(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddReference(grammar, ENTRY, R1)
+        P4_AddReference(grammar, "entry", "r1")
     );
 
-    P4_Source* source = P4_CreateSource("HELLO", ENTRY);
+    P4_Source* source = P4_CreateSource("HELLO", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_NameError,

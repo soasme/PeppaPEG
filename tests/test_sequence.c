@@ -15,14 +15,14 @@ void test_match_literal_sequence_successfully(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddSequenceWithMembers(grammar, ENTRY, 3,
+        P4_AddSequenceWithMembers(grammar, "entry", 3,
             P4_CreateLiteral("你好", true),
             P4_CreateLiteral(" ", true),
             P4_CreateLiteral("WORLD", true)
         )
     );
 
-    P4_Source* source = P4_CreateSource("你好 WORLD", ENTRY);
+    P4_Source* source = P4_CreateSource("你好 WORLD", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -35,7 +35,7 @@ void test_match_literal_sequence_successfully(void) {
     TEST_ASSERT_NULL(node->next);
     TEST_ASSERT_NULL(node->head);
     TEST_ASSERT_NULL(node->tail);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
     ASSERT_EQUAL_NODE_STRING("你好 WORLD", node);
 
     P4_DeleteSource(source);
@@ -58,14 +58,14 @@ void test_match_literal_sequence_partially_raise_match_error(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddSequenceWithMembers(grammar, ENTRY, 3,
+        P4_AddSequenceWithMembers(grammar, "entry", 3,
             P4_CreateLiteral("你好", true),
             P4_CreateLiteral(" ", true),
             P4_CreateLiteral("WORLD", true)
         )
     );
 
-    P4_Source* source = P4_CreateSource("你好 ", ENTRY);
+    P4_Source* source = P4_CreateSource("你好 ", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_MatchError,
@@ -96,14 +96,14 @@ void test_match_literal_sequence_having_member_nomatch_raise_match_error(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddSequenceWithMembers(grammar, ENTRY, 3,
+        P4_AddSequenceWithMembers(grammar, "entry", 3,
             P4_CreateLiteral("你好", true),
             P4_CreateLiteral(" ", true),
             P4_CreateLiteral("WORLD", true)
         )
     );
 
-    P4_Source* source = P4_CreateSource("你好 WORL", ENTRY);
+    P4_Source* source = P4_CreateSource("你好 WORL", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_MatchError,
@@ -136,17 +136,17 @@ void test_match_reference_in_sequence_successfully(void) {
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddSequenceWithMembers(grammar, ENTRY, 2,
-            P4_CreateReference(R1),
-            P4_CreateReference(R1)
+        P4_AddSequenceWithMembers(grammar, "entry", 2,
+            P4_CreateReference("r1"),
+            P4_CreateReference("r1")
         )
     );
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddLiteral(grammar, R1, "OLA", false)
+        P4_AddLiteral(grammar, "r1", "OLA", false)
     );
 
-    P4_Source* source = P4_CreateSource("OLAola", ENTRY);
+    P4_Source* source = P4_CreateSource("OLAola", "entry");
     TEST_ASSERT_NOT_NULL(source);
     TEST_ASSERT_EQUAL(
         P4_Ok,
@@ -157,15 +157,15 @@ void test_match_reference_in_sequence_successfully(void) {
     P4_Node* node = P4_GetSourceAst(source);
 
     TEST_ASSERT_NOT_NULL(node);
-    ASSERT_EQUAL_NODE_RULE(ENTRY, node);
+    ASSERT_EQUAL_NODE_RULE("entry", node);
     ASSERT_EQUAL_NODE_STRING("OLAola", node);
 
     TEST_ASSERT_NOT_NULL(node->head);
-    ASSERT_EQUAL_NODE_RULE(R1, node->head);
+    ASSERT_EQUAL_NODE_RULE("r1", node->head);
     ASSERT_EQUAL_NODE_STRING("OLA", node->head);
 
     TEST_ASSERT_NOT_NULL(node->tail);
-    ASSERT_EQUAL_NODE_RULE(R1, node->tail);
+    ASSERT_EQUAL_NODE_RULE("r1", node->tail);
     ASSERT_EQUAL_NODE_STRING("ola", node->tail);
 
     P4_DeleteSource(source);

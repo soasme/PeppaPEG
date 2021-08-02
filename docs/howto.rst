@@ -29,7 +29,7 @@ In this example, Peppa PEG only parses the substring "YXXXY"[1:4], e.g. "XXX".
 
 .. code-block:: c
 
-    >> P4_Source* source = P4_CreateSource("YXXXY", ENTRY);
+    >> P4_Source* source = P4_CreateSource("YXXXY", "entry");
     >> P4_SetSourceSlice(source, 1, 4);
     P4_Ok
     >> P4_Parse(grammar, source);
@@ -45,9 +45,9 @@ Considering below case,
 .. code-block:: c
 
     P4_Grammar* grammar = P4_CreateGrammar();
-    assert(P4_Ok == P4_AddZeroOrMore(grammar, 1, P4_AddLiteral("a", true)));
+    assert(P4_Ok == P4_AddZeroOrMore(grammar, "entry", P4_AddLiteral("a", true)));
 
-    P4_Source* source = P4_CreateSource("aaab", 1);
+    P4_Source* source = P4_CreateSource("aaab", "entry");
     P4_Parse(grammar, source); // P4_Ok!
 
 Guess what, :c:func:`P4_Parse` returns :c:enum:`P4_Ok`! Peppa PEG eats 3 "a" characters and ignores the rest of the input.
@@ -60,21 +60,21 @@ If you use using PEG API, use `&.` and `!.`:
 
 .. code-block::
 
-    grammar = &. a*  !. ;
+    entry = &. a*  !. ;
 
 If you are using low level API, use :c:func:`P4_CreateStartOfInput` and :c:func:`P4_CreateEndOfInput`.
 
 .. code-block:: c
 
     P4_Grammar* grammar = P4_CreateGrammar();
-    assert(P4_Ok == P4_AddSequenceWithMembers(grammar, 1, 3,
+    assert(P4_Ok == P4_AddSequenceWithMembers(grammar, "entry", 3,
         P4_CreateStartOfInput(),
         P4_CreateZeroOrMore(P4_AddLiteral("a", true)),
         P4_CreateEndOfInput()
     ));
-    assert(P4_Ok == P4_AddZeroOrMore(grammar, 1, P4_AddLiteral("a", true)));
+    assert(P4_Ok == P4_AddZeroOrMore(grammar, "a", P4_AddLiteral("a", true)));
 
-    P4_Source* source = P4_CreateSource("aaab", 1);
+    P4_Source* source = P4_CreateSource("aaab", "entry");
     P4_Parse(grammar, source); // P4_MatchError
 
 :seealso: :c:func:`P4_CreateStartOfInput`, :c:func:`P4_CreateEndOfInput`.

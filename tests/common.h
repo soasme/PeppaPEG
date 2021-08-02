@@ -27,9 +27,9 @@ cleanup_freep (void *p)
     TEST_ASSERT_EQUAL_STRING((s), nodestr); \
 } while (0);
 
-# define ASSERT_EQUAL_NODE_RULE(id, node) do { \
+# define ASSERT_EQUAL_NODE_RULE(name, node) do { \
     TEST_ASSERT_NOT_NULL((node)); \
-    TEST_ASSERT_EQUAL_UINT_MESSAGE((id), (node)->rule_id, "invalid node rule"); \
+    TEST_ASSERT_EQUAL_STRING_MESSAGE((name), (node)->rule_name, "invalid node rule"); \
 } while (0);
 
 # define ASSERT_EQUAL_NODE_LINE_OFFSET(startline, startoffset, stopline, stopoffset, node) do { \
@@ -43,9 +43,9 @@ cleanup_freep (void *p)
 void TEST_ADD_WHITESPACE(P4_Grammar* grammar, P4_RuleID id) {
     TEST_ASSERT_EQUAL(
         P4_Ok,
-        P4_AddChoice(grammar, id, 3)
+        P4_AddChoice(grammar, "ws", 3)
     );
-    P4_Expression* ws = P4_GetGrammarRule(grammar, id);
+    P4_Expression* ws = P4_GetGrammarRuleByName(grammar, "ws");
     TEST_ASSERT_NOT_NULL(ws);
     TEST_ASSERT_EQUAL(
         P4_Ok,

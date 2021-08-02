@@ -50,21 +50,6 @@ extern "C"
 #include <stdlib.h>
 #include "../peppapeg.h"
 
-typedef enum {
-    P4_CalcStatement    = 1,
-    P4_CalcTerm         = 2,
-    P4_CalcFactor       = 3,
-    P4_CalcUnary        = 4,
-    P4_CalcPrimary      = 5,
-    P4_CalcInteger      = 6,
-    P4_CalcAddSign      = 7,
-    P4_CalcMinusSign    = 8,
-    P4_CalcMulSign      = 9,
-    P4_CalcDivSign      = 10,
-    P4_CalcWhitespace   = 11,
-    P4_CalcEol          = 12,
-} P4_CalcRuleID;
-
 P4_Grammar*  P4_CreateCalcGrammar() {
     return P4_LoadGrammar(
         "statement = term eol;\n"
@@ -158,110 +143,6 @@ P4_Error P4_CalcEval(P4_Node* node, long* result) {
         return P4_ValueError;
 
     }
-}
-
-P4_Grammar*  P4_CreateCalcGrammarLowLevel() {
-    P4_Grammar* grammar = P4_CreateGrammar();
-    if (grammar == NULL) {
-        return NULL;
-    }
-
-    P4_Error err = P4_Ok;
-
-    if ((err = P4_AddSequenceWithMembers(grammar, "statement", 3,
-        P4_CreateStartOfInput(),
-        P4_CreateReference("term"),
-        P4_CreateEndOfInput()
-    )) != P4_Ok)
-        goto finalize;
-
-    if ((err = P4_AddSequenceWithMembers(grammar, "term", 2,
-        P4_CreateReference("factor"),
-        P4_CreateZeroOrMore(
-            P4_CreateSequenceWithMembers(2,
-                P4_CreateChoiceWithMembers(2,
-                    P4_CreateReference("add"),
-                    P4_CreateReference("minus")
-                ),
-                P4_CreateReference("factor")
-            )
-        )
-    )) != P4_Ok)
-        goto finalize;
-
-    if ((err = P4_AddSequenceWithMembers(grammar, "factor", 2,
-        P4_CreateReference("unary"),
-        P4_CreateZeroOrMore(
-            P4_CreateSequenceWithMembers(2,
-                P4_CreateChoiceWithMembers(2,
-                    P4_CreateReference("mul"),
-                    P4_CreateReference("div")
-                ),
-                P4_CreateReference("unary")
-            )
-        )
-    )) != P4_Ok)
-        goto finalize;
-
-    if ((err = P4_AddChoiceWithMembers(grammar, "unary", 3,
-        P4_CreateSequenceWithMembers(2, P4_CreateReference("add"), P4_CreateReference("unary")),
-        P4_CreateSequenceWithMembers(2, P4_CreateReference("minus"), P4_CreateReference("unary")),
-        P4_CreateReference("primary")
-    )) != P4_Ok)
-        goto finalize;
-
-    if ((err = P4_AddLiteral(grammar, "minus", "-", true)) != P4_Ok)
-        goto finalize;
-
-    if ((err = P4_AddLiteral(grammar, "add", "+", true)) != P4_Ok)
-        goto finalize;
-
-    if ((err = P4_AddLiteral(grammar, "mul", "*", true)) != P4_Ok)
-        goto finalize;
-
-    if ((err = P4_AddLiteral(grammar, "div", "/", true)) != P4_Ok)
-        goto finalize;
-
-    if ((err = P4_AddChoiceWithMembers(grammar, "primary", 2,
-        P4_CreateReference("integer"),
-        P4_CreateSequenceWithMembers(3,
-            P4_CreateLiteral("(", true),
-            P4_CreateReference("term"),
-            P4_CreateLiteral(")", true)
-        )
-    )) != P4_Ok)
-        goto finalize;
-
-    if ((err = P4_AddOnceOrMore(grammar, "integer", P4_CreateRange('0', '9', 1))) != P4_Ok)
-        goto finalize;
-
-    if ((err = P4_AddChoiceWithMembers(grammar, "eol", 3,
-        P4_CreateLiteral("\n", true),
-        P4_CreateLiteral("\r", true),
-        P4_CreateLiteral(";", true)
-    )) != P4_Ok)
-        goto finalize;
-
-    if ((err = P4_AddChoiceWithMembers(grammar, "whitespace", 2,
-        P4_CreateLiteral(" ", true),
-        P4_CreateLiteral("\t", true)
-    )) != P4_Ok)
-        goto finalize;
-
-    if ((err = P4_SetGrammarRuleFlag(grammar, "integer", P4_FLAG_TIGHT | P4_FLAG_SQUASHED)) != P4_Ok)
-        goto finalize;
-
-    if ((err = P4_SetGrammarRuleFlag(grammar, "primary", P4_FLAG_LIFTED)) != P4_Ok)
-        goto finalize;
-
-    if ((err = P4_SetGrammarRuleFlag(grammar, "whitespace", P4_FLAG_SPACED | P4_FLAG_LIFTED)) != P4_Ok)
-        goto finalize;
-
-    return grammar;
-
-finalize:
-    P4_DeleteGrammar(grammar);
-    return NULL;
 }
 
 #ifdef __cplusplus

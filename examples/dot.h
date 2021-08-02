@@ -39,42 +39,6 @@ extern "C"
 
 #include "../peppapeg.h"
 
-typedef enum P4_DotRule {
-    P4_DotRuleEntry = 1,
-    P4_DotRuleGraph,
-    P4_DotRuleID,
-    P4_DotRuleIdentifier,
-    P4_DotRuleNumber,
-    P4_DotRuleString,
-    P4_DotRuleNodeID,
-    P4_DotRuleNodeStmt,
-    P4_DotRulePort,
-    P4_DotRuleCompassPt,
-    P4_DotRuleAttribute,
-    P4_DotRuleAList,
-    P4_DotRuleAttrList,
-    P4_DotRuleAttrStmt,
-    P4_DotRuleKeywordGraph,
-    P4_DotRuleKeywordNode,
-    P4_DotRuleKeywordEdge,
-    P4_DotRuleStatement,
-    P4_DotRuleWhitespace,
-    P4_DotRuleDirectedEdgeOP,
-    P4_DotRuleUndirectedEdgeOP,
-    P4_DotRuleEdgeOP,
-    P4_DotRuleKeywordSubgraph,
-    P4_DotRuleSubgraph,
-    P4_DotRuleStatements,
-    P4_DotRuleEdgeStmt,
-    P4_DotRuleKeywordDigraph,
-    P4_DotRuleStrict,
-    P4_DotRuleComment,
-    P4_DotRuleMacroComment,
-    P4_DotRuleCComment,
-    P4_DotRuleBlockComment,
-    P4_DotRuleHtmlString,
-} P4_DotRule;
-
 P4_Grammar* P4_CreateDotGrammar() {
     return P4_LoadGrammar(
         "@lifted\n"

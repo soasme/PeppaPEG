@@ -39,27 +39,6 @@ extern "C"
 
 #include "../peppapeg.h"
 
-typedef enum {
-    P4_JSONEntry        = 1,
-    P4_JSONValue,
-    P4_JSONObject,
-    P4_JSONObjectItem,
-    P4_JSONArray,
-    P4_JSONString,
-    P4_JSONTrue,
-    P4_JSONFalse,
-    P4_JSONNull,
-    P4_JSONNumber,
-    P4_JSONEscape,
-    P4_JSONUnicodeEscape,
-    P4_JSONMinus,
-    P4_JSONPlus,
-    P4_JSONIntegral,
-    P4_JSONFractional,
-    P4_JSONExponent,
-    P4_JSONWhitespace,
-} P4_JSONRuleID;
-
 P4_Grammar*  P4_CreateJSONGrammar() {
     return P4_LoadGrammar(
         "@lifted\n"

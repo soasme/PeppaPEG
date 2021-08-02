@@ -27,7 +27,7 @@ void test_spaced_rule_should_loosen_sequence(void) {
             P4_CreateLiteral("WORLD", true)
         )
     );
-    TEST_ADD_WHITESPACE(grammar, WHITESPACE);
+    TEST_ADD_WHITESPACE(grammar, "ws");
 
     P4_Source* source = P4_CreateSource("HELLO \t\n\t WORLD", "entry");
     TEST_ASSERT_NOT_NULL(source);
@@ -72,7 +72,7 @@ void test_spaced_rule_should_be_ignored_in_tight_sequence(void) {
     );
     TEST_ASSERT_EQUAL(P4_Ok, P4_SetGrammarRuleFlag(grammar, "entry", P4_FLAG_TIGHT));
 
-    TEST_ADD_WHITESPACE(grammar, WHITESPACE);
+    TEST_ADD_WHITESPACE(grammar, "ws");
 
     P4_Source* source = P4_CreateSource("HELLOWORLD", "entry");
     TEST_ASSERT_NOT_NULL(source);
@@ -118,7 +118,7 @@ void test_spaced_rule_should_loosen_sequence_despite_member_is_tight(void) {
             P4_CreateReference("r1")
         )
     );
-    TEST_ADD_WHITESPACE(grammar, WHITESPACE);
+    TEST_ADD_WHITESPACE(grammar, "ws");
     TEST_ASSERT_EQUAL(
         P4_Ok,
         P4_AddSequenceWithMembers(grammar, "r1", 2,
@@ -167,7 +167,7 @@ void test_spaced_rule_should_be_ignored_in_tight_sequence2(void) {
         )
     );
     TEST_ASSERT_EQUAL(P4_Ok, P4_SetGrammarRuleFlag(grammar, "entry", P4_FLAG_TIGHT));
-    TEST_ADD_WHITESPACE(grammar, WHITESPACE);
+    TEST_ADD_WHITESPACE(grammar, "ws");
 
     P4_Source* source = P4_CreateSource("HELLO \t\n\t WORLD", "entry");
     TEST_ASSERT_NOT_NULL(source);
@@ -203,7 +203,7 @@ void test_spaced_rule_should_be_applied_in_repeat(void) {
         P4_Ok,
         P4_AddRepeatExact(grammar, "entry", P4_CreateLiteral("0", true), 6)
     );
-    TEST_ADD_WHITESPACE(grammar, WHITESPACE);
+    TEST_ADD_WHITESPACE(grammar, "ws");
 
     P4_Source* source = P4_CreateSource("0 0\t0\n0\t0 0", "entry");
     TEST_ASSERT_NOT_NULL(source);
@@ -246,7 +246,7 @@ void test_spaced_rule_should_be_ignored_in_tight_repeat(void) {
         P4_AddRepeatExact(grammar, "entry", P4_CreateLiteral("0", true), 6)
     );
     TEST_ASSERT_EQUAL(P4_Ok, P4_SetGrammarRuleFlag(grammar, "entry", P4_FLAG_TIGHT));
-    TEST_ADD_WHITESPACE(grammar, WHITESPACE);
+    TEST_ADD_WHITESPACE(grammar, "ws");
 
     P4_Source* source = P4_CreateSource("0 0\t0\n0\t0 0", "entry");
     TEST_ASSERT_NOT_NULL(source);
@@ -280,7 +280,7 @@ void test_spaced_rule_should_be_ignored_in_tight_repeat2(void) {
         P4_AddRepeatExact(grammar, "entry", P4_CreateLiteral("0", true), 6)
     );
     TEST_ASSERT_EQUAL(P4_Ok, P4_SetGrammarRuleFlag(grammar, "entry", P4_FLAG_TIGHT));
-    TEST_ADD_WHITESPACE(grammar, WHITESPACE);
+    TEST_ADD_WHITESPACE(grammar, "ws");
 
     P4_Source* source = P4_CreateSource("000000 0\t0\n0\t0 0", "entry");
     TEST_ASSERT_NOT_NULL(source);

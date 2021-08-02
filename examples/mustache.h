@@ -41,31 +41,6 @@ extern "C"
 
 #include "../peppapeg.h"
 
-typedef enum {
-    P4_MustacheEntry            = 1,
-    P4_MustacheLine             = 2,
-    P4_MustacheText             = 3,
-    P4_MustacheNewLine          = 4,
-    P4_MustacheSOI              = 5,
-    P4_MustacheEOI              = 6,
-    P4_MustacheTag              = 7,
-    P4_MustacheTagContent       = 8,
-    P4_MustacheSetDelimiter     = 9,
-    P4_MustacheComment          = 10,
-    P4_MustacheUnescaped        = 11,
-    P4_MustacheTripleUnescaped  = 12,
-    P4_MustacheSectionOpen      = 13,
-    P4_MustacheSectionClose     = 14,
-    P4_MustachePartial          = 15,
-    P4_MustacheVariable         = 16,
-    P4_MustacheOpener           = 17,
-    P4_MustacheCloser           = 18,
-    P4_MustacheNewOpener        = 19,
-    P4_MustacheNewCloser        = 20,
-    P4_MustacheNonCloser        = 21,
-    P4_MustacheWhitespace       = 22,
-} P4_MustacheRuleID;
-
 P4_Error P4_MustacheCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
     if (rule
             && P4_GetRuleName(rule)

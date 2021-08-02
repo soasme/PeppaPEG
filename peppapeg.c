@@ -2980,13 +2980,13 @@ P4_GetErrorMessage(P4_Source* source) {
 P4_PRIVATE(P4_Error)
 P4_SetWhitespaces(P4_Grammar* grammar) {
     P4_Error        err = P4_Ok;
+    P4_Expression   *rule = NULL, *rule_ref = NULL;
 
     /* Get the total number of SPACED rules */
     size_t          count = 0;
-    khint_t         k = 0;
-    for (k = kh_begin(grammar->rules2); k != kh_end(grammar->rules2); k++)
-        if (kh_exist(grammar->rules2, k) && IS_SPACED(kh_value(grammar->rules2, k)))
-            count++;
+    kh_foreach_value(grammar->rules2, rule, {
+        if (IS_SPACED(rule)) count++;
+    });
 
     /* Set the total number of SPACED rules */
     grammar->spaced_count = count;
@@ -3001,11 +3001,8 @@ P4_SetWhitespaces(P4_Grammar* grammar) {
         P4_Panic("failed to create expression: out of memory");
 
     /* Add all SPACED rules to the repeat expression. */
-    P4_Expression *rule = NULL, *rule_ref = NULL;
-    for (k = kh_begin(grammar->rules2); k != kh_end(grammar->rules2); k++) {
-        if (!kh_exist(grammar->rules2, k)) continue;
-        rule = kh_value(grammar->rules2, k);
-
+    size_t j = 0;
+    kh_foreach_value(grammar->rules2, rule, {
         if (IS_SPACED(rule)) {
             rule_ref = P4_CreateReference(rule->name);
 
@@ -3019,7 +3016,7 @@ P4_SetWhitespaces(P4_Grammar* grammar) {
 
             j++;
         }
-    }
+    });
 
     /* Repeat the choice for zero or more times. */
     if ((grammar->spaced_rules = P4_CreateZeroOrMore(repeat))== NULL)
@@ -4499,8 +4496,9 @@ P4_PegEvalGrammar(P4_Node* node, P4_Result* result) {
     }
 
     /* Resolve named references. */
-    for (i = 0; i < grammar->count; i++)
+    kh_foreach_value(grammar->rules2, rule, {
         catch(P4_PegEvalGrammarReferences(grammar, grammar->rules[i], result));
+    });
 
 finalize:
 

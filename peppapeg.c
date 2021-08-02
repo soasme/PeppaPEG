@@ -395,7 +395,6 @@ struct P4_Expression {
         /** Used by P4_Reference..P4_Negative. */
         struct {
             P4_String               reference;
-            P4_RuleID               ref_id;
             P4_Expression*          ref_expr;
         };
 
@@ -2515,7 +2514,6 @@ P4_CreateReference(P4_String reference) {
     expr->flag = 0;
     expr->name = NULL;
     expr->reference = STRDUP(reference);
-    expr->ref_id = 0;
     expr->ref_expr = NULL;
     return expr;
 }

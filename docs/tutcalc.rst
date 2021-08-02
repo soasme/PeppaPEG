@@ -16,23 +16,16 @@ In this tutorial, we will write a calculator. It supports
 
 The calculator can take arbitrary valid string calc expressions and yield the result.
 
-Step 1: Define RuleIDs
+Step 1: Create Grammar
 ----------------------
 
-Let's create a new file "calc.h" and define some enums as RuleIDs.
-
-.. literalinclude:: ../examples/calc.h
-   :lines: 53-66
-
-Step 2: Create Grammar
-----------------------
-
-We'll create the grammar using :c:func:`P4_LoadGrammar`.
+Let's create a new file "calc.h" and
+create the grammar using :c:func:`P4_LoadGrammar`.
 
 The order of rules must be same with `P4_CalcRuleID`.
 
 .. literalinclude:: ../examples/calc.h
-   :lines: 68-97
+   :lines: 53-82
 
 To extend a little bit,
 
@@ -40,19 +33,19 @@ To extend a little bit,
 * Rule `term` can parse inputs like `a + b - c + d ...` or `a`.
 * Rule `factor` can parse inputs like `a * b / c * d ...` or `a`.
 * Rule `unary` can parse inputs like `+a`, `++a`, `-a`, `a`, etc.
-* Rule `primary` will have no corresponding node in the ast.
-* Rule `integer` are some squashed digits, which avoids creating nodes for each digit.
+* Rule `primary` can parse inputs like `(a)`, etc.
+* Rule `integer` are some squashed digits. It avoids creating nodes for each digit.
 * Rule `whitespace` allows arbitrary number of whitespace or tab in between expressions.
 
-Step 3: Eval Ast
+Step 2: Eval Ast
 ----------------
 
 Next, let's evaluate the tree. We traverse the AST and calculate the result.
 
 .. literalinclude:: ../examples/calc.h
-   :lines: 99-164
+   :lines: 84-146
 
-Step 4: Parse
+Step 3: Parse
 -------------
 
 Let's create a new file "calc.c" and parse inputs reading from stdin.

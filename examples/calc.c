@@ -10,7 +10,7 @@ int main() {
     printf("Type statement to continue. Type ^C to quit.\n");
 
     while (fgets(line, sizeof(line), stdin)) {
-        source = P4_CreateSource(line, P4_CalcStatement);
+        source = P4_CreateSource(line, "statement");
         if ((error = P4_Parse(grammar, source)) != P4_Ok) {
             printf("error: parse: %d\n", error);
         } else if ((error = P4_CalcEval(P4_GetSourceAst(source), &result)) != P4_Ok){

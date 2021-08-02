@@ -36,18 +36,6 @@ extern "C"
 
 #include "../peppapeg.h"
 
-typedef enum {
-    P4_INI_Entry = 1,
-    P4_INI_Row,
-    P4_INI_Section,
-    P4_INI_Property,
-    P4_INI_Newline,
-    P4_INI_Name,
-    P4_INI_Value,
-    P4_INI_Char,
-    P4_INI_Whitespace,
-} P4_INIRuleID;
-
 P4_PUBLIC(P4_Grammar*)  P4_CreateINIGrammar() {
     P4_Grammar* grammar = P4_CreateGrammar();
     if (grammar == NULL) {
@@ -56,58 +44,58 @@ P4_PUBLIC(P4_Grammar*)  P4_CreateINIGrammar() {
 
     // Entry = POSITIVE([1-0x10ffff]) Row* NEGATIVE([1-0x10ffff])
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_INI_Entry, 3,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, "entry", 3,
         P4_CreatePositive(P4_CreateRange(0x1, 0x10ffff, 1)), // start of input
-        P4_CreateZeroOrMore(P4_CreateReference(P4_INI_Row)),
+        P4_CreateZeroOrMore(P4_CreateReference("row")),
         P4_CreateNegative(P4_CreateRange(0x1, 0x10ffff, 1)) // end of input
     ))
         goto finalize;
 
     // Row {LIFTED,TIGHT} = (Section / Property)? Newline
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_INI_Row, 2,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, "row", 2,
         P4_CreateZeroOrOnce(
             P4_CreateChoiceWithMembers(2,
-                P4_CreateReference(P4_INI_Section),
-                P4_CreateReference(P4_INI_Property)
+                P4_CreateReference("section"),
+                P4_CreateReference("property")
             )
         ),
         P4_CreateReference(P4_INI_Newline)
     ))
         goto finalize;
 
-    P4_SetExpressionFlag(P4_GetGrammarRule(grammar, P4_INI_Row), P4_FLAG_LIFTED | P4_FLAG_TIGHT);
+    P4_SetExpressionFlag(P4_GetGrammarRuleByName(grammar, "row"), P4_FLAG_LIFTED | P4_FLAG_TIGHT);
 
     // Section = "[" Name "]"
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_INI_Section, 3,
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, "section", 3,
         P4_CreateLiteral("[", true),
-        P4_CreateReference(P4_INI_Name),
+        P4_CreateReference("name"),
         P4_CreateLiteral("]", true)
     ))
         goto finalize;
 
     // Property = Name "=" Value?
 
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, P4_INI_Property, 3,
-        P4_CreateReference(P4_INI_Name),
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, "property", 3,
+        P4_CreateReference("name"),
         P4_CreateLiteral("=", true),
-        P4_CreateZeroOrOnce(P4_CreateReference(P4_INI_Value))
+        P4_CreateZeroOrOnce(P4_CreateReference("value"))
     ))
         goto finalize;
 
     // Name = Char+
 
-    if (P4_Ok != P4_AddOnceOrMore(grammar, P4_INI_Name, P4_CreateReference(P4_INI_Char)))
+    if (P4_Ok != P4_AddOnceOrMore(grammar, "name", P4_CreateReference("char")))
         goto finalize;
 
     // Value = Char*
 
-    if (P4_Ok != P4_AddOnceOrMore(grammar, P4_INI_Value, P4_CreateReference(P4_INI_Char)))
+    if (P4_Ok != P4_AddOnceOrMore(grammar, "value", P4_CreateReference("char")))
         goto finalize;
 
     // Char = [a-z] / [A-Z] / [0-9] / " " / "." / ":" / "?" / "_" / "/"
 
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_INI_Char, 9,
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, "char", 9,
         P4_CreateRange('a', 'z', 1),
         P4_CreateRange('A', 'Z', 1),
         P4_CreateRange('0', '9', 1),
@@ -121,16 +109,16 @@ P4_PUBLIC(P4_Grammar*)  P4_CreateINIGrammar() {
         goto finalize;
 
     // Newline {LIFTED} = "\n"
-    if (P4_Ok != P4_AddLiteral(grammar, P4_INI_Newline, "\n", true))
+    if (P4_Ok != P4_AddLiteral(grammar, "newline", "\n", true))
         goto finalize;
 
     P4_SetExpressionFlag(
-        P4_GetGrammarRule(grammar, P4_INI_Newline),
+        P4_GetGrammarRuleByName(grammar, "newline"),
         P4_FLAG_LIFTED
     );
 
     // Whitespace {LIFTED,SPACED} = " " / "\t" / "\n"
-    if (P4_Ok != P4_AddChoiceWithMembers(grammar, P4_INI_Whitespace, 3,
+    if (P4_Ok != P4_AddChoiceWithMembers(grammar, "whitespace", 3,
         P4_CreateLiteral(" ", true),
         P4_CreateLiteral("\t", true),
         P4_CreateLiteral("\n", true)
@@ -138,7 +126,7 @@ P4_PUBLIC(P4_Grammar*)  P4_CreateINIGrammar() {
         goto finalize;
 
     P4_SetExpressionFlag(
-        P4_GetGrammarRule(grammar, P4_INI_Whitespace),
+        P4_GetGrammarRuleByName(grammar, "whitespace"),
         P4_FLAG_LIFTED | P4_FLAG_SPACED
     );
 

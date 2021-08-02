@@ -369,7 +369,7 @@ KHASH_MAP_INIT_STR(rules, P4_Expression*)
 
 struct P4_Grammar {
     /** A map associating names with expressions. Type: Map<str, P4_Expression*>. */
-    khash_t(rules)*         rules2;
+    khash_t(rules)*         rules;
     /** The total number of spaced rules. */
     size_t                  spaced_count;
     /** The repetition rule for spaced rules. */
@@ -2709,7 +2709,7 @@ P4_IsRule(P4_Expression* e) {
 
 P4_PUBLIC P4_Grammar*    P4_CreateGrammar(void) {
     P4_Grammar* grammar = P4_MALLOC(sizeof(P4_Grammar));
-    grammar->rules2 = kh_init(rules);
+    grammar->rules = kh_init(rules);
     grammar->spaced_count = SIZE_MAX;
     grammar->spaced_rules = NULL;
     grammar->depth = P4_DEFAULT_RECURSION_LIMIT;
@@ -2725,20 +2725,20 @@ P4_DeleteGrammar(P4_Grammar* grammar) {
     P4_Expression*  rule;
     if (grammar) {
         if (grammar->spaced_rules) P4_DeleteExpression(grammar->spaced_rules);
-        kh_foreach(grammar->rules2, name, rule, {
+        kh_foreach_value(grammar->rules, rule, {
             P4_DeleteExpression(rule);
-            kh_del(rules, grammar->rules2, __i);
+            kh_del(rules, grammar->rules, __i);
         });
-        kh_destroy(rules, grammar->rules2);
+        kh_destroy(rules, grammar->rules);
         P4_FREE(grammar);
     }
 }
 
 P4_PUBLIC P4_Expression*
 P4_GetGrammarRuleByName(P4_Grammar* grammar, P4_String name) {
-    khint_t k = kh_get(rules, grammar->rules2, name);
-    bool is_missing = (k == kh_end(grammar->rules2));
-    return is_missing ? NULL : kh_val(grammar->rules2, k);
+    khint_t k = kh_get(rules, grammar->rules, name);
+    bool is_missing = (k == kh_end(grammar->rules));
+    return is_missing ? NULL : kh_val(grammar->rules, k);
 }
 
 P4_PUBLIC P4_Error
@@ -2786,8 +2786,8 @@ P4_AddGrammarRule(P4_Grammar* grammar, P4_String name, P4_Expression* expr) {
 
     expr->name = strdup(name);
 
-    khint_t k = kh_put(rules, grammar->rules2, expr->name, &kret);
-    kh_value(grammar->rules2, k) = expr;
+    khint_t k = kh_put(rules, grammar->rules, expr->name, &kret);
+    kh_value(grammar->rules, k) = expr;
 
     return P4_Ok;
 }
@@ -2956,7 +2956,7 @@ P4_SetWhitespaces(P4_Grammar* grammar) {
 
     /* Get the total number of SPACED rules */
     size_t          count = 0;
-    kh_foreach_value(grammar->rules2, rule, {
+    kh_foreach_value(grammar->rules, rule, {
         if (IS_SPACED(rule)) count++;
     });
 
@@ -2974,7 +2974,7 @@ P4_SetWhitespaces(P4_Grammar* grammar) {
 
     /* Add all SPACED rules to the repeat expression. */
     size_t j = 0;
-    kh_foreach_value(grammar->rules2, rule, {
+    kh_foreach_value(grammar->rules, rule, {
         if (IS_SPACED(rule)) {
             rule_ref = P4_CreateReference(rule->name);
 
@@ -3556,14 +3556,14 @@ P4_ReplaceGrammarRule(P4_Grammar* grammar, P4_String name, P4_Expression* expr) 
 
     P4_Error err = P4_Ok;
 
-    khint_t k = kh_get(rules, grammar->rules2, name);
-    kh_del(rules, grammar->rules2, k);
+    khint_t k = kh_get(rules, grammar->rules, name);
+    kh_del(rules, grammar->rules, k);
     P4_DeleteExpression(oldexpr);
 
     expr->name = strdup(name);
 
     P4_Expression* rule;
-    kh_foreach_value(grammar->rules2, rule, {
+    kh_foreach_value(grammar->rules, rule, {
         if (strcmp(rule->name, name) != 0) {
             err = P4_RefreshReference(rule, name);
 
@@ -3573,8 +3573,8 @@ P4_ReplaceGrammarRule(P4_Grammar* grammar, P4_String name, P4_Expression* expr) 
     });
 
     int kret;
-    k = kh_put(rules, grammar->rules2, name, &kret);
-    kh_value(grammar->rules2, k) = expr;
+    k = kh_put(rules, grammar->rules, name, &kret);
+    kh_value(grammar->rules, k) = expr;
 
     return P4_Ok;
 }
@@ -4459,7 +4459,7 @@ P4_PegEvalGrammar(P4_Node* node, P4_Result* result) {
     }
 
     /* Resolve named references. */
-    kh_foreach_value(grammar->rules2, rule, {
+    kh_foreach_value(grammar->rules, rule, {
         catch(P4_PegEvalGrammarReferences(grammar, rule, result));
     });
 

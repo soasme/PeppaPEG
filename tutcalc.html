@@ -211,29 +211,10 @@
 <li><p>Parenthesis <cite>()</cite>.</p></li>
 </ul>
 <p>The calculator can take arbitrary valid string calc expressions and yield the result.</p>
-<section id="step-1-define-ruleids">
-<h2>Step 1: Define RuleIDs<a class="headerlink" href="#step-1-define-ruleids" title="Permalink to this headline">¶</a></h2>
-<p>Let’s create a new file “calc.h” and define some enums as RuleIDs.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">typedef</span> <span class="n">enum</span> <span class="p">{</span>
-    <span class="n">P4_CalcStatement</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="n">P4_CalcTerm</span>         <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
-    <span class="n">P4_CalcFactor</span>       <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
-    <span class="n">P4_CalcUnary</span>        <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
-    <span class="n">P4_CalcPrimary</span>      <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
-    <span class="n">P4_CalcInteger</span>      <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
-    <span class="n">P4_CalcAddSign</span>      <span class="o">=</span> <span class="mi">7</span><span class="p">,</span>
-    <span class="n">P4_CalcMinusSign</span>    <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
-    <span class="n">P4_CalcMulSign</span>      <span class="o">=</span> <span class="mi">9</span><span class="p">,</span>
-    <span class="n">P4_CalcDivSign</span>      <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
-    <span class="n">P4_CalcWhitespace</span>   <span class="o">=</span> <span class="mi">11</span><span class="p">,</span>
-    <span class="n">P4_CalcEol</span>          <span class="o">=</span> <span class="mi">12</span><span class="p">,</span>
-<span class="p">}</span> <span class="n">P4_CalcRuleID</span><span class="p">;</span>
-</pre></div>
-</div>
-</section>
-<section id="step-2-create-grammar">
-<h2>Step 2: Create Grammar<a class="headerlink" href="#step-2-create-grammar" title="Permalink to this headline">¶</a></h2>
-<p>We’ll create the grammar using <a class="reference internal" href="api.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a>.</p>
+<section id="step-1-create-grammar">
+<h2>Step 1: Create Grammar<a class="headerlink" href="#step-1-create-grammar" title="Permalink to this headline">¶</a></h2>
+<p>Let’s create a new file “calc.h” and
+create the grammar using <a class="reference internal" href="api.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a>.</p>
 <p>The order of rules must be same with <cite>P4_CalcRuleID</cite>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span>  <span class="n">P4_CreateCalcGrammar</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="n">P4_LoadGrammar</span><span class="p">(</span>
@@ -273,13 +254,13 @@
 <li><p>Rule <cite>term</cite> can parse inputs like <cite>a + b - c + d …</cite> or <cite>a</cite>.</p></li>
 <li><p>Rule <cite>factor</cite> can parse inputs like <cite>a * b / c * d …</cite> or <cite>a</cite>.</p></li>
 <li><p>Rule <cite>unary</cite> can parse inputs like <cite>+a</cite>, <cite>++a</cite>, <cite>-a</cite>, <cite>a</cite>, etc.</p></li>
-<li><p>Rule <cite>primary</cite> will have no corresponding node in the ast.</p></li>
-<li><p>Rule <cite>integer</cite> are some squashed digits, which avoids creating nodes for each digit.</p></li>
+<li><p>Rule <cite>primary</cite> can parse inputs like <cite>(a)</cite>, etc.</p></li>
+<li><p>Rule <cite>integer</cite> are some squashed digits. It avoids creating nodes for each digit.</p></li>
 <li><p>Rule <cite>whitespace</cite> allows arbitrary number of whitespace or tab in between expressions.</p></li>
 </ul>
 </section>
-<section id="step-3-eval-ast">
-<h2>Step 3: Eval Ast<a class="headerlink" href="#step-3-eval-ast" title="Permalink to this headline">¶</a></h2>
+<section id="step-2-eval-ast">
+<h2>Step 2: Eval Ast<a class="headerlink" href="#step-2-eval-ast" title="Permalink to this headline">¶</a></h2>
 <p>Next, let’s evaluate the tree. We traverse the AST and calculate the result.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Error</span> <span class="n">P4_CalcEval</span><span class="p">(</span><span class="n">P4_Node</span><span class="o">*</span> <span class="n">node</span><span class="p">,</span> <span class="n">long</span><span class="o">*</span> <span class="n">result</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">P4_Error</span> <span class="n">err</span> <span class="o">=</span> <span class="n">P4_Ok</span><span class="p">;</span>
@@ -344,14 +325,11 @@
 
     <span class="p">}</span>
 <span class="p">}</span>
-
-<span class="n">P4_Grammar</span><span class="o">*</span>  <span class="n">P4_CreateCalcGrammarLowLevel</span><span class="p">()</span> <span class="p">{</span>
-    <span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
 </pre></div>
 </div>
 </section>
-<section id="step-4-parse">
-<h2>Step 4: Parse<a class="headerlink" href="#step-4-parse" title="Permalink to this headline">¶</a></h2>
+<section id="step-3-parse">
+<h2>Step 3: Parse<a class="headerlink" href="#step-3-parse" title="Permalink to this headline">¶</a></h2>
 <p>Let’s create a new file “calc.c” and parse inputs reading from stdin.</p>
 <p>The main function does the below things:</p>
 <ul class="simple">
@@ -373,7 +351,7 @@
     <span class="n">printf</span><span class="p">(</span><span class="s2">"Type statement to continue. Type ^C to quit.</span><span class="se">\n</span><span class="s2">"</span><span class="p">);</span>
 
     <span class="k">while</span> <span class="p">(</span><span class="n">fgets</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">sizeof</span><span class="p">(</span><span class="n">line</span><span class="p">),</span> <span class="n">stdin</span><span class="p">))</span> <span class="p">{</span>
-        <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">P4_CalcStatement</span><span class="p">);</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="s2">"statement"</span><span class="p">);</span>
         <span class="k">if</span> <span class="p">((</span><span class="n">error</span> <span class="o">=</span> <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">))</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="p">{</span>
             <span class="n">printf</span><span class="p">(</span><span class="s2">"error: parse: </span><span class="si">%d</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">error</span><span class="p">);</span>
         <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">((</span><span class="n">error</span> <span class="o">=</span> <span class="n">P4_CalcEval</span><span class="p">(</span><span class="n">P4_GetSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">result</span><span class="p">))</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">){</span>
@@ -460,10 +438,9 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Tutorial: Calculator</a><ul>
-<li><a class="reference internal" href="#step-1-define-ruleids">Step 1: Define RuleIDs</a></li>
-<li><a class="reference internal" href="#step-2-create-grammar">Step 2: Create Grammar</a></li>
-<li><a class="reference internal" href="#step-3-eval-ast">Step 3: Eval Ast</a></li>
-<li><a class="reference internal" href="#step-4-parse">Step 4: Parse</a></li>
+<li><a class="reference internal" href="#step-1-create-grammar">Step 1: Create Grammar</a></li>
+<li><a class="reference internal" href="#step-2-eval-ast">Step 2: Eval Ast</a></li>
+<li><a class="reference internal" href="#step-3-parse">Step 3: Parse</a></li>
 </ul>
 </li>
 </ul>

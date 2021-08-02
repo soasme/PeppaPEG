@@ -236,11 +236,9 @@ A grammar includes a set of grammar rules.  Each grammar rule is built from :c:s
 
 .. code-block:: c
 
-    typedef enum { Entry, Text, ... };
+    P4_AddLiteral(grammar, "text", "Hello,WORLD", true);
 
-    P4_AddLiteral(grammar, Text, "Hello,WORLD", true);
-
-    P4_Expression* expr = P4_CreateReference(Text);
+    P4_Expression* expr = P4_CreateReference("text");
 
 The referenced grammar rule must exist before calling :c:func:`P4_Parse`.
 
@@ -364,7 +362,7 @@ For example,
 
 .. code-block:: c
 
-    P4_AddSequenceWithMembers(grammar, Entry, 2
+    P4_AddSequenceWithMembers(grammar, "entry", 2
         P4_CreateReference(Text),
         P4_CreateReference(Text)
     );
@@ -378,11 +376,11 @@ This grammar parses the text "xx" into three nodes:
       Token(0..1) "X"
       Token(1..2) "x"
 
-If the grammar rule `Entry` has flag `P4_FLAG_SQUASHED`, the children nodes disappear:
+If the grammar rule `"entry"` has flag `P4_FLAG_SQUASHED`, the children nodes disappear:
 
 .. code-block:: c
 
-    P4_SetGrammarRuleFlag(grammar, Entry, P4_FLAG_SQUASHED);
+    P4_SetGrammarRuleFlag(grammar, "entry", P4_FLAG_SQUASHED);
 
 .. code-block::
 
@@ -399,9 +397,7 @@ For example,
 
 .. code-block:: c
 
-    typedef enum { Entry, Text } MyRuleID;
-
-    P4_AddSequenceWithMembers(grammar, Entry, 2
+    P4_AddSequenceWithMembers(grammar, "entry", 2
         P4_CreateReference(Text),
         P4_CreateReference(Text)
     );
@@ -415,11 +411,11 @@ This grammar can match text "xx" into three nodes:
       Token(0..1) "X"
       Token(1..2) "x"
 
-If the grammar rule `Entry` has flag `P4_FLAG_LIFTED`, the node is lifted and replaced by its children:
+If the grammar rule `"entry"` has flag `P4_FLAG_LIFTED`, the node is lifted and replaced by its children:
 
 .. code-block:: c
 
-    P4_SetGrammarRuleFlag(grammar, Entry, P4_FLAG_LIFTED);
+    P4_SetGrammarRuleFlag(grammar, "entry", P4_FLAG_LIFTED);
 
 .. code-block::
 
@@ -435,7 +431,7 @@ For example,
 
 .. code-block:: c
 
-    P4_AddSequenceWithMembers(grammar, Entry, 2
+    P4_AddSequenceWithMembers(grammar, "entry", 2
         P4_CreateLiteral("(", true),
         P4_CreateReference(Text),
         P4_CreateLiteral(")", true)
@@ -449,11 +445,11 @@ This grammar can match text "(x)" into two nodes:
     Token(0..3): "(x)"
       Token(1..2) "x"
 
-If the grammar rule `Entry` has flag `P4_FLAG_NON_TERMINAL`, the node is lifted and replaced by its single child node:
+If the grammar rule `"entry"` has flag `P4_FLAG_NON_TERMINAL`, the node is lifted and replaced by its single child node:
 
 .. code-block:: c
 
-    P4_SetGrammarRuleFlag(grammar, Entry, P4_FLAG_NON_TERMINAL);
+    P4_SetGrammarRuleFlag(grammar, "entry", P4_FLAG_NON_TERMINAL);
 
 .. code-block::
 
@@ -472,17 +468,15 @@ For example,
 
 .. code-block:: c
 
-    typedef enum { Entry, Whitespace } MyRuleID;
+    P4_AddLiteral(grammar, "whitespace", " ", false);
 
-    P4_AddLiteral(grammar, Whitespace, " ", false);
-
-    P4_SetGrammarRuleFlag(grammar, Whitespace, P4_FLAG_SPACED);
+    P4_SetGrammarRuleFlag(grammar, "whitespace", P4_FLAG_SPACED);
 
 Often, we don't want the whitespace having nodes, so it's usually combined with `P4_FLAG_LIFTED`.
 
 .. code-block:: c
 
-    P4_SetGrammarRuleFlag(grammar, Whitespace, P4_FLAG_SPACED | P4_FLAG_LIFTED);
+    P4_SetGrammarRuleFlag(grammar, "whitespace", P4_FLAG_SPACED | P4_FLAG_LIFTED);
 
 This flag does not work on its own. It takes effect on Sequence or Repeat.
 
@@ -492,7 +486,7 @@ For example, this rule matches "HelloWorld", "Hello World", "Hello       World",
 
 .. code-block:: c
 
-    P4_AddSequenceWithMembers(grammar, Entry, 2,
+    P4_AddSequenceWithMembers(grammar, "entry", 2,
         P4_AddLiteral("Hello", true),
         P4_AddLiteral("World", true)
     );
@@ -501,7 +495,7 @@ For example, this rule matches "xxx", "x   x         x", etc.
 
 .. code-block:: c
 
-    P4_AddOnceOrMore(grammar, Entry, P4_AddLiteral("x", true));
+    P4_AddOnceOrMore(grammar, "entry", P4_AddLiteral("x", true));
 
 The SPACED expressions are not inserted before or after the Sequence and Repeat, hence "  Hello World  ", "  xxx  " not matching.
 
@@ -515,7 +509,7 @@ Given the above `P4_FLAG_SPACED` expression, if we set the grammar rule with fla
 
 .. code-block:: c
 
-    P4_SetGrammarRuleFlag(grammar, Entry, P4_FLAG_TIGHT);
+    P4_SetGrammarRuleFlag(grammar, "entry", P4_FLAG_TIGHT);
 
 Peppa PEG applies SPACED expressions on every Sequence and Repeat unless a `P4_FLAG_TIGHT` is explicitly specified on a Sequence or Repeat.
 
@@ -528,6 +522,6 @@ Flag `P4_FLAG_TIGHT` takes effects not only on the expression but its all descen
 
 .. code-block:: c
 
-    P4_SetGrammarRuleFlag(grammar, Entry, P4_FLAG_SCOPED);
+    P4_SetGrammarRuleFlag(grammar, "entry", P4_FLAG_SCOPED);
 
 Starting from the SCOPED grammar rule, the nodes are not squashed; the implicit whitespace is enabled as well.

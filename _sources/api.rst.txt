@@ -14,6 +14,11 @@ ENUMS
 .. doxygenfile:: peppapeg.h
    :sections: enum
 
+TYPEDEFS
+-------
+.. doxygenfile:: peppapeg.h
+   :sections: typedef
+
 STRUCTS
 -------
 

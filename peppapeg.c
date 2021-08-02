@@ -2721,13 +2721,11 @@ P4_PUBLIC P4_Grammar*    P4_CreateGrammar(void) {
 
 P4_PUBLIC void
 P4_DeleteGrammar(P4_Grammar* grammar) {
-    const char* name;
     P4_Expression*  rule;
     if (grammar) {
         if (grammar->spaced_rules) P4_DeleteExpression(grammar->spaced_rules);
         kh_foreach_value(grammar->rules, rule, {
             P4_DeleteExpression(rule);
-            kh_del(rules, grammar->rules, __i);
         });
         kh_destroy(rules, grammar->rules);
         P4_FREE(grammar);
@@ -2784,7 +2782,14 @@ P4_AddGrammarRule(P4_Grammar* grammar, P4_String name, P4_Expression* expr) {
     if (grammar == NULL || name == NULL || expr == NULL)
         return P4_NullError;
 
-    expr->name = strdup(name);
+    if (expr->name == NULL) {
+        expr->name = strdup(name);
+    } else if (expr->name != NULL) {
+        if (strcmp(name, expr->name) != 0) {
+            P4_FREE(expr->name);
+            expr->name = strdup(name);
+        }
+    }
 
     khint_t k = kh_put(rules, grammar->rules, expr->name, &kret);
     kh_value(grammar->rules, k) = expr;
@@ -4327,23 +4332,19 @@ P4_PegEvalReference(P4_Node* node, P4_Result* result) {
 
     catch(P4_PegEvalRuleName(node, &ref));
 
-    /* We can't know the ref_id at this stage.
-     * So, let's just simply create a placeholder with id=SIZE_MAX.
-     */
-    if ((expr = P4_CreateReference("")) == NULL)
+    if ((expr = P4_CreateReference(ref)) == NULL)
         P4_Panic("failed to create expression: out of memory.");
 
-    /* However, the string reference must be set.
-     * When the full grammar is evaluated, we will refresh
-     * all ref_ids based on these reference names.
-     */
     result->expr = expr;
-    result->expr->reference = ref;
+
+    P4_FREE(ref);
     return P4_Ok;
 
 finalize:
     if (ref)
         P4_FREE(ref);
+    if (expr)
+        P4_DeleteExpression(expr);
 
     return err;
 }

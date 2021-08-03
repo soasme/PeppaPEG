@@ -498,10 +498,10 @@ struct P4_Source {
 # define P4_UnwrapGrammar(r) ((r)->errmsg[0] == 0 ? (r)->grammar : NULL)
 # define P4_UnwrapExpression(r) ((r)->errmsg[0] == 0 ? (r)->expr : NULL)
 
-static void P4_Panic(const char * str)     __attribute__((noreturn));
-static void P4_Panic(const char * str)     { fputs(str, stderr); exit(1); }
-static void P4_Panicf(const char * fmt, ...) __attribute__((noreturn));
-static void P4_Panicf(const char * fmt, ...) { va_list args; va_start(args, fmt); vfprintf(stderr, fmt, args); exit(1); }
+static void panic(const char * str)     __attribute__((noreturn));
+static void panic(const char * str)     { fputs(str, stderr); exit(1); }
+static void panicf(const char * fmt, ...) __attribute__((noreturn));
+static void panicf(const char * fmt, ...) { va_list args; va_start(args, fmt); vfprintf(stderr, fmt, args); exit(1); }
 
 #define P4_EvalRaise(fmt, ...) \
     do { \
@@ -511,7 +511,7 @@ static void P4_Panicf(const char * fmt, ...) { va_list args; va_start(args, fmt)
     } while (0);
 
 # if defined(DEBUG)
-#define UNREACHABLE() P4_Panicf("[%s:%d] This code should not be reached in %s()\n", __FILE__, __LINE__, __func__);
+#define UNREACHABLE() panicf("[%s:%d] This code should not be reached in %s()\n", __FILE__, __LINE__, __func__);
 # elif defined(_MSC_VER)
 #define UNREACHABLE() __assume(0)
 # elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5))
@@ -521,7 +521,7 @@ static void P4_Panicf(const char * fmt, ...) { va_list args; va_start(args, fmt)
 # endif
 
 # if defined(DEBUG)
-#define ASSERT(c,m) if(!(c)) P4_Panicf("[%s:%d] Assert failed in %s(): %s\n", __FILE__, __LINE__, __func__, (m));
+#define ASSERT(c,m) if(!(c)) panicf("[%s:%d] Assert failed in %s(): %s\n", __FILE__, __LINE__, __func__, (m));
 # else
 #define ASSERT(c,m) do { } while (false)
 # endif
@@ -529,7 +529,7 @@ static void P4_Panicf(const char * fmt, ...) { va_list args; va_start(args, fmt)
 # define                        catch_oom(s) \
     do { \
         if ((s) == NULL) { \
-            P4_Panic("out of memory."); \
+            panic("out of memory."); \
         } \
     } while (0);
 
@@ -563,12 +563,12 @@ static void P4_Panicf(const char * fmt, ...) { va_list args; va_start(args, fmt)
     P4_SetPosition(&((s)->stop), (b)); \
 } while (0)
 
-#define P4_EachChild(node, child, code) \
+#define foreach_child(node, child, code) \
     for ((child) = (node)->head; (child) != NULL; (child) = (child)->next) { code; }
 
 # define                        autofree __attribute__ ((cleanup (cleanup_freep)))
 
-#define strdup(x) P4_Panic("Do not use strdup(). Use STRDUP() instead.")
+#define strdup(x) panic("Do not use strdup(). Use STRDUP() instead.")
 
 static char *STRDUP(const char *src) { /* STRDUP is not ANSI. Copy source here. */
     char *dst = P4_MALLOC(strlen (src) + 1);
@@ -622,7 +622,7 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
             goto end;               \
         }                           \
         if ((expr = (rule)) == NULL) \
-            P4_Panic("failed to create expression: out of memory"); \
+            panic("failed to create expression: out of memory"); \
                                     \
         if ((err=P4_AddGrammarRule(grammar, name, expr))!=P4_Ok) {\
             goto end;               \
@@ -1919,7 +1919,7 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
 
     autofree P4_Slice* backrefs = P4_MALLOC(sizeof(P4_Slice) * e->count);
     if (backrefs == NULL)
-        P4_Panic("failed to create slices: out of memory");
+        panic("failed to create slices: out of memory");
 
     bool need_space = NEED_SPACE(s);
 
@@ -2013,7 +2013,7 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
 
     P4_Node* oneof = P4_CreateNode (s->content, startpos, endpos, e->name);
     if (oneof == NULL)
-        P4_Panic("failed to create node: out of memory");
+        panic("failed to create node: out of memory");
 
     P4_AdoptNode(oneof->head, oneof->tail, tok);
     return oneof;
@@ -2224,10 +2224,10 @@ P4_MatchDispatch(P4_Source* s, P4_Expression* e) {
             result = P4_MatchRepeat(s, e);
             break;
         case P4_BackReference:
-            P4_Panic("backreference can be applied only in sequence.");
+            panic("backreference can be applied only in sequence.");
         default:
             UNREACHABLE();
-            P4_Panicf("invalid dispatch kind: %zu.", e->kind);
+            panicf("invalid dispatch kind: %zu.", e->kind);
     }
 
     return result;
@@ -2344,7 +2344,7 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
     autofree P4_String litstr = P4_CopySliceString(s->content, slice);
 
     if (litstr == NULL)
-        P4_Panic("failed to create string: out of memory");
+        panic("failed to create string: out of memory");
 
     P4_Expression* backref_expr = e->members[index];
 
@@ -2356,7 +2356,7 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
     P4_Expression* litexpr = P4_CreateLiteral(litstr, backref->sensitive);
 
     if (litexpr == NULL)
-        P4_Panic("failed to create expression: out of memory");
+        panic("failed to create expression: out of memory");
 
     if (backref_expr->kind == P4_Reference) {
         litexpr->name = STRDUP(backref_expr->ref_expr->name);
@@ -3100,7 +3100,7 @@ P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_String name, size_t count, ...
         expr->members[i] = va_arg(members, P4_Expression*);
 
         if (expr->members[i] == NULL)
-            P4_Panicf("failed to set %zuth expression.", i);
+            panicf("failed to set %zuth expression.", i);
     }
 
     va_end (members);
@@ -3129,7 +3129,7 @@ P4_AddChoiceWithMembers(P4_Grammar* grammar, P4_String name, size_t count, ...) 
         expr->members[i] = va_arg(members, P4_Expression*);
 
         if (expr->members[i] == NULL)
-            P4_Panicf("failed to set %zuth expression.", i);
+            panicf("failed to set %zuth expression.", i);
     }
 
     va_end (members);
@@ -3371,7 +3371,7 @@ P4_PUBLIC size_t
 P4_GetNodeChildrenCount(P4_Node* node) {
     P4_Node* child = NULL;
     size_t   count = 0;
-    P4_EachChild(node, child, {
+    foreach_child(node, child, {
         count++;
     });
     return count;
@@ -3884,7 +3884,7 @@ P4_PegEvalFlag(P4_Node* node, P4_ExpressionFlag *flag) {
     else {
         /* P4_CreatePegRule() guarantees only 6 kinds of strings are possible. */
         UNREACHABLE();
-        P4_Panicf("InternalError: invalid flag: %s" NODE_ERROR_HINT_FMT,
+        panicf("InternalError: invalid flag: %s" NODE_ERROR_HINT_FMT,
             node_str, NODE_ERROR_HINT);
     }
 
@@ -4004,7 +4004,7 @@ P4_PegEvalRange(P4_Node* node, P4_Result* result) {
         size_t count = 0;
 
         if (0 == P4_ReadRuneRange(node->head->text, &node->head->slice, &count, &ranges))
-            P4_Panicf("ValueError: failed to read code point from source. "
+            panicf("ValueError: failed to read code point from source. "
                 NODE_ERROR_HINT_FMT, NODE_ERROR_HINT);
 
         catch_oom(expr = P4_CreateRanges(count, ranges));
@@ -4064,7 +4064,7 @@ P4_PegEvalMembers(P4_Node* node, P4_Expression* expr, P4_Result* result) {
     P4_Node* child = NULL;
 
     /* for each child, eval expr and set it as ith member. */
-    P4_EachChild(node, child, {
+    foreach_child(node, child, {
         catch_err(P4_PegEvalExpression(child, result));
         catch_err(P4_SetMember(expr, i, P4_UnwrapExpression(result)));
         i++;
@@ -4073,7 +4073,7 @@ P4_PegEvalMembers(P4_Node* node, P4_Expression* expr, P4_Result* result) {
 finalize:
     /* crash if failed to eval & set members. */
     if (err)
-        P4_Panicf(
+        panicf(
             "%s: failed to set %zuth member. " NODE_ERROR_HINT_FMT,
             P4_GetErrorString(err), i, NODE_ERROR_HINT
         );
@@ -4190,7 +4190,7 @@ P4_PegEvalRepeat(P4_Node* node, P4_Result* result) {
         max = min;
     } else {
         UNREACHABLE();
-        P4_Panicf("InternalError: unknown repeat kind: %s"
+        panicf("InternalError: unknown repeat kind: %s"
             NODE_ERROR_HINT_FMT, node->head->next->rule_name, NODE_ERROR_HINT);
     }
 
@@ -4268,7 +4268,7 @@ P4_PegEvalGrammarRule(P4_Node* node, P4_Result* result) {
     /* eval rule decorators, rule name, and rule expression
      * from node children. */
 
-    P4_EachChild(node, child, {
+    foreach_child(node, child, {
         if (strcmp(child->rule_name, "decorators") == 0)
             catch_err(P4_PegEvalRuleFlags(child, &rule_flag))
         else if (strcmp(child->rule_name, "name") == 0)
@@ -4351,7 +4351,7 @@ P4_PegEvalGrammar(P4_Node* node, P4_Result* result) {
 
     /* eval each child to a grammar rule,
      * and then add the rule to grammar object. */
-    P4_EachChild(node, child, {
+    foreach_child(node, child, {
         catch_err(P4_PegEvalGrammarRule(child, result));
 
         rule = P4_UnwrapExpression(result);
@@ -4410,7 +4410,7 @@ P4_PegEvalExpression(P4_Node* node, P4_Result* result) {
         return P4_PegEvalReference(node, result);
 
     UNREACHABLE();
-    P4_Panicf("Unreachable: node %p is not a peg expression", node);
+    panicf("Unreachable: node %p is not a peg expression", node);
 }
 
 P4_PUBLIC P4_Error
@@ -4473,7 +4473,7 @@ P4_LoadGrammar(P4_String rules) {
 
 finalize:
     /* terminates the program if failed to load grammar object. */
-    P4_Panicf("%s\n", result->errmsg);
+    panicf("%s\n", result->errmsg);
 }
 
 P4_PUBLIC const P4_String

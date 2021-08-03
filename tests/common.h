@@ -45,7 +45,7 @@ void TEST_ADD_WHITESPACE(P4_Grammar* grammar, P4_String name) {
         P4_Ok,
         P4_AddChoice((grammar), (name), 3)
     );
-    P4_Expression* ws = P4_GetGrammarRuleByName((grammar), (name));
+    P4_Expression* ws = P4_GetGrammarRule((grammar), (name));
     TEST_ASSERT_NOT_NULL(ws);
     TEST_ASSERT_EQUAL(
         P4_Ok,

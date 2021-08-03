@@ -63,7 +63,7 @@ P4_PUBLIC(P4_Grammar*)  P4_CreateINIGrammar() {
     ))
         goto finalize;
 
-    P4_SetExpressionFlag(P4_GetGrammarRuleByName(grammar, "row"), P4_FLAG_LIFTED | P4_FLAG_TIGHT);
+    P4_SetExpressionFlag(P4_GetGrammarRule(grammar, "row"), P4_FLAG_LIFTED | P4_FLAG_TIGHT);
 
     // Section = "[" Name "]"
 
@@ -113,7 +113,7 @@ P4_PUBLIC(P4_Grammar*)  P4_CreateINIGrammar() {
         goto finalize;
 
     P4_SetExpressionFlag(
-        P4_GetGrammarRuleByName(grammar, "newline"),
+        P4_GetGrammarRule(grammar, "newline"),
         P4_FLAG_LIFTED
     );
 
@@ -126,7 +126,7 @@ P4_PUBLIC(P4_Grammar*)  P4_CreateINIGrammar() {
         goto finalize;
 
     P4_SetExpressionFlag(
-        P4_GetGrammarRuleByName(grammar, "whitespace"),
+        P4_GetGrammarRule(grammar, "whitespace"),
         P4_FLAG_LIFTED | P4_FLAG_SPACED
     );
 

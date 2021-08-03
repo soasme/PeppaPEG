@@ -13,7 +13,7 @@
 #define ASSERT_EVAL_GRAMMAR(peg_rules, entry_name, source_code, parse_code, ast) do { \
     P4_Grammar*     grammar = P4_LoadGrammar((peg_rules)); \
     TEST_ASSERT_NOT_NULL_MESSAGE(grammar, "peg rule should be valid peg code."); \
-    P4_Expression*  entry = P4_GetGrammarRuleByName(grammar, (entry_name)); \
+    P4_Expression*  entry = P4_GetGrammarRule(grammar, (entry_name)); \
     TEST_ASSERT_NOT_NULL_MESSAGE(entry, "peg entry rule should created."); \
     P4_Source*      source  = P4_CreateSource((source_code), (entry_name)); \
     TEST_ASSERT_EQUAL_MESSAGE( \
@@ -27,7 +27,7 @@
     } \
     P4_Node*       ast_node = P4_GetSourceAst(source); \
     FILE *f = fopen("check.json","w"); \
-    P4_JsonifySourceAst(grammar, f, ast_node); \
+    P4_JsonifySourceAst(f, ast_node); \
     fclose(f); \
     P4_String s = read_file("check.json"); TEST_ASSERT_EQUAL_STRING((ast), s); free(s); \
     P4_DeleteSource(source); \
@@ -41,7 +41,7 @@
     if ((code) == P4_Ok) { \
         P4_Node* root = P4_GetSourceAst(source); \
         FILE *f = fopen("check.json","w"); \
-        P4_JsonifySourceAst(grammar, f, root); \
+        P4_JsonifySourceAst(f, root); \
         fclose(f); \
         P4_String s = read_file("check.json"); \
         TEST_ASSERT_EQUAL_STRING((output), s); \

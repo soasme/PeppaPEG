@@ -205,9 +205,9 @@ void test_name(void) {
     P4_Grammar* grammar = P4_CreateGrammar();
     TEST_ASSERT_NOT_NULL(grammar);
     TEST_ASSERT_EQUAL( P4_Ok, P4_AddLiteral(grammar, "r1", "A", false));
-    P4_Expression* expr = P4_GetGrammarRuleByName(grammar, "r1");
-    TEST_ASSERT_EQUAL( expr, P4_GetGrammarRuleByName(grammar, "r1"));
-    TEST_ASSERT_EQUAL( NULL, P4_GetGrammarRuleByName(grammar, "r0"));
+    P4_Expression* expr = P4_GetGrammarRule(grammar, "r1");
+    TEST_ASSERT_EQUAL( expr, P4_GetGrammarRule(grammar, "r1"));
+    TEST_ASSERT_EQUAL( NULL, P4_GetGrammarRule(grammar, "r0"));
 
     P4_DeleteGrammar(grammar);
 }

@@ -1884,8 +1884,8 @@ WARNING: NOT IMPLEMENTED. </p>
 </dl>
 </dd></dl>
 <dl class="c function">
-<dt class="sig sig-object c" id="c.P4_GetGrammarRuleByName">
-<span class="target" id="peppapeg_8h_1a8d6421c6ef85fc9040151797555bb6f5"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="n"><span class="pre">P4_Expression</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">P4_GetGrammarRuleByName</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="n"><span class="pre">P4_Grammar</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">grammar</span></span>, <a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a><span class="w"> </span><span class="n"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetGrammarRuleByName" title="Permalink to this definition">¶</a><br/></dt>
+<dt class="sig sig-object c" id="c.P4_GetGrammarRule">
+<span class="target" id="peppapeg_8h_1af796873cb353edca93f059c981aab3ba"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="n"><span class="pre">P4_Expression</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">P4_GetGrammarRule</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="n"><span class="pre">P4_Grammar</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">grammar</span></span>, <a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a><span class="w"> </span><span class="n"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_GetGrammarRule" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Get a grammar rule by its name.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2140,18 +2140,17 @@ You’re on your own now to manage the de-allocation of the source ast.</p>
 </dd></dl>
 <dl class="c function">
 <dt class="sig sig-object c" id="c.P4_JsonifySourceAst">
-<span class="target" id="peppapeg_8h_1a391fccc49c59e82398862f626c062864"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_JsonifySourceAst</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="n"><span class="pre">P4_Grammar</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">grammar</span></span>, <span class="n"><span class="pre">FILE</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">stream</span></span>, <a class="reference internal" href="#c.P4_Node" title="P4_Node"><span class="n"><span class="pre">P4_Node</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">node</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_JsonifySourceAst" title="Permalink to this definition">¶</a><br/></dt>
+<span class="target" id="peppapeg_8h_1a336834b8c596f4a7a7306656594187e2"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_JsonifySourceAst</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">FILE</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">stream</span></span>, <a class="reference internal" href="#c.P4_Node" title="P4_Node"><span class="n"><span class="pre">P4_Node</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">node</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_JsonifySourceAst" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Print the node tree. </p>
 <p>
 Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Node</span><span class="o">*</span> <span class="n">root</span> <span class="o">=</span> <span class="n">P4_GetSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
- <span class="n">P4_JsonifySourceAst</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">root</span><span class="p">);</span>
+ <span class="n">P4_JsonifySourceAst</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="n">root</span><span class="p">);</span>
 </pre></div>
 </div>
 </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>grammar</strong> – The grammar. </p></li>
 <li><p><strong>stream</strong> – The output stream. </p></li>
 <li><p><strong>node</strong> – The root node of source ast.</p></li>
 </ul>

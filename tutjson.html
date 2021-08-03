@@ -287,7 +287,7 @@
     <span class="n">P4_Source</span><span class="o">*</span> <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">P4_JSONEntry</span><span class="p">);</span>
     <span class="n">P4_Error</span> <span class="n">err</span> <span class="o">=</span> <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">);</span>
     <span class="n">P4_Token</span><span class="o">*</span> <span class="n">root</span> <span class="o">=</span> <span class="n">P4_GetSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
-    <span class="n">P4_JsonifySourceAst</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">root</span><span class="p">);</span>
+    <span class="n">P4_JsonifySourceAst</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="n">root</span><span class="p">);</span>
     <span class="n">P4_DeleteSource</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
     <span class="n">P4_DeleteGrammar</span><span class="p">(</span><span class="n">grammar</span><span class="p">);</span>
     <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>

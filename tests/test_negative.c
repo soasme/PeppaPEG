@@ -17,7 +17,7 @@ void test_match_negative_successfully(void) {
         P4_Ok,
         P4_AddSequence(grammar, "entry", 2)
     );
-    P4_Expression* entry = P4_GetGrammarRuleByName(grammar, "entry");
+    P4_Expression* entry = P4_GetGrammarRule(grammar, "entry");
     TEST_ASSERT_EQUAL(
         P4_Ok,
         P4_SetMember(entry, 0, P4_CreateNegative(P4_CreateLiteral("Hello", true)))
@@ -68,7 +68,7 @@ void test_match_negative_consumes_no_input(void) {
         P4_Ok,
         P4_AddSequence(grammar, "entry", 2)
     );
-    P4_Expression* entry = P4_GetGrammarRuleByName(grammar, "entry");
+    P4_Expression* entry = P4_GetGrammarRule(grammar, "entry");
     TEST_ASSERT_EQUAL(
         P4_Ok,
         P4_SetReferenceMember(entry, 0, "r1")
@@ -130,7 +130,7 @@ void test_match_negative_failed(void) {
         P4_Ok,
         P4_AddSequence(grammar, "entry", 2)
     );
-    P4_Expression* entry = P4_GetGrammarRuleByName(grammar, "entry");
+    P4_Expression* entry = P4_GetGrammarRule(grammar, "entry");
     TEST_ASSERT_EQUAL(
         P4_Ok,
         P4_SetMember(entry, 0, P4_CreateNegative(P4_CreateLiteral("Hello", true)))

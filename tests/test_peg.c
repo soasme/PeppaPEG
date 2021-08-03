@@ -13,7 +13,7 @@
 #define ASSERT_EVAL_GRAMMAR(peg_rules, entry_name, source_code, parse_code, ast) do { \
     P4_Grammar*     grammar = P4_LoadGrammar((peg_rules)); \
     TEST_ASSERT_NOT_NULL_MESSAGE(grammar, "peg rule should be valid peg code."); \
-    P4_Expression*  entry = P4_GetGrammarRuleByName(grammar, (entry_name)); \
+    P4_Expression*  entry = P4_GetGrammarRule(grammar, (entry_name)); \
     TEST_ASSERT_NOT_NULL_MESSAGE(entry, "peg entry rule should created."); \
     P4_Source*      source  = P4_CreateSource((source_code), (entry_name)); \
     TEST_ASSERT_EQUAL_MESSAGE( \

@@ -1866,7 +1866,7 @@ P4_GetReference(P4_Source* s, P4_Expression* e) {
         return e->ref_expr;
 
     if (e->reference != NULL) {
-        e->ref_expr = P4_GetGrammarRuleByName(s->grammar, e->reference);
+        e->ref_expr = P4_GetGrammarRule(s->grammar, e->reference);
     }
 
     return e->ref_expr;
@@ -1877,7 +1877,7 @@ P4_MatchReference(P4_Source* s, P4_Expression* e) {
     assert(NO_ERROR(s));
 
     if (e->ref_expr == NULL && e->reference != NULL) {
-        e->ref_expr = P4_GetGrammarRuleByName(s->grammar, e->reference);
+        e->ref_expr = P4_GetGrammarRule(s->grammar, e->reference);
     }
 
     if (e->ref_expr == NULL) {
@@ -2723,7 +2723,7 @@ P4_DeleteGrammar(P4_Grammar* grammar) {
 }
 
 P4_PUBLIC P4_Expression*
-P4_GetGrammarRuleByName(P4_Grammar* grammar, P4_String name) {
+P4_GetGrammarRule(P4_Grammar* grammar, P4_String name) {
     khint_t k = kh_get(rules, grammar->rules, name);
     bool is_missing = (k == kh_end(grammar->rules));
     return is_missing ? NULL : kh_val(grammar->rules, k);
@@ -2731,7 +2731,7 @@ P4_GetGrammarRuleByName(P4_Grammar* grammar, P4_String name) {
 
 P4_PUBLIC P4_Error
 P4_SetGrammarRuleFlag(P4_Grammar* grammar, P4_String name, P4_ExpressionFlag flag) {
-    P4_Expression* expr = P4_GetGrammarRuleByName(grammar, name);
+    P4_Expression* expr = P4_GetGrammarRule(grammar, name);
     if (expr == NULL)
         return P4_NameError;
 
@@ -2879,7 +2879,7 @@ P4_Parse(P4_Grammar* grammar, P4_Source* source) {
 
     source->grammar = grammar;
 
-    P4_Expression* expr     = P4_GetGrammarRuleByName(grammar, source->entry_name);
+    P4_Expression* expr     = P4_GetGrammarRule(grammar, source->entry_name);
     P4_Node*       tok      = P4_Match(source, expr);
 
     source->root            = tok;
@@ -3082,7 +3082,7 @@ P4_AddNegative(P4_Grammar* grammar, P4_String name, P4_Expression* ref_expr) {
 P4_PUBLIC P4_Error
 P4_AddSequence(P4_Grammar* grammar, P4_String name, size_t size) {
     P4_AddSomeGrammarRule(grammar, name, P4_CreateContainer(size));
-    P4_GetGrammarRuleByName(grammar, name)->kind = P4_Sequence;
+    P4_GetGrammarRule(grammar, name)->kind = P4_Sequence;
     return P4_Ok;
 }
 
@@ -3091,7 +3091,7 @@ P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_String name, size_t count, ...
     P4_AddSomeGrammarRule(grammar, name, P4_CreateSequence(count));
 
     size_t i = 0;
-    P4_Expression* expr = P4_GetGrammarRuleByName(grammar, name);
+    P4_Expression* expr = P4_GetGrammarRule(grammar, name);
 
     va_list members;
     va_start (members, count);
@@ -3111,7 +3111,7 @@ P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_String name, size_t count, ...
 P4_PUBLIC P4_Error
 P4_AddChoice(P4_Grammar* grammar, P4_String name, size_t size) {
     P4_AddSomeGrammarRule(grammar, name, P4_CreateContainer(size));
-    P4_GetGrammarRuleByName(grammar, name)->kind = P4_Choice;
+    P4_GetGrammarRule(grammar, name)->kind = P4_Choice;
     return P4_Ok;
 }
 
@@ -3119,7 +3119,7 @@ P4_PUBLIC P4_Error
 P4_AddChoiceWithMembers(P4_Grammar* grammar, P4_String name, size_t count, ...) {
     P4_AddSomeGrammarRule(grammar, name, P4_CreateChoice(count));
 
-    P4_Expression* expr = P4_GetGrammarRuleByName(grammar, name);
+    P4_Expression* expr = P4_GetGrammarRule(grammar, name);
     size_t i = 0;
 
     va_list members;
@@ -3535,7 +3535,7 @@ P4_ReplaceGrammarRule(P4_Grammar* grammar, P4_String name, P4_Expression* expr) 
         return P4_NullError;
 
     /* get the existing rule expr. */
-    P4_Expression* oldexpr = P4_GetGrammarRuleByName(grammar, name);
+    P4_Expression* oldexpr = P4_GetGrammarRule(grammar, name);
     if (oldexpr == NULL)
         return P4_NameError;
 
@@ -4313,7 +4313,7 @@ P4_PegEvalGrammarReferences(
          * raise an error if can't find a grammar rule for the reference. */
         case P4_Reference:
             if (!expr->reference ||
-                    !P4_GetGrammarRuleByName(grammar, expr->reference)) {
+                    !P4_GetGrammarRule(grammar, expr->reference)) {
                 err = P4_NameError;
                 P4_EvalRaise("reference %s is undefined", expr->reference);
             }

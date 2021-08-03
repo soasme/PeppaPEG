@@ -1298,7 +1298,7 @@ void           P4_DeleteGrammarRule(P4_Grammar* grammar, const P4_String name);
  *      P4_AddLiteral(grammar, "a", true);
  *      P4_Expression* expr = P4_GetGrammarRule(grammar, "a"); // The literal expression.
  */
-P4_Expression* P4_GetGrammarRuleByName(P4_Grammar* grammar, P4_String name);
+P4_Expression* P4_GetGrammarRule(P4_Grammar* grammar, P4_String name);
 
 /**
  * @brief       Set the flag of a grammar rule.

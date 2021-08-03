@@ -8,7 +8,7 @@
 #define ASSERT_CALC(source_code, parse_code, r) do { \
     P4_Grammar*     grammar = P4_CreateCalcGrammar(); \
     TEST_ASSERT_NOT_NULL_MESSAGE(grammar, "peg rule should be valid peg code."); \
-    P4_Expression*  entry = P4_GetGrammarRuleByName(grammar, "statement"); \
+    P4_Expression*  entry = P4_GetGrammarRule(grammar, "statement"); \
     TEST_ASSERT_NOT_NULL_MESSAGE(entry, "peg entry rule should created."); \
     P4_Source*      source  = P4_CreateSource((source_code), "statement"); \
     TEST_ASSERT_EQUAL_MESSAGE( \

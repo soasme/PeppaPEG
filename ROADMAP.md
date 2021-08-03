@@ -1,11 +1,11 @@
 # ROADMAP
 
+- [ ] api: @cut: https://news.ycombinator.com/item?id=20502032
 - [ ] api: operate slice (copy string, get size, etc).
 - [ ] api: set source verbose mode.
 - [ ] api: save backreference in source stack so it can be used outside a sequence.
 - [ ] api: except (any but).
 - [ ] api: until.
-- [ ] api: take a look at ohm.
 - [ ] api: Sanitize `\0` to whitespace for the source input, this happens in creating the source/setting the source size.
 - [ ] api: register a function for matching source. This should help dealing with some inputs difficult to parse.
 - [ ] api: support UTF-8 BOM sequence (0xEF 0xBB 0xBF) at the start of source.
@@ -25,12 +25,10 @@
 - [ ] perf: trace: add a tracer in P4_Source. When matching, annotate the tracer. An additional tool can aggregate data and output a DOT / compile to png.
 - [ ] perf: tracer: https://pegjs.org/documentation
       https://github.com/orlandohill/peg-left-recursion
-- [ ] binding: python: example: cffi, misaka, parsimonious (api). <https://tomassetti.me/parsing-in-python/>.
 - [ ] tests: benchmark: example: json-c. `valgrind --tool=massif --massif-out-file=massif.out ./build/tests/test_example_json && ms_print massif.out ms_print.out`.
 - [ ] tests: enable AddressSanitizer. Example: cJSON.
 - [ ] tests: add a fuzzy testing framework.
 - [ ] docs: read [A parsing machine for PEGs](http://www.inf.puc-rio.br/~roberto/docs/ry08-4.pdf).
-- [ ] docs: landing page for the project doc site.
 - [ ] docs: example: brainfuck https://en.wikipedia.org/wiki/Brainfuck
 - [ ] lang: python grammar.
 - [ ] lang: ES5 grammar: https://ohmlang.github.io/editor/#0a9a649c3c630fd0a470ba6cb75393fe
@@ -41,6 +39,7 @@
 - [ ] pratt parser: https://en.wikipedia.org/wiki/Operator-precedence_parser
 - [ ] build: static lib.
 - [ ] build: wasm. `docker run --rm -v $(pwd):/src -u $(id -u):$(id -g)   emscripten/emsdk emcc peppapeg.c -Os -s WASM=1 -s SIDE_MODULE=1 -o /src/peppapeg.wasm`.  https://gist.github.com/kripken/59c67556dc03bb6d57052fedef1e61ab https://github.com/mbasso/awesome-wasm
+- [x] docs: landing page for the project doc site.
 - [x] bug: eval grammar: when failed, should produce no grammar. Fixed in v1.13.0
 - [x] api: print error messages for Human. Added in v1.13.0.
 - [x] api: support comment in peg grammar. Added in v1.12.0.

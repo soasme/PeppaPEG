@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
 
     free(text);
 
-    P4_JsonifySourceAst(grammar, stdout, root);
+    P4_JsonifySourceAst(stdout, root);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

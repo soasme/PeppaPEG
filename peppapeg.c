@@ -2380,7 +2380,7 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
 }
 
 void
-P4_JsonifySourceAst(P4_Grammar* grammar, FILE* stream, P4_Node* node) {
+P4_JsonifySourceAst(FILE* stream, P4_Node* node) {
     P4_Node* tmp = node;
 
     fprintf(stream, "[");
@@ -2389,7 +2389,7 @@ P4_JsonifySourceAst(P4_Grammar* grammar, FILE* stream, P4_Node* node) {
         fprintf(stream, ",\"type\":\"%s\"", tmp->rule_name);
         if (tmp->head != NULL) {
             fprintf(stream, ",\"children\":");
-            P4_JsonifySourceAst(grammar, stream, tmp->head);
+            P4_JsonifySourceAst(stream, tmp->head);
         }
         fprintf(stream, "}");
         if (tmp->next != NULL) fprintf(stream, ",");

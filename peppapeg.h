@@ -1451,16 +1451,15 @@ size_t          P4_GetSourcePosition(P4_Source* source);
 
 /**
  * @brief       Print the node tree.
- * @param       grammar     The grammar.
  * @param       stream      The output stream.
  * @param       node       The root node of source ast.
  *
  * Example:
  *
  *      P4_Node* root = P4_GetSourceAst(source);
- *      P4_JsonifySourceAst(grammar, stdout, root);
+ *      P4_JsonifySourceAst(stdout, root);
  */
-void           P4_JsonifySourceAst(P4_Grammar* grammar, FILE* stream, P4_Node* node);
+void           P4_JsonifySourceAst(FILE* stream, P4_Node* node);
 
 /**
  * @brief       Inspect the node tree.

@@ -2880,7 +2880,7 @@ P4_Parse(P4_Grammar* grammar, P4_Source* source) {
     source->grammar = grammar;
 
     P4_Expression* expr     = P4_GetGrammarRuleByName(grammar, source->entry_name);
-    P4_Node*      tok      = P4_Match(source, expr);
+    P4_Node*       tok      = P4_Match(source, expr);
 
     source->root            = tok;
 
@@ -2907,32 +2907,19 @@ P4_GetError(P4_Source* source) {
 P4_String
 P4_GetErrorString(P4_Error err) {
     switch (err) {
-        case P4_Ok:
-            return "";
-        case P4_InternalError:
-            return "InternalError";
-        case P4_MatchError:
-            return "MatchError";
-        case P4_NameError:
-            return "NameError";
-        case P4_AdvanceError:
-            return "AdvanceError";
-        case P4_MemoryError:
-            return "MemoryError";
-        case P4_ValueError:
-            return "ValueError";
-        case P4_IndexError:
-            return "IndexError";
-        case P4_KeyError:
-            return "KeyError";
-        case P4_NullError:
-            return "NullError";
-        case P4_StackError:
-            return "StackError";
-        case P4_PegError:
-            return "PegError";
-        default:
-            return "UnknownError";
+        case P4_Ok: return "";
+        case P4_InternalError: return "InternalError";
+        case P4_MatchError: return "MatchError";
+        case P4_NameError: return "NameError";
+        case P4_AdvanceError: return "AdvanceError";
+        case P4_MemoryError: return "MemoryError";
+        case P4_ValueError: return "ValueError";
+        case P4_IndexError: return "IndexError";
+        case P4_KeyError: return "KeyError";
+        case P4_NullError: return "NullError";
+        case P4_StackError: return "StackError";
+        case P4_PegError: return "PegError";
+        default: return "UnknownError";
     }
 }
 
@@ -3175,6 +3162,8 @@ P4_SetMember(P4_Expression* expr, size_t offset, P4_Expression* member) {
 
 P4_PUBLIC P4_Error
 P4_SetReferenceMember(P4_Expression* expr, size_t offset, P4_String ref) {
+    /* this functions allows adding a member which is simply a reference. */
+
     P4_Expression* ref_expr = NULL;
     catch_oom(ref_expr = P4_CreateReference(ref));
 
@@ -3380,18 +3369,19 @@ P4_GetNodeSlice(P4_Node* node) {
 
 P4_PUBLIC size_t
 P4_GetNodeChildrenCount(P4_Node* node) {
-    P4_Node* child = node->head;
-
-    size_t    child_count = 0;
-    while (child != NULL) {
-        child_count++; child = child->next;
-    }
-
-    return child_count;
+    P4_Node* child = NULL;
+    size_t   count = 0;
+    P4_EachChild(node, child, {
+        count++;
+    });
+    return count;
 }
 
 P4_PRIVATE(P4_String)
 P4_CopySliceString(P4_String s, P4_Slice* slice) {
+    /* return the string covered by the slice.
+     * note that caller should free the copied string. */
+
     size_t    len = P4_GetSliceSize(slice);
     assert(len >= 0);
 
@@ -3510,67 +3500,77 @@ P4_RefreshReference(P4_Expression* expr, P4_String name) {
     P4_Error err = P4_Ok;
 
     switch(expr->kind) {
+        /* clean up reference->ref_expr. */
         case P4_Reference:
             if (strcmp(expr->reference, name) == 0)
                 expr->ref_expr = NULL;
             break;
+
+        /* recursively refresh references. */
         case P4_Positive:
         case P4_Negative:
-            err = P4_RefreshReference(expr->ref_expr, name);
+            catch_err(P4_RefreshReference(expr->ref_expr, name));
             break;
         case P4_Sequence:
         case P4_Choice:
             for (i = 0; i < expr->count; i++) {
-                err = P4_RefreshReference(expr->members[i], name);
-                if (err != P4_Ok)
-                    break;
+                catch_err(P4_RefreshReference(expr->members[i], name));
             }
             break;
         case P4_Repeat:
-            err = P4_RefreshReference(expr->repeat_expr, name);
+            catch_err(P4_RefreshReference(expr->repeat_expr, name));
             break;
         default:
             break;
     }
 
+finalize:
     return err;
 }
 
 P4_PUBLIC P4_Error
 P4_ReplaceGrammarRule(P4_Grammar* grammar, P4_String name, P4_Expression* expr) {
+    /* ensure inputs are valid. */
     if (grammar == NULL || name == NULL || expr == NULL)
         return P4_NullError;
 
+    /* get the existing rule expr. */
     P4_Expression* oldexpr = P4_GetGrammarRuleByName(grammar, name);
     if (oldexpr == NULL)
         return P4_NameError;
 
     P4_Error err = P4_Ok;
 
+    /* delete rule expr from grammar rules. */
     khint_t k = kh_get(rules, grammar->rules, name);
     kh_del(rules, grammar->rules, k);
     P4_DeleteExpression(oldexpr);
 
+    /* set the new rule expr name. */
+    ASSERT(expr->name == NULL, "expr name should not set by P4_ReplaceGrammarRule().");
     expr->name = STRDUP(name);
 
+    /* ensure references in all rule expressions are refreshed
+     * so they can pick up the new rule expr. */
     P4_Expression* rule;
     kh_foreach_value(grammar->rules, rule, {
-        if (strcmp(rule->name, name) != 0) {
-            err = P4_RefreshReference(rule, name);
-
-            if (err != P4_Ok)
-                return err;
-        }
+        if (strcmp(rule->name, name) != 0)
+            catch_err(P4_RefreshReference(rule, name))
     });
 
+    /* put rule expr to grammar rules. */
     int kret;
     k = kh_put(rules, grammar->rules, name, &kret);
     kh_value(grammar->rules, k) = expr;
 
-    return P4_Ok;
+finalize:
+    return err;
 }
 
 P4_Grammar* P4_CreatePegGrammar () {
+    /* build bootstrap peg grammar using low-level api.
+     * the bootstrap peg grammar is used to parse grammar from user input. */
+
     P4_Error    err     = P4_Ok;
     P4_Grammar* grammar = P4_CreateGrammar();
 

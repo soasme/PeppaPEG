@@ -2335,55 +2335,46 @@ P4_MatchSpacedExpressions(P4_Source* s, P4_Expression* e) {
 
 P4_PRIVATE(P4_Node*)
 P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Expression* backref) {
-    if (backrefs == NULL) {
-        P4_MatchRaise(s, P4_NullError, "");
-        return NULL;
-    }
+    ASSERT(backrefs != NULL, "backrefs should not be null");
 
     size_t index = backref->backref_index;
 
-    if (index > e->count) {
-        P4_MatchRaise(s, P4_IndexError, "BackReference Index OutOfBound");
+    if (index > e->count || index < 0) {
+        P4_MatchRaisef(s, P4_IndexError,
+            "expect %s (backref out of bound)", P4_PeekFrame(s)->expr->name);
         return NULL;
     }
 
     P4_Slice* slice = &(backrefs[index]);
-    if (slice == NULL) {
-        P4_MatchRaise(s, P4_IndexError, "BackReference Index OutOfBound");
-        return NULL;
-    }
+    /* backrefs is allocated as an array so it shouldn't be null. */
+    ASSERT(slice != NULL, "backref should not be null");
 
-    autofree P4_String litstr = P4_CopySliceString(s->content, slice);
-
-    if (litstr == NULL)
-        panic("failed to create string: out of memory");
+    autofree P4_String litstr = NULL;
+    catch_oom(litstr = P4_CopySliceString(s->content, slice));
 
     P4_Expression* backref_expr = e->members[index];
 
     if (backref_expr == NULL) {
-        P4_MatchRaise(s, P4_NullError, "Member NULL");
+        P4_MatchRaisef(s, P4_PegError, "expect %s (null backref expr)", P4_PeekFrame(s)->expr->name);
         return NULL;
     }
 
-    P4_Expression* litexpr = P4_CreateLiteral(litstr, backref->sensitive);
+    P4_Expression* litexpr = NULL;
+    catch_oom(litexpr = P4_CreateLiteral(litstr, backref->sensitive));
 
-    if (litexpr == NULL)
-        panic("failed to create expression: out of memory");
-
-    if (backref_expr->kind == P4_Reference) {
-        litexpr->name = STRDUP(backref_expr->ref_expr->name);
-    } else {
-        litexpr->name = STRDUP(backref_expr->name);
+# define set_literal_rule_name(n, bref) \
+    if ((bref)->kind == P4_Reference) {\
+        (n) = STRDUP((bref)->ref_expr->name); \
+    } else {\
+        (n) = STRDUP((bref)->name); \
     }
+
+    set_literal_rule_name(litexpr->name, backref_expr);
 
     P4_Node* tok = P4_MatchLiteral(s, litexpr);
 
     if (tok != NULL) {
-        if (backref_expr->kind == P4_Reference) { /* TODO: other cases? */
-            tok->rule_name = backref_expr->ref_expr->name;
-        } else {
-            tok->rule_name = backref_expr->name;
-        }
+        set_literal_rule_name(tok->rule_name, backref_expr);
     }
 
     P4_DeleteExpression(litexpr);

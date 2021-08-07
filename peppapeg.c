@@ -642,18 +642,12 @@ P4_PRIVATE(P4_String)           P4_RemainingText(P4_Source*);
 
 P4_PRIVATE(bool)                P4_NeedLift(P4_Source*, P4_Expression*);
 
-# define P4_MatchRaise(s,e,m) \
-    do { \
-        (s)->err = (e); \
-        memset((s)->errmsg, 0, sizeof((s)->errmsg)); \
-        sprintf((s)->errmsg, "%s", (m)); \
-    } while (0);
-
 # define P4_MatchRaisef(s,e,m,...) \
     do { \
         (s)->err = (e); \
         memset((s)->errmsg, 0, sizeof((s)->errmsg)); \
-        sprintf((s)->errmsg, (m), __VA_ARGS__); \
+        sprintf((s)->errmsg, m ", line %zu:%zu (char %zu)", \
+                __VA_ARGS__, (s)->lineno, (s)->offset, (s)->pos); \
     } while (0);
 
 P4_PRIVATE(void)                P4_RescueError(P4_Source*);
@@ -1790,9 +1784,8 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
     P4_ReadRune(e->literal, rune);
 
     if (IS_END(s)) {
-        P4_MatchRaisef(s, P4_MatchError, "expect %s (char '%s'), line %zu:%zu (char %zu)",
-                s->frame_stack->expr->name,
-                (char*)rune, startpos->lineno, startpos->offset, startpos->pos);
+        P4_MatchRaisef(s, P4_MatchError, "expect %s (char '%s')",
+                P4_PeekFrame(s)->expr->name, (char*)rune);
         return NULL;
     }
 
@@ -1800,9 +1793,8 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
 
     if ((!e->sensitive && P4_CaseCmpInsensitive(e->literal, str, len) != 0)
             || (e->sensitive && memcmp(e->literal, str, len) != 0)) {
-        P4_MatchRaisef(s, P4_MatchError, "expect %s (char '%s'), line %zu:%zu (char %zu)",
-                s->frame_stack->expr->name,
-                (char*)rune, startpos->lineno, startpos->offset, startpos->pos);
+        P4_MatchRaisef(s, P4_MatchError, "expect %s (char '%s')",
+                P4_PeekFrame(s)->expr->name, (char*)rune);
         return NULL;
     }
 
@@ -1825,8 +1817,7 @@ P4_MatchRange(P4_Source* s, P4_Expression* e) {
 
     P4_String str = P4_RemainingText(s);
     if (IS_END(s)) {
-        P4_MatchRaisef(s, P4_MatchError, "expect %s, line %zu:%zu (char %zu)",
-            e->name?e->name:s->frame_stack->expr->name, s->lineno, s->offset, s->pos);
+        P4_MatchRaisef(s, P4_MatchError, "expect %s", P4_PeekFrame(s)->expr->name);
         return NULL;
     }
 
@@ -1847,8 +1838,7 @@ P4_MatchRange(P4_Source* s, P4_Expression* e) {
     }
 
     if (!found) {
-        P4_MatchRaisef(s, P4_MatchError, "expect %s, line %zu:%zu (char %zu)",
-            e->name?e->name:s->frame_stack->expr->name, s->lineno, s->offset, s->pos);
+        P4_MatchRaisef(s, P4_MatchError, "expect %s", P4_PeekFrame(s)->expr->name);
         return NULL;
     }
 
@@ -1886,7 +1876,7 @@ P4_MatchReference(P4_Source* s, P4_Expression* e) {
     }
 
     if (e->ref_expr == NULL) {
-        P4_MatchRaise(s, P4_NameError, "");
+        P4_MatchRaisef(s, P4_NameError, "expect %s", e->reference);
         return NULL;
     }
 
@@ -2005,8 +1995,7 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
                 P4_SetPosition(s, startpos);
             /* fail when the last one is a no-match. */
             } else {
-                P4_MatchRaisef(s, P4_MatchError, "expect %s, line %zu:%zu (char %zu)",
-                    e->name?e->name:s->frame_stack->expr->name, s->lineno, s->offset, s->pos);
+                P4_MatchRaisef(s, P4_MatchError, "expect %s", P4_PeekFrame(s)->expr->name);
                 goto finalize;
             }
         }
@@ -2055,7 +2044,8 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     if (IS_PROGRESSING(e->repeat_expr->kind) ||
             (IS_REF(e->repeat_expr)
              && IS_PROGRESSING(P4_GetReference(s, e->repeat_expr)->kind))) {
-        P4_MatchRaise(s, P4_AdvanceError, "no progressing in repetition");
+        P4_MatchRaisef(s, P4_AdvanceError,
+            "expect %s (no progressing in repetition)", P4_PeekFrame(s)->expr->name);
         return NULL;
     }
 
@@ -2092,8 +2082,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
             }
 
             if (min != SIZE_MAX && repeated < min) {
-                P4_MatchRaisef(s, P4_MatchError, "expect %s, line %zu:%zu (char %zu)",
-                    e->name?e->name:s->frame_stack->expr->name, s->lineno, s->offset, s->pos);
+                P4_MatchRaisef(s, P4_MatchError, "expect %s", P4_PeekFrame(s)->expr->name);
                 goto finalize;
             } else {                       /* sufficient repetitions. */
                 P4_RescueError(s);
@@ -2106,8 +2095,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
 
         if (P4_GetPosition(s) == whitespace_startpos->pos) {
             P4_MatchRaisef(s, P4_MatchError,
-                    "expect %s (repetition not advancing), line %zu:%zu (char %zu)",
-                    e->name?e->name:s->frame_stack->expr->name, s->lineno, s->offset, s->pos);
+                    "expect %s (repetition not advancing)", P4_PeekFrame(s)->expr->name);
             goto finalize;
         }
 
@@ -2127,15 +2115,15 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     /* fails when attempts are excessive, e.g. repeated > max. */
     if (max != SIZE_MAX && repeated > max) {
         P4_MatchRaisef(s, P4_MatchError,
-            "expect %s (at most %zu repetitions), line %zu:%zu (char %zu)",
-            e->name?e->name:s->frame_stack->expr->name, max, s->lineno, s->offset, s->pos);
+            "expect %s (at most %zu repetitions)",
+            P4_PeekFrame(s)->expr->name, max);
         goto finalize;
     }
 
     if (min != SIZE_MAX && repeated < min) {
         P4_MatchRaisef(s, P4_MatchError,
-            "expect %s (at least %zu repetitions), line %zu:%zu (char %zu)",
-            e->name?e->name:s->frame_stack->expr->name, min, s->lineno, s->offset, s->pos);
+            "expect %s (at least %zu repetitions)",
+            P4_PeekFrame(s)->expr->name, min);
         goto finalize;
     }
 
@@ -2190,8 +2178,7 @@ P4_MatchNegative(P4_Source* s, P4_Expression* e) {
 
     if (NO_ERROR(s)) {
         P4_DeleteNode(node);
-        P4_MatchRaisef(s, P4_MatchError, "expect %s, line %zu:%zu (char %zu)",
-            e->name?e->name:s->frame_stack->expr->name, startpos->lineno, startpos->offset, startpos->pos);
+        P4_MatchRaisef(s, P4_MatchError, "expect %s", P4_PeekFrame(s)->expr->name);
     } else if (s->err == P4_MatchError || s->err == P4_CutError) {
         P4_RescueError(s);
     }
@@ -2269,7 +2256,7 @@ P4_Match(P4_Source* s, P4_Expression* e) {
     P4_Node* result = NULL;
 
     if (IS_RULE(e) && (err = P4_PushFrame(s, e)) != P4_Ok) {
-        P4_MatchRaise(s, err, "failed to push frame");
+        P4_MatchRaisef(s, err, "expect %s (max recursion)", e->name);
         goto finalize;
     }
 
@@ -2279,27 +2266,20 @@ P4_Match(P4_Source* s, P4_Expression* e) {
         s->err = P4_CutError;
     }
 
-    if (IS_RULE(e) && (err = P4_PopFrame(s, NULL)) != P4_Ok) {
-        P4_MatchRaise(s, err, "failed to pop frame");
-        P4_DeleteNode(result);
-        goto finalize;
+    if (IS_RULE(e)) {
+        P4_PopFrame(s, NULL);
     }
 
     if (s->err != P4_Ok) {
         P4_DeleteNode(result);
         if (e->name != NULL && s->errmsg[0] == 0) {
-            size_t len = strlen(e->name);
-            P4_String errmsg = P4_MALLOC(sizeof(char) * (len+8));
-            memset(errmsg, 0, len);
-            sprintf(errmsg, "expect %s", e->name);
-            P4_MatchRaise(s, s->err, errmsg);
-            P4_FREE(errmsg);
+            P4_MatchRaisef(s, s->err, "expect %s", e->name);
         }
         goto finalize;
     }
 
     if (s->grammar->on_match && (err = (s->grammar->on_match)(s->grammar, e, result)) != P4_Ok) {
-        P4_MatchRaise(s, err, "failed to run match callback.");
+        P4_MatchRaisef(s, s->err, "expect %s (match callback failed)", e->name);
         P4_DeleteNode(result);
         goto finalize;
     }
@@ -2308,7 +2288,7 @@ P4_Match(P4_Source* s, P4_Expression* e) {
 
 finalize:
     if (s->grammar->on_error && (err = (s->grammar->on_error)(s->grammar, e)) != P4_Ok) {
-        P4_MatchRaise(s, err, "failed to run error callback.");
+        P4_MatchRaisef(s, s->err, "expect %s (error callback failed)", e->name);
     }
     return NULL;
 }
@@ -2342,55 +2322,47 @@ P4_MatchSpacedExpressions(P4_Source* s, P4_Expression* e) {
 
 P4_PRIVATE(P4_Node*)
 P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Expression* backref) {
-    if (backrefs == NULL) {
-        P4_MatchRaise(s, P4_NullError, "");
-        return NULL;
-    }
+    ASSERT(backrefs != NULL, "backrefs should not be null");
 
     size_t index = backref->backref_index;
 
-    if (index > e->count) {
-        P4_MatchRaise(s, P4_IndexError, "BackReference Index OutOfBound");
+    if (index > e->count || index < 0) {
+        P4_MatchRaisef(s, P4_IndexError,
+            "expect %s (backref out of bound)", P4_PeekFrame(s)->expr->name);
         return NULL;
     }
 
     P4_Slice* slice = &(backrefs[index]);
-    if (slice == NULL) {
-        P4_MatchRaise(s, P4_IndexError, "BackReference Index OutOfBound");
-        return NULL;
-    }
+    /* backrefs is allocated as an array so it shouldn't be null. */
+    ASSERT(slice != NULL, "backref should not be null");
 
-    autofree P4_String litstr = P4_CopySliceString(s->content, slice);
-
-    if (litstr == NULL)
-        panic("failed to create string: out of memory");
+    autofree P4_String litstr = NULL;
+    catch_oom(litstr = P4_CopySliceString(s->content, slice));
 
     P4_Expression* backref_expr = e->members[index];
 
     if (backref_expr == NULL) {
-        P4_MatchRaise(s, P4_NullError, "Member NULL");
+        P4_MatchRaisef(s, P4_PegError, "expect %s (null backref expr)", P4_PeekFrame(s)->expr->name);
         return NULL;
     }
 
-    P4_Expression* litexpr = P4_CreateLiteral(litstr, backref->sensitive);
+    P4_Expression* litexpr = NULL;
+    catch_oom(litexpr = P4_CreateLiteral(litstr, backref->sensitive));
 
-    if (litexpr == NULL)
-        panic("failed to create expression: out of memory");
-
-    if (backref_expr->kind == P4_Reference) {
-        litexpr->name = STRDUP(backref_expr->ref_expr->name);
-    } else {
-        litexpr->name = STRDUP(backref_expr->name);
+# define NO_OP
+# define set_literal_rule_name(n, bref, op) \
+    if ((bref)->kind == P4_Reference) {\
+        (n) = op((bref)->ref_expr->name); \
+    } else {\
+        (n) = op((bref)->name); \
     }
+
+    set_literal_rule_name(litexpr->name, backref_expr, STRDUP);
 
     P4_Node* tok = P4_MatchLiteral(s, litexpr);
 
     if (tok != NULL) {
-        if (backref_expr->kind == P4_Reference) { /* TODO: other cases? */
-            tok->rule_name = backref_expr->ref_expr->name;
-        } else {
-            tok->rule_name = backref_expr->name;
-        }
+        set_literal_rule_name(tok->rule_name, backref_expr, NO_OP);
     }
 
     P4_DeleteExpression(litexpr);

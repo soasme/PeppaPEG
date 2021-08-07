@@ -189,6 +189,8 @@ typedef enum {
      * OnceOrMore, ZeroOrMore, ZeroOrOnce.
      */
     P4_Repeat,
+    /** Rule: Cut. */
+    P4_Cut,
 } P4_ExpressionKind;
 
 /**
@@ -221,6 +223,8 @@ typedef enum {
     P4_StackError           = 10,
     /** When the given value is not valid peg grammar. */
     P4_PegError             = 11,
+    /** When the failure occurs after a @cut operator. */
+    P4_CutError             = 12,
 } P4_Error;
 
 /*
@@ -644,6 +648,14 @@ P4_Expression* P4_CreateNegative(P4_Expression* expr);
  *      P4_AddNegative(grammar, "R1", P4_CreateLiteral("let", true));
  */
 P4_Error       P4_AddNegative(P4_Grammar* grammar, P4_String name, P4_Expression* refexpr);
+
+/**
+ * Create a P4_Cut expression.
+ *
+ * @return  A P4_Expression.
+ *
+ */
+P4_Expression* P4_CreateCut();
 
 /**
  * Create a P4_Sequence expression.

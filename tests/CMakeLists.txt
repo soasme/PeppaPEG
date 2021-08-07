@@ -13,6 +13,7 @@ set(
     test_negative
     test_repeat
     test_flags
+    test_cut
     test_back_reference
     test_misc
     test_peg

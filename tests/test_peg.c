@@ -394,6 +394,109 @@ void test_eval_negative(void) {
     ASSERT_EVAL_GRAMMAR("R1 = !\"b\" [a-f];", "R1", "b", P4_MatchError, "expect R1, line 1:1 (char 0)");
 }
 
+void test_eval_cut(void) {
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = R2 / R3;\n"
+        "R2 = \"[\" @cut \"]\";\n"
+        "R3 = \"null\";\n",
+        "R1", "[]", P4_Ok,
+        "[{\"slice\":[0,2],\"type\":\"R1\",\"children\":[{\"slice\":[0,2],\"type\":\"R2\"}]}]"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = R2 / R3;\n"
+        "R2 = \"[\" @cut \"]\";\n"
+        "R3 = \"null\";\n",
+        "R1", "null", P4_Ok,
+        "[{\"slice\":[0,4],\"type\":\"R1\",\"children\":[{\"slice\":[0,4],\"type\":\"R3\"}]}]"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = R2 / R3;\n"
+        "R2 = \"[\" @cut \"]\";\n"
+        "R3 = \"null\";\n",
+        "R1", "[", P4_CutError, "expect R2 (char ']'), line 1:2 (char 1)"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = R2 / R3;\n"
+        "R2 = \"[\" @cut \"]\";\n"
+        "R3 = \"null\";\n",
+        "R1", "1", P4_MatchError, "expect R1, line 1:1 (char 0)"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = R2 / R3;\n"
+        "R2 = \"[\" @cut \"]\";\n"
+        "R3 = \"null\";\n",
+        "R1", "[null]", P4_CutError, "expect R2 (char ']'), line 1:2 (char 1)"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = R2 / R3;\n"
+        "R2 = \"[\" @cut R3 \"]\";\n"
+        "R3 = \"null\";\n",
+        "R1", "[null", P4_CutError, "expect R2 (char ']'), line 1:6 (char 5)"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = R2 / R3;\n"
+        "R2 = \"[\" @cut R08 \"]\";\n"
+        "R3 = \"null\";\n"
+        "R08 = [0-8];\n",
+        "R1", "[9", P4_CutError, "expect R08, line 1:2 (char 1)"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = R2 / R3;\n"
+        "R2 = \"[\" @cut R08 \"]\";\n"
+        "R3 = \"null\";\n"
+        "R08 = [0-8];\n",
+        "R1", "[8", P4_CutError, "expect R2 (char ']'), line 1:3 (char 2)"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = R2 / R3;\n"
+        "R2 = \"[\" @cut R08 \"]\";\n"
+        "R3 = \"null\";\n"
+        "R08 = [0-8];\n",
+        "R1", "[8]", P4_Ok,
+        "[{\"slice\":[0,3],\"type\":\"R1\",\"children\":[{\"slice\":[0,3],\"type\":\"R2\",\"children\":[{\"slice\":[1,2],\"type\":\"R08\"}]}]}]"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = R2 / R3;\n"
+        "R2 = \"[\" @cut [0-8] \"]\";\n"
+        "R3 = \"null\";\n",
+        "R1", "[9", P4_CutError, "expect R2, line 1:2 (char 1)"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = \"[\" @cut \"]\" / \"null\";\n",
+        "R1", "[", P4_CutError, "expect R1 (char ']'), line 1:2 (char 1)"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = R2*;"
+        "R2 = \"1\" @cut \"2\";",
+        "R1", "121", P4_CutError, "expect R2 (char '2'), line 1:4 (char 3)"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = R2*;"
+        "R2 = \"1\" @cut \"2\";",
+        "R1", "121", P4_CutError, "expect R2 (char '2'), line 1:4 (char 3)"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = R2*;"
+        "R2 = R12 / R21;"
+        "R12 = \"1\" @cut \"2\";"
+        "R21 = \"2\" @cut \"1\";",
+        "R1", "122", P4_CutError, "expect R21 (char '1'), line 1:4 (char 3)"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = \"[\" !R21 [0-9]+ \"]\";"
+        "R21 = \"2\" @cut \"1\";",
+        "R1", "[2]", P4_Ok,
+        "[{\"slice\":[0,3],\"type\":\"R1\"}]"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = \"[\" R1_Inner \"]\";"
+        "R1_Inner = !R21 [0-9]+;"
+        "R21 = \"2\" @cut \"1\";",
+        "R1", "[21]", P4_MatchError,
+        "expect R1_Inner, line 1:2 (char 1)"
+    );
+}
+
 void test_eval_repeat(void) {
     ASSERT_EVAL_GRAMMAR("R1 = (\"\\n\" / \"\\r\")+;", "R1", "\r\n\r\n", P4_Ok, "[{\"slice\":[0,4],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "1A9F", P4_Ok, "[{\"slice\":[0,4],\"type\":\"R1\"}]");
@@ -986,6 +1089,7 @@ int main(void) {
     RUN_TEST(test_eval_choice);
     RUN_TEST(test_eval_positive);
     RUN_TEST(test_eval_negative);
+    RUN_TEST(test_eval_cut);
     RUN_TEST(test_eval_repeat);
     RUN_TEST(test_eval_reference);
     RUN_TEST(test_eval_dot);

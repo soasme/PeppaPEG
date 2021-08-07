@@ -427,6 +427,8 @@ struct P4_Frame {
     bool            space;
     /** Whether silencing is applicable to frame & frame dependents. */
     bool            silent;
+    /** Whether cut is enabled to frame. */
+    bool            cut;
     /** The next frame in the stack. */
     P4_Frame*       next;
 };
@@ -2528,6 +2530,15 @@ P4_CreateNegative(P4_Expression* refexpr) {
     return expr;
 }
 
+P4_PUBLIC P4_Expression*
+P4_CreateCut() {
+    P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
+    expr->kind = P4_Cut;
+    expr->flag = 0;
+    expr->name = NULL;
+    return expr;
+}
+
 P4_PRIVATE(P4_Expression*)
 P4_CreateContainer(size_t count) {
     if (count == 0)
@@ -3754,6 +3765,7 @@ P4_Grammar* P4_CreatePegGrammar () {
     catch_err(P4_SetGrammarRuleFlag(grammar, "repeat", P4_FLAG_NON_TERMINAL));
 
     catch_err(P4_AddLiteral(grammar, "dot", ".", true));
+    catch_err(P4_AddLiteral(grammar, "cut", "@cut", true));
 
     catch_err(P4_AddChoiceWithMembers(grammar, "primary", 8,
         P4_CreateReference("literal"),
@@ -4222,6 +4234,12 @@ P4_PegEvalDot(P4_Node* node, P4_Result* result) {
 }
 
 P4_PRIVATE(P4_Error)
+P4_PegEvalCut(P4_Node* node, P4_Result* result) {
+    catch_oom(result->expr = P4_CreateCut());
+    return P4_Ok;
+}
+
+P4_PRIVATE(P4_Error)
 P4_PegEvalRuleName(P4_Node* node, P4_String* result) {
     /* get the rule name string length. */
     size_t len = P4_GetSliceSize(&node->slice);
@@ -4405,6 +4423,9 @@ P4_PegEvalExpression(P4_Node* node, P4_Result* result) {
 
     if (strcmp(node->rule_name, "dot")          == 0)
         return P4_PegEvalDot(node, result);
+
+    if (strcmp(node->rule_name, "cut")          == 0)
+        return P4_PegEvalCut(node, result);
 
     if (strcmp(node->rule_name, "reference")    == 0)
         return P4_PegEvalReference(node, result);

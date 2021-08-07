@@ -376,6 +376,30 @@ If any one of the attempts succeeds, the match succeeds. If all attempts fail, t
 </pre></div>
 </div>
 </section>
+<section id="cut">
+<h2>Cut<a class="headerlink" href="#cut" title="Permalink to this headline">¶</a></h2>
+<p>Cut is a decorator written as “@cut”. It always succeeds, but cannot be backtracked.
+It’s used to prevent unwanted backtracking, e.g. to prevent excessive choice options.</p>
+<p>Backtracking means if e1 in <cite>rule = e1 / e2;</cite> fails, the parser returns the last position where e1 started, and tries e2.
+If there is a <cite>@cut</cite> in e1, any failure after the cutting point will cause rule failed immediately.
+Cut ensures the parse sticks to the current rule, even if it fails to parse.
+See ideas [1](<a class="reference external" href="http://ceur-ws.org/Vol-1269/paper232.pdf">http://ceur-ws.org/Vol-1269/paper232.pdf</a>), [2](<a class="reference external" href="https://news.ycombinator.com/item?id=20503245">https://news.ycombinator.com/item?id=20503245</a>).</p>
+<p>For example, considering the grammar below first,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">value</span> <span class="o">=</span> <span class="n">array</span> <span class="o">/</span> <span class="n">null</span><span class="p">;</span>
+<span class="n">array</span> <span class="o">=</span> <span class="s2">"["</span> <span class="s2">"]"</span><span class="p">;</span>
+<span class="n">null</span>  <span class="o">=</span> <span class="s2">"null"</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Given input “[”, it attempts matching array first. After failed, it will try null next. At last, value match is failed.</p>
+<p>Let’s add a cut operator:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">value</span> <span class="o">=</span> <span class="n">array</span> <span class="o">/</span> <span class="n">null</span><span class="p">;</span>
+<span class="n">array</span> <span class="o">=</span> <span class="s2">"["</span> <span class="nd">@cut</span> <span class="s2">"]"</span><span class="p">;</span>
+<span class="n">null</span>  <span class="o">=</span> <span class="s2">"null"</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Given input “[”, it attempts matching array first. After failed, value match is failed immediately.</p>
+<p>Given input “null”, it attempts matching array first. It fails before <cite>@cut</cite> and then failed matching array. Parser then match “null” successfully.</p>
+</section>
 <section id="comment">
 <h2>Comment<a class="headerlink" href="#comment" title="Permalink to this headline">¶</a></h2>
 <p>Comment are any characters followed by a # (included) in a line.</p>
@@ -592,28 +616,31 @@ number = [0-9];
 <tr class="row-odd"><td><p><cite>!foo</cite></p></td>
 <td><p>negative</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>foo*</cite></p></td>
+<tr class="row-even"><td><p><cite>@cut</cite></p></td>
+<td><p>prevent unwanted backtracking</p></td>
+</tr>
+<tr class="row-odd"><td><p><cite>foo*</cite></p></td>
 <td><p>zero or more</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>foo+</cite></p></td>
+<tr class="row-even"><td><p><cite>foo+</cite></p></td>
 <td><p>once or more</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>foo?</cite></p></td>
+<tr class="row-odd"><td><p><cite>foo?</cite></p></td>
 <td><p>optional</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>foo{m,}</cite></p></td>
+<tr class="row-even"><td><p><cite>foo{m,}</cite></p></td>
 <td><p>repeat at least m times</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>foo{,n}</cite></p></td>
+<tr class="row-odd"><td><p><cite>foo{,n}</cite></p></td>
 <td><p>repeat at most n times</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>foo{m,n}</cite></p></td>
+<tr class="row-even"><td><p><cite>foo{m,n}</cite></p></td>
 <td><p>repeat between m-n times</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>foo{m}</cite></p></td>
+<tr class="row-odd"><td><p><cite>foo{m}</cite></p></td>
 <td><p>repeat exact n times</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite># IGNORE</cite></p></td>
+<tr class="row-even"><td><p><cite># IGNORE</cite></p></td>
 <td><p>comment</p></td>
 </tr>
 </tbody>
@@ -686,6 +713,7 @@ number = [0-9];
 <li><a class="reference internal" href="#positive">Positive</a></li>
 <li><a class="reference internal" href="#negative">Negative</a></li>
 <li><a class="reference internal" href="#repeat">Repeat</a></li>
+<li><a class="reference internal" href="#cut">Cut</a></li>
 <li><a class="reference internal" href="#comment">Comment</a></li>
 <li><a class="reference internal" href="#grammar-rule-flags">Grammar Rule Flags</a><ul>
 <li><a class="reference internal" href="#spaced">&#64;spaced</a></li>

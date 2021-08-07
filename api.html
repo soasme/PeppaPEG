@@ -365,6 +365,11 @@
 <span class="target" id="peppapeg_8h_1a048293a52ef88f0da76f0ad9c7e2e340a1ece677395c634cb1209051ad627d93d"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_Repeat</span></span></span><a class="headerlink" href="#c.P4_ExpressionKind.P4_Repeat" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Rule: RepeatMinMax, RepeatMin, RepeatMax, RepeatExact, OnceOrMore, ZeroOrMore, ZeroOrOnce. </p>
 </dd></dl>
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.P4_ExpressionKind.P4_Cut">
+<span class="target" id="peppapeg_8h_1a048293a52ef88f0da76f0ad9c7e2e340a35d9ed50392ef8b94e83fdd9d00ad15e"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_Cut</span></span></span><a class="headerlink" href="#c.P4_ExpressionKind.P4_Cut" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Rule: Cut. </p>
+</dd></dl>
 </dd></dl>
 <dl class="c enum">
 <dt class="sig sig-object c" id="c.P4_Error">
@@ -430,6 +435,11 @@
 <dt class="sig sig-object c" id="c.P4_Error.P4_PegError">
 <span class="target" id="peppapeg_8h_1a57a1e31ea2a76eb6dc09ee1a24912e18abf7fbc53932f702912fa22bb55993134"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_PegError</span></span></span><a class="headerlink" href="#c.P4_Error.P4_PegError" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>When the given value is not valid peg grammar. </p>
+</dd></dl>
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.P4_Error.P4_CutError">
+<span class="target" id="peppapeg_8h_1a57a1e31ea2a76eb6dc09ee1a24912e18ad3216c00ea59b9b02b7d6e5ae7809cd6"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_CutError</span></span></span><a class="headerlink" href="#c.P4_Error.P4_CutError" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>When the failure occurs after a @cut operator. </p>
 </dd></dl>
 </dd></dl>
 </div>
@@ -994,6 +1004,16 @@ Example: <div class="highlight-default notranslate"><div class="highlight"><pre>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>The error code.</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.P4_CreateCut">
+<span class="target" id="peppapeg_8h_1a0ddf2f2261a6ba8da4cec02cfaebcdd5"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="n"><span class="pre">P4_Expression</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">P4_CreateCut</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateCut" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Create a P4_Cut expression.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A P4_Expression. </p>
 </dd>
 </dl>
 </dd></dl>

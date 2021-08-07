@@ -253,6 +253,39 @@ Repeat **matches the sub-expression several times**.
 
    hex = "\u{" ([0-9] / [a-z] / [A-Z]){1,6} "}";
 
+Cut
+---
+
+Cut is a decorator written as "@cut". It always succeeds, but cannot be backtracked.
+It's used to prevent unwanted backtracking, e.g. to prevent excessive choice options.
+
+Backtracking means if e1 in `rule = e1 / e2;` fails, the parser returns the last position where e1 started, and tries e2.
+If there is a `@cut` in e1, any failure after the cutting point will cause rule failed immediately.
+Cut ensures the parse sticks to the current rule, even if it fails to parse.
+See ideas [1](http://ceur-ws.org/Vol-1269/paper232.pdf), [2](https://news.ycombinator.com/item?id=20503245).
+
+For example, considering the grammar below first,
+
+.. code-block::
+
+    value = array / null;
+    array = "[" "]";
+    null  = "null";
+
+Given input "[", it attempts matching array first. After failed, it will try null next. At last, value match is failed.
+
+Let's add a cut operator:
+
+.. code-block::
+
+    value = array / null;
+    array = "[" @cut "]";
+    null  = "null";
+
+Given input "[", it attempts matching array first. After failed, value match is failed immediately.
+
+Given input "null", it attempts matching array first. It fails before `@cut` and then failed matching array. Parser then match "null" successfully.
+
 Comment
 -------
 
@@ -473,6 +506,8 @@ Cheatsheet
      - positive
    * - `!foo`
      - negative
+   * - `@cut`
+     - prevent unwanted backtracking
    * - `foo*`
      - zero or more
    * - `foo+`

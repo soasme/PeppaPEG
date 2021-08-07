@@ -292,6 +292,26 @@ Negative can be useful in limiting the possiblities of the latter member in a Se
 
 :seealso: :c:enum:`P4_Negative`, :c:func:`P4_CreateNegative`, :c:func:`P4_AddNegative`.
 
+Cut
+````
+
+Cut **matches everything but avoids unwanted backtracking.**
+
+For example,
+
+.. code-block:: c
+
+    P4_Expression* value = P4_CreateChoiceWithMembers(2,
+        P4_CreateReference("array"),
+        P4_CreateReference("null")
+    );
+    P4_Expression* value = P4_CreateSequenceWithMembers(3,
+        P4_CreateLiteral("[", true),
+        P4_CreateCut(),
+        P4_CreateLiteral("]", true)
+    );
+    P4_Expression* value = P4_CreateLiteral("null", true);
+
 Repeat
 `````````
 

@@ -455,6 +455,23 @@ Choice: failure!
 </dd>
 </dl>
 </section>
+<section id="cut">
+<h3>Cut<a class="headerlink" href="#cut" title="Permalink to this headline">¶</a></h3>
+<p>Cut <strong>matches everything but avoids unwanted backtracking.</strong></p>
+<p>For example,</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">value</span> <span class="o">=</span> <span class="n">P4_CreateChoiceWithMembers</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">P4_CreateReference</span><span class="p">(</span><span class="s">"array"</span><span class="p">),</span>
+    <span class="n">P4_CreateReference</span><span class="p">(</span><span class="s">"null"</span><span class="p">)</span>
+<span class="p">);</span>
+<span class="n">P4_Expression</span><span class="o">*</span> <span class="n">value</span> <span class="o">=</span> <span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"["</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
+    <span class="n">P4_CreateCut</span><span class="p">(),</span>
+    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"]"</span><span class="p">,</span> <span class="nb">true</span><span class="p">)</span>
+<span class="p">);</span>
+<span class="n">P4_Expression</span><span class="o">*</span> <span class="n">value</span> <span class="o">=</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"null"</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
 <section id="repeat">
 <h3>Repeat<a class="headerlink" href="#repeat" title="Permalink to this headline">¶</a></h3>
 <p>Repeat <strong>matches the sub-expression several times</strong>.</p>
@@ -698,6 +715,7 @@ Choice: failure!
 <li><a class="reference internal" href="#reference">Reference</a></li>
 <li><a class="reference internal" href="#positive">Positive</a></li>
 <li><a class="reference internal" href="#negative">Negative</a></li>
+<li><a class="reference internal" href="#cut">Cut</a></li>
 <li><a class="reference internal" href="#repeat">Repeat</a></li>
 </ul>
 </li>

@@ -17,11 +17,8 @@ if (ENABLE_SANITIZERS)
     list(APPEND custom_compiler_flags
         -fno-omit-frame-pointer
         -fsanitize=address
-        -fsanitize=undefined
         -fsanitize=float-cast-overflow
         -fsanitize-address-use-after-scope
-        -fsanitize=integer
-        -fno-sanitize-recover
         )
 endif()
 

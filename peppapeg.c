@@ -1793,9 +1793,8 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
     size_t len = strlen(e->literal);
     size_t slen = strlen(str);
     if (slen < len) {
-        P4_RaiseErrorf(s, P4_MatchError, "expect %s (len %zu), line %zu:%zu (char %zu)",
-                s->frame_stack->expr->name,
-                len, startpos->lineno, startpos->offset, startpos->pos);
+        P4_MatchRaisef(s, P4_MatchError, "expect %s (len %zu)",
+                s->frame_stack->expr->name, len);
         return NULL;
     }
 

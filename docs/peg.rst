@@ -261,6 +261,7 @@ It's used to prevent unwanted backtracking, e.g. to prevent excessive choice opt
 
 Backtracking means if e1 in `rule = e1 / e2;` fails, the parser returns the last position where e1 started, and tries e2.
 If there is a `@cut` in e1, any failure after the cutting point will cause rule failed immediately.
+Cut ensures the parse sticks to the current rule, even if it fails to parse.
 See ideas [1](http://ceur-ws.org/Vol-1269/paper232.pdf), [2](https://news.ycombinator.com/item?id=20503245).
 
 For example, considering the grammar below first,

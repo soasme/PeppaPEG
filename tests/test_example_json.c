@@ -336,7 +336,7 @@ void test_array_deep_nesting(void) {
 
     P4_Source* source;
 
-    const int NESTING_DEPTH = 10;
+    const int NESTING_DEPTH = 50;
 
     P4_String input = malloc(sizeof(char) * (NESTING_DEPTH*2 + 1));
     int i;
@@ -535,6 +535,7 @@ void test_json_spec(char* json_spec) {
     if (strcmp(json_spec, "") == 0) return;
 
     P4_Grammar* grammar = P4_CreateJSONGrammar();
+    P4_SetRecursionLimit(grammar, 500);
 
     char* buf = read_file(json_spec);
 

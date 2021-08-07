@@ -39,7 +39,8 @@ jobs:
       if: "contains( matrix.os, 'ubuntu')"
 
     - name: Create Build Environment
-      run: cmake -E make_directory ${{github.workspace}}/build
+      run: |
+        cmake -E make_directory ${{github.workspace}}/build
 
     - name: Configure CMake (CLANG)
       shell: bash

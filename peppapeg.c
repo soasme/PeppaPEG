@@ -535,9 +535,10 @@ static void panicf(const char * fmt, ...) { va_list args; va_start(args, fmt); v
         } \
     } while (0);
 
-# define                        catch_err(s) \
+# define                        catch_err(s, ...) \
     do { \
         if ((err = (s)) != P4_Ok) { \
+            __VA_ARGS__; \
             goto finalize; \
         } \
     } while (0);
@@ -2248,16 +2249,16 @@ P4_Node*
 P4_Match(P4_Source* s, P4_Expression* e) {
     assert(e != NULL);
 
-    if (s->err != P4_Ok) {
-        goto finalize;
-    }
-
     P4_Error     err = P4_Ok;
     P4_Node* result = NULL;
 
-    if (IS_RULE(e) && (err = P4_PushFrame(s, e)) != P4_Ok) {
-        P4_MatchRaisef(s, err, "expect %s (max recursion)", e->name);
-        goto finalize;
+    catch_err(s->err);
+
+    if (IS_RULE(e)) {
+        catch_err(
+            P4_PushFrame(s, e),
+            P4_MatchRaisef(s, err, "expect %s (max recursion)", e->name)
+        );
     }
 
     result = P4_MatchDispatch(s, e);
@@ -2270,18 +2271,19 @@ P4_Match(P4_Source* s, P4_Expression* e) {
         P4_PopFrame(s, NULL);
     }
 
-    if (s->err != P4_Ok) {
+    catch_err(s->err, {
         P4_DeleteNode(result);
         if (e->name != NULL && s->errmsg[0] == 0) {
             P4_MatchRaisef(s, s->err, "expect %s", e->name);
         }
-        goto finalize;
-    }
+    });
 
-    if (s->grammar->on_match && (err = (s->grammar->on_match)(s->grammar, e, result)) != P4_Ok) {
-        P4_MatchRaisef(s, s->err, "expect %s (match callback failed)", e->name);
-        P4_DeleteNode(result);
-        goto finalize;
+    if (s->grammar->on_match != NULL) {
+        catch_err((s->grammar->on_match)(s->grammar, e, result), {
+            if (s->errmsg[0] == 0)
+                P4_MatchRaisef(s, s->err, "expect %s (match callback failed)", e->name);
+            P4_DeleteNode(result);
+        });
     }
 
     return result;
@@ -2396,16 +2398,15 @@ P4_InspectSourceAst(P4_Node* node, void* userdata, P4_Error (*inspector)(P4_Node
     P4_Error err = P4_Ok;
 
     while (tmp != NULL) {
-        if ((err = inspector(tmp, userdata)) != P4_Ok)
-            return err;
+        catch_err(inspector(tmp, userdata));
 
         if (tmp->head != NULL)
-            if ((err = P4_InspectSourceAst(tmp->head, userdata, inspector)) != P4_Ok)
-                return err;
+            catch_err(P4_InspectSourceAst(tmp->head, userdata, inspector));
 
         tmp = tmp->next;
     }
 
+finalize:
     return err;
 }
 
@@ -2960,9 +2961,7 @@ P4_SetWhitespaces(P4_Grammar* grammar) {
             catch_oom(rule_ref = P4_CreateReference(rule->name));
             rule_ref->ref_expr = rule;
 
-            if ((err = P4_SetMember(repeat, j, rule_ref)) != P4_Ok)
-                goto finalize;
-
+            catch_err(P4_SetMember(repeat, j, rule_ref));
             j++;
         }
     });
@@ -3164,25 +3163,19 @@ P4_PUBLIC P4_Error
 P4_SetReferenceMember(P4_Expression* expr, size_t offset, P4_String ref) {
     /* this functions allows adding a member which is simply a reference. */
 
+    P4_Error       err      = P4_Ok;
     P4_Expression* ref_expr = NULL;
+
     catch_oom(ref_expr = P4_CreateReference(ref));
+    catch_err(P4_SetMember(expr, offset, ref_expr), P4_DeleteExpression(ref_expr));
 
-    P4_Error error = P4_SetMember(expr, offset, ref_expr);
-    if (error != P4_Ok) {
-        P4_DeleteExpression(ref_expr);
-        return error;
-    }
-
-    return P4_Ok;
+finalize:
+    return err;
 }
 
 P4_PUBLIC size_t
 P4_GetMembersCount(P4_Expression* expr) {
-    if (expr == NULL) {
-        return 0;
-    }
-
-    return expr->count;
+    return expr == NULL ? 0 : expr->count;
 }
 
 

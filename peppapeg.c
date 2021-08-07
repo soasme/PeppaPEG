@@ -660,6 +660,7 @@ P4_PRIVATE(void)                P4_RescueError(P4_Source*);
 
 P4_PRIVATE(P4_Error)            P4_PushFrame(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Error)            P4_PopFrame(P4_Source*, P4_Frame*);
+# define P4_PeekFrame(s) ((s)->frame_stack)
 
 P4_PRIVATE(P4_Expression*)      P4_GetReference(P4_Source*, P4_Expression*);
 
@@ -676,6 +677,7 @@ P4_PRIVATE(P4_Node*)           P4_MatchRange(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*)           P4_MatchReference(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*)           P4_MatchPositive(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*)           P4_MatchNegative(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*)           P4_MatchCut(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*)           P4_MatchSequence(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*)           P4_MatchChoice(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*)           P4_MatchRepeat(P4_Source*, P4_Expression*);
@@ -1748,6 +1750,7 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
     /* Set expr & next */
     frame->expr = e;
     frame->next = top;
+    frame->cut = false;
 
     /* Push stack */
     s->frame_stack_size++;
@@ -2196,6 +2199,13 @@ P4_MatchNegative(P4_Source* s, P4_Expression* e) {
     return NULL;
 }
 
+P4_PRIVATE(P4_Node*)
+P4_MatchCut(P4_Source* s, P4_Expression* e) {
+    /* enable flag cut in the top frame. */
+    P4_PeekFrame(s)->cut = true;
+    return NULL;
+}
+
 P4_Node*
 P4_MatchDispatch(P4_Source* s, P4_Expression* e) {
     P4_Node* result = NULL;
@@ -2221,6 +2231,9 @@ P4_MatchDispatch(P4_Source* s, P4_Expression* e) {
             break;
         case P4_Negative:
             result = P4_MatchNegative(s, e);
+            break;
+        case P4_Cut:
+            result = P4_MatchCut(s, e);
             break;
         case P4_Repeat:
             result = P4_MatchRepeat(s, e);
@@ -2261,6 +2274,10 @@ P4_Match(P4_Source* s, P4_Expression* e) {
     }
 
     result = P4_MatchDispatch(s, e);
+
+    if (NO_MATCH(s) && P4_PeekFrame(s)->cut) {
+        s->err = P4_CutError;
+    }
 
     if (IS_RULE(e) && (err = P4_PopFrame(s, NULL)) != P4_Ok) {
         P4_MatchRaise(s, err, "failed to pop frame");
@@ -3767,7 +3784,7 @@ P4_Grammar* P4_CreatePegGrammar () {
     catch_err(P4_AddLiteral(grammar, "dot", ".", true));
     catch_err(P4_AddLiteral(grammar, "cut", "@cut", true));
 
-    catch_err(P4_AddChoiceWithMembers(grammar, "primary", 8,
+    catch_err(P4_AddChoiceWithMembers(grammar, "primary", 9,
         P4_CreateReference("literal"),
         P4_CreateReference("insensitive"),
         P4_CreateReference("range"),
@@ -3782,7 +3799,8 @@ P4_Grammar* P4_CreatePegGrammar () {
             P4_CreateReference("choice"),
             P4_CreateLiteral(")", true)
         ),
-        P4_CreateReference("dot")
+        P4_CreateReference("dot"),
+        P4_CreateReference("cut")
     ));
     catch_err(P4_SetGrammarRuleFlag(grammar, "primary", P4_FLAG_LIFTED));
 

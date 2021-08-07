@@ -482,6 +482,19 @@ void test_eval_cut(void) {
         "R21 = \"2\" @cut \"1\";",
         "R1", "122", P4_CutError, "expect R21 (char '1'), line 1:4 (char 3)"
     );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = \"[\" !R21 [0-9]+ \"]\";"
+        "R21 = \"2\" @cut \"1\";",
+        "R1", "[2]", P4_Ok,
+        "[{\"slice\":[0,3],\"type\":\"R1\"}]"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = \"[\" R1_Inner \"]\";"
+        "R1_Inner = !R21 [0-9]+;"
+        "R21 = \"2\" @cut \"1\";",
+        "R1", "[21]", P4_MatchError,
+        "expect R1_Inner, line 1:2 (char 1)"
+    );
 }
 
 void test_eval_repeat(void) {

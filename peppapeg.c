@@ -2192,7 +2192,7 @@ P4_MatchNegative(P4_Source* s, P4_Expression* e) {
         P4_DeleteNode(node);
         P4_MatchRaisef(s, P4_MatchError, "expect %s, line %zu:%zu (char %zu)",
             e->name?e->name:s->frame_stack->expr->name, startpos->lineno, startpos->offset, startpos->pos);
-    } else if (s->err == P4_MatchError) {
+    } else if (s->err == P4_MatchError || s->err == P4_CutError) {
         P4_RescueError(s);
     }
 

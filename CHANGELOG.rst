@@ -4,7 +4,23 @@ Change Log
 Not Yet Released
 ----------------
 
-Code change: <https://github.com/soasme/PeppaPEG/compare/v1.13.0..HEAD>.
+Code change: <https://github.com/soasme/PeppaPEG/compare/v1.14.0..HEAD>.
+
+1.14.0 (8 Aug, 2021)
+---------------------
+
+Code change: <https://github.com/soasme/PeppaPEG/compare/v1.13.0..v1.14.0>.
+
+* [Feature]: New PEG expression: `@cut`. [#90](https://github.com/soasme/PeppaPEG/pull/90).
+* [API Change]: `P4_JsonifySourceAst` now doesn't require `grammar` in the parameters. [#89](https://github.com/soasme/PeppaPEG/pull/89).
+* [Enhancement]: Wrap errors with catch_err / catch_oom in the .c implementation. [#88](https://github.com/soasme/PeppaPEG/pull/88) [#91](https://github.com/soasme/PeppaPEG/pull/91) [#92](https://github.com/soasme/PeppaPEG/pull/92).
+* [Bugfix]: Error report now can display correct lineno:offset information. [#87](https://github.com/soasme/PeppaPEG/pull/87).
+* [API Change]: `P4_RuleID` is now deprecated. Please use string (`char*`) for finding a rule. [#84](https://github.com/soasme/PeppaPEG/pull/84) [#86](https://github.com/soasme/PeppaPEG/pull/86).
+* [API Change]: `struct P4_Grammar`, `struct P4_Expression`, `struct P4_Frame` are now private structures. However, you can still access `P4_Grammar`, `P4_Expression` as typedefs.
+* [Example]: Added a example TOML v1.0 parser. [#81](https://github.com/soasme/PeppaPEG/pull/81).
+* [Feature]: New escape type: `\xXX`. This allows terser form for ASCII chars. [#80](https://github.com/soasme/PeppaPEG/pull/80).
+* [API Change]: `\u{XXXX}` is now deprecated. Please use `\uXXXX` or `\UXXXXXXXX`. [#79](https://github.com/soasme/PeppaPEG/pull/79).
+* [API Change]: `P4_Token` is now renamed to `P4_Node`. [#78](https://github.com/soasme/PeppaPEG/pull/78).
 
 1.13.0 (6 May, 2021)
 --------------------

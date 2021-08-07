@@ -2349,19 +2349,20 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
     P4_Expression* litexpr = NULL;
     catch_oom(litexpr = P4_CreateLiteral(litstr, backref->sensitive));
 
-# define set_literal_rule_name(n, bref) \
+# define NO_OP
+# define set_literal_rule_name(n, bref, op) \
     if ((bref)->kind == P4_Reference) {\
-        (n) = STRDUP((bref)->ref_expr->name); \
+        (n) = op((bref)->ref_expr->name); \
     } else {\
-        (n) = STRDUP((bref)->name); \
+        (n) = op((bref)->name); \
     }
 
-    set_literal_rule_name(litexpr->name, backref_expr);
+    set_literal_rule_name(litexpr->name, backref_expr, STRDUP);
 
     P4_Node* tok = P4_MatchLiteral(s, litexpr);
 
     if (tok != NULL) {
-        set_literal_rule_name(tok->rule_name, backref_expr);
+        set_literal_rule_name(tok->rule_name, backref_expr, NO_OP);
     }
 
     P4_DeleteExpression(litexpr);

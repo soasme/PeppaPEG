@@ -642,13 +642,6 @@ P4_PRIVATE(P4_String)           P4_RemainingText(P4_Source*);
 
 P4_PRIVATE(bool)                P4_NeedLift(P4_Source*, P4_Expression*);
 
-# define P4_MatchRaise(s,e,m) \
-    do { \
-        (s)->err = (e); \
-        memset((s)->errmsg, 0, sizeof((s)->errmsg)); \
-        sprintf((s)->errmsg, "%s", (m)); \
-    } while (0);
-
 # define P4_MatchRaisef(s,e,m,...) \
     do { \
         (s)->err = (e); \
@@ -1883,7 +1876,7 @@ P4_MatchReference(P4_Source* s, P4_Expression* e) {
     }
 
     if (e->ref_expr == NULL) {
-        P4_MatchRaise(s, P4_NameError, "");
+        P4_MatchRaisef(s, P4_NameError, "expect %s", e->reference);
         return NULL;
     }
 
@@ -2051,7 +2044,8 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     if (IS_PROGRESSING(e->repeat_expr->kind) ||
             (IS_REF(e->repeat_expr)
              && IS_PROGRESSING(P4_GetReference(s, e->repeat_expr)->kind))) {
-        P4_MatchRaise(s, P4_AdvanceError, "no progressing in repetition");
+        P4_MatchRaisef(s, P4_AdvanceError,
+            "expect %s (no progressing in repetition)", P4_PeekFrame(s)->expr->name);
         return NULL;
     }
 
@@ -2262,7 +2256,7 @@ P4_Match(P4_Source* s, P4_Expression* e) {
     P4_Node* result = NULL;
 
     if (IS_RULE(e) && (err = P4_PushFrame(s, e)) != P4_Ok) {
-        P4_MatchRaise(s, err, "failed to push frame");
+        P4_MatchRaisef(s, err, "expect %s (max recursion)", e->name);
         goto finalize;
     }
 
@@ -2272,27 +2266,20 @@ P4_Match(P4_Source* s, P4_Expression* e) {
         s->err = P4_CutError;
     }
 
-    if (IS_RULE(e) && (err = P4_PopFrame(s, NULL)) != P4_Ok) {
-        P4_MatchRaise(s, err, "failed to pop frame");
-        P4_DeleteNode(result);
-        goto finalize;
+    if (IS_RULE(e)) {
+        P4_PopFrame(s, NULL);
     }
 
     if (s->err != P4_Ok) {
         P4_DeleteNode(result);
         if (e->name != NULL && s->errmsg[0] == 0) {
-            size_t len = strlen(e->name);
-            P4_String errmsg = P4_MALLOC(sizeof(char) * (len+8));
-            memset(errmsg, 0, len);
-            sprintf(errmsg, "expect %s", e->name);
-            P4_MatchRaise(s, s->err, errmsg);
-            P4_FREE(errmsg);
+            P4_MatchRaisef(s, s->err, "expect %s", e->name);
         }
         goto finalize;
     }
 
     if (s->grammar->on_match && (err = (s->grammar->on_match)(s->grammar, e, result)) != P4_Ok) {
-        P4_MatchRaise(s, err, "failed to run match callback.");
+        P4_MatchRaisef(s, s->err, "expect %s (match callback failed)", e->name);
         P4_DeleteNode(result);
         goto finalize;
     }
@@ -2301,7 +2288,7 @@ P4_Match(P4_Source* s, P4_Expression* e) {
 
 finalize:
     if (s->grammar->on_error && (err = (s->grammar->on_error)(s->grammar, e)) != P4_Ok) {
-        P4_MatchRaise(s, err, "failed to run error callback.");
+        P4_MatchRaisef(s, s->err, "expect %s (error callback failed)", e->name);
     }
     return NULL;
 }

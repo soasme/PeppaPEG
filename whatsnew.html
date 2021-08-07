@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="Debug" href="debug.html" />
 
     <meta name="generator" content="sphinx-4.1.2, furo 2021.07.31.beta41"/>
-        <title>Change Log - Peppa PEG 1.13.0 documentation</title>
+        <title>Change Log - Peppa PEG 1.14.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=daa650a7760fac3eee23aa959745d2c866b74cb3" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=93475b62d1c3bc01323a0eefdc14a62d77b12690" />
@@ -121,7 +121,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">Peppa PEG 1.13.0 documentation</div></a>
+      <a href="index.html"><div class="brand">Peppa PEG 1.14.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -144,7 +144,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">Peppa PEG 1.13.0 documentation</span>
+  <span class="sidebar-brand-text">Peppa PEG 1.14.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -201,7 +201,23 @@
 <h1>Change Log<a class="headerlink" href="#change-log" title="Permalink to this headline">¶</a></h1>
 <section id="not-yet-released">
 <h2>Not Yet Released<a class="headerlink" href="#not-yet-released" title="Permalink to this headline">¶</a></h2>
-<p>Code change: &lt;<a class="reference external" href="https://github.com/soasme/PeppaPEG/compare/v1.13.0..HEAD">https://github.com/soasme/PeppaPEG/compare/v1.13.0..HEAD</a>&gt;.</p>
+<p>Code change: &lt;<a class="reference external" href="https://github.com/soasme/PeppaPEG/compare/v1.14.0..HEAD">https://github.com/soasme/PeppaPEG/compare/v1.14.0..HEAD</a>&gt;.</p>
+</section>
+<section id="aug-2021">
+<h2>1.14.0 (8 Aug, 2021)<a class="headerlink" href="#aug-2021" title="Permalink to this headline">¶</a></h2>
+<p>Code change: &lt;<a class="reference external" href="https://github.com/soasme/PeppaPEG/compare/v1.13.0..v1.14.0">https://github.com/soasme/PeppaPEG/compare/v1.13.0..v1.14.0</a>&gt;.</p>
+<ul class="simple">
+<li><p>[Feature]: New PEG expression: <cite>@cut</cite>. [#90](<a class="reference external" href="https://github.com/soasme/PeppaPEG/pull/90">https://github.com/soasme/PeppaPEG/pull/90</a>).</p></li>
+<li><p>[API Change]: <cite>P4_JsonifySourceAst</cite> now doesn’t require <cite>grammar</cite> in the parameters. [#89](<a class="reference external" href="https://github.com/soasme/PeppaPEG/pull/89">https://github.com/soasme/PeppaPEG/pull/89</a>).</p></li>
+<li><p>[Enhancement]: Wrap errors with catch_err / catch_oom in the .c implementation. [#88](<a class="reference external" href="https://github.com/soasme/PeppaPEG/pull/88">https://github.com/soasme/PeppaPEG/pull/88</a>) [#91](<a class="reference external" href="https://github.com/soasme/PeppaPEG/pull/91">https://github.com/soasme/PeppaPEG/pull/91</a>) [#92](<a class="reference external" href="https://github.com/soasme/PeppaPEG/pull/92">https://github.com/soasme/PeppaPEG/pull/92</a>).</p></li>
+<li><p>[Bugfix]: Error report now can display correct lineno:offset information. [#87](https://github.com/soasme/PeppaPEG/pull/87).</p></li>
+<li><p>[API Change]: <cite>P4_RuleID</cite> is now deprecated. Please use string (<cite>char*</cite>) for finding a rule. [#84](<a class="reference external" href="https://github.com/soasme/PeppaPEG/pull/84">https://github.com/soasme/PeppaPEG/pull/84</a>) [#86](<a class="reference external" href="https://github.com/soasme/PeppaPEG/pull/86">https://github.com/soasme/PeppaPEG/pull/86</a>).</p></li>
+<li><p>[API Change]: <cite>struct P4_Grammar</cite>, <cite>struct P4_Expression</cite>, <cite>struct P4_Frame</cite> are now private structures. However, you can still access <cite>P4_Grammar</cite>, <cite>P4_Expression</cite> as typedefs.</p></li>
+<li><p>[Example]: Added a example TOML v1.0 parser. [#81](<a class="reference external" href="https://github.com/soasme/PeppaPEG/pull/81">https://github.com/soasme/PeppaPEG/pull/81</a>).</p></li>
+<li><p>[Feature]: New escape type: <cite>xXX</cite>. This allows terser form for ASCII chars. [#80](<a class="reference external" href="https://github.com/soasme/PeppaPEG/pull/80">https://github.com/soasme/PeppaPEG/pull/80</a>).</p></li>
+<li><p>[API Change]: <cite>u{XXXX}</cite> is now deprecated. Please use <cite>uXXXX</cite> or <cite>UXXXXXXXX</cite>. [#79](<a class="reference external" href="https://github.com/soasme/PeppaPEG/pull/79">https://github.com/soasme/PeppaPEG/pull/79</a>).</p></li>
+<li><p>[API Change]: <cite>P4_Token</cite> is now renamed to <cite>P4_Node</cite>. [#78](<a class="reference external" href="https://github.com/soasme/PeppaPEG/pull/78">https://github.com/soasme/PeppaPEG/pull/78</a>).</p></li>
+</ul>
 </section>
 <section id="may-2021">
 <h2>1.13.0 (6 May, 2021)<a class="headerlink" href="#may-2021" title="Permalink to this headline">¶</a></h2>
@@ -390,6 +406,7 @@ Check it out: &lt;<a class="reference external" href="https://www.soasme.com/Pep
             <ul>
 <li><a class="reference internal" href="#">Change Log</a><ul>
 <li><a class="reference internal" href="#not-yet-released">Not Yet Released</a></li>
+<li><a class="reference internal" href="#aug-2021">1.14.0 (8 Aug, 2021)</a></li>
 <li><a class="reference internal" href="#may-2021">1.13.0 (6 May, 2021)</a></li>
 <li><a class="reference internal" href="#apr-2021">1.12.0 (17 Apr, 2021)</a></li>
 <li><a class="reference internal" href="#id9">1.11.0 (8 Apr, 2021)</a></li>

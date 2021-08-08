@@ -2294,8 +2294,10 @@ P4_Match(P4_Source* s, P4_Expression* e) {
     return result;
 
 finalize:
-    if (s->grammar->on_error && (err = (s->grammar->on_error)(s->grammar, e)) != P4_Ok) {
-        P4_MatchRaisef(s, s->err, "expect %s (error callback failed)", e->name);
+    if (s->grammar->on_error != NULL) {
+        err = (s->grammar->on_error)(s->grammar, e);
+        if (err != P4_Ok && s->errmsg[0] == 0)
+            P4_MatchRaisef(s, s->err, "expect %s (error callback failed)", e->name);
     }
     return NULL;
 }
@@ -2877,8 +2879,9 @@ P4_GetSourcePosition(P4_Source* source) {
 
 P4_PUBLIC P4_Error
 P4_Parse(P4_Grammar* grammar, P4_Source* source) {
-    if (source->err != P4_Ok)
-        return source->err;
+    P4_Error err = P4_Ok;
+
+    catch_err(source->err);
 
     if (source->root != NULL)
         return P4_Ok;
@@ -2890,23 +2893,20 @@ P4_Parse(P4_Grammar* grammar, P4_Source* source) {
 
     source->root            = tok;
 
+finalize:
     return source->err;
 }
 
 
 P4_PUBLIC bool
 P4_HasError(P4_Source* source) {
-    if (source == NULL)
-        return false;
-
+    if (source == NULL) panic("source must not be NULL.");
     return source->err != P4_Ok;
 }
 
 P4_PUBLIC P4_Error
 P4_GetError(P4_Source* source) {
-    if (source == NULL)
-        return P4_NullError;
-
+    if (source == NULL) panic("source must not be NULL.");
     return source->err;
 }
 

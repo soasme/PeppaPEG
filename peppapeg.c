@@ -505,13 +505,6 @@ static void panic(const char * str)     { fputs(str, stderr); exit(1); }
 static void panicf(const char * fmt, ...) __attribute__((noreturn));
 static void panicf(const char * fmt, ...) { va_list args; va_start(args, fmt); vfprintf(stderr, fmt, args); exit(1); }
 
-#define P4_EvalRaise(fmt, ...) \
-    do { \
-        memset(result->errmsg, 0, sizeof(result->errmsg)); \
-        sprintf(result->errmsg, (fmt), __VA_ARGS__); \
-        goto finalize; \
-    } while (0);
-
 # if defined(DEBUG)
 #define UNREACHABLE() panicf("[%s:%d] This code should not be reached in %s()\n", __FILE__, __LINE__, __func__);
 # elif defined(_MSC_VER)
@@ -649,6 +642,12 @@ P4_PRIVATE(bool)                P4_NeedLift(P4_Source*, P4_Expression*);
         memset((s)->errmsg, 0, sizeof((s)->errmsg)); \
         sprintf((s)->errmsg, m ", line %zu:%zu (char %zu)", \
                 __VA_ARGS__, (s)->lineno, (s)->offset, (s)->pos); \
+    } while (0);
+
+# define P4_EvalRaisef(r,m,...) \
+    do { \
+        memset((r)->errmsg, 0, sizeof((r)->errmsg)); \
+        sprintf((r)->errmsg, (m), __VA_ARGS__); \
     } while (0);
 
 P4_PRIVATE(void)                P4_RescueError(P4_Source*);
@@ -3944,11 +3943,9 @@ P4_PegEvalLiteral(P4_Node* node, P4_Result* result) {
 
     size_t len = P4_GetSliceSize(&node->slice) - 2; /* - 2: remove two quotes */
     if (len <= 0) {
-        err = P4_PegError;
-        P4_EvalRaise(
+        catch_err(P4_PegError, P4_EvalRaisef(result,
             "literal rule should have at least one character. "
-            NODE_ERROR_HINT_FMT, NODE_ERROR_HINT
-        );
+            NODE_ERROR_HINT_FMT, NODE_ERROR_HINT));
     }
 
     catch_oom(cur = lit = P4_MALLOC((len+1) * sizeof(char)));
@@ -3960,11 +3957,9 @@ P4_PegEvalLiteral(P4_Node* node, P4_Result* result) {
                 (rune == 0) ||
                 (size == 0) ||
                 (i + size > node->slice.stop.pos-1)) {
-            err = P4_PegError;
-            P4_EvalRaise(
+            catch_err(P4_PegError, P4_EvalRaisef(result,
                 "char %lu is invalid. " NODE_ERROR_HINT_FMT,
-                idx, NODE_ERROR_HINT
-            );
+                idx, NODE_ERROR_HINT));
         }
 
         cur = P4_ConcatRune(cur, rune, size);
@@ -4004,7 +3999,7 @@ P4_PegEvalRange(P4_Node* node, P4_Result* result) {
         P4_RuneRange* ranges = NULL;
         size_t count = 0;
 
-        if (0 == P4_ReadRuneRange(node->head->text, &node->head->slice, &count, &ranges))
+        if (P4_ReadRuneRange(node->head->text, &node->head->slice, &count, &ranges) == 0)
             panicf("ValueError: failed to read code point from source. "
                 NODE_ERROR_HINT_FMT, NODE_ERROR_HINT);
 
@@ -4023,29 +4018,23 @@ P4_PegEvalRange(P4_Node* node, P4_Result* result) {
         if (stride_node) catch_err(P4_PegEvalNumber(stride_node, &stride));
 
         if (lower > upper) {
-            err = P4_PegError;
-            P4_EvalRaise(
+            catch_err(P4_PegError, P4_EvalRaisef(result,
                 "range lower 0x%x is greater than upper 0x%x. "
-                NODE_ERROR_HINT_FMT, lower, upper, NODE_ERROR_HINT
-            );
+                NODE_ERROR_HINT_FMT, lower, upper, NODE_ERROR_HINT));
         }
 
         if ((lower == 0) || (upper == 0) || (stride == 0)) {
-            err = P4_PegError;
-            P4_EvalRaise(
+            catch_err(P4_PegError, P4_EvalRaisef(result,
                 "range lower 0x%x, upper 0x%x, stride 0x%lx "
                 "must be all non-zeros. " NODE_ERROR_HINT_FMT,
-                lower, upper, stride, NODE_ERROR_HINT
-            );
+                lower, upper, stride, NODE_ERROR_HINT));
         }
 
         if ((lower > 0x10ffff) || (upper > 0x10ffff)) {
-            err = P4_PegError;
-            P4_EvalRaise(
+            catch_err(P4_PegError, P4_EvalRaisef(result,
                 "range lower 0x%x, upper 0x%x must be "
                 "less than 0x10ffff. " NODE_ERROR_HINT_FMT,
-                lower, upper, NODE_ERROR_HINT
-            );
+                lower, upper, NODE_ERROR_HINT));
         }
 
         catch_oom(expr = P4_CreateRange(lower, upper, stride));
@@ -4197,11 +4186,9 @@ P4_PegEvalRepeat(P4_Node* node, P4_Result* result) {
 
     /* repeat min should be greater than max. */
     if (min > max) {
-        err = P4_PegError;
-        P4_EvalRaise(
+        catch_err(P4_PegError, P4_EvalRaisef(result,
             "repeat min %lu is greater than max %lu. "
-            NODE_ERROR_HINT_FMT, min, max, NODE_ERROR_HINT
-        );
+            NODE_ERROR_HINT_FMT, min, max, NODE_ERROR_HINT));
     }
 
     /* create repeat expr. */
@@ -4321,8 +4308,10 @@ P4_PegEvalGrammarReferences(
         case P4_Reference:
             if (!expr->reference ||
                     !P4_GetGrammarRule(grammar, expr->reference)) {
-                err = P4_NameError;
-                P4_EvalRaise("reference %s is undefined", expr->reference);
+                catch_err(
+                    P4_NameError,
+                    P4_EvalRaisef(result, "reference %s is undefined", expr->reference)
+                );
             }
             break;
 
@@ -4360,10 +4349,11 @@ P4_PegEvalGrammar(P4_Node* node, P4_Result* result) {
      * and then add the rule to grammar object. */
     foreach_child(node, child, {
         catch_err(P4_PegEvalGrammarRule(child, result));
-
         rule = P4_UnwrapExpression(result);
-        if ((err = P4_AddGrammarRule(grammar, rule->name, rule)) != P4_Ok)
-            P4_EvalRaise("failed to add rule %s.", rule->name);
+        catch_err(
+            P4_AddGrammarRule(grammar, rule->name, rule),
+            P4_EvalRaisef(result, "failed to add rule %s.", rule->name)
+        );
     });
 
     /* traverse all grammar rules to resolve references. */
@@ -4438,27 +4428,22 @@ P4_LoadGrammarResult(P4_String rules, P4_Result* result) {
     catch_oom(rules_src = P4_CreateSource(rules, "grammar"));
 
     /* parse grammar rule source */
-    if ((err = P4_Parse(bootstrap, rules_src)) != P4_Ok)
-        P4_EvalRaise(
-            "%s: failed to parse peg rules: %s.",
-            P4_GetErrorString(err),
-            P4_GetErrorMessage(rules_src)
-        );
+    catch_err(P4_Parse(bootstrap, rules_src), {
+        P4_EvalRaisef(result, "%s: failed to parse peg rules: %s.",
+            P4_GetErrorString(err), P4_GetErrorMessage(rules_src));
+    });
 
     /* get grammar rule parse tree. */
-    if ((rules_tok = P4_GetSourceAst(rules_src)) == NULL)
-        P4_EvalRaise(
-            "%s: failed to create parse tree.",
-            P4_GetErrorString(P4_PegError)
-        );
+    if ((rules_tok = P4_GetSourceAst(rules_src)) == NULL) {
+        catch_err(P4_PegError, {
+            P4_EvalRaisef(result, "%s: parse tree is null.", P4_GetErrorString(err));
+        });
+    }
 
     /* eval grammar rule parse tree to grammar object. */
-    if ((err = P4_PegEvalGrammar(rules_tok, evalres)) != P4_Ok)
-        P4_EvalRaise(
-            "%s: %s.",
-            P4_GetErrorString(err),
-            evalres->errmsg
-        );
+    catch_err(P4_PegEvalGrammar(rules_tok, evalres), {
+        P4_EvalRaisef(result, "%s: %s.", P4_GetErrorString(err), evalres->errmsg);
+    });
 
 finalize:
     /* set the grammar object to the result,

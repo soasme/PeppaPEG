@@ -29,7 +29,7 @@ void test_match_cut_raise_cut_error(void) {
         P4_CutError,
         P4_Parse(grammar, source)
     );
-    TEST_ASSERT_EQUAL_STRING("expect r1 (char ']'), line 1:2 (char 1)", P4_GetErrorMessage(source));
+    TEST_ASSERT_EQUAL_STRING("line 1:2, expect r1 (char ']')", P4_GetErrorMessage(source));
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
 }

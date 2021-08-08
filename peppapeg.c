@@ -639,8 +639,8 @@ P4_PRIVATE(bool)                P4_NeedLift(P4_Source*, P4_Expression*);
     do { \
         (s)->err = (e); \
         memset((s)->errmsg, 0, sizeof((s)->errmsg)); \
-        sprintf((s)->errmsg, m ", line %zu:%zu (char %zu)", \
-                __VA_ARGS__, (s)->lineno, (s)->offset, (s)->pos); \
+        sprintf((s)->errmsg, "line %zu:%zu, " m, \
+                (s)->lineno, (s)->offset, __VA_ARGS__); \
     } while (0);
 
 # define P4_EvalRaisef(r,m,...) \

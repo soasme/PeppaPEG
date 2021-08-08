@@ -207,7 +207,7 @@ void test_rule_name(void) {
 
 void test_rule_flag(void) {
     ASSERT_PEG_PARSE("decorator", "@scoped", P4_Ok, "[{\"slice\":[0,7],\"type\":\"decorator\"}]");
-    ASSERT_PEG_PARSE("decorator", "@whatever", P4_MatchError, "line 1:2, expect decorator");
+    ASSERT_PEG_PARSE("decorator", "@whatever", P4_CutError, "line 1:2, expect decorator");
 }
 
 void test_rule(void) {
@@ -1005,6 +1005,13 @@ void test_eval_bad_grammar(void) {
     );
 }
 
+void test_eval_bad_grammar_decorator(void) {
+    ASSERT_BAD_GRAMMAR(
+        "@some_random_decorator R1 = \"a\";",
+        "CutError: failed to parse grammar: line 1:2, expect decorator."
+    );
+}
+
 void test_eval_bad_grammar_literal(void) {
     ASSERT_BAD_GRAMMAR(
         "R1 = \"\";",
@@ -1074,6 +1081,10 @@ void test_eval_bad_grammar_repeat(void) {
         "R1 = [0-9]{3,2};",
         "PegError: repeat min 3 is greater than max 2. char 5-15: [0-9]{3,2}."
     );
+    ASSERT_BAD_GRAMMAR(
+        "R1 = [0-9]{m,n};",
+        "CutError: failed to parse grammar: line 1:11, expect rule (char ';')."
+    );
 }
 
 void test_eval_bad_grammar_reference(void) {
@@ -1120,11 +1131,11 @@ int main(void) {
     RUN_TEST(test_eval_flags);
 
     RUN_TEST(test_eval_bad_grammar);
+    RUN_TEST(test_eval_bad_grammar_decorator);
     RUN_TEST(test_eval_bad_grammar_literal);
     RUN_TEST(test_eval_bad_grammar_range);
     RUN_TEST(test_eval_bad_grammar_repeat);
     RUN_TEST(test_eval_bad_grammar_reference);
-
 
     return UNITY_END();
 }

@@ -3793,8 +3793,9 @@ P4_Grammar* P4_CreatePegGrammar () {
     catch_err(P4_AddReference(grammar, "name", "reference"));
     catch_err(P4_SetGrammarRuleFlag(grammar, "name", P4_FLAG_SQUASHED));
 
-    catch_err(P4_AddSequenceWithMembers(grammar, "decorator", 2,
+    catch_err(P4_AddSequenceWithMembers(grammar, "decorator", 3,
         P4_CreateLiteral("@", true),
+        P4_CreateCut(),
         P4_CreateChoiceWithMembers(6,
             P4_CreateLiteral("squashed", true),
             P4_CreateLiteral("scoped", true),

@@ -428,6 +428,8 @@ struct P4_Frame {
     bool            silent;
     /** Whether cut is enabled to frame. */
     bool            cut;
+    /** Which local expr is bound to cut point. */
+    P4_Expression*  cutexp;
     /** The next frame in the stack. */
     P4_Frame*       next;
 };
@@ -1745,6 +1747,7 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
     frame->expr = e;
     frame->next = top;
     frame->cut = false;
+    frame->cutexp = NULL;
 
     /* Push stack */
     s->frame_stack_size++;
@@ -1943,6 +1946,8 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
         if (member->kind == P4_BackReference) {
             tok = P4_MatchBackReference(s, e, backrefs, member);
             if (!no_error(s)) goto finalize;
+        } else if (member->kind == P4_Cut) {
+            tok = P4_MatchCut(s, e);
         } else {
             tok = P4_Match(s, member);
         }
@@ -2086,7 +2091,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
             }
 
             if (min != SIZE_MAX && repeated < min) {
-                P4_MatchRaisef(s, P4_MatchError, "expect %s", P4_PeekFrame(s)->expr->name);
+                P4_MatchRaisef(s, P4_MatchError, "expect %s (insufficient repetitions)", P4_PeekFrame(s)->expr->name);
                 goto finalize;
             } else {                       /* sufficient repetitions. */
                 P4_RescueError(s);
@@ -2193,7 +2198,9 @@ P4_MatchNegative(P4_Source* s, P4_Expression* e) {
 P4_PRIVATE(P4_Node*)
 P4_MatchCut(P4_Source* s, P4_Expression* e) {
     /* enable flag cut in the top frame. */
-    P4_PeekFrame(s)->cut = true;
+    P4_Frame* frame = P4_PeekFrame(s);
+    frame->cut = true;
+    frame->cutexp = e;
     return NULL;
 }
 
@@ -2223,12 +2230,11 @@ P4_MatchDispatch(P4_Source* s, P4_Expression* e) {
         case P4_Negative:
             result = P4_MatchNegative(s, e);
             break;
-        case P4_Cut:
-            result = P4_MatchCut(s, e);
-            break;
         case P4_Repeat:
             result = P4_MatchRepeat(s, e);
             break;
+        case P4_Cut:
+            panic("cut can be applied only in sequence.");
         case P4_BackReference:
             panic("backreference can be applied only in sequence.");
         default:
@@ -2266,7 +2272,8 @@ P4_Match(P4_Source* s, P4_Expression* e) {
 
     result = P4_MatchDispatch(s, e);
 
-    if (no_match(s) && P4_PeekFrame(s)->cut && !s->whitespacing) {
+    P4_Frame* frame = P4_PeekFrame(s);
+    if (no_match(s) && frame->cut && frame->cutexp == e && !s->whitespacing) {
         s->err = P4_CutError;
     }
 

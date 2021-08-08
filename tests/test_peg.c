@@ -499,13 +499,19 @@ void test_eval_cut(void) {
         "R1", "[21]", P4_MatchError,
         "line 1:2, expect R1_Inner"
     );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = \"[\" @cut R1_Inner+ \"]\";"
+        "R1_Inner = \"1\" / \"2\";",
+        "R1", "[1]", P4_Ok,
+        "[{\"slice\":[0,3],\"type\":\"R1\",\"children\":[{\"slice\":[1,2],\"type\":\"R1_Inner\"}]}]"
+    );
 }
 
 void test_eval_repeat(void) {
     ASSERT_EVAL_GRAMMAR("R1 = (\"\\n\" / \"\\r\")+;", "R1", "\r\n\r\n", P4_Ok, "[{\"slice\":[0,4],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "1A9F", P4_Ok, "[{\"slice\":[0,4],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "FFFFFF", P4_Ok, "[{\"slice\":[0,6],\"type\":\"R1\"}]");
-    ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "HHHH", P4_MatchError, "line 1:1, expect R1");
+    ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "HHHH", P4_MatchError, "line 1:1, expect R1 (insufficient repetitions)");
     ASSERT_EVAL_GRAMMAR("R1 = ([0-9] / [a-f] / [A-F])+;", "R1", "", P4_MatchError, "line 1:1, expect R1 (at least 1 repetitions)");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\"*;", "R1", "aaaaa", P4_Ok, "[{\"slice\":[0,5],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = \"a\"*;", "R1", "", P4_Ok, "[]");
@@ -700,7 +706,7 @@ void test_eval_flags(void) {
         "@spaced @lifted\n"
         "R2 = \" \" / \"\\t\" / \"\\r\" / \"\\n\";",
 
-        "R1", "x   x x\t\t\nx", P4_MatchError, "line 1:2, expect R1"
+        "R1", "x   x x\t\t\nx", P4_MatchError, "line 1:2, expect R1 (insufficient repetitions)"
     );
 
     ASSERT_EVAL_GRAMMAR(
@@ -985,6 +991,18 @@ void test_eval_bad_grammar(void) {
         "R1 = \"a\"",
         "CutError: failed to parse grammar: line 1:9, expect rule (char ';')."
     );
+    ASSERT_BAD_GRAMMAR(
+        "R1 = \"\\x3\";",
+        "CutError: failed to parse grammar: line 1:10, expect two_hexdigits (insufficient repetitions)."
+    );
+    ASSERT_BAD_GRAMMAR(
+        "R1 = \"\\u123z\";",
+        "CutError: failed to parse grammar: line 1:12, expect four_hexdigits (insufficient repetitions)."
+    );
+    ASSERT_BAD_GRAMMAR(
+        "R1 = \"\\U123a123z\";",
+        "CutError: failed to parse grammar: line 1:16, expect eight_hexdigits (insufficient repetitions)."
+    );
 }
 
 void test_eval_bad_grammar_literal(void) {
@@ -1106,6 +1124,7 @@ int main(void) {
     RUN_TEST(test_eval_bad_grammar_range);
     RUN_TEST(test_eval_bad_grammar_repeat);
     RUN_TEST(test_eval_bad_grammar_reference);
+
 
     return UNITY_END();
 }

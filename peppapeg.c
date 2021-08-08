@@ -3585,6 +3585,18 @@ P4_Grammar* P4_CreatePegGrammar () {
     ));
     catch_err(P4_SetGrammarRuleFlag(grammar, "number", P4_FLAG_SQUASHED | P4_FLAG_TIGHT));
 
+    catch_err(P4_AddChoiceWithMembers(grammar, "hexdigit", 3,
+        P4_CreateRange('0', '9', 1),
+        P4_CreateRange('a', 'f', 1),
+        P4_CreateRange('A', 'F', 1)
+    ));
+    catch_err(P4_AddRepeatExact(grammar, "two_hexdigits",
+        P4_CreateReference("hexdigit"), 2));
+    catch_err(P4_AddRepeatExact(grammar, "four_hexdigits",
+        P4_CreateReference("hexdigit"), 4));
+    catch_err(P4_AddRepeatExact(grammar, "eight_hexdigits",
+        P4_CreateReference("hexdigit"), 8));
+
     catch_err(P4_AddChoiceWithMembers(grammar, "char", 4,
         P4_CreateRange(0x20, 0x21, 1), /* Can't be 0x22: double quote " */
         P4_CreateRange(0x23, 0x5b, 1), /* Can't be 0x5c: escape leading \ */
@@ -3600,35 +3612,20 @@ P4_Grammar* P4_CreatePegGrammar () {
                 P4_CreateLiteral("n", true),
                 P4_CreateLiteral("r", true),
                 P4_CreateLiteral("t", true),
-                P4_CreateSequenceWithMembers(2,
+                P4_CreateSequenceWithMembers(3,
                     P4_CreateLiteral("x", true),
-                    P4_CreateRepeatExact(
-                        P4_CreateChoiceWithMembers(3,
-                            P4_CreateRange('0', '9', 1),
-                            P4_CreateRange('a', 'f', 1),
-                            P4_CreateRange('A', 'F', 1)
-                        ), 2
-                    )
+                    P4_CreateCut(),
+                    P4_CreateReference("two_hexdigits")
                 ),
-                P4_CreateSequenceWithMembers(2,
+                P4_CreateSequenceWithMembers(3,
                     P4_CreateLiteral("u", true),
-                    P4_CreateRepeatExact(
-                        P4_CreateChoiceWithMembers(3,
-                            P4_CreateRange('0', '9', 1),
-                            P4_CreateRange('a', 'f', 1),
-                            P4_CreateRange('A', 'F', 1)
-                        ), 4
-                    )
+                    P4_CreateCut(),
+                    P4_CreateReference("four_hexdigits")
                 ),
-                P4_CreateSequenceWithMembers(2,
+                P4_CreateSequenceWithMembers(3,
                     P4_CreateLiteral("U", true),
-                    P4_CreateRepeatExact(
-                        P4_CreateChoiceWithMembers(3,
-                            P4_CreateRange('0', '9', 1),
-                            P4_CreateRange('a', 'f', 1),
-                            P4_CreateRange('A', 'F', 1)
-                        ), 8
-                    )
+                    P4_CreateCut(),
+                    P4_CreateReference("eight_hexdigits")
                 )
             )
         )

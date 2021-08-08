@@ -267,7 +267,7 @@ void test_rule(void) {
         "]}"
     "]");
 
-    ASSERT_PEG_PARSE("rule", "a = \"1\"", P4_MatchError, "line 1:8, expect rule (char ';')");
+    ASSERT_PEG_PARSE("rule", "a = \"1\"", P4_CutError, "line 1:8, expect rule (char ';')");
 }
 
 void test_cut(void) {
@@ -294,7 +294,7 @@ void test_grammar(void) {
             "]}"
         "]"
     );
-    ASSERT_PEG_PARSE("grammar", "a = \"1\";\nb = \"2\"", P4_MatchError, "line 2:1, expect grammar");
+    ASSERT_PEG_PARSE("grammar", "a = \"1\";\nb = \"2\"", P4_CutError, "line 2:8, expect rule (char ';')");
 }
 
 void test_eval_literal(void) {
@@ -983,7 +983,7 @@ void test_eval_grammar(void) {
 void test_eval_bad_grammar(void) {
     ASSERT_BAD_GRAMMAR(
         "R1 = \"a\"",
-        "MatchError: failed to parse peg rules: line 1:1, expect grammar."
+        "CutError: failed to parse grammar: line 1:9, expect rule (char ';')."
     );
 }
 

@@ -2923,6 +2923,7 @@ P4_GetErrorString(P4_Error err) {
         case P4_NullError: return "NullError";
         case P4_StackError: return "StackError";
         case P4_PegError: return "PegError";
+        case P4_CutError: return "CutError";
         default: return "UnknownError";
     }
 }
@@ -3804,9 +3805,10 @@ P4_Grammar* P4_CreatePegGrammar () {
             P4_CreateReference("decorator")
     ));
 
-    catch_err(P4_AddSequenceWithMembers(grammar, "rule", 5,
+    catch_err(P4_AddSequenceWithMembers(grammar, "rule", 6,
         P4_CreateReference("decorators"),
         P4_CreateReference("name"),
+        P4_CreateCut(),
         P4_CreateLiteral("=", true),
         P4_CreateReference("expression"),
         P4_CreateLiteral(";", true)
@@ -4425,7 +4427,7 @@ P4_LoadGrammarResult(P4_String rules, P4_Result* result) {
 
     /* parse grammar rule source */
     catch_err(P4_Parse(bootstrap, rules_src), {
-        P4_EvalRaisef(result, "%s: failed to parse peg rules: %s.",
+        P4_EvalRaisef(result, "%s: failed to parse grammar: %s.",
             P4_GetErrorString(err), P4_GetErrorMessage(rules_src));
     });
 

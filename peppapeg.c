@@ -2266,7 +2266,7 @@ P4_Match(P4_Source* s, P4_Expression* e) {
 
     result = P4_MatchDispatch(s, e);
 
-    if (no_match(s) && P4_PeekFrame(s)->cut) {
+    if (no_match(s) && P4_PeekFrame(s)->cut && !s->whitespacing) {
         s->err = P4_CutError;
     }
 

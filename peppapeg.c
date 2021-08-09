@@ -430,8 +430,6 @@ struct P4_Frame {
     bool            silent;
     /** Whether cut is enabled to frame. */
     bool            cut;
-    /** Which local expr is bound to cut point. */
-    P4_Expression*  cutexp;
     /** The next frame in the stack. */
     P4_Frame*       next;
 };
@@ -1749,7 +1747,6 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
     frame->expr = e;
     frame->next = top;
     frame->cut = false;
-    frame->cutexp = NULL;
 
     /* Set rule */
     if (is_rule(e)) {
@@ -2209,7 +2206,6 @@ P4_MatchCut(P4_Source* s, P4_Expression* e) {
     /* enable flag cut in the top frame. */
     P4_Frame* frame = P4_PeekFrame(s);
     frame->cut = true;
-    frame->cutexp = e;
     return NULL;
 }
 
@@ -2280,7 +2276,7 @@ P4_Match(P4_Source* s, P4_Expression* e) {
     result = P4_MatchDispatch(s, e);
 
     P4_Frame* frame = P4_PeekFrame(s);
-    if (no_match(s) && frame->cut && frame->cutexp == e && !s->whitespacing) {
+    if (no_match(s) && frame->cut && !s->whitespacing) {
         s->err = P4_CutError;
     }
 

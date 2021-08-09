@@ -28,7 +28,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
-#include <assert.h>
 #include <inttypes.h>
 
 /** Start of khash.h */
@@ -423,6 +422,8 @@ struct P4_Expression {
 struct P4_Frame {
     /** The current matching expression for the frame. */
     P4_Expression*  expr;
+    /** The current rule for the frame. */
+    P4_Expression*  rule;
     /** Whether spacing is applicable to frame & frame dependents. */
     bool            space;
     /** Whether silencing is applicable to frame & frame dependents. */
@@ -497,20 +498,13 @@ struct P4_Source {
 /** It indicates the function or type is not for public use. */
 # define P4_PRIVATE(type) static type
 
-# define P4_UnwrapGrammar(r) ((r)->errmsg[0] == 0 ? (r)->grammar : NULL)
-# define P4_UnwrapExpression(r) ((r)->errmsg[0] == 0 ? (r)->expr : NULL)
+# define unwrap_grammar(r) ((r)->errmsg[0] == 0 ? (r)->grammar : NULL)
+# define unwrap_expr(r) ((r)->errmsg[0] == 0 ? (r)->expr : NULL)
 
 static void panic(const char * str)     __attribute__((noreturn));
 static void panic(const char * str)     { fputs(str, stderr); exit(1); }
 static void panicf(const char * fmt, ...) __attribute__((noreturn));
 static void panicf(const char * fmt, ...) { va_list args; va_start(args, fmt); vfprintf(stderr, fmt, args); exit(1); }
-
-#define P4_EvalRaise(fmt, ...) \
-    do { \
-        memset(result->errmsg, 0, sizeof(result->errmsg)); \
-        sprintf(result->errmsg, (fmt), __VA_ARGS__); \
-        goto finalize; \
-    } while (0);
 
 # if defined(DEBUG)
 #define UNREACHABLE() panicf("[%s:%d] This code should not be reached in %s()\n", __FILE__, __LINE__, __func__);
@@ -522,57 +516,65 @@ static void panicf(const char * fmt, ...) { va_list args; va_start(args, fmt); v
 #define UNREACHABLE()
 # endif
 
-# if defined(DEBUG)
-#define ASSERT(c,m) if(!(c)) panicf("[%s:%d] Assert failed in %s(): %s\n", __FILE__, __LINE__, __func__, (m));
-# else
-#define ASSERT(c,m) do { } while (false)
-# endif
+#define assert(c,m) \
+    if(!(c)) \
+        panicf("[%s:%d] Assert failed in %s(): %s\n", __FILE__, __LINE__, __func__, (m));
 
-# define                        catch_oom(s) \
-    do { \
-        if ((s) == NULL) { \
-            panic("out of memory."); \
-        } \
-    } while (0);
-
-# define                        catch_err(s, ...) \
-    do { \
-        if ((err = (s)) != P4_Ok) { \
-            __VA_ARGS__; \
-            goto finalize; \
-        } \
-    } while (0);
-
-# define                        IS_END(s) ((s)->pos >= (s)->slice.stop.pos)
-# define                        IS_TIGHT(e) (((e)->flag & P4_FLAG_TIGHT) != 0)
-# define                        IS_SCOPED(e) (((e)->flag & P4_FLAG_SCOPED) != 0)
-# define                        IS_SPACED(e) (((e)->flag & P4_FLAG_SPACED) != 0)
-# define                        IS_SQUASHED(e) (((e)->flag & P4_FLAG_SQUASHED) != 0)
-# define                        IS_LIFTED(e) (((e)->flag & P4_FLAG_LIFTED) != 0)
-# define                        IS_NON_TERMINAL(e) (((e)->flag & P4_FLAG_NON_TERMINAL) != 0)
-# define                        IS_RULE(e) ((e)->name != NULL)
-# define                        NEED_SILENT(s) ((s)->frame_stack ? (s)->frame_stack->silent : false)
-# define                        NEED_SPACE(s) (!(s)->whitespacing && ((s)->frame_stack ? (s)->frame_stack->space : false))
-# define                        NO_ERROR(s) ((s)->err == P4_Ok)
-# define                        NO_MATCH(s) ((s)->err == P4_MatchError)
-# define                        P4_GetSliceSize(s) ((s)->stop.pos - (s)->start.pos)
-# define                        P4_SetPosition(s, d) do { \
-    (s)->pos = (d)->pos; \
-    (s)->lineno = (d)->lineno; \
-    (s)->offset = (d)->offset; \
+# define catch_oom(s) do { \
+    if ((s) == NULL) { \
+        panic("out of memory."); \
+    } \
 } while (0);
-# define                        P4_SetSlicePositions(s, a, b) do { \
-    P4_SetPosition(&((s)->start), (a)); \
-    P4_SetPosition(&((s)->stop), (b)); \
-} while (0)
+
+# define catch_err(s, ...) do { \
+    if ((err = (s)) != P4_Ok) { \
+        __VA_ARGS__; \
+        goto finalize; \
+    } \
+} while (0);
+
+# define is_end(s) ((s)->pos >= (s)->slice.stop.pos)
+# define is_tight(e) (((e)->flag & P4_FLAG_TIGHT) != 0)
+# define is_scoped(e) (((e)->flag & P4_FLAG_SCOPED) != 0)
+# define is_spaced(e) (((e)->flag & P4_FLAG_SPACED) != 0)
+# define is_squashed(e) (((e)->flag & P4_FLAG_SQUASHED) != 0)
+# define is_lifted(e) (((e)->flag & P4_FLAG_LIFTED) != 0)
+# define is_non_terminal(e) (((e)->flag & P4_FLAG_NON_TERMINAL) != 0)
+# define is_rule(e) ((e)->name != NULL)
+# define need_silent(s) ((s)->frame_stack ? (s)->frame_stack->silent : false)
+# define need_whitespace(s) (!(s)->whitespacing && ((s)->frame_stack ? (s)->frame_stack->space : false))
+
+# define no_error(s) ((s)->err == P4_Ok)
+# define no_match(s) ((s)->err == P4_MatchError)
+
+# define set_position(s, d) \
+    do { \
+        (s)->pos = (d)->pos; \
+        (s)->lineno = (d)->lineno; \
+        (s)->offset = (d)->offset; \
+    } while (0);
+# define mark_position(s, p) \
+    P4_Position* p = & (P4_Position) { \
+        .pos = (s)->pos, \
+        .lineno = (s)->lineno, \
+        .offset = (s)->offset \
+    };
+
+# define get_slice_size(s) ((s)->stop.pos - (s)->start.pos)
+# define set_slice(s, a, b) \
+    do { \
+        set_position(&((s)->start), (a)); \
+        set_position(&((s)->stop), (b)); \
+    } while (0)
 
 #define foreach_child(node, child, code) \
-    for ((child) = (node)->head; (child) != NULL; (child) = (child)->next) { code; }
-
-# define                        autofree __attribute__ ((cleanup (cleanup_freep)))
+    for ((child) = (node)->head; \
+            (child) != NULL; \
+            (child) = (child)->next) { \
+        code; \
+    }
 
 #define strdup(x) panic("Do not use strdup(). Use STRDUP() instead.")
-
 static char *STRDUP(const char *src) { /* STRDUP is not ANSI. Copy source here. */
     char *dst = P4_MALLOC(strlen (src) + 1);
     if (dst == NULL) return NULL;
@@ -580,12 +582,10 @@ static char *STRDUP(const char *src) { /* STRDUP is not ANSI. Copy source here. 
     return dst;
 }
 
-P4_PRIVATE(void)
-cleanup_freep (void *p)
-{
+# define autofree __attribute__ ((cleanup (cleanup_freep)))
+static void cleanup_freep (void *p) { /* clean a malloc-ed variable. */
   void **pp = (void **) p;
-  if (*pp)
-    P4_FREE(*pp);
+  if (*pp) P4_FREE(*pp);
 }
 
 P4_PRIVATE(size_t)       P4_GetRuneSize(P4_Rune ch);
@@ -595,12 +595,6 @@ P4_PRIVATE(int)          P4_CaseCmpInsensitive(const void*, const void*, size_t 
 
 P4_PRIVATE(size_t)       P4_GetPosition(P4_Source*);
 P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size_t offset, P4_Position* stop);
-
-# define                 P4_MarkPosition(s, p) P4_Position* p = & (P4_Position) { \
-                             .pos = (s)->pos, \
-                             .lineno = (s)->lineno, \
-                             .offset = (s)->offset \
-                         };
 
 # define P4_AdoptNode(head, tail, list) \
     do { \
@@ -647,8 +641,14 @@ P4_PRIVATE(bool)                P4_NeedLift(P4_Source*, P4_Expression*);
     do { \
         (s)->err = (e); \
         memset((s)->errmsg, 0, sizeof((s)->errmsg)); \
-        sprintf((s)->errmsg, m ", line %zu:%zu (char %zu)", \
-                __VA_ARGS__, (s)->lineno, (s)->offset, (s)->pos); \
+        sprintf((s)->errmsg, "line %zu:%zu, " m, \
+                (s)->lineno, (s)->offset, __VA_ARGS__); \
+    } while (0);
+
+# define P4_EvalRaisef(r,m,...) \
+    do { \
+        memset((r)->errmsg, 0, sizeof((r)->errmsg)); \
+        sprintf((r)->errmsg, (m), __VA_ARGS__); \
     } while (0);
 
 P4_PRIVATE(void)                P4_RescueError(P4_Source*);
@@ -1186,15 +1186,16 @@ static P4_RuneRange _Zs[] = {
 };
 
 
-size_t P4_GetRuneSize(P4_Rune ch) { if (0 == ((P4_Rune)0xffffff80 & ch)) {
-    return 1;
-  } else if (0 == ((P4_Rune)0xfffff800 & ch)) {
-    return 2;
-  } else if (0 == ((P4_Rune)0xffff0000 & ch)) {
-    return 3;
-  } else { /* e.g.  0 == ((int)0xffe00000 & chr)) */
-    return 4;
-  }
+size_t P4_GetRuneSize(P4_Rune ch) {
+    if (0 == ((P4_Rune)0xffffff80 & ch)) {
+        return 1;
+    } else if (0 == ((P4_Rune)0xfffff800 & ch)) {
+        return 2;
+    } else if (0 == ((P4_Rune)0xffff0000 & ch)) {
+        return 3;
+    } else { /* e.g.  0 == ((int)0xffe00000 & chr)) */
+        return 4;
+    }
 }
 
 /**
@@ -1321,7 +1322,7 @@ size_t P4_ReadEscapedRune(char* text, P4_Rune* rune) {
 }
 
 size_t P4_ReadRuneRange(char* text, P4_Slice* slice, size_t* count, P4_RuneRange** ranges) {
-    size_t len = P4_GetSliceSize(slice);
+    size_t len = get_slice_size(slice);
 
 # define READ_RUNE_RANGE(p,l) \
     if (len == (l) && memcmp(text+slice->start.pos, #p , len) == 0) {\
@@ -1600,7 +1601,7 @@ P4_CaseCmpInsensitive(const void* src1, const void* src2, size_t n) {
  */
 P4_PRIVATE(bool)
 P4_NeedLift(P4_Source* s, P4_Expression* e) {
-    return !IS_RULE(e) || IS_LIFTED(e) || NEED_SILENT(s);
+    return !is_rule(e) || is_lifted(e) || need_silent(s);
 }
 
 /*
@@ -1634,7 +1635,7 @@ P4_CreateNode (const P4_String     str,
     node->head         = NULL;
     node->tail         = NULL;
 
-    P4_SetSlicePositions(&node->slice, start, stop);
+    set_slice(&node->slice, start, stop);
 
     return node;
 }
@@ -1715,12 +1716,10 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
 
     /* Set silent */
     frame->silent = false;
-
     P4_Frame* top = s->frame_stack;
-
-    if (!IS_SCOPED(e)) {
+    if (!is_scoped(e)) {
         if (
-            (top && IS_SQUASHED(top->expr))
+            (top && is_squashed(top->rule))
             || (top && top->silent)
         )
             frame->silent = true;
@@ -1728,16 +1727,15 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
 
     /* Set space */
     frame->space = false;
-
     if (P4_GetWhitespaces(s->grammar) != NULL
             && !s->whitespacing) {
-        if (IS_SCOPED(e)) {
+        if (is_scoped(e)) {
             frame->space = true;
         } else if (top) {
-            if (!IS_TIGHT(e)) {
+            if (!is_tight(e)) {
                 frame->space = top->space;
             }
-        } else if (!IS_TIGHT(e)) {
+        } else if (!is_tight(e)) {
             frame->space = true;
         }
     }
@@ -1745,7 +1743,12 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
     /* Set expr & next */
     frame->expr = e;
     frame->next = top;
+
+    /* Set cut */
     frame->cut = false;
+
+    /* Set rule */
+    frame->rule = is_rule(e) ? e : top->rule;
 
     /* Push stack */
     s->frame_stack_size++;
@@ -1760,7 +1763,7 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
  */
 P4_PRIVATE(P4_Error)
 P4_PopFrame(P4_Source* s, P4_Frame* f) {
-    ASSERT(s->frame_stack != NULL, "frame should not be empty");
+    assert(s->frame_stack != NULL, "frame should not be empty");
 
     P4_Frame* oldtop = s->frame_stack;
 
@@ -1776,17 +1779,17 @@ P4_PopFrame(P4_Source* s, P4_Frame* f) {
 
 P4_PRIVATE(P4_Node*)
 P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
-    assert(NO_ERROR(s));
+    assert(no_error(s), "can't proceed due to a failed match");
 
-    P4_MarkPosition(s, startpos);
+    mark_position(s, startpos);
 
     P4_String str = P4_RemainingText(s);
     P4_Rune rune[2] = {0};
     P4_ReadRune(e->literal, rune);
 
-    if (IS_END(s)) {
+    if (is_end(s)) {
         P4_MatchRaisef(s, P4_MatchError, "expect %s (char '%s')",
-                P4_PeekFrame(s)->expr->name, (char*)rune);
+                P4_PeekFrame(s)->rule->name, (char*)rune);
         return NULL;
     }
 
@@ -1794,20 +1797,20 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
     size_t slen = strlen(str);
     if (slen < len) {
         P4_MatchRaisef(s, P4_MatchError, "expect %s (len %zu)",
-                s->frame_stack->expr->name, len);
+                s->frame_stack->rule->name, len);
         return NULL;
     }
 
     if ((!e->sensitive && P4_CaseCmpInsensitive(e->literal, str, len) != 0)
             || (e->sensitive && memcmp(e->literal, str, len) != 0)) {
         P4_MatchRaisef(s, P4_MatchError, "expect %s (char '%s')",
-                P4_PeekFrame(s)->expr->name, (char*)rune);
+                P4_PeekFrame(s)->rule->name, (char*)rune);
         return NULL;
     }
 
     P4_Position* endpos= &(P4_Position){ 0 };
     P4_DiffPosition(s->content, startpos, len, endpos);
-    P4_SetPosition(s, endpos);
+    set_position(s, endpos);
 
     if (P4_NeedLift(s, e))
         return NULL;
@@ -1820,15 +1823,15 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
 
 P4_PRIVATE(P4_Node*)
 P4_MatchRange(P4_Source* s, P4_Expression* e) {
-    assert(NO_ERROR(s));
+    assert(no_error(s), "can't proceed due to a failed match");
 
     P4_String str = P4_RemainingText(s);
-    if (IS_END(s)) {
-        P4_MatchRaisef(s, P4_MatchError, "expect %s", P4_PeekFrame(s)->expr->name);
+    if (is_end(s)) {
+        P4_MatchRaisef(s, P4_MatchError, "expect %s", P4_PeekFrame(s)->rule->name);
         return NULL;
     }
 
-    P4_MarkPosition(s, startpos);
+    mark_position(s, startpos);
 
     uint32_t rune = 0x0;
     size_t size = P4_ReadRune(str, &rune);
@@ -1845,13 +1848,13 @@ P4_MatchRange(P4_Source* s, P4_Expression* e) {
     }
 
     if (!found) {
-        P4_MatchRaisef(s, P4_MatchError, "expect %s", P4_PeekFrame(s)->expr->name);
+        P4_MatchRaisef(s, P4_MatchError, "expect %s", P4_PeekFrame(s)->rule->name);
         return NULL;
     }
 
     P4_Position* endpos= &(P4_Position){ 0 };
     P4_DiffPosition(s->content, startpos, size, endpos);
-    P4_SetPosition(s, endpos);
+    set_position(s, endpos);
 
     if (P4_NeedLift(s, e))
         return NULL;
@@ -1876,7 +1879,7 @@ P4_GetReference(P4_Source* s, P4_Expression* e) {
 
 P4_PRIVATE(P4_Node*)
 P4_MatchReference(P4_Source* s, P4_Expression* e) {
-    assert(NO_ERROR(s));
+    assert(no_error(s), "can't proceed due to a failed match");
 
     if (e->ref_expr == NULL && e->reference != NULL) {
         e->ref_expr = P4_GetGrammarRule(s->grammar, e->reference);
@@ -1887,12 +1890,12 @@ P4_MatchReference(P4_Source* s, P4_Expression* e) {
         return NULL;
     }
 
-    P4_MarkPosition(s, startpos);
+    mark_position(s, startpos);
     P4_Node* reftok = P4_Match(s, e->ref_expr);
-    P4_MarkPosition(s, endpos);
+    mark_position(s, endpos);
 
     /* Ref matching is terminated when error occurred. */
-    if (!NO_ERROR(s))
+    if (!no_error(s))
         return NULL;
 
     /* The referenced node is returned when silenced. */
@@ -1911,7 +1914,7 @@ P4_MatchReference(P4_Source* s, P4_Expression* e) {
 
 P4_PRIVATE(P4_Node*)
 P4_MatchSequence(P4_Source* s, P4_Expression* e) {
-    assert(NO_ERROR(s));
+    assert(no_error(s), "can't proceed due to a failed match");
 
     P4_Expression *member = NULL;
     P4_Node *head = NULL,
@@ -1923,9 +1926,9 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
     if (backrefs == NULL)
         panic("failed to create slices: out of memory");
 
-    bool need_space = NEED_SPACE(s);
+    bool space = need_whitespace(s);
 
-    P4_MarkPosition(s, startpos);
+    mark_position(s, startpos);
 
     size_t i = 0;
 
@@ -1933,41 +1936,47 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
         member = e->members[i];
 
         /* Optional `WHITESPACE` and `COMMENT` are inserted between every member. */
-        if (need_space && i > 0) {
+        if (space && i > 0) {
             whitespace = P4_MatchSpacedExpressions(s, NULL);
-            if (!NO_ERROR(s)) goto finalize;
+            if (!no_error(s)) goto finalize;
             P4_AdoptNode(head, tail, whitespace);
         }
 
-        P4_MarkPosition(s, member_startpos);
+        mark_position(s, member_startpos);
 
-        if (member->kind == P4_BackReference) {
-            tok = P4_MatchBackReference(s, e, backrefs, member);
-            if (!NO_ERROR(s)) goto finalize;
-        } else {
-            tok = P4_Match(s, member);
+        switch (member->kind) {
+            case P4_BackReference:
+                tok = P4_MatchBackReference(s, e, backrefs, member);
+                if (!no_error(s)) goto finalize;
+                break;
+            case P4_Cut:
+                tok = P4_MatchCut(s, e);
+                break;
+            default:
+                tok = P4_Match(s, member);
+                break;
         }
 
         /* If any of the sequence members fails, the entire sequence fails. */
         /* Puke the eaten text and free all created nodes. */
-        if (!NO_ERROR(s)) {
+        if (!no_error(s)) {
             goto finalize;
         }
 
         P4_AdoptNode(head, tail, tok);
 
-        P4_MarkPosition(s, member_endpos);
-        P4_SetSlicePositions(&backrefs[i], member_startpos, member_endpos);
+        mark_position(s, member_endpos);
+        set_slice(&backrefs[i], member_startpos, member_endpos);
     }
 
     if (P4_NeedLift(s, e))
         return head;
 
-    if (IS_NON_TERMINAL(e) && head != NULL && head->next == NULL) {
+    if (is_non_terminal(e) && head != NULL && head->next == NULL) {
         return head;
     }
 
-    P4_MarkPosition(s, endpos);
+    mark_position(s, endpos);
 
     P4_Node*  ret = NULL;
     catch_oom(ret = P4_CreateNode(s->content, startpos, endpos, e->name));
@@ -1977,7 +1986,7 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
     return ret;
 
 finalize:
-    P4_SetPosition(s, startpos);
+    set_position(s, startpos);
     P4_DeleteNode(head);
     return NULL;
 }
@@ -1989,25 +1998,25 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
 
     /* A member is attempted if previous yields no match. */
     /* The oneof match matches successfully immediately if any match passes. */
-    P4_MarkPosition(s, startpos);
+    mark_position(s, startpos);
     size_t i;
     for (i = 0; i < e->count; i++) {
         member = e->members[i];
         tok = P4_Match(s, member);
-        if (NO_ERROR(s)) break;
-        if (NO_MATCH(s)) {
+        if (no_error(s)) break;
+        if (no_match(s)) {
             /* retry until the last one. */
             if (i < e->count-1) {
                 P4_RescueError(s);
-                P4_SetPosition(s, startpos);
+                set_position(s, startpos);
             /* fail when the last one is a no-match. */
             } else {
-                P4_MatchRaisef(s, P4_MatchError, "expect %s", P4_PeekFrame(s)->expr->name);
+                P4_MatchRaisef(s, P4_MatchError, "expect %s", P4_PeekFrame(s)->rule->name);
                 goto finalize;
             }
         }
     }
-    P4_MarkPosition(s, endpos);
+    mark_position(s, endpos);
 
     if (P4_NeedLift(s, e))
         return tok;
@@ -2020,7 +2029,7 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
     return oneof;
 
 finalize:
-    P4_SetPosition(s, startpos);
+    set_position(s, startpos);
     P4_FREE(tok);
     return NULL;
 }
@@ -2036,9 +2045,10 @@ P4_PRIVATE(P4_Node*)
 P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     size_t min = SIZE_MAX, max = SIZE_MAX, repeated = 0;
 
-    assert(e->repeat_min != min || e->repeat_max != max); /* need at least one of min/max. */
-    assert(e->repeat_expr != NULL); /* need repeat expression. */
-    assert(NO_ERROR(s));
+    assert(e->repeat_min != min || e->repeat_max != max,
+            "need at least one of min/max");
+    assert(e->repeat_expr != NULL, "need repeat expression");
+    assert(no_error(s), "can't proceed due to a failed match");
 
 # define IS_REF(e) ((e)->kind == P4_Reference)
 # define IS_PROGRESSING(k) ((k)==P4_Positive \
@@ -2052,44 +2062,41 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
             (IS_REF(e->repeat_expr)
              && IS_PROGRESSING(P4_GetReference(s, e->repeat_expr)->kind))) {
         P4_MatchRaisef(s, P4_AdvanceError,
-            "expect %s (no progressing in repetition)", P4_PeekFrame(s)->expr->name);
+            "expect %s (no progressing in repetition)", P4_PeekFrame(s)->rule->name);
         return NULL;
     }
 
     min = e->repeat_min;
     max = e->repeat_max;
 
-    bool need_space = NEED_SPACE(s);
-    P4_MarkPosition(s, startpos);
+    bool space = need_whitespace(s);
+    mark_position(s, startpos);
     P4_Node *head = NULL, *tail = NULL, *tok = NULL, *whitespace = NULL;
 
-    while (!IS_END(s)) {
-        P4_MarkPosition(s, whitespace_startpos);
+    while (!is_end(s)) {
+        mark_position(s, whitespace_startpos);
 
         /* SPACED rule expressions are inserted between every repetition. */
-        if (need_space && repeated > 0 ) {
+        if (space && repeated > 0 ) {
             whitespace = P4_MatchSpacedExpressions(s, NULL);
-            if (!NO_ERROR(s)) goto finalize;
+            if (!no_error(s)) goto finalize;
             P4_AdoptNode(head, tail, whitespace);
         }
 
         tok = P4_Match(s, e->repeat_expr);
 
-        P4_MarkPosition(s, member_endpos);
-        P4_SetPosition(s, member_endpos);
+        if (no_match(s)) {
+            assert(tok == NULL, "failed match should not produce a token");
 
-        if (NO_MATCH(s)) {
-            assert(tok == NULL);
-
-            /* considering the case: MATCH WHITESPACE MATCH WHITESPACE NO_MATCH */
-            if (need_space && repeated > 0){/*              ^          ^ we are here */
+            /* considering the case: MATCH WHITESPACE MATCH WHITESPACE no_match */
+            if (space && repeated > 0){/*              ^          ^ we are here */
                                                                   /* ^ puke extra whitespace */
-                P4_SetPosition(s, whitespace_startpos);
+                set_position(s, whitespace_startpos);
                                                /*           ^ now we are here */
             }
 
             if (min != SIZE_MAX && repeated < min) {
-                P4_MatchRaisef(s, P4_MatchError, "expect %s", P4_PeekFrame(s)->expr->name);
+                P4_MatchRaisef(s, P4_MatchError, "expect %s (insufficient repetitions)", P4_PeekFrame(s)->rule->name);
                 goto finalize;
             } else {                       /* sufficient repetitions. */
                 P4_RescueError(s);
@@ -2097,12 +2104,12 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
             }
         }
 
-        if (!NO_ERROR(s))
+        if (!no_error(s))
             goto finalize;
 
         if (P4_GetPosition(s) == whitespace_startpos->pos) {
             P4_MatchRaisef(s, P4_MatchError,
-                    "expect %s (repetition not advancing)", P4_PeekFrame(s)->expr->name);
+                    "expect %s (repetition not advancing)", P4_PeekFrame(s)->rule->name);
             goto finalize;
         }
 
@@ -2117,20 +2124,20 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     }
 
     /* there should be no error when repetition is successful. */
-    assert(NO_ERROR(s));
+    assert(no_error(s), "can't proceed due to a failed match");
 
     /* fails when attempts are excessive, e.g. repeated > max. */
     if (max != SIZE_MAX && repeated > max) {
         P4_MatchRaisef(s, P4_MatchError,
             "expect %s (at most %zu repetitions)",
-            P4_PeekFrame(s)->expr->name, max);
+            P4_PeekFrame(s)->rule->name, max);
         goto finalize;
     }
 
     if (min != SIZE_MAX && repeated < min) {
         P4_MatchRaisef(s, P4_MatchError,
             "expect %s (at least %zu repetitions)",
-            P4_PeekFrame(s)->expr->name, min);
+            P4_PeekFrame(s)->rule->name, min);
         goto finalize;
     }
 
@@ -2140,11 +2147,11 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     if (P4_NeedLift(s, e))
         return head;
 
-    if (IS_NON_TERMINAL(e) && head != NULL && head->next == NULL) {
+    if (is_non_terminal(e) && head != NULL && head->next == NULL) {
         return head;
     }
 
-    P4_MarkPosition(s, endpos);
+    mark_position(s, endpos);
 
     P4_Node*  ret = NULL;
     catch_oom(ret = P4_CreateNode(s->content, startpos, endpos, e->name));
@@ -2155,37 +2162,37 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
 /* cleanup before returning NULL. */
 /* nodes between head..tail should be freed. */
 finalize:
-    P4_SetPosition(s, startpos);
+    set_position(s, startpos);
     P4_DeleteNode(head);
     return NULL;
 }
 
 P4_PRIVATE(P4_Node*)
 P4_MatchPositive(P4_Source* s, P4_Expression* e) {
-    assert(NO_ERROR(s) && e->ref_expr != NULL);
+    assert(no_error(s) && e->ref_expr != NULL, "expression should not be null");
 
-    P4_MarkPosition(s, startpos);
+    mark_position(s, startpos);
 
     P4_Node* node = P4_Match(s, e->ref_expr);
     if (node != NULL)
         P4_DeleteNode(node);
 
-    P4_SetPosition(s, startpos);
+    set_position(s, startpos);
 
     return NULL;
 }
 
 P4_PRIVATE(P4_Node*)
 P4_MatchNegative(P4_Source* s, P4_Expression* e) {
-    assert(NO_ERROR(s) && e->ref_expr != NULL);
+    assert(no_error(s) && e->ref_expr != NULL, "expression should not be null");
 
-    P4_MarkPosition(s, startpos);
+    mark_position(s, startpos);
     P4_Node* node = P4_Match(s, e->ref_expr);
-    P4_SetPosition(s, startpos);
+    set_position(s, startpos);
 
-    if (NO_ERROR(s)) {
+    if (no_error(s)) {
         P4_DeleteNode(node);
-        P4_MatchRaisef(s, P4_MatchError, "expect %s", P4_PeekFrame(s)->expr->name);
+        P4_MatchRaisef(s, P4_MatchError, "expect %s", P4_PeekFrame(s)->rule->name);
     } else if (s->err == P4_MatchError || s->err == P4_CutError) {
         P4_RescueError(s);
     }
@@ -2196,7 +2203,8 @@ P4_MatchNegative(P4_Source* s, P4_Expression* e) {
 P4_PRIVATE(P4_Node*)
 P4_MatchCut(P4_Source* s, P4_Expression* e) {
     /* enable flag cut in the top frame. */
-    P4_PeekFrame(s)->cut = true;
+    P4_Frame* frame = P4_PeekFrame(s);
+    frame->cut = true;
     return NULL;
 }
 
@@ -2226,12 +2234,11 @@ P4_MatchDispatch(P4_Source* s, P4_Expression* e) {
         case P4_Negative:
             result = P4_MatchNegative(s, e);
             break;
-        case P4_Cut:
-            result = P4_MatchCut(s, e);
-            break;
         case P4_Repeat:
             result = P4_MatchRepeat(s, e);
             break;
+        case P4_Cut:
+            panic("cut can be applied only in sequence.");
         case P4_BackReference:
             panic("backreference can be applied only in sequence.");
         default:
@@ -2253,29 +2260,26 @@ P4_MatchDispatch(P4_Source* s, P4_Expression* e) {
  */
 P4_Node*
 P4_Match(P4_Source* s, P4_Expression* e) {
-    assert(e != NULL);
+    assert(e != NULL, "expression should not be null");
 
     P4_Error     err = P4_Ok;
     P4_Node* result = NULL;
 
     catch_err(s->err);
 
-    if (IS_RULE(e)) {
-        catch_err(
-            P4_PushFrame(s, e),
-            P4_MatchRaisef(s, err, "expect %s (max recursion)", e->name)
-        );
-    }
+    catch_err(
+        P4_PushFrame(s, e),
+        P4_MatchRaisef(s, err, "expect %s (max recursion)", e->name)
+    );
 
     result = P4_MatchDispatch(s, e);
 
-    if (NO_MATCH(s) && P4_PeekFrame(s)->cut) {
+    P4_Frame* frame = P4_PeekFrame(s);
+    if (no_match(s) && frame->cut && !s->whitespacing) {
         s->err = P4_CutError;
     }
 
-    if (IS_RULE(e)) {
-        P4_PopFrame(s, NULL);
-    }
+    P4_PopFrame(s, NULL);
 
     catch_err(s->err, {
         P4_DeleteNode(result);
@@ -2295,8 +2299,10 @@ P4_Match(P4_Source* s, P4_Expression* e) {
     return result;
 
 finalize:
-    if (s->grammar->on_error && (err = (s->grammar->on_error)(s->grammar, e)) != P4_Ok) {
-        P4_MatchRaisef(s, s->err, "expect %s (error callback failed)", e->name);
+    if (s->grammar->on_error != NULL) {
+        err = (s->grammar->on_error)(s->grammar, e);
+        if (err != P4_Ok && s->errmsg[0] == 0)
+            P4_MatchRaisef(s, s->err, "expect %s (error callback failed)", e->name);
     }
     return NULL;
 }
@@ -2305,13 +2311,13 @@ P4_PRIVATE(P4_Node*)
 P4_MatchSpacedExpressions(P4_Source* s, P4_Expression* e) {
     /* implicit whitespace is guaranteed to be an unnamed rule. */
     /* state flag is guaranteed to be none. */
-    assert(NO_ERROR(s));
+    assert(no_error(s), "can't proceed due to a failed match");
 
     if (s->grammar == NULL)
         return NULL;
 
     P4_Expression* implicit_whitespace = P4_GetWhitespaces(s->grammar);
-    assert(implicit_whitespace != NULL);
+    assert(implicit_whitespace != NULL, "implicit whitespace should not be null");
 
     /* (1) Temporarily set implicit whitespace to empty. */
     s->whitespacing = true;
@@ -2319,7 +2325,7 @@ P4_MatchSpacedExpressions(P4_Source* s, P4_Expression* e) {
     /* (2) Perform implicit whitespace checks. */
     /*     We won't do implicit whitespace inside an implicit whitespace expr. */
     P4_Node* result = P4_Match(s, implicit_whitespace);
-    if (NO_MATCH(s))
+    if (no_match(s))
         P4_RescueError(s);
 
     /* (3) Set implicit whitespace back. */
@@ -2330,19 +2336,19 @@ P4_MatchSpacedExpressions(P4_Source* s, P4_Expression* e) {
 
 P4_PRIVATE(P4_Node*)
 P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Expression* backref) {
-    ASSERT(backrefs != NULL, "backrefs should not be null");
+    assert(backrefs != NULL, "backrefs should not be null");
 
     size_t index = backref->backref_index;
 
     if (index > e->count || index < 0) {
         P4_MatchRaisef(s, P4_IndexError,
-            "expect %s (backref out of bound)", P4_PeekFrame(s)->expr->name);
+            "expect %s (backref out of bound)", P4_PeekFrame(s)->rule->name);
         return NULL;
     }
 
     P4_Slice* slice = &(backrefs[index]);
     /* backrefs is allocated as an array so it shouldn't be null. */
-    ASSERT(slice != NULL, "backref should not be null");
+    assert(slice != NULL, "backref should not be null");
 
     autofree P4_String litstr = NULL;
     catch_oom(litstr = P4_CopySliceString(s->content, slice));
@@ -2350,7 +2356,7 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
     P4_Expression* backref_expr = e->members[index];
 
     if (backref_expr == NULL) {
-        P4_MatchRaisef(s, P4_PegError, "expect %s (null backref expr)", P4_PeekFrame(s)->expr->name);
+        P4_MatchRaisef(s, P4_PegError, "expect %s (null backref expr)", P4_PeekFrame(s)->rule->name);
         return NULL;
     }
 
@@ -2820,12 +2826,12 @@ P4_SetSourceSlice(P4_Source* source, size_t start, size_t stop) {
 
     P4_Position* startpos = &(P4_Position){ .pos=0, .lineno=1, .offset=1 };
     P4_DiffPosition(source->content, startpos, start, startpos);
-    P4_SetPosition(source, startpos);
+    set_position(source, startpos);
 
     P4_Position* endpos = &(P4_Position){ 0 };
     P4_DiffPosition(source->content, startpos, stop-start, endpos);
 
-    P4_SetSlicePositions(&source->slice, startpos, endpos);
+    set_slice(&source->slice, startpos, endpos);
 
     return P4_Ok;
 }
@@ -2878,8 +2884,9 @@ P4_GetSourcePosition(P4_Source* source) {
 
 P4_PUBLIC P4_Error
 P4_Parse(P4_Grammar* grammar, P4_Source* source) {
-    if (source->err != P4_Ok)
-        return source->err;
+    P4_Error err = P4_Ok;
+
+    catch_err(source->err);
 
     if (source->root != NULL)
         return P4_Ok;
@@ -2891,23 +2898,20 @@ P4_Parse(P4_Grammar* grammar, P4_Source* source) {
 
     source->root            = tok;
 
+finalize:
     return source->err;
 }
 
 
 P4_PUBLIC bool
 P4_HasError(P4_Source* source) {
-    if (source == NULL)
-        return false;
-
+    if (source == NULL) panic("source must not be NULL.");
     return source->err != P4_Ok;
 }
 
 P4_PUBLIC P4_Error
 P4_GetError(P4_Source* source) {
-    if (source == NULL)
-        return P4_NullError;
-
+    if (source == NULL) panic("source must not be NULL.");
     return source->err;
 }
 
@@ -2926,6 +2930,7 @@ P4_GetErrorString(P4_Error err) {
         case P4_NullError: return "NullError";
         case P4_StackError: return "StackError";
         case P4_PegError: return "PegError";
+        case P4_CutError: return "CutError";
         default: return "UnknownError";
     }
 }
@@ -2946,7 +2951,7 @@ P4_SetWhitespaces(P4_Grammar* grammar) {
     /* Get the total number of SPACED rules */
     size_t          count = 0;
     kh_foreach_value(grammar->rules, rule, {
-        if (IS_SPACED(rule)) count++;
+        if (is_spaced(rule)) count++;
     });
 
     /* Set the total number of SPACED rules */
@@ -2963,7 +2968,7 @@ P4_SetWhitespaces(P4_Grammar* grammar) {
     /* Add all SPACED rules to the repeat expression. */
     size_t j = 0;
     kh_foreach_value(grammar->rules, rule, {
-        if (IS_SPACED(rule)) {
+        if (is_spaced(rule)) {
             catch_oom(rule_ref = P4_CreateReference(rule->name));
             rule_ref->ref_expr = rule;
 
@@ -3000,7 +3005,7 @@ P4_GetWhitespaces(P4_Grammar* g) {
 
 P4_PUBLIC void
 P4_SetExpressionFlag(P4_Expression* e, P4_ExpressionFlag f) {
-    assert(e != NULL);
+    assert(e != NULL, "expression should not be null");
     e->flag |= f;
 }
 
@@ -3381,9 +3386,7 @@ P4_CopySliceString(P4_String s, P4_Slice* slice) {
     /* return the string covered by the slice.
      * note that caller should free the copied string. */
 
-    size_t    len = P4_GetSliceSize(slice);
-    assert(len >= 0);
-
+    size_t    len = get_slice_size(slice);
     P4_String str = P4_MALLOC(len+1);
     strncpy(str, s + slice->start.pos, len);
     str[len] = '\0';
@@ -3546,7 +3549,7 @@ P4_ReplaceGrammarRule(P4_Grammar* grammar, P4_String name, P4_Expression* expr) 
     P4_DeleteExpression(oldexpr);
 
     /* set the new rule expr name. */
-    ASSERT(expr->name == NULL, "expr name should not set by P4_ReplaceGrammarRule().");
+    assert(expr->name == NULL, "expr name should not set by P4_ReplaceGrammarRule().");
     expr->name = STRDUP(name);
 
     /* ensure references in all rule expressions are refreshed
@@ -3582,6 +3585,18 @@ P4_Grammar* P4_CreatePegGrammar () {
     ));
     catch_err(P4_SetGrammarRuleFlag(grammar, "number", P4_FLAG_SQUASHED | P4_FLAG_TIGHT));
 
+    catch_err(P4_AddChoiceWithMembers(grammar, "hexdigit", 3,
+        P4_CreateRange('0', '9', 1),
+        P4_CreateRange('a', 'f', 1),
+        P4_CreateRange('A', 'F', 1)
+    ));
+    catch_err(P4_AddRepeatExact(grammar, "two_hexdigits",
+        P4_CreateReference("hexdigit"), 2));
+    catch_err(P4_AddRepeatExact(grammar, "four_hexdigits",
+        P4_CreateReference("hexdigit"), 4));
+    catch_err(P4_AddRepeatExact(grammar, "eight_hexdigits",
+        P4_CreateReference("hexdigit"), 8));
+
     catch_err(P4_AddChoiceWithMembers(grammar, "char", 4,
         P4_CreateRange(0x20, 0x21, 1), /* Can't be 0x22: double quote " */
         P4_CreateRange(0x23, 0x5b, 1), /* Can't be 0x5c: escape leading \ */
@@ -3597,35 +3612,20 @@ P4_Grammar* P4_CreatePegGrammar () {
                 P4_CreateLiteral("n", true),
                 P4_CreateLiteral("r", true),
                 P4_CreateLiteral("t", true),
-                P4_CreateSequenceWithMembers(2,
+                P4_CreateSequenceWithMembers(3,
                     P4_CreateLiteral("x", true),
-                    P4_CreateRepeatExact(
-                        P4_CreateChoiceWithMembers(3,
-                            P4_CreateRange('0', '9', 1),
-                            P4_CreateRange('a', 'f', 1),
-                            P4_CreateRange('A', 'F', 1)
-                        ), 2
-                    )
+                    P4_CreateCut(),
+                    P4_CreateReference("two_hexdigits")
                 ),
-                P4_CreateSequenceWithMembers(2,
+                P4_CreateSequenceWithMembers(3,
                     P4_CreateLiteral("u", true),
-                    P4_CreateRepeatExact(
-                        P4_CreateChoiceWithMembers(3,
-                            P4_CreateRange('0', '9', 1),
-                            P4_CreateRange('a', 'f', 1),
-                            P4_CreateRange('A', 'F', 1)
-                        ), 4
-                    )
+                    P4_CreateCut(),
+                    P4_CreateReference("four_hexdigits")
                 ),
-                P4_CreateSequenceWithMembers(2,
+                P4_CreateSequenceWithMembers(3,
                     P4_CreateLiteral("U", true),
-                    P4_CreateRepeatExact(
-                        P4_CreateChoiceWithMembers(3,
-                            P4_CreateRange('0', '9', 1),
-                            P4_CreateRange('a', 'f', 1),
-                            P4_CreateRange('A', 'F', 1)
-                        ), 8
-                    )
+                    P4_CreateCut(),
+                    P4_CreateReference("eight_hexdigits")
                 )
             )
         )
@@ -3793,8 +3793,9 @@ P4_Grammar* P4_CreatePegGrammar () {
     catch_err(P4_AddReference(grammar, "name", "reference"));
     catch_err(P4_SetGrammarRuleFlag(grammar, "name", P4_FLAG_SQUASHED));
 
-    catch_err(P4_AddSequenceWithMembers(grammar, "decorator", 2,
+    catch_err(P4_AddSequenceWithMembers(grammar, "decorator", 3,
         P4_CreateLiteral("@", true),
+        P4_CreateCut(),
         P4_CreateChoiceWithMembers(6,
             P4_CreateLiteral("squashed", true),
             P4_CreateLiteral("scoped", true),
@@ -3809,9 +3810,10 @@ P4_Grammar* P4_CreatePegGrammar () {
             P4_CreateReference("decorator")
     ));
 
-    catch_err(P4_AddSequenceWithMembers(grammar, "rule", 5,
+    catch_err(P4_AddSequenceWithMembers(grammar, "rule", 6,
         P4_CreateReference("decorators"),
         P4_CreateReference("name"),
+        P4_CreateCut(),
         P4_CreateLiteral("=", true),
         P4_CreateReference("expression"),
         P4_CreateLiteral(";", true)
@@ -3861,14 +3863,14 @@ finalize:
 # define NODE_ERROR_HINT \
                 node->slice.start.pos, \
                 node->slice.stop.pos, \
-                MIN((int)P4_GetSliceSize(&node->slice), 50), \
+                MIN((int)get_slice_size(&node->slice), 50), \
                 node->text + node->slice.start.pos
 
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalFlag(P4_Node* node, P4_ExpressionFlag *flag) {
     P4_String node_str = node->text + node->slice.start.pos;
-    size_t    node_len = P4_GetSliceSize(&node->slice);
+    size_t    node_len = get_slice_size(&node->slice);
 
     if (node_len == 9 && memcmp("@squashed", node_str, node_len) == 0)
         *flag = P4_FLAG_SQUASHED;
@@ -3942,13 +3944,11 @@ P4_PegEvalLiteral(P4_Node* node, P4_Result* result) {
                    cur  = NULL;
     P4_Expression* expr = NULL;
 
-    size_t len = P4_GetSliceSize(&node->slice) - 2; /* - 2: remove two quotes */
+    size_t len = get_slice_size(&node->slice) - 2; /* - 2: remove two quotes */
     if (len <= 0) {
-        err = P4_PegError;
-        P4_EvalRaise(
+        catch_err(P4_PegError, P4_EvalRaisef(result,
             "literal rule should have at least one character. "
-            NODE_ERROR_HINT_FMT, NODE_ERROR_HINT
-        );
+            NODE_ERROR_HINT_FMT, NODE_ERROR_HINT));
     }
 
     catch_oom(cur = lit = P4_MALLOC((len+1) * sizeof(char)));
@@ -3960,11 +3960,9 @@ P4_PegEvalLiteral(P4_Node* node, P4_Result* result) {
                 (rune == 0) ||
                 (size == 0) ||
                 (i + size > node->slice.stop.pos-1)) {
-            err = P4_PegError;
-            P4_EvalRaise(
+            catch_err(P4_PegError, P4_EvalRaisef(result,
                 "char %lu is invalid. " NODE_ERROR_HINT_FMT,
-                idx, NODE_ERROR_HINT
-            );
+                idx, NODE_ERROR_HINT));
         }
 
         cur = P4_ConcatRune(cur, rune, size);
@@ -3986,8 +3984,8 @@ P4_PegEvalInsensitiveLiteral(P4_Node* node, P4_Result* result) {
 
     /* eval literal and set it as insensitive. */
     catch_err(P4_PegEvalLiteral(node->head, result));
-    P4_Expression* expr = P4_UnwrapExpression(result);
-    ASSERT(expr != NULL, "insensitive literal expr should not be null.");
+    P4_Expression* expr = unwrap_expr(result);
+    assert(expr != NULL, "insensitive literal expr should not be null.");
     expr->sensitive = false;
     return P4_Ok;
 
@@ -4004,7 +4002,7 @@ P4_PegEvalRange(P4_Node* node, P4_Result* result) {
         P4_RuneRange* ranges = NULL;
         size_t count = 0;
 
-        if (0 == P4_ReadRuneRange(node->head->text, &node->head->slice, &count, &ranges))
+        if (P4_ReadRuneRange(node->head->text, &node->head->slice, &count, &ranges) == 0)
             panicf("ValueError: failed to read code point from source. "
                 NODE_ERROR_HINT_FMT, NODE_ERROR_HINT);
 
@@ -4023,29 +4021,23 @@ P4_PegEvalRange(P4_Node* node, P4_Result* result) {
         if (stride_node) catch_err(P4_PegEvalNumber(stride_node, &stride));
 
         if (lower > upper) {
-            err = P4_PegError;
-            P4_EvalRaise(
+            catch_err(P4_PegError, P4_EvalRaisef(result,
                 "range lower 0x%x is greater than upper 0x%x. "
-                NODE_ERROR_HINT_FMT, lower, upper, NODE_ERROR_HINT
-            );
+                NODE_ERROR_HINT_FMT, lower, upper, NODE_ERROR_HINT));
         }
 
         if ((lower == 0) || (upper == 0) || (stride == 0)) {
-            err = P4_PegError;
-            P4_EvalRaise(
+            catch_err(P4_PegError, P4_EvalRaisef(result,
                 "range lower 0x%x, upper 0x%x, stride 0x%lx "
                 "must be all non-zeros. " NODE_ERROR_HINT_FMT,
-                lower, upper, stride, NODE_ERROR_HINT
-            );
+                lower, upper, stride, NODE_ERROR_HINT));
         }
 
         if ((lower > 0x10ffff) || (upper > 0x10ffff)) {
-            err = P4_PegError;
-            P4_EvalRaise(
+            catch_err(P4_PegError, P4_EvalRaisef(result,
                 "range lower 0x%x, upper 0x%x must be "
                 "less than 0x10ffff. " NODE_ERROR_HINT_FMT,
-                lower, upper, NODE_ERROR_HINT
-            );
+                lower, upper, NODE_ERROR_HINT));
         }
 
         catch_oom(expr = P4_CreateRange(lower, upper, stride));
@@ -4067,7 +4059,7 @@ P4_PegEvalMembers(P4_Node* node, P4_Expression* expr, P4_Result* result) {
     /* for each child, eval expr and set it as ith member. */
     foreach_child(node, child, {
         catch_err(P4_PegEvalExpression(child, result));
-        catch_err(P4_SetMember(expr, i, P4_UnwrapExpression(result)));
+        catch_err(P4_SetMember(expr, i, unwrap_expr(result)));
         i++;
     });
 
@@ -4123,7 +4115,7 @@ P4_PegEvalPositive(P4_Node* node, P4_Result* result) {
 
     /* eval positive->ref_expr. */
     catch_err(P4_PegEvalExpression(node->head, result));
-    ref = P4_UnwrapExpression(result);
+    ref = unwrap_expr(result);
 
     /* create a positive expr. */
     catch_oom(expr = P4_CreatePositive(ref));
@@ -4145,7 +4137,7 @@ P4_PegEvalNegative(P4_Node* node, P4_Result* result) {
 
     /* eval negative->ref_expr. */
     catch_err(P4_PegEvalExpression(node->head, result));
-    ref = P4_UnwrapExpression(result);
+    ref = unwrap_expr(result);
 
     /* create a negative expr. */
     catch_oom(expr = P4_CreateNegative(ref));
@@ -4169,7 +4161,7 @@ P4_PegEvalRepeat(P4_Node* node, P4_Result* result) {
 
     /* eval repeated expr. */
     catch_err(P4_PegEvalExpression(node->head, result));
-    ref = P4_UnwrapExpression(result);
+    ref = unwrap_expr(result);
 
     /* eval repeat min/max. */
     P4_String       rule_name = node->head->next->rule_name;
@@ -4197,11 +4189,9 @@ P4_PegEvalRepeat(P4_Node* node, P4_Result* result) {
 
     /* repeat min should be greater than max. */
     if (min > max) {
-        err = P4_PegError;
-        P4_EvalRaise(
+        catch_err(P4_PegError, P4_EvalRaisef(result,
             "repeat min %lu is greater than max %lu. "
-            NODE_ERROR_HINT_FMT, min, max, NODE_ERROR_HINT
-        );
+            NODE_ERROR_HINT_FMT, min, max, NODE_ERROR_HINT));
     }
 
     /* create repeat expr. */
@@ -4231,8 +4221,8 @@ P4_PegEvalCut(P4_Node* node, P4_Result* result) {
 P4_PRIVATE(P4_Error)
 P4_PegEvalRuleName(P4_Node* node, P4_String* result) {
     /* get the rule name string length. */
-    size_t len = P4_GetSliceSize(&node->slice);
-    ASSERT(len > 0, "Node slice size should be greater than zero.");
+    size_t len = get_slice_size(&node->slice);
+    assert(len > 0, "Node slice size should be greater than zero.");
 
     /* malloc a new string for the rule name. */
     catch_oom(*result = P4_MALLOC((len+1) * sizeof(char)));
@@ -4287,8 +4277,8 @@ P4_PegEvalGrammarRule(P4_Node* node, P4_Result* result) {
     /* we can now unwrap an expr from the result.
      * next, let's set rule name and rule flags. */
 
-    expr = P4_UnwrapExpression(result);
-    ASSERT(expr != NULL, "failed to eval grammar rule expression");
+    expr = unwrap_expr(result);
+    assert(expr != NULL, "failed to eval grammar rule expression");
     expr->name = rule_name;
     expr->flag = rule_flag;
 
@@ -4313,7 +4303,7 @@ P4_PegEvalGrammarReferences(
     size_t   i   = 0;
     P4_Error err = P4_Ok;
 
-    ASSERT(expr != NULL, "reference expr is NULL.");
+    assert(expr != NULL, "reference expr is NULL.");
 
     switch (expr->kind) {
         /* detect if references are all "resolvable".
@@ -4321,8 +4311,10 @@ P4_PegEvalGrammarReferences(
         case P4_Reference:
             if (!expr->reference ||
                     !P4_GetGrammarRule(grammar, expr->reference)) {
-                err = P4_NameError;
-                P4_EvalRaise("reference %s is undefined", expr->reference);
+                catch_err(
+                    P4_NameError,
+                    P4_EvalRaisef(result, "reference %s is undefined", expr->reference)
+                );
             }
             break;
 
@@ -4360,10 +4352,11 @@ P4_PegEvalGrammar(P4_Node* node, P4_Result* result) {
      * and then add the rule to grammar object. */
     foreach_child(node, child, {
         catch_err(P4_PegEvalGrammarRule(child, result));
-
-        rule = P4_UnwrapExpression(result);
-        if ((err = P4_AddGrammarRule(grammar, rule->name, rule)) != P4_Ok)
-            P4_EvalRaise("failed to add rule %s.", rule->name);
+        rule = unwrap_expr(result);
+        catch_err(
+            P4_AddGrammarRule(grammar, rule->name, rule),
+            P4_EvalRaisef(result, "failed to add rule %s.", rule->name)
+        );
     });
 
     /* traverse all grammar rules to resolve references. */
@@ -4438,27 +4431,22 @@ P4_LoadGrammarResult(P4_String rules, P4_Result* result) {
     catch_oom(rules_src = P4_CreateSource(rules, "grammar"));
 
     /* parse grammar rule source */
-    if ((err = P4_Parse(bootstrap, rules_src)) != P4_Ok)
-        P4_EvalRaise(
-            "%s: failed to parse peg rules: %s.",
-            P4_GetErrorString(err),
-            P4_GetErrorMessage(rules_src)
-        );
+    catch_err(P4_Parse(bootstrap, rules_src), {
+        P4_EvalRaisef(result, "%s: failed to parse grammar: %s.",
+            P4_GetErrorString(err), P4_GetErrorMessage(rules_src));
+    });
 
     /* get grammar rule parse tree. */
-    if ((rules_tok = P4_GetSourceAst(rules_src)) == NULL)
-        P4_EvalRaise(
-            "%s: failed to create parse tree.",
-            P4_GetErrorString(P4_PegError)
-        );
+    if ((rules_tok = P4_GetSourceAst(rules_src)) == NULL) {
+        catch_err(P4_PegError, {
+            P4_EvalRaisef(result, "%s: parse tree is null.", P4_GetErrorString(err));
+        });
+    }
 
     /* eval grammar rule parse tree to grammar object. */
-    if ((err = P4_PegEvalGrammar(rules_tok, evalres)) != P4_Ok)
-        P4_EvalRaise(
-            "%s: %s.",
-            P4_GetErrorString(err),
-            evalres->errmsg
-        );
+    catch_err(P4_PegEvalGrammar(rules_tok, evalres), {
+        P4_EvalRaisef(result, "%s: %s.", P4_GetErrorString(err), evalres->errmsg);
+    });
 
 finalize:
     /* set the grammar object to the result,

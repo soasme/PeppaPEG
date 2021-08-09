@@ -1716,9 +1716,7 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
 
     /* Set silent */
     frame->silent = false;
-
     P4_Frame* top = s->frame_stack;
-
     if (!is_scoped(e)) {
         if (
             (top && is_squashed(top->rule))
@@ -1729,7 +1727,6 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
 
     /* Set space */
     frame->space = false;
-
     if (P4_GetWhitespaces(s->grammar) != NULL
             && !s->whitespacing) {
         if (is_scoped(e)) {
@@ -1746,14 +1743,12 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
     /* Set expr & next */
     frame->expr = e;
     frame->next = top;
+
+    /* Set cut */
     frame->cut = false;
 
     /* Set rule */
-    if (is_rule(e)) {
-        frame->rule = e;
-    } else {
-        frame->rule = s->frame_stack->rule;
-    }
+    frame->rule = is_rule(e) ? e : top->rule;
 
     /* Push stack */
     s->frame_stack_size++;
@@ -1949,13 +1944,17 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
 
         mark_position(s, member_startpos);
 
-        if (member->kind == P4_BackReference) {
-            tok = P4_MatchBackReference(s, e, backrefs, member);
-            if (!no_error(s)) goto finalize;
-        } else if (member->kind == P4_Cut) {
-            tok = P4_MatchCut(s, e);
-        } else {
-            tok = P4_Match(s, member);
+        switch (member->kind) {
+            case P4_BackReference:
+                tok = P4_MatchBackReference(s, e, backrefs, member);
+                if (!no_error(s)) goto finalize;
+                break;
+            case P4_Cut:
+                tok = P4_MatchCut(s, e);
+                break;
+            default:
+                tok = P4_Match(s, member);
+                break;
         }
 
         /* If any of the sequence members fails, the entire sequence fails. */

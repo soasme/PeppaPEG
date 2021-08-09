@@ -533,6 +533,22 @@ void test_eval_cut(void) {
         "R1", "[()A]", P4_Ok,
         "[{\"slice\":[0,5],\"type\":\"R1\",\"children\":[{\"slice\":[1,3],\"type\":\"RP\"}]}]"
     );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = &(\"a\" @cut \"b\") [a-z]{3};",
+        "R1", "zzz", P4_MatchError,
+        "line 1:1, expect R1 (char 'a')"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = &(\"a\" @cut \"b\") [a-z]{3};",
+        "R1", "abz", P4_Ok,
+        "[{\"slice\":[0,3],\"type\":\"R1\"}]"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = !(\"a\" @cut \"b\") [a-z]{3};",
+        "R1", "abz", P4_MatchError,
+        "line 1:1, expect R1"
+    );
+
 }
 
 void test_eval_repeat(void) {

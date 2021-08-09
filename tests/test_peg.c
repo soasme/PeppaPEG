@@ -505,6 +505,34 @@ void test_eval_cut(void) {
         "R1", "[1]", P4_Ok,
         "[{\"slice\":[0,3],\"type\":\"R1\",\"children\":[{\"slice\":[1,2],\"type\":\"R1_Inner\"}]}]"
     );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = \"[\" @cut (RB / RP) . \"]\";"
+        "RB = \"{\" @cut \"}\";"
+        "RP = \"(\" \")\";",
+        "R1", "[{]", P4_CutError,
+        "line 1:3, expect RB (char '}')"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = \"[\" @cut (RB / RP) . \"]\";"
+        "RB = \"{\" @cut \"}\";"
+        "RP = \"(\" \")\";",
+        "R1", "[{}.]", P4_Ok,
+        "[{\"slice\":[0,5],\"type\":\"R1\",\"children\":[{\"slice\":[1,3],\"type\":\"RB\"}]}]"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = \"[\" @cut (RB / RP) (!\"]\" .) \"]\";"
+        "RB = \"{\" @cut \"}\";"
+        "RP = \"(\" \")\";",
+        "R1", "[()]", P4_CutError,
+        "line 1:4, expect R1"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = \"[\" @cut (RB / RP) (!\"]\" .) \"]\";"
+        "RB = \"{\" @cut \"}\";"
+        "RP = \"(\" \")\";",
+        "R1", "[()A]", P4_Ok,
+        "[{\"slice\":[0,5],\"type\":\"R1\",\"children\":[{\"slice\":[1,3],\"type\":\"RP\"}]}]"
+    );
 }
 
 void test_eval_repeat(void) {

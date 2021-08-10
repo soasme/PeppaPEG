@@ -4438,7 +4438,7 @@ P4_LoadGrammarResult(P4_String rules, P4_Result* result) {
 
     /* parse grammar rule source */
     catch_err(P4_Parse(bootstrap, rules_src), {
-        P4_EvalRaisef(result, "%s: failed to parse grammar: %s.",
+        P4_EvalRaisef(result, "%s: grammar syntax error: %s.",
             P4_GetErrorString(err), P4_GetErrorMessage(rules_src));
     });
 

@@ -1035,33 +1035,33 @@ void test_eval_grammar(void) {
 void test_eval_bad_grammar(void) {
     ASSERT_BAD_GRAMMAR(
         "R1 = \"a\"",
-        "CutError: failed to parse grammar: line 1:9, expect rule (char ';')."
+        "CutError: grammar syntax error: line 1:9, expect rule (char ';')."
     );
     ASSERT_BAD_GRAMMAR(
         "R1 = \"\\x3\";",
-        "CutError: failed to parse grammar: line 1:10, expect two_hexdigits (insufficient repetitions)."
+        "CutError: grammar syntax error: line 1:10, expect two_hexdigits (insufficient repetitions)."
     );
     ASSERT_BAD_GRAMMAR(
         "R1 = \"\\u123z\";",
-        "CutError: failed to parse grammar: line 1:12, expect four_hexdigits (insufficient repetitions)."
+        "CutError: grammar syntax error: line 1:12, expect four_hexdigits (insufficient repetitions)."
     );
     ASSERT_BAD_GRAMMAR(
         "R1 = \"\\U123a123z\";",
-        "CutError: failed to parse grammar: line 1:16, expect eight_hexdigits (insufficient repetitions)."
+        "CutError: grammar syntax error: line 1:16, expect eight_hexdigits (insufficient repetitions)."
     );
 }
 
 void test_eval_bad_grammar_decorator(void) {
     ASSERT_BAD_GRAMMAR(
         "@some_random_decorator R1 = \"a\";",
-        "CutError: failed to parse grammar: line 1:2, expect decorator."
+        "CutError: grammar syntax error: line 1:2, expect decorator."
     );
 }
 
 void test_eval_bad_grammar_literal(void) {
     ASSERT_BAD_GRAMMAR(
         "R1 = \";",
-        "CutError: failed to parse grammar: line 1:8, expect literal (char '\"')."
+        "CutError: grammar syntax error: line 1:8, expect literal (char '\"')."
     );
     ASSERT_BAD_GRAMMAR(
         "R1 = \"\";",
@@ -1070,7 +1070,7 @@ void test_eval_bad_grammar_literal(void) {
 
     ASSERT_BAD_GRAMMAR(
         "R1 = i\";",
-        "CutError: failed to parse grammar: line 1:9, expect literal (char '\"')."
+        "CutError: grammar syntax error: line 1:9, expect literal (char '\"')."
     );
 
     ASSERT_BAD_GRAMMAR(
@@ -1092,7 +1092,7 @@ void test_eval_bad_grammar_literal(void) {
 void test_eval_bad_grammar_range(void) {
     ASSERT_BAD_GRAMMAR(
         "R1 = [];",
-        "CutError: failed to parse grammar: line 1:7, expect range."
+        "CutError: grammar syntax error: line 1:7, expect range."
     );
 
     /* lower > upper. */
@@ -1143,7 +1143,7 @@ void test_eval_bad_grammar_repeat(void) {
     );
     ASSERT_BAD_GRAMMAR(
         "R1 = [0-9]{m,n};",
-        "CutError: failed to parse grammar: line 1:11, expect rule (char ';')."
+        "CutError: grammar syntax error: line 1:11, expect rule (char ';')."
     );
 }
 
@@ -1157,14 +1157,14 @@ void test_eval_bad_grammar_reference(void) {
 void test_eval_bad_grammar_negative(void) {
     ASSERT_BAD_GRAMMAR(
         "R1 = !;",
-        "CutError: failed to parse grammar: line 1:7, expect primary."
+        "CutError: grammar syntax error: line 1:7, expect primary."
     );
 }
 
 void test_eval_bad_grammar_positive(void) {
     ASSERT_BAD_GRAMMAR(
         "R1 = &;",
-        "CutError: failed to parse grammar: line 1:7, expect primary."
+        "CutError: grammar syntax error: line 1:7, expect primary."
     );
 }
 

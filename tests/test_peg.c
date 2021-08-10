@@ -116,7 +116,7 @@ void test_range(void) {
 
     ASSERT_PEG_PARSE("range", "[]", P4_CutError, "line 1:2, expect range")
     ASSERT_PEG_PARSE("range", "[\"a\"]", P4_CutError, "line 1:2, expect range")
-    ASSERT_PEG_PARSE("range", "[\\p{__}]", P4_CutError, "line 1:2, expect range_category")
+    ASSERT_PEG_PARSE("range", "[\\p{__}]", P4_CutError, "line 1:5, expect range_category")
     ASSERT_PEG_PARSE("range", "[\\p{C}]", P4_Ok, "\
 [{\"slice\":[0,7],\"type\":\"range\",\"children\":[\
 {\"slice\":[4,5],\"type\":\"range_category\"}]}]");
@@ -1069,6 +1069,11 @@ void test_eval_bad_grammar_literal(void) {
     );
 
     ASSERT_BAD_GRAMMAR(
+        "R1 = i\";",
+        "CutError: failed to parse grammar: line 1:9, expect literal (char '\"')."
+    );
+
+    ASSERT_BAD_GRAMMAR(
         "R1 = i\"\";",
         "PegError: literal rule should have at least one character. char 6-8: \"\"."
     );
@@ -1149,6 +1154,20 @@ void test_eval_bad_grammar_reference(void) {
     );
 }
 
+void test_eval_bad_grammar_negative(void) {
+    ASSERT_BAD_GRAMMAR(
+        "R1 = !;",
+        "CutError: failed to parse grammar: line 1:7, expect primary."
+    );
+}
+
+void test_eval_bad_grammar_positive(void) {
+    ASSERT_BAD_GRAMMAR(
+        "R1 = &;",
+        "CutError: failed to parse grammar: line 1:7, expect primary."
+    );
+}
+
 int main(void) {
     UNITY_BEGIN();
 
@@ -1191,6 +1210,8 @@ int main(void) {
     RUN_TEST(test_eval_bad_grammar_range);
     RUN_TEST(test_eval_bad_grammar_repeat);
     RUN_TEST(test_eval_bad_grammar_reference);
+    RUN_TEST(test_eval_bad_grammar_negative);
+    RUN_TEST(test_eval_bad_grammar_positive);
 
     return UNITY_END();
 }

@@ -3702,12 +3702,14 @@ P4_Grammar* P4_CreatePegGrammar () {
     ));
     catch_err(P4_SetGrammarRuleFlag(grammar, "reference", P4_FLAG_SQUASHED | P4_FLAG_TIGHT));
 
-    catch_err(P4_AddSequenceWithMembers(grammar, "positive", 2,
+    catch_err(P4_AddSequenceWithMembers(grammar, "positive", 3,
         P4_CreateLiteral("&", true),
+        P4_CreateCut(),
         P4_CreateReference("primary")
     ));
-    catch_err(P4_AddSequenceWithMembers(grammar, "negative", 2,
+    catch_err(P4_AddSequenceWithMembers(grammar, "negative", 3,
         P4_CreateLiteral("!", true),
+        P4_CreateCut(),
         P4_CreateReference("primary")
     ));
 

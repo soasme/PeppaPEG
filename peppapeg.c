@@ -1947,6 +1947,12 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
 
         switch (member->kind) {
             case P4_BackReference:
+                if (i == member->backref_index) {
+                    P4_MatchRaisef(s, P4_IndexError,
+                        "expect %s (backref %zu point to self)",
+                        P4_PeekFrame(s)->rule->name, i);
+                    goto finalize;
+                }
                 tok = P4_MatchBackReference(s, e, backrefs, member);
                 if (!no_error(s)) goto finalize;
                 break;
@@ -2343,7 +2349,20 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
 
     if (index > e->count || index < 0) {
         P4_MatchRaisef(s, P4_IndexError,
-            "expect %s (backref out of bound)", P4_PeekFrame(s)->rule->name);
+            "expect %s (backref %zu out of bound)",
+            P4_PeekFrame(s)->rule->name, index);
+        return NULL;
+    }
+
+    P4_Expression* backref_expr = e->members[index];
+
+    if (backref_expr == NULL) {
+        P4_MatchRaisef(s, P4_PegError, "expect %s (null backref expr)", P4_PeekFrame(s)->rule->name);
+        return NULL;
+    }
+
+    if (backref_expr->kind == P4_BackReference) {
+        P4_MatchRaisef(s, P4_PegError, "expect %s (backref point to backref)", P4_PeekFrame(s)->rule->name);
         return NULL;
     }
 
@@ -2353,13 +2372,6 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
 
     autofree P4_String litstr = NULL;
     catch_oom(litstr = P4_CopySliceString(s->content, slice));
-
-    P4_Expression* backref_expr = e->members[index];
-
-    if (backref_expr == NULL) {
-        P4_MatchRaisef(s, P4_PegError, "expect %s (null backref expr)", P4_PeekFrame(s)->rule->name);
-        return NULL;
-    }
 
     P4_Expression* litexpr = NULL;
     catch_oom(litexpr = P4_CreateLiteral(litstr, backref->sensitive));
@@ -2383,7 +2395,6 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
     }
 
     P4_DeleteExpression(litexpr);
-
     return tok;
 }
 

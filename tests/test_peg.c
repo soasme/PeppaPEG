@@ -672,6 +672,30 @@ void test_eval_back_reference(void) {
             "]}"
         "]"
     );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = R23 \\10;"
+        "R23 = \"2\" / \"3\";",
+        "R1", "2222", P4_IndexError,
+        "line 1:2, expect R1 (backref 10 out of bound)"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = R23 \\1;"
+        "R23 = \"2\" / \"3\";",
+        "R1", "2222", P4_IndexError,
+        "line 1:2, expect R1 (backref 1 point to self)"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = R23 \\0 \\1;"
+        "R23 = \"2\" / \"3\";",
+        "R1", "223", P4_PegError,
+        "line 1:3, expect R1 (backref point to backref)"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = (\"2\" / \"3\") \\0 \\0;"
+        "R23 = \"2\" / \"3\";",
+        "R1", "333", P4_Ok,
+        "[{\"slice\":[0,3],\"type\":\"R1\"}]"
+    );
 }
 
 void test_eval_dot(void) {

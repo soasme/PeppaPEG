@@ -142,6 +142,11 @@ void test_reference(void) {
     ASSERT_PEG_PARSE("reference", "4PEG", P4_MatchError, "line 1:1, expect reference");
 }
 
+void test_back_reference(void) {
+    ASSERT_PEG_PARSE("back_reference", "\\1", P4_Ok, "[{\"slice\":[0,2],\"type\":\"back_reference\",\"children\":[{\"slice\":[1,2],\"type\":\"number\"}]}]");
+    ASSERT_PEG_PARSE("back_reference", "\\a", P4_CutError, "line 1:2, expect number");
+}
+
 void test_positive(void) {
     ASSERT_PEG_PARSE("positive", "&\"a\"", P4_Ok, "[{\"slice\":[0,4],\"type\":\"positive\",\"children\":[{\"slice\":[1,4],\"type\":\"literal\"}]}]");
     ASSERT_PEG_PARSE("positive", "&&\"a\"", P4_Ok, "[{\"slice\":[0,5],\"type\":\"positive\",\"children\":[{\"slice\":[1,5],\"type\":\"positive\",\"children\":[{\"slice\":[2,5],\"type\":\"literal\"}]}]}]");
@@ -633,6 +638,37 @@ void test_eval_reference(void) {
         "["
             "{\"slice\":[0,1],\"type\":\"R1\",\"children\":["
                 "{\"slice\":[0,1],\"type\":\"R3\"}"
+            "]}"
+        "]"
+    );
+}
+
+void test_eval_back_reference(void) {
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = R23 \\0;"
+        "R23 = \"2\" / \"3\";",
+        "R1", "22", P4_Ok,
+        "["
+            "{\"slice\":[0,2],\"type\":\"R1\",\"children\":["
+                "{\"slice\":[0,1],\"type\":\"R23\"},"
+                "{\"slice\":[1,2],\"type\":\"R23\"}"
+            "]}"
+        "]"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = R23 \\0;"
+        "R23 = \"2\" / \"3\";",
+        "R1", "23", P4_MatchError,
+        "line 1:2, expect R1 (char '2')"
+    );
+    ASSERT_EVAL_GRAMMAR(
+        "R1 = (R2 \\0) \\0;"
+        "R2 = \"2\" / \"3\";",
+        "R1", "2222", P4_Ok,
+        "["
+            "{\"slice\":[0,4],\"type\":\"R1\",\"children\":["
+                "{\"slice\":[0,1],\"type\":\"R2\"},"
+                "{\"slice\":[1,2],\"type\":\"R2\"}"
             "]}"
         "]"
     );
@@ -1177,6 +1213,7 @@ int main(void) {
     RUN_TEST(test_insensitive);
     RUN_TEST(test_range);
     RUN_TEST(test_reference);
+    RUN_TEST(test_back_reference);
     RUN_TEST(test_positive);
     RUN_TEST(test_negative);
     RUN_TEST(test_choice);
@@ -1200,6 +1237,7 @@ int main(void) {
     RUN_TEST(test_eval_cut);
     RUN_TEST(test_eval_repeat);
     RUN_TEST(test_eval_reference);
+    RUN_TEST(test_eval_back_reference);
     RUN_TEST(test_eval_dot);
     RUN_TEST(test_eval_comment);
     RUN_TEST(test_eval_flags);

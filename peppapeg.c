@@ -3632,18 +3632,22 @@ P4_Grammar* P4_CreatePegGrammar () {
     ));
     catch_err(P4_SetGrammarRuleFlag(grammar, "char", P4_FLAG_SQUASHED | P4_FLAG_TIGHT));
 
-    catch_err(P4_AddSequenceWithMembers(grammar, "literal", 3,
+    catch_err(P4_AddZeroOrMore(grammar, "chars", P4_CreateReference("char")));
+    catch_err(P4_AddSequenceWithMembers(grammar, "literal", 4,
         P4_CreateLiteral("\"", true),
-        P4_CreateZeroOrMore(P4_CreateReference("char")),
+        P4_CreateCut(),
+        P4_CreateReference("chars"),
         P4_CreateLiteral("\"", true)
     ));
     catch_err(P4_SetGrammarRuleFlag(grammar, "literal", P4_FLAG_SQUASHED | P4_FLAG_TIGHT));
 
-    catch_err(P4_AddSequenceWithMembers(grammar, "range", 3,
+    catch_err(P4_AddSequenceWithMembers(grammar, "range", 4,
         P4_CreateLiteral("[", true),
+        P4_CreateCut(),
         P4_CreateChoiceWithMembers(2,
-            P4_CreateSequenceWithMembers(3,
+            P4_CreateSequenceWithMembers(4,
                 P4_CreateLiteral("\\p{", true),
+                P4_CreateCut(),
                 P4_CreateReference("range_category"),
                 P4_CreateLiteral("}", true)
             ),
@@ -3698,12 +3702,14 @@ P4_Grammar* P4_CreatePegGrammar () {
     ));
     catch_err(P4_SetGrammarRuleFlag(grammar, "reference", P4_FLAG_SQUASHED | P4_FLAG_TIGHT));
 
-    catch_err(P4_AddSequenceWithMembers(grammar, "positive", 2,
+    catch_err(P4_AddSequenceWithMembers(grammar, "positive", 3,
         P4_CreateLiteral("&", true),
+        P4_CreateCut(),
         P4_CreateReference("primary")
     ));
-    catch_err(P4_AddSequenceWithMembers(grammar, "negative", 2,
+    catch_err(P4_AddSequenceWithMembers(grammar, "negative", 3,
         P4_CreateLiteral("!", true),
+        P4_CreateCut(),
         P4_CreateReference("primary")
     ));
 
@@ -4432,7 +4438,7 @@ P4_LoadGrammarResult(P4_String rules, P4_Result* result) {
 
     /* parse grammar rule source */
     catch_err(P4_Parse(bootstrap, rules_src), {
-        P4_EvalRaisef(result, "%s: failed to parse grammar: %s.",
+        P4_EvalRaisef(result, "%s: grammar syntax error: %s.",
             P4_GetErrorString(err), P4_GetErrorMessage(rules_src));
     });
 

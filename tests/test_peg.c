@@ -114,7 +114,9 @@ void test_range(void) {
 {\"slice\":[3,4],\"type\":\"char\"},\
 {\"slice\":[6,7],\"type\":\"number\"}]}]");
 
-    ASSERT_PEG_PARSE("range", "[\\p{__}]", P4_MatchError, "line 1:2, expect range")
+    ASSERT_PEG_PARSE("range", "[]", P4_CutError, "line 1:2, expect range")
+    ASSERT_PEG_PARSE("range", "[\"a\"]", P4_CutError, "line 1:2, expect range")
+    ASSERT_PEG_PARSE("range", "[\\p{__}]", P4_CutError, "line 1:5, expect range_category")
     ASSERT_PEG_PARSE("range", "[\\p{C}]", P4_Ok, "\
 [{\"slice\":[0,7],\"type\":\"range\",\"children\":[\
 {\"slice\":[4,5],\"type\":\"range_category\"}]}]");
@@ -1033,33 +1035,42 @@ void test_eval_grammar(void) {
 void test_eval_bad_grammar(void) {
     ASSERT_BAD_GRAMMAR(
         "R1 = \"a\"",
-        "CutError: failed to parse grammar: line 1:9, expect rule (char ';')."
+        "CutError: grammar syntax error: line 1:9, expect rule (char ';')."
     );
     ASSERT_BAD_GRAMMAR(
         "R1 = \"\\x3\";",
-        "CutError: failed to parse grammar: line 1:10, expect two_hexdigits (insufficient repetitions)."
+        "CutError: grammar syntax error: line 1:10, expect two_hexdigits (insufficient repetitions)."
     );
     ASSERT_BAD_GRAMMAR(
         "R1 = \"\\u123z\";",
-        "CutError: failed to parse grammar: line 1:12, expect four_hexdigits (insufficient repetitions)."
+        "CutError: grammar syntax error: line 1:12, expect four_hexdigits (insufficient repetitions)."
     );
     ASSERT_BAD_GRAMMAR(
         "R1 = \"\\U123a123z\";",
-        "CutError: failed to parse grammar: line 1:16, expect eight_hexdigits (insufficient repetitions)."
+        "CutError: grammar syntax error: line 1:16, expect eight_hexdigits (insufficient repetitions)."
     );
 }
 
 void test_eval_bad_grammar_decorator(void) {
     ASSERT_BAD_GRAMMAR(
         "@some_random_decorator R1 = \"a\";",
-        "CutError: failed to parse grammar: line 1:2, expect decorator."
+        "CutError: grammar syntax error: line 1:2, expect decorator."
     );
 }
 
 void test_eval_bad_grammar_literal(void) {
     ASSERT_BAD_GRAMMAR(
+        "R1 = \";",
+        "CutError: grammar syntax error: line 1:8, expect literal (char '\"')."
+    );
+    ASSERT_BAD_GRAMMAR(
         "R1 = \"\";",
         "PegError: literal rule should have at least one character. char 5-7: \"\"."
+    );
+
+    ASSERT_BAD_GRAMMAR(
+        "R1 = i\";",
+        "CutError: grammar syntax error: line 1:9, expect literal (char '\"')."
     );
 
     ASSERT_BAD_GRAMMAR(
@@ -1079,6 +1090,11 @@ void test_eval_bad_grammar_literal(void) {
 }
 
 void test_eval_bad_grammar_range(void) {
+    ASSERT_BAD_GRAMMAR(
+        "R1 = [];",
+        "CutError: grammar syntax error: line 1:7, expect range."
+    );
+
     /* lower > upper. */
 
     ASSERT_BAD_GRAMMAR(
@@ -1127,7 +1143,7 @@ void test_eval_bad_grammar_repeat(void) {
     );
     ASSERT_BAD_GRAMMAR(
         "R1 = [0-9]{m,n};",
-        "CutError: failed to parse grammar: line 1:11, expect rule (char ';')."
+        "CutError: grammar syntax error: line 1:11, expect rule (char ';')."
     );
 }
 
@@ -1135,6 +1151,20 @@ void test_eval_bad_grammar_reference(void) {
     ASSERT_BAD_GRAMMAR(
         "R1 = R2;",
         "NameError: reference R2 is undefined."
+    );
+}
+
+void test_eval_bad_grammar_negative(void) {
+    ASSERT_BAD_GRAMMAR(
+        "R1 = !;",
+        "CutError: grammar syntax error: line 1:7, expect primary."
+    );
+}
+
+void test_eval_bad_grammar_positive(void) {
+    ASSERT_BAD_GRAMMAR(
+        "R1 = &;",
+        "CutError: grammar syntax error: line 1:7, expect primary."
     );
 }
 
@@ -1180,6 +1210,8 @@ int main(void) {
     RUN_TEST(test_eval_bad_grammar_range);
     RUN_TEST(test_eval_bad_grammar_repeat);
     RUN_TEST(test_eval_bad_grammar_reference);
+    RUN_TEST(test_eval_bad_grammar_negative);
+    RUN_TEST(test_eval_bad_grammar_positive);
 
     return UNITY_END();
 }

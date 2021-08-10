@@ -1058,6 +1058,10 @@ void test_eval_bad_grammar_decorator(void) {
 
 void test_eval_bad_grammar_literal(void) {
     ASSERT_BAD_GRAMMAR(
+        "R1 = \";",
+        "CutError: failed to parse grammar: line 1:8, expect literal (char '\"')."
+    );
+    ASSERT_BAD_GRAMMAR(
         "R1 = \"\";",
         "PegError: literal rule should have at least one character. char 5-7: \"\"."
     );

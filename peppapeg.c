@@ -3632,9 +3632,11 @@ P4_Grammar* P4_CreatePegGrammar () {
     ));
     catch_err(P4_SetGrammarRuleFlag(grammar, "char", P4_FLAG_SQUASHED | P4_FLAG_TIGHT));
 
-    catch_err(P4_AddSequenceWithMembers(grammar, "literal", 3,
+    catch_err(P4_AddZeroOrMore(grammar, "chars", P4_CreateReference("char")));
+    catch_err(P4_AddSequenceWithMembers(grammar, "literal", 4,
         P4_CreateLiteral("\"", true),
-        P4_CreateZeroOrMore(P4_CreateReference("char")),
+        P4_CreateCut(),
+        P4_CreateReference("chars"),
         P4_CreateLiteral("\"", true)
     ));
     catch_err(P4_SetGrammarRuleFlag(grammar, "literal", P4_FLAG_SQUASHED | P4_FLAG_TIGHT));

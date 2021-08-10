@@ -676,13 +676,13 @@ void test_eval_back_reference(void) {
         "R1 = R23 \\10;"
         "R23 = \"2\" / \"3\";",
         "R1", "2222", P4_IndexError,
-        "line 1:2, expect R1 (backref 10 out of bound)"
+        "line 1:2, expect R1 (\\10 out reached)"
     );
     ASSERT_EVAL_GRAMMAR(
         "R1 = R23 \\1;"
         "R23 = \"2\" / \"3\";",
         "R1", "2222", P4_IndexError,
-        "line 1:2, expect R1 (backref 1 point to self)"
+        "line 1:2, expect R1 (\\1 out reached)"
     );
     ASSERT_EVAL_GRAMMAR(
         "R1 = R23 \\0 \\1;"

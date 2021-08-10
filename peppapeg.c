@@ -1947,10 +1947,10 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
 
         switch (member->kind) {
             case P4_BackReference:
-                if (i == member->backref_index) {
+                if (member->backref_index >= i) {
                     P4_MatchRaisef(s, P4_IndexError,
-                        "expect %s (backref %zu point to self)",
-                        P4_PeekFrame(s)->rule->name, i);
+                        "expect %s (\\%zu out reached)",
+                        P4_PeekFrame(s)->rule->name, member->backref_index);
                     goto finalize;
                 }
                 tok = P4_MatchBackReference(s, e, backrefs, member);
@@ -2349,7 +2349,7 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
 
     if (index > e->count || index < 0) {
         P4_MatchRaisef(s, P4_IndexError,
-            "expect %s (backref %zu out of bound)",
+            "expect %s (\\%zu out of bound)",
             P4_PeekFrame(s)->rule->name, index);
         return NULL;
     }

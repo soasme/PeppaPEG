@@ -694,6 +694,7 @@ P4_PRIVATE(P4_Error)            P4_PegEvalNegative(P4_Node* node, P4_Result* res
 P4_PRIVATE(P4_Error)            P4_PegEvalRepeat(P4_Node* node, P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalDot(P4_Node* node, P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalReference(P4_Node* node, P4_Result* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalBackReference(P4_Node* node, P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalExpression(P4_Node* node, P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalGrammarRule(P4_Node* node, P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalRuleName(P4_Node* node, P4_String* result);
@@ -1946,6 +1947,12 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
 
         switch (member->kind) {
             case P4_BackReference:
+                if (member->backref_index >= i) {
+                    P4_MatchRaisef(s, P4_IndexError,
+                        "expect %s (\\%zu out reached)",
+                        P4_PeekFrame(s)->rule->name, member->backref_index);
+                    goto finalize;
+                }
                 tok = P4_MatchBackReference(s, e, backrefs, member);
                 if (!no_error(s)) goto finalize;
                 break;
@@ -2342,7 +2349,20 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
 
     if (index > e->count || index < 0) {
         P4_MatchRaisef(s, P4_IndexError,
-            "expect %s (backref out of bound)", P4_PeekFrame(s)->rule->name);
+            "expect %s (\\%zu out of bound)",
+            P4_PeekFrame(s)->rule->name, index);
+        return NULL;
+    }
+
+    P4_Expression* backref_expr = e->members[index];
+
+    if (backref_expr == NULL) {
+        P4_MatchRaisef(s, P4_PegError, "expect %s (null backref expr)", P4_PeekFrame(s)->rule->name);
+        return NULL;
+    }
+
+    if (backref_expr->kind == P4_BackReference) {
+        P4_MatchRaisef(s, P4_PegError, "expect %s (backref point to backref)", P4_PeekFrame(s)->rule->name);
         return NULL;
     }
 
@@ -2353,13 +2373,6 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
     autofree P4_String litstr = NULL;
     catch_oom(litstr = P4_CopySliceString(s->content, slice));
 
-    P4_Expression* backref_expr = e->members[index];
-
-    if (backref_expr == NULL) {
-        P4_MatchRaisef(s, P4_PegError, "expect %s (null backref expr)", P4_PeekFrame(s)->rule->name);
-        return NULL;
-    }
-
     P4_Expression* litexpr = NULL;
     catch_oom(litexpr = P4_CreateLiteral(litstr, backref->sensitive));
 
@@ -2367,8 +2380,10 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
 # define set_literal_rule_name(n, bref, op) \
     if ((bref)->kind == P4_Reference) {\
         (n) = op((bref)->ref_expr->name); \
-    } else {\
+    } else if (is_rule((bref))) {\
         (n) = op((bref)->name); \
+    } else { \
+        (n) = NULL; \
     }
 
     set_literal_rule_name(litexpr->name, backref_expr, STRDUP);
@@ -2380,7 +2395,6 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
     }
 
     P4_DeleteExpression(litexpr);
-
     return tok;
 }
 
@@ -3702,6 +3716,13 @@ P4_Grammar* P4_CreatePegGrammar () {
     ));
     catch_err(P4_SetGrammarRuleFlag(grammar, "reference", P4_FLAG_SQUASHED | P4_FLAG_TIGHT));
 
+    catch_err(P4_AddSequenceWithMembers(grammar, "back_reference", 3,
+        P4_CreateLiteral("\\", true),
+        P4_CreateCut(),
+        P4_CreateReference("number")
+    ));
+    catch_err(P4_SetGrammarRuleFlag(grammar, "reference", P4_FLAG_TIGHT));
+
     catch_err(P4_AddSequenceWithMembers(grammar, "positive", 3,
         P4_CreateLiteral("&", true),
         P4_CreateCut(),
@@ -3761,7 +3782,7 @@ P4_Grammar* P4_CreatePegGrammar () {
     catch_err(P4_AddLiteral(grammar, "dot", ".", true));
     catch_err(P4_AddLiteral(grammar, "cut", "@cut", true));
 
-    catch_err(P4_AddChoiceWithMembers(grammar, "primary", 9,
+    catch_err(P4_AddChoiceWithMembers(grammar, "primary", 10,
         P4_CreateReference("literal"),
         P4_CreateReference("insensitive"),
         P4_CreateReference("range"),
@@ -3769,6 +3790,7 @@ P4_Grammar* P4_CreatePegGrammar () {
             P4_CreateReference("reference"),
             P4_CreateNegative(P4_CreateLiteral("=", true))
         ),
+        P4_CreateReference("back_reference"),
         P4_CreateReference("positive"),
         P4_CreateReference("negative"),
         P4_CreateSequenceWithMembers(3,
@@ -4261,6 +4283,22 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
+P4_PegEvalBackReference(P4_Node* node, P4_Result* result) {
+    P4_Error       err  = P4_Ok;
+    P4_Expression* expr = NULL;
+    size_t         idx  = SIZE_MAX;
+
+    catch_err(P4_PegEvalNumber(node->head, &idx));
+    catch_oom(expr = P4_CreateBackReference(idx, false));
+    result->expr = expr;
+
+    return P4_Ok;
+
+finalize:
+    return err;
+}
+
+P4_PRIVATE(P4_Error)
 P4_PegEvalGrammarRule(P4_Node* node, P4_Result* result) {
     P4_String           rule_name = NULL;
     P4_ExpressionFlag   rule_flag = 0;
@@ -4417,6 +4455,9 @@ P4_PegEvalExpression(P4_Node* node, P4_Result* result) {
 
     if (strcmp(node->rule_name, "reference")    == 0)
         return P4_PegEvalReference(node, result);
+
+    if (strcmp(node->rule_name, "back_reference")    == 0)
+        return P4_PegEvalBackReference(node, result);
 
     UNREACHABLE();
     panicf("Unreachable: node %p is not a peg expression", node);

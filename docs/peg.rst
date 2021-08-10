@@ -186,6 +186,21 @@ The order of defining a rule does not matter.
 
 One should ensure all references must have corresponding rule defined, otherwise, the parse will fail with :c:enum:`P4_MatchError`.
 
+Back Reference
+--------------
+
+Back Reference **matches an exact same string as previously matched in the sequence**.
+
+For example, \\0 matches whatever `quote` has matched, thus `"abc"` or `'abc'` are valid. But `"abc'` or `'abc"` are invalid.
+
+.. code-block::
+
+    str = quote chars \0;
+    quote = "\"" / "'";
+    chars = [a-z]*;
+
+Back Reference starts with a back slash, followed by a number. The number is zero-based and cannot be a number greater than or equal to the index of itself.
+
 Positive
 --------
 
@@ -502,6 +517,8 @@ Cheatsheet
      - sequence
    * - `foo / bar`
      - choice
+   * - `\0`
+     - back reference
    * - `&foo`
      - positive
    * - `!foo`

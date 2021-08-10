@@ -1,22 +1,19 @@
 # ROADMAP
 
-- [ ] api: @cut: https://news.ycombinator.com/item?id=20502032
 - [ ] api: operate slice (copy string, get size, etc).
+- [ ] api: operate node.
 - [ ] api: set source verbose mode.
 - [ ] api: save backreference in source stack so it can be used outside a sequence.
-- [ ] api: except (any but).
 - [ ] api: until.
-- [ ] api: Sanitize `\0` to whitespace for the source input, this happens in creating the source/setting the source size.
-- [ ] api: register a function for matching source. This should help dealing with some inputs difficult to parse.
+- [ ] api: Sanitize `\0` to whitespace for the source input, this happens in creating the source/setting the source size. Example: Python Parser.
 - [ ] api: support UTF-8 BOM sequence (0xEF 0xBB 0xBF) at the start of source.
+- [ ] api: register a function for matching source. This should help dealing with some inputs difficult to parse.
 - [ ] api: add `expect_rule_id`, instead of saving `errmsg`.
 - [ ] peg: numeric.
-- [ ] peg: complement.
 - [ ] peg: panic.
-- [ ] peg: function.
+- [ ] peg: rule template.
 - [ ] peg: sub grammar.
-- [ ] peg: stop on first error v/s recover from Panic.
-- [ ] peg: left recursive: https://tratt.net/laurie/research/pubs/html/tratt__direct_left_recursive_parsing_expression_grammars/ https://github.com/orlandohill/peg-left-recursion
+- [ ] peg: left recursive: https://tratt.net/laurie/research/pubs/html/tratt__direct_left_recursive_parsing_expression_grammars/ https://github.com/orlandohill/peg-left-recursion. introduce @left_recursion, @right_recursion in sequence.
 - [ ] peg: support Python-style INDENT rule.
 - [ ] peg: describe grammar AST using ADSL-style rules.
 - [ ] perf: pre-alloc tokens.
@@ -28,17 +25,19 @@
 - [ ] tests: benchmark: example: json-c. `valgrind --tool=massif --massif-out-file=massif.out ./build/tests/test_example_json && ms_print massif.out ms_print.out`.
 - [ ] tests: enable AddressSanitizer. Example: cJSON.
 - [ ] tests: add a fuzzy testing framework.
-- [ ] docs: read [A parsing machine for PEGs](http://www.inf.puc-rio.br/~roberto/docs/ry08-4.pdf).
-- [ ] docs: example: brainfuck https://en.wikipedia.org/wiki/Brainfuck
 - [ ] lang: python grammar.
-- [ ] lang: ES5 grammar: https://ohmlang.github.io/editor/#0a9a649c3c630fd0a470ba6cb75393fe
+- [ ] lang: ES6 grammar: https://www.ecma-international.org/wp-content/uploads/ECMA-262_6th_edition_june_2015.pdf
 - [ ] lang: zig grammar: https://ziglang.org/documentation/master/#Grammar
 - [ ] lang: awk grammar: https://github.com/onetrueawk/awk/blob/master/lex.c https://github.com/onetrueawk/awk/blob/master/awkgram.y
 - [ ] lang: sql grammar: https://tomassetti.me/parsing-sql/
-- [ ] lang: A binary executable for display parsed results in JSON output. The executable can support general programming languages, such as Mustache, Python, JSON, YAML, etc. Some other programs can then takes the input from stdin and do some fancy work. `p4 parse --lang=py38 source.py`
+- [ ] lang: A binary executable for display parsed results in JSON output. The executable can support general programming languages, such as Mustache, Python, JSON, YAML, etc. Some other programs can then takes the input from stdin and do some fancy work. `p4 cst source.py`, `p4 ast source.py`.
 - [ ] pratt parser: https://en.wikipedia.org/wiki/Operator-precedence_parser
 - [ ] build: static lib.
-- [ ] build: wasm. `docker run --rm -v $(pwd):/src -u $(id -u):$(id -g)   emscripten/emsdk emcc peppapeg.c -Os -s WASM=1 -s SIDE_MODULE=1 -o /src/peppapeg.wasm`.  https://gist.github.com/kripken/59c67556dc03bb6d57052fedef1e61ab https://github.com/mbasso/awesome-wasm
+- [x] ~~build: wasm. `docker run --rm -v $(pwd):/src -u $(id -u):$(id -g)   emscripten/emsdk emcc peppapeg.c -Os -s WASM=1 -s SIDE_MODULE=1 -o /src/peppapeg.wasm`.  https://gist.github.com/kripken/59c67556dc03bb6d57052fedef1e61ab https://github.com/mbasso/awesome-wasm~~ won't do it.
+- [x] docs: read [A parsing machine for PEGs](http://www.inf.puc-rio.br/~roberto/docs/ry08-4.pdf).
+- [x] ~~peg: stop on first error v/s recover from Panic.~~ e.g. cut.
+- [x] api: @cut: https://news.ycombinator.com/item?id=20502032. v1.14.0
+- [x] api: no rule id. v1.14.0
 - [x] docs: landing page for the project doc site.
 - [x] bug: eval grammar: when failed, should produce no grammar. Fixed in v1.13.0
 - [x] api: print error messages for Human. Added in v1.13.0.

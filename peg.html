@@ -330,6 +330,17 @@ If any one of the attempts succeeds, the match succeeds. If all attempts fail, t
 </div>
 <p>One should ensure all references must have corresponding rule defined, otherwise, the parse will fail with <a class="reference internal" href="api.html#c.P4_Error.P4_MatchError" title="P4_MatchError"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_MatchError</span></code></a>.</p>
 </section>
+<section id="back-reference">
+<h2>Back Reference<a class="headerlink" href="#back-reference" title="Permalink to this headline">¶</a></h2>
+<p>Back Reference <strong>matches an exact same string as previously matched in the sequence</strong>.</p>
+<p>For example, \0 matches whatever <cite>quote</cite> has matched, thus <cite>“abc”</cite> or <cite>‘abc’</cite> are valid. But <cite>“abc’</cite> or <cite>‘abc”</cite> are invalid.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">str</span> <span class="o">=</span> <span class="n">quote</span> <span class="n">chars</span> \<span class="mi">0</span><span class="p">;</span>
+<span class="n">quote</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\"</span><span class="s2">"</span> <span class="o">/</span> <span class="s2">"'"</span><span class="p">;</span>
+<span class="n">chars</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">-</span><span class="n">z</span><span class="p">]</span><span class="o">*</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Back Reference starts with a back slash, followed by a number. The number is zero-based and cannot be a number greater than or equal to the index of itself.</p>
+</section>
 <section id="positive">
 <h2>Positive<a class="headerlink" href="#positive" title="Permalink to this headline">¶</a></h2>
 <p>Positive <strong>tests if the sub-expression matches</strong>.</p>
@@ -610,37 +621,40 @@ number = [0-9];
 <tr class="row-odd"><td><p><cite>foo / bar</cite></p></td>
 <td><p>choice</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>&amp;foo</cite></p></td>
+<tr class="row-even"><td><p><cite>0</cite></p></td>
+<td><p>back reference</p></td>
+</tr>
+<tr class="row-odd"><td><p><cite>&amp;foo</cite></p></td>
 <td><p>positive</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>!foo</cite></p></td>
+<tr class="row-even"><td><p><cite>!foo</cite></p></td>
 <td><p>negative</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>@cut</cite></p></td>
+<tr class="row-odd"><td><p><cite>@cut</cite></p></td>
 <td><p>prevent unwanted backtracking</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>foo*</cite></p></td>
+<tr class="row-even"><td><p><cite>foo*</cite></p></td>
 <td><p>zero or more</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>foo+</cite></p></td>
+<tr class="row-odd"><td><p><cite>foo+</cite></p></td>
 <td><p>once or more</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>foo?</cite></p></td>
+<tr class="row-even"><td><p><cite>foo?</cite></p></td>
 <td><p>optional</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>foo{m,}</cite></p></td>
+<tr class="row-odd"><td><p><cite>foo{m,}</cite></p></td>
 <td><p>repeat at least m times</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>foo{,n}</cite></p></td>
+<tr class="row-even"><td><p><cite>foo{,n}</cite></p></td>
 <td><p>repeat at most n times</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>foo{m,n}</cite></p></td>
+<tr class="row-odd"><td><p><cite>foo{m,n}</cite></p></td>
 <td><p>repeat between m-n times</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>foo{m}</cite></p></td>
+<tr class="row-even"><td><p><cite>foo{m}</cite></p></td>
 <td><p>repeat exact n times</p></td>
 </tr>
-<tr class="row-even"><td><p><cite># IGNORE</cite></p></td>
+<tr class="row-odd"><td><p><cite># IGNORE</cite></p></td>
 <td><p>comment</p></td>
 </tr>
 </tbody>
@@ -710,6 +724,7 @@ number = [0-9];
 <li><a class="reference internal" href="#sequence">Sequence</a></li>
 <li><a class="reference internal" href="#choice">Choice</a></li>
 <li><a class="reference internal" href="#reference">Reference</a></li>
+<li><a class="reference internal" href="#back-reference">Back Reference</a></li>
 <li><a class="reference internal" href="#positive">Positive</a></li>
 <li><a class="reference internal" href="#negative">Negative</a></li>
 <li><a class="reference internal" href="#repeat">Repeat</a></li>

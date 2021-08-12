@@ -338,6 +338,8 @@ void test_eval_insensitive(void) {
     ASSERT_EVAL_GRAMMAR("R1 = i\"\\r\";", "R1", "\r", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = i\"\\t\";", "R1", "\t", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = i\"   \";", "R1", "   ", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\" i\\0;", "R1", "aA", P4_Ok, "[{\"slice\":[0,2],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = \"a\" i\\0;", "R1", "aa", P4_Ok, "[{\"slice\":[0,2],\"type\":\"R1\"}]");
 }
 
 void test_eval_range(void) {

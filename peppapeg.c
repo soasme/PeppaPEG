@@ -684,7 +684,7 @@ P4_PRIVATE(P4_Error)            P4_PegEvalRuleFlags(P4_Node* node, P4_Expression
 P4_PRIVATE(P4_Error)            P4_PegEvalNumber(P4_Node* node, size_t* num);
 P4_PRIVATE(P4_Error)            P4_PegEvalChar(P4_Node* node, P4_Rune* rune);
 P4_PRIVATE(P4_Error)            P4_PegEvalLiteral(P4_Node* node, P4_Result* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalInsensitiveLiteral(P4_Node* node, P4_Result* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalInsensitive(P4_Node* node, P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalRange(P4_Node* node, P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalMembers(P4_Node* node, P4_Expression* expr, P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalSequence(P4_Node* node, P4_Result* result);
@@ -3805,7 +3805,10 @@ P4_Grammar* P4_CreatePegGrammar () {
 
     catch_err(P4_AddSequenceWithMembers(grammar, "insensitive", 2,
         P4_CreateLiteral("i", true),
-        P4_CreateReference("literal")
+        P4_CreateChoiceWithMembers(2,
+            P4_CreateReference("literal"),
+            P4_CreateReference("back_reference")
+        )
     ));
     catch_err(P4_SetGrammarRuleFlag(grammar, "insensitive", P4_FLAG_TIGHT));
 
@@ -4007,11 +4010,18 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalInsensitiveLiteral(P4_Node* node, P4_Result* result) {
+P4_PegEvalInsensitive(P4_Node* node, P4_Result* result) {
     P4_Error err = P4_Ok;
 
     /* eval literal and set it as insensitive. */
-    catch_err(P4_PegEvalLiteral(node->head, result));
+    if (strcmp(node->head->rule_name, "literal") == 0) {
+        catch_err(P4_PegEvalLiteral(node->head, result));
+    } else if (strcmp(node->head->rule_name, "back_reference") == 0) {
+        catch_err(P4_PegEvalBackReference(node->head, result));
+    } else {
+        panic("PegError: insensitive works on literal and back_reference only.");
+    }
+
     P4_Expression* expr = unwrap_expr(result);
     assert(expr != NULL, "insensitive literal expr should not be null.");
     expr->sensitive = false;
@@ -4427,7 +4437,7 @@ P4_PegEvalExpression(P4_Node* node, P4_Result* result) {
         return P4_PegEvalLiteral(node, result);
 
     if (strcmp(node->rule_name, "insensitive")  == 0)
-        return P4_PegEvalInsensitiveLiteral(node, result);
+        return P4_PegEvalInsensitive(node, result);
 
     if (strcmp(node->rule_name, "range")        == 0)
         return P4_PegEvalRange(node, result);

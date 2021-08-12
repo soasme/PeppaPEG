@@ -201,6 +201,12 @@ For example, \\0 matches whatever `quote` has matched, thus `"abc"` or `'abc'` a
 
 Back Reference starts with a back slash, followed by a number. The number is zero-based and cannot be a number greater than or equal to the index of itself.
 
+Back Reference allows a case-insensitive prefix `i`. For example, given such a rule, `a=A`, `a=a` are both valid.
+
+.. code-block::
+
+    rule = [a-z] "=" i\0;
+
 Positive
 --------
 

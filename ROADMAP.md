@@ -14,25 +14,34 @@
 - [ ] peg: rule template.
 - [ ] peg: sub grammar.
 - [ ] peg: left recursive: https://tratt.net/laurie/research/pubs/html/tratt__direct_left_recursive_parsing_expression_grammars/ https://github.com/orlandohill/peg-left-recursion. introduce @left_recursion, @right_recursion in sequence.
-- [ ] peg: support Python-style INDENT rule.
 - [ ] peg: describe grammar AST using ADSL-style rules.
 - [ ] perf: pre-alloc tokens.
-- [ ] perf: Cache literal len.
-- [ ] perf: backrefs is not necessary if there is no BackReference in Sequence.
+- [ ] perf: Cache literal len or use better string structure internally.
 - [ ] perf: trace: add a tracer in P4_Source. When matching, annotate the tracer. An additional tool can aggregate data and output a DOT / compile to png.
 - [ ] perf: tracer: https://pegjs.org/documentation
       https://github.com/orlandohill/peg-left-recursion
 - [ ] tests: benchmark: example: json-c. `valgrind --tool=massif --massif-out-file=massif.out ./build/tests/test_example_json && ms_print massif.out ms_print.out`.
-- [ ] tests: enable AddressSanitizer. Example: cJSON.
+- [ ] match: packrat or not? http://mousepeg.sourceforge.net/index.htm
 - [ ] tests: add a fuzzy testing framework.
-- [ ] lang: python grammar.
-- [ ] lang: ES6 grammar: https://www.ecma-international.org/wp-content/uploads/ECMA-262_6th_edition_june_2015.pdf
-- [ ] lang: zig grammar: https://ziglang.org/documentation/master/#Grammar
-- [ ] lang: awk grammar: https://github.com/onetrueawk/awk/blob/master/lex.c https://github.com/onetrueawk/awk/blob/master/awkgram.y
-- [ ] lang: sql grammar: https://tomassetti.me/parsing-sql/
-- [ ] lang: A binary executable for display parsed results in JSON output. The executable can support general programming languages, such as Mustache, Python, JSON, YAML, etc. Some other programs can then takes the input from stdin and do some fancy work. `p4 cst source.py`, `p4 ast source.py`.
-- [ ] pratt parser: https://en.wikipedia.org/wiki/Operator-precedence_parser
+- [ ] shell: `p4 ast --grammar=python3`. https://docs.python.org/3.11/reference/grammar.html
+- [ ] shell: `p4 ast --grammar=c99`: https://github.com/pointlander/peg/blob/master/grammars/c/c.peg
+- [ ] shell: `p4 ast --grammar=es6`: https://www.ecma-international.org/wp-content/uploads/ECMA-262_6th_edition_june_2015.pdf
+- [ ] shell: `p4 ast --grammar=zig`: https://ziglang.org/documentation/master/#Grammar
+- [ ] shell: `p4 ast --grammar=awk`: https://github.com/onetrueawk/awk/blob/master/lex.c https://github.com/onetrueawk/awk/blob/master/awkgram.y
+- [ ] shell: `p4 ast --grammar=sql`: https://tomassetti.me/parsing-sql/
+- [ ] shell: `p4 ast --grammar --rule --input`. Return json tree in stdout or error in stderr.
+- [ ] shell: `p4 test spec.yml`. The spec contains an array of [name, grammar(/path/to/peg,./path/to/peg,toml,c99,...), rule, input, output, error].
+- [ ] build: binary cli - shell.c
 - [ ] build: static lib.
+- [ ] peg: support Python-style INDENT rule.
+- [ ] peg: range support ID_Start, ID_Continue, Other_ID_Start, Other_ID_Continue.
+- [ ] peg: optional ICU support - `\p{...}`. This allows even more choices: `Lu`, `gc=Lu`, `General_Category=Uppercase_Letter`. Wrap the feature in `ENABLE_ICU`.
+- [ ] api: print grammar and/or rules.
+- [ ] peg: we can skip using RuneRanges but save category name like "Co" in Range, which will move the evaluation to the runtime.
+- [ ] refactor: move some variables to `frame` to reduce function frame size.
+- [x] peg: insensitive back reference.
+- [x] peg: back reference.
+- [x] tests: enable AddressSanitizer for CLang.
 - [x] ~~build: wasm. `docker run --rm -v $(pwd):/src -u $(id -u):$(id -g)   emscripten/emsdk emcc peppapeg.c -Os -s WASM=1 -s SIDE_MODULE=1 -o /src/peppapeg.wasm`.  https://gist.github.com/kripken/59c67556dc03bb6d57052fedef1e61ab https://github.com/mbasso/awesome-wasm~~ won't do it.
 - [x] docs: read [A parsing machine for PEGs](http://www.inf.puc-rio.br/~roberto/docs/ry08-4.pdf).
 - [x] ~~peg: stop on first error v/s recover from Panic.~~ e.g. cut.

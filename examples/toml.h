@@ -46,17 +46,17 @@ P4_Error P4_TomlPropagate(P4_Grammar* grammar, P4_Expression* rule, P4_Node* nod
 
 P4_Error P4_TomlEvalDigit(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
     if (node->text[node->slice.start.pos] <= '9')
-        node->userdata = (void*) (node->text[node->slice.start.pos] - '0');
+        node->userdata = (void*) (int64_t) (node->text[node->slice.start.pos] - '0');
     else if (node->text[node->slice.start.pos] <= 'f')
-        node->userdata = (void*) (node->text[node->slice.start.pos] - 'a');
+        node->userdata = (void*) (int64_t) (node->text[node->slice.start.pos] - 'a');
     else if (node->text[node->slice.start.pos] <= 'F')
-        node->userdata = (void*) (node->text[node->slice.start.pos] - 'A');
+        node->userdata = (void*) (int64_t) (node->text[node->slice.start.pos] - 'A');
     return P4_Ok;
 }
 
 P4_Error P4_TomlEvalDecInt(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
-    int64_t num = node->tail->userdata;
-    const char* rule_name = P4_GetRuleName(node->head);
+    int64_t num = (int64_t) node->tail->userdata;
+    const char* rule_name = node->head->rule_name;
     if (strcmp(rule_name, "minus")) num = -num;
     node->userdata = (void*)num;
     return P4_Ok;

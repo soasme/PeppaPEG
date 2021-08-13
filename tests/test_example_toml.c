@@ -77,6 +77,8 @@ void test_valid(void) {
     ASSERT_TOML("toml", "abc = \"\"\"abc\"\"\"", P4_Ok, "[]");
     ASSERT_TOML("toml", "abc = \"\"\"a\"b\"c\"\"\"", P4_Ok, "[]");
     /* ASSERT_TOML("toml", "abc = \"\"\"abc\"\"\"\"\"", P4_Ok, "[]"); */
+    ASSERT_TOML("toml", "abc = nan", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = inf", P4_Ok, "[]");
 }
 
 int main(void) {

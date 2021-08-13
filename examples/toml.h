@@ -40,11 +40,19 @@ extern "C"
 #include <stdlib.h>
 #include "../peppapeg.h"
 
+typedef struct P4_TomlDateTime {
+    char kind; /* t (local_time), d (local_date), D (local_date_time), T (offset_date_time)  */
+    size_t hour, minute, second;
+    long millisecond;
+} P4_TomlDateTime;
+
 typedef struct P4_TomlValue {
-    char kind; /* i, f, */
+    char kind; /* i, f, s, d, */
     union {
         int64_t i;
         double f;
+        char* s;
+        P4_TomlDateTime* d;
     };
 } P4_TomlValue;
 
@@ -62,17 +70,36 @@ P4_TomlValue* P4_TomlNewFloat(double f) {
     return v;
 }
 
+P4_TomlValue* P4_TomlNewLocalTime(size_t hour, size_t minute, size_t second, size_t millisecond) {
+    P4_TomlValue* v = P4_MALLOC(sizeof(P4_TomlValue));
+    v->kind = 'd';
+    v->d = P4_MALLOC(sizeof(P4_TomlDateTime));
+    v->d->kind = 't';
+    v->d->hour = hour;
+    v->d->minute = minute;
+    v->d->second = second;
+    v->d->millisecond = millisecond;
+    return v;
+}
+
 # define as_val(n) ((P4_TomlValue*)((n)->userdata))
 # define as_int(n) (as_val(n)->i)
 # define from_int(i) (void*)(P4_TomlNewInteger(i))
 # define as_float(n) (as_val(n)->f)
 # define from_float(f) (void*)(P4_TomlNewFloat(f))
+# define as_local_time(n) (as_val(n)->d)
+# define from_local_time(h,m,s,ms) (void*)(P4_TomlNewLocalTime(h,m,s,ms))
 
 void P4_TomlFormatNode(FILE* stream, P4_Node* node) {
     if (strcmp(node->rule_name, "integer") == 0) {
         fprintf(stream, ",\"value\": %lld", as_int(node));
     } else if (strcmp(node->rule_name, "float") == 0) {
         fprintf(stream, ",\"value\": %f", as_float(node));
+    } else if (strcmp(node->rule_name, "local_time") == 0) {
+        if (as_val(node)->d->kind == 't') {
+            P4_TomlDateTime* dt = as_local_time(node);
+            fprintf(stream, ",\"hour\": %lu, \"minute\": %lu, \"second\": %lu, \"millisecond\": %ld", dt->hour, dt->minute, dt->second, dt->millisecond);
+        }
     }
 }
 
@@ -133,6 +160,16 @@ P4_Error P4_TomlEvalUnsignedInt(P4_Grammar* grammar, P4_Expression* rule, P4_Nod
     return P4_Ok;
 }
 
+P4_Error P4_TomlEvalLocalTime(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
+    size_t hour = as_int(node->head->head);
+    size_t minute = as_int(node->head->head->next);
+    size_t second = as_int(node->head->head->next->next);
+    long millisecond = node->head->head->next->next->next ? as_int(node->head->head->next->next->next) : 0;
+    node->userdata = from_local_time(hour, minute, second, millisecond);
+    P4_DeleteNodeChildren(node);
+    return P4_Ok;
+}
+
 P4_Error P4_TomlCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
     const char* rule_name = P4_GetRuleName(rule);
     if (rule_name == NULL || node == NULL) return P4_Ok;
@@ -148,6 +185,11 @@ P4_Error P4_TomlCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node
     if (strcmp(rule_name, "dec_int") == 0) return P4_TomlEvalDecInt(grammar, rule, node);
     if (strcmp(rule_name, "integer") == 0) return P4_TomlEvalInteger(grammar, rule, node);
     if (strcmp(rule_name, "float") == 0) return P4_TomlEvalFloat(grammar, rule, node);
+    if (strcmp(rule_name, "time_hour") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 10);
+    if (strcmp(rule_name, "time_minute") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 10);
+    if (strcmp(rule_name, "time_second") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 10);
+    if (strcmp(rule_name, "time_secfrac") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 10);
+    if (strcmp(rule_name, "local_time") == 0) return P4_TomlEvalLocalTime(grammar, rule, node);
     return P4_Ok;
 }
 
@@ -234,10 +276,10 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         "@squashed date_month = \"0\" [1-9] / \"1\" [0-2];\n"
         "@squashed date_mday = DIGIT{2};\n"
         "time_delim = i\"t\" / \" \";\n"
-        "@squashed time_hour = DIGIT{2};\n"
-        "@squashed time_minute = DIGIT{2};\n"
-        "@squashed time_second = DIGIT{2};\n"
-        "@squashed time_secfrac = DIGIT+;\n"
+        "time_hour = DIGIT{2};\n"
+        "time_minute = DIGIT{2};\n"
+        "time_second = DIGIT{2};\n"
+        "time_secfrac = DIGIT+;\n"
         "time_numoffset = (\"+\" / \"-\") time_hour \":\" time_minute;\n"
         "time_offset = i\"z\" / time_numoffset;\n"
         "partial_time = time_hour \":\" time_minute \":\" time_second (\".\" time_secfrac)?;\n"

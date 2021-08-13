@@ -596,7 +596,6 @@ P4_PRIVATE(P4_Rune)      P4_GetRuneLower(P4_Rune ch);
 P4_PRIVATE(P4_Rune)      P4_GetRuneUpper(P4_Rune ch);
 P4_PRIVATE(int)          P4_CaseCmpInsensitive(const void*, const void*, size_t n);
 
-P4_PRIVATE(size_t)       P4_GetPosition(P4_Source*);
 P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size_t offset, P4_Position* stop);
 
 # define P4_AdoptNode(head, tail, list) \
@@ -2093,7 +2092,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         if (!no_error(s))
             goto finalize;
 
-        if (P4_GetPosition(s) == whitespace_startpos->pos) {
+        if (s->pos == whitespace_startpos->pos) {
             P4_MatchRaisef(s, P4_MatchError,
                     "expect %s (repetition not advancing)", peek_rule_name(s));
             goto finalize;
@@ -2127,7 +2126,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         goto finalize;
     }
 
-    if (P4_GetPosition(s) == startpos->pos) /* success but no node is produced. */
+    if (s->pos == startpos->pos) /* success but no node is produced. */
         goto finalize;
 
     if (need_lift(s, e))
@@ -2969,11 +2968,6 @@ P4_PUBLIC void
 P4_SetExpressionFlag(P4_Expression* e, P4_ExpressionFlag f) {
     assert(e != NULL, "expression should not be null");
     e->flag |= f;
-}
-
-P4_PRIVATE(size_t)
-P4_GetPosition(P4_Source* s) {
-    return s->pos;
 }
 
 P4_PRIVATE(void)

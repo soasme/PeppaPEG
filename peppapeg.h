@@ -1594,6 +1594,17 @@ P4_Node*      P4_CreateNode(P4_String text, P4_Position* start, P4_Position* sto
 void           P4_DeleteNode(P4_Node* node);
 
 /**
+ * @brief       Delete the node children.
+ *              This will free the occupied memory for all node children.
+ * @param       node   The node.
+ *
+ * Example:
+ *
+ *      P4_DeleteNodeChildren(node);
+ */
+void P4_DeleteNodeChildren(P4_Node* node);
+
+/**
  * @brief       Get the slice that the node covers.
  *              The slice is owned by the node so don't free it.
  * @param       node   The node.

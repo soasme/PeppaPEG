@@ -1621,7 +1621,7 @@ P4_DeleteNodeNode(P4_Node* node) {
 /*
  * Free all of the children nodes of the node.
  */
-P4_PRIVATE(void)
+P4_PUBLIC void
 P4_DeleteNodeChildren(P4_Node* node) {
     if (node == NULL)
         return;
@@ -1636,6 +1636,7 @@ P4_DeleteNodeChildren(P4_Node* node) {
         P4_DeleteNodeNode(child);
         child = tmp;
     }
+    node->head = node->tail = NULL;
 }
 
 

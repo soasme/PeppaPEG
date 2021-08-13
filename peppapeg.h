@@ -1463,15 +1463,16 @@ size_t          P4_GetSourcePosition(P4_Source* source);
 
 /**
  * @brief       Print the node tree.
- * @param       stream      The output stream.
+ * @param       stream     The output stream.
  * @param       node       The root node of source ast.
+ * *param       formatter  A callback function to format node.
  *
  * Example:
  *
  *      P4_Node* root = P4_GetSourceAst(source);
  *      P4_JsonifySourceAst(stdout, root);
  */
-void           P4_JsonifySourceAst(FILE* stream, P4_Node* node);
+void           P4_JsonifySourceAst(FILE* stream, P4_Node* node, void (*formatter)(FILE* stream, P4_Node* node));
 
 /**
  * @brief       Inspect the node tree.

@@ -10,7 +10,7 @@
     TEST_ASSERT_EQUAL_MESSAGE((code), P4_Parse(grammar, source), "unexpected parse grammar return code"); \
     P4_Node* root = P4_GetSourceAst(source); \
     FILE *f = fopen("check.json","w"); \
-    P4_JsonifySourceAst(f, root); \
+    P4_JsonifySourceAst(f, root, P4_TomlFormatNode); \
     fclose(f); \
     P4_String s = read_file("check.json"); \
     printf("%s\n%s\n", input, s); \

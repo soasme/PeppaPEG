@@ -2337,16 +2337,21 @@ match_back_reference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Expr
 }
 
 void
-P4_JsonifySourceAst(FILE* stream, P4_Node* node) {
+P4_JsonifySourceAst(FILE* stream, P4_Node* node,
+        void (*formatter)(FILE* stream, P4_Node* node)) {
     P4_Node* tmp = node;
 
     fprintf(stream, "[");
     while (tmp != NULL) {
         fprintf(stream, "{\"slice\":[%lu,%lu]", tmp->slice.start.pos, tmp->slice.stop.pos);
         fprintf(stream, ",\"type\":\"%s\"", tmp->rule_name);
+        if (formatter != NULL) {
+            fprintf(stream, ",");
+            formatter(stream, node);
+        }
         if (tmp->head != NULL) {
             fprintf(stream, ",\"children\":");
-            P4_JsonifySourceAst(stream, tmp->head);
+            P4_JsonifySourceAst(stream, tmp->head, formatter);
         }
         fprintf(stream, "}");
         if (tmp->next != NULL) fprintf(stream, ",");

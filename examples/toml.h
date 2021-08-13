@@ -39,8 +39,13 @@ extern "C"
 
 #include "../peppapeg.h"
 
-P4_Error P4_TomlPropagate(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
+void P4_TomlFormatNode(FILE* stream, P4_Node* node) {
+}
+
+P4_Error P4_TomlEvalInteger(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
     node->userdata = node->head->userdata;
+    printf("integer: %lld\n", node->userdata);
+    P4_DeleteNodeChildren(node);
     return P4_Ok;
 }
 
@@ -90,7 +95,7 @@ P4_Error P4_TomlCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node
     if (strcmp(rule_name, "oct_int") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 8);
     if (strcmp(rule_name, "bin_int") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 2);
     if (strcmp(rule_name, "dec_int") == 0) return P4_TomlEvalDecInt(grammar, rule, node);
-    if (strcmp(rule_name, "integer") == 0) return P4_TomlPropagate(grammar, rule, node);
+    if (strcmp(rule_name, "integer") == 0) return P4_TomlEvalInteger(grammar, rule, node);
     return P4_Ok;
 }
 
@@ -164,7 +169,7 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         "integer = hex_int / oct_int / bin_int / dec_int;\n"
 
         /* Float */
-        "@squashed float = special_float / dec_int (exp / frac exp?);"
+        "float = special_float / dec_int (exp / frac exp?);"
         "zero_prefixed_int = DIGIT (underscore DIGIT / DIGIT)*;\n"
         "frac = \".\" zero_prefixed_int;\n"
         "exp = i\"e\" (minus / plus)? zero_prefixed_int;\n"

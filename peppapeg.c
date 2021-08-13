@@ -541,6 +541,7 @@ static void panicf(const char * fmt, ...) { va_list args; va_start(args, fmt); v
 # define is_lifted(e) (((e)->flag & P4_FLAG_LIFTED) != 0)
 # define is_non_terminal(e) (((e)->flag & P4_FLAG_NON_TERMINAL) != 0)
 # define is_rule(e) ((e)->name != NULL)
+# define is_cut(s) ((s)->frame_stack->cut)
 # define need_silent(s) ((s)->frame_stack ? (s)->frame_stack->silent : false)
 # define need_whitespace(s) (!(s)->whitespacing && ((s)->frame_stack ? (s)->frame_stack->space : false))
 
@@ -653,9 +654,11 @@ P4_PRIVATE(bool)                P4_NeedLift(P4_Source*, P4_Expression*);
 
 P4_PRIVATE(void)                P4_RescueError(P4_Source*);
 
-P4_PRIVATE(P4_Error)            P4_PushFrame(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Error)            P4_PopFrame(P4_Source*, P4_Frame*);
-# define P4_PeekFrame(s) ((s)->frame_stack)
+#define peek_frame(s)       ((s)->frame_stack)
+#define peek_rule_name(s)   ((s)->frame_stack->rule->name)
+
+P4_PRIVATE(P4_Error)        push_frame(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Error)        pop_frame(P4_Source*, P4_Frame*);
 
 P4_PRIVATE(P4_Expression*)      P4_GetReference(P4_Source*, P4_Expression*);
 
@@ -1707,7 +1710,7 @@ P4_DeleteNodeUserData(P4_Grammar* grammar, P4_Node* node) {
  * Push e into s->frame_stack.
  */
 P4_PRIVATE(P4_Error)
-P4_PushFrame(P4_Source* s, P4_Expression* e) {
+push_frame(P4_Source* s, P4_Expression* e) {
     if ((s->frame_stack_size) >= (s->grammar->depth)) {
         return P4_StackError;
     }
@@ -1763,7 +1766,7 @@ P4_PushFrame(P4_Source* s, P4_Expression* e) {
  * Pop top from s->frames.
  */
 P4_PRIVATE(P4_Error)
-P4_PopFrame(P4_Source* s, P4_Frame* f) {
+pop_frame(P4_Source* s, P4_Frame* f) {
     assert(s->frame_stack != NULL, "frame should not be empty");
 
     P4_Frame* oldtop = s->frame_stack;
@@ -1790,7 +1793,7 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
 
     if (is_end(s)) {
         P4_MatchRaisef(s, P4_MatchError, "expect %s (char '%s')",
-                P4_PeekFrame(s)->rule->name, (char*)rune);
+                peek_rule_name(s), (char*)rune);
         return NULL;
     }
 
@@ -1805,7 +1808,7 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
     if ((!e->sensitive && P4_CaseCmpInsensitive(e->literal, str, len) != 0)
             || (e->sensitive && memcmp(e->literal, str, len) != 0)) {
         P4_MatchRaisef(s, P4_MatchError, "expect %s (char '%s')",
-                P4_PeekFrame(s)->rule->name, (char*)rune);
+                peek_rule_name(s), (char*)rune);
         return NULL;
     }
 
@@ -1828,7 +1831,7 @@ P4_MatchRange(P4_Source* s, P4_Expression* e) {
 
     P4_String str = P4_RemainingText(s);
     if (is_end(s)) {
-        P4_MatchRaisef(s, P4_MatchError, "expect %s", P4_PeekFrame(s)->rule->name);
+        P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
         return NULL;
     }
 
@@ -1849,7 +1852,7 @@ P4_MatchRange(P4_Source* s, P4_Expression* e) {
     }
 
     if (!found) {
-        P4_MatchRaisef(s, P4_MatchError, "expect %s", P4_PeekFrame(s)->rule->name);
+        P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
         return NULL;
     }
 
@@ -1950,7 +1953,7 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
                 if (member->backref_index >= i) {
                     P4_MatchRaisef(s, P4_IndexError,
                         "expect %s (\\%zu out reached)",
-                        P4_PeekFrame(s)->rule->name, member->backref_index);
+                        peek_rule_name(s), member->backref_index);
                     goto finalize;
                 }
                 tok = P4_MatchBackReference(s, e, backrefs, member);
@@ -2018,7 +2021,7 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
                 set_position(s, startpos);
             /* fail when the last one is a no-match. */
             } else {
-                P4_MatchRaisef(s, P4_MatchError, "expect %s", P4_PeekFrame(s)->rule->name);
+                P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
                 goto finalize;
             }
         }
@@ -2069,7 +2072,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
             (IS_REF(e->repeat_expr)
              && IS_PROGRESSING(P4_GetReference(s, e->repeat_expr)->kind))) {
         P4_MatchRaisef(s, P4_AdvanceError,
-            "expect %s (no progressing in repetition)", P4_PeekFrame(s)->rule->name);
+            "expect %s (no progressing in repetition)", peek_rule_name(s));
         return NULL;
     }
 
@@ -2103,7 +2106,8 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
             }
 
             if (min != SIZE_MAX && repeated < min) {
-                P4_MatchRaisef(s, P4_MatchError, "expect %s (insufficient repetitions)", P4_PeekFrame(s)->rule->name);
+                P4_MatchRaisef(s, P4_MatchError,
+                    "expect %s (insufficient repetitions)", peek_rule_name(s));
                 goto finalize;
             } else {                       /* sufficient repetitions. */
                 P4_RescueError(s);
@@ -2116,7 +2120,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
 
         if (P4_GetPosition(s) == whitespace_startpos->pos) {
             P4_MatchRaisef(s, P4_MatchError,
-                    "expect %s (repetition not advancing)", P4_PeekFrame(s)->rule->name);
+                    "expect %s (repetition not advancing)", peek_rule_name(s));
             goto finalize;
         }
 
@@ -2137,14 +2141,14 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     if (max != SIZE_MAX && repeated > max) {
         P4_MatchRaisef(s, P4_MatchError,
             "expect %s (at most %zu repetitions)",
-            P4_PeekFrame(s)->rule->name, max);
+            peek_rule_name(s), max);
         goto finalize;
     }
 
     if (min != SIZE_MAX && repeated < min) {
         P4_MatchRaisef(s, P4_MatchError,
             "expect %s (at least %zu repetitions)",
-            P4_PeekFrame(s)->rule->name, min);
+            peek_rule_name(s), min);
         goto finalize;
     }
 
@@ -2199,7 +2203,7 @@ P4_MatchNegative(P4_Source* s, P4_Expression* e) {
 
     if (no_error(s)) {
         P4_DeleteNode(node);
-        P4_MatchRaisef(s, P4_MatchError, "expect %s", P4_PeekFrame(s)->rule->name);
+        P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
     } else if (s->err == P4_MatchError || s->err == P4_CutError) {
         P4_RescueError(s);
     }
@@ -2210,7 +2214,7 @@ P4_MatchNegative(P4_Source* s, P4_Expression* e) {
 P4_PRIVATE(P4_Node*)
 P4_MatchCut(P4_Source* s, P4_Expression* e) {
     /* enable flag cut in the top frame. */
-    P4_Frame* frame = P4_PeekFrame(s);
+    P4_Frame* frame = peek_frame(s);
     frame->cut = true;
     return NULL;
 }
@@ -2251,18 +2255,18 @@ P4_Match(P4_Source* s, P4_Expression* e) {
     catch_err(s->err);
 
     catch_err(
-        P4_PushFrame(s, e),
+        push_frame(s, e),
         P4_MatchRaisef(s, err, "expect %s (max recursion)", e->name)
     );
 
     result = P4_MatchDispatch(s, e);
 
-    P4_Frame* frame = P4_PeekFrame(s);
-    if (no_match(s) && frame->cut && !s->whitespacing) {
+    P4_Frame* frame = peek_frame(s);
+    if (no_match(s) && is_cut(s) && !s->whitespacing) {
         s->err = P4_CutError;
     }
 
-    P4_PopFrame(s, NULL);
+    pop_frame(s, NULL);
 
     catch_err(s->err, {
         P4_DeleteNode(result);
@@ -2326,19 +2330,19 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
     if (index > e->count || index < 0) {
         P4_MatchRaisef(s, P4_IndexError,
             "expect %s (\\%zu out of bound)",
-            P4_PeekFrame(s)->rule->name, index);
+            peek_rule_name(s), index);
         return NULL;
     }
 
     P4_Expression* backref_expr = e->members[index];
 
     if (backref_expr == NULL) {
-        P4_MatchRaisef(s, P4_PegError, "expect %s (null backref expr)", P4_PeekFrame(s)->rule->name);
+        P4_MatchRaisef(s, P4_PegError, "expect %s (null backref expr)", peek_rule_name(s));
         return NULL;
     }
 
     if (backref_expr->kind == P4_BackReference) {
-        P4_MatchRaisef(s, P4_PegError, "expect %s (backref point to backref)", P4_PeekFrame(s)->rule->name);
+        P4_MatchRaisef(s, P4_PegError, "expect %s (backref point to backref)", peek_rule_name(s));
         return NULL;
     }
 

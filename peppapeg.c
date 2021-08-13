@@ -544,6 +544,7 @@ static void panicf(const char * fmt, ...) { va_list args; va_start(args, fmt); v
 # define is_cut(s) ((s)->frame_stack->cut)
 # define need_silent(s) ((s)->frame_stack ? (s)->frame_stack->silent : false)
 # define need_whitespace(s) (!(s)->whitespacing && ((s)->frame_stack ? (s)->frame_stack->space : false))
+# define no_backtrack(s) (no_match(s) && is_cut(s) && !(s)->whitespacing)
 
 # define no_error(s) ((s)->err == P4_Ok)
 # define no_match(s) ((s)->err == P4_MatchError)
@@ -658,7 +659,7 @@ P4_PRIVATE(void)                P4_RescueError(P4_Source*);
 #define peek_rule_name(s)   ((s)->frame_stack->rule->name)
 
 P4_PRIVATE(P4_Error)        push_frame(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Error)        pop_frame(P4_Source*, P4_Frame*);
+P4_PRIVATE(P4_Error)        pop_frame(P4_Source*);
 
 P4_PRIVATE(P4_Expression*)      P4_GetReference(P4_Source*, P4_Expression*);
 
@@ -1766,7 +1767,7 @@ push_frame(P4_Source* s, P4_Expression* e) {
  * Pop top from s->frames.
  */
 P4_PRIVATE(P4_Error)
-pop_frame(P4_Source* s, P4_Frame* f) {
+pop_frame(P4_Source* s) {
     assert(s->frame_stack != NULL, "frame should not be empty");
 
     P4_Frame* oldtop = s->frame_stack;
@@ -2219,23 +2220,6 @@ P4_MatchCut(P4_Source* s, P4_Expression* e) {
     return NULL;
 }
 
-P4_Node*
-P4_MatchDispatch(P4_Source* s, P4_Expression* e) {
-    switch (e->kind) {
-        case P4_Literal: return P4_MatchLiteral(s, e);
-        case P4_Range: return P4_MatchRange(s, e);
-        case P4_Reference: return P4_MatchReference(s, e);
-        case P4_Sequence: return P4_MatchSequence(s, e);
-        case P4_Choice: return P4_MatchChoice(s, e);
-        case P4_Positive: return P4_MatchPositive(s, e);
-        case P4_Negative: return P4_MatchNegative(s, e);
-        case P4_Repeat: return P4_MatchRepeat(s, e);
-        case P4_Cut: panic("cut can be applied only in sequence.");
-        case P4_BackReference: panic("backreference can be applied only in sequence.");
-        default: panicf("invalid dispatch kind: %zu.", e->kind);
-    }
-}
-
 /*
  * The match function updates the state given an expression.
  *
@@ -2249,48 +2233,58 @@ P4_Node*
 P4_Match(P4_Source* s, P4_Expression* e) {
     assert(e != NULL, "expression should not be null");
 
-    P4_Error     err = P4_Ok;
+    P4_Error err = P4_Ok;
     P4_Node* result = NULL;
 
+    /* abort match if any error has occurred. */
     catch_err(s->err);
 
+    /* push the frame. */
     catch_err(
         push_frame(s, e),
         P4_MatchRaisef(s, err, "expect %s (max recursion)", e->name)
     );
 
-    result = P4_MatchDispatch(s, e);
+    /* match the input based on expression kind. */
+    switch (e->kind) {
+        case P4_Literal:       result = P4_MatchLiteral(s, e);   break;
+        case P4_Range:         result = P4_MatchRange(s, e);     break;
+        case P4_Reference:     result = P4_MatchReference(s, e); break;
+        case P4_Sequence:      result = P4_MatchSequence(s, e);  break;
+        case P4_Choice:        result = P4_MatchChoice(s, e);    break;
+        case P4_Positive:      result = P4_MatchPositive(s, e);  break;
+        case P4_Negative:      result = P4_MatchNegative(s, e);  break;
+        case P4_Repeat:        result = P4_MatchRepeat(s, e);    break;
+        case P4_Cut:           panic("cut can be applied only in sequence.");
+        case P4_BackReference: panic("backreference can be applied only in sequence.");
+        default:               panicf("invalid dispatch kind: %zu.", e->kind);
+    }
 
-    P4_Frame* frame = peek_frame(s);
-    if (no_match(s) && is_cut(s) && !s->whitespacing) {
+    /* pop the frame. stops backtracking if an cut error is raised. */
+    if (no_backtrack(s))
         s->err = P4_CutError;
-    }
+    pop_frame(s);
+    catch_err(s->err);
 
-    pop_frame(s, NULL);
-
-    catch_err(s->err, {
-        P4_DeleteNode(result);
-        if (e->name != NULL && s->errmsg[0] == 0) {
-            P4_MatchRaisef(s, s->err, "expect %s", e->name);
-        }
-    });
-
-    if (s->grammar->on_match != NULL) {
-        catch_err((s->grammar->on_match)(s->grammar, e, result), {
-            if (s->errmsg[0] == 0)
-                P4_MatchRaisef(s, s->err, "expect %s (match callback failed)", e->name);
-            P4_DeleteNode(result);
-        });
-    }
+    /* run match callback. */
+    if (no_error(s) && s->grammar->on_match != NULL)
+        catch_err((s->grammar->on_match)(s->grammar, e, result));
 
     return result;
 
 finalize:
+    /* run error callback. */
     if (s->grammar->on_error != NULL) {
         err = (s->grammar->on_error)(s->grammar, e);
         if (err != P4_Ok && s->errmsg[0] == 0)
-            P4_MatchRaisef(s, s->err, "expect %s (error callback failed)", e->name);
+            P4_MatchRaisef(s, s->err, "expect %s", e->name);
     }
+
+    /* clean up */
+    P4_DeleteNode(result);
+    if (e->name != NULL && s->errmsg[0] == 0)
+        P4_MatchRaisef(s, s->err, "expect %s", e->name);
+
     return NULL;
 }
 

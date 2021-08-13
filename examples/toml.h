@@ -42,6 +42,7 @@ extern "C"
 
 typedef struct P4_TomlDateTime {
     char kind; /* t (local_time), d (local_date), D (local_date_time), T (offset_date_time)  */
+    size_t year, month, day;
     size_t hour, minute, second;
     long millisecond;
 } P4_TomlDateTime;
@@ -82,6 +83,17 @@ P4_TomlValue* P4_TomlNewLocalTime(size_t hour, size_t minute, size_t second, siz
     return v;
 }
 
+P4_TomlValue* P4_TomlNewLocalDate(size_t year, size_t month, size_t day) {
+    P4_TomlValue* v = P4_MALLOC(sizeof(P4_TomlValue));
+    v->kind = 'd';
+    v->d = P4_MALLOC(sizeof(P4_TomlDateTime));
+    v->d->kind = 'd';
+    v->d->year = year;
+    v->d->month = month;
+    v->d->day = day;
+    return v;
+}
+
 # define as_val(n) ((P4_TomlValue*)((n)->userdata))
 # define as_int(n) (as_val(n)->i)
 # define from_int(i) (void*)(P4_TomlNewInteger(i))
@@ -89,6 +101,8 @@ P4_TomlValue* P4_TomlNewLocalTime(size_t hour, size_t minute, size_t second, siz
 # define from_float(f) (void*)(P4_TomlNewFloat(f))
 # define as_local_time(n) (as_val(n)->d)
 # define from_local_time(h,m,s,ms) (void*)(P4_TomlNewLocalTime(h,m,s,ms))
+# define as_local_date(n) (as_val(n)->d)
+# define from_local_date(y,m,d) (void*)(P4_TomlNewLocalDate(y,m,d))
 
 void P4_TomlFormatNode(FILE* stream, P4_Node* node) {
     if (strcmp(node->rule_name, "integer") == 0) {
@@ -99,6 +113,11 @@ void P4_TomlFormatNode(FILE* stream, P4_Node* node) {
         if (as_val(node)->d->kind == 't') {
             P4_TomlDateTime* dt = as_local_time(node);
             fprintf(stream, ",\"hour\": %lu, \"minute\": %lu, \"second\": %lu, \"millisecond\": %ld", dt->hour, dt->minute, dt->second, dt->millisecond);
+        }
+    } else if (strcmp(node->rule_name, "local_date") == 0) {
+        if (as_val(node)->d->kind == 'd') {
+            P4_TomlDateTime* dt = as_local_date(node);
+            fprintf(stream, ",\"year\": %lu, \"month\": %lu, \"day\": %lu", dt->year, dt->month, dt->day);
         }
     }
 }
@@ -170,12 +189,25 @@ P4_Error P4_TomlEvalLocalTime(P4_Grammar* grammar, P4_Expression* rule, P4_Node*
     return P4_Ok;
 }
 
+P4_Error P4_TomlEvalLocalDate(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
+    size_t year = as_int(node->head->head);
+    size_t month = as_int(node->head->head->next);
+    size_t day = as_int(node->head->head->next->next);
+    printf("%lu %lu %lu\n", year, month, day);
+    node->userdata = from_local_date(year, month, day);
+    P4_DeleteNodeChildren(node);
+    return P4_Ok;
+}
+
 P4_Error P4_TomlCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
     const char* rule_name = P4_GetRuleName(rule);
     if (rule_name == NULL || node == NULL) return P4_Ok;
     if (strcmp(rule_name, "one_nine") == 0) return P4_TomlEvalDigit(grammar, rule, node);
     if (strcmp(rule_name, "zero_seven") == 0) return P4_TomlEvalDigit(grammar, rule, node);
     if (strcmp(rule_name, "zero_one") == 0) return P4_TomlEvalDigit(grammar, rule, node);
+    if (strcmp(rule_name, "zero_two") == 0) return P4_TomlEvalDigit(grammar, rule, node);
+    if (strcmp(rule_name, "zero") == 0) return P4_TomlEvalDigit(grammar, rule, node);
+    if (strcmp(rule_name, "one") == 0) return P4_TomlEvalDigit(grammar, rule, node);
     if (strcmp(rule_name, "HEXDIG") == 0) return P4_TomlEvalDigit(grammar, rule, node);
     if (strcmp(rule_name, "DIGIT") == 0) return P4_TomlEvalDigit(grammar, rule, node);
     if (strcmp(rule_name, "unsigned_dec_int") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 10);
@@ -190,6 +222,10 @@ P4_Error P4_TomlCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node
     if (strcmp(rule_name, "time_second") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 10);
     if (strcmp(rule_name, "time_secfrac") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 10);
     if (strcmp(rule_name, "local_time") == 0) return P4_TomlEvalLocalTime(grammar, rule, node);
+    if (strcmp(rule_name, "date_fullyear") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 10);
+    if (strcmp(rule_name, "date_month") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 10);
+    if (strcmp(rule_name, "date_mday") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 10);
+    if (strcmp(rule_name, "local_date") == 0) return P4_TomlEvalLocalDate(grammar, rule, node);
     return P4_Ok;
 }
 
@@ -252,6 +288,9 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         "one_nine = [1-9];\n"
         "zero_seven = [0-7];\n"
         "zero_one = [0-1];\n"
+        "zero_two = [0-2];\n"
+        "zero = \"0\";\n"
+        "one = \"1\";\n"
         "@lifted hex_prefix = i\"0x\";\n"
         "@lifted oct_prefix = i\"0o\";\n"
         "@lifted bin_prefix = i\"0b\";\n"
@@ -272,9 +311,9 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         "nan = \"nan\";\n"
 
         /* Date and Time */
-        "@squashed date_fullyear = DIGIT{4};\n"
-        "@squashed date_month = \"0\" [1-9] / \"1\" [0-2];\n"
-        "@squashed date_mday = DIGIT{2};\n"
+        "date_fullyear = DIGIT{4};\n"
+        "date_month = zero one_nine / one zero_two;\n"
+        "date_mday = DIGIT{2};\n"
         "time_delim = i\"t\" / \" \";\n"
         "time_hour = DIGIT{2};\n"
         "time_minute = DIGIT{2};\n"

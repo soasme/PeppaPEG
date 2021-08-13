@@ -544,6 +544,7 @@ static void panicf(const char * fmt, ...) { va_list args; va_start(args, fmt); v
 # define is_cut(s) ((s)->frame_stack->cut)
 # define need_silent(s) ((s)->frame_stack ? (s)->frame_stack->silent : false)
 # define need_whitespace(s) (!(s)->whitespacing && ((s)->frame_stack ? (s)->frame_stack->space : false))
+# define need_lift(s,e) (!is_rule(e) || is_lifted(e) || need_silent(s))
 # define no_backtrack(s) (no_match(s) && is_cut(s) && !(s)->whitespacing)
 
 # define no_error(s) ((s)->err == P4_Ok)
@@ -637,8 +638,6 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
 
 P4_PRIVATE(P4_String)           P4_RemainingText(P4_Source*);
 
-P4_PRIVATE(bool)                P4_NeedLift(P4_Source*, P4_Expression*);
-
 # define P4_MatchRaisef(s,e,m,...) \
     do { \
         (s)->err = (e); \
@@ -653,10 +652,10 @@ P4_PRIVATE(bool)                P4_NeedLift(P4_Source*, P4_Expression*);
         sprintf((r)->errmsg, (m), __VA_ARGS__); \
     } while (0);
 
-P4_PRIVATE(void)                P4_RescueError(P4_Source*);
+# define rescue_error(s)    do { (s)->err = P4_Ok; (s)->errmsg[0] = '\0'; } while (0)
 
-#define peek_frame(s)       ((s)->frame_stack)
-#define peek_rule_name(s)   ((s)->frame_stack->rule->name)
+# define peek_frame(s)      ((s)->frame_stack)
+# define peek_rule_name(s)  ((s)->frame_stack->rule->name)
 
 P4_PRIVATE(P4_Error)        push_frame(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Error)        pop_frame(P4_Source*);
@@ -1597,31 +1596,6 @@ P4_CaseCmpInsensitive(const void* src1, const void* src2, size_t n) {
 }
 
 /*
- * Determine if the corresponding node to `e` should be ignored.
- *
- * 1. Intermediate expr.
- * 2. Bareness expr.
- * 3. Hollowed expr.
- *
- */
-P4_PRIVATE(bool)
-P4_NeedLift(P4_Source* s, P4_Expression* e) {
-    return !is_rule(e) || is_lifted(e) || need_silent(s);
-}
-
-/*
- * Clear an error.
- *
- * It allows the parser to keep parsing the text.
- */
-P4_PRIVATE(void)
-P4_RescueError(P4_Source* s) {
-    s->err = P4_Ok;
-    memset(s->errmsg, 0, sizeof(s->errmsg));
-}
-
-
-/*
  * Initialize a node.
  */
 P4_Node*
@@ -1817,7 +1791,7 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
     P4_DiffPosition(s->content, startpos, len, endpos);
     set_position(s, endpos);
 
-    if (P4_NeedLift(s, e))
+    if (need_lift(s, e))
         return NULL;
 
     P4_Node*  result = NULL;
@@ -1861,7 +1835,7 @@ P4_MatchRange(P4_Source* s, P4_Expression* e) {
     P4_DiffPosition(s->content, startpos, size, endpos);
     set_position(s, endpos);
 
-    if (P4_NeedLift(s, e))
+    if (need_lift(s, e))
         return NULL;
 
     P4_Node*  result = NULL;
@@ -1904,7 +1878,7 @@ P4_MatchReference(P4_Source* s, P4_Expression* e) {
         return NULL;
 
     /* The referenced node is returned when silenced. */
-    if (P4_NeedLift(s, e))
+    if (need_lift(s, e))
         return reftok;
 
     /* A single reference expr can be a rule: `e = { ref }` */
@@ -1980,7 +1954,7 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
         set_slice(&backrefs[i], member_startpos, member_endpos);
     }
 
-    if (P4_NeedLift(s, e))
+    if (need_lift(s, e))
         return head;
 
     if (is_non_terminal(e) && head != NULL && head->next == NULL) {
@@ -2018,7 +1992,7 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
         if (no_match(s)) {
             /* retry until the last one. */
             if (i < e->count-1) {
-                P4_RescueError(s);
+                rescue_error(s);
                 set_position(s, startpos);
             /* fail when the last one is a no-match. */
             } else {
@@ -2029,7 +2003,7 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
     }
     mark_position(s, endpos);
 
-    if (P4_NeedLift(s, e))
+    if (need_lift(s, e))
         return tok;
 
     P4_Node* oneof = P4_CreateNode (s->content, startpos, endpos, e->name);
@@ -2111,7 +2085,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
                     "expect %s (insufficient repetitions)", peek_rule_name(s));
                 goto finalize;
             } else {                       /* sufficient repetitions. */
-                P4_RescueError(s);
+                rescue_error(s);
                 break;
             }
         }
@@ -2129,7 +2103,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
         P4_AdoptNode(head, tail, tok);
 
         if (max != SIZE_MAX && repeated == max) { /* enough attempts */
-            P4_RescueError(s);
+            rescue_error(s);
             break;
         }
 
@@ -2156,7 +2130,7 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
     if (P4_GetPosition(s) == startpos->pos) /* success but no node is produced. */
         goto finalize;
 
-    if (P4_NeedLift(s, e))
+    if (need_lift(s, e))
         return head;
 
     if (is_non_terminal(e) && head != NULL && head->next == NULL) {
@@ -2206,7 +2180,7 @@ P4_MatchNegative(P4_Source* s, P4_Expression* e) {
         P4_DeleteNode(node);
         P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
     } else if (s->err == P4_MatchError || s->err == P4_CutError) {
-        P4_RescueError(s);
+        rescue_error(s);
     }
 
     return NULL;
@@ -2221,12 +2195,12 @@ P4_MatchCut(P4_Source* s, P4_Expression* e) {
 }
 
 /*
- * The match function updates the state given an expression.
+ * This function matches an expression given source.
  *
- * It returns a node linked list, NULL if no node is generated.
- * State pos will advance if needed.
- * Not-advancing pos / NULL returning node list do not indicate a failed match.
- * It fails when state err/errmsg are set.
+ * It returns either NULL or a list of nodes.
+ * Advance source pos if needed.
+ *
+ * After returned, if s->err is not P4_Ok, it's a failed match.
  * It propagate the failed match up to the top level.
  */
 P4_Node*
@@ -2307,7 +2281,7 @@ P4_MatchSpacedExpressions(P4_Source* s, P4_Expression* e) {
     /*     We won't do implicit whitespace inside an implicit whitespace expr. */
     P4_Node* result = P4_Match(s, implicit_whitespace);
     if (no_match(s))
-        P4_RescueError(s);
+        rescue_error(s);
 
     /* (3) Set implicit whitespace back. */
     s->whitespacing = false;
@@ -2802,7 +2776,7 @@ P4_CreateSource(P4_String content, P4_String entry_name) {
     source->whitespacing = false;
 
     P4_SetSourceSlice(source, 0, strlen(content));
-    P4_RescueError(source);
+    rescue_error(source);
 
     return source;
 }
@@ -2836,7 +2810,7 @@ P4_ResetSource(P4_Source* source) {
         source->frame_stack = tmp;
     }
 
-    P4_RescueError(source);
+    rescue_error(source);
 
     if (source->root) {
         P4_DeleteNodeUserData(source->grammar, source->root);

@@ -37,10 +37,66 @@ extern "C"
 {
 #endif
 
+#include <math.h>
 #include "../peppapeg.h"
 
+P4_Error P4_TomlPropagate(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
+    node->userdata = node->head->userdata;
+    return P4_Ok;
+}
+
+P4_Error P4_TomlEvalDigit(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
+    if (node->text[node->slice.start.pos] <= '9')
+        node->userdata = (void*) (node->text[node->slice.start.pos] - '0');
+    else if (node->text[node->slice.start.pos] <= 'f')
+        node->userdata = (void*) (node->text[node->slice.start.pos] - 'a');
+    else if (node->text[node->slice.start.pos] <= 'F')
+        node->userdata = (void*) (node->text[node->slice.start.pos] - 'A');
+    return P4_Ok;
+}
+
+P4_Error P4_TomlEvalDecInt(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
+    int64_t num = node->tail->userdata;
+    const char* rule_name = P4_GetRuleName(node->head);
+    if (strcmp(rule_name, "minus")) num = -num;
+    node->userdata = (void*)num;
+    return P4_Ok;
+}
+
+P4_Error P4_TomlEvalUnsignedInt(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node, int base) {
+    P4_Node* child = NULL;
+    int64_t num = 0;
+
+    if (node->head == NULL) { /* "0" */
+        num = 0;
+    } else {
+        for (child = node->head; child != NULL; child = child->next) {
+            num = num * base + (int64_t) (child->userdata);
+        }
+    }
+    node->userdata = (void*) num;
+    return P4_Ok;
+}
+
+P4_Error P4_TomlCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
+    const char* rule_name = P4_GetRuleName(rule);
+    if (rule_name == NULL || node == NULL) return P4_Ok;
+    if (strcmp(rule_name, "one_nine") == 0) return P4_TomlEvalDigit(grammar, rule, node);
+    if (strcmp(rule_name, "zero_seven") == 0) return P4_TomlEvalDigit(grammar, rule, node);
+    if (strcmp(rule_name, "zero_one") == 0) return P4_TomlEvalDigit(grammar, rule, node);
+    if (strcmp(rule_name, "HEXDIG") == 0) return P4_TomlEvalDigit(grammar, rule, node);
+    if (strcmp(rule_name, "DIGIT") == 0) return P4_TomlEvalDigit(grammar, rule, node);
+    if (strcmp(rule_name, "unsigned_dec_int") == 0) return P4_TomlEvalUnsignedDecInt(grammar, rule, node, 10);
+    if (strcmp(rule_name, "hex_int") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 16);
+    if (strcmp(rule_name, "oct_int") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 8);
+    if (strcmp(rule_name, "bin_int") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 2);
+    if (strcmp(rule_name, "dec_int") == 0) return P4_TomlEvalDecInt(grammar, rule, node);
+    if (strcmp(rule_name, "integer") == 0) return P4_TomlPropagate(grammar, rule, node);
+    return P4_Ok;
+}
+
 P4_Grammar*  P4_CreateTomlGrammar() {
-    return P4_LoadGrammar(
+    P4_Grammar* grammar = P4_LoadGrammar(
 
         "toml = expression (newline expression)*;\n"
         "expression = ws (keyval / table)? ws comment?;\n"
@@ -94,19 +150,19 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         /* Integer */
         "minus = \"-\";\n"
         "plus = \"+\";\n"
-        "underscore = \"_\";\n"
+        "@lifted underscore = \"_\";\n"
         "one_nine = [1-9];\n"
         "zero_seven = [0-7];\n"
         "zero_one = [0-1];\n"
-        "hex_prefix = i\"0x\";\n"
-        "oct_prefix = i\"0o\";\n"
-        "bin_prefix = i\"0b\";\n"
+        "@lifted hex_prefix = i\"0x\";\n"
+        "@lifted oct_prefix = i\"0o\";\n"
+        "@lifted bin_prefix = i\"0b\";\n"
         "dec_int = (minus / plus)? unsigned_dec_int;\n"
         "unsigned_dec_int = \"0\" / one_nine (DIGIT / underscore DIGIT)*;\n"
         "hex_int = hex_prefix HEXDIG (HEXDIG / underscore HEXDIG)*;\n"
         "oct_int = oct_prefix zero_seven (zero_seven / underscore zero_seven)*;\n"
         "bin_int = bin_prefix zero_one (zero_one / underscore zero_one)*;\n"
-        "@squashed integer = hex_int / oct_int / bin_int / dec_int;\n"
+        "integer = hex_int / oct_int / bin_int / dec_int;\n"
 
         /* Float */
         "@squashed float = special_float / dec_int (exp / frac exp?);"
@@ -185,6 +241,10 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         "DIGIT = [0-9];\n"
         "HEXDIG = [a-f] / [A-F] / [0-9];\n"
     );
+
+    P4_SetGrammarCallback(grammar, P4_TomlCallback, NULL);
+
+    return grammar;
 }
 
 #ifdef __cplusplus

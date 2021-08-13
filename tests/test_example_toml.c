@@ -77,8 +77,11 @@ void test_valid(void) {
     ASSERT_TOML("toml", "abc = 0o123", P4_Ok, "[]");
     ASSERT_TOML("toml", "abc = 1.0", P4_Ok, "[]");
     ASSERT_TOML("toml", "abc = -1.0", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = -123_456.0001", P4_Ok, "[]");
     ASSERT_TOML("toml", "abc = nan", P4_Ok, "[]");
     ASSERT_TOML("toml", "abc = inf", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = +inf", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = -inf", P4_Ok, "[]");
 }
 
 int main(void) {

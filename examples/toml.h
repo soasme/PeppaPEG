@@ -48,13 +48,6 @@ typedef struct P4_TomlValue {
     };
 } P4_TomlValue;
 
-void P4_TomlFreeValue(void* v) {
-    if (v) {
-        P4_TomlValue *p = v;
-        P4_FREE(p);
-    }
-}
-
 P4_TomlValue* P4_TomlNewInteger(int64_t i) {
     P4_TomlValue* v = P4_MALLOC(sizeof(P4_TomlValue));
     v->kind = 'i';
@@ -87,9 +80,10 @@ P4_Error P4_TomlEvalFloat(P4_Grammar* grammar, P4_Expression* rule, P4_Node* nod
     P4_DeleteNodeChildren(node);
     P4_String s = P4_CopyNodeString(node);
     size_t i = 0, offset = 0, len = strlen(s);
-    for (i = 0; i+offset < len; i++) {
+    for (i = 0; i+offset < len; ) {
         if (s[i + offset] == '_') { offset += 1; continue; }
         s[i] = s[i + offset];
+        i++;
     }
     s[i++] = 0;
     node->userdata = from_float(atof(s));
@@ -142,7 +136,6 @@ P4_Error P4_TomlEvalUnsignedInt(P4_Grammar* grammar, P4_Expression* rule, P4_Nod
 P4_Error P4_TomlCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
     const char* rule_name = P4_GetRuleName(rule);
     if (rule_name == NULL || node == NULL) return P4_Ok;
-    /*
     if (strcmp(rule_name, "one_nine") == 0) return P4_TomlEvalDigit(grammar, rule, node);
     if (strcmp(rule_name, "zero_seven") == 0) return P4_TomlEvalDigit(grammar, rule, node);
     if (strcmp(rule_name, "zero_one") == 0) return P4_TomlEvalDigit(grammar, rule, node);
@@ -154,8 +147,7 @@ P4_Error P4_TomlCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node
     if (strcmp(rule_name, "bin_int") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 2);
     if (strcmp(rule_name, "dec_int") == 0) return P4_TomlEvalDecInt(grammar, rule, node);
     if (strcmp(rule_name, "integer") == 0) return P4_TomlEvalInteger(grammar, rule, node);
-    */
-    /* if (strcmp(rule_name, "float") == 0) return P4_TomlEvalFloat(grammar, rule, node); */
+    if (strcmp(rule_name, "float") == 0) return P4_TomlEvalFloat(grammar, rule, node);
     return P4_Ok;
 }
 
@@ -307,7 +299,6 @@ P4_Grammar*  P4_CreateTomlGrammar() {
     );
 
     P4_SetGrammarCallback(grammar, P4_TomlCallback, NULL);
-    P4_SetUserDataFreeFunc(grammar, P4_TomlFreeValue);
 
     return grammar;
 }

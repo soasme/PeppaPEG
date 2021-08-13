@@ -480,7 +480,7 @@ struct P4_Source {
     /** The flag for checking if the parse is matching SPACED rules.
      *
      * Since we're wrapping SPACED rules into a repetition rule internally,
-     * it's important to prevent matching SPACED rules in P4_MatchRepeat.
+     * it's important to prevent matching SPACED rules in match_repeat.
      *
      * XXX: Maybe there are some better ways to prevent that?
      */
@@ -533,50 +533,6 @@ static void panicf(const char * fmt, ...) { va_list args; va_start(args, fmt); v
     } \
 } while (0);
 
-# define is_end(s) ((s)->pos >= (s)->slice.stop.pos)
-# define is_tight(e) (((e)->flag & P4_FLAG_TIGHT) != 0)
-# define is_scoped(e) (((e)->flag & P4_FLAG_SCOPED) != 0)
-# define is_spaced(e) (((e)->flag & P4_FLAG_SPACED) != 0)
-# define is_squashed(e) (((e)->flag & P4_FLAG_SQUASHED) != 0)
-# define is_lifted(e) (((e)->flag & P4_FLAG_LIFTED) != 0)
-# define is_non_terminal(e) (((e)->flag & P4_FLAG_NON_TERMINAL) != 0)
-# define is_rule(e) ((e)->name != NULL)
-# define is_cut(s) ((s)->frame_stack->cut)
-# define need_silent(s) ((s)->frame_stack ? (s)->frame_stack->silent : false)
-# define need_whitespace(s) (!(s)->whitespacing && ((s)->frame_stack ? (s)->frame_stack->space : false))
-# define need_lift(s,e) (!is_rule(e) || is_lifted(e) || need_silent(s))
-# define no_backtrack(s) (no_match(s) && is_cut(s) && !(s)->whitespacing)
-
-# define no_error(s) ((s)->err == P4_Ok)
-# define no_match(s) ((s)->err == P4_MatchError)
-
-# define set_position(s, d) \
-    do { \
-        (s)->pos = (d)->pos; \
-        (s)->lineno = (d)->lineno; \
-        (s)->offset = (d)->offset; \
-    } while (0);
-# define mark_position(s, p) \
-    P4_Position* p = & (P4_Position) { \
-        .pos = (s)->pos, \
-        .lineno = (s)->lineno, \
-        .offset = (s)->offset \
-    };
-
-# define get_slice_size(s) ((s)->stop.pos - (s)->start.pos)
-# define set_slice(s, a, b) \
-    do { \
-        set_position(&((s)->start), (a)); \
-        set_position(&((s)->stop), (b)); \
-    } while (0)
-
-#define foreach_child(node, child, code) \
-    for ((child) = (node)->head; \
-            (child) != NULL; \
-            (child) = (child)->next) { \
-        code; \
-    }
-
 #define strdup(x) panic("Do not use strdup(). Use STRDUP() instead.")
 static char *STRDUP(const char *src) { /* STRDUP is not ANSI. Copy source here. */
     char *dst = P4_MALLOC(strlen (src) + 1);
@@ -610,7 +566,6 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
             } \
         } \
     } while (0)
-
 # define P4_AddSomeGrammarRule(g, name, rule) \
     do { \
         P4_Error err = P4_Ok;       \
@@ -634,9 +589,6 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
         }                           \
         return err;                 \
     } while (0)
-
-P4_PRIVATE(P4_String)           P4_RemainingText(P4_Source*);
-
 # define P4_MatchRaisef(s,e,m,...) \
     do { \
         (s)->err = (e); \
@@ -644,20 +596,69 @@ P4_PRIVATE(P4_String)           P4_RemainingText(P4_Source*);
         sprintf((s)->errmsg, "line %zu:%zu, " m, \
                 (s)->lineno, (s)->offset, __VA_ARGS__); \
     } while (0);
-
 # define P4_EvalRaisef(r,m,...) \
     do { \
         memset((r)->errmsg, 0, sizeof((r)->errmsg)); \
         sprintf((r)->errmsg, (m), __VA_ARGS__); \
     } while (0);
-
+# define is_end(s) ((s)->pos >= (s)->slice.stop.pos)
+# define is_tight(e) (((e)->flag & P4_FLAG_TIGHT) != 0)
+# define is_scoped(e) (((e)->flag & P4_FLAG_SCOPED) != 0)
+# define is_spaced(e) (((e)->flag & P4_FLAG_SPACED) != 0)
+# define is_squashed(e) (((e)->flag & P4_FLAG_SQUASHED) != 0)
+# define is_lifted(e) (((e)->flag & P4_FLAG_LIFTED) != 0)
+# define is_non_terminal(e) (((e)->flag & P4_FLAG_NON_TERMINAL) != 0)
+# define is_rule(e) ((e)->name != NULL)
+# define is_cut(s) ((s)->frame_stack->cut)
+# define need_silent(s) ((s)->frame_stack ? (s)->frame_stack->silent : false)
+# define need_whitespace(s) (!(s)->whitespacing && ((s)->frame_stack ? (s)->frame_stack->space : false))
+# define need_lift(s,e) (!is_rule(e) || is_lifted(e) || need_silent(s))
+# define no_backtrack(s) (no_match(s) && is_cut(s) && !(s)->whitespacing)
+# define no_error(s) ((s)->err == P4_Ok)
+# define no_match(s) ((s)->err == P4_MatchError)
+# define set_position(s, d) \
+    do { \
+        (s)->pos = (d)->pos; \
+        (s)->lineno = (d)->lineno; \
+        (s)->offset = (d)->offset; \
+    } while (0);
+# define mark_position(s, p) \
+    P4_Position* p = & (P4_Position) { \
+        .pos = (s)->pos, \
+        .lineno = (s)->lineno, \
+        .offset = (s)->offset \
+    };
+# define get_slice_size(s) ((s)->stop.pos - (s)->start.pos)
+# define set_slice(s, a, b) \
+    do { \
+        set_position(&((s)->start), (a)); \
+        set_position(&((s)->stop), (b)); \
+    } while (0)
+# define foreach_child(node, child, code) \
+    for ((child) = (node)->head; \
+            (child) != NULL; \
+            (child) = (child)->next) { \
+        code; \
+    }
 # define rescue_error(s)    do { (s)->err = P4_Ok; (s)->errmsg[0] = '\0'; } while (0)
-
 # define peek_frame(s)      ((s)->frame_stack)
 # define peek_rule_name(s)  ((s)->frame_stack->rule->name)
 
-P4_PRIVATE(P4_Error)        push_frame(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Error)        pop_frame(P4_Source*);
+P4_PRIVATE(P4_String)           P4_RemainingText(P4_Source*);
+P4_PRIVATE(P4_Error) push_frame(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Error) pop_frame(P4_Source*);
+P4_PRIVATE(P4_Node*) match_expression(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*) match_literal(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*) match_range(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*) match_reference(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*) match_positive(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*) match_negative(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*) match_cut(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*) match_sequence(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*) match_choice(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*) match_repeat(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*) match_spaced_rules(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*) match_back_reference(P4_Source*, P4_Expression*, P4_Slice*, P4_Expression*);
 
 P4_PRIVATE(P4_Expression*)      P4_GetReference(P4_Source*, P4_Expression*);
 
@@ -667,19 +668,6 @@ P4_PRIVATE(P4_Error)            P4_SetWhitespaces(P4_Grammar*);
 P4_PRIVATE(P4_Expression*)      P4_GetWhitespaces(P4_Grammar*);
 
 P4_PRIVATE(P4_Error)            P4_RefreshReference(P4_Expression*, P4_String);
-
-P4_PRIVATE(P4_Node*)           P4_Match(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*)           P4_MatchLiteral(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*)           P4_MatchRange(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*)           P4_MatchReference(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*)           P4_MatchPositive(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*)           P4_MatchNegative(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*)           P4_MatchCut(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*)           P4_MatchSequence(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*)           P4_MatchChoice(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*)           P4_MatchRepeat(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*)           P4_MatchSpacedExpressions(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*)           P4_MatchBackReference(P4_Source*, P4_Expression*, P4_Slice*, P4_Expression*);
 
 P4_PRIVATE(P4_Error)            P4_PegEvalFlag(P4_Node* node, P4_ExpressionFlag *flag);
 P4_PRIVATE(P4_Error)            P4_PegEvalRuleFlags(P4_Node* node, P4_ExpressionFlag* flag);
@@ -1756,7 +1744,7 @@ pop_frame(P4_Source* s) {
 
 
 P4_PRIVATE(P4_Node*)
-P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
+match_literal(P4_Source* s, P4_Expression* e) {
     assert(no_error(s), "can't proceed due to a failed match");
 
     mark_position(s, startpos);
@@ -1800,7 +1788,7 @@ P4_MatchLiteral(P4_Source* s, P4_Expression* e) {
 }
 
 P4_PRIVATE(P4_Node*)
-P4_MatchRange(P4_Source* s, P4_Expression* e) {
+match_range(P4_Source* s, P4_Expression* e) {
     assert(no_error(s), "can't proceed due to a failed match");
 
     P4_String str = P4_RemainingText(s);
@@ -1856,7 +1844,7 @@ P4_GetReference(P4_Source* s, P4_Expression* e) {
 }
 
 P4_PRIVATE(P4_Node*)
-P4_MatchReference(P4_Source* s, P4_Expression* e) {
+match_reference(P4_Source* s, P4_Expression* e) {
     assert(no_error(s), "can't proceed due to a failed match");
 
     if (e->ref_expr == NULL && e->reference != NULL) {
@@ -1869,7 +1857,7 @@ P4_MatchReference(P4_Source* s, P4_Expression* e) {
     }
 
     mark_position(s, startpos);
-    P4_Node* reftok = P4_Match(s, e->ref_expr);
+    P4_Node* reftok = match_expression(s, e->ref_expr);
     mark_position(s, endpos);
 
     /* Ref matching is terminated when error occurred. */
@@ -1891,7 +1879,7 @@ P4_MatchReference(P4_Source* s, P4_Expression* e) {
 }
 
 P4_PRIVATE(P4_Node*)
-P4_MatchSequence(P4_Source* s, P4_Expression* e) {
+match_sequence(P4_Source* s, P4_Expression* e) {
     assert(no_error(s), "can't proceed due to a failed match");
 
     P4_Expression *member = NULL;
@@ -1915,7 +1903,7 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
 
         /* Optional `WHITESPACE` and `COMMENT` are inserted between every member. */
         if (space && i > 0) {
-            whitespace = P4_MatchSpacedExpressions(s, NULL);
+            whitespace = match_spaced_rules(s, NULL);
             if (!no_error(s)) goto finalize;
             P4_AdoptNode(head, tail, whitespace);
         }
@@ -1930,14 +1918,14 @@ P4_MatchSequence(P4_Source* s, P4_Expression* e) {
                         peek_rule_name(s), member->backref_index);
                     goto finalize;
                 }
-                tok = P4_MatchBackReference(s, e, backrefs, member);
+                tok = match_back_reference(s, e, backrefs, member);
                 if (!no_error(s)) goto finalize;
                 break;
             case P4_Cut:
-                tok = P4_MatchCut(s, e);
+                tok = match_cut(s, e);
                 break;
             default:
-                tok = P4_Match(s, member);
+                tok = match_expression(s, member);
                 break;
         }
 
@@ -1976,7 +1964,7 @@ finalize:
 }
 
 P4_PRIVATE(P4_Node*)
-P4_MatchChoice(P4_Source* s, P4_Expression* e) {
+match_choice(P4_Source* s, P4_Expression* e) {
     P4_Node* tok = NULL;
     P4_Expression* member = NULL;
 
@@ -1986,7 +1974,7 @@ P4_MatchChoice(P4_Source* s, P4_Expression* e) {
     size_t i;
     for (i = 0; i < e->count; i++) {
         member = e->members[i];
-        tok = P4_Match(s, member);
+        tok = match_expression(s, member);
         if (no_error(s)) break;
         if (no_match(s)) {
             /* retry until the last one. */
@@ -2026,7 +2014,7 @@ finalize:
  * There are seven repetition mode: zeroormore, zerooronce,
  */
 P4_PRIVATE(P4_Node*)
-P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
+match_repeat(P4_Source* s, P4_Expression* e) {
     size_t min = SIZE_MAX, max = SIZE_MAX, repeated = 0;
 
     assert(e->repeat_min != min || e->repeat_max != max,
@@ -2062,12 +2050,12 @@ P4_MatchRepeat(P4_Source* s, P4_Expression* e) {
 
         /* SPACED rule expressions are inserted between every repetition. */
         if (space && repeated > 0 ) {
-            whitespace = P4_MatchSpacedExpressions(s, NULL);
+            whitespace = match_spaced_rules(s, NULL);
             if (!no_error(s)) goto finalize;
             P4_AdoptNode(head, tail, whitespace);
         }
 
-        tok = P4_Match(s, e->repeat_expr);
+        tok = match_expression(s, e->repeat_expr);
 
         if (no_match(s)) {
             assert(tok == NULL, "failed match should not produce a token");
@@ -2153,12 +2141,12 @@ finalize:
 }
 
 P4_PRIVATE(P4_Node*)
-P4_MatchPositive(P4_Source* s, P4_Expression* e) {
+match_positive(P4_Source* s, P4_Expression* e) {
     assert(no_error(s) && e->ref_expr != NULL, "expression should not be null");
 
     mark_position(s, startpos);
 
-    P4_Node* node = P4_Match(s, e->ref_expr);
+    P4_Node* node = match_expression(s, e->ref_expr);
     if (node != NULL)
         P4_DeleteNode(node);
 
@@ -2168,11 +2156,11 @@ P4_MatchPositive(P4_Source* s, P4_Expression* e) {
 }
 
 P4_PRIVATE(P4_Node*)
-P4_MatchNegative(P4_Source* s, P4_Expression* e) {
+match_negative(P4_Source* s, P4_Expression* e) {
     assert(no_error(s) && e->ref_expr != NULL, "expression should not be null");
 
     mark_position(s, startpos);
-    P4_Node* node = P4_Match(s, e->ref_expr);
+    P4_Node* node = match_expression(s, e->ref_expr);
     set_position(s, startpos);
 
     if (no_error(s)) {
@@ -2186,7 +2174,7 @@ P4_MatchNegative(P4_Source* s, P4_Expression* e) {
 }
 
 P4_PRIVATE(P4_Node*)
-P4_MatchCut(P4_Source* s, P4_Expression* e) {
+match_cut(P4_Source* s, P4_Expression* e) {
     /* enable flag cut in the top frame. */
     P4_Frame* frame = peek_frame(s);
     frame->cut = true;
@@ -2203,7 +2191,7 @@ P4_MatchCut(P4_Source* s, P4_Expression* e) {
  * It propagate the failed match up to the top level.
  */
 P4_Node*
-P4_Match(P4_Source* s, P4_Expression* e) {
+match_expression(P4_Source* s, P4_Expression* e) {
     assert(e != NULL, "expression should not be null");
 
     P4_Error err = P4_Ok;
@@ -2220,14 +2208,14 @@ P4_Match(P4_Source* s, P4_Expression* e) {
 
     /* match the input based on expression kind. */
     switch (e->kind) {
-        case P4_Literal:       result = P4_MatchLiteral(s, e);   break;
-        case P4_Range:         result = P4_MatchRange(s, e);     break;
-        case P4_Reference:     result = P4_MatchReference(s, e); break;
-        case P4_Sequence:      result = P4_MatchSequence(s, e);  break;
-        case P4_Choice:        result = P4_MatchChoice(s, e);    break;
-        case P4_Positive:      result = P4_MatchPositive(s, e);  break;
-        case P4_Negative:      result = P4_MatchNegative(s, e);  break;
-        case P4_Repeat:        result = P4_MatchRepeat(s, e);    break;
+        case P4_Literal:       result = match_literal(s, e);   break;
+        case P4_Range:         result = match_range(s, e);     break;
+        case P4_Reference:     result = match_reference(s, e); break;
+        case P4_Sequence:      result = match_sequence(s, e);  break;
+        case P4_Choice:        result = match_choice(s, e);    break;
+        case P4_Positive:      result = match_positive(s, e);  break;
+        case P4_Negative:      result = match_negative(s, e);  break;
+        case P4_Repeat:        result = match_repeat(s, e);    break;
         case P4_Cut:           panic("cut can be applied only in sequence.");
         case P4_BackReference: panic("backreference can be applied only in sequence.");
         default:               panicf("invalid dispatch kind: %zu.", e->kind);
@@ -2249,20 +2237,22 @@ finalize:
     /* run error callback. */
     if (s->grammar->on_error != NULL) {
         err = (s->grammar->on_error)(s->grammar, e);
-        if (err != P4_Ok && s->errmsg[0] == 0)
+        if (err != P4_Ok && s->errmsg[0] == 0) {
             P4_MatchRaisef(s, s->err, "expect %s", e->name);
+        }
     }
 
     /* clean up */
     P4_DeleteNode(result);
-    if (e->name != NULL && s->errmsg[0] == 0)
+    if (e->name != NULL && s->errmsg[0] == 0) {
         P4_MatchRaisef(s, s->err, "expect %s", e->name);
+    }
 
     return NULL;
 }
 
 P4_PRIVATE(P4_Node*)
-P4_MatchSpacedExpressions(P4_Source* s, P4_Expression* e) {
+match_spaced_rules(P4_Source* s, P4_Expression* e) {
     /* implicit whitespace is guaranteed to be an unnamed rule. */
     /* state flag is guaranteed to be none. */
     assert(no_error(s), "can't proceed due to a failed match");
@@ -2278,7 +2268,7 @@ P4_MatchSpacedExpressions(P4_Source* s, P4_Expression* e) {
 
     /* (2) Perform implicit whitespace checks. */
     /*     We won't do implicit whitespace inside an implicit whitespace expr. */
-    P4_Node* result = P4_Match(s, implicit_whitespace);
+    P4_Node* result = match_expression(s, implicit_whitespace);
     if (no_match(s))
         rescue_error(s);
 
@@ -2289,7 +2279,7 @@ P4_MatchSpacedExpressions(P4_Source* s, P4_Expression* e) {
 }
 
 P4_PRIVATE(P4_Node*)
-P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Expression* backref) {
+match_back_reference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Expression* backref) {
     assert(backrefs != NULL, "backrefs should not be null");
 
     size_t index = backref->backref_index;
@@ -2335,7 +2325,7 @@ P4_MatchBackReference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Exp
 
     set_literal_rule_name(litexpr->name, backref_expr, STRDUP);
 
-    P4_Node* tok = P4_MatchLiteral(s, litexpr);
+    P4_Node* tok = match_literal(s, litexpr);
 
     if (tok != NULL) {
         set_literal_rule_name(tok->rule_name, backref_expr, NO_OP);
@@ -2855,7 +2845,7 @@ P4_Parse(P4_Grammar* grammar, P4_Source* source) {
     source->grammar = grammar;
 
     P4_Expression* expr     = P4_GetGrammarRule(grammar, source->entry_name);
-    P4_Node*       tok      = P4_Match(source, expr);
+    P4_Node*       tok      = match_expression(source, expr);
 
     source->root            = tok;
 

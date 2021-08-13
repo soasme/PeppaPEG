@@ -2217,43 +2217,19 @@ P4_MatchCut(P4_Source* s, P4_Expression* e) {
 
 P4_Node*
 P4_MatchDispatch(P4_Source* s, P4_Expression* e) {
-    P4_Node* result = NULL;
-
     switch (e->kind) {
-        case P4_Literal:
-            result = P4_MatchLiteral(s, e);
-            break;
-        case P4_Range:
-            result = P4_MatchRange(s, e);
-            break;
-        case P4_Reference:
-            result = P4_MatchReference(s, e);
-            break;
-        case P4_Sequence:
-            result = P4_MatchSequence(s, e);
-            break;
-        case P4_Choice:
-            result = P4_MatchChoice(s, e);
-            break;
-        case P4_Positive:
-            result = P4_MatchPositive(s, e);
-            break;
-        case P4_Negative:
-            result = P4_MatchNegative(s, e);
-            break;
-        case P4_Repeat:
-            result = P4_MatchRepeat(s, e);
-            break;
-        case P4_Cut:
-            panic("cut can be applied only in sequence.");
-        case P4_BackReference:
-            panic("backreference can be applied only in sequence.");
-        default:
-            UNREACHABLE();
-            panicf("invalid dispatch kind: %zu.", e->kind);
+        case P4_Literal: return P4_MatchLiteral(s, e);
+        case P4_Range: return P4_MatchRange(s, e);
+        case P4_Reference: return P4_MatchReference(s, e);
+        case P4_Sequence: return P4_MatchSequence(s, e);
+        case P4_Choice: return P4_MatchChoice(s, e);
+        case P4_Positive: return P4_MatchPositive(s, e);
+        case P4_Negative: return P4_MatchNegative(s, e);
+        case P4_Repeat: return P4_MatchRepeat(s, e);
+        case P4_Cut: panic("cut can be applied only in sequence.");
+        case P4_BackReference: panic("backreference can be applied only in sequence.");
+        default: panicf("invalid dispatch kind: %zu.", e->kind);
     }
-
-    return result;
 }
 
 /*

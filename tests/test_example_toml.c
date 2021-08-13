@@ -61,6 +61,12 @@ void test_valid(void) {
     ASSERT_TOML("toml", "[ a.\"b\".c ]", P4_Ok, "[]");
     ASSERT_TOML("toml", "[[abc]]", P4_Ok, "[]");
     ASSERT_TOML("toml", "[[ a.\"b\".c ]]", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = '''abc'''", P4_Ok, "[]");
+    /* ASSERT_TOML("toml", "abc = '''abc'''''", P4_Ok, "[]"); */
+    ASSERT_TOML("toml", "abc = '''a'b'c'''", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = \"\"\"abc\"\"\"", P4_Ok, "[]");
+    ASSERT_TOML("toml", "abc = \"\"\"a\"b\"c\"\"\"", P4_Ok, "[]");
+    /* ASSERT_TOML("toml", "abc = \"\"\"abc\"\"\"\"\"", P4_Ok, "[]"); */
     ASSERT_TOML("toml", "abc = 0", P4_Ok, "[]");
     ASSERT_TOML("toml", "abc = 1", P4_Ok, "[]");
     ASSERT_TOML("toml", "abc = 123_456_789", P4_Ok, "[]");
@@ -71,12 +77,6 @@ void test_valid(void) {
     ASSERT_TOML("toml", "abc = 0o123", P4_Ok, "[]");
     ASSERT_TOML("toml", "abc = 1.0", P4_Ok, "[]");
     ASSERT_TOML("toml", "abc = -1.0", P4_Ok, "[]");
-    ASSERT_TOML("toml", "abc = '''abc'''", P4_Ok, "[]");
-    /* ASSERT_TOML("toml", "abc = '''abc'''''", P4_Ok, "[]"); */
-    ASSERT_TOML("toml", "abc = '''a'b'c'''", P4_Ok, "[]");
-    ASSERT_TOML("toml", "abc = \"\"\"abc\"\"\"", P4_Ok, "[]");
-    ASSERT_TOML("toml", "abc = \"\"\"a\"b\"c\"\"\"", P4_Ok, "[]");
-    /* ASSERT_TOML("toml", "abc = \"\"\"abc\"\"\"\"\"", P4_Ok, "[]"); */
     ASSERT_TOML("toml", "abc = nan", P4_Ok, "[]");
     ASSERT_TOML("toml", "abc = inf", P4_Ok, "[]");
 }

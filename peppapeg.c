@@ -2346,8 +2346,7 @@ P4_JsonifySourceAst(FILE* stream, P4_Node* node,
         fprintf(stream, "{\"slice\":[%lu,%lu]", tmp->slice.start.pos, tmp->slice.stop.pos);
         fprintf(stream, ",\"type\":\"%s\"", tmp->rule_name);
         if (formatter != NULL) {
-            fprintf(stream, ",");
-            formatter(stream, node);
+            formatter(stream, tmp);
         }
         if (tmp->head != NULL) {
             fprintf(stream, ",\"children\":");

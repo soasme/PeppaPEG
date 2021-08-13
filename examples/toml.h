@@ -37,33 +37,89 @@ extern "C"
 {
 #endif
 
+#include <stdlib.h>
 #include "../peppapeg.h"
 
-void P4_TomlFormatNode(FILE* stream, P4_Node* node) {
+typedef struct P4_TomlValue {
+    char kind; /* i, f, */
+    union {
+        int64_t i;
+        double f;
+    };
+} P4_TomlValue;
+
+void P4_TomlFreeValue(void* v) {
+    if (v) {
+        P4_TomlValue *p = v;
+        P4_FREE(p);
+    }
 }
+
+P4_TomlValue* P4_TomlNewInteger(int64_t i) {
+    P4_TomlValue* v = P4_MALLOC(sizeof(P4_TomlValue));
+    v->kind = 'i';
+    v->i = i;
+    return v;
+}
+
+P4_TomlValue* P4_TomlNewFloat(double f) {
+    P4_TomlValue* v = P4_MALLOC(sizeof(P4_TomlValue));
+    v->kind = 'f';
+    v->f = f;
+    return v;
+}
+
+# define as_val(n) ((P4_TomlValue*)((n)->userdata))
+# define as_int(n) (as_val(n)->i)
+# define from_int(i) (void*)(P4_TomlNewInteger(i))
+# define as_float(n) (as_val(n)->f)
+# define from_float(f) (void*)(P4_TomlNewFloat(f))
+
+void P4_TomlFormatNode(FILE* stream, P4_Node* node) {
+    if (strcmp(node->rule_name, "integer") == 0) {
+        fprintf(stream, ",\"value\": %lld", as_int(node));
+    } else if (strcmp(node->rule_name, "float") == 0) {
+        fprintf(stream, ",\"value\": %f", as_float(node));
+    }
+}
+
+P4_Error P4_TomlEvalFloat(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
+    P4_DeleteNodeChildren(node);
+    P4_String s = P4_CopyNodeString(node);
+    size_t i = 0, offset = 0, len = strlen(s);
+    for (i = 0; i+offset < len; i++) {
+        if (s[i + offset] == '_') { offset += 1; continue; }
+        s[i] = s[i + offset];
+    }
+    s[i++] = 0;
+    node->userdata = from_float(atof(s));
+    return P4_Ok;
+}
+
 
 P4_Error P4_TomlEvalInteger(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
     node->userdata = node->head->userdata;
-    printf("integer: %lld\n", node->userdata);
+    node->head->userdata = NULL;
     P4_DeleteNodeChildren(node);
     return P4_Ok;
 }
 
 P4_Error P4_TomlEvalDigit(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
     if (node->text[node->slice.start.pos] <= '9')
-        node->userdata = (void*) (int64_t) (node->text[node->slice.start.pos] - '0');
+        node->userdata = from_int(node->text[node->slice.start.pos] - '0');
     else if (node->text[node->slice.start.pos] <= 'f')
-        node->userdata = (void*) (int64_t) (node->text[node->slice.start.pos] - 'a');
+        node->userdata = from_int(node->text[node->slice.start.pos] - 'a');
     else if (node->text[node->slice.start.pos] <= 'F')
-        node->userdata = (void*) (int64_t) (node->text[node->slice.start.pos] - 'A');
+        node->userdata = from_int(node->text[node->slice.start.pos] - 'A');
     return P4_Ok;
 }
 
 P4_Error P4_TomlEvalDecInt(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
-    int64_t num = (int64_t) node->tail->userdata;
+    int64_t num = as_int(node->tail);
     const char* rule_name = node->head->rule_name;
     if (strcmp(rule_name, "minus")) num = -num;
-    node->userdata = (void*)num;
+    node->userdata = from_int(num);
+    P4_DeleteNodeChildren(node);
     return P4_Ok;
 }
 
@@ -75,16 +131,18 @@ P4_Error P4_TomlEvalUnsignedInt(P4_Grammar* grammar, P4_Expression* rule, P4_Nod
         num = 0;
     } else {
         for (child = node->head; child != NULL; child = child->next) {
-            num = num * base + (int64_t) (child->userdata);
+            num = num * base + as_int(child);
         }
     }
-    node->userdata = (void*) num;
+    node->userdata = from_int(num);
+    P4_DeleteNodeChildren(node);
     return P4_Ok;
 }
 
 P4_Error P4_TomlCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
     const char* rule_name = P4_GetRuleName(rule);
     if (rule_name == NULL || node == NULL) return P4_Ok;
+    /*
     if (strcmp(rule_name, "one_nine") == 0) return P4_TomlEvalDigit(grammar, rule, node);
     if (strcmp(rule_name, "zero_seven") == 0) return P4_TomlEvalDigit(grammar, rule, node);
     if (strcmp(rule_name, "zero_one") == 0) return P4_TomlEvalDigit(grammar, rule, node);
@@ -96,6 +154,8 @@ P4_Error P4_TomlCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node
     if (strcmp(rule_name, "bin_int") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 2);
     if (strcmp(rule_name, "dec_int") == 0) return P4_TomlEvalDecInt(grammar, rule, node);
     if (strcmp(rule_name, "integer") == 0) return P4_TomlEvalInteger(grammar, rule, node);
+    */
+    /* if (strcmp(rule_name, "float") == 0) return P4_TomlEvalFloat(grammar, rule, node); */
     return P4_Ok;
 }
 
@@ -247,6 +307,7 @@ P4_Grammar*  P4_CreateTomlGrammar() {
     );
 
     P4_SetGrammarCallback(grammar, P4_TomlCallback, NULL);
+    P4_SetUserDataFreeFunc(grammar, P4_TomlFreeValue);
 
     return grammar;
 }

@@ -37,7 +37,6 @@ extern "C"
 {
 #endif
 
-#include <math.h>
 #include "../peppapeg.h"
 
 P4_Error P4_TomlPropagate(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
@@ -86,7 +85,7 @@ P4_Error P4_TomlCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node
     if (strcmp(rule_name, "zero_one") == 0) return P4_TomlEvalDigit(grammar, rule, node);
     if (strcmp(rule_name, "HEXDIG") == 0) return P4_TomlEvalDigit(grammar, rule, node);
     if (strcmp(rule_name, "DIGIT") == 0) return P4_TomlEvalDigit(grammar, rule, node);
-    if (strcmp(rule_name, "unsigned_dec_int") == 0) return P4_TomlEvalUnsignedDecInt(grammar, rule, node, 10);
+    if (strcmp(rule_name, "unsigned_dec_int") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 10);
     if (strcmp(rule_name, "hex_int") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 16);
     if (strcmp(rule_name, "oct_int") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 8);
     if (strcmp(rule_name, "bin_int") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 2);

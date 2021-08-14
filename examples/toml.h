@@ -45,6 +45,7 @@ typedef struct P4_TomlDateTime {
     size_t year, month, day;
     size_t hour, minute, second;
     long millisecond;
+    size_t tz_offset_hour, tz_offset_minute;
 } P4_TomlDateTime;
 
 typedef struct P4_TomlValue {
@@ -94,6 +95,21 @@ P4_TomlValue* P4_TomlNewLocalDate(size_t year, size_t month, size_t day) {
     return v;
 }
 
+P4_TomlValue* P4_TomlNewLocalDateTime(size_t year, size_t month, size_t day, size_t hour, size_t minute, size_t second, size_t millisecond) {
+    P4_TomlValue* v = P4_MALLOC(sizeof(P4_TomlValue));
+    v->kind = 'd';
+    v->d = P4_MALLOC(sizeof(P4_TomlDateTime));
+    v->d->kind = 'D';
+    v->d->year = year;
+    v->d->month = month;
+    v->d->day = day;
+    v->d->hour = hour;
+    v->d->minute = minute;
+    v->d->second = second;
+    v->d->millisecond = millisecond;
+    return v;
+}
+
 # define as_val(n) ((P4_TomlValue*)((n)->userdata))
 # define as_int(n) (as_val(n)->i)
 # define from_int(i) (void*)(P4_TomlNewInteger(i))
@@ -103,6 +119,8 @@ P4_TomlValue* P4_TomlNewLocalDate(size_t year, size_t month, size_t day) {
 # define from_local_time(h,m,s,ms) (void*)(P4_TomlNewLocalTime(h,m,s,ms))
 # define as_local_date(n) (as_val(n)->d)
 # define from_local_date(y,m,d) (void*)(P4_TomlNewLocalDate(y,m,d))
+# define as_local_date_time(n) (as_val(n)->d)
+# define from_local_date_time(y,m,d,hh,mm,ss,ms) (void*)(P4_TomlNewLocalDateTime(y,m,d,hh,mm,ss,ms))
 
 void P4_TomlFormatNode(FILE* stream, P4_Node* node) {
     if (strcmp(node->rule_name, "integer") == 0) {
@@ -118,6 +136,11 @@ void P4_TomlFormatNode(FILE* stream, P4_Node* node) {
         if (as_val(node)->d->kind == 'd') {
             P4_TomlDateTime* dt = as_local_date(node);
             fprintf(stream, ",\"year\": %lu, \"month\": %lu, \"day\": %lu", dt->year, dt->month, dt->day);
+        }
+    } else if (strcmp(node->rule_name, "local_date_time") == 0) {
+        if (as_val(node)->d->kind == 'D') {
+            P4_TomlDateTime* dt = as_local_date_time(node);
+            fprintf(stream, ",\"year\": %lu, \"month\": %lu, \"day\": %lu, \"hour\": %lu, \"minute\": %lu, \"second\": %lu, \"millisecond\": %ld", dt->year, dt->month, dt->day, dt->hour, dt->minute, dt->second, dt->millisecond);
         }
     }
 }
@@ -179,22 +202,47 @@ P4_Error P4_TomlEvalUnsignedInt(P4_Grammar* grammar, P4_Expression* rule, P4_Nod
     return P4_Ok;
 }
 
-P4_Error P4_TomlEvalLocalTime(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
-    size_t hour = as_int(node->head->head);
-    size_t minute = as_int(node->head->head->next);
-    size_t second = as_int(node->head->head->next->next);
-    long millisecond = node->head->head->next->next->next ? as_int(node->head->head->next->next->next) : 0;
+P4_Error P4_TomlEvalPartialTime(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
+    size_t hour = as_int(node->head);
+    size_t minute = as_int(node->head->next);
+    size_t second = as_int(node->head->next->next);
+    long millisecond = node->head->next->next->next ? as_int(node->head->next->next->next) : 0;
     node->userdata = from_local_time(hour, minute, second, millisecond);
     P4_DeleteNodeChildren(node);
     return P4_Ok;
 }
 
-P4_Error P4_TomlEvalLocalDate(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
-    size_t year = as_int(node->head->head);
-    size_t month = as_int(node->head->head->next);
-    size_t day = as_int(node->head->head->next->next);
-    printf("%lu %lu %lu\n", year, month, day);
+P4_Error P4_TomlEvalLocalTime(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
+    node->userdata = node->head->userdata;
+    node->head->userdata = NULL;
+    P4_DeleteNodeChildren(node);
+    return P4_Ok;
+}
+
+P4_Error P4_TomlEvalFullDate(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
+    size_t year = as_int(node->head);
+    size_t month = as_int(node->head->next);
+    size_t day = as_int(node->head->next->next);
     node->userdata = from_local_date(year, month, day);
+    P4_DeleteNodeChildren(node);
+    return P4_Ok;
+}
+
+P4_Error P4_TomlEvalLocalDate(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
+    node->userdata = node->head->userdata;
+    node->head->userdata = NULL;
+    P4_DeleteNodeChildren(node);
+    return P4_Ok;
+}
+
+P4_Error P4_TomlEvalLocalDateTime(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
+    P4_TomlDateTime* date = as_local_date(node->head);
+    P4_TomlDateTime* time = as_local_time(node->tail);
+    node->userdata = from_local_date_time(
+        date->year, date->month, date->day,
+        time->hour, time->minute, time->second,
+        time->millisecond
+    );
     P4_DeleteNodeChildren(node);
     return P4_Ok;
 }
@@ -221,11 +269,14 @@ P4_Error P4_TomlCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node
     if (strcmp(rule_name, "time_minute") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 10);
     if (strcmp(rule_name, "time_second") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 10);
     if (strcmp(rule_name, "time_secfrac") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 10);
+    if (strcmp(rule_name, "partial_time") == 0) return P4_TomlEvalPartialTime(grammar, rule, node);
     if (strcmp(rule_name, "local_time") == 0) return P4_TomlEvalLocalTime(grammar, rule, node);
     if (strcmp(rule_name, "date_fullyear") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 10);
     if (strcmp(rule_name, "date_month") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 10);
     if (strcmp(rule_name, "date_mday") == 0) return P4_TomlEvalUnsignedInt(grammar, rule, node, 10);
     if (strcmp(rule_name, "local_date") == 0) return P4_TomlEvalLocalDate(grammar, rule, node);
+    if (strcmp(rule_name, "full_date") == 0) return P4_TomlEvalFullDate(grammar, rule, node);
+    if (strcmp(rule_name, "local_date_time") == 0) return P4_TomlEvalLocalDateTime(grammar, rule, node);
     return P4_Ok;
 }
 
@@ -314,12 +365,12 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         "date_fullyear = DIGIT{4};\n"
         "date_month = zero one_nine / one zero_two;\n"
         "date_mday = DIGIT{2};\n"
-        "time_delim = i\"t\" / \" \";\n"
+        "@lifted time_delim = i\"t\" / \" \";\n"
         "time_hour = DIGIT{2};\n"
         "time_minute = DIGIT{2};\n"
         "time_second = DIGIT{2};\n"
         "time_secfrac = DIGIT+;\n"
-        "time_numoffset = (\"+\" / \"-\") time_hour \":\" time_minute;\n"
+        "time_numoffset = (minus / plus) time_hour \":\" time_minute;\n"
         "time_offset = i\"z\" / time_numoffset;\n"
         "partial_time = time_hour \":\" time_minute \":\" time_second (\".\" time_secfrac)?;\n"
         "full_date = date_fullyear \"-\" date_month \"-\" date_mday;\n"

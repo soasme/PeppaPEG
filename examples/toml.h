@@ -73,6 +73,13 @@ P4_TomlValue* P4_TomlNewFloat(double f) {
     return v;
 }
 
+P4_TomlValue* P4_TomlNewString(char* s) {
+    P4_TomlValue* v = P4_MALLOC(sizeof(P4_TomlValue));
+    v->kind = 's';
+    v->s = s;
+    return v;
+}
+
 P4_TomlValue* P4_TomlNewLocalTime(size_t hour, size_t minute, size_t second, long millisecond) {
     P4_TomlValue* v = P4_MALLOC(sizeof(P4_TomlValue));
     v->kind = 'd';
@@ -141,31 +148,35 @@ P4_TomlValue* P4_TomlNewOffsetDateTime(size_t year, size_t month, size_t day, si
 # define from_local_date_time(y,m,d,hh,mm,ss,ms) (void*)(P4_TomlNewLocalDateTime(y,m,d,hh,mm,ss,ms))
 # define as_offset_date_time(n) (as_val(n)->d)
 # define from_offset_date_time(y,m,d,hh,mm,ss,ms,tzh,tzm) (void*)(P4_TomlNewOffsetDateTime(y,m,d,hh,mm,ss,ms,tzh,tzm))
+# define as_str(n) (as_val(n)->s)
+# define from_str(s) (void*)(P4_TomlNewString(s))
 
 void P4_TomlFormatNode(FILE* stream, P4_Node* node) {
     if (strcmp(node->rule_name, "integer") == 0) {
-        fprintf(stream, ",\"value\": %lld", as_int(node));
+        fprintf(stream, ",\"value\":%lld", as_int(node));
     } else if (strcmp(node->rule_name, "float") == 0) {
-        fprintf(stream, ",\"value\": %f", as_float(node));
+        fprintf(stream, ",\"value\":%f", as_float(node));
+    } else if (strcmp(node->rule_name, "literal_string") == 0) {
+        fprintf(stream, ",\"value\":\"%s\"", as_str(node));
     } else if (strcmp(node->rule_name, "local_time") == 0) {
         if (as_val(node)->d->kind == 't') {
             P4_TomlDateTime* dt = as_local_time(node);
-            fprintf(stream, ",\"hour\": %lu, \"minute\": %lu, \"second\": %lu, \"millisecond\": %ld", dt->hour, dt->minute, dt->second, dt->millisecond);
+            fprintf(stream, ",\"hour\":%lu, \"minute\":%lu, \"second\":%lu, \"millisecond\":%ld", dt->hour, dt->minute, dt->second, dt->millisecond);
         }
     } else if (strcmp(node->rule_name, "local_date") == 0) {
         if (as_val(node)->d->kind == 'd') {
             P4_TomlDateTime* dt = as_local_date(node);
-            fprintf(stream, ",\"year\": %lu, \"month\": %lu, \"day\": %lu", dt->year, dt->month, dt->day);
+            fprintf(stream, ",\"year\":%lu, \"month\":%lu, \"day\":%lu", dt->year, dt->month, dt->day);
         }
     } else if (strcmp(node->rule_name, "local_date_time") == 0) {
         if (as_val(node)->d->kind == 'D') {
             P4_TomlDateTime* dt = as_local_date_time(node);
-            fprintf(stream, ",\"year\": %lu, \"month\": %lu, \"day\": %lu, \"hour\": %lu, \"minute\": %lu, \"second\": %lu, \"millisecond\": %ld", dt->year, dt->month, dt->day, dt->hour, dt->minute, dt->second, dt->millisecond);
+            fprintf(stream, ",\"year\":%lu, \"month\":%lu, \"day\":%lu, \"hour\":%lu, \"minute\":%lu, \"second\":%lu, \"millisecond\":%ld", dt->year, dt->month, dt->day, dt->hour, dt->minute, dt->second, dt->millisecond);
         }
     } else if (strcmp(node->rule_name, "offset_date_time") == 0) {
         if (as_val(node)->d->kind == 'T') {
             P4_TomlDateTime* dt = as_local_date_time(node);
-            fprintf(stream, ",\"year\": %lu, \"month\": %lu, \"day\": %lu, \"hour\": %lu, \"minute\": %lu, \"second\": %lu, \"millisecond\": %ld, \"tz_offset_hour\": %d, \"tz_offset_minute\": %d",
+            fprintf(stream, ",\"year\":%lu, \"month\":%lu, \"day\":%lu, \"hour\":%lu, \"minute\":%lu, \"second\":%lu, \"millisecond\":%ld, \"tz_offset_hour\":%d, \"tz_offset_minute\":%d",
                     dt->year, dt->month, dt->day, dt->hour, dt->minute, dt->second, dt->millisecond,
                     dt->tz_offset_hour, dt->tz_offset_minute);
         }
@@ -305,6 +316,16 @@ P4_Error P4_TomlEvalOffsetDateTime(P4_Grammar* grammar, P4_Expression* rule, P4_
     return P4_Ok;
 }
 
+P4_Error P4_TomlEvalLiteralString(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
+    size_t len = node->slice.stop.pos - node->slice.start.pos - 2;
+    char* s = P4_MALLOC(sizeof(char) * (1 + len));
+    memcpy(s, node->text + node->slice.start.pos + 1, len);
+    s[len] = 0;
+    node->userdata = from_str(s);
+    P4_DeleteNodeChildren(node);
+    return P4_Ok;
+}
+
 P4_Error P4_TomlCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
     const char* rule_name = P4_GetRuleName(rule);
     if (rule_name == NULL || node == NULL) return P4_Ok;
@@ -337,6 +358,7 @@ P4_Error P4_TomlCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node
     if (strcmp(rule_name, "local_date_time") == 0) return P4_TomlEvalLocalDateTime(grammar, rule, node);
     if (strcmp(rule_name, "full_time") == 0) return P4_TomlEvalFullTime(grammar, rule, node);
     if (strcmp(rule_name, "offset_date_time") == 0) return P4_TomlEvalOffsetDateTime(grammar, rule, node);
+    if (strcmp(rule_name, "literal_string") == 0) return P4_TomlEvalLiteralString(grammar, rule, node);
     return P4_Ok;
 }
 
@@ -479,7 +501,7 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         "non_ascii = [\\u0080-\\uD7FF] / [\\uE000-\\U0010FFFF];\n"
 
         /* Newline */
-        "newline = \"\\n\" / \"\\r\\n\";\n"
+        "@squashed newline = \"\\n\" / \"\\r\\n\";\n"
 
         /* Whitespace */
         "@lifted @squashed ws = wschar*;\n"

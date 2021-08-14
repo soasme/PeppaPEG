@@ -45,7 +45,8 @@ typedef struct P4_TomlDateTime {
     size_t year, month, day;
     size_t hour, minute, second;
     long millisecond;
-    size_t tz_offset_hour, tz_offset_minute;
+    int tz_offset_hour;
+    int tz_offset_minute;
 } P4_TomlDateTime;
 
 typedef struct P4_TomlValue {
@@ -72,7 +73,7 @@ P4_TomlValue* P4_TomlNewFloat(double f) {
     return v;
 }
 
-P4_TomlValue* P4_TomlNewLocalTime(size_t hour, size_t minute, size_t second, size_t millisecond) {
+P4_TomlValue* P4_TomlNewLocalTime(size_t hour, size_t minute, size_t second, long millisecond) {
     P4_TomlValue* v = P4_MALLOC(sizeof(P4_TomlValue));
     v->kind = 'd';
     v->d = P4_MALLOC(sizeof(P4_TomlDateTime));
@@ -95,7 +96,7 @@ P4_TomlValue* P4_TomlNewLocalDate(size_t year, size_t month, size_t day) {
     return v;
 }
 
-P4_TomlValue* P4_TomlNewLocalDateTime(size_t year, size_t month, size_t day, size_t hour, size_t minute, size_t second, size_t millisecond) {
+P4_TomlValue* P4_TomlNewLocalDateTime(size_t year, size_t month, size_t day, size_t hour, size_t minute, size_t second, long millisecond) {
     P4_TomlValue* v = P4_MALLOC(sizeof(P4_TomlValue));
     v->kind = 'd';
     v->d = P4_MALLOC(sizeof(P4_TomlDateTime));
@@ -110,6 +111,23 @@ P4_TomlValue* P4_TomlNewLocalDateTime(size_t year, size_t month, size_t day, siz
     return v;
 }
 
+P4_TomlValue* P4_TomlNewOffsetDateTime(size_t year, size_t month, size_t day, size_t hour, size_t minute, size_t second, long millisecond, int tz_offset_hour, int tz_offset_minute) {
+    P4_TomlValue* v = P4_MALLOC(sizeof(P4_TomlValue));
+    v->kind = 'd';
+    v->d = P4_MALLOC(sizeof(P4_TomlDateTime));
+    v->d->kind = 'T';
+    v->d->year = year;
+    v->d->month = month;
+    v->d->day = day;
+    v->d->hour = hour;
+    v->d->minute = minute;
+    v->d->second = second;
+    v->d->millisecond = millisecond;
+    v->d->tz_offset_hour = tz_offset_hour;
+    v->d->tz_offset_minute = tz_offset_minute;
+    return v;
+}
+
 # define as_val(n) ((P4_TomlValue*)((n)->userdata))
 # define as_int(n) (as_val(n)->i)
 # define from_int(i) (void*)(P4_TomlNewInteger(i))
@@ -121,6 +139,8 @@ P4_TomlValue* P4_TomlNewLocalDateTime(size_t year, size_t month, size_t day, siz
 # define from_local_date(y,m,d) (void*)(P4_TomlNewLocalDate(y,m,d))
 # define as_local_date_time(n) (as_val(n)->d)
 # define from_local_date_time(y,m,d,hh,mm,ss,ms) (void*)(P4_TomlNewLocalDateTime(y,m,d,hh,mm,ss,ms))
+# define as_offset_date_time(n) (as_val(n)->d)
+# define from_offset_date_time(y,m,d,hh,mm,ss,ms,tzh,tzm) (void*)(P4_TomlNewOffsetDateTime(y,m,d,hh,mm,ss,ms,tzh,tzm))
 
 void P4_TomlFormatNode(FILE* stream, P4_Node* node) {
     if (strcmp(node->rule_name, "integer") == 0) {
@@ -141,6 +161,13 @@ void P4_TomlFormatNode(FILE* stream, P4_Node* node) {
         if (as_val(node)->d->kind == 'D') {
             P4_TomlDateTime* dt = as_local_date_time(node);
             fprintf(stream, ",\"year\": %lu, \"month\": %lu, \"day\": %lu, \"hour\": %lu, \"minute\": %lu, \"second\": %lu, \"millisecond\": %ld", dt->year, dt->month, dt->day, dt->hour, dt->minute, dt->second, dt->millisecond);
+        }
+    } else if (strcmp(node->rule_name, "offset_date_time") == 0) {
+        if (as_val(node)->d->kind == 'T') {
+            P4_TomlDateTime* dt = as_local_date_time(node);
+            fprintf(stream, ",\"year\": %lu, \"month\": %lu, \"day\": %lu, \"hour\": %lu, \"minute\": %lu, \"second\": %lu, \"millisecond\": %ld, \"tz_offset_hour\": %d, \"tz_offset_minute\": %d",
+                    dt->year, dt->month, dt->day, dt->hour, dt->minute, dt->second, dt->millisecond,
+                    dt->tz_offset_hour, dt->tz_offset_minute);
         }
     }
 }
@@ -247,6 +274,37 @@ P4_Error P4_TomlEvalLocalDateTime(P4_Grammar* grammar, P4_Expression* rule, P4_N
     return P4_Ok;
 }
 
+
+P4_Error P4_TomlEvalFullTime(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
+    P4_TomlDateTime* time = as_local_time(node->head);
+    if (node->tail->head == NULL) { /* z */
+        time->tz_offset_hour = 0;
+        time->tz_offset_minute = 0;
+    } else {
+        time->tz_offset_hour = as_int(node->tail->head->head->next);
+        time->tz_offset_minute = as_int(node->tail->head->tail);
+        if (strcmp(node->tail->head->head->rule_name, "minus") == 0)
+            time->tz_offset_hour = -time->tz_offset_hour;
+    }
+    node->userdata = node->head->userdata;
+    node->head->userdata = NULL;
+    P4_DeleteNodeChildren(node);
+    return P4_Ok;
+}
+
+P4_Error P4_TomlEvalOffsetDateTime(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
+    P4_TomlDateTime* date = as_local_date(node->head);
+    P4_TomlDateTime* time = as_local_time(node->tail);
+    node->userdata = from_offset_date_time(
+        date->year, date->month, date->day,
+        time->hour, time->minute, time->second,
+        time->millisecond,
+        time->tz_offset_hour, time->tz_offset_minute
+    );
+    P4_DeleteNodeChildren(node);
+    return P4_Ok;
+}
+
 P4_Error P4_TomlCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
     const char* rule_name = P4_GetRuleName(rule);
     if (rule_name == NULL || node == NULL) return P4_Ok;
@@ -277,6 +335,8 @@ P4_Error P4_TomlCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node
     if (strcmp(rule_name, "local_date") == 0) return P4_TomlEvalLocalDate(grammar, rule, node);
     if (strcmp(rule_name, "full_date") == 0) return P4_TomlEvalFullDate(grammar, rule, node);
     if (strcmp(rule_name, "local_date_time") == 0) return P4_TomlEvalLocalDateTime(grammar, rule, node);
+    if (strcmp(rule_name, "full_time") == 0) return P4_TomlEvalFullTime(grammar, rule, node);
+    if (strcmp(rule_name, "offset_date_time") == 0) return P4_TomlEvalOffsetDateTime(grammar, rule, node);
     return P4_Ok;
 }
 
@@ -379,7 +439,7 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         "local_date_time = full_date time_delim partial_time;\n"
         "local_date = full_date;\n"
         "local_time = partial_time;\n"
-        "datetime = offset_date_time / local_date_time / local_date / local_time;\n"
+        "@lifted datetime = offset_date_time / local_date_time / local_date / local_time;\n"
 
         /* Array */
         "array = array_open array_ws array_values? array_ws array_close;\n"

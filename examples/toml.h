@@ -156,7 +156,8 @@ void P4_TomlFormatNode(FILE* stream, P4_Node* node) {
         fprintf(stream, ",\"value\":%lld", as_int(node));
     } else if (strcmp(node->rule_name, "float") == 0) {
         fprintf(stream, ",\"value\":%f", as_float(node));
-    } else if (strcmp(node->rule_name, "literal_string") == 0) {
+    } else if (strcmp(node->rule_name, "literal_string") == 0
+            || strcmp(node->rule_name, "ml_literal_string") == 0) {
         fprintf(stream, ",\"value\":\"%s\"", as_str(node));
     } else if (strcmp(node->rule_name, "local_time") == 0) {
         if (as_val(node)->d->kind == 't') {
@@ -326,6 +327,23 @@ P4_Error P4_TomlEvalLiteralString(P4_Grammar* grammar, P4_Expression* rule, P4_N
     return P4_Ok;
 }
 
+P4_Error P4_TomlEvalMlLiteralBody(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
+    size_t len = node->slice.stop.pos - node->slice.start.pos;
+    char* s = P4_MALLOC(sizeof(char) * (1 + len));
+    memcpy(s, node->text + node->slice.start.pos, len);
+    s[len] = 0;
+    node->userdata = from_str(s);
+    P4_DeleteNodeChildren(node);
+    return P4_Ok;
+}
+
+P4_Error P4_TomlEvalMlLiteralString(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
+    node->userdata = node->head->userdata;
+    node->head->userdata = NULL;
+    P4_DeleteNodeChildren(node);
+    return P4_Ok;
+}
+
 P4_Error P4_TomlCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
     const char* rule_name = P4_GetRuleName(rule);
     if (rule_name == NULL || node == NULL) return P4_Ok;
@@ -359,6 +377,8 @@ P4_Error P4_TomlCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node
     if (strcmp(rule_name, "full_time") == 0) return P4_TomlEvalFullTime(grammar, rule, node);
     if (strcmp(rule_name, "offset_date_time") == 0) return P4_TomlEvalOffsetDateTime(grammar, rule, node);
     if (strcmp(rule_name, "literal_string") == 0) return P4_TomlEvalLiteralString(grammar, rule, node);
+    if (strcmp(rule_name, "ml_literal_body") == 0) return P4_TomlEvalMlLiteralBody(grammar, rule, node);
+    if (strcmp(rule_name, "ml_literal_string") == 0) return P4_TomlEvalMlLiteralString(grammar, rule, node);
     return P4_Ok;
 }
 
@@ -405,8 +425,8 @@ P4_Grammar*  P4_CreateTomlGrammar() {
         "@lifted literal_char = \"\\t\" / [\\u0020-\\u0026] / [\\u0028-\\u007E] / non_ascii;\n"
 
         /* Multi-line literal String */
-        "@squashed ml_literal_string = \"'''\" newline? ml_literal_body \"'''\";\n"
-        "ml_literal_body = mll_content* (mll_quotes mll_content+)*;\n"
+        "ml_literal_string = \"'''\" newline? ml_literal_body \"'''\";\n"
+        "@squashed ml_literal_body = mll_content* (mll_quotes mll_content+)*;\n"
         "mll_content = mll_char / newline;\n"
         "mll_char = \"\\x09\" / [\\x20-\\x26] / [\\x28-\\x7e] / non_ascii;\n"
         "mll_quotes = \"''\" / \"'\";\n"

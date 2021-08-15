@@ -1600,6 +1600,7 @@ P4_CreateNode (const P4_String     str,
     node->next         = NULL;
     node->head         = NULL;
     node->tail         = NULL;
+    node->userdata     = NULL;
 
     set_slice(&node->slice, start, stop);
 

@@ -59,6 +59,22 @@ typedef struct P4_TomlValue {
     };
 } P4_TomlValue;
 
+void P4_TomlFreeValue(void* p) {
+    if (p == NULL) return;
+    P4_TomlValue* v = p;
+    switch(v->kind) {
+        case 's':
+            P4_FREE(v->s);
+            break;
+        case 'd':
+            P4_FREE(v->d);
+            break;
+        default:
+            break;
+    }
+    P4_FREE(v);
+}
+
 P4_TomlValue* P4_TomlNewInteger(int64_t i) {
     P4_TomlValue* v = P4_MALLOC(sizeof(P4_TomlValue));
     v->kind = 'i';
@@ -195,6 +211,7 @@ P4_Error P4_TomlEvalFloat(P4_Grammar* grammar, P4_Expression* rule, P4_Node* nod
     }
     s[i++] = 0;
     node->userdata = from_float(atof(s));
+    P4_FREE(s);
     return P4_Ok;
 }
 
@@ -533,6 +550,7 @@ P4_Grammar*  P4_CreateTomlGrammar() {
     );
 
     P4_SetGrammarCallback(grammar, P4_TomlCallback, NULL);
+    P4_SetUserDataFreeFunc(grammar, P4_TomlFreeValue);
 
     return grammar;
 }

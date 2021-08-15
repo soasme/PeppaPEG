@@ -201,7 +201,7 @@ void P4_TomlFormatNode(FILE* stream, P4_Node* node) {
 }
 
 P4_Error P4_TomlEvalFloat(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
-    P4_DeleteNodeChildren(node);
+    P4_DeleteNodeChildren(grammar, node);
     P4_String s = P4_CopyNodeString(node);
     size_t i = 0, offset = 0, len = strlen(s);
     for (i = 0; i+offset < len; ) {
@@ -219,7 +219,7 @@ P4_Error P4_TomlEvalFloat(P4_Grammar* grammar, P4_Expression* rule, P4_Node* nod
 P4_Error P4_TomlEvalInteger(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
     node->userdata = node->head->userdata;
     node->head->userdata = NULL;
-    P4_DeleteNodeChildren(node);
+    P4_DeleteNodeChildren(grammar, node);
     return P4_Ok;
 }
 
@@ -238,7 +238,7 @@ P4_Error P4_TomlEvalDecInt(P4_Grammar* grammar, P4_Expression* rule, P4_Node* no
     const char* rule_name = node->head->rule_name;
     if (strcmp(rule_name, "minus")) num = -num;
     node->userdata = from_int(num);
-    P4_DeleteNodeChildren(node);
+    P4_DeleteNodeChildren(grammar, node);
     return P4_Ok;
 }
 
@@ -254,7 +254,7 @@ P4_Error P4_TomlEvalUnsignedInt(P4_Grammar* grammar, P4_Expression* rule, P4_Nod
         }
     }
     node->userdata = from_int(num);
-    P4_DeleteNodeChildren(node);
+    P4_DeleteNodeChildren(grammar, node);
     return P4_Ok;
 }
 
@@ -264,14 +264,14 @@ P4_Error P4_TomlEvalPartialTime(P4_Grammar* grammar, P4_Expression* rule, P4_Nod
     size_t second = as_int(node->head->next->next);
     long millisecond = node->head->next->next->next ? as_int(node->head->next->next->next) : 0;
     node->userdata = from_local_time(hour, minute, second, millisecond);
-    P4_DeleteNodeChildren(node);
+    P4_DeleteNodeChildren(grammar, node);
     return P4_Ok;
 }
 
 P4_Error P4_TomlEvalLocalTime(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
     node->userdata = node->head->userdata;
     node->head->userdata = NULL;
-    P4_DeleteNodeChildren(node);
+    P4_DeleteNodeChildren(grammar, node);
     return P4_Ok;
 }
 
@@ -280,14 +280,14 @@ P4_Error P4_TomlEvalFullDate(P4_Grammar* grammar, P4_Expression* rule, P4_Node* 
     size_t month = as_int(node->head->next);
     size_t day = as_int(node->head->next->next);
     node->userdata = from_local_date(year, month, day);
-    P4_DeleteNodeChildren(node);
+    P4_DeleteNodeChildren(grammar, node);
     return P4_Ok;
 }
 
 P4_Error P4_TomlEvalLocalDate(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
     node->userdata = node->head->userdata;
     node->head->userdata = NULL;
-    P4_DeleteNodeChildren(node);
+    P4_DeleteNodeChildren(grammar, node);
     return P4_Ok;
 }
 
@@ -299,7 +299,7 @@ P4_Error P4_TomlEvalLocalDateTime(P4_Grammar* grammar, P4_Expression* rule, P4_N
         time->hour, time->minute, time->second,
         time->millisecond
     );
-    P4_DeleteNodeChildren(node);
+    P4_DeleteNodeChildren(grammar, node);
     return P4_Ok;
 }
 
@@ -317,7 +317,7 @@ P4_Error P4_TomlEvalFullTime(P4_Grammar* grammar, P4_Expression* rule, P4_Node* 
     }
     node->userdata = node->head->userdata;
     node->head->userdata = NULL;
-    P4_DeleteNodeChildren(node);
+    P4_DeleteNodeChildren(grammar, node);
     return P4_Ok;
 }
 
@@ -330,7 +330,7 @@ P4_Error P4_TomlEvalOffsetDateTime(P4_Grammar* grammar, P4_Expression* rule, P4_
         time->millisecond,
         time->tz_offset_hour, time->tz_offset_minute
     );
-    P4_DeleteNodeChildren(node);
+    P4_DeleteNodeChildren(grammar, node);
     return P4_Ok;
 }
 
@@ -340,7 +340,7 @@ P4_Error P4_TomlEvalLiteralString(P4_Grammar* grammar, P4_Expression* rule, P4_N
     memcpy(s, node->text + node->slice.start.pos + 1, len);
     s[len] = 0;
     node->userdata = from_str(s);
-    P4_DeleteNodeChildren(node);
+    P4_DeleteNodeChildren(grammar, node);
     return P4_Ok;
 }
 
@@ -350,14 +350,14 @@ P4_Error P4_TomlEvalMlLiteralBody(P4_Grammar* grammar, P4_Expression* rule, P4_N
     memcpy(s, node->text + node->slice.start.pos, len);
     s[len] = 0;
     node->userdata = from_str(s);
-    P4_DeleteNodeChildren(node);
+    P4_DeleteNodeChildren(grammar, node);
     return P4_Ok;
 }
 
 P4_Error P4_TomlEvalMlLiteralString(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
     node->userdata = node->head->userdata;
     node->head->userdata = NULL;
-    P4_DeleteNodeChildren(node);
+    P4_DeleteNodeChildren(grammar, node);
     return P4_Ok;
 }
 

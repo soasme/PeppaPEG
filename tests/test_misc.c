@@ -270,7 +270,7 @@ void test_acquire_source_ast(void) {
     TEST_ASSERT_NOT_NULL(root);
     TEST_ASSERT_NULL(P4_GetSourceAst(source));
 
-    P4_DeleteNode(root);
+    P4_DeleteNode(grammar, root);
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
 }

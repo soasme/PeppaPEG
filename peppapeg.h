@@ -1450,7 +1450,7 @@ P4_Node*      P4_GetSourceAst(P4_Source* source);
  *
  *      P4_Node* root = P4_AcquireSourceAst(source);
  *      // ...
- *      P4_DeleteNode(root);
+ *      P4_DeleteNode(grammar, root);
  */
 P4_Node*      P4_AcquireSourceAst(P4_Source* source);
 
@@ -1578,7 +1578,7 @@ P4_String      P4_GetErrorMessage(P4_Source* source);
  *
  *      // do something.
  *
- *      P4_DeleteNode(node);
+ *      P4_DeleteNode(grammar, node);
  */
 P4_Node*      P4_CreateNode(P4_String text, P4_Position* start, P4_Position* stop, P4_String rule);
 
@@ -1586,24 +1586,26 @@ P4_Node*      P4_CreateNode(P4_String text, P4_Position* start, P4_Position* sto
  * @brief       Delete the node.
  *              This will free the occupied memory for node.
  *              The str of the node won't be free-ed since the node only owns not the string but the slice of a string.
- * @param       node   The node.
+ * @param       grammar The grammar.
+ * @param       node    The node.
  *
  * Example:
  *
- *      P4_DeleteNode(node);
+ *      P4_DeleteNode(grammar, node);
  */
-void           P4_DeleteNode(P4_Node* node);
+void           P4_DeleteNode(P4_Grammar* grammar, P4_Node* node);
 
 /**
  * @brief       Delete the node children.
  *              This will free the occupied memory for all node children.
- * @param       node   The node.
+ * @param       grammar The grammar.
+ * @param       node    The node.
  *
  * Example:
  *
- *      P4_DeleteNodeChildren(node);
+ *      P4_DeleteNodeChildren(grammar, node);
  */
-void P4_DeleteNodeChildren(P4_Node* node);
+void P4_DeleteNodeChildren(P4_Grammar* grammar, P4_Node* node);
 
 /**
  * @brief       Get the slice that the node covers.

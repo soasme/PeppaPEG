@@ -660,6 +660,7 @@ P4_PRIVATE(P4_Node*) match_repeat(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_spaced_rules(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_back_reference(P4_Source*, P4_Expression*, P4_Slice*, P4_Expression*);
 
+P4_PRIVATE(void)                P4_DeleteNodeUserData(P4_Grammar* grammar, P4_Node* node);
 P4_PRIVATE(P4_Expression*)      P4_GetReference(P4_Source*, P4_Expression*);
 
 P4_PRIVATE(P4_String)           P4_CopySliceString(P4_String, P4_Slice*);
@@ -1600,6 +1601,7 @@ P4_CreateNode (const P4_String     str,
     node->next         = NULL;
     node->head         = NULL;
     node->tail         = NULL;
+    node->userdata     = NULL;
 
     set_slice(&node->slice, start, stop);
 
@@ -1613,16 +1615,19 @@ P4_CreateNode (const P4_String     str,
  * DANGER: this function does not free children nodes.
  */
 P4_PRIVATE(void)
-P4_DeleteNodeNode(P4_Node* node) {
-    if (node) P4_FREE(node);
+P4_DeleteNodeNode(P4_Grammar* grammar, P4_Node* node) {
+    if (node) {
+        P4_DeleteNodeUserData(grammar, node);
+        P4_FREE(node);
+    }
 }
 
 
 /*
  * Free all of the children nodes of the node.
  */
-P4_PRIVATE(void)
-P4_DeleteNodeChildren(P4_Node* node) {
+P4_PUBLIC void
+P4_DeleteNodeChildren(P4_Grammar* grammar, P4_Node* node) {
     if (node == NULL)
         return;
 
@@ -1632,10 +1637,11 @@ P4_DeleteNodeChildren(P4_Node* node) {
     while (child) {
         tmp = child->next;
         if (child->head)
-            P4_DeleteNodeChildren(child);
-        P4_DeleteNodeNode(child);
+            P4_DeleteNodeChildren(grammar, child);
+        P4_DeleteNodeNode(grammar, child);
         child = tmp;
     }
+    node->head = node->tail = NULL;
 }
 
 
@@ -1644,12 +1650,12 @@ P4_DeleteNodeChildren(P4_Node* node) {
  * node in the node list.
  */
 P4_PUBLIC void
-P4_DeleteNode(P4_Node* node) {
+P4_DeleteNode(P4_Grammar* grammar, P4_Node* node) {
     P4_Node* tmp = NULL;
     while (node) {
         tmp     = node->next;
-        P4_DeleteNodeChildren(node);
-        P4_DeleteNodeNode(node);
+        P4_DeleteNodeChildren(grammar, node);
+        P4_DeleteNodeNode(grammar, node);
         node   = tmp;
     }
 }
@@ -1661,8 +1667,10 @@ P4_DeleteNodeUserData(P4_Grammar* grammar, P4_Node* node) {
 
     P4_Node* tmp = node;
     while (tmp != NULL) {
-        if (tmp->userdata != NULL)
+        if (tmp->userdata != NULL) {
             grammar->free_func(tmp->userdata);
+            tmp->userdata = NULL;
+        }
         P4_DeleteNodeUserData(grammar, tmp->head);
         tmp = tmp->next;
     }
@@ -1959,7 +1967,7 @@ match_sequence(P4_Source* s, P4_Expression* e) {
 
 finalize:
     set_position(s, startpos);
-    P4_DeleteNode(head);
+    P4_DeleteNode(s->grammar, head);
     return NULL;
 }
 
@@ -2136,7 +2144,7 @@ match_repeat(P4_Source* s, P4_Expression* e) {
 /* nodes between head..tail should be freed. */
 finalize:
     set_position(s, startpos);
-    P4_DeleteNode(head);
+    P4_DeleteNode(s->grammar, head);
     return NULL;
 }
 
@@ -2148,7 +2156,7 @@ match_positive(P4_Source* s, P4_Expression* e) {
 
     P4_Node* node = match_expression(s, e->ref_expr);
     if (node != NULL)
-        P4_DeleteNode(node);
+        P4_DeleteNode(s->grammar, node);
 
     set_position(s, startpos);
 
@@ -2164,7 +2172,7 @@ match_negative(P4_Source* s, P4_Expression* e) {
     set_position(s, startpos);
 
     if (no_error(s)) {
-        P4_DeleteNode(node);
+        P4_DeleteNode(s->grammar, node);
         P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
     } else if (s->err == P4_MatchError || s->err == P4_CutError) {
         rescue_error(s);
@@ -2243,7 +2251,7 @@ finalize:
     }
 
     /* clean up */
-    P4_DeleteNode(result);
+    P4_DeleteNode(s->grammar, result);
     if (e->name != NULL && s->errmsg[0] == 0) {
         P4_MatchRaisef(s, s->err, "expect %s", e->name);
     }
@@ -2336,16 +2344,20 @@ match_back_reference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Expr
 }
 
 void
-P4_JsonifySourceAst(FILE* stream, P4_Node* node) {
+P4_JsonifySourceAst(FILE* stream, P4_Node* node,
+        void (*formatter)(FILE* stream, P4_Node* node)) {
     P4_Node* tmp = node;
 
     fprintf(stream, "[");
     while (tmp != NULL) {
         fprintf(stream, "{\"slice\":[%lu,%lu]", tmp->slice.start.pos, tmp->slice.stop.pos);
         fprintf(stream, ",\"type\":\"%s\"", tmp->rule_name);
+        if (formatter != NULL) {
+            formatter(stream, tmp);
+        }
         if (tmp->head != NULL) {
             fprintf(stream, ",\"children\":");
-            P4_JsonifySourceAst(stream, tmp->head);
+            P4_JsonifySourceAst(stream, tmp->head, formatter);
         }
         fprintf(stream, "}");
         if (tmp->next != NULL) fprintf(stream, ",");
@@ -2803,7 +2815,7 @@ P4_ResetSource(P4_Source* source) {
 
     if (source->root) {
         P4_DeleteNodeUserData(source->grammar, source->root);
-        P4_DeleteNode(source->root);
+        P4_DeleteNode(source->grammar, source->root);
     }
 
 }

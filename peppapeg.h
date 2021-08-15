@@ -1450,7 +1450,7 @@ P4_Node*      P4_GetSourceAst(P4_Source* source);
  *
  *      P4_Node* root = P4_AcquireSourceAst(source);
  *      // ...
- *      P4_DeleteNode(root);
+ *      P4_DeleteNode(grammar, root);
  */
 P4_Node*      P4_AcquireSourceAst(P4_Source* source);
 
@@ -1463,15 +1463,16 @@ size_t          P4_GetSourcePosition(P4_Source* source);
 
 /**
  * @brief       Print the node tree.
- * @param       stream      The output stream.
+ * @param       stream     The output stream.
  * @param       node       The root node of source ast.
+ * *param       formatter  A callback function to format node.
  *
  * Example:
  *
  *      P4_Node* root = P4_GetSourceAst(source);
  *      P4_JsonifySourceAst(stdout, root);
  */
-void           P4_JsonifySourceAst(FILE* stream, P4_Node* node);
+void           P4_JsonifySourceAst(FILE* stream, P4_Node* node, void (*formatter)(FILE* stream, P4_Node* node));
 
 /**
  * @brief       Inspect the node tree.
@@ -1577,7 +1578,7 @@ P4_String      P4_GetErrorMessage(P4_Source* source);
  *
  *      // do something.
  *
- *      P4_DeleteNode(node);
+ *      P4_DeleteNode(grammar, node);
  */
 P4_Node*      P4_CreateNode(P4_String text, P4_Position* start, P4_Position* stop, P4_String rule);
 
@@ -1585,13 +1586,26 @@ P4_Node*      P4_CreateNode(P4_String text, P4_Position* start, P4_Position* sto
  * @brief       Delete the node.
  *              This will free the occupied memory for node.
  *              The str of the node won't be free-ed since the node only owns not the string but the slice of a string.
- * @param       node   The node.
+ * @param       grammar The grammar.
+ * @param       node    The node.
  *
  * Example:
  *
- *      P4_DeleteNode(node);
+ *      P4_DeleteNode(grammar, node);
  */
-void           P4_DeleteNode(P4_Node* node);
+void           P4_DeleteNode(P4_Grammar* grammar, P4_Node* node);
+
+/**
+ * @brief       Delete the node children.
+ *              This will free the occupied memory for all node children.
+ * @param       grammar The grammar.
+ * @param       node    The node.
+ *
+ * Example:
+ *
+ *      P4_DeleteNodeChildren(grammar, node);
+ */
+void P4_DeleteNodeChildren(P4_Grammar* grammar, P4_Node* node);
 
 /**
  * @brief       Get the slice that the node covers.

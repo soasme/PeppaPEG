@@ -2128,7 +2128,7 @@ You’re on your own now to manage the de-allocation of the source ast.</p>
 <p>The source is implicitly reset after the source ast is acquired by the caller.</p>
 <p>Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Node</span><span class="o">*</span> <span class="n">root</span> <span class="o">=</span> <span class="n">P4_AcquireSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
  <span class="o">//</span> <span class="o">...</span>
- <span class="n">P4_DeleteNode</span><span class="p">(</span><span class="n">root</span><span class="p">);</span>
+ <span class="n">P4_DeleteNode</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">root</span><span class="p">);</span>
 </pre></div>
 </div>
 </p>
@@ -2160,7 +2160,7 @@ You’re on your own now to manage the de-allocation of the source ast.</p>
 </dd></dl>
 <dl class="c function">
 <dt class="sig sig-object c" id="c.P4_JsonifySourceAst">
-<span class="target" id="peppapeg_8h_1a336834b8c596f4a7a7306656594187e2"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_JsonifySourceAst</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">FILE</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">stream</span></span>, <a class="reference internal" href="#c.P4_Node" title="P4_Node"><span class="n"><span class="pre">P4_Node</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">node</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_JsonifySourceAst" title="Permalink to this definition">¶</a><br/></dt>
+<span class="target" id="peppapeg_8h_1a338ed9bca8547ab8edead19f6c61318e"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_JsonifySourceAst</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">FILE</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">stream</span></span>, <a class="reference internal" href="#c.P4_Node" title="P4_Node"><span class="n"><span class="pre">P4_Node</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">node</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">formatter</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">FILE</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">stream</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#c.P4_Node" title="P4_Node"><span class="n"><span class="pre">P4_Node</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_JsonifySourceAst" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Print the node tree. </p>
 <p>
 Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Node</span><span class="o">*</span> <span class="n">root</span> <span class="o">=</span> <span class="n">P4_GetSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
@@ -2172,7 +2172,7 @@ Example: <div class="highlight-default notranslate"><div class="highlight"><pre>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>stream</strong> – The output stream. </p></li>
-<li><p><strong>node</strong> – The root node of source ast.</p></li>
+<li><p><strong>node</strong> – The root node of source ast. *param formatter A callback function to format node.</p></li>
 </ul>
 </dd>
 </dl>
@@ -2327,7 +2327,7 @@ Example: <div class="highlight-default notranslate"><div class="highlight"><pre>
 
  <span class="o">//</span> <span class="n">do</span> <span class="n">something</span><span class="o">.</span>
 
- <span class="n">P4_DeleteNode</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
+ <span class="n">P4_DeleteNode</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">node</span><span class="p">);</span>
 </pre></div>
 </div>
 </p>
@@ -2347,16 +2347,35 @@ Example: <div class="highlight-default notranslate"><div class="highlight"><pre>
 </dd></dl>
 <dl class="c function">
 <dt class="sig sig-object c" id="c.P4_DeleteNode">
-<span class="target" id="peppapeg_8h_1a9183c147fd7f4a45b1e55424b10018c3"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_DeleteNode</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Node" title="P4_Node"><span class="n"><span class="pre">P4_Node</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">node</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_DeleteNode" title="Permalink to this definition">¶</a><br/></dt>
+<span class="target" id="peppapeg_8h_1a6a1b093b6edfbfcf7bffed72b3a184a4"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_DeleteNode</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="n"><span class="pre">P4_Grammar</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">grammar</span></span>, <a class="reference internal" href="#c.P4_Node" title="P4_Node"><span class="n"><span class="pre">P4_Node</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">node</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_DeleteNode" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Delete the node. This will free the occupied memory for node. The str of the node won’t be free-ed since the node only owns not the string but the slice of a string. </p>
 <p>
-Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_DeleteNode</span><span class="p">(</span><span class="n">node</span><span class="p">);</span>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_DeleteNode</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">node</span><span class="p">);</span>
 </pre></div>
 </div>
 </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>node</strong> – The node.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.P4_DeleteNodeChildren">
+<span class="target" id="peppapeg_8h_1a8789b34d246cd65b74d8c143cd526478"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_DeleteNodeChildren</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="n"><span class="pre">P4_Grammar</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">grammar</span></span>, <a class="reference internal" href="#c.P4_Node" title="P4_Node"><span class="n"><span class="pre">P4_Node</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">node</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_DeleteNodeChildren" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Delete the node children. This will free the occupied memory for all node children. </p>
+<p>
+Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_DeleteNodeChildren</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">node</span><span class="p">);</span>
+</pre></div>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
 <li><p><strong>node</strong> – The node.</p></li>
 </ul>
 </dd>

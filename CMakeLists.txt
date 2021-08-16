@@ -6,11 +6,19 @@ set(P4_LIB peppapeg)
 set(P4_HEADERS peppapeg.h)
 set(P4_SOURCES peppapeg.c)
 add_library("${P4_LIB}" SHARED "${P4_HEADERS}" "${P4_SOURCES}")
-# If testing is enabled
-target_compile_options("${P4_LIB}" PRIVATE "-g")
+
 target_compile_options("${P4_LIB}" PRIVATE "-ansi")
 target_compile_options("${P4_LIB}" PRIVATE "-Wall")
-# target_compile_options("${P4_LIB}" PRIVATE "-fsanitize=address")
+
+find_library(UNISTRING_LIB unistring REQUIRED)
+find_path(UNISTR_H NAMES unistr.h)
+target_compile_options("${P4_LIB}" PRIVATE "-I${UNISTR_H}")
+target_link_libraries("${P4_LIB}" PUBLIC "${UNISTRING_LIB}")
+
+option(ENABLE_TEST "Enables AddressSanitizer and UndefinedBehaviorSanitizer." OFF)
+if (ENABLE_TEST)
+    target_compile_options("${P4_LIB}" PRIVATE "-g")
+endif()
 
 option(ENABLE_SANITIZERS "Enables AddressSanitizer and UndefinedBehaviorSanitizer." OFF)
 if (ENABLE_SANITIZERS)

@@ -46,6 +46,18 @@ extern "C"
 #include <stdio.h>
 #include <string.h>
 
+# ifdef ENABLE_UNISTR
+#include <unistr.h>
+# else
+
+/**
+ * A single unicode character.
+ * Used when libunistring is not installed.
+ * */
+typedef uint32_t        ucs4_t;
+
+# endif
+
 # ifndef P4_MALLOC
 # define P4_MALLOC malloc
 # endif
@@ -241,11 +253,6 @@ typedef enum {
  * @brief The flag of expression.
  **/
 typedef uint32_t        P4_ExpressionFlag;
-
-/** A single unicode character.
- * This type is the same as defined in <unitypes.h>.
- * */
-typedef uint32_t        ucs4_t;
 
 /**
  * The C string type in locale encoding, by default utf-8.

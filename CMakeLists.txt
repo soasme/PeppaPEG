@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.9)
 
 project(peppapeg C)
 
+include(GNUInstallDirs)
+
 set(P4_LIB peppapeg)
 set(P4_HEADERS peppapeg.h)
 set(P4_SOURCES peppapeg.c)
@@ -11,23 +13,40 @@ target_compile_options("${P4_LIB}" PRIVATE "-ansi")
 target_compile_options("${P4_LIB}" PRIVATE "-Wall")
 
 find_library(UNISTRING_LIB unistring REQUIRED)
-find_path(UNISTR_H NAMES unistr.h)
-target_compile_options("${P4_LIB}" PRIVATE "-I${UNISTR_H}")
-target_link_libraries("${P4_LIB}" PUBLIC "${UNISTRING_LIB}")
+if (UNISTRING_LIB)
+    message("-- Detected libunistring. Build Peppa PEG with libunistring.")
+    find_path(UNISTR_H NAMES unistr.h)
+    target_compile_options("${P4_LIB}" PRIVATE "-I${UNISTR_H}")
+    target_compile_options("${P4_LIB}" PRIVATE "-DENABLE_UNISTR=On")
+    target_link_libraries("${P4_LIB}" PUBLIC "${UNISTRING_LIB}")
+endif()
 
 option(ENABLE_TEST "Enables AddressSanitizer and UndefinedBehaviorSanitizer." OFF)
 if (ENABLE_TEST)
     target_compile_options("${P4_LIB}" PRIVATE "-g")
 endif()
 
-option(ENABLE_SANITIZERS "Enables AddressSanitizer and UndefinedBehaviorSanitizer." OFF)
+option(-DENABLE_ADDRESS_SANITIZER "Enables AddressSanitizer." OFF)
+message("-- Clang: AddressSanitizer - ${-DENABLE_ADDRESS_SANITIZER}.")
 if (ENABLE_SANITIZERS)
     list(APPEND custom_compiler_flags
         -fno-omit-frame-pointer
         -fsanitize=address
         -fsanitize=float-cast-overflow
         -fsanitize-address-use-after-scope
-        )
+    )
+endif()
+
+option(ENABLE_MEMORY_SANITIZER "Enable Clang memory sanitizer for nvim binary." OFF)
+message("-- Clang: MemorySanitizer - ${ENABLE_MEMORY_SANITIZER}.")
+if (ENABLE_MEMORY_SANITIZER)
+    message("-- Clang: Enabled MemorySanitizer.")
+    list(APPEND custom_compiler_flags
+        -fsanitize=memory
+        -fsanitize-memory-track-origins
+        -fno-omit-frame-pointer
+        -fno-optimize-sibling-calls
+    )
 endif()
 
 foreach(compiler_flag ${custom_compiler_flags})

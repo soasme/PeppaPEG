@@ -17,7 +17,7 @@ if (UNISTRING_LIB)
     message("-- Detected libunistring. Build Peppa PEG with libunistring.")
     find_path(UNISTR_H NAMES unistr.h)
     target_compile_options("${P4_LIB}" PRIVATE "-I${UNISTR_H}")
-    target_compile_options("${P4_LIB}" PRIVATE "-DENABLE_UNISTR=On")
+    target_compile_options("${P4_LIB}" PRIVATE "-D ENABLE_UNISTR")
     target_link_libraries("${P4_LIB}" PUBLIC "${UNISTRING_LIB}")
 endif()
 

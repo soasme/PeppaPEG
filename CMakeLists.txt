@@ -12,9 +12,10 @@ add_library("${P4_LIB}" SHARED "${P4_HEADERS}" "${P4_SOURCES}")
 target_compile_options("${P4_LIB}" PRIVATE "-ansi")
 target_compile_options("${P4_LIB}" PRIVATE "-Wall")
 
-find_library(UNISTRING_LIB unistring REQUIRED)
-if (UNISTRING_LIB)
-    message("-- Detected libunistring. Build Peppa PEG with libunistring.")
+option(-DENABLE_UNISTR "Enables libunistring." OFF)
+message("-- Optional Dependency: libunistring - ${ENABLE_UNISTR}.")
+if (ENABLE_UNISTR)
+    find_library(UNISTRING_LIB unistring REQUIRED)
     find_path(UNISTR_H NAMES unistr.h)
     target_compile_options("${P4_LIB}" PRIVATE "-I${UNISTR_H}")
     target_compile_options("${P4_LIB}" PRIVATE "-D ENABLE_UNISTR")
@@ -27,7 +28,7 @@ if (ENABLE_TEST)
 endif()
 
 option(-DENABLE_ADDRESS_SANITIZER "Enables AddressSanitizer." OFF)
-message("-- Clang: AddressSanitizer - ${-DENABLE_ADDRESS_SANITIZER}.")
+message("-- Clang: AddressSanitizer - ${ENABLE_ADDRESS_SANITIZER}.")
 if (ENABLE_SANITIZERS)
     list(APPEND custom_compiler_flags
         -fno-omit-frame-pointer

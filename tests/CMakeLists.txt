@@ -46,8 +46,11 @@ foreach(unity_testcase ${unity_testcases})
     target_compile_options("${unity_testcase}" PRIVATE "-g")
     target_compile_options("${unity_testcase}" PRIVATE "-ansi")
     target_compile_options("${unity_testcase}" PRIVATE "-DDEBUG")
-    target_compile_options("${unity_testcase}" PRIVATE "-I${UNISTR_H}")
-    target_compile_options("${unity_testcase}" PRIVATE "-DENABLE_UNISTR")
+
+    if (ENABLE_UNISTR)
+        target_compile_options("${unity_testcase}" PRIVATE "-I${UNISTR_H}")
+        target_compile_options("${unity_testcase}" PRIVATE "-DENABLE_UNISTR")
+    endif()
 
     if (VALGRIND)
         add_test(

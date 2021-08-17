@@ -403,16 +403,22 @@ struct P4_Expression {
             struct P4_RuneRange*    ranges;
         };
 
+        /** Used by P4_UnicodeCategory. */
+        struct {
+            uc_property_t           unicode_property;
+            uc_general_category_t   unicode_category;
+        };
+
         /** Used by P4_Sequence..P4_Choice. */
         struct {
-            P4_Expression**  members;
+            P4_Expression**         members;
             size_t                  count;
         };
 
         /** Used by P4_ZeroOrOnce..P4_RepeatExact.
          * repeat the expr for n times, n >= min and n <= max. */
         struct {
-            P4_Expression*   repeat_expr; /* maybe we can merge it with ref_expr? */
+            P4_Expression*          repeat_expr; /* maybe we can merge it with ref_expr? */
             size_t                  repeat_min;
             size_t                  repeat_max;
         };
@@ -650,6 +656,7 @@ P4_PRIVATE(P4_Error) pop_frame(P4_Source*);
 P4_PRIVATE(P4_Node*) match_expression(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_literal(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_range(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*) match_unicode_category(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_reference(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_positive(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_negative(P4_Source*, P4_Expression*);
@@ -1807,7 +1814,7 @@ match_range(P4_Source* s, P4_Expression* e) {
 
     mark_position(s, startpos);
 
-    uint32_t rune = 0x0;
+    ucs4_t rune = 0x0;
     size_t size = P4_ReadRune(str, &rune);
     size_t i = 0;
     bool found = false;
@@ -1824,6 +1831,45 @@ match_range(P4_Source* s, P4_Expression* e) {
     if (!found) {
         P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
         return NULL;
+    }
+
+    P4_Position* endpos= &(P4_Position){ 0 };
+    P4_DiffPosition(s->content, startpos, size, endpos);
+    set_position(s, endpos);
+
+    if (need_lift(s, e))
+        return NULL;
+
+    P4_Node*  result = NULL;
+    catch_oom(result = P4_CreateNode(s->content, startpos, endpos, e->name));
+
+    return result;
+}
+
+P4_PRIVATE(P4_Node*)
+match_unicode_category(P4_Source* s, P4_Expression* e) {
+    assert(no_error(s), "can't proceed due to a failed match");
+    mark_position(s, startpos);
+
+    ucs4_t uc = 0x0;
+    size_t size = P4_ReadRune(P4_RemainingText(s), &uc);
+
+
+    if (size == 0 ) {
+        P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
+        return NULL;
+    }
+
+    if (uc_property_is_valid(e->unicode_property)) {
+        if (!uc_is_property(uc, e->unicode_property)) {
+            P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
+            return NULL;
+        }
+    } else {
+        if (!uc_is_general_category(uc, e->unicode_category)) {
+            P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
+            return NULL;
+        }
     }
 
     P4_Position* endpos= &(P4_Position){ 0 };
@@ -2218,6 +2264,7 @@ match_expression(P4_Source* s, P4_Expression* e) {
     switch (e->kind) {
         case P4_Literal:       result = match_literal(s, e);   break;
         case P4_Range:         result = match_range(s, e);     break;
+        case P4_UnicodeCategory: result = match_unicode_category(s, e); break;
         case P4_Reference:     result = match_reference(s, e); break;
         case P4_Sequence:      result = match_sequence(s, e);  break;
         case P4_Choice:        result = match_choice(s, e);    break;
@@ -2452,6 +2499,27 @@ P4_CreateRanges(size_t count, P4_RuneRange* ranges) {
         expr->ranges[i].stride = ranges[i].stride;
     }
 
+    return expr;
+}
+
+P4_PUBLIC P4_Expression*
+P4_CreateUnicodeProperty(uc_property_t property) {
+    P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
+    expr->kind = P4_UnicodeCategory;
+    expr->flag = 0;
+    expr->name = NULL;
+    expr->unicode_property = property;
+    return expr;
+}
+
+P4_PUBLIC P4_Expression*
+P4_CreateUnicodeCategory(uc_general_category_t category) {
+    P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
+    expr->kind = P4_UnicodeCategory;
+    expr->flag = 0;
+    expr->name = NULL;
+    expr->unicode_property = (uc_property_t){0};
+    expr->unicode_category = category;
     return expr;
 }
 
@@ -3621,7 +3689,7 @@ P4_Grammar* P4_CreatePegGrammar () {
         ),
         P4_CreateLiteral("]", true)
     ));
-    catch_err(P4_AddChoiceWithMembers(grammar, "range_category", 19,
+    catch_err(P4_AddChoiceWithMembers(grammar, "range_category", 20,
         P4_CreateLiteral("Cc", true),
         P4_CreateLiteral("Cf", true),
         P4_CreateLiteral("Co", true),
@@ -3640,7 +3708,8 @@ P4_Grammar* P4_CreatePegGrammar () {
         P4_CreateLiteral("Zl", true),
         P4_CreateLiteral("Zp", true),
         P4_CreateLiteral("Zs", true),
-        P4_CreateLiteral("Z", true)
+        P4_CreateLiteral("Z", true),
+        P4_CreateLiteral("White space", true)
     ));
 
     catch_err(P4_AddSequenceWithMembers(grammar, "reference", 2,
@@ -3981,6 +4050,19 @@ P4_PegEvalRange(P4_Node* node, P4_Result* result) {
     P4_Expression* expr = NULL;
 
     if (node->head == node->tail) { /* one single child - [\\p{XX}] */
+
+# ifdef ENABLE_UNISTR
+        autofree char* name = NULL;
+        catch_oom(name = P4_CopyNodeString(node->head));
+
+        uc_property_t property = uc_property_byname(name);
+        if (uc_property_is_valid(property)) {
+            catch_oom(expr = P4_CreateUnicodeProperty(property));
+        } else {
+            uc_general_category_t category = uc_general_category_byname(name);
+            catch_oom(expr = P4_CreateUnicodeCategory(category));
+        }
+# else
         P4_RuneRange* ranges = NULL;
         size_t count = 0;
 
@@ -3989,6 +4071,7 @@ P4_PegEvalRange(P4_Node* node, P4_Result* result) {
                 NODE_ERROR_HINT_FMT, NODE_ERROR_HINT);
 
         catch_oom(expr = P4_CreateRanges(count, ranges));
+# endif
 
     } else { /* two to three children - [lower-upper] or [lower-upper..stride] */
         ucs4_t lower = 0, upper = 0;

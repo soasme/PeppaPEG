@@ -132,6 +132,11 @@ void test_range(void) {
     ASSERT_PEG_PARSE("range", "[\\p{Cc}]", P4_Ok, "\
 [{\"slice\":[0,8],\"type\":\"range\",\"children\":[\
 {\"slice\":[4,6],\"type\":\"range_category\"}]}]");
+# ifdef ENABLE_UNISTR
+    ASSERT_PEG_PARSE("range", "[\\p{White space}]", P4_Ok, "\
+[{\"slice\":[0,17],\"type\":\"range\",\"children\":[\
+{\"slice\":[4,15],\"type\":\"range_category\"}]}]");
+# endif
 }
 
 void test_reference(void) {

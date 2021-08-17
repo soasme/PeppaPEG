@@ -48,6 +48,7 @@ extern "C"
 
 # ifdef ENABLE_UNISTR
 #include <unistr.h>
+#include <unictype.h>
 # else
 
 /**
@@ -55,6 +56,20 @@ extern "C"
  * Used when libunistring is not installed.
  * */
 typedef uint32_t        ucs4_t;
+
+/**
+ * unicode property type.
+ */
+typedef struct {
+  bool (*test_fn) (ucs4_t uc);
+} uc_property_t;
+
+/** Stub functions for unicode property check. */
+#define uc_property_is_valid(property) ((property).test_fn != NULL)
+extern uc_property_t uc_property_byname (const char *property_name) { return (uc_property_t){0}; }
+extern bool uc_is_property (ucs4_t uc, uc_property_t property) {
+    return false;
+}
 
 # endif
 

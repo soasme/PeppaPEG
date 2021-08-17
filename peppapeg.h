@@ -190,7 +190,7 @@ typedef enum {
      */
     P4_Repeat,
     /** Rule: Cut. */
-    P4_Cut,
+    P4_Cut
 } P4_ExpressionKind;
 
 /**
@@ -224,7 +224,7 @@ typedef enum {
     /** When the given value is not valid peg grammar. */
     P4_PegError             = 11,
     /** When the failure occurs after a @cut operator. */
-    P4_CutError             = 12,
+    P4_CutError             = 12
 } P4_Error;
 
 /*
@@ -242,11 +242,20 @@ typedef enum {
  **/
 typedef uint32_t        P4_ExpressionFlag;
 
-/** An UTF8 rune */
+/** A single unicode character.
+ * This type is the same as defined in <unitypes.h>.
+ * */
 typedef uint32_t        ucs4_t;
 
-/** A string, equivalent to char*. */
+/**
+ * The C string type in locale encoding, by default utf-8.
+ **/
 typedef char*           P4_String;
+
+/**
+ * The utf-8 string type.
+ */
+typedef uint8_t*        P4_Utf8;
 
 /**
  * The reference of user data.

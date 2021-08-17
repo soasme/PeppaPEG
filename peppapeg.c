@@ -1849,11 +1849,12 @@ match_range(P4_Source* s, P4_Expression* e) {
 P4_PRIVATE(P4_Node*)
 match_unicode_category(P4_Source* s, P4_Expression* e) {
     assert(no_error(s), "can't proceed due to a failed match");
+
+# ifdef ENABLE_UNISTR
     mark_position(s, startpos);
 
     ucs4_t uc = 0x0;
     size_t size = P4_ReadRune(P4_RemainingText(s), &uc);
-
 
     if (size == 0 ) {
         P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
@@ -1883,6 +1884,12 @@ match_unicode_category(P4_Source* s, P4_Expression* e) {
     catch_oom(result = P4_CreateNode(s->content, startpos, endpos, e->name));
 
     return result;
+
+# else
+    P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
+    return NULL;
+
+# endif
 }
 
 P4_PRIVATE(P4_Expression*)
@@ -3689,28 +3696,16 @@ P4_Grammar* P4_CreatePegGrammar () {
         ),
         P4_CreateLiteral("]", true)
     ));
-    catch_err(P4_AddChoiceWithMembers(grammar, "range_category", 20,
-        P4_CreateLiteral("Cc", true),
-        P4_CreateLiteral("Cf", true),
-        P4_CreateLiteral("Co", true),
-        P4_CreateLiteral("Cs", true),
-        P4_CreateLiteral("C", true),
-        P4_CreateLiteral("Ll", true),
-        P4_CreateLiteral("Lm", true),
-        P4_CreateLiteral("Lo", true),
-        P4_CreateLiteral("Lt", true),
-        P4_CreateLiteral("Lu", true),
-        P4_CreateLiteral("L", true),
-        P4_CreateLiteral("Nl", true),
-        P4_CreateLiteral("Nd", true),
-        P4_CreateLiteral("No", true),
-        P4_CreateLiteral("N", true),
-        P4_CreateLiteral("Zl", true),
-        P4_CreateLiteral("Zp", true),
-        P4_CreateLiteral("Zs", true),
-        P4_CreateLiteral("Z", true),
-        P4_CreateLiteral("White space", true)
+    catch_err(P4_AddOnceOrMore(grammar, "range_category",
+        P4_CreateChoiceWithMembers(5,
+            P4_CreateRange('a', 'z', 1),
+            P4_CreateRange('A', 'Z', 1),
+            P4_CreateRange('0', '9', 1),
+            P4_CreateLiteral("_", true),
+            P4_CreateLiteral(" ", true)
+        )
     ));
+    catch_err(P4_SetGrammarRuleFlag(grammar, "range_category", P4_FLAG_SQUASHED | P4_FLAG_TIGHT));
 
     catch_err(P4_AddSequenceWithMembers(grammar, "reference", 2,
         P4_CreateChoiceWithMembers(3,
@@ -4045,34 +4040,53 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
+P4_PegEvalUnicodeCategory(P4_Node* node, P4_Result* result) {
+    P4_Error       err  = P4_Ok;
+    P4_Expression* expr = NULL;
+
+# ifdef ENABLE_UNISTR
+    autofree char* name = NULL;
+    catch_oom(name = P4_CopyNodeString(node->head));
+
+    uc_property_t property = uc_property_byname(name);
+    if (uc_property_is_valid(property)) {
+        catch_oom(expr = P4_CreateUnicodeProperty(property));
+    } else {
+        uc_general_category_t category = uc_general_category_byname(name);
+        if (uc_general_category_name(category) == NULL) {
+            catch_err(P4_PegError, P4_EvalRaisef(result,
+                "invalid range category. " NODE_ERROR_HINT_FMT, NODE_ERROR_HINT));
+        } else {
+            catch_oom(expr = P4_CreateUnicodeCategory(category));
+        }
+    }
+
+# else
+    P4_RuneRange* ranges = NULL;
+    size_t count = 0;
+
+    if (P4_ReadRuneRange(node->head->text, &node->head->slice, &count, &ranges) == 0) {
+        catch_err(P4_PegError, P4_EvalRaisef(result,
+            "invalid range category. " NODE_ERROR_HINT_FMT, NODE_ERROR_HINT));
+    }
+
+    catch_oom(expr = P4_CreateRanges(count, ranges));
+# endif
+
+    result->expr = expr;
+    return P4_Ok;
+
+finalize:
+    return err;
+}
+
+P4_PRIVATE(P4_Error)
 P4_PegEvalRange(P4_Node* node, P4_Result* result) {
     P4_Error       err  = P4_Ok;
     P4_Expression* expr = NULL;
 
     if (node->head == node->tail) { /* one single child - [\\p{XX}] */
-
-# ifdef ENABLE_UNISTR
-        autofree char* name = NULL;
-        catch_oom(name = P4_CopyNodeString(node->head));
-
-        uc_property_t property = uc_property_byname(name);
-        if (uc_property_is_valid(property)) {
-            catch_oom(expr = P4_CreateUnicodeProperty(property));
-        } else {
-            uc_general_category_t category = uc_general_category_byname(name);
-            catch_oom(expr = P4_CreateUnicodeCategory(category));
-        }
-# else
-        P4_RuneRange* ranges = NULL;
-        size_t count = 0;
-
-        if (P4_ReadRuneRange(node->head->text, &node->head->slice, &count, &ranges) == 0)
-            panicf("ValueError: failed to read code point from source. "
-                NODE_ERROR_HINT_FMT, NODE_ERROR_HINT);
-
-        catch_oom(expr = P4_CreateRanges(count, ranges));
-# endif
-
+        return P4_PegEvalUnicodeCategory(node, result);
     } else { /* two to three children - [lower-upper] or [lower-upper..stride] */
         ucs4_t lower = 0, upper = 0;
         size_t stride = 1;

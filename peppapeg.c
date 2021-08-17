@@ -547,9 +547,9 @@ static void cleanup_freep (void *p) { /* clean a malloc-ed variable. */
   if (*pp) P4_FREE(*pp);
 }
 
-P4_PRIVATE(size_t)       P4_GetRuneSize(P4_Rune ch);
-P4_PRIVATE(P4_Rune)      P4_GetRuneLower(P4_Rune ch);
-P4_PRIVATE(P4_Rune)      P4_GetRuneUpper(P4_Rune ch);
+P4_PRIVATE(size_t)       P4_GetRuneSize(ucs4_t ch);
+P4_PRIVATE(ucs4_t)      P4_GetRuneLower(ucs4_t ch);
+P4_PRIVATE(ucs4_t)      P4_GetRuneUpper(ucs4_t ch);
 P4_PRIVATE(int)          P4_CaseCmpInsensitive(const void*, const void*, size_t n);
 
 P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size_t offset, P4_Position* stop);
@@ -673,7 +673,7 @@ P4_PRIVATE(P4_Error)            P4_RefreshReference(P4_Expression*, P4_String);
 P4_PRIVATE(P4_Error)            P4_PegEvalFlag(P4_Node* node, P4_ExpressionFlag *flag);
 P4_PRIVATE(P4_Error)            P4_PegEvalRuleFlags(P4_Node* node, P4_ExpressionFlag* flag);
 P4_PRIVATE(P4_Error)            P4_PegEvalNumber(P4_Node* node, size_t* num);
-P4_PRIVATE(P4_Error)            P4_PegEvalChar(P4_Node* node, P4_Rune* rune);
+P4_PRIVATE(P4_Error)            P4_PegEvalChar(P4_Node* node, ucs4_t* rune);
 P4_PRIVATE(P4_Error)            P4_PegEvalLiteral(P4_Node* node, P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalInsensitive(P4_Node* node, P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalRange(P4_Node* node, P4_Result* result);
@@ -1178,12 +1178,12 @@ static P4_RuneRange _Zs[] = {
 };
 
 
-size_t P4_GetRuneSize(P4_Rune ch) {
-    if (0 == ((P4_Rune)0xffffff80 & ch)) {
+size_t P4_GetRuneSize(ucs4_t ch) {
+    if (0 == ((ucs4_t)0xffffff80 & ch)) {
         return 1;
-    } else if (0 == ((P4_Rune)0xfffff800 & ch)) {
+    } else if (0 == ((ucs4_t)0xfffff800 & ch)) {
         return 2;
-    } else if (0 == ((P4_Rune)0xffff0000 & ch)) {
+    } else if (0 == ((ucs4_t)0xffff0000 & ch)) {
         return 3;
     } else { /* e.g.  0 == ((int)0xffe00000 & chr)) */
         return 4;
@@ -1206,7 +1206,7 @@ size_t P4_GetRuneSize(P4_Rune ch) {
  *     0x4f60 20320
  */
 size_t
-P4_ReadRune(P4_String s, P4_Rune* c) {
+P4_ReadRune(P4_String s, ucs4_t* c) {
     *c = 0;
 
     if ((s[0] & 0b10000000) == 0) { /* 1 byte code point, ASCII */
@@ -1227,17 +1227,17 @@ P4_ReadRune(P4_String s, P4_Rune* c) {
     }
 }
 
-void* P4_ConcatRune(void *str, P4_Rune chr, size_t n) {
+void* P4_ConcatRune(void *str, ucs4_t chr, size_t n) {
   char *s = (char *)str;
 
-  if (0 == ((P4_Rune)0xffffff80 & chr)) {
+  if (0 == ((ucs4_t)0xffffff80 & chr)) {
     /* 1-byte/7-bit ascii (0b0xxxxxxx) */
     if (n < 1) {
       return 0;
     }
     s[0] = (char)chr;
     s += 1;
-  } else if (0 == ((P4_Rune)0xfffff800 & chr)) {
+  } else if (0 == ((ucs4_t)0xfffff800 & chr)) {
     /* 2-byte/11-bit utf8 code point (0b110xxxxx 0b10xxxxxx) */
     if (n < 2) {
       return 0;
@@ -1245,7 +1245,7 @@ void* P4_ConcatRune(void *str, P4_Rune chr, size_t n) {
     s[0] = (char) 0xc0 | (char)((chr >> 6) & 0x1f);
     s[1] = (char) 0x80 | (char)(chr & 0x3f);
     s += 2;
-  } else if (0 == ((P4_Rune)0xffff0000 & chr)) {
+  } else if (0 == ((ucs4_t)0xffff0000 & chr)) {
     /* 3-byte/16-bit utf8 code point (0b1110xxxx 0b10xxxxxx 0b10xxxxxx) */
     if (n < 3) {
       return 0;
@@ -1269,7 +1269,7 @@ void* P4_ConcatRune(void *str, P4_Rune chr, size_t n) {
   return s;
 }
 
-size_t P4_ReadEscapedRune(char* text, P4_Rune* rune) {
+size_t P4_ReadEscapedRune(char* text, ucs4_t* rune) {
     char ch0 = *text;
 
     if (ch0 == '\0') {
@@ -1352,8 +1352,8 @@ size_t P4_ReadRuneRange(char* text, P4_Slice* slice, size_t* count, P4_RuneRange
  *
  * Modified from https://github.com/sheredom/utf8.h
  */
-P4_PRIVATE(P4_Rune)
-P4_GetRuneLower(P4_Rune cp) {
+P4_PRIVATE(ucs4_t)
+P4_GetRuneLower(ucs4_t cp) {
     if (((0x0041 <= cp) && (0x005a >= cp)) ||
         ((0x00c0 <= cp) && (0x00d6 >= cp)) ||
         ((0x00d8 <= cp) && (0x00de >= cp)) ||
@@ -1439,8 +1439,8 @@ P4_GetRuneLower(P4_Rune cp) {
  *
  * Modified from https://github.com/sheredom/utf8.h
  */
-P4_PRIVATE(P4_Rune)
-P4_GetRuneUpper(P4_Rune cp) {
+P4_PRIVATE(ucs4_t)
+P4_GetRuneUpper(ucs4_t cp) {
     if (((0x0061 <= cp) && (0x007a >= cp)) ||
         ((0x00e0 <= cp) && (0x00f6 >= cp)) ||
         ((0x00f8 <= cp) && (0x00fe >= cp)) ||
@@ -1529,7 +1529,7 @@ P4_GetRuneUpper(P4_Rune cp) {
  */
 P4_PRIVATE(int)
 P4_CaseCmpInsensitive(const void* src1, const void* src2, size_t n) {
-    P4_Rune src1_lwr_cp, src2_lwr_cp, src1_upr_cp, src2_upr_cp, src1_orig_cp, src2_orig_cp;
+    ucs4_t src1_lwr_cp, src2_lwr_cp, src1_upr_cp, src2_upr_cp, src1_orig_cp, src2_orig_cp;
 
     do {
         const unsigned char *const s1 = (const unsigned char *)src1;
@@ -1539,23 +1539,23 @@ P4_CaseCmpInsensitive(const void* src1, const void* src2, size_t n) {
         if (0 == n) return 0;
 
         if ((1 == n) && ((0xc0 == (0xe0 & *s1)) || (0xc0 == (0xe0 & *s2)))) {
-            const P4_Rune c1 = (0xe0 & *s1);
-            const P4_Rune c2 = (0xe0 & *s2);
+            const ucs4_t c1 = (0xe0 & *s1);
+            const ucs4_t c2 = (0xe0 & *s2);
             if (c1 < c2) return c1 - c2;
             else return 0;
         }
 
         if ((2 >= n) && ((0xe0 == (0xf0 & *s1)) || (0xe0 == (0xf0 & *s2)))) {
-            const P4_Rune c1 = (0xf0 & *s1);
-            const P4_Rune c2 = (0xf0 & *s2);
+            const ucs4_t c1 = (0xf0 & *s1);
+            const ucs4_t c2 = (0xf0 & *s2);
 
             if (c1 < c2) return (int) c1 - (int) c2;
             else return 0;
         }
 
         if ((3 >= n) && ((0xf0 == (0xf8 & *s1)) || (0xf0 == (0xf8 & *s2)))) {
-            const P4_Rune c1 = (0xf8 & *s1);
-            const P4_Rune c2 = (0xf8 & *s2);
+            const ucs4_t c1 = (0xf8 & *s1);
+            const ucs4_t c2 = (0xf8 & *s2);
             if (c1 < c2) return (int) c1 - (int) c2;
             else return 0;
         }
@@ -1758,7 +1758,7 @@ match_literal(P4_Source* s, P4_Expression* e) {
     mark_position(s, startpos);
 
     P4_String str = P4_RemainingText(s);
-    P4_Rune rune[2] = {0};
+    ucs4_t rune[2] = {0};
     P4_ReadRune(e->literal, rune);
 
     if (is_end(s)) {
@@ -2420,7 +2420,7 @@ P4_CreateLiteral(const P4_String literal, bool sensitive) {
 }
 
 P4_PUBLIC P4_Expression*
-P4_CreateRange(P4_Rune lower, P4_Rune upper, size_t stride) {
+P4_CreateRange(ucs4_t lower, ucs4_t upper, size_t stride) {
     if (lower > upper || lower > 0x10ffff || upper > 0x10ffff || lower == 0 || upper == 0)
         return NULL;
 
@@ -3019,7 +3019,7 @@ P4_AddLiteral(P4_Grammar* grammar, P4_String name, const P4_String literal, bool
 }
 
 P4_PUBLIC P4_Error
-P4_AddRange(P4_Grammar* grammar, P4_String name, P4_Rune lower, P4_Rune upper, size_t stride) {
+P4_AddRange(P4_Grammar* grammar, P4_String name, ucs4_t lower, ucs4_t upper, size_t stride) {
     P4_AddSomeGrammarRule(grammar, name, P4_CreateRange(lower, upper, stride));
     return P4_Ok;
 }
@@ -3896,7 +3896,7 @@ P4_PegEvalNumber(P4_Node* node, size_t* num) {
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalChar(P4_Node* node, P4_Rune* rune) {
+P4_PegEvalChar(P4_Node* node, ucs4_t* rune) {
     size_t size = P4_ReadEscapedRune(node->text+node->slice.start.pos, rune);
 
     if (size == 0)
@@ -3914,7 +3914,7 @@ P4_PegEvalLiteral(P4_Node* node, P4_Result* result) {
                    size = 0,
                    idx  = 0;
     P4_Error       err  = P4_Ok;
-    P4_Rune        rune = 0;
+    ucs4_t         rune = 0;
     P4_String      lit  = NULL,
                    cur  = NULL;
     P4_Expression* expr = NULL;
@@ -3991,7 +3991,7 @@ P4_PegEvalRange(P4_Node* node, P4_Result* result) {
         catch_oom(expr = P4_CreateRanges(count, ranges));
 
     } else { /* two to three children - [lower-upper] or [lower-upper..stride] */
-        P4_Rune lower = 0, upper = 0;
+        ucs4_t lower = 0, upper = 0;
         size_t stride = 1;
 
         P4_Node* lower_node = node->head;

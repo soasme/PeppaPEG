@@ -243,7 +243,7 @@ typedef enum {
 typedef uint32_t        P4_ExpressionFlag;
 
 /** An UTF8 rune */
-typedef uint32_t        P4_Rune;
+typedef uint32_t        ucs4_t;
 
 /** A string, equivalent to char*. */
 typedef char*           P4_String;
@@ -336,9 +336,9 @@ typedef struct P4_Position {
  */
 typedef struct P4_RuneRange {
     /* The lower code point of the range (inclusive). */
-    P4_Rune                 lower;
+    ucs4_t                 lower;
     /* The upper code point of the range (inclusive). */
-    P4_Rune                 upper;
+    ucs4_t                 upper;
     /* The step to jump inside the range. */
     size_t                  stride;
 } P4_RuneRange;
@@ -391,7 +391,7 @@ struct P4_Node {
 typedef struct P4_Result {
     union {
         P4_String               str;
-        P4_Rune                 rune;
+        ucs4_t                 rune;
         size_t                  num;
         P4_ExpressionFlag       flag;
         /* The expression result. */
@@ -429,7 +429,7 @@ P4_String      P4_Version(void);
 /**
  * Read a single code point (rune) from an UTF-8 string.
  */
-size_t         P4_ReadRune(P4_String s, P4_Rune* c);
+size_t         P4_ReadRune(P4_String s, ucs4_t* c);
 
 /**
  * Read an escaped single code point (rune) from an UTF-8 string.
@@ -440,10 +440,10 @@ size_t         P4_ReadRune(P4_String s, P4_Rune* c);
  *
  * For example:
  *
- *      P4_Rune rune;
+ *      ucs4_t rune;
  *      P4_ReadEscapedRune("\\u000D", rune); // 0xd
  */
-size_t         P4_ReadEscapedRune(char* text, P4_Rune* rune);
+size_t         P4_ReadEscapedRune(char* text, ucs4_t* rune);
 
 /**
  * Append a rune to str (in-place).
@@ -453,7 +453,7 @@ size_t         P4_ReadEscapedRune(char* text, P4_Rune* rune);
  * @param       n       The size of rune. Should be 1, 2, 3, 4.
  * @return      The string starting from appended rune.
  */
-void*          P4_ConcatRune(void* str, P4_Rune chr, size_t n);
+void*          P4_ConcatRune(void* str, ucs4_t chr, size_t n);
 
 /**
  * Create a P4_Literal expression.
@@ -509,7 +509,7 @@ P4_Error       P4_AddLiteral(P4_Grammar* grammar, P4_String name, const P4_Strin
  *
  *
  */
-P4_Expression* P4_CreateRange(P4_Rune lower, P4_Rune upper, size_t stride);
+P4_Expression* P4_CreateRange(ucs4_t lower, ucs4_t upper, size_t stride);
 
 /**
  * Create a P4_Range expression that holds multiple ranges.
@@ -543,7 +543,7 @@ P4_Expression* P4_CreateRanges(size_t count, P4_RuneRange* ranges);
  *
  *      P4_AddRange(grammar, "R1", 0x4E00, 0x9FFF, 1);
  */
-P4_Error       P4_AddRange(P4_Grammar* grammar, P4_String name, P4_Rune lower, P4_Rune upper, size_t stride);
+P4_Error       P4_AddRange(P4_Grammar* grammar, P4_String name, ucs4_t lower, ucs4_t upper, size_t stride);
 
 /**
  * Add sub-ranges expression as grammar rule.

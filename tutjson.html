@@ -205,7 +205,7 @@
 <section id="step-1-define-ruleids">
 <h2>Step 1: Define RuleIDs<a class="headerlink" href="#step-1-define-ruleids" title="Permalink to this headline">¶</a></h2>
 <p>Let’s create a new file “json.h” and define some enums as RuleIDs.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">"peppapeg.h"</span><span class="cp"></span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">"peppa.h"</span><span class="cp"></span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span>  <span class="n">P4_CreateJSONGrammar</span><span class="p">()</span> <span class="p">{</span>
@@ -295,7 +295,7 @@
 </pre></div>
 </div>
 <p>Run:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gcc ../examples/parse_json.c ../peppapeg.c
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gcc ../examples/parse_json.c ../peppa.c
 <span class="gp">$ </span>./a.out
 <span class="go">[{"slice":[0,39],"type":"array","children":[{"slice":[1,2],"type":"number"},{"slice":[3,6],"type":"number"},{"slice":[7,10],"type":"number"},{"slice":[11,15],"type":"true"},{"slice":[16,21],"type":"false"},{"slice":[22,26],"type":"null"},{"slice":[27,32],"type":"string"},{"slice":[33,35],"type":"object"},{"slice":[36,38],"type":"array"}]}]</span>
 </pre></div>

@@ -296,14 +296,14 @@
 <section id="how-to-replace-malloc-free-realloc">
 <h2>How to Replace Malloc/Free/Realloc?<a class="headerlink" href="#how-to-replace-malloc-free-realloc" title="Permalink to this headline">¶</a></h2>
 <p>You may choose your own memory management solution by replacing macros <cite>P4_MALLOC</cite>, <cite>P4_FREE</cite> and <cite>P4_REALLOC</cite>.</p>
-<p>Say you want to replace stdlib malloc/free/realloc with bdwgc <cite>GC_*</cite>, you can define the above macros before including “peppapeg.h”:</p>
+<p>Say you want to replace stdlib malloc/free/realloc with bdwgc <cite>GC_*</cite>, you can define the above macros before including “peppa.h”:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># include "gc.h"</span>
 
 <span class="c1"># define P4_MALLOC GC_MALLOC</span>
 <span class="c1"># define P4_FREE</span>
 <span class="c1"># define P4_REALLOC GC_REALLOC</span>
 
-<span class="c1"># define "peppapeg.h"</span>
+<span class="c1"># define "peppa.h"</span>
 </pre></div>
 </div>
 </section>

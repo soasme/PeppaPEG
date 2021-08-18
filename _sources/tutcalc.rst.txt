@@ -64,7 +64,7 @@ Run:
 
 .. code-block:: console
 
-    $ gcc -o calc calc.c peppapeg.c && ./calc
+    $ gcc -o calc calc.c peppa.c && ./calc
     Type statement to continue. Type ^C to quit.
 
     1+2*3;

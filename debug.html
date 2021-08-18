@@ -205,7 +205,7 @@ If you believe the issue origins from Peppa PEG and want to debug it, this docum
 <h2>Checking Segfaults<a class="headerlink" href="#checking-segfaults" title="Permalink to this headline">¶</a></h2>
 <p>Assuming your operation system has gdb or lldb installed. Depending on your toolchain, use gdb if using gcc, use lldb if using llvm. After installing a debugger, you can create a simple program that recurs the segfault problem.</p>
 <p>For example,</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">"peppapeg.h"</span><span class="cp"></span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">"peppa.h"</span><span class="cp"></span>
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">    </span><span class="n">P4_Grammar</span><span class="o">*</span><span class="w"> </span><span class="n">grammar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
 <span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">"%lu</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">grammar</span><span class="o">-&gt;</span><span class="n">count</span><span class="p">);</span><span class="w"></span>
@@ -213,7 +213,7 @@ If you believe the issue origins from Peppa PEG and want to debug it, this docum
 </pre></div>
 </div>
 <p>Compile the program with debugging option enabled:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gcc -g peppapeg.c debug.c
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gcc -g peppa.c debug.c
 </pre></div>
 </div>
 <p>Run the program with a debugger. Gdb directive <cite>run</cite> can run the program, <cite>where</cite> can output where the program stops, and <cite>p</cite> can print the value of the variable.</p>

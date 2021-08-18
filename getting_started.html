@@ -201,10 +201,10 @@
 <span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
 <section id="header-file-and-source-file">
 <h2>Header File and Source File<a class="headerlink" href="#header-file-and-source-file" title="Permalink to this headline">¶</a></h2>
-<p>Peppa PEG has a header file and a C file, so you can add it to your project by copying files <cite>peppapeg.h</cite> and <cite>peppapeg.c</cite>.</p>
+<p>Peppa PEG has a header file and a C file, so you can add it to your project by copying files <cite>peppa.h</cite> and <cite>peppa.c</cite>.</p>
 <p>Peppa PEG assumes your project is ANSI C (C89, or C90) compatible.</p>
 <p>Once copied, add include macro and start using the library:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#include "peppapeg.h"</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#include "peppa.h"</span>
 </pre></div>
 </div>
 </section>
@@ -287,7 +287,7 @@ The second parameter is the name of entry grammar rule.</p>
 </pre></div>
 </div>
 <p>It may be helpful to output the source AST in JSON format:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">P4_JsonifySourceAst</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="n">root</span><span class="p">);</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">P4_JsonifySourceAst</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">NULL</span><span class="p">);</span>
 </pre></div>
 </div>
 </section>
@@ -307,7 +307,7 @@ The second parameter is the name of entry grammar rule.</p>
 <h2>Full Example Code<a class="headerlink" href="#full-example-code" title="Permalink to this headline">¶</a></h2>
 <p>The complete code for this example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#include &lt;stdio.h&gt;</span>
-<span class="c1">#include "peppapeg.h"</span>
+<span class="c1">#include &lt;peppa.h&gt;</span>
 
 <span class="c1"># define ENTRY 1</span>
 
@@ -346,7 +346,7 @@ The second parameter is the name of entry grammar rule.</p>
 
     <span class="n">free</span><span class="p">(</span><span class="n">text</span><span class="p">);</span>
 
-    <span class="n">P4_JsonifySourceAst</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="n">root</span><span class="p">);</span>
+    <span class="n">P4_JsonifySourceAst</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">NULL</span><span class="p">);</span>
 
     <span class="n">P4_DeleteSource</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
     <span class="n">P4_DeleteGrammar</span><span class="p">(</span><span class="n">grammar</span><span class="p">);</span>
@@ -356,7 +356,7 @@ The second parameter is the name of entry grammar rule.</p>
 </pre></div>
 </div>
 <p>The output of the example looks like:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ gcc -o example ../example.c ../peppapeg.c
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ gcc -o example ../example.c ../peppa.c
 $ ./example
 root span: [0 11]
 root start: line=1 offset=1

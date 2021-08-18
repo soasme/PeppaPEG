@@ -40,6 +40,18 @@
 
 # define read_arg(argc, argv, opts, c) (-1 != ((c) = getopt((argc), (argv), (opts))))
 
+typedef struct p4_args_t p4_args_t;
+
+struct p4_args_t {
+    char* executable;
+    bool  help;
+    bool  verbose;
+    FILE* grammar_file;
+    char* grammar_entry;
+    size_t arguments_count;
+    char** arguments;
+};
+
 static void version(const char* name) {
     printf("%s version %s\n", name, P4_Version());
 }
@@ -94,80 +106,89 @@ finalize:
     return code;
 }
 
+int exec_args(p4_args_t* args) {
+    return 0;
+}
+
 int main(int argc, char* argv[]) {
-    int c;
-    FILE* grammar_file = NULL;
-    FILE* input_file = NULL;
-    char* entry = NULL;
+    int c, err;
+    p4_args_t* args = &(p4_args_t){ 0 };
+
+    args->executable = argv[0];
 
     while (read_arg(argc, argv, "Vhg:e:", c)) {
         switch (c) {
             case 'V':
-                version(basename(argv[0]));
-                exit(0);
+                args->verbose = true;
+                version(basename(args->executable));
+                err = 0; goto finalize;
             case 'h':
-                version(basename(argv[0]));
-                usage(basename(argv[0]));
-                exit(0);
+                args->help = true;
+                version(basename(args->executable));
+                usage(basename(args->executable));
+                err = 0; goto finalize;
             case 'e':
-                entry = optarg;
+                args->grammar_entry = optarg;
                 break;
             case 'g':
-                if (!(grammar_file = fopen(optarg, "r"))) {
+                if (!(args->grammar_file = fopen(optarg, "r"))) {
                     perror(optarg);
-                    exit(1);
+                    err = 1; goto finalize;
                 }
                 break;
             default:
-                fprintf(stderr, "for usage try: %s -h\n", argv[0]);
-                exit(1);
+                fprintf(stderr, "for usage try: %s -h\n", args->executable);
+                err = 1; goto finalize;
         }
     }
 
     if (optind == 1) {
-        usage(basename(argv[0]));
-        exit(1);
+        usage(basename(args->executable));
+        err = 1; goto finalize;
     }
 
-    argc -= optind;
-    argv += optind;
+    args->arguments_count = argc - optind;
+    args->arguments = argv + optind;
 
-    if (grammar_file == NULL) {
-        fprintf(stderr, "error: option -g is required\n");
-        usage(basename(argv[0]));
-        exit(1);
-    }
-
-    if (entry == NULL) {
-        fprintf(stderr, "error: option -e is required\n");
-        usage(basename(argv[0]));
-        exit(1);
-    }
-
-    if (!argc) {
+    if (args->arguments_count == 0) {
         fprintf(stderr, "error: argument FILE is required\n");
-        usage(basename(argv[0]));
-        exit(1);
+        usage(basename(args->executable));
+        err = 1; goto finalize;
     }
 
-    if (strcmp(*argv, "-") == 0) {
+    if (args->grammar_file == NULL) {
+        fprintf(stderr, "error: option -g is required\n");
+        usage(basename(args->executable));
+        err = 1; goto finalize;
+    }
+
+    if (args->grammar_entry == NULL) {
+        fprintf(stderr, "error: option -e is required\n");
+        usage(basename(args->executable));
+        err = 1; goto finalize;
+    }
+
+    FILE* input_file = NULL;
+
+    if (strcmp(args->arguments[0], "-") == 0) {
         input_file = stdin;
     } else {
-        if (!(input_file = fopen(*argv, "r"))) {
-            perror(*argv);
-            exit(1);
+        if (!(input_file = fopen(args->arguments[0], "r"))) {
+            perror(args->arguments[0]);
+            err = 1; goto finalize;
         }
     }
 
-    char* grammar_content = read_file(grammar_file);
+    char* grammar_content = read_file(args->grammar_file);
     char* input_content = read_file(input_file);
 
-    int code = print_ast(grammar_content, input_content, entry);
+    err = print_ast(grammar_content, input_content, args->grammar_entry);
 
     P4_FREE(input_content);
     P4_FREE(grammar_content);
-    fclose(grammar_file);
     fclose(input_file);
 
-    return code;
+finalize:
+    fclose(args->grammar_file);
+    return err;
 }

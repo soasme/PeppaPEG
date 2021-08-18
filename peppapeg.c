@@ -1872,11 +1872,9 @@ match_unicode_category(P4_Source* s, P4_Expression* e) {
             P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
             return NULL;
         }
-    } else {
-        if (!uc_is_general_category(uc, e->unicode_category)) {
-            P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
-            return NULL;
-        }
+    } else if (!uc_is_general_category(uc, e->unicode_category)) {
+        P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
+        return NULL;
     }
 
     P4_Position* endpos= &(P4_Position){ 0 };
@@ -2523,6 +2521,7 @@ P4_CreateUnicodeProperty(uc_property_t property) {
     expr->flag = 0;
     expr->name = NULL;
     expr->unicode_property = property;
+    expr->unicode_category = (uc_general_category_t){0};
     return expr;
 }
 

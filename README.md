@@ -136,7 +136,7 @@ outputs the parse tree into JSON format:
 
 ```
 P4_Node* root = P4_GetSourceAST(source);
-P4_JsonifySourceAst(stdout, root);
+P4_JsonifySourceAst(stdout, root, NULL);
 ```
 
 ```

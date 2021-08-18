@@ -829,8 +829,8 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
 # define rescue_error(s)    do { (s)->err = P4_Ok; (s)->errmsg[0] = '\0'; } while (0)
 # define peek_frame(s)      ((s)->frame_stack)
 # define peek_rule_name(s)  ((s)->frame_stack->rule->name)
+# define remaining_text(s)  ((s)->content + (s)->pos)
 
-P4_PRIVATE(P4_String)           P4_RemainingText(P4_Source*);
 P4_PRIVATE(P4_Error) push_frame(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Error) pop_frame(P4_Source*);
 P4_PRIVATE(P4_Node*) match_expression(P4_Source*, P4_Expression*);
@@ -1763,7 +1763,7 @@ match_literal(P4_Source* s, P4_Expression* e) {
 
     mark_position(s, startpos);
 
-    P4_String str = P4_RemainingText(s);
+    P4_String str = remaining_text(s);
     ucs4_t rune[2] = {0};
     u8_next_char(e->literal, rune);
 
@@ -1805,7 +1805,7 @@ P4_PRIVATE(P4_Node*)
 match_range(P4_Source* s, P4_Expression* e) {
     assert(no_error(s), "can't proceed due to a failed match");
 
-    P4_String str = P4_RemainingText(s);
+    P4_String str = remaining_text(s);
     if (is_end(s)) {
         P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
         return NULL;
@@ -1853,7 +1853,7 @@ match_unicode_category(P4_Source* s, P4_Expression* e) {
     mark_position(s, startpos);
 
     ucs4_t uc = 0x0;
-    size_t size = u8_next_char(P4_RemainingText(s), &uc);
+    size_t size = u8_next_char(remaining_text(s), &uc);
 
     if (size == 0 ) {
         P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
@@ -3078,14 +3078,6 @@ P4_DiffPosition(P4_String str, P4_Position* start, size_t offset, P4_Position* s
     stop->pos = stop_pos;
     stop->lineno = stop_lineno;
     stop->offset = stop_offset;
-}
-
-/*
- * Get the remaining text.
- */
-P4_PRIVATE(P4_String)
-P4_RemainingText(P4_Source* s) {
-    return s->content + s->pos;
 }
 
 P4_PUBLIC P4_Error

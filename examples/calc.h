@@ -48,7 +48,7 @@ extern "C"
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "../peppapeg.h"
+#include "../peppa.h"
 
 P4_Grammar*  P4_CreateCalcGrammar() {
     return P4_LoadGrammar(

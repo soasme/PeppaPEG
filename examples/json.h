@@ -37,7 +37,7 @@ extern "C"
 {
 #endif
 
-#include "../peppapeg.h"
+#include "../peppa.h"
 
 P4_Grammar*  P4_CreateJSONGrammar() {
     return P4_LoadGrammar(

@@ -25,17 +25,17 @@ References: [GitHub](https://github.com/soasme/PeppaPEG)
 
 # Usage
 
-## Copy `peppapeg.h` / `peppapeg.c`
+## Copy `peppa.h` / `peppa.c`
 
 Peppa PEG has a header file and a C file, so you can add
-it to your project by copying files "peppapeg.h" and "peppapeg.c".
+it to your project by copying files "peppa.h" and "peppa.c".
 
 Peppa PEG assumes your project is ANSI C (C89, or C90) compatible.
 
 Once copied, add include macro and start using the library!
 
 ```
-#include "peppapeg.h"
+#include "peppa.h"
 ```
 
 ## Load Grammar

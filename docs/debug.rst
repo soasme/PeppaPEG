@@ -13,7 +13,7 @@ For example,
 
 .. code-block:: c
 
-    #include "peppapeg.h"
+    #include "peppa.h"
     int main() {
         P4_Grammar* grammar = NULL;
         printf("%lu\n", grammar->count);
@@ -23,7 +23,7 @@ Compile the program with debugging option enabled:
 
 .. code-block:: console
 
-    $ gcc -g peppapeg.c debug.c
+    $ gcc -g peppa.c debug.c
 
 Run the program with a debugger. Gdb directive `run` can run the program, `where` can output where the program stops, and `p` can print the value of the variable.
 

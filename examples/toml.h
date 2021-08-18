@@ -38,7 +38,7 @@ extern "C"
 #endif
 
 #include <stdlib.h>
-#include "../peppapeg.h"
+#include "../peppa.h"
 
 typedef struct P4_TomlDateTime {
     char kind; /* t (local_time), d (local_date), D (local_date_time), T (offset_date_time)  */

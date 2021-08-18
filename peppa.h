@@ -23,9 +23,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  *
- * @file       peppapeg.h
+ * @file       peppa.h
  * @brief      Peppa PEG header file
- * @author     Ju
+ * @author     Ju Lin
  * @copyright  MIT
  * @date       2021
  * @see        https://github.com/soasme/PeppaPEG

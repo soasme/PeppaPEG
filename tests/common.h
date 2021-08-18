@@ -4,7 +4,7 @@
 #include "unity/src/unity.h"
 #include "unity/src/unity_internals.h"
 
-#include "../peppapeg.h"
+#include "../peppa.h"
 
 #define autofree __attribute__ ((cleanup (cleanup_freep)))
 

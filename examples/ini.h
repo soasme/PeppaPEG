@@ -34,7 +34,7 @@ extern "C"
 {
 #endif
 
-#include "../peppapeg.h"
+#include "../peppa.h"
 
 P4_PUBLIC(P4_Grammar*)  P4_CreateINIGrammar() {
     P4_Grammar* grammar = P4_CreateGrammar();

@@ -39,7 +39,7 @@ extern "C"
 {
 #endif
 
-#include "../peppapeg.h"
+#include "../peppa.h"
 
 P4_Error P4_MustacheCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* node) {
     if (rule

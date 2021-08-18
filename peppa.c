@@ -4574,7 +4574,7 @@ P4_LoadGrammar(P4_String rules) {
 
 finalize:
     /* terminates the program if failed to load grammar object. */
-    panicf("%s\n", result->errmsg);
+    panicf("grammar syntax error: %s\n", result->errmsg);
 }
 
 P4_PUBLIC const P4_String

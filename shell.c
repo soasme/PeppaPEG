@@ -36,7 +36,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <libgen.h>
-#include <peppa.h>
+#include "peppa.h"
 
 # define read_arg(argc, argv, opts, c) (-1 != ((c) = getopt((argc), (argv), (opts))))
 
@@ -87,6 +87,7 @@ static int print_ast(
     }
     P4_Node*    root = P4_GetSourceAst(source);
     P4_JsonifySourceAst(stdout, root, NULL);
+    fprintf(stdout, "\n");
 finalize:
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -121,6 +122,11 @@ int main(int argc, char* argv[]) {
                 fprintf(stderr, "for usage try: %s -h\n", argv[0]);
                 exit(1);
         }
+    }
+
+    if (optind == 1) {
+        usage(basename(argv[0]));
+        exit(1);
     }
 
     argc -= optind;

@@ -7,10 +7,10 @@ set(PROJECT_VERSION_MINOR 14)
 set(PROJECT_VERSION_PATCH 0)
 set(P4_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
-
 include(GNUInstallDirs)
 
 set(P4_LIB peppa)
+set(P4_BIN cli)
 set(P4_HEADERS peppa.h)
 set(P4_SOURCES peppa.c)
 add_library("${P4_LIB}" SHARED "${P4_HEADERS}" "${P4_SOURCES}")
@@ -82,5 +82,30 @@ install(
     INCLUDES DESTINATION "${CMAKE_INSTALL_FULL_INCLUDEDIR}"
 )
 
-add_subdirectory(tests)
-add_subdirectory(docs)
+option(ENABLE_CHECK "Enable unit test." OFF)
+if (ENABLE_CHECK)
+    add_subdirectory(tests)
+endif()
+
+option(ENABLE_DOCS "Enable documentation build." OFF)
+if (ENABLE_DOCS)
+    add_subdirectory(docs)
+endif()
+
+option(ENABLE_CLI "Enable building command-line interface." On)
+if (ENABLE_CLI)
+    add_executable("${P4_BIN}" "shell.c")
+    target_link_libraries("${P4_BIN}" "${P4_LIB}")
+    if (ENABLE_UNISTR)
+        target_compile_options("peppa" PRIVATE "-I${UNISTR_H}")
+        target_compile_options("peppa" PRIVATE "-DENABLE_UNISTR")
+    endif()
+    install(
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/${P4_BIN}"
+        DESTINATION "${CMAKE_INSTALL_FULL_BINDIR}"
+        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                    GROUP_READ GROUP_EXECUTE
+                    WORLD_READ WORLD_EXECUTE
+        RENAME "peppa"
+    )
+endif()

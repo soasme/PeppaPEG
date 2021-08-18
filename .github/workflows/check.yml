@@ -54,7 +54,7 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: |
         export CC=${{ matrix.compiler }}
-        cmake $GITHUB_WORKSPACE -DENABLE_ADDRESS_SANITIZER=On -DENABLE_DEBUG=On -DENABLE_UNISTR=${{ matrix.unistr }}
+        cmake $GITHUB_WORKSPACE -DENABLE_CHECK=On -DENABLE_ADDRESS_SANITIZER=On -DENABLE_DEBUG=On -DENABLE_UNISTR=${{ matrix.unistr }}
       if: "contains( matrix.compiler, 'clang')"
 
     - name: Configure CMake (GCC)
@@ -62,7 +62,7 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: |
         export CC=${{ matrix.compiler }}
-        cmake $GITHUB_WORKSPACE -DENABLE_VALGRIND=On -DENABLE_DEBUG=On -DENABLE_UNISTR=${{ matrix.unistr }}
+        cmake $GITHUB_WORKSPACE -DENABLE_CHECK=On -DENABLE_VALGRIND=On -DENABLE_DEBUG=On -DENABLE_UNISTR=${{ matrix.unistr }}
       if: "contains( matrix.compiler, 'gcc')"
 
     - name: Build Check

@@ -155,10 +155,50 @@ P4_JsonifySourceAst(stdout, root, NULL);
 ]
 ```
 
+## Utility
 
-Read the documentation here: <https://soasme.com/PeppaPEG/>.
+Peppa PEG ships with a tiny utility: `peppa` to help troubleshooting the PEG grammar.
+You can build the utility via cmake:
+
+```bash
+$ cd build
+$ cmake -DENABLE_CLI=On ..
+$ make install
+```
+
+Example: given files: `json.peg` and `data.json`, run with `peppa` utility:
+
+```bash
+$ cat json.peg
+@lifted entry = &. value !.;
+@lifted value = object / array / string / number / true / false / null;
+object = "{" (item ("," item)*)? "}";
+item = string ":" value;
+array = "[" (value ("," value)*)? "]";
+@tight string = "\"" ([\u0020-\u0021] / [\u0023-\u005b] / [\u005d-\U0010ffff] / escape )* "\"";
+true = "true";
+false = "false";
+null = "null";
+@tight @squashed number = minus? integral fractional? exponent?;
+@tight @squashed @lifted escape = "\\" ("\"" / "/" / "\\" / "b" / "f" / "n" / "r" / "t" / unicode);
+@tight @squashed unicode = "u" ([0-9] / [a-f] / [A-F]){4};
+minus = "-";
+plus = "+";
+@squashed @tight integral = "0" / [1-9] [0-9]*;
+@squashed @tight fractional = "." [0-9]+;
+@tight exponent = i"e" (plus / minus)? [0-9]+;
+@spaced @lifted whitespace = " " / "\r" / "\n" / "\t";
+
+$ cat data.json
+[{"numbers": [1,2.0,3e1]},[true,false,null],"xyz"]
+
+$ peppa -g json.peg -e entry data.json
+[{"slice":[0,50],"type":"array","children":[{"slice":[1,25],"type":"object","children":[{"slice":[2,24],"type":"item","children":[{"slice":[2,11],"type":"string"},{"slice":[13,24],"type":"array","children":[{"slice":[14,15],"type":"number"},{"slice":[16,19],"type":"number"},{"slice":[20,23],"type":"number"}]}]}]},{"slice":[26,43],"type":"array","children":[{"slice":[27,31],"type":"true"},{"slice":[32,37],"type":"false"},{"slice":[38,42],"type":"null"}]},{"slice":[44,49],"type":"string"}]}]
+```
 
 # Peppy Hacking Peppa PEG!
+
+Read the documentation here: <https://soasme.com/PeppaPEG/>.
 
 ## Test
 
@@ -174,7 +214,7 @@ Assume you have `cmake` and `gcc` installed.
 ```bash
 (root) $ mkdir -p build
 (root) $ cd build
-(build) $ cmake ..
+(build) $ cmake -DENABLE_CHECK=On ..
 (build) $ make check
 ...
 100% tests passed, 0 tests failed
@@ -203,6 +243,7 @@ Peppa PEG docs can be built via doxygen:
 
 ```bash
 (root) $ cd build
+(build) $ cmake -DENABLE_DOCS=On ..
 (build) $ rm -rf docs && make docs
 ```
 

@@ -21,6 +21,7 @@ More Cmake options include:
 * `-DENABLE_CHECK=On`: Enable building and running checks.
 * `-DENABLE_DOCS=On`: Enable building documentations.
 * `-DENABLE_DEBUG=On`: Enable building with CC -g (debug) option.
+* `-DENABLE_CLI=On`: Enable building command-line interface (utility peppa).
 
 Development
 ------------

@@ -30,7 +30,7 @@ def get_version(line, type):
     return False, 0
 
 _version = [0, 0, 0]
-with open('../peppapeg.h') as f:
+with open('../peppa.h') as f:
     for line in f.readlines():
         found, major = get_version(line, 'P4_MAJOR_VERSION')
         if found:

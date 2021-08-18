@@ -82,5 +82,12 @@ install(
     INCLUDES DESTINATION "${CMAKE_INSTALL_FULL_INCLUDEDIR}"
 )
 
-add_subdirectory(tests)
-add_subdirectory(docs)
+option(ENABLE_CHECK "Enable unit test." OFF)
+if (ENABLE_CHECK)
+    add_subdirectory(tests)
+endif()
+
+option(ENABLE_DOCS "Enable documentation build." OFF)
+if (ENABLE_DOCS)
+    add_subdirectory(docs)
+endif()

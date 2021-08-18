@@ -47,7 +47,6 @@ extern "C"
 #include <string.h>
 
 # ifdef ENABLE_UNISTR
-#include <unistr.h>
 #include <unictype.h>
 # else
 
@@ -56,16 +55,6 @@ extern "C"
  * Used when libunistring is not installed.
  * */
 typedef uint32_t        ucs4_t;
-
-/**
- * unicode property type.
- */
-typedef struct { uint8_t __stub__; } uc_property_t;
-
-/**
- * unicode general category type.
- */
-typedef struct { uint8_t __stub__; } uc_general_category_t;
 # endif
 
 # ifndef P4_MALLOC

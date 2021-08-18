@@ -30,6 +30,10 @@
 #include <stdarg.h>
 #include <inttypes.h>
 
+# ifdef ENABLE_UNISTR
+#include <unistr.h>
+# endif
+
 /** Start of khash.h */
 /* The MIT License
    Copyright (c) 2008, 2009, 2011 by Attractive Chaos <attractor@live.co.uk>
@@ -403,11 +407,13 @@ struct P4_Expression {
             struct P4_RuneRange*    ranges;
         };
 
+# if ENABLE_UNISTR
         /** Used by P4_UnicodeCategory. */
         struct {
             uc_property_t           unicode_property;
             uc_general_category_t   unicode_category;
         };
+# endif
 
         /** Used by P4_Sequence..P4_Choice. */
         struct {
@@ -2509,6 +2515,7 @@ P4_CreateRanges(size_t count, P4_RuneRange* ranges) {
     return expr;
 }
 
+# ifdef ENABLE_UNISTR
 P4_PUBLIC P4_Expression*
 P4_CreateUnicodeProperty(uc_property_t property) {
     P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
@@ -2529,6 +2536,7 @@ P4_CreateUnicodeCategory(uc_general_category_t category) {
     expr->unicode_category = category;
     return expr;
 }
+# endif
 
 P4_PUBLIC P4_Expression*
 P4_CreateReference(P4_String reference) {

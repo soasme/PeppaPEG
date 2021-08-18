@@ -1,5 +1,6 @@
 enable_testing()
 
+include(GNUInstallDirs)
 add_library(unity STATIC unity/src/unity.c)
 
 set(
@@ -46,13 +47,18 @@ foreach(unity_testcase ${unity_testcases})
     target_compile_options("${unity_testcase}" PRIVATE "-ansi")
     target_compile_options("${unity_testcase}" PRIVATE "-DDEBUG")
 
+    if (ENABLE_UNISTR)
+        target_compile_options("${unity_testcase}" PRIVATE "-I${UNISTR_H}")
+        target_compile_options("${unity_testcase}" PRIVATE "-DENABLE_UNISTR")
+    endif()
+
     if (VALGRIND)
         add_test(
             NAME "${unity_testcase}"
             COMMAND "${VALGRIND}" ${VALGRIND_OPTIONS} "${CMAKE_CURRENT_BINARY_DIR}/${unity_testcase}"
         )
     else()
-        set(ASAN_OPTIONS "detect_leaks=1")
+        set(ENV{ASAN_OPTIONS} "detect_leaks=1")
         add_test(
             NAME "${unity_testcase}"
             COMMAND "./${unity_testcase}"

@@ -30,6 +30,189 @@
 #include <stdarg.h>
 #include <inttypes.h>
 
+#include "peppapeg.h"
+
+/** Start of unicode utility functions. */
+
+# ifdef ENABLE_UNISTR
+#include <unistr.h>
+#include <unicase.h>
+# else
+/**
+ * @brief   Get rune in lower case.
+ *
+ * Modified from https://github.com/sheredom/utf8.h
+ */
+ucs4_t uc_tolower(ucs4_t cp) {
+    if (((0x0041 <= cp) && (0x005a >= cp)) ||
+        ((0x00c0 <= cp) && (0x00d6 >= cp)) ||
+        ((0x00d8 <= cp) && (0x00de >= cp)) ||
+        ((0x0391 <= cp) && (0x03a1 >= cp)) ||
+        ((0x03a3 <= cp) && (0x03ab >= cp)) ||
+        ((0x0410 <= cp) && (0x042f >= cp))) {
+        cp += 32;
+    } else if ((0x0400 <= cp) && (0x040f >= cp)) {
+        cp += 80;
+    } else if (((0x0100 <= cp) && (0x012f >= cp)) ||
+                ((0x0132 <= cp) && (0x0137 >= cp)) ||
+                ((0x014a <= cp) && (0x0177 >= cp)) ||
+                ((0x0182 <= cp) && (0x0185 >= cp)) ||
+                ((0x01a0 <= cp) && (0x01a5 >= cp)) ||
+                ((0x01de <= cp) && (0x01ef >= cp)) ||
+                ((0x01f8 <= cp) && (0x021f >= cp)) ||
+                ((0x0222 <= cp) && (0x0233 >= cp)) ||
+                ((0x0246 <= cp) && (0x024f >= cp)) ||
+                ((0x03d8 <= cp) && (0x03ef >= cp)) ||
+                ((0x0460 <= cp) && (0x0481 >= cp)) ||
+                ((0x048a <= cp) && (0x04ff >= cp))) {
+        cp |= 0x1;
+    } else if (((0x0139 <= cp) && (0x0148 >= cp)) ||
+                ((0x0179 <= cp) && (0x017e >= cp)) ||
+                ((0x01af <= cp) && (0x01b0 >= cp)) ||
+                ((0x01b3 <= cp) && (0x01b6 >= cp)) ||
+                ((0x01cd <= cp) && (0x01dc >= cp))) {
+        cp += 1;
+        cp &= ~0x1;
+    } else {
+        switch (cp) {
+            case 0x0178: cp = 0x00ff; break;
+            case 0x0243: cp = 0x0180; break;
+            case 0x018e: cp = 0x01dd; break;
+            case 0x023d: cp = 0x019a; break;
+            case 0x0220: cp = 0x019e; break;
+            case 0x01b7: cp = 0x0292; break;
+            case 0x01c4: cp = 0x01c6; break;
+            case 0x01c7: cp = 0x01c9; break;
+            case 0x01ca: cp = 0x01cc; break;
+            case 0x01f1: cp = 0x01f3; break;
+            case 0x01f7: cp = 0x01bf; break;
+            case 0x0187: cp = 0x0188; break;
+            case 0x018b: cp = 0x018c; break;
+            case 0x0191: cp = 0x0192; break;
+            case 0x0198: cp = 0x0199; break;
+            case 0x01a7: cp = 0x01a8; break;
+            case 0x01ac: cp = 0x01ad; break;
+            case 0x01af: cp = 0x01b0; break;
+            case 0x01b8: cp = 0x01b9; break;
+            case 0x01bc: cp = 0x01bd; break;
+            case 0x01f4: cp = 0x01f5; break;
+            case 0x023b: cp = 0x023c; break;
+            case 0x0241: cp = 0x0242; break;
+            case 0x03fd: cp = 0x037b; break;
+            case 0x03fe: cp = 0x037c; break;
+            case 0x03ff: cp = 0x037d; break;
+            case 0x037f: cp = 0x03f3; break;
+            case 0x0386: cp = 0x03ac; break;
+            case 0x0388: cp = 0x03ad; break;
+            case 0x0389: cp = 0x03ae; break;
+            case 0x038a: cp = 0x03af; break;
+            case 0x038c: cp = 0x03cc; break;
+            case 0x038e: cp = 0x03cd; break;
+            case 0x038f: cp = 0x03ce; break;
+            case 0x0370: cp = 0x0371; break;
+            case 0x0372: cp = 0x0373; break;
+            case 0x0376: cp = 0x0377; break;
+            case 0x03f4: cp = 0x03b8; break;
+            case 0x03cf: cp = 0x03d7; break;
+            case 0x03f9: cp = 0x03f2; break;
+            case 0x03f7: cp = 0x03f8; break;
+            case 0x03fa: cp = 0x03fb; break;
+            default: break;
+        }
+    }
+
+    return cp;
+}
+
+/**
+ * @brief   Get rune in upper case.
+ *
+ * Modified from https://github.com/sheredom/utf8.h
+ */
+ucs4_t uc_toupper(ucs4_t cp) {
+    if (((0x0061 <= cp) && (0x007a >= cp)) ||
+        ((0x00e0 <= cp) && (0x00f6 >= cp)) ||
+        ((0x00f8 <= cp) && (0x00fe >= cp)) ||
+        ((0x03b1 <= cp) && (0x03c1 >= cp)) ||
+        ((0x03c3 <= cp) && (0x03cb >= cp)) ||
+        ((0x0430 <= cp) && (0x044f >= cp))) {
+        cp -= 32;
+    } else if ((0x0450 <= cp) && (0x045f >= cp)) {
+        cp -= 80;
+    } else if (((0x0100 <= cp) && (0x012f >= cp)) ||
+                ((0x0132 <= cp) && (0x0137 >= cp)) ||
+                ((0x014a <= cp) && (0x0177 >= cp)) ||
+                ((0x0182 <= cp) && (0x0185 >= cp)) ||
+                ((0x01a0 <= cp) && (0x01a5 >= cp)) ||
+                ((0x01de <= cp) && (0x01ef >= cp)) ||
+                ((0x01f8 <= cp) && (0x021f >= cp)) ||
+                ((0x0222 <= cp) && (0x0233 >= cp)) ||
+                ((0x0246 <= cp) && (0x024f >= cp)) ||
+                ((0x03d8 <= cp) && (0x03ef >= cp)) ||
+                ((0x0460 <= cp) && (0x0481 >= cp)) ||
+                ((0x048a <= cp) && (0x04ff >= cp))) {
+        cp &= ~0x1;
+    } else if (((0x0139 <= cp) && (0x0148 >= cp)) ||
+                ((0x0179 <= cp) && (0x017e >= cp)) ||
+                ((0x01af <= cp) && (0x01b0 >= cp)) ||
+                ((0x01b3 <= cp) && (0x01b6 >= cp)) ||
+                ((0x01cd <= cp) && (0x01dc >= cp))) {
+        cp -= 1;
+        cp |= 0x1;
+    } else {
+        switch (cp) {
+            case 0x00ff: cp = 0x0178; break;
+            case 0x0180: cp = 0x0243; break;
+            case 0x01dd: cp = 0x018e; break;
+            case 0x019a: cp = 0x023d; break;
+            case 0x019e: cp = 0x0220; break;
+            case 0x0292: cp = 0x01b7; break;
+            case 0x01c6: cp = 0x01c4; break;
+            case 0x01c9: cp = 0x01c7; break;
+            case 0x01cc: cp = 0x01ca; break;
+            case 0x01f3: cp = 0x01f1; break;
+            case 0x01bf: cp = 0x01f7; break;
+            case 0x0188: cp = 0x0187; break;
+            case 0x018c: cp = 0x018b; break;
+            case 0x0192: cp = 0x0191; break;
+            case 0x0199: cp = 0x0198; break;
+            case 0x01a8: cp = 0x01a7; break;
+            case 0x01ad: cp = 0x01ac; break;
+            case 0x01b0: cp = 0x01af; break;
+            case 0x01b9: cp = 0x01b8; break;
+            case 0x01bd: cp = 0x01bc; break;
+            case 0x01f5: cp = 0x01f4; break;
+            case 0x023c: cp = 0x023b; break;
+            case 0x0242: cp = 0x0241; break;
+            case 0x037b: cp = 0x03fd; break;
+            case 0x037c: cp = 0x03fe; break;
+            case 0x037d: cp = 0x03ff; break;
+            case 0x03f3: cp = 0x037f; break;
+            case 0x03ac: cp = 0x0386; break;
+            case 0x03ad: cp = 0x0388; break;
+            case 0x03ae: cp = 0x0389; break;
+            case 0x03af: cp = 0x038a; break;
+            case 0x03cc: cp = 0x038c; break;
+            case 0x03cd: cp = 0x038e; break;
+            case 0x03ce: cp = 0x038f; break;
+            case 0x0371: cp = 0x0370; break;
+            case 0x0373: cp = 0x0372; break;
+            case 0x0377: cp = 0x0376; break;
+            case 0x03d1: cp = 0x0398; break;
+            case 0x03d7: cp = 0x03cf; break;
+            case 0x03f2: cp = 0x03f9; break;
+            case 0x03f8: cp = 0x03f7; break;
+            case 0x03fb: cp = 0x03fa; break;
+            default: break;
+        }
+    }
+
+    return cp;
+}
+# endif
+
+/** End of unicode utility functions. */
+
 /** Start of khash.h */
 /* The MIT License
    Copyright (c) 2008, 2009, 2011 by Attractive Chaos <attractor@live.co.uk>
@@ -351,8 +534,6 @@ typedef const char *kh_cstr_t;
 
 /** End of khash.h */
 
-#include "peppapeg.h"
-
 KHASH_MAP_INIT_STR(rules, P4_Expression*)
 
 struct P4_Grammar {
@@ -403,16 +584,24 @@ struct P4_Expression {
             struct P4_RuneRange*    ranges;
         };
 
+# if ENABLE_UNISTR
+        /** Used by P4_UnicodeCategory. */
+        struct {
+            uc_property_t           unicode_property;
+            uc_general_category_t   unicode_category;
+        };
+# endif
+
         /** Used by P4_Sequence..P4_Choice. */
         struct {
-            P4_Expression**  members;
+            P4_Expression**         members;
             size_t                  count;
         };
 
         /** Used by P4_ZeroOrOnce..P4_RepeatExact.
          * repeat the expr for n times, n >= min and n <= max. */
         struct {
-            P4_Expression*   repeat_expr; /* maybe we can merge it with ref_expr? */
+            P4_Expression*          repeat_expr; /* maybe we can merge it with ref_expr? */
             size_t                  repeat_min;
             size_t                  repeat_max;
         };
@@ -547,9 +736,6 @@ static void cleanup_freep (void *p) { /* clean a malloc-ed variable. */
   if (*pp) P4_FREE(*pp);
 }
 
-P4_PRIVATE(size_t)       P4_GetRuneSize(P4_Rune ch);
-P4_PRIVATE(P4_Rune)      P4_GetRuneLower(P4_Rune ch);
-P4_PRIVATE(P4_Rune)      P4_GetRuneUpper(P4_Rune ch);
 P4_PRIVATE(int)          P4_CaseCmpInsensitive(const void*, const void*, size_t n);
 
 P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size_t offset, P4_Position* stop);
@@ -643,13 +829,14 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
 # define rescue_error(s)    do { (s)->err = P4_Ok; (s)->errmsg[0] = '\0'; } while (0)
 # define peek_frame(s)      ((s)->frame_stack)
 # define peek_rule_name(s)  ((s)->frame_stack->rule->name)
+# define remaining_text(s)  ((s)->content + (s)->pos)
 
-P4_PRIVATE(P4_String)           P4_RemainingText(P4_Source*);
 P4_PRIVATE(P4_Error) push_frame(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Error) pop_frame(P4_Source*);
 P4_PRIVATE(P4_Node*) match_expression(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_literal(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_range(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*) match_unicode_category(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_reference(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_positive(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_negative(P4_Source*, P4_Expression*);
@@ -673,7 +860,7 @@ P4_PRIVATE(P4_Error)            P4_RefreshReference(P4_Expression*, P4_String);
 P4_PRIVATE(P4_Error)            P4_PegEvalFlag(P4_Node* node, P4_ExpressionFlag *flag);
 P4_PRIVATE(P4_Error)            P4_PegEvalRuleFlags(P4_Node* node, P4_ExpressionFlag* flag);
 P4_PRIVATE(P4_Error)            P4_PegEvalNumber(P4_Node* node, size_t* num);
-P4_PRIVATE(P4_Error)            P4_PegEvalChar(P4_Node* node, P4_Rune* rune);
+P4_PRIVATE(P4_Error)            P4_PegEvalChar(P4_Node* node, ucs4_t* rune);
 P4_PRIVATE(P4_Error)            P4_PegEvalLiteral(P4_Node* node, P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalInsensitive(P4_Node* node, P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalRange(P4_Node* node, P4_Result* result);
@@ -1178,17 +1365,10 @@ static P4_RuneRange _Zs[] = {
 };
 
 
-size_t P4_GetRuneSize(P4_Rune ch) {
-    if (0 == ((P4_Rune)0xffffff80 & ch)) {
-        return 1;
-    } else if (0 == ((P4_Rune)0xfffff800 & ch)) {
-        return 2;
-    } else if (0 == ((P4_Rune)0xffff0000 & ch)) {
-        return 3;
-    } else { /* e.g.  0 == ((int)0xffe00000 & chr)) */
-        return 4;
-    }
-}
+# define u8_bytes(ch) \
+    (0 == ((ucs4_t)0xffffff80 & (ch)) ? 1 : \
+    (0 == ((ucs4_t)0xfffff800 & (ch)) ? 2 : \
+    (0 == ((ucs4_t)0xffff0000 & (ch)) ? 3 : 4)))
 
 /**
  *
@@ -1200,13 +1380,13 @@ size_t P4_GetRuneSize(P4_Rune ch) {
  * Example::
  *
  *     > uint32_t c = 0x0
- *     > P4_ReadRune("你好", &c)
+ *     > u8_next_char("你好", &c)
  *     3
  *     > printf("%p %d\n", c, c)
  *     0x4f60 20320
  */
 size_t
-P4_ReadRune(P4_String s, P4_Rune* c) {
+u8_next_char(P4_String s, ucs4_t* c) {
     *c = 0;
 
     if ((s[0] & 0b10000000) == 0) { /* 1 byte code point, ASCII */
@@ -1227,17 +1407,17 @@ P4_ReadRune(P4_String s, P4_Rune* c) {
     }
 }
 
-void* P4_ConcatRune(void *str, P4_Rune chr, size_t n) {
+void* u8_append_char(void *str, ucs4_t chr, size_t n) {
   char *s = (char *)str;
 
-  if (0 == ((P4_Rune)0xffffff80 & chr)) {
+  if (0 == ((ucs4_t)0xffffff80 & chr)) {
     /* 1-byte/7-bit ascii (0b0xxxxxxx) */
     if (n < 1) {
       return 0;
     }
     s[0] = (char)chr;
     s += 1;
-  } else if (0 == ((P4_Rune)0xfffff800 & chr)) {
+  } else if (0 == ((ucs4_t)0xfffff800 & chr)) {
     /* 2-byte/11-bit utf8 code point (0b110xxxxx 0b10xxxxxx) */
     if (n < 2) {
       return 0;
@@ -1245,7 +1425,7 @@ void* P4_ConcatRune(void *str, P4_Rune chr, size_t n) {
     s[0] = (char) 0xc0 | (char)((chr >> 6) & 0x1f);
     s[1] = (char) 0x80 | (char)(chr & 0x3f);
     s += 2;
-  } else if (0 == ((P4_Rune)0xffff0000 & chr)) {
+  } else if (0 == ((ucs4_t)0xffff0000 & chr)) {
     /* 3-byte/16-bit utf8 code point (0b1110xxxx 0b10xxxxxx 0b10xxxxxx) */
     if (n < 3) {
       return 0;
@@ -1269,7 +1449,7 @@ void* P4_ConcatRune(void *str, P4_Rune chr, size_t n) {
   return s;
 }
 
-size_t P4_ReadEscapedRune(char* text, P4_Rune* rune) {
+size_t u8_next_escaped_char(char* text, ucs4_t* rune) {
     char ch0 = *text;
 
     if (ch0 == '\0') {
@@ -1278,7 +1458,7 @@ size_t P4_ReadEscapedRune(char* text, P4_Rune* rune) {
     }
 
     if (ch0 != '\\')
-        return P4_ReadRune(text, rune);
+        return u8_next_char(text, rune);
 
     char ch1 = text[1];
 
@@ -1347,180 +1527,6 @@ size_t P4_ReadRuneRange(char* text, P4_Slice* slice, size_t* count, P4_RuneRange
     return 0;
 }
 
-/**
- * @brief   Get rune in lower case.
- *
- * Modified from https://github.com/sheredom/utf8.h
- */
-P4_PRIVATE(P4_Rune)
-P4_GetRuneLower(P4_Rune cp) {
-    if (((0x0041 <= cp) && (0x005a >= cp)) ||
-        ((0x00c0 <= cp) && (0x00d6 >= cp)) ||
-        ((0x00d8 <= cp) && (0x00de >= cp)) ||
-        ((0x0391 <= cp) && (0x03a1 >= cp)) ||
-        ((0x03a3 <= cp) && (0x03ab >= cp)) ||
-        ((0x0410 <= cp) && (0x042f >= cp))) {
-        cp += 32;
-    } else if ((0x0400 <= cp) && (0x040f >= cp)) {
-        cp += 80;
-    } else if (((0x0100 <= cp) && (0x012f >= cp)) ||
-                ((0x0132 <= cp) && (0x0137 >= cp)) ||
-                ((0x014a <= cp) && (0x0177 >= cp)) ||
-                ((0x0182 <= cp) && (0x0185 >= cp)) ||
-                ((0x01a0 <= cp) && (0x01a5 >= cp)) ||
-                ((0x01de <= cp) && (0x01ef >= cp)) ||
-                ((0x01f8 <= cp) && (0x021f >= cp)) ||
-                ((0x0222 <= cp) && (0x0233 >= cp)) ||
-                ((0x0246 <= cp) && (0x024f >= cp)) ||
-                ((0x03d8 <= cp) && (0x03ef >= cp)) ||
-                ((0x0460 <= cp) && (0x0481 >= cp)) ||
-                ((0x048a <= cp) && (0x04ff >= cp))) {
-        cp |= 0x1;
-    } else if (((0x0139 <= cp) && (0x0148 >= cp)) ||
-                ((0x0179 <= cp) && (0x017e >= cp)) ||
-                ((0x01af <= cp) && (0x01b0 >= cp)) ||
-                ((0x01b3 <= cp) && (0x01b6 >= cp)) ||
-                ((0x01cd <= cp) && (0x01dc >= cp))) {
-        cp += 1;
-        cp &= ~0x1;
-    } else {
-        switch (cp) {
-            case 0x0178: cp = 0x00ff; break;
-            case 0x0243: cp = 0x0180; break;
-            case 0x018e: cp = 0x01dd; break;
-            case 0x023d: cp = 0x019a; break;
-            case 0x0220: cp = 0x019e; break;
-            case 0x01b7: cp = 0x0292; break;
-            case 0x01c4: cp = 0x01c6; break;
-            case 0x01c7: cp = 0x01c9; break;
-            case 0x01ca: cp = 0x01cc; break;
-            case 0x01f1: cp = 0x01f3; break;
-            case 0x01f7: cp = 0x01bf; break;
-            case 0x0187: cp = 0x0188; break;
-            case 0x018b: cp = 0x018c; break;
-            case 0x0191: cp = 0x0192; break;
-            case 0x0198: cp = 0x0199; break;
-            case 0x01a7: cp = 0x01a8; break;
-            case 0x01ac: cp = 0x01ad; break;
-            case 0x01af: cp = 0x01b0; break;
-            case 0x01b8: cp = 0x01b9; break;
-            case 0x01bc: cp = 0x01bd; break;
-            case 0x01f4: cp = 0x01f5; break;
-            case 0x023b: cp = 0x023c; break;
-            case 0x0241: cp = 0x0242; break;
-            case 0x03fd: cp = 0x037b; break;
-            case 0x03fe: cp = 0x037c; break;
-            case 0x03ff: cp = 0x037d; break;
-            case 0x037f: cp = 0x03f3; break;
-            case 0x0386: cp = 0x03ac; break;
-            case 0x0388: cp = 0x03ad; break;
-            case 0x0389: cp = 0x03ae; break;
-            case 0x038a: cp = 0x03af; break;
-            case 0x038c: cp = 0x03cc; break;
-            case 0x038e: cp = 0x03cd; break;
-            case 0x038f: cp = 0x03ce; break;
-            case 0x0370: cp = 0x0371; break;
-            case 0x0372: cp = 0x0373; break;
-            case 0x0376: cp = 0x0377; break;
-            case 0x03f4: cp = 0x03b8; break;
-            case 0x03cf: cp = 0x03d7; break;
-            case 0x03f9: cp = 0x03f2; break;
-            case 0x03f7: cp = 0x03f8; break;
-            case 0x03fa: cp = 0x03fb; break;
-            default: break;
-        }
-    }
-
-    return cp;
-}
-
-/**
- * @brief   Get rune in upper case.
- *
- * Modified from https://github.com/sheredom/utf8.h
- */
-P4_PRIVATE(P4_Rune)
-P4_GetRuneUpper(P4_Rune cp) {
-    if (((0x0061 <= cp) && (0x007a >= cp)) ||
-        ((0x00e0 <= cp) && (0x00f6 >= cp)) ||
-        ((0x00f8 <= cp) && (0x00fe >= cp)) ||
-        ((0x03b1 <= cp) && (0x03c1 >= cp)) ||
-        ((0x03c3 <= cp) && (0x03cb >= cp)) ||
-        ((0x0430 <= cp) && (0x044f >= cp))) {
-        cp -= 32;
-    } else if ((0x0450 <= cp) && (0x045f >= cp)) {
-        cp -= 80;
-    } else if (((0x0100 <= cp) && (0x012f >= cp)) ||
-                ((0x0132 <= cp) && (0x0137 >= cp)) ||
-                ((0x014a <= cp) && (0x0177 >= cp)) ||
-                ((0x0182 <= cp) && (0x0185 >= cp)) ||
-                ((0x01a0 <= cp) && (0x01a5 >= cp)) ||
-                ((0x01de <= cp) && (0x01ef >= cp)) ||
-                ((0x01f8 <= cp) && (0x021f >= cp)) ||
-                ((0x0222 <= cp) && (0x0233 >= cp)) ||
-                ((0x0246 <= cp) && (0x024f >= cp)) ||
-                ((0x03d8 <= cp) && (0x03ef >= cp)) ||
-                ((0x0460 <= cp) && (0x0481 >= cp)) ||
-                ((0x048a <= cp) && (0x04ff >= cp))) {
-        cp &= ~0x1;
-    } else if (((0x0139 <= cp) && (0x0148 >= cp)) ||
-                ((0x0179 <= cp) && (0x017e >= cp)) ||
-                ((0x01af <= cp) && (0x01b0 >= cp)) ||
-                ((0x01b3 <= cp) && (0x01b6 >= cp)) ||
-                ((0x01cd <= cp) && (0x01dc >= cp))) {
-        cp -= 1;
-        cp |= 0x1;
-    } else {
-        switch (cp) {
-            case 0x00ff: cp = 0x0178; break;
-            case 0x0180: cp = 0x0243; break;
-            case 0x01dd: cp = 0x018e; break;
-            case 0x019a: cp = 0x023d; break;
-            case 0x019e: cp = 0x0220; break;
-            case 0x0292: cp = 0x01b7; break;
-            case 0x01c6: cp = 0x01c4; break;
-            case 0x01c9: cp = 0x01c7; break;
-            case 0x01cc: cp = 0x01ca; break;
-            case 0x01f3: cp = 0x01f1; break;
-            case 0x01bf: cp = 0x01f7; break;
-            case 0x0188: cp = 0x0187; break;
-            case 0x018c: cp = 0x018b; break;
-            case 0x0192: cp = 0x0191; break;
-            case 0x0199: cp = 0x0198; break;
-            case 0x01a8: cp = 0x01a7; break;
-            case 0x01ad: cp = 0x01ac; break;
-            case 0x01b0: cp = 0x01af; break;
-            case 0x01b9: cp = 0x01b8; break;
-            case 0x01bd: cp = 0x01bc; break;
-            case 0x01f5: cp = 0x01f4; break;
-            case 0x023c: cp = 0x023b; break;
-            case 0x0242: cp = 0x0241; break;
-            case 0x037b: cp = 0x03fd; break;
-            case 0x037c: cp = 0x03fe; break;
-            case 0x037d: cp = 0x03ff; break;
-            case 0x03f3: cp = 0x037f; break;
-            case 0x03ac: cp = 0x0386; break;
-            case 0x03ad: cp = 0x0388; break;
-            case 0x03ae: cp = 0x0389; break;
-            case 0x03af: cp = 0x038a; break;
-            case 0x03cc: cp = 0x038c; break;
-            case 0x03cd: cp = 0x038e; break;
-            case 0x03ce: cp = 0x038f; break;
-            case 0x0371: cp = 0x0370; break;
-            case 0x0373: cp = 0x0372; break;
-            case 0x0377: cp = 0x0376; break;
-            case 0x03d1: cp = 0x0398; break;
-            case 0x03d7: cp = 0x03cf; break;
-            case 0x03f2: cp = 0x03f9; break;
-            case 0x03f8: cp = 0x03f7; break;
-            case 0x03fb: cp = 0x03fa; break;
-            default: break;
-        }
-    }
-
-    return cp;
-}
-
 /*
  * Compare case-insensitive string src1 v/s src2.
  *
@@ -1529,7 +1535,7 @@ P4_GetRuneUpper(P4_Rune cp) {
  */
 P4_PRIVATE(int)
 P4_CaseCmpInsensitive(const void* src1, const void* src2, size_t n) {
-    P4_Rune src1_lwr_cp, src2_lwr_cp, src1_upr_cp, src2_upr_cp, src1_orig_cp, src2_orig_cp;
+    ucs4_t src1_lwr_cp, src2_lwr_cp, src1_upr_cp, src2_upr_cp, src1_orig_cp, src2_orig_cp;
 
     do {
         const unsigned char *const s1 = (const unsigned char *)src1;
@@ -1539,36 +1545,36 @@ P4_CaseCmpInsensitive(const void* src1, const void* src2, size_t n) {
         if (0 == n) return 0;
 
         if ((1 == n) && ((0xc0 == (0xe0 & *s1)) || (0xc0 == (0xe0 & *s2)))) {
-            const P4_Rune c1 = (0xe0 & *s1);
-            const P4_Rune c2 = (0xe0 & *s2);
+            const ucs4_t c1 = (0xe0 & *s1);
+            const ucs4_t c2 = (0xe0 & *s2);
             if (c1 < c2) return c1 - c2;
             else return 0;
         }
 
         if ((2 >= n) && ((0xe0 == (0xf0 & *s1)) || (0xe0 == (0xf0 & *s2)))) {
-            const P4_Rune c1 = (0xf0 & *s1);
-            const P4_Rune c2 = (0xf0 & *s2);
+            const ucs4_t c1 = (0xf0 & *s1);
+            const ucs4_t c2 = (0xf0 & *s2);
 
             if (c1 < c2) return (int) c1 - (int) c2;
             else return 0;
         }
 
         if ((3 >= n) && ((0xf0 == (0xf8 & *s1)) || (0xf0 == (0xf8 & *s2)))) {
-            const P4_Rune c1 = (0xf8 & *s1);
-            const P4_Rune c2 = (0xf8 & *s2);
+            const ucs4_t c1 = (0xf8 & *s1);
+            const ucs4_t c2 = (0xf8 & *s2);
             if (c1 < c2) return (int) c1 - (int) c2;
             else return 0;
         }
 
-        src1 = src1 + P4_ReadRune((P4_String)src1, &src1_orig_cp);
-        src2 = src2 + P4_ReadRune((P4_String)src2, &src2_orig_cp);
-        n -= P4_GetRuneSize(src1_orig_cp);
+        src1 = src1 + u8_next_char((P4_String)src1, &src1_orig_cp);
+        src2 = src2 + u8_next_char((P4_String)src2, &src2_orig_cp);
+        n -= u8_bytes(src1_orig_cp);
 
-        src1_lwr_cp = P4_GetRuneLower(src1_orig_cp);
-        src2_lwr_cp = P4_GetRuneLower(src2_orig_cp);
+        src1_lwr_cp = uc_tolower(src1_orig_cp);
+        src2_lwr_cp = uc_tolower(src2_orig_cp);
 
-        src1_upr_cp = P4_GetRuneUpper(src1_orig_cp);
-        src2_upr_cp = P4_GetRuneUpper(src2_orig_cp);
+        src1_upr_cp = uc_toupper(src1_orig_cp);
+        src2_upr_cp = uc_toupper(src2_orig_cp);
 
         /* check if the lowered codepoints match */
         if ((0 == src1_orig_cp) && (0 == src2_orig_cp))
@@ -1757,9 +1763,9 @@ match_literal(P4_Source* s, P4_Expression* e) {
 
     mark_position(s, startpos);
 
-    P4_String str = P4_RemainingText(s);
-    P4_Rune rune[2] = {0};
-    P4_ReadRune(e->literal, rune);
+    P4_String str = remaining_text(s);
+    ucs4_t rune[2] = {0};
+    u8_next_char(e->literal, rune);
 
     if (is_end(s)) {
         P4_MatchRaisef(s, P4_MatchError, "expect %s (char '%s')",
@@ -1799,7 +1805,7 @@ P4_PRIVATE(P4_Node*)
 match_range(P4_Source* s, P4_Expression* e) {
     assert(no_error(s), "can't proceed due to a failed match");
 
-    P4_String str = P4_RemainingText(s);
+    P4_String str = remaining_text(s);
     if (is_end(s)) {
         P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
         return NULL;
@@ -1807,8 +1813,8 @@ match_range(P4_Source* s, P4_Expression* e) {
 
     mark_position(s, startpos);
 
-    uint32_t rune = 0x0;
-    size_t size = P4_ReadRune(str, &rune);
+    ucs4_t rune = 0x0;
+    size_t size = u8_next_char(str, &rune);
     size_t i = 0;
     bool found = false;
 
@@ -1837,6 +1843,51 @@ match_range(P4_Source* s, P4_Expression* e) {
     catch_oom(result = P4_CreateNode(s->content, startpos, endpos, e->name));
 
     return result;
+}
+
+P4_PRIVATE(P4_Node*)
+match_unicode_category(P4_Source* s, P4_Expression* e) {
+    assert(no_error(s), "can't proceed due to a failed match");
+
+# ifdef ENABLE_UNISTR
+    mark_position(s, startpos);
+
+    ucs4_t uc = 0x0;
+    size_t size = u8_next_char(remaining_text(s), &uc);
+
+    if (size == 0 ) {
+        P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
+        return NULL;
+    }
+
+    if (uc_property_is_valid(e->unicode_property)) {
+        if (!uc_is_property(uc, e->unicode_property)) {
+            P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
+            return NULL;
+        }
+    } else if (!uc_is_general_category(uc, e->unicode_category)) {
+        P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
+        return NULL;
+    }
+
+    P4_Position* endpos= &(P4_Position){ 0 };
+    P4_DiffPosition(s->content, startpos, size, endpos);
+    set_position(s, endpos);
+
+    if (need_lift(s, e))
+        return NULL;
+
+    P4_Node*  result = NULL;
+    catch_oom(result = P4_CreateNode(s->content, startpos, endpos, e->name));
+
+    return result;
+
+# else
+    P4_MatchRaisef(s, P4_MatchError, "expect %s (unicode category not supported)",
+            peek_rule_name(s));
+    return NULL;
+
+# endif
 }
 
 P4_PRIVATE(P4_Expression*)
@@ -2218,6 +2269,7 @@ match_expression(P4_Source* s, P4_Expression* e) {
     switch (e->kind) {
         case P4_Literal:       result = match_literal(s, e);   break;
         case P4_Range:         result = match_range(s, e);     break;
+        case P4_UnicodeCategory: result = match_unicode_category(s, e); break;
         case P4_Reference:     result = match_reference(s, e); break;
         case P4_Sequence:      result = match_sequence(s, e);  break;
         case P4_Choice:        result = match_choice(s, e);    break;
@@ -2420,7 +2472,7 @@ P4_CreateLiteral(const P4_String literal, bool sensitive) {
 }
 
 P4_PUBLIC P4_Expression*
-P4_CreateRange(P4_Rune lower, P4_Rune upper, size_t stride) {
+P4_CreateRange(ucs4_t lower, ucs4_t upper, size_t stride) {
     if (lower > upper || lower > 0x10ffff || upper > 0x10ffff || lower == 0 || upper == 0)
         return NULL;
 
@@ -2454,6 +2506,30 @@ P4_CreateRanges(size_t count, P4_RuneRange* ranges) {
 
     return expr;
 }
+
+# ifdef ENABLE_UNISTR
+P4_PUBLIC P4_Expression*
+P4_CreateUnicodeProperty(uc_property_t property) {
+    P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
+    expr->kind = P4_UnicodeCategory;
+    expr->flag = 0;
+    expr->name = NULL;
+    expr->unicode_property = property;
+    expr->unicode_category = (uc_general_category_t){0};
+    return expr;
+}
+
+P4_PUBLIC P4_Expression*
+P4_CreateUnicodeCategory(uc_general_category_t category) {
+    P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
+    expr->kind = P4_UnicodeCategory;
+    expr->flag = 0;
+    expr->name = NULL;
+    expr->unicode_property = (uc_property_t){0};
+    expr->unicode_category = category;
+    return expr;
+}
+# endif
 
 P4_PUBLIC P4_Expression*
 P4_CreateReference(P4_String reference) {
@@ -3004,14 +3080,6 @@ P4_DiffPosition(P4_String str, P4_Position* start, size_t offset, P4_Position* s
     stop->offset = stop_offset;
 }
 
-/*
- * Get the remaining text.
- */
-P4_PRIVATE(P4_String)
-P4_RemainingText(P4_Source* s) {
-    return s->content + s->pos;
-}
-
 P4_PUBLIC P4_Error
 P4_AddLiteral(P4_Grammar* grammar, P4_String name, const P4_String literal, bool sensitive) {
     P4_AddSomeGrammarRule(grammar, name, P4_CreateLiteral(literal, sensitive));
@@ -3019,7 +3087,7 @@ P4_AddLiteral(P4_Grammar* grammar, P4_String name, const P4_String literal, bool
 }
 
 P4_PUBLIC P4_Error
-P4_AddRange(P4_Grammar* grammar, P4_String name, P4_Rune lower, P4_Rune upper, size_t stride) {
+P4_AddRange(P4_Grammar* grammar, P4_String name, ucs4_t lower, ucs4_t upper, size_t stride) {
     P4_AddSomeGrammarRule(grammar, name, P4_CreateRange(lower, upper, stride));
     return P4_Ok;
 }
@@ -3621,27 +3689,16 @@ P4_Grammar* P4_CreatePegGrammar () {
         ),
         P4_CreateLiteral("]", true)
     ));
-    catch_err(P4_AddChoiceWithMembers(grammar, "range_category", 19,
-        P4_CreateLiteral("Cc", true),
-        P4_CreateLiteral("Cf", true),
-        P4_CreateLiteral("Co", true),
-        P4_CreateLiteral("Cs", true),
-        P4_CreateLiteral("C", true),
-        P4_CreateLiteral("Ll", true),
-        P4_CreateLiteral("Lm", true),
-        P4_CreateLiteral("Lo", true),
-        P4_CreateLiteral("Lt", true),
-        P4_CreateLiteral("Lu", true),
-        P4_CreateLiteral("L", true),
-        P4_CreateLiteral("Nl", true),
-        P4_CreateLiteral("Nd", true),
-        P4_CreateLiteral("No", true),
-        P4_CreateLiteral("N", true),
-        P4_CreateLiteral("Zl", true),
-        P4_CreateLiteral("Zp", true),
-        P4_CreateLiteral("Zs", true),
-        P4_CreateLiteral("Z", true)
+    catch_err(P4_AddOnceOrMore(grammar, "range_category",
+        P4_CreateChoiceWithMembers(5,
+            P4_CreateRange('a', 'z', 1),
+            P4_CreateRange('A', 'Z', 1),
+            P4_CreateRange('0', '9', 1),
+            P4_CreateLiteral("_", true),
+            P4_CreateLiteral(" ", true)
+        )
     ));
+    catch_err(P4_SetGrammarRuleFlag(grammar, "range_category", P4_FLAG_SQUASHED | P4_FLAG_TIGHT));
 
     catch_err(P4_AddSequenceWithMembers(grammar, "reference", 2,
         P4_CreateChoiceWithMembers(3,
@@ -3896,8 +3953,8 @@ P4_PegEvalNumber(P4_Node* node, size_t* num) {
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalChar(P4_Node* node, P4_Rune* rune) {
-    size_t size = P4_ReadEscapedRune(node->text+node->slice.start.pos, rune);
+P4_PegEvalChar(P4_Node* node, ucs4_t* rune) {
+    size_t size = u8_next_escaped_char(node->text+node->slice.start.pos, rune);
 
     if (size == 0)
         return P4_ValueError;
@@ -3914,7 +3971,7 @@ P4_PegEvalLiteral(P4_Node* node, P4_Result* result) {
                    size = 0,
                    idx  = 0;
     P4_Error       err  = P4_Ok;
-    P4_Rune        rune = 0;
+    ucs4_t         rune = 0;
     P4_String      lit  = NULL,
                    cur  = NULL;
     P4_Expression* expr = NULL;
@@ -3929,7 +3986,7 @@ P4_PegEvalLiteral(P4_Node* node, P4_Result* result) {
     catch_oom(cur = lit = P4_MALLOC((len+1) * sizeof(char)));
 
     for (i = node->slice.start.pos+1, idx = 0; i < node->slice.stop.pos-1; i += size) {
-        size = P4_ReadEscapedRune(node->text+i, &rune);
+        size = u8_next_escaped_char(node->text+i, &rune);
 
         if ((rune > 0x10ffff) ||
                 (rune == 0) ||
@@ -3940,7 +3997,7 @@ P4_PegEvalLiteral(P4_Node* node, P4_Result* result) {
                 idx, NODE_ERROR_HINT));
         }
 
-        cur = P4_ConcatRune(cur, rune, size);
+        cur = u8_append_char(cur, rune, size);
         idx++;
     }
     *cur = '\0';
@@ -3976,22 +4033,55 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
+P4_PegEvalUnicodeCategory(P4_Node* node, P4_Result* result) {
+    P4_Error       err  = P4_Ok;
+    P4_Expression* expr = NULL;
+
+# ifdef ENABLE_UNISTR
+    autofree char* name = NULL;
+    catch_oom(name = P4_CopyNodeString(node->head));
+
+    uc_property_t property = uc_property_byname(name);
+    if (uc_property_is_valid(property)) {
+        catch_oom(expr = P4_CreateUnicodeProperty(property));
+    } else {
+        uc_general_category_t category = uc_general_category_byname(name);
+        if (uc_general_category_name(category) == NULL) {
+            catch_err(P4_PegError, P4_EvalRaisef(result,
+                "invalid range category. " NODE_ERROR_HINT_FMT, NODE_ERROR_HINT));
+        } else {
+            catch_oom(expr = P4_CreateUnicodeCategory(category));
+        }
+    }
+
+# else
+    P4_RuneRange* ranges = NULL;
+    size_t count = 0;
+
+    if (P4_ReadRuneRange(node->head->text, &node->head->slice, &count, &ranges) == 0) {
+        catch_err(P4_PegError, P4_EvalRaisef(result,
+            "invalid range category. " NODE_ERROR_HINT_FMT, NODE_ERROR_HINT));
+    }
+
+    catch_oom(expr = P4_CreateRanges(count, ranges));
+# endif
+
+    result->expr = expr;
+    return P4_Ok;
+
+finalize:
+    return err;
+}
+
+P4_PRIVATE(P4_Error)
 P4_PegEvalRange(P4_Node* node, P4_Result* result) {
     P4_Error       err  = P4_Ok;
     P4_Expression* expr = NULL;
 
     if (node->head == node->tail) { /* one single child - [\\p{XX}] */
-        P4_RuneRange* ranges = NULL;
-        size_t count = 0;
-
-        if (P4_ReadRuneRange(node->head->text, &node->head->slice, &count, &ranges) == 0)
-            panicf("ValueError: failed to read code point from source. "
-                NODE_ERROR_HINT_FMT, NODE_ERROR_HINT);
-
-        catch_oom(expr = P4_CreateRanges(count, ranges));
-
+        return P4_PegEvalUnicodeCategory(node, result);
     } else { /* two to three children - [lower-upper] or [lower-upper..stride] */
-        P4_Rune lower = 0, upper = 0;
+        ucs4_t lower = 0, upper = 0;
         size_t stride = 1;
 
         P4_Node* lower_node = node->head;

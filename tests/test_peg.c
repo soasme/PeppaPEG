@@ -116,7 +116,6 @@ void test_range(void) {
 
     ASSERT_PEG_PARSE("range", "[]", P4_CutError, "line 1:2, expect range")
     ASSERT_PEG_PARSE("range", "[\"a\"]", P4_CutError, "line 1:2, expect range")
-    ASSERT_PEG_PARSE("range", "[\\p{__}]", P4_CutError, "line 1:5, expect range_category")
     ASSERT_PEG_PARSE("range", "[\\p{C}]", P4_Ok, "\
 [{\"slice\":[0,7],\"type\":\"range\",\"children\":[\
 {\"slice\":[4,5],\"type\":\"range_category\"}]}]");
@@ -132,6 +131,11 @@ void test_range(void) {
     ASSERT_PEG_PARSE("range", "[\\p{Cc}]", P4_Ok, "\
 [{\"slice\":[0,8],\"type\":\"range\",\"children\":[\
 {\"slice\":[4,6],\"type\":\"range_category\"}]}]");
+# ifdef ENABLE_UNISTR
+    ASSERT_PEG_PARSE("range", "[\\p{White space}]", P4_Ok, "\
+[{\"slice\":[0,17],\"type\":\"range\",\"children\":[\
+{\"slice\":[4,15],\"type\":\"range_category\"}]}]");
+# endif
 }
 
 void test_reference(void) {
@@ -376,6 +380,13 @@ void test_eval_range(void) {
     ASSERT_EVAL_GRAMMAR("R1 = [\\p{N}];", "R1", "０", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [\\p{N}];", "R1", "Ⅵ", P4_Ok, "[{\"slice\":[0,3],\"type\":\"R1\"}]");
     ASSERT_EVAL_GRAMMAR("R1 = [\\p{N}];", "R1", "¼", P4_Ok, "[{\"slice\":[0,2],\"type\":\"R1\"}]");
+# ifdef ENABLE_UNISTR
+    ASSERT_EVAL_GRAMMAR("R1 = [\\p{White space}];", "R1", " ", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = [\\p{Id_Start}];", "R1", "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = [\\p{Id_Start}];", "R1", "1", P4_MatchError, "line 1:1, expect R1");
+    ASSERT_EVAL_GRAMMAR("R1 = [\\p{ID_Continue}];", "R1", "a", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+    ASSERT_EVAL_GRAMMAR("R1 = [\\p{ID_Continue}];", "R1", "1", P4_Ok, "[{\"slice\":[0,1],\"type\":\"R1\"}]");
+# endif
 }
 
 void test_eval_sequence(void) {
@@ -1196,6 +1207,10 @@ void test_eval_bad_grammar_range(void) {
         "PegError: range lower 0x1, upper 0x110000 must be less than 0x10ffff. char 5-24: [\\u0001-\\U00110000]."
     );
 
+    ASSERT_BAD_GRAMMAR(
+        "R1 = [\\p{This is a bad category}];",
+        "PegError: invalid range category. char 5-33: [\\p{This is a bad category}]."
+    );
 }
 
 void test_eval_bad_grammar_repeat(void) {

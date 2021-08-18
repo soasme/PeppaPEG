@@ -16,7 +16,7 @@ Let's create a new file "json.h" and define some enums as RuleIDs.
 
 .. code-block:: c
 
-   #include "peppapeg.h"
+   #include "peppa.h"
 
 .. literalinclude:: ../examples/json.h
    :lines: 42-61
@@ -54,6 +54,6 @@ Run:
 
 .. code-block:: console
 
-   $ gcc ../examples/parse_json.c ../peppapeg.c
+   $ gcc ../examples/parse_json.c ../peppa.c
    $ ./a.out
    [{"slice":[0,39],"type":"array","children":[{"slice":[1,2],"type":"number"},{"slice":[3,6],"type":"number"},{"slice":[7,10],"type":"number"},{"slice":[11,15],"type":"true"},{"slice":[16,21],"type":"false"},{"slice":[22,26],"type":"null"},{"slice":[27,32],"type":"string"},{"slice":[33,35],"type":"object"},{"slice":[36,38],"type":"array"}]}]

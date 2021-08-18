@@ -1,0 +1,9 @@
+libdir=@CMAKE_INSTALL_FULL_LIBDIR@
+includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
+
+Name: libpeppa
+Version: @PROJECT_VERSION@
+Description: Ultra lightweight PEG parser in ANSI C
+URL: https://soasme.com/PeppaPEG/
+Libs: -L${libdir} -lpeppa
+Cflags: -I${includedir}/peppa

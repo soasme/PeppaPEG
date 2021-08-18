@@ -68,6 +68,7 @@ jobs:
     - name: Build Check
       shell: bash
       working-directory: ${{github.workspace}}/build
-      env:
-        ASAN_OPTIONS: "detect_leaks=1"
-      run: cmake --build . --target check
+      run: |
+        make
+        sudo make install
+        ASAN_OPTIONS="detect_leaks=1" make check

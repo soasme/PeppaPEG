@@ -1,22 +1,22 @@
 All APIs & References
 ======================
 
-.. doxygenfile:: peppapeg.h
+.. doxygenfile:: peppa.h
    :sections: detaileddescription
 
 DEFINES
 -------
-.. doxygenfile:: peppapeg.h
+.. doxygenfile:: peppa.h
    :sections: define
 
 ENUMS
 ---------
-.. doxygenfile:: peppapeg.h
+.. doxygenfile:: peppa.h
    :sections: enum
 
 TYPEDEFS
 -------
-.. doxygenfile:: peppapeg.h
+.. doxygenfile:: peppa.h
    :sections: typedef
 
 STRUCTS
@@ -33,5 +33,5 @@ STRUCTS
 
 FUNCTIONS
 ---------
-.. doxygenfile:: peppapeg.h
+.. doxygenfile:: peppa.h
    :sections: func

@@ -1,12 +1,18 @@
 cmake_minimum_required(VERSION 3.9)
 
-project(peppapeg C)
+project(peppa C)
+
+set(PROJECT_VERSION_MAJOR 1)
+set(PROJECT_VERSION_MINOR 14)
+set(PROJECT_VERSION_PATCH 0)
+set(P4_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
+
 
 include(GNUInstallDirs)
 
-set(P4_LIB peppapeg)
-set(P4_HEADERS peppapeg.h)
-set(P4_SOURCES peppapeg.c)
+set(P4_LIB peppa)
+set(P4_HEADERS peppa.h)
+set(P4_SOURCES peppa.c)
 add_library("${P4_LIB}" SHARED "${P4_HEADERS}" "${P4_SOURCES}")
 
 target_compile_options("${P4_LIB}" PRIVATE "-ansi")
@@ -53,6 +59,28 @@ endif()
 foreach(compiler_flag ${custom_compiler_flags})
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${compiler_flag}")
 endforeach()
+
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/configs/libpeppa.pc.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/libpeppa.pc"
+    @ONLY
+)
+install(
+    FILES peppa.h
+    DESTINATION "${CMAKE_INSTALL_FULL_INCLUDEDIR}"
+)
+install(
+    FILES "${CMAKE_CURRENT_BINARY_DIR}/libpeppa.pc"
+    DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}/pkgconfig"
+)
+install(
+    TARGETS "${P4_LIB}"
+    EXPORT "${P4_LIB}"
+    ARCHIVE DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}"
+    LIBRARY DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}"
+    RUNTIME DESTINATION "${CMAKE_INSTALL_FULL_BINDIR}"
+    INCLUDES DESTINATION "${CMAKE_INSTALL_FULL_INCLUDEDIR}"
+)
 
 add_subdirectory(tests)
 add_subdirectory(docs)

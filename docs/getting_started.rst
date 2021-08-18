@@ -6,13 +6,13 @@ Getting Started
 Header File and Source File
 --------------------------------
 
-Peppa PEG has a header file and a C file, so you can add it to your project by copying files `peppapeg.h` and `peppapeg.c`.
+Peppa PEG has a header file and a C file, so you can add it to your project by copying files `peppa.h` and `peppa.c`.
 
 Peppa PEG assumes your project is ANSI C (C89, or C90) compatible.
 
 Once copied, add include macro and start using the library::
 
-    #include "peppapeg.h"
+    #include "peppa.h"
 
 Data Structures
 ---------------
@@ -101,7 +101,7 @@ The output of the example looks like:
 
 .. code-block::
 
-    $ gcc -o example ../example.c ../peppapeg.c
+    $ gcc -o example ../example.c ../peppa.c
     $ ./example
     root span: [0 11]
     root start: line=1 offset=1

@@ -13,6 +13,13 @@ Assume you have cmake and gcc installed.
     $ cmake ..
     $ make
 
+More Cmake options include:
+
+* `-DENABLE_UNISTR=On`: Enable building with libunistring.
+* `-DENABLE_ADDRESS_SANITIZER=On`: Enable building with Clang AddressSanitizer.
+* `-DENABLE_MEMORY_SANITIZER=On`: Enable building with Clang MemorySanitizer.
+* `-DENABLE_DEBUG=On`: Enable building with CC -g (debug) option.
+
 Development
 ------------
 

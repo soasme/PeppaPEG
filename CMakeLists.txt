@@ -22,8 +22,8 @@ if (ENABLE_UNISTR)
     target_link_libraries("${P4_LIB}" PUBLIC "${UNISTRING_LIB}")
 endif()
 
-option(ENABLE_TEST "Enables AddressSanitizer and UndefinedBehaviorSanitizer." OFF)
-if (ENABLE_TEST)
+option(ENABLE_DEBUG "Enables CC -g." OFF)
+if (ENABLE_DEBUG)
     target_compile_options("${P4_LIB}" PRIVATE "-g")
 endif()
 

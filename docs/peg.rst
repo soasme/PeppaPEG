@@ -117,6 +117,7 @@ In this example, only odd number between `'0'` to `'9'` can match.
 
 Range also supports certain unicode character sets,  such as `C`, `Cc`, `Cf`, `Co`, `Cs`,
 `Ll`, `Lm`, `Lo`, `Lt`, `Lu`, `L`, `Nd`, `Nl`, `No`, `N`, etc.
+When the library is built with `-DENABLE_UNISTR=On`, it can support even more unicode general categories and unicode properties, such as `Id_Start`, `Id_Continue`, `Other_Id_Start`, `Other_Id_Continue`, `White space`, etc.
 They're wrapped via `\\p{}`, for example:
 
 * unicode_letter: a Unicode code point classified as "Letter" (Ll+Lm+Lo+Lt+Lu).
@@ -126,6 +127,7 @@ They're wrapped via `\\p{}`, for example:
 
     unicode_letter = [\p{L}];
     unicode_digit  = [\p{Nd}];
+
 
 Dot
 ---

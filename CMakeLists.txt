@@ -67,7 +67,7 @@ configure_file(
 )
 install(
     FILES peppa.h
-    DESTINATION "${CMAKE_INSTALL_FULL_INCLUDEDIR}/peppa"
+    DESTINATION "${CMAKE_INSTALL_FULL_INCLUDEDIR}"
 )
 install(
     FILES "${CMAKE_CURRENT_BINARY_DIR}/libpeppa.pc"

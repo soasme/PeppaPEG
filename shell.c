@@ -52,30 +52,49 @@ static void version(const char* name) {
 }
 
 static void usage(const char* name) {
-    version(name);
     printf("usage: %s [OPTION]... [FILE]...\n", name);
     printf(
         "OPTION:\n"
         "  -h\tprint help information\n"
         "  -V\tprint version\n"
+        "  -g\trequired, path to peg grammar file\n"
     );
 }
 
 int main(int argc, char* argv[]) {
     int c;
+    FILE* grammar_file = NULL;
+    char* grammar_content = NULL;
+
     while (read_arg(argc, argv, "Vhg:", c)) {
         switch (c) {
             case 'V':
                 version(basename(argv[0]));
                 exit(0);
             case 'h':
+                version(basename(argv[0]));
                 usage(basename(argv[0]));
                 exit(0);
+            case 'g':
+                if (!(grammar_file = fopen(optarg, "r"))) {
+                    perror(optarg);
+                    exit(1);
+                }
+                break;
             default:
                 fprintf(stderr, "for usage try: %s -h\n", argv[0]);
                 exit(1);
         }
     }
+
+    if (grammar_file == NULL) {
+        fprintf(stderr, "error: option -g is required\n");
+        usage(basename(argv[0]));
+        exit(1);
+    }
+
+    fclose(grammar_file);
+
     return 0;
 }
 

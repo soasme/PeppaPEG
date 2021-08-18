@@ -25,18 +25,48 @@ References: [GitHub](https://github.com/soasme/PeppaPEG)
 
 # Usage
 
+## Install Peppa PEG
+
+Assume your system has `cmake` installed, run
+
+```
+$ cd PeppaPEG/
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make
+$ make install
+```
+
+Once installed, add include macro and start using the library!
+
+```c
+#include <peppa.h>
+```
+
+You can use pkg-config to link the library:
+
+```c
+$ gcc `pkg-config --cflags --libs libpeppa` example.c
+```
+
 ## Copy `peppa.h` / `peppa.c`
 
-Peppa PEG has a header file and a C file, so you can add
+Peppa PEG has a header file and a C file, so alternatively you can add
 it to your project by copying files "peppa.h" and "peppa.c".
-
-Peppa PEG assumes your project is ANSI C (C89, or C90) compatible.
 
 Once copied, add include macro and start using the library!
 
-```
+```c
 #include "peppa.h"
 ```
+
+You can manually load the library source:
+
+```bash
+$ gcc example.c peppa.c
+```
+
 
 ## Load Grammar
 

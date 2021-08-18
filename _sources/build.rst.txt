@@ -4,7 +4,7 @@ Build
 Build Peppa PEG
 ---------------
 
-Assume you have cmake and gcc installed.
+Assume you have cmake and gcc/clang installed.
 
 .. code-block:: console
 
@@ -18,7 +18,10 @@ More Cmake options include:
 * `-DENABLE_UNISTR=On`: Enable building with libunistring.
 * `-DENABLE_ADDRESS_SANITIZER=On`: Enable building with Clang AddressSanitizer.
 * `-DENABLE_MEMORY_SANITIZER=On`: Enable building with Clang MemorySanitizer.
+* `-DENABLE_CHECK=On`: Enable building and running checks.
+* `-DENABLE_DOCS=On`: Enable building documentations.
 * `-DENABLE_DEBUG=On`: Enable building with CC -g (debug) option.
+* `-DENABLE_CLI=On`: Enable building command-line interface (utility peppa).
 
 Development
 ------------
@@ -46,22 +49,18 @@ If you have Valgrind installed, you can enable `ENABLE_VALGRIND`.
     # cd build
     # cmake -DENABLE_VALGRIND=On ..
 
-If you have doxygen and Python3 installed, you can enable `ENABLE_DOCS`.
-
-.. code-block:: console
-
-    # cmake -DENABLE_DOCS=On ..
-
 To build test,
 
 .. code-block:: console
 
+    # cmake -DENABLE_CHECK=On ..
     # cmake --build . --target check
 
 To build docs,
 
 .. code-block:: console
 
+    # cmake -DENABLE_DOCS=On ..
     $ cmake --build . --target docs
 
 GitHub Actions

@@ -201,7 +201,7 @@
 <h1>Build<a class="headerlink" href="#build" title="Permalink to this headline">¶</a></h1>
 <section id="build-peppa-peg">
 <h2>Build Peppa PEG<a class="headerlink" href="#build-peppa-peg" title="Permalink to this headline">¶</a></h2>
-<p>Assume you have cmake and gcc installed.</p>
+<p>Assume you have cmake and gcc/clang installed.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>cmake -E make_directory ./build
 <span class="gp">$ </span><span class="nb">cd</span> build
 <span class="gp">$ </span>cmake ..
@@ -213,7 +213,10 @@
 <li><p><cite>-DENABLE_UNISTR=On</cite>: Enable building with libunistring.</p></li>
 <li><p><cite>-DENABLE_ADDRESS_SANITIZER=On</cite>: Enable building with Clang AddressSanitizer.</p></li>
 <li><p><cite>-DENABLE_MEMORY_SANITIZER=On</cite>: Enable building with Clang MemorySanitizer.</p></li>
+<li><p><cite>-DENABLE_CHECK=On</cite>: Enable building and running checks.</p></li>
+<li><p><cite>-DENABLE_DOCS=On</cite>: Enable building documentations.</p></li>
 <li><p><cite>-DENABLE_DEBUG=On</cite>: Enable building with CC -g (debug) option.</p></li>
+<li><p><cite>-DENABLE_CLI=On</cite>: Enable building command-line interface (utility peppa).</p></li>
 </ul>
 </section>
 <section id="development">
@@ -235,16 +238,14 @@
 <span class="gp"># </span>cmake -DENABLE_VALGRIND<span class="o">=</span>On ..
 </pre></div>
 </div>
-<p>If you have doxygen and Python3 installed, you can enable <cite>ENABLE_DOCS</cite>.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>cmake -DENABLE_DOCS<span class="o">=</span>On ..
-</pre></div>
-</div>
 <p>To build test,</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>cmake --build . --target check
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>cmake -DENABLE_CHECK<span class="o">=</span>On ..
+<span class="gp"># </span>cmake --build . --target check
 </pre></div>
 </div>
 <p>To build docs,</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>cmake --build . --target docs
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>cmake -DENABLE_DOCS<span class="o">=</span>On ..
+<span class="gp">$ </span>cmake --build . --target docs
 </pre></div>
 </div>
 </section>

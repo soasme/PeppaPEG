@@ -37,9 +37,13 @@ jobs:
       with:
         submodules: true
 
-    - name: Install Dependencies
-      run: sudo apt-get install -y valgrind
+    - name: Install Dependencies (Linux)
+      run: sudo apt-get install -y valgrind libunistring-dev
       if: "contains( matrix.os, 'ubuntu')"
+
+    - name: Install Dependencies (MacOS)
+      run: brew install libunistring
+      if: "contains( matrix.os, 'macos')"
 
     - name: Create Build Environment
       run: |

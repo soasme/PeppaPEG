@@ -30,6 +30,8 @@
 #include <stdarg.h>
 #include <inttypes.h>
 
+#include "peppapeg.h"
+
 /** Start of unicode utility functions. */
 
 # ifdef ENABLE_UNISTR
@@ -531,8 +533,6 @@ typedef const char *kh_cstr_t;
 #endif /* __AC_KHASH_H */
 
 /** End of khash.h */
-
-#include "peppapeg.h"
 
 KHASH_MAP_INIT_STR(rules, P4_Expression*)
 

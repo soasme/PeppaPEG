@@ -5,11 +5,11 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="All APIs &amp; References" href="api.html" /><link rel="prev" title="PEG APIs" href="peg.html" />
 
-    <meta name="generator" content="sphinx-4.1.2, furo 2021.08.11.beta42"/>
+    <meta name="generator" content="sphinx-4.1.2, furo 2021.08.17.beta43"/>
         <title>Low Level APIs - Peppa PEG 1.14.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=197f00461d56902ea7ca048ec6e6ba026f62c97b" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=93475b62d1c3bc01323a0eefdc14a62d77b12690" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=910ac4ccc9d7c023151c34010d7b500fb9777a51" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
     
     
 
@@ -204,24 +204,24 @@
 <section id="literal">
 <h3>Literal<a class="headerlink" href="#literal" title="Permalink to this headline">¶</a></h3>
 <p>Literal <strong>matches an exact string</strong>.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello world"</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello world"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Literal can be case insensitive for ASCII characters, if the option sensitive is false.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"HELLO WORLD"</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"HELLO WORLD"</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Literal can be in UTF-8 format.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"你好, 世界"</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"你好, 世界"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Literal can include emoji characters.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Peppa 🐷"</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Peppa 🐷"</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Literal cannot be an empty string.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="c1">// WRONG!</span>
-<span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">""</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
+<span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">""</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -233,31 +233,31 @@
 <section id="range">
 <h3>Range<a class="headerlink" href="#range" title="Permalink to this headline">¶</a></h3>
 <p>Range <strong>matches a single character in range</strong>.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRange</span><span class="p">(</span><span class="sc">'0'</span><span class="p">,</span> <span class="sc">'9'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateRange</span><span class="p">(</span><span class="sc">'0'</span><span class="p">,</span><span class="w"> </span><span class="sc">'9'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>The lower and upper character of range can be ASCII characters or UTF-8 runes.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRange</span><span class="p">(</span><span class="mh">0x4E00</span><span class="p">,</span> <span class="mh">0x9FFF</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateRange</span><span class="p">(</span><span class="mh">0x4E00</span><span class="p">,</span><span class="w"> </span><span class="mh">0x9FFF</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Range can be used to match anything (0, or ‘0’, or EOF is used for terminating a string in C):</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mh">0x10ffff</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateRange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mh">0x10ffff</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>The stride parameter allows larger steps when iterating characters in range.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="c1">// Only match 1, 3, 5, 7, 9.</span>
-<span class="n">P4_Expression</span><span class="o">*</span> <span class="n">odd</span> <span class="o">=</span> <span class="n">P4_CreateRange</span><span class="p">(</span><span class="sc">'1'</span><span class="p">,</span> <span class="sc">'9'</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+<span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">odd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateRange</span><span class="p">(</span><span class="sc">'1'</span><span class="p">,</span><span class="w"> </span><span class="sc">'9'</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>The value of lower must be less than the upper.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="c1">// WRONG!</span>
-<span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRange</span><span class="p">(</span><span class="sc">'z'</span><span class="p">,</span> <span class="sc">'a'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateRange</span><span class="p">(</span><span class="sc">'z'</span><span class="p">,</span><span class="w"> </span><span class="sc">'a'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Range can be an aggregation of several sub-ranges. The below example is
 equivalent to a choice of 3 ranges.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_RuneRange</span> <span class="n">alphadigits</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{{</span><span class="sc">'a'</span><span class="p">,</span> <span class="sc">'z'</span><span class="p">,</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="sc">'A'</span><span class="p">,</span> <span class="sc">'Z'</span><span class="p">,</span> <span class="mi">1</span><span class="p">},</span> <span class="p">{</span><span class="sc">'0'</span><span class="p">,</span> <span class="sc">'9'</span><span class="p">,</span> <span class="mi">1</span><span class="p">}};</span>
-<span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRanges</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">alphadigits</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_RuneRange</span><span class="w"> </span><span class="n">alphadigits</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{{</span><span class="sc">'a'</span><span class="p">,</span><span class="w"> </span><span class="sc">'z'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="sc">'A'</span><span class="p">,</span><span class="w"> </span><span class="sc">'Z'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">},</span><span class="w"> </span><span class="p">{</span><span class="sc">'0'</span><span class="p">,</span><span class="w"> </span><span class="sc">'9'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">}};</span><span class="w"></span>
+<span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateRanges</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">alphadigits</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -270,11 +270,11 @@ equivalent to a choice of 3 ranges.</p>
 <section id="sequence">
 <h3>Sequence<a class="headerlink" href="#sequence" title="Permalink to this headline">¶</a></h3>
 <p>Sequence <strong>matches a sequence of sub-expressions in order</strong>.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>
-    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
-    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">","</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
-    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"World"</span><span class="p">,</span> <span class="nb">false</span><span class="p">)</span>
-<span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">","</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"World"</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">)</span><span class="w"></span>
+<span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>When parsing, the first sequence member is attempted. If succeeds, the second is attempted, so on and on.
@@ -293,15 +293,15 @@ Sequence: failure!
 </pre></div>
 </div>
 <p>The members can be set after the Sequence is created:</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequence</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateSequence</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span><span class="w"></span>
 
-<span class="k">if</span> <span class="p">(</span><span class="n">expr</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">goto</span> <span class="n">oom</span><span class="p">;</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">expr</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="k">goto</span><span class="w"> </span><span class="n">oom</span><span class="p">;</span><span class="w"></span>
 
-<span class="k">if</span> <span class="p">(</span><span class="n">P4_SetMember</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span> <span class="nb">true</span><span class="p">))</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="k">goto</span> <span class="n">oom</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">P4_SetMember</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">","</span><span class="p">,</span> <span class="nb">true</span><span class="p">))</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="k">goto</span> <span class="n">oom</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">P4_SetMember</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"World"</span><span class="p">,</span> <span class="nb">false</span><span class="p">))</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="k">goto</span> <span class="n">oom</span><span class="p">;</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">P4_SetMember</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">))</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">P4_Ok</span><span class="p">)</span><span class="w"> </span><span class="k">goto</span><span class="w"> </span><span class="n">oom</span><span class="p">;</span><span class="w"></span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">P4_SetMember</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">","</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">))</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">P4_Ok</span><span class="p">)</span><span class="w"> </span><span class="k">goto</span><span class="w"> </span><span class="n">oom</span><span class="p">;</span><span class="w"></span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">P4_SetMember</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"World"</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">))</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">P4_Ok</span><span class="p">)</span><span class="w"> </span><span class="k">goto</span><span class="w"> </span><span class="n">oom</span><span class="p">;</span><span class="w"></span>
 
-<span class="nl">oom</span><span class="p">:</span> <span class="n">P4_DeleteExpression</span><span class="p">(</span><span class="n">expr</span><span class="p">);</span>
+<span class="nl">oom</span><span class="p">:</span><span class="w"> </span><span class="n">P4_DeleteExpression</span><span class="p">(</span><span class="n">expr</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -313,37 +313,37 @@ Sequence: failure!
 <section id="backreference">
 <h3>BackReference<a class="headerlink" href="#backreference" title="Permalink to this headline">¶</a></h3>
 <p>BackReference <strong>matches an exact string previously matched in a Sequence</strong>. BackReference can and only can be used as a Sequence member. For example, the below snippet matches “a:a”, but not “a:A” or “a:b”.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>
-    <span class="n">P4_CreateRange</span><span class="p">(</span><span class="sc">'a'</span><span class="p">,</span> <span class="sc">'z'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">":"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
-    <span class="n">P4_CreateBackReference</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">true</span><span class="p">)</span>
-<span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateRange</span><span class="p">(</span><span class="sc">'a'</span><span class="p">,</span><span class="w"> </span><span class="sc">'z'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">":"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateBackReference</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">)</span><span class="w"></span>
+<span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>The BackReference can be case insensitive, regardless whether the original match was case sensitive. For example, the below snippet matches “a:a” and “a:A”.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>
-    <span class="n">P4_CreateRange</span><span class="p">(</span><span class="sc">'a'</span><span class="p">,</span> <span class="sc">'z'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">":"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
-    <span class="n">P4_CreateBackReference</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">false</span><span class="p">)</span>
-<span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateRange</span><span class="p">(</span><span class="sc">'a'</span><span class="p">,</span><span class="w"> </span><span class="sc">'z'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">":"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateBackReference</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">)</span><span class="w"></span>
+<span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>The index value of a BackReference must be less than the total number of members in a Sequence.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="c1">// WRONG!</span>
-<span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>
-    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
-    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">":"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
-    <span class="n">P4_CreateBackReference</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="nb">true</span><span class="p">)</span>
-<span class="p">);</span>
+<span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">":"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateBackReference</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">)</span><span class="w"></span>
+<span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>The index value of a BackReference must not be the index of itself.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="c1">// WRONG!</span>
-<span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>
-    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
-    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">":"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
-    <span class="n">P4_CreateBackReference</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">true</span><span class="p">)</span>
-<span class="p">);</span>
+<span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">":"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateBackReference</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">)</span><span class="w"></span>
+<span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -355,11 +355,11 @@ Sequence: failure!
 <section id="choice">
 <h3>Choice<a class="headerlink" href="#choice" title="Permalink to this headline">¶</a></h3>
 <p>Choice <strong>matches one of the sub-expression.</strong></p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateChoiceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>
-    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
-    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Kia Ora"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
-    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"你好"</span><span class="p">,</span> <span class="nb">false</span><span class="p">)</span>
-<span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateChoiceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Kia Ora"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"你好"</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">)</span><span class="w"></span>
+<span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>When parsing, the first sequence member is attempted. If fails, the second is attempted, so on and on.
@@ -378,15 +378,15 @@ Choice: failure!
 </pre></div>
 </div>
 <p>Similar to Sequence, the members can be set after the Choice is created.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateChoice</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateChoice</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span><span class="w"></span>
 
-<span class="k">if</span> <span class="p">(</span><span class="n">expr</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span> <span class="k">goto</span> <span class="n">oom</span><span class="p">;</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">expr</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="k">goto</span><span class="w"> </span><span class="n">oom</span><span class="p">;</span><span class="w"></span>
 
-<span class="k">if</span> <span class="p">(</span><span class="n">P4_SetMember</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span> <span class="nb">true</span><span class="p">))</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="k">goto</span> <span class="n">oom</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">P4_SetMember</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Kia Ora"</span><span class="p">,</span> <span class="nb">true</span><span class="p">))</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="k">goto</span> <span class="n">oom</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">P4_SetMember</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"你好"</span><span class="p">,</span> <span class="nb">true</span><span class="p">))</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="k">goto</span> <span class="n">oom</span><span class="p">;</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">P4_SetMember</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">))</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">P4_Ok</span><span class="p">)</span><span class="w"> </span><span class="k">goto</span><span class="w"> </span><span class="n">oom</span><span class="p">;</span><span class="w"></span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">P4_SetMember</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Kia Ora"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">))</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">P4_Ok</span><span class="p">)</span><span class="w"> </span><span class="k">goto</span><span class="w"> </span><span class="n">oom</span><span class="p">;</span><span class="w"></span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">P4_SetMember</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"你好"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">))</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">P4_Ok</span><span class="p">)</span><span class="w"> </span><span class="k">goto</span><span class="w"> </span><span class="n">oom</span><span class="p">;</span><span class="w"></span>
 
-<span class="nl">oom</span><span class="p">:</span> <span class="n">P4_DeleteExpression</span><span class="p">(</span><span class="n">expr</span><span class="p">);</span>
+<span class="nl">oom</span><span class="p">:</span><span class="w"> </span><span class="n">P4_DeleteExpression</span><span class="p">(</span><span class="n">expr</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -399,9 +399,9 @@ Choice: failure!
 <h3>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h3>
 <p>Reference <strong>matches a string based on the referenced grammar rule</strong>.</p>
 <p>A grammar includes a set of grammar rules.  Each grammar rule is built from <a class="reference internal" href="api.html#c.P4_Expression" title="P4_Expression"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Expression</span></code></a> and is associated with an id.  A grammar rule can then be referenced in other grammar rules.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s">"text"</span><span class="p">,</span> <span class="s">"Hello,WORLD"</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="s">"text"</span><span class="p">,</span><span class="w"> </span><span class="s">"Hello,WORLD"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
 
-<span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateReference</span><span class="p">(</span><span class="s">"text"</span><span class="p">);</span>
+<span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateReference</span><span class="p">(</span><span class="s">"text"</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>The referenced grammar rule must exist before calling <a class="reference internal" href="api.html#c.P4_Parse" title="P4_Parse"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_Parse()</span></code></a>.</p>
@@ -414,17 +414,17 @@ Choice: failure!
 <section id="positive">
 <h3>Positive<a class="headerlink" href="#positive" title="Permalink to this headline">¶</a></h3>
 <p>Positive <strong>tests if the sub-expression matches</strong>.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreatePositive</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span> <span class="nb">true</span><span class="p">));</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreatePositive</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">));</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Positive attempts to match the sub-expression. If succeeds, the test passes. Positive does not “consume” any text.</p>
 <p>Positive can be useful in limiting the possibilities of the latter member in a Sequence. In this example, the Sequence expression must start with “Hello”, e.g. “Hello World”, “Hello WORLD”, “Hello world”, etc, will match but “HELLO WORLD” will not match.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span>
-    <span class="n">P4_CreatePositive</span><span class="p">(</span>
-        <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span> <span class="nb">true</span><span class="p">)</span>
-    <span class="p">);</span>
-    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello World"</span><span class="p">,</span> <span class="nb">false</span><span class="p">)</span>
-<span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreatePositive</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello World"</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">)</span><span class="w"></span>
+<span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -436,17 +436,17 @@ Choice: failure!
 <section id="negative">
 <h3>Negative<a class="headerlink" href="#negative" title="Permalink to this headline">¶</a></h3>
 <p>Negative <strong>tests if the sub-expression does not match</strong>.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateNegative</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span> <span class="nb">true</span><span class="p">));</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateNegative</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">));</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Negative expects the sub-expression doesn’t match. If fails, the test passes. Negative does not “consume” any text.</p>
 <p>Negative can be useful in limiting the possiblities of the latter member in a Sequence. In this example, the Sequence expression must not start with “Hello”, e.g. “HELLO World”, “hello WORLD”, “hello world”, etc, will match but “Hello World” will not match.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span>
-    <span class="n">P4_CreateNegative</span><span class="p">(</span>
-        <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span> <span class="nb">true</span><span class="p">)</span>
-    <span class="p">);</span>
-    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello World"</span><span class="p">,</span> <span class="nb">false</span><span class="p">)</span>
-<span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateNegative</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello World"</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">)</span><span class="w"></span>
+<span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -459,16 +459,16 @@ Choice: failure!
 <h3>Cut<a class="headerlink" href="#cut" title="Permalink to this headline">¶</a></h3>
 <p>Cut <strong>matches everything but avoids unwanted backtracking.</strong></p>
 <p>For example,</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">value</span> <span class="o">=</span> <span class="n">P4_CreateChoiceWithMembers</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span>
-    <span class="n">P4_CreateReference</span><span class="p">(</span><span class="s">"array"</span><span class="p">),</span>
-    <span class="n">P4_CreateReference</span><span class="p">(</span><span class="s">"null"</span><span class="p">)</span>
-<span class="p">);</span>
-<span class="n">P4_Expression</span><span class="o">*</span> <span class="n">value</span> <span class="o">=</span> <span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span>
-    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"["</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
-    <span class="n">P4_CreateCut</span><span class="p">(),</span>
-    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"]"</span><span class="p">,</span> <span class="nb">true</span><span class="p">)</span>
-<span class="p">);</span>
-<span class="n">P4_Expression</span><span class="o">*</span> <span class="n">value</span> <span class="o">=</span> <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"null"</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateChoiceWithMembers</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateReference</span><span class="p">(</span><span class="s">"array"</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateReference</span><span class="p">(</span><span class="s">"null"</span><span class="p">)</span><span class="w"></span>
+<span class="p">);</span><span class="w"></span>
+<span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateSequenceWithMembers</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"["</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateCut</span><span class="p">(),</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"]"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">)</span><span class="w"></span>
+<span class="p">);</span><span class="w"></span>
+<span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"null"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -476,27 +476,27 @@ Choice: failure!
 <h3>Repeat<a class="headerlink" href="#repeat" title="Permalink to this headline">¶</a></h3>
 <p>Repeat <strong>matches the sub-expression several times</strong>.</p>
 <p>ZeroOrOnce, ZeroOrMore, OnceOrMore consume zero or one , zero or more, or one or more consecutive repetitions of their sub-expression.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateZeroOrOnce</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span> <span class="nb">true</span><span class="p">));</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateZeroOrOnce</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">));</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateZeroOrMore</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span> <span class="nb">true</span><span class="p">));</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateZeroOrMore</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">));</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateOnceOrMore</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span> <span class="nb">true</span><span class="p">));</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateOnceOrMore</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">));</span><span class="w"></span>
 </pre></div>
 </div>
 <p>ZeroOrOnce and ZeroOrMore always succeeds because it allows matching zero times.</p>
 <p>The repetition can also be set with designated min or max times.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRepeatMin</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span> <span class="mi">3</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateRepeatMin</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">),</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRepeatMax</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span> <span class="mi">3</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateRepeatMax</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">),</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRepeatExact</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span> <span class="mi">3</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateRepeatExact</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">),</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span> <span class="n">expr</span> <span class="o">=</span> <span class="n">P4_CreateRepeatMinMax</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Expression</span><span class="o">*</span><span class="w"> </span><span class="n">expr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateRepeatMinMax</span><span class="p">(</span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">),</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -527,11 +527,11 @@ Choice: failure!
 <h3><cite>P4_FLAG_SQUASHED</cite><a class="headerlink" href="#p4-flag-squashed" title="Permalink to this headline">¶</a></h3>
 <p>Flag <cite>P4_FLAG_SQUASHED</cite> <strong>prevents generating children nodes</strong>.</p>
 <p>For example,</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s">"entry"</span><span class="p">,</span> <span class="mi">2</span>
-    <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">Text</span><span class="p">),</span>
-    <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
-<span class="p">);</span>
-<span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="s">"x"</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="s">"entry"</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">Text</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span><span class="w"></span>
+<span class="p">);</span><span class="w"></span>
+<span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="n">Text</span><span class="p">,</span><span class="w"> </span><span class="s">"x"</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>This grammar parses the text “xx” into three nodes:</p>
@@ -541,7 +541,7 @@ Choice: failure!
 </pre></div>
 </div>
 <p>If the grammar rule <cite>“entry”</cite> has flag <cite>P4_FLAG_SQUASHED</cite>, the children nodes disappear:</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s">"entry"</span><span class="p">,</span> <span class="n">P4_FLAG_SQUASHED</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="s">"entry"</span><span class="p">,</span><span class="w"> </span><span class="n">P4_FLAG_SQUASHED</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Token</span><span class="p">(</span><span class="mf">0..2</span><span class="p">):</span> <span class="s2">"Xx"</span>
@@ -553,11 +553,11 @@ Choice: failure!
 <h3><cite>P4_FLAG_LIFTED</cite><a class="headerlink" href="#p4-flag-lifted" title="Permalink to this headline">¶</a></h3>
 <p><cite>P4_FLAG_LIFTED</cite> <strong>replaces the node with its children nodes</strong>.</p>
 <p>For example,</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s">"entry"</span><span class="p">,</span> <span class="mi">2</span>
-    <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">Text</span><span class="p">),</span>
-    <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span>
-<span class="p">);</span>
-<span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="s">"x"</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="s">"entry"</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">Text</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">Text</span><span class="p">)</span><span class="w"></span>
+<span class="p">);</span><span class="w"></span>
+<span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="n">Text</span><span class="p">,</span><span class="w"> </span><span class="s">"x"</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>This grammar can match text “xx” into three nodes:</p>
@@ -567,7 +567,7 @@ Choice: failure!
 </pre></div>
 </div>
 <p>If the grammar rule <cite>“entry”</cite> has flag <cite>P4_FLAG_LIFTED</cite>, the node is lifted and replaced by its children:</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s">"entry"</span><span class="p">,</span> <span class="n">P4_FLAG_LIFTED</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="s">"entry"</span><span class="p">,</span><span class="w"> </span><span class="n">P4_FLAG_LIFTED</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Token</span><span class="p">(</span><span class="mf">0..1</span><span class="p">):</span> <span class="s2">"X"</span>
@@ -579,12 +579,12 @@ Choice: failure!
 <h3><cite>P4_FLAG_NON_TERMINAL</cite><a class="headerlink" href="#p4-flag-non-terminal" title="Permalink to this headline">¶</a></h3>
 <p><cite>P4_FLAG_NON_TERMINAL</cite> <strong>replaces the node with its single child node or does nothing.</strong>.</p>
 <p>For example,</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s">"entry"</span><span class="p">,</span> <span class="mi">2</span>
-    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"("</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
-    <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">Text</span><span class="p">),</span>
-    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">")"</span><span class="p">,</span> <span class="nb">true</span><span class="p">)</span>
-<span class="p">);</span>
-<span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="s">"x"</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="s">"entry"</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">"("</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">Text</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s">")"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">)</span><span class="w"></span>
+<span class="p">);</span><span class="w"></span>
+<span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="n">Text</span><span class="p">,</span><span class="w"> </span><span class="s">"x"</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>This grammar can match text “(x)” into two nodes:</p>
@@ -593,7 +593,7 @@ Choice: failure!
 </pre></div>
 </div>
 <p>If the grammar rule <cite>“entry”</cite> has flag <cite>P4_FLAG_NON_TERMINAL</cite>, the node is lifted and replaced by its single child node:</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s">"entry"</span><span class="p">,</span> <span class="n">P4_FLAG_NON_TERMINAL</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="s">"entry"</span><span class="p">,</span><span class="w"> </span><span class="n">P4_FLAG_NON_TERMINAL</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Token</span><span class="p">(</span><span class="mf">1..2</span><span class="p">):</span> <span class="s2">"x"</span>
@@ -606,26 +606,26 @@ Choice: failure!
 <h3><cite>P4_FLAG_SPACED</cite><a class="headerlink" href="#p4-flag-spaced" title="Permalink to this headline">¶</a></h3>
 <p><cite>P4_FLAG_SPACED</cite> <strong>indicates the expression is for whitespaces</strong>.</p>
 <p>For example,</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s">"whitespace"</span><span class="p">,</span> <span class="s">" "</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="s">"whitespace"</span><span class="p">,</span><span class="w"> </span><span class="s">" "</span><span class="p">,</span><span class="w"> </span><span class="nb">false</span><span class="p">);</span><span class="w"></span>
 
-<span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s">"whitespace"</span><span class="p">,</span> <span class="n">P4_FLAG_SPACED</span><span class="p">);</span>
+<span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="s">"whitespace"</span><span class="p">,</span><span class="w"> </span><span class="n">P4_FLAG_SPACED</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Often, we don’t want the whitespace having nodes, so it’s usually combined with <cite>P4_FLAG_LIFTED</cite>.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s">"whitespace"</span><span class="p">,</span> <span class="n">P4_FLAG_SPACED</span> <span class="o">|</span> <span class="n">P4_FLAG_LIFTED</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="s">"whitespace"</span><span class="p">,</span><span class="w"> </span><span class="n">P4_FLAG_SPACED</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">P4_FLAG_LIFTED</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>This flag does not work on its own. It takes effect on Sequence or Repeat.</p>
 <p>When parsing Sequence and Repeat, the grammar will match as many whitespaces as possible between every sequence member or every repetition sub-expression.</p>
 <p>For example, this rule matches “HelloWorld”, “Hello World”, “Hello       World”, etc.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s">"entry"</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span>
-    <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span> <span class="nb">true</span><span class="p">),</span>
-    <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"World"</span><span class="p">,</span> <span class="nb">true</span><span class="p">)</span>
-<span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="s">"entry"</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"Hello"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"World"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">)</span><span class="w"></span>
+<span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>For example, this rule matches “xxx”, “x   x         x”, etc.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_AddOnceOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s">"entry"</span><span class="p">,</span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"x"</span><span class="p">,</span> <span class="nb">true</span><span class="p">));</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_AddOnceOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="s">"entry"</span><span class="p">,</span><span class="w"> </span><span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"x"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">));</span><span class="w"></span>
 </pre></div>
 </div>
 <p>The SPACED expressions are not inserted before or after the Sequence and Repeat, hence ”  Hello World  “, ”  xxx  ” not matching.</p>
@@ -634,7 +634,7 @@ Choice: failure!
 <h3><cite>P4_FLAG_TIGHT</cite><a class="headerlink" href="#p4-flag-tight" title="Permalink to this headline">¶</a></h3>
 <p><cite>P4_FLAG_TIGHT</cite> <strong>prevents inserting the `P4_FLAG_SPACED` expressions</strong>. This tag only works for Sequence and Repeat.</p>
 <p>Given the above <cite>P4_FLAG_SPACED</cite> expression, if we set the grammar rule with flag <cite>P4_FLAG_TIGHT</cite>, the SPACED expressions are not inserted.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s">"entry"</span><span class="p">,</span> <span class="n">P4_FLAG_TIGHT</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="s">"entry"</span><span class="p">,</span><span class="w"> </span><span class="n">P4_FLAG_TIGHT</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Peppa PEG applies SPACED expressions on every Sequence and Repeat unless a <cite>P4_FLAG_TIGHT</cite> is explicitly specified on a Sequence or Repeat.</p>
@@ -643,7 +643,7 @@ Choice: failure!
 <section id="p4-flag-scoped">
 <h3><cite>P4_FLAG_SCOPED</cite><a class="headerlink" href="#p4-flag-scoped" title="Permalink to this headline">¶</a></h3>
 <p><cite>P4_FLAG_SCOPED</cite> <strong>prevents the effect of `P4_FLAG_SQUASHED` and `P4_FLAG_SPACED`</strong>.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s">"entry"</span><span class="p">,</span> <span class="n">P4_FLAG_SCOPED</span><span class="p">);</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="s">"entry"</span><span class="p">,</span><span class="w"> </span><span class="n">P4_FLAG_SCOPED</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Starting from the SCOPED grammar rule, the nodes are not squashed; the implicit whitespace is enabled as well.</p>

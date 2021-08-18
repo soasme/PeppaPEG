@@ -5,11 +5,11 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Concepts" href="concepts.html" /><link rel="prev" title="Tutorial: JSON" href="tutjson.html" />
 
-    <meta name="generator" content="sphinx-4.1.2, furo 2021.08.11.beta42"/>
+    <meta name="generator" content="sphinx-4.1.2, furo 2021.08.17.beta43"/>
         <title>How-To Guides - Peppa PEG 1.14.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=197f00461d56902ea7ca048ec6e6ba026f62c97b" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=93475b62d1c3bc01323a0eefdc14a62d77b12690" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=910ac4ccc9d7c023151c34010d7b500fb9777a51" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
     
     
 
@@ -203,11 +203,11 @@
 <h2>How to Prevent StackError?<a class="headerlink" href="#how-to-prevent-stackerror" title="Permalink to this headline">¶</a></h2>
 <p>Considering a json nested array: <cite>[[[[…]]]]</cite>. If the depth is too deep, Peppa PEG may end up with a StackError. This is due to Peppa PEG is a recursion-based parser. To prevent the stack address exhausts, one can set a limit on the recursion depth. By default, the depth is 8192.</p>
 <p>If you need to adjust the depth, try <a class="reference internal" href="api.html#c.P4_SetRecursionLimit" title="P4_SetRecursionLimit"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_SetRecursionLimit()</span></code></a>.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">P4_SetRecursionLimit</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="mi">1000</span><span class="p">);</span>
-<span class="n">P4_Ok</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">P4_SetRecursionLimit</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="mi">1000</span><span class="p">);</span><span class="w"></span>
+<span class="n">P4_Ok</span><span class="w"></span>
 
-<span class="o">&gt;&gt;</span> <span class="n">P4_GetRecursionLimit</span><span class="p">(</span><span class="n">grammar</span><span class="p">);</span>
-<span class="mi">1000</span>
+<span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">P4_GetRecursionLimit</span><span class="p">(</span><span class="n">grammar</span><span class="p">);</span><span class="w"></span>
+<span class="mi">1000</span><span class="w"></span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -221,11 +221,11 @@
 <p>Peppa PEG supports parsing a subset of source input. By default, all source content are attempted.</p>
 <p>One can use <cite>P4_SetSourceSlice</cite> to set the start position and stop position in the source input.</p>
 <p>In this example, Peppa PEG only parses the substring “YXXXY”[1:4], e.g. “XXX”.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">P4_Source</span><span class="o">*</span> <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s">"YXXXY"</span><span class="p">,</span> <span class="s">"entry"</span><span class="p">);</span>
-<span class="o">&gt;&gt;</span> <span class="n">P4_SetSourceSlice</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
-<span class="n">P4_Ok</span>
-<span class="o">&gt;&gt;</span> <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">);</span>
-<span class="n">P4_Ok</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">P4_Source</span><span class="o">*</span><span class="w"> </span><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateSource</span><span class="p">(</span><span class="s">"YXXXY"</span><span class="p">,</span><span class="w"> </span><span class="s">"entry"</span><span class="p">);</span><span class="w"></span>
+<span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">P4_SetSourceSlice</span><span class="p">(</span><span class="n">source</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span><span class="w"></span>
+<span class="n">P4_Ok</span><span class="w"></span>
+<span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="p">);</span><span class="w"></span>
+<span class="n">P4_Ok</span><span class="w"></span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -237,11 +237,11 @@
 <section id="how-to-prevent-partial-parse">
 <h2>How to Prevent Partial Parse?<a class="headerlink" href="#how-to-prevent-partial-parse" title="Permalink to this headline">¶</a></h2>
 <p>Considering below case,</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span> <span class="o">==</span> <span class="n">P4_AddZeroOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s">"entry"</span><span class="p">,</span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span> <span class="nb">true</span><span class="p">)));</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span><span class="w"> </span><span class="n">grammar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateGrammar</span><span class="p">();</span><span class="w"></span>
+<span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">P4_AddZeroOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="s">"entry"</span><span class="p">,</span><span class="w"> </span><span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">)));</span><span class="w"></span>
 
-<span class="n">P4_Source</span><span class="o">*</span> <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s">"aaab"</span><span class="p">,</span> <span class="s">"entry"</span><span class="p">);</span>
-<span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">);</span> <span class="c1">// P4_Ok!</span>
+<span class="n">P4_Source</span><span class="o">*</span><span class="w"> </span><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateSource</span><span class="p">(</span><span class="s">"aaab"</span><span class="p">,</span><span class="w"> </span><span class="s">"entry"</span><span class="p">);</span><span class="w"></span>
+<span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="p">);</span><span class="w"> </span><span class="c1">// P4_Ok!</span>
 </pre></div>
 </div>
 <p>Guess what, <a class="reference internal" href="api.html#c.P4_Parse" title="P4_Parse"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_Parse()</span></code></a> returns <a class="reference internal" href="api.html#c.P4_Error.P4_Ok" title="P4_Ok"><code class="xref c c-enum docutils literal notranslate"><span class="pre">P4_Ok</span></code></a>! Peppa PEG eats 3 “a” characters and ignores the rest of the input.</p>
@@ -252,16 +252,16 @@
 </pre></div>
 </div>
 <p>If you are using low level API, use <a class="reference internal" href="api.html#c.P4_CreateStartOfInput" title="P4_CreateStartOfInput"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateStartOfInput()</span></code></a> and <a class="reference internal" href="api.html#c.P4_CreateEndOfInput" title="P4_CreateEndOfInput"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateEndOfInput()</span></code></a>.</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span> <span class="o">==</span> <span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s">"entry"</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span>
-    <span class="n">P4_CreateStartOfInput</span><span class="p">(),</span>
-    <span class="n">P4_CreateZeroOrMore</span><span class="p">(</span><span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span> <span class="nb">true</span><span class="p">)),</span>
-    <span class="n">P4_CreateEndOfInput</span><span class="p">()</span>
-<span class="p">));</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span> <span class="o">==</span> <span class="n">P4_AddZeroOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s">"a"</span><span class="p">,</span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span> <span class="nb">true</span><span class="p">)));</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span><span class="w"> </span><span class="n">grammar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateGrammar</span><span class="p">();</span><span class="w"></span>
+<span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="s">"entry"</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateStartOfInput</span><span class="p">(),</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateZeroOrMore</span><span class="p">(</span><span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">)),</span><span class="w"></span>
+<span class="w">    </span><span class="n">P4_CreateEndOfInput</span><span class="p">()</span><span class="w"></span>
+<span class="p">));</span><span class="w"></span>
+<span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">P4_AddZeroOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="s">"a"</span><span class="p">,</span><span class="w"> </span><span class="n">P4_AddLiteral</span><span class="p">(</span><span class="s">"a"</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">)));</span><span class="w"></span>
 
-<span class="n">P4_Source</span><span class="o">*</span> <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s">"aaab"</span><span class="p">,</span> <span class="s">"entry"</span><span class="p">);</span>
-<span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">);</span> <span class="c1">// P4_MatchError</span>
+<span class="n">P4_Source</span><span class="o">*</span><span class="w"> </span><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateSource</span><span class="p">(</span><span class="s">"aaab"</span><span class="p">,</span><span class="w"> </span><span class="s">"entry"</span><span class="p">);</span><span class="w"></span>
+<span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="n">source</span><span class="p">);</span><span class="w"> </span><span class="c1">// P4_MatchError</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -276,12 +276,12 @@
 <p>For example, let’s match <cite>1,2,3</cite>:</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp"># define ROW 1</span>
 <span class="cp"># define NUM 2</span>
-<span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
+<span class="n">P4_Grammar</span><span class="o">*</span><span class="w"> </span><span class="n">grammar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P4_CreateGrammar</span><span class="p">();</span><span class="w"></span>
 
 <span class="c1">// Or: P4_AddGrammarRule(grammar, ROW, P4_CreateJoin(",", NUM))</span>
-<span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span> <span class="o">==</span> <span class="n">P4_AddJoin</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">ROW</span><span class="p">,</span> <span class="s">","</span><span class="p">,</span> <span class="n">NUM</span><span class="p">));</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">P4_AddJoin</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="n">ROW</span><span class="p">,</span><span class="w"> </span><span class="s">","</span><span class="p">,</span><span class="w"> </span><span class="n">NUM</span><span class="p">));</span><span class="w"></span>
 
-<span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span> <span class="o">==</span> <span class="n">P4_AddRange</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">NUM</span><span class="p">,</span> <span class="sc">'0'</span><span class="p">,</span> <span class="sc">'9'</span><span class="p">,</span> <span class="mi">1</span><span class="p">));</span>
+<span class="n">assert</span><span class="p">(</span><span class="n">P4_Ok</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">P4_AddRange</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="n">NUM</span><span class="p">,</span><span class="w"> </span><span class="sc">'0'</span><span class="p">,</span><span class="w"> </span><span class="sc">'9'</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">));</span><span class="w"></span>
 </pre></div>
 </div>
 <p>When parsing <cite>1,2,3</cite>, it will produce such a data structure:</p>

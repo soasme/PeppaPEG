@@ -5,11 +5,11 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Build" href="build.html" /><link rel="prev" title="Low Level APIs" href="lowlevel.html" />
 
-    <meta name="generator" content="sphinx-4.1.2, furo 2021.08.11.beta42"/>
+    <meta name="generator" content="sphinx-4.1.2, furo 2021.08.17.beta43"/>
         <title>All APIs &amp; References - Peppa PEG 1.14.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=197f00461d56902ea7ca048ec6e6ba026f62c97b" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=93475b62d1c3bc01323a0eefdc14a62d77b12690" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=910ac4ccc9d7c023151c34010d7b500fb9777a51" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
     
     
 
@@ -331,6 +331,11 @@
 <dd><p>Rule: Range. </p>
 </dd></dl>
 <dl class="c enumerator">
+<dt class="sig sig-object c" id="c.P4_ExpressionKind.P4_UnicodeCategory">
+<span class="target" id="peppapeg_8h_1a048293a52ef88f0da76f0ad9c7e2e340a512737d7cb43100d4947e5306287e660"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_UnicodeCategory</span></span></span><a class="headerlink" href="#c.P4_ExpressionKind.P4_UnicodeCategory" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Rule: Unicode Category. </p>
+</dd></dl>
+<dl class="c enumerator">
 <dt class="sig sig-object c" id="c.P4_ExpressionKind.P4_Reference">
 <span class="target" id="peppapeg_8h_1a048293a52ef88f0da76f0ad9c7e2e340a1c7a151c8e7e1fdbc7eb4eaa5f0ebbe5"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_Reference</span></span></span><a class="headerlink" href="#c.P4_ExpressionKind.P4_Reference" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Rule: Reference. </p>
@@ -449,19 +454,24 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
 <dl class="c type">
+<dt class="sig sig-object c" id="c.ucs4_t">
+<span class="target" id="peppapeg_8h_1a506ec699bde6f8d26bc0f3666b7522f5"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ucs4_t</span></span></span><a class="headerlink" href="#c.ucs4_t" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>A single unicode character. Used when libunistring is not installed. </p>
+</dd></dl>
+<dl class="c type">
 <dt class="sig sig-object c" id="c.P4_ExpressionFlag">
 <span class="target" id="peppapeg_8h_1a2fce6ca410ea2def757aef5e92933655"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_ExpressionFlag</span></span></span><a class="headerlink" href="#c.P4_ExpressionFlag" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>The flag of expression. </p>
 </dd></dl>
 <dl class="c type">
-<dt class="sig sig-object c" id="c.P4_Rune">
-<span class="target" id="peppapeg_8h_1ad3f2a45110a1ab28cd6fca0464bd81f0"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_Rune</span></span></span><a class="headerlink" href="#c.P4_Rune" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>An UTF8 rune </p>
-</dd></dl>
-<dl class="c type">
 <dt class="sig sig-object c" id="c.P4_String">
 <span class="target" id="peppapeg_8h_1ab70ba95c0fc81b797180de1f96ac1020"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">P4_String</span></span></span><a class="headerlink" href="#c.P4_String" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>A string, equivalent to char*. </p>
+<dd><p>The C string type in locale encoding, by default utf-8. </p>
+</dd></dl>
+<dl class="c type">
+<dt class="sig sig-object c" id="c.P4_Utf8">
+<span class="target" id="peppapeg_8h_1a6416995fd10f8080f2b11a47168a6d60"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">P4_Utf8</span></span></span><a class="headerlink" href="#c.P4_Utf8" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>The utf-8 string type. </p>
 </dd></dl>
 <dl class="c type">
 <dt class="sig sig-object c" id="c.P4_UserData">
@@ -662,36 +672,15 @@ Example: <div class="highlight-default notranslate"><div class="highlight"><pre>
 </dd></dl>
 <dl class="c function">
 <dt class="sig sig-object c" id="c.P4_ReadRune">
-<span class="target" id="peppapeg_8h_1a510196c85378c76a8ce9fb93fb9f13ba"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_ReadRune</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a><span class="w"> </span><span class="n"><span class="pre">s</span></span>, <a class="reference internal" href="#c.P4_Rune" title="P4_Rune"><span class="n"><span class="pre">P4_Rune</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">c</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_ReadRune" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>Reads a single UTF-8 code point from the string. </p>
-<p>Read a single code point (rune) from an UTF-8 string.</p>
-<p>
-Example:: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">uint32_t</span> <span class="n">c</span> <span class="o">=</span> <span class="mh">0x0</span>
-<span class="o">&gt;</span> <span class="n">P4_ReadRune</span><span class="p">(</span><span class="s2">"你好"</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">)</span>
-<span class="mi">3</span>
-<span class="o">&gt;</span> <span class="n">printf</span><span class="p">(</span><span class="s2">"%p </span><span class="si">%d</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
-<span class="mh">0x4f60</span> <span class="mi">20320</span>
-</pre></div>
-</div>
-</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>s</strong> – The string in UTF-8 encoding. </p></li>
-<li><p><strong>c</strong> – The pointer to the rune to read. </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The size of rune, could be 1,2,3,4. When error occurs, read nothing and returning size is 0.</p>
-</dd>
-</dl>
+<span class="target" id="peppapeg_8h_1af1f6b53502983fc57c21fb82929f82e5"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_ReadRune</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a><span class="w"> </span><span class="n"><span class="pre">s</span></span>, <a class="reference internal" href="#c.ucs4_t" title="ucs4_t"><span class="n"><span class="pre">ucs4_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">c</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_ReadRune" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Read a single code point (rune) from an UTF-8 string. </p>
 </dd></dl>
 <dl class="c function">
 <dt class="sig sig-object c" id="c.P4_ReadEscapedRune">
-<span class="target" id="peppapeg_8h_1a556692f6f9e171f48d6051b4ec45757e"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_ReadEscapedRune</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">text</span></span>, <a class="reference internal" href="#c.P4_Rune" title="P4_Rune"><span class="n"><span class="pre">P4_Rune</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">rune</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_ReadEscapedRune" title="Permalink to this definition">¶</a><br/></dt>
+<span class="target" id="peppapeg_8h_1a2c6e88b8cd5ccef14629c14c5a2c19bb"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_ReadEscapedRune</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">text</span></span>, <a class="reference internal" href="#c.ucs4_t" title="ucs4_t"><span class="n"><span class="pre">ucs4_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">rune</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_ReadEscapedRune" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Read an escaped single code point (rune) from an UTF-8 string.</p>
 <p>
-For example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Rune</span> <span class="n">rune</span><span class="p">;</span>
+For example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">ucs4_t</span> <span class="n">rune</span><span class="p">;</span>
  <span class="n">P4_ReadEscapedRune</span><span class="p">(</span><span class="s2">"</span><span class="se">\\</span><span class="s2">u000D"</span><span class="p">,</span> <span class="n">rune</span><span class="p">);</span> <span class="o">//</span> <span class="mh">0xd</span>
 </pre></div>
 </div>
@@ -710,7 +699,7 @@ For example: <div class="highlight-default notranslate"><div class="highlight"><
 </dd></dl>
 <dl class="c function">
 <dt class="sig sig-object c" id="c.P4_ConcatRune">
-<span class="target" id="peppapeg_8h_1a52a6e4c90fc0e1be5fad6ebd3f6852b8"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">P4_ConcatRune</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">str</span></span>, <a class="reference internal" href="#c.P4_Rune" title="P4_Rune"><span class="n"><span class="pre">P4_Rune</span></span></a><span class="w"> </span><span class="n"><span class="pre">chr</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">n</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_ConcatRune" title="Permalink to this definition">¶</a><br/></dt>
+<span class="target" id="peppapeg_8h_1a0433ce168a8018afad80fae1292027d9"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">P4_ConcatRune</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">str</span></span>, <a class="reference internal" href="#c.ucs4_t" title="ucs4_t"><span class="n"><span class="pre">ucs4_t</span></span></a><span class="w"> </span><span class="n"><span class="pre">chr</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">n</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_ConcatRune" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Append a rune to str (in-place).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -776,7 +765,7 @@ Example: <div class="highlight-default notranslate"><div class="highlight"><pre>
 </dd></dl>
 <dl class="c function">
 <dt class="sig sig-object c" id="c.P4_CreateRange">
-<span class="target" id="peppapeg_8h_1a370fb5328cce4201cc2c667dfca3d96c"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="n"><span class="pre">P4_Expression</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">P4_CreateRange</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Rune" title="P4_Rune"><span class="n"><span class="pre">P4_Rune</span></span></a><span class="w"> </span><span class="n"><span class="pre">lower</span></span>, <a class="reference internal" href="#c.P4_Rune" title="P4_Rune"><span class="n"><span class="pre">P4_Rune</span></span></a><span class="w"> </span><span class="n"><span class="pre">upper</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">stride</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateRange" title="Permalink to this definition">¶</a><br/></dt>
+<span class="target" id="peppapeg_8h_1aaad44b9539339a6476c7772679858a91"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="n"><span class="pre">P4_Expression</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">P4_CreateRange</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.ucs4_t" title="ucs4_t"><span class="n"><span class="pre">ucs4_t</span></span></a><span class="w"> </span><span class="n"><span class="pre">lower</span></span>, <a class="reference internal" href="#c.ucs4_t" title="ucs4_t"><span class="n"><span class="pre">ucs4_t</span></span></a><span class="w"> </span><span class="n"><span class="pre">upper</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">stride</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateRange" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Range expression.</p>
 <p>
 Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="o">//</span> <span class="n">It</span> <span class="n">can</span> <span class="n">match</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mf">9.</span>
@@ -827,7 +816,7 @@ Example: <div class="highlight-default notranslate"><div class="highlight"><pre>
 </dd></dl>
 <dl class="c function">
 <dt class="sig sig-object c" id="c.P4_AddRange">
-<span class="target" id="peppapeg_8h_1a09ffa05ddc13cc9a6a3573058f13cb1c"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="n"><span class="pre">P4_Error</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_AddRange</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="n"><span class="pre">P4_Grammar</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">grammar</span></span>, <a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a><span class="w"> </span><span class="n"><span class="pre">name</span></span>, <a class="reference internal" href="#c.P4_Rune" title="P4_Rune"><span class="n"><span class="pre">P4_Rune</span></span></a><span class="w"> </span><span class="n"><span class="pre">lower</span></span>, <a class="reference internal" href="#c.P4_Rune" title="P4_Rune"><span class="n"><span class="pre">P4_Rune</span></span></a><span class="w"> </span><span class="n"><span class="pre">upper</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">stride</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddRange" title="Permalink to this definition">¶</a><br/></dt>
+<span class="target" id="peppapeg_8h_1a3842dd4d6fe3c5d59836a28f51399873"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="n"><span class="pre">P4_Error</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_AddRange</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="n"><span class="pre">P4_Grammar</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">grammar</span></span>, <a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a><span class="w"> </span><span class="n"><span class="pre">name</span></span>, <a class="reference internal" href="#c.ucs4_t" title="ucs4_t"><span class="n"><span class="pre">ucs4_t</span></span></a><span class="w"> </span><span class="n"><span class="pre">lower</span></span>, <a class="reference internal" href="#c.ucs4_t" title="ucs4_t"><span class="n"><span class="pre">ucs4_t</span></span></a><span class="w"> </span><span class="n"><span class="pre">upper</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n"><span class="pre">stride</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddRange" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Add a range expression as grammar rule.</p>
 <p>
 Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_AddRange</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s2">"R1"</span><span class="p">,</span> <span class="s1">'0'</span><span class="p">,</span> <span class="s1">'9'</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>

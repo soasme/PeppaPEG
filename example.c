@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "peppapeg.h"
+#include <peppa.h>
 
 # define ENTRY 1
 
@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
 
     free(text);
 
-    P4_JsonifySourceAst(stdout, root);
+    P4_JsonifySourceAst(stdout, root, NULL);
 
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);

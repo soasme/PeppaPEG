@@ -45,14 +45,17 @@ static void version(const char* name) {
 }
 
 static void usage(const char* name) {
-    printf("usage: %s [OPTION]... [FILE]...\n", name);
+    printf("usage: %s [OPTION]... [FILE]...\n\n", name);
     printf(
         "OPTION:\n"
         "  -h\tprint help information\n"
         "  -V\tprint version\n"
         "  -g\trequired, path to peg grammar file\n"
         "  -e\trequired, entry rule name in peg grammar\n"
+        "\n"
+        "EXAMPLE:\n\n"
     );
+    printf("    $ %s -g /path/to/grammar.peg -e entry /path/to/input.txt\n", name);
 }
 
 static char* read_file(FILE* f) {
@@ -79,7 +82,7 @@ static int print_ast(
     }
     if (P4_Parse(grammar, source) != P4_Ok) {
         code = 1;
-        fprintf(stderr, "%s\n", P4_GetErrorMessage(source));
+        fprintf(stderr, "%s: %s\n", P4_GetErrorString(P4_GetError(source)), P4_GetErrorMessage(source));
         goto finalize;
     }
     P4_Node*    root = P4_GetSourceAst(source);

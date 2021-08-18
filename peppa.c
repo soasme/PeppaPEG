@@ -2940,6 +2940,11 @@ P4_Parse(P4_Grammar* grammar, P4_Source* source) {
     source->grammar = grammar;
 
     P4_Expression* expr     = P4_GetGrammarRule(grammar, source->entry_name);
+    if (expr == NULL) {
+        P4_MatchRaisef(source, P4_ValueError, "rule %s not found", source->entry_name);
+        goto finalize;
+    }
+
     P4_Node*       tok      = match_expression(source, expr);
 
     source->root            = tok;

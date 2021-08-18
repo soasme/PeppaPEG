@@ -32,13 +32,14 @@
 - [ ] shell: `p4 ast --grammar --rule --input`. Return json tree in stdout or error in stderr.
 - [ ] shell: `p4 test spec.yml`. The spec contains an array of [name, grammar(/path/to/peg,./path/to/peg,toml,c99,...), rule, input, output, error].
 - [ ] build: binary cli - shell.c
-- [ ] build: static lib.
 - [ ] peg: support Python-style INDENT rule.
-- [ ] peg: range support ID_Start, ID_Continue, Other_ID_Start, Other_ID_Continue.
-- [ ] peg: optional ICU support - `\p{...}`. This allows even more choices: `Lu`, `gc=Lu`, `General_Category=Uppercase_Letter`. Wrap the feature in `ENABLE_ICU`.
 - [ ] api: print grammar and/or rules.
-- [ ] peg: we can skip using RuneRanges but save category name like "Co" in Range, which will move the evaluation to the runtime.
 - [ ] refactor: move some variables to `frame` to reduce function frame size.
+- [x] ~~peg: optional ICU support - `\p{...}`. This allows even more choices: `Lu`, `gc=Lu`, `General_Category=Uppercase_Letter`. Wrap the feature in `ENABLE_ICU`.~~ use libunistring instead of ICU, which is way smaller.
+- [x] ~~peg: we can skip using RuneRanges but save category name like "Co" in Range, which will move the evaluation to the runtime.~~ use libunistring which evaluated in runtime.
+- [x] build: static lib.
+- [x] cmake: make install.
+- [x] peg: range support ID_Start, ID_Continue, Other_ID_Start, Other_ID_Continue.
 - [x] peg: insensitive back reference.
 - [x] peg: back reference.
 - [x] tests: enable AddressSanitizer for CLang.

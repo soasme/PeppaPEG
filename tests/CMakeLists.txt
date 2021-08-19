@@ -74,9 +74,18 @@ set(
 
 find_program(PYTHON python3)
 foreach(spec_testcase ${spec_testcases})
+    if (VALGRIND)
+        set(SPEC_BIN "${VALGRIND} ${VALGRIND_OPTIONS} ${CMAKE_BINARY_DIR}/${P4_BIN}")
+    else()
+        set(SPEC_BIN "${CMAKE_BINARY_DIR}/${P4_BIN}")
+    endif()
+
     add_test(
         NAME "${spec_testcase}"
-        COMMAND "${PYTHON}" "${PROJECT_SOURCE_DIR}/scripts/check_spec.py" "${CMAKE_BINARY_DIR}/${P4_BIN}" "${PROJECT_SOURCE_DIR}/tests/${spec_testcase}.json"
+        COMMAND "${PYTHON}"
+            "${PROJECT_SOURCE_DIR}/scripts/check_spec.py"
+            "${SPEC_BIN}"
+            "${PROJECT_SOURCE_DIR}/tests/${spec_testcase}.json"
         WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     )
 endforeach()
@@ -87,4 +96,5 @@ add_custom_target(
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_SOURCE_DIR}/json_test_parsing ${CMAKE_CURRENT_BINARY_DIR}/../json_test_parsing
     COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
     DEPENDS ${unity_testcases}
+    DEPENDS ${P4_BIN}
 )

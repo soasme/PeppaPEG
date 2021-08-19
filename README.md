@@ -192,9 +192,10 @@ plus = "+";
 $ cat data.json
 [{"numbers": [1,2.0,3e1]},[true,false,null],"xyz"]
 
-$ peppa ast -g json.peg -e entry data.json
-[{"slice":[0,50],"type":"array","children":[{"slice":[1,25],"type":"object","children":[{"slice":[2,24],"type":"item","children":[{"slice":[2,11],"type":"string"},{"slice":[13,24],"type":"array","children":[{"slice":[14,15],"type":"number"},{"slice":[16,19],"type":"number"},{"slice":[20,23],"type":"number"}]}]}]},{"slice":[26,43],"type":"array","children":[{"slice":[27,31],"type":"true"},{"slice":[32,37],"type":"false"},{"slice":[38,42],"type":"null"}]},{"slice":[44,49],"type":"string"}]}]
+$ peppa ast -g json.peg -e entry data.json | python3 ./scripts/gendot.py | dot -Tsvg -o/tmp/data.svg
 ```
+
+![Example JSON AST](docs/_static/readme-json-ast2.svg)
 
 # Peppy Hacking Peppa PEG!
 

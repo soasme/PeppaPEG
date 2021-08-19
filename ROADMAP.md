@@ -1,5 +1,8 @@
 # ROADMAP
 
+- [ ] peg: @sibling_to_descdent. can be used to transform cases like toml [key1.key2], key2 should be a child of key1.
+- [ ] peg: @right_recursion.
+- [ ] peg: @left_recursion. can be used to transform cases like expression: `a=b (@left_recursion "+" b)*`.
 - [ ] ci: support windows.
 - [ ] ci: publish binary to github release.
 - [ ] ci: publish ppa.

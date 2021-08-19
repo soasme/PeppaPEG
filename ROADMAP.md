@@ -1,5 +1,13 @@
 # ROADMAP
 
+- [ ] api: function `P4_NodeEqual(node1, node2, NULL)`: check text[slice] are the same, children count are the same, each child is the same. Third param check user data.
+- [ ] api: function `P4_FindNodeChild(node, node_name)`.
+- [ ] api: function `P4_FindNodeChildren(node, node_name)`.
+- [ ] peg: support `rule = a:b;` - P4_Node->rule_name = "a", P4_Node->node_name = "b".
+- [ ] man: man page for peppa.
+- [ ] peg: support multiple ranges in []: `[0-9a-zA-Z]`.
+- [ ] api: jsonify support pretty print (indent, newline).
+- [ ] shell: compile peg to LLVM IR/bitcode code (can use LLVM to compile to C, JS).
 - [ ] peg: @sibling_to_descdent. can be used to transform cases like toml [key1.key2], key2 should be a child of key1.
 - [ ] peg: @right_recursion.
 - [ ] peg: @left_recursion. can be used to transform cases like expression: `a=b (@left_recursion "+" b)*`.
@@ -30,6 +38,8 @@
 - [ ] tests: benchmark: example: json-c. `valgrind --tool=massif --massif-out-file=massif.out ./build/tests/test_example_json && ms_print massif.out ms_print.out`.
 - [ ] match: packrat or not? http://mousepeg.sourceforge.net/index.htm
 - [ ] tests: add a fuzzy testing framework.
+- [ ] script: turn peg grammar into a railroad diagram.
+- [ ] shell: `p4 ast --language=cmake`. https://cmake.org/cmake/help/latest/manual/cmake-language.7.html
 - [ ] shell: `p4 ast --grammar=python3`. https://docs.python.org/3.11/reference/grammar.html
 - [ ] shell: `p4 ast --grammar=c99`: https://github.com/pointlander/peg/blob/master/grammars/c/c.peg
 - [ ] shell: `p4 ast --grammar=es6`: https://www.ecma-international.org/wp-content/uploads/ECMA-262_6th_edition_june_2015.pdf

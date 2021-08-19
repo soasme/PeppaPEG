@@ -38,6 +38,7 @@
 #include <libgen.h>
 #include "peppa.h"
 
+# define abort(code) do { err = (code); goto finalize; } while (0)
 # define read_arg(argc, argv, opts, c) (-1 != ((c) = getopt((argc), (argv), (opts))))
 
 typedef struct p4_args_t p4_args_t;
@@ -106,13 +107,8 @@ finalize:
     return code;
 }
 
-int exec_args(p4_args_t* args) {
-    return 0;
-}
-
-int main(int argc, char* argv[]) {
-    int c, err;
-    p4_args_t* args = &(p4_args_t){ 0 };
+int init_args(p4_args_t* args, int argc, char* argv[]) {
+    int c;
 
     args->executable = argv[0];
 
@@ -120,75 +116,91 @@ int main(int argc, char* argv[]) {
         switch (c) {
             case 'V':
                 args->verbose = true;
-                version(basename(args->executable));
-                err = 0; goto finalize;
+                break;
             case 'h':
                 args->help = true;
-                version(basename(args->executable));
-                usage(basename(args->executable));
-                err = 0; goto finalize;
+                break;
             case 'e':
                 args->grammar_entry = optarg;
                 break;
             case 'g':
                 if (!(args->grammar_file = fopen(optarg, "r"))) {
                     perror(optarg);
-                    err = 1; goto finalize;
+                    return -1;
                 }
                 break;
             default:
                 fprintf(stderr, "for usage try: %s -h\n", args->executable);
-                err = 1; goto finalize;
+                return -1;
         }
     }
 
     if (optind == 1) {
-        usage(basename(args->executable));
-        err = 1; goto finalize;
+        fprintf(stderr, "for usage try: %s -h\n", args->executable);
+        return -1;
     }
 
     args->arguments_count = argc - optind;
     args->arguments = argv + optind;
 
+    return 0;
+}
+
+int run_cmd(p4_args_t* args) {
+    int err = 0;
+    char *grammar_content = NULL, *input_content = NULL;
+    FILE* input_file = NULL;
+
     if (args->arguments_count == 0) {
         fprintf(stderr, "error: argument FILE is required\n");
         usage(basename(args->executable));
-        err = 1; goto finalize;
+        abort(1);
     }
 
     if (args->grammar_file == NULL) {
         fprintf(stderr, "error: option -g is required\n");
         usage(basename(args->executable));
-        err = 1; goto finalize;
+        abort(1);
     }
 
     if (args->grammar_entry == NULL) {
         fprintf(stderr, "error: option -e is required\n");
         usage(basename(args->executable));
-        err = 1; goto finalize;
+        abort(1);
     }
 
-    FILE* input_file = NULL;
-
-    if (strcmp(args->arguments[0], "-") == 0) {
-        input_file = stdin;
-    } else {
-        if (!(input_file = fopen(args->arguments[0], "r"))) {
-            perror(args->arguments[0]);
-            err = 1; goto finalize;
-        }
+    if (!(input_file = fopen(args->arguments[0], "r"))) {
+        perror(args->arguments[0]);
+        abort(1);
     }
 
-    char* grammar_content = read_file(args->grammar_file);
-    char* input_content = read_file(input_file);
-
+    grammar_content = read_file(args->grammar_file);
+    input_content = read_file(input_file);
     err = print_ast(grammar_content, input_content, args->grammar_entry);
+
+finalize:
 
     P4_FREE(input_content);
     P4_FREE(grammar_content);
     fclose(input_file);
+    return err;
+}
 
-finalize:
-    fclose(args->grammar_file);
+void close_args(p4_args_t* args) {
+    if (args->grammar_file)
+        fclose(args->grammar_file);
+}
+
+int main(int argc, char* argv[]) {
+    int         err = 0;
+    p4_args_t*  args = &(p4_args_t){ 0 };
+
+    if (init_args(args, argc, argv) != 0) {
+        close_args(args);
+        return 1;
+    }
+
+    err = run_cmd(args);
+    close_args(args);
     return err;
 }

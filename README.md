@@ -97,7 +97,7 @@ plus = "+";
 $ cat data.json
 [{"numbers": [1,2.0,3e1]},[true,false,null],"xyz"]
 
-$ peppa ast -g json.peg -e entry data.json | python3 ./scripts/gendot.py | dot -Tsvg -o/tmp/data.svg
+$ peppa ast -G json.peg -e entry data.json | python3 ./scripts/gendot.py | dot -Tsvg -o/tmp/data.svg
 ```
 
 ![Example JSON AST](docs/_static/readme-json-ast2.svg)

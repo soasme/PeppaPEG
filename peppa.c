@@ -1630,7 +1630,8 @@ P4_CreateNode (const P4_String     str,
 P4_PRIVATE(void)
 P4_DeleteNodeNode(P4_Grammar* grammar, P4_Node* node) {
     if (node) {
-        P4_DeleteNodeUserData(grammar, node);
+        if (grammar->free_func && node->userdata)
+            grammar->free_func(node->userdata);
         P4_FREE(node);
     }
 }

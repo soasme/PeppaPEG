@@ -23,9 +23,7 @@ References: [GitHub](https://github.com/soasme/PeppaPEG)
 | [Project Home Page](https://soasme.com/PeppaPEG/landing.html)
 | [Project Documentation Pages](https://soasme.com/PeppaPEG/).
 
-# Usage
-
-## Install Peppa PEG
+## Installation
 
 Assume your system has `cmake` installed, run
 
@@ -67,15 +65,51 @@ You can manually load the library source:
 $ gcc example.c peppa.c
 ```
 
+# Usage
 
-## Load Grammar
+## CLI
+
+Peppa PEG ships with a tiny utility: `peppa` to help develop a PEG grammar.
+
+Example: given files: `json.peg` and `data.json`, run with `peppa` utility:
+
+```bash
+$ cat json.peg
+@lifted entry = &. value !.;
+@lifted value = object / array / string / number / true / false / null;
+object = "{" (item ("," item)*)? "}";
+item = string ":" value;
+array = "[" (value ("," value)*)? "]";
+@tight string = "\"" ([\u0020-\u0021] / [\u0023-\u005b] / [\u005d-\U0010ffff] / escape )* "\"";
+true = "true";
+false = "false";
+null = "null";
+@tight @squashed number = minus? integral fractional? exponent?;
+@tight @squashed @lifted escape = "\\" ("\"" / "/" / "\\" / "b" / "f" / "n" / "r" / "t" / unicode);
+@tight @squashed unicode = "u" ([0-9] / [a-f] / [A-F]){4};
+minus = "-";
+plus = "+";
+@squashed @tight integral = "0" / [1-9] [0-9]*;
+@squashed @tight fractional = "." [0-9]+;
+@tight exponent = i"e" (plus / minus)? [0-9]+;
+@spaced @lifted whitespace = " " / "\r" / "\n" / "\t";
+
+$ cat data.json
+[{"numbers": [1,2.0,3e1]},[true,false,null],"xyz"]
+
+$ peppa ast -g json.peg -e entry data.json | python3 ./scripts/gendot.py | dot -Tsvg -o/tmp/data.svg
+```
+
+![Example JSON AST](docs/_static/readme-json-ast2.svg)
+
+## C API
 
 In Peppa PEG, grammar syntax can be loaded from a string. Below is an example of JSON grammar syntax.
 
 ```c
 P4_Grammar* grammar = P4_LoadGrammar(
     "@lifted\n"
-    "entry = &[\\u0001-\\U0010ffff] value ![\\u0001-\\u0010ffff];\n"
+    "entry = &. value !.;\n"
 
     "@lifted\n"
     "value = object / array / string / number / true / false / null;\n"
@@ -118,82 +152,35 @@ P4_Grammar* grammar = P4_LoadGrammar(
 );
 ```
 
-## Parse
+The input can be parsed via `P4_Parse`:
 
-In Peppa PEG, the input can be parsed via `P4_Parse`:
-
-```
-P4_Source* source = P4_CreateSource("[1,2.0,3e1,true,false,null,\"xyz\",{},[]]", "entry");
+```c
+P4_Source* source = P4_CreateSource("[{\"numbers\": [1,2.0,3e1]},[true,false,null],\"xyz\"]", "entry");
 P4_Parse(grammar, source);
 ```
-
-If success, the parsed source will contain an AST:
-
-![Example JSON AST](docs/_static/readme-json-ast.svg)
 
 You can traverse the parse tree. For example, the below function
 outputs the parse tree into JSON format:
 
-```
+```c
 P4_Node* root = P4_GetSourceAST(source);
 P4_JsonifySourceAst(stdout, root, NULL);
 ```
 
-```
-[
-    {"slice":[0,39],"type":"array","children":[
-        {"slice":[1,2],"type":"number"},
-        {"slice":[3,6],"type":"number"},
-        {"slice":[7,10],"type":"number"},
-        {"slice":[11,15],"type":"true"},
-        {"slice":[16,21],"type":"false"},
-        {"slice":[22,26],"type":"null"},
-        {"slice":[27,32],"type":"string"},
-        {"slice":[33,35],"type":"object"},
-        {"slice":[36,38],"type":"array"}
-    ]}
-]
-```
-
-## Utility
-
-Peppa PEG ships with a tiny utility: `peppa` to help troubleshooting the PEG grammar.
-You can build the utility via cmake:
-
-```bash
-$ cd build
-$ cmake -DENABLE_CLI=On ..
-$ make install
-```
-
-Example: given files: `json.peg` and `data.json`, run with `peppa` utility:
-
-```bash
-$ cat json.peg
-@lifted entry = &. value !.;
-@lifted value = object / array / string / number / true / false / null;
-object = "{" (item ("," item)*)? "}";
-item = string ":" value;
-array = "[" (value ("," value)*)? "]";
-@tight string = "\"" ([\u0020-\u0021] / [\u0023-\u005b] / [\u005d-\U0010ffff] / escape )* "\"";
-true = "true";
-false = "false";
-null = "null";
-@tight @squashed number = minus? integral fractional? exponent?;
-@tight @squashed @lifted escape = "\\" ("\"" / "/" / "\\" / "b" / "f" / "n" / "r" / "t" / unicode);
-@tight @squashed unicode = "u" ([0-9] / [a-f] / [A-F]){4};
-minus = "-";
-plus = "+";
-@squashed @tight integral = "0" / [1-9] [0-9]*;
-@squashed @tight fractional = "." [0-9]+;
-@tight exponent = i"e" (plus / minus)? [0-9]+;
-@spaced @lifted whitespace = " " / "\r" / "\n" / "\t";
-
-$ cat data.json
-[{"numbers": [1,2.0,3e1]},[true,false,null],"xyz"]
-
-$ peppa -g json.peg -e entry data.json
-[{"slice":[0,50],"type":"array","children":[{"slice":[1,25],"type":"object","children":[{"slice":[2,24],"type":"item","children":[{"slice":[2,11],"type":"string"},{"slice":[13,24],"type":"array","children":[{"slice":[14,15],"type":"number"},{"slice":[16,19],"type":"number"},{"slice":[20,23],"type":"number"}]}]}]},{"slice":[26,43],"type":"array","children":[{"slice":[27,31],"type":"true"},{"slice":[32,37],"type":"false"},{"slice":[38,42],"type":"null"}]},{"slice":[44,49],"type":"string"}]}]
+```javascript
+[{"slice":[0,50],"type":"array","children":[
+        {"slice":[1,25],"type":"object","children":[
+            {"slice":[2,24],"type":"item","children":[
+                {"slice":[2,11],"type":"string"},
+                {"slice":[13,24],"type":"array","children":[
+                    {"slice":[14,15],"type":"number"},
+                    {"slice":[16,19],"type":"number"},
+                    {"slice":[20,23],"type":"number"}]}]}]},
+        {"slice":[26,43],"type":"array","children":[
+            {"slice":[27,31],"type":"true"},
+            {"slice":[32,37],"type":"false"},
+            {"slice":[38,42],"type":"null"}]},
+        {"slice":[44,49],"type":"string"}]}]
 ```
 
 # Peppy Hacking Peppa PEG!

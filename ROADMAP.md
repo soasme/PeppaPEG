@@ -1,5 +1,9 @@
 # ROADMAP
 
+- [ ] ci: support windows.
+- [ ] ci: publish binary to github release.
+- [ ] ci: publish ppa.
+- [ ] ci: let homebrew users can use the utility.
 - [ ] api: operate slice (copy string, get size, etc).
 - [ ] api: operate node.
 - [ ] api: set source verbose mode.
@@ -29,20 +33,21 @@
 - [ ] shell: `p4 ast --grammar=zig`: https://ziglang.org/documentation/master/#Grammar
 - [ ] shell: `p4 ast --grammar=awk`: https://github.com/onetrueawk/awk/blob/master/lex.c https://github.com/onetrueawk/awk/blob/master/awkgram.y
 - [ ] shell: `p4 ast --grammar=sql`: https://tomassetti.me/parsing-sql/
-- [ ] shell: `p4 ast --grammar --rule --input`. Return json tree in stdout or error in stderr.
-- [ ] shell: `p4 test spec.yml`. The spec contains an array of [name, grammar(/path/to/peg,./path/to/peg,toml,c99,...), rule, input, output, error].
-- [ ] build: binary cli - shell.c
 - [ ] peg: support Python-style INDENT rule.
 - [ ] api: print grammar and/or rules.
 - [ ] refactor: move some variables to `frame` to reduce function frame size.
-- [x] ~~peg: optional ICU support - `\p{...}`. This allows even more choices: `Lu`, `gc=Lu`, `General_Category=Uppercase_Letter`. Wrap the feature in `ENABLE_ICU`.~~ use libunistring instead of ICU, which is way smaller.
-- [x] ~~peg: we can skip using RuneRanges but save category name like "Co" in Range, which will move the evaluation to the runtime.~~ use libunistring which evaluated in runtime.
-- [x] build: static lib.
-- [x] cmake: make install.
-- [x] peg: range support ID_Start, ID_Continue, Other_ID_Start, Other_ID_Continue.
-- [x] peg: insensitive back reference.
-- [x] peg: back reference.
-- [x] tests: enable AddressSanitizer for CLang.
+- [x] shell: `p4 ast --grammar --rule --input`. Return json tree in stdout or error in stderr. v1.15.0
+- [x] ~~shell: `p4 test spec.yml`. The spec contains an array of [name, grammar(/path/to/peg,./path/to/peg,toml,c99,...), rule, input, output, error].~~ this is done by `scripts/check_spec.py`. v1.15.0.
+- [x] build: binary cli - shell.c. v1.15.0
+- [x] tests: introduce JSON-based test. v1.15.0
+- [x] ~~peg: optional ICU support - `\p{...}`. This allows even more choices: `Lu`, `gc=Lu`, `General_Category=Uppercase_Letter`. Wrap the feature in `ENABLE_ICU`.~~ use libunistring instead of ICU, which is way smaller. v1.15.0
+- [x] ~~peg: we can skip using RuneRanges but save category name like "Co" in Range, which will move the evaluation to the runtime.~~ use libunistring which evaluated in runtime. v1.15.0
+- [x] build: static lib. v1.15.0
+- [x] cmake: make install. v1.15.0
+- [x] peg: range support ID_Start, ID_Continue, Other_ID_Start, Other_ID_Continue. v1.15.0.
+- [x] peg: insensitive back reference. v1.15.0.
+- [x] peg: back reference. v1.15.0
+- [x] tests: enable AddressSanitizer for CLang. v.15.0
 - [x] ~~build: wasm. `docker run --rm -v $(pwd):/src -u $(id -u):$(id -g)   emscripten/emsdk emcc peppapeg.c -Os -s WASM=1 -s SIDE_MODULE=1 -o /src/peppapeg.wasm`.  https://gist.github.com/kripken/59c67556dc03bb6d57052fedef1e61ab https://github.com/mbasso/awesome-wasm~~ won't do it.
 - [x] docs: read [A parsing machine for PEGs](http://www.inf.puc-rio.br/~roberto/docs/ry08-4.pdf).
 - [x] ~~peg: stop on first error v/s recover from Panic.~~ e.g. cut.

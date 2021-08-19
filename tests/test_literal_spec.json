@@ -47,7 +47,7 @@
             },
             {
                 "I": "Hello Worl",
-                "E": "MatchError: line 1:11, expect R1 (char 'd')"
+                "E": "MatchError: line 1:1, expect R1 (len 11)"
             },
             {
                 "I": "hello world",

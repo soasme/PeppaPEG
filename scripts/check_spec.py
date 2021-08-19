@@ -8,10 +8,12 @@ def test_spec():
     with open(specs_json) as f:
         specs = json.load(f)
 
+    failed, total = 0, 0
     for spec in specs:
         with open('grammar', 'w') as grammar_file:
             grammar_file.write(spec['grammar'])
         for test in spec['tests']:
+            total += 1
             with open('input', 'w') as input_file:
                 input_file.write(test['I'])
             command = f'{executable} ast -g grammar -e {spec["entry"]} input'
@@ -27,6 +29,7 @@ def test_spec():
                             f"OUTPUT:\n{test['O']}\n"
                             f"GOT:\n{output}\n"
                         )
+                        failed += 1
                 else:
                     print(
                         f"GRAMMAR:\n{spec['grammar']}\n"
@@ -34,6 +37,7 @@ def test_spec():
                         f"OUTPUT:\n{test['O']}\n"
                         f"GOT:\n{proc.stderr.decode('utf-8')}\n"
                     )
+                    failed += 1
             else:
                 assert proc.returncode != 0, proc.stderr
                 if proc.stderr.decode('utf-8').strip() != test['E']:
@@ -43,6 +47,11 @@ def test_spec():
                         f"ERROR:\n{test['E']}\n"
                         f"GOT:\n{proc.stderr.decode('utf-8')}"
                     )
+                    failed += 1
+
+    print("total: %d, failed: %d" % (total, failed))
+    if failed:
+        exit(1)
 
 if __name__ == '__main__':
     test_spec()

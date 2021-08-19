@@ -67,6 +67,20 @@ foreach(unity_testcase ${unity_testcases})
 
 endforeach()
 
+set(
+    spec_testcases
+    "test_literal_spec"
+)
+
+find_program(PYTHON python3)
+foreach(spec_testcase ${spec_testcases})
+    add_test(
+        NAME "${spec_testcase}"
+        COMMAND "${PYTHON}" "${PROJECT_SOURCE_DIR}/scripts/check_spec.py" "${CMAKE_BINARY_DIR}/${P4_BIN}" "${PROJECT_SOURCE_DIR}/tests/${spec_testcase}.json"
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+    )
+endforeach()
+
 add_custom_target(
     check
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_SOURCE_DIR}/json_test_parsing ${CMAKE_CURRENT_BINARY_DIR}/json_test_parsing

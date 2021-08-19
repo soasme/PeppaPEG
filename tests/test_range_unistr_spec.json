@@ -1,0 +1,88 @@
+[
+    {
+        "grammar": "Space = [\\p{White space}];",
+        "entry": "Space",
+        "tests": [
+            {
+                "I": "\u000D",
+                "O": [{"slice":[0,1],"type":"Space"}]
+            },
+            {
+                "I": " ",
+                "O": [{"slice":[0,1],"type":"Space"}]
+            },
+            {
+                "I": "a",
+                "E": "MatchError: line 1:1, expect Space"
+            }
+        ]
+    },
+
+    {
+        "grammar": "Space = [\\p{WHITE SPACE}];",
+        "entry": "Space",
+        "tests": [
+            {
+                "I": "\u000D",
+                "O": [{"slice":[0,1],"type":"Space"}]
+            },
+            {
+                "I": " ",
+                "O": [{"slice":[0,1],"type":"Space"}]
+            },
+            {
+                "I": "a",
+                "E": "MatchError: line 1:1, expect Space"
+            }
+        ]
+    },
+
+    {
+        "grammar": "Space = [\\p{White_space}];",
+        "entry": "Space",
+        "tests": [
+            {
+                "I": "\u000D",
+                "O": [{"slice":[0,1],"type":"Space"}]
+            },
+            {
+                "I": " ",
+                "O": [{"slice":[0,1],"type":"Space"}]
+            },
+            {
+                "I": "a",
+                "E": "MatchError: line 1:1, expect Space"
+            }
+        ]
+    },
+
+    {
+        "grammar": "ID_Start = [\\p{ID_Start}];",
+        "entry": "ID_Start",
+        "tests": [
+            {
+                "I": "a",
+                "O": [{"slice":[0,1],"type":"ID_Start"}]
+            },
+            {
+                "I": "1",
+                "E": "MatchError: line 1:1, expect ID_Start"
+            }
+        ]
+    },
+
+    {
+        "grammar": "ID_Continue = [\\p{ID_Continue}];",
+        "entry": "ID_Continue",
+        "tests": [
+            {
+                "I": "a",
+                "O": [{"slice":[0,1],"type":"ID_Continue"}]
+            },
+            {
+                "I": "1",
+                "O": [{"slice":[0,1],"type":"ID_Continue"}]
+            }
+        ]
+    }
+]

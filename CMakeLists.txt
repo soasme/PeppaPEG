@@ -18,7 +18,7 @@ add_library("${P4_LIB}" SHARED "${P4_HEADERS}" "${P4_SOURCES}")
 target_compile_options("${P4_LIB}" PRIVATE "-ansi")
 target_compile_options("${P4_LIB}" PRIVATE "-Wall")
 
-option(-DENABLE_UNISTR "Enables libunistring." OFF)
+option(ENABLE_UNISTR "Enables libunistring." OFF)
 message("-- Optional Dependency: libunistring - ${ENABLE_UNISTR}.")
 if (ENABLE_UNISTR)
     find_library(UNISTRING_LIB unistring REQUIRED)
@@ -33,7 +33,7 @@ if (ENABLE_DEBUG)
     target_compile_options("${P4_LIB}" PRIVATE "-g")
 endif()
 
-option(-DENABLE_ADDRESS_SANITIZER "Enables AddressSanitizer." OFF)
+option(ENABLE_ADDRESS_SANITIZER "Enables AddressSanitizer." OFF)
 message("-- Clang: AddressSanitizer - ${ENABLE_ADDRESS_SANITIZER}.")
 if (ENABLE_SANITIZERS)
     list(APPEND custom_compiler_flags

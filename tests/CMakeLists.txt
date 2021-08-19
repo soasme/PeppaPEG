@@ -69,7 +69,9 @@ endforeach()
 
 set(
     spec_testcases
-    "test_literal_spec"
+    test_literal_spec
+    test_range_spec
+    test_range_unistr_spec
 )
 
 find_program(PYTHON python3)
@@ -80,6 +82,10 @@ foreach(spec_testcase ${spec_testcases})
         string(CONCAT SPEC_BIN "${CMAKE_BINARY_DIR}/${P4_BIN}")
     else()
         set(SPEC_BIN "${CMAKE_BINARY_DIR}/${P4_BIN}")
+    endif()
+
+    if (spec_testcase MATCHES "unistr" AND NOT ENABLE_UNISTR)
+        continue()
     endif()
 
     add_test(

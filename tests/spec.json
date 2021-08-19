@@ -16,5 +16,51 @@
                 "E": "MatchError: line 1:1, expect R1 (char '1')"
             }
         ]
+    },
+
+    {
+        "grammar": "R1 = \"a\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "a",
+                "O": [{"slice":[0,1],"type":"R1"}]
+            },
+            {
+                "I": "b",
+                "E": "MatchError: line 1:1, expect R1 (char 'a')"
+            },
+            {
+                "I": "",
+                "E": "MatchError: line 1:1, expect R1 (char 'a')"
+            }
+        ]
+    },
+
+    {
+        "grammar": "R1 = \"Hello World\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "Hello World",
+                "O": [{"slice":[0,11],"type":"R1"}]
+            },
+            {
+                "I": "Hello Worl",
+                "E": "MatchError: line 1:11, expect R1 (char 'd')"
+            },
+            {
+                "I": "hello world",
+                "E": "MatchError: line 1:1, expect R1 (char 'H')"
+            },
+            {
+                "I": "Hello World + More Text",
+                "O": [{"slice":[0,11],"type":"R1"}]
+            },
+            {
+                "I": "",
+                "E": "MatchError: line 1:1, expect R1 (char 'H')"
+            }
+        ]
     }
 ]

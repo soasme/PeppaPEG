@@ -3,24 +3,46 @@ import sys
 import json
 
 def test_spec():
-    specs_json = sys.argv[1]
+    executable = sys.argv[1]
+    specs_json = sys.argv[2]
     with open(specs_json) as f:
         specs = json.load(f)
 
     for spec in specs:
-        with open('grammar', 'wb') as grammar_file:
-            grammar_file.write(spec['grammar'].encode('utf-8'))
+        with open('grammar', 'w') as grammar_file:
+            grammar_file.write(spec['grammar'])
         for test in spec['tests']:
-            command = f'./peppa -g grammar -e {spec["entry"]} -'
-            proc = subprocess.run(command, capture_output=True, shell=True, input=test['I'].encode('utf-8'))
+            with open('input', 'w') as input_file:
+                input_file.write(test['I'])
+            command = f'{executable} ast -g grammar -e {spec["entry"]} input'
+            proc = subprocess.run(command, capture_output=True, shell=True)
             if 'O' in test:
-                assert proc.returncode == 0, proc.stderr
-                output = json.loads(proc.stdout.decode('utf-8'))
-                expect = test['O']
-                assert output == expect, f'spec: {spec}'
+                if proc.returncode == 0:
+                    output = json.loads(proc.stdout.decode('utf-8'))
+                    expect = test['O']
+                    if output != expect:
+                        print(
+                            f"GRAMMAR:\n{spec['grammar']}\n"
+                            f"INPUT:\n{test['I']}\n"
+                            f"OUTPUT:\n{test['O']}\n"
+                            f"GOT:\n{output}\n"
+                        )
+                else:
+                    print(
+                        f"GRAMMAR:\n{spec['grammar']}\n"
+                        f"INPUT:\n{test['I']}\n"
+                        f"OUTPUT:\n{test['O']}\n"
+                        f"GOT:\n{proc.stderr.decode('utf-8')}\n"
+                    )
             else:
                 assert proc.returncode != 0, proc.stderr
-                assert proc.stderr.decode('utf-8').strip() == test['E'], proc.stderr
+                if proc.stderr.decode('utf-8').strip() != test['E']:
+                    print(
+                        f"GRAMMAR:\n{spec['grammar']}\n"
+                        f"INPUT:\n{test['I']}\n"
+                        f"ERROR:\n{test['E']}\n"
+                        f"GOT:\n{proc.stderr.decode('utf-8')}"
+                    )
 
 if __name__ == '__main__':
     test_spec()

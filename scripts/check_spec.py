@@ -1,6 +1,7 @@
 import subprocess
 import sys
 import json
+import shlex
 
 def test_spec():
     executable = sys.argv[1]
@@ -13,8 +14,7 @@ def test_spec():
         for test in spec['tests']:
             total += 1
             proc = subprocess.run(
-                [
-                    executable,
+                shlex.split(executable) + [
                     'ast',
                     '--grammar', spec['grammar'],
                     '--grammar-entry', spec['entry'],

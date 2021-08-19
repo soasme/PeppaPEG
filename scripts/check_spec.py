@@ -16,7 +16,7 @@ def test_spec():
             proc = subprocess.run(
                 shlex.split(executable) + [
                     'ast',
-                    '--grammar', spec['grammar'],
+                    '--grammar-str', spec['grammar'],
                     '--grammar-entry', spec['entry'],
                 ],
                 capture_output=True,

@@ -47,7 +47,7 @@
             },
             {
                 "I": "Hello Worl",
-                "E": "MatchError: line 1:1, expect R1 (len 11)"
+                "E": "MatchError: line 1:1, expect R1 (char 'H')"
             },
             {
                 "I": "hello world",
@@ -59,7 +59,150 @@
             },
             {
                 "I": "",
-                "E": "MatchError: line 1:1, expect R1 (char 'H')"
+                "E": "MatchError: line 1:1, expect R1 (len 11)"
+            }
+        ]
+    },
+
+    {
+        "grammar": "Chinese = \"你好，世界\";",
+        "entry": "Chinese",
+        "tests": [
+            {
+                "I": "你好，世界",
+                "O": [{"slice":[0,15],"type":"Chinese"}]
+            }
+        ]
+    },
+
+    {
+        "grammar": "Japanese = \"こんにちは世界\";",
+        "entry": "Japanese",
+        "tests": [
+            {
+                "I": "こんにちは世界",
+                "O": [{"slice":[0,21],"type":"Japanese"}]
+            }
+        ]
+    },
+
+    {
+        "grammar": "Korean = \"안녕 세상\";",
+        "entry": "Korean",
+        "tests": [
+            {
+                "I": "안녕 세상",
+                "O": [{"slice":[0,13],"type":"Korean"}]
+            }
+        ]
+    },
+
+    {
+        "grammar": "R1 = \"نامهای\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "نامهای",
+                "O": [{"slice":[0,12],"type":"R1"}]
+            }
+        ]
+    },
+
+    {
+        "grammar": "R1 = \"Peppa PEG 🐷\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "Peppa PEG 🐷",
+                "O": [{"slice":[0,14],"type":"R1"}]
+            }
+        ]
+    },
+
+    {
+        "grammar": "R1 = \"\\x48\\x65\\x6c\\x6c\\x6f, world\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "Hello, world",
+                "O": [{"slice":[0,12],"type":"R1"}]
+            }
+        ]
+    },
+
+    {
+        "grammar": "R1 = \"\\u4f60\\u597d, world\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "你好, world",
+                "O": [{"slice":[0,13],"type":"R1"}]
+            }
+        ]
+    },
+
+    {
+        "grammar": "R1 = \"\\xe4\\xbd\\xa0\\xe5\\xa5\\xbd, world\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "ä½ å¥½, world",
+                "O": [{"slice":[0,19],"type":"R1"}]
+            }
+        ]
+    },
+
+    {
+        "grammar": "R1 = \"\\n\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "\n",
+                "O": [{"slice":[0,1],"type":"R1"}]
+            }
+        ]
+    },
+
+    {
+        "grammar": "R1 = \"\\t\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "\t",
+                "O": [{"slice":[0,1],"type":"R1"}]
+            }
+        ]
+    },
+
+    {
+        "grammar": "R1 = \"\\r\\n\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "\r\n",
+                "O": [{"slice":[0,2],"type":"R1"}]
+            }
+        ]
+    },
+
+    {
+        "grammar": "R1 = \"\\x0A\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "\n",
+                "O": [{"slice":[0,1],"type":"R1"}]
+            }
+        ]
+    },
+
+    {
+        "grammar": "R1 = \"   \";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "   ",
+                "O": [{"slice":[0,3],"type":"R1"}]
             }
         ]
     }

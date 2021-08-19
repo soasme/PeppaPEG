@@ -64,7 +64,7 @@ static int subcommand_usage(const char* name) {
     printf("usage: %s [SUBCOMMAND] [OPTION]...\n\n", name);
     printf(
         "SUBCOMMAND: ast [OPTIONS]... [FILE]...\n\n"
-        "  --grammar/-g FILE\tpeg grammar string\n"
+        "  --grammar-str/-g FILE\tpeg grammar string\n"
         "  --grammar-file/-G FILE\tpath to peg grammar file\n"
         "  --grammar-entry/-e NAME\tentry rule name in peg grammar\n"
         "\n"
@@ -126,7 +126,7 @@ int init_args(p4_args_t* args, int argc, char* argv[]) {
             {"help", no_argument, 0, 'h'},
             {"grammar-entry", required_argument, 0, 'e'},
             {"grammar-file", required_argument, 0, 'G'},
-            {"grammar", required_argument, 0, 'g'},
+            {"grammar-str", required_argument, 0, 'g'},
             {0, 0, 0, 0}
         };
         int option_index = 0;
@@ -175,7 +175,7 @@ int subcommand_ast(p4_args_t* args) {
     FILE* input_file = NULL;
 
     if (args->grammar_file == NULL && args->grammar_content == NULL) {
-        fprintf(stderr, "error: --grammar-file/-G or --grammar/-g is required\n");
+        fprintf(stderr, "error: --grammar-file/-G or --grammar-str/-g is required\n");
         abort(1);
     }
 
@@ -192,7 +192,11 @@ int subcommand_ast(p4_args_t* args) {
 
     if (args->arguments_count == 1) {
         input_content = P4_MALLOC(sizeof(char) * 1024 * 1024);
-        scanf("%1048575[^\n]", input_content);
+        char* s = input_content;
+        size_t size = 0;
+        while ((*(s++) = getchar()) != EOF && (++size) < 1024 * 1024 - 1) {
+        }
+        *s = '\0';
     } else {
         if (!(input_file = fopen(args->arguments[1], "r"))) {
             perror(args->arguments[1]);

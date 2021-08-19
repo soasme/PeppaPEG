@@ -1,0 +1,457 @@
+[
+    {
+        "grammar": "Num = [1-9];",
+        "entry": "Num",
+        "tests": [
+            {
+                "I": "1",
+                "O": [{"slice":[0,1],"type":"Num"}]
+            },
+            {
+                "I": "0",
+                "E": "MatchError: line 1:1, expect Num"
+            },
+            {
+                "I": "",
+                "E": "MatchError: line 1:1, expect Num"
+            }
+        ]
+    },
+
+    {
+        "grammar": "Odd = [1-9..2];",
+        "entry": "Odd",
+        "tests": [
+            {
+                "I": "1",
+                "O": [{"slice":[0,1],"type":"Odd"}]
+            },
+            {
+                "I": "2",
+                "E": "MatchError: line 1:1, expect Odd"
+            },
+            {
+                "I": "3",
+                "O": [{"slice":[0,1],"type":"Odd"}]
+            },
+            {
+                "I": "4",
+                "E": "MatchError: line 1:1, expect Odd"
+            },
+            {
+                "I": "a",
+                "E": "MatchError: line 1:1, expect Odd"
+            }
+        ]
+    },
+
+    {
+        "grammar": "Lower = [a-z];",
+        "entry": "Lower",
+        "tests": [
+            {
+                "I": "a",
+                "O": [{"slice":[0,1],"type":"Lower"}]
+            },
+            {
+                "I": "A",
+                "E": "MatchError: line 1:1, expect Lower"
+            },
+            {
+                "I": "z",
+                "O": [{"slice":[0,1],"type":"Lower"}]
+            },
+            {
+                "I": "Z",
+                "E": "MatchError: line 1:1, expect Lower"
+            },
+            {
+                "I": ";",
+                "E": "MatchError: line 1:1, expect Lower"
+            }
+        ]
+    },
+
+    {
+        "grammar": "Upper = [A-Z];",
+        "entry": "Upper",
+        "tests": [
+            {
+                "I": "A",
+                "O": [{"slice":[0,1],"type":"Upper"}]
+            },
+            {
+                "I": "a",
+                "E": "MatchError: line 1:1, expect Upper"
+            },
+            {
+                "I": "Z",
+                "O": [{"slice":[0,1],"type":"Upper"}]
+            },
+            {
+                "I": "z",
+                "E": "MatchError: line 1:1, expect Upper"
+            },
+            {
+                "I": ";",
+                "E": "MatchError: line 1:1, expect Upper"
+            }
+        ]
+    },
+
+    {
+        "grammar": "Num = [\\x30-\\x39];",
+        "entry": "Num",
+        "tests": [
+            {
+                "I": "0",
+                "O": [{"slice":[0,1],"type":"Num"}]
+            },
+            {
+                "I": "a",
+                "E": "MatchError: line 1:1, expect Num"
+            },
+            {
+                "I": "9",
+                "O": [{"slice":[0,1],"type":"Num"}]
+            },
+            {
+                "I": "a",
+                "E": "MatchError: line 1:1, expect Num"
+            },
+            {
+                "I": ";",
+                "E": "MatchError: line 1:1, expect Num"
+            }
+        ]
+    },
+
+    {
+        "grammar": "Any = [\\u0001-\\U0010ffff];",
+        "entry": "Any",
+        "tests": [
+            {
+                "I": "0",
+                "O": [{"slice":[0,1],"type":"Any"}]
+            },
+            {
+                "I": "a",
+                "O": [{"slice":[0,1],"type":"Any"}]
+            },
+            {
+                "I": ";",
+                "O": [{"slice":[0,1],"type":"Any"}]
+            },
+            {
+                "I": "好",
+                "O": [{"slice":[0,3],"type":"Any"}]
+            },
+            {
+                "I": "👌",
+                "O": [{"slice":[0,4],"type":"Any"}]
+            },
+            {
+                "I": "",
+                "E": "MatchError: line 1:1, expect Any"
+            }
+        ]
+    },
+
+    {
+        "grammar": "CJK = [一-十];",
+        "entry": "CJK",
+        "tests": [
+            {
+                "I": "一",
+                "O": [{"slice":[0,3],"type":"CJK"}]
+            },
+            {
+                "I": "二",
+                "O": [{"slice":[0,3],"type":"CJK"}]
+            },
+            {
+                "I": "三",
+                "O": [{"slice":[0,3],"type":"CJK"}]
+            },
+            {
+                "I": "1",
+                "E": "MatchError: line 1:1, expect CJK"
+            }
+        ]
+    },
+
+    {
+        "grammar": "Control = [\\p{Cc}];",
+        "entry": "Control",
+        "tests": [
+            {
+                "I": "\n",
+                "O": [{"slice":[0,1],"type":"Control"}]
+            },
+            {
+                "I": "\t",
+                "O": [{"slice":[0,1],"type":"Control"}]
+            },
+            {
+                "I": "\b",
+                "O": [{"slice":[0,1],"type":"Control"}]
+            },
+            {
+                "I": "1",
+                "E": "MatchError: line 1:1, expect Control"
+            }
+        ]
+    },
+
+    {
+        "grammar": "Lower = [\\p{Ll}];",
+        "entry": "Lower",
+        "tests": [
+            {
+                "I": "Ì",
+                "E": "MatchError: line 1:1, expect Lower"
+            },
+            {
+                "I": "ì",
+                "O": [{"slice":[0,2],"type":"Lower"}]
+            },
+            {
+                "I": "i",
+                "O": [{"slice":[0,1],"type":"Lower"}]
+            },
+            {
+                "I": "ί",
+                "O": [{"slice":[0,2],"type":"Lower"}]
+            },
+            {
+                "I": "\n",
+                "E": "MatchError: line 1:1, expect Lower"
+            },
+            {
+                "I": "1",
+                "E": "MatchError: line 1:1, expect Lower"
+            }
+        ]
+    },
+
+    {
+        "grammar": "Upper = [\\p{Lu}];",
+        "entry": "Upper",
+        "tests": [
+            {
+                "I": "Ì",
+                "O": [{"slice":[0,2],"type":"Upper"}]
+            },
+            {
+                "I": "ì",
+                "E": "MatchError: line 1:1, expect Upper"
+            },
+            {
+                "I": "I",
+                "O": [{"slice":[0,1],"type":"Upper"}]
+            },
+            {
+                "I": "i",
+                "E": "MatchError: line 1:1, expect Upper"
+            },
+            {
+                "I": "\n",
+                "E": "MatchError: line 1:1, expect Upper"
+            },
+            {
+                "I": "1",
+                "E": "MatchError: line 1:1, expect Upper"
+            }
+        ]
+    },
+
+    {
+        "grammar": "Letter = [\\p{L}];",
+        "entry": "Letter",
+        "tests": [
+            {
+                "I": "Ì",
+                "O": [{"slice":[0,2],"type":"Letter"}]
+            },
+            {
+                "I": "ì",
+                "O": [{"slice":[0,2],"type":"Letter"}]
+            },
+            {
+                "I": "I",
+                "O": [{"slice":[0,1],"type":"Letter"}]
+            },
+            {
+                "I": "i",
+                "O": [{"slice":[0,1],"type":"Letter"}]
+            },
+            {
+                "I": "\n",
+                "E": "MatchError: line 1:1, expect Letter"
+            },
+            {
+                "I": "1",
+                "E": "MatchError: line 1:1, expect Letter"
+            }
+        ]
+    },
+
+    {
+        "grammar": "Title = [\\p{Lt}];",
+        "entry": "Title",
+        "tests": [
+            {
+                "I": "ǈ",
+                "O": [{"slice":[0,2],"type":"Title"}]
+            },
+            {
+                "I": "Lj",
+                "E": "MatchError: line 1:1, expect Title"
+            },
+            {
+                "I": "\n",
+                "E": "MatchError: line 1:1, expect Title"
+            },
+            {
+                "I": "1",
+                "E": "MatchError: line 1:1, expect Title"
+            }
+        ]
+    },
+
+    {
+        "grammar": "OtherLetter = [\\p{Lo}];",
+        "entry": "OtherLetter",
+        "tests": [
+            {
+                "I": "א",
+                "O": [{"slice":[0,2],"type":"OtherLetter"}]
+            },
+            {
+                "I": "ب",
+                "O": [{"slice":[0,2],"type":"OtherLetter"}]
+            },
+            {
+                "I": "Lj",
+                "E": "MatchError: line 1:1, expect OtherLetter"
+            },
+            {
+                "I": "\n",
+                "E": "MatchError: line 1:1, expect OtherLetter"
+            },
+            {
+                "I": "1",
+                "E": "MatchError: line 1:1, expect OtherLetter"
+            }
+        ]
+    },
+
+    {
+        "grammar": "LineSeparator = [\\p{Zl}];",
+        "entry": "LineSeparator",
+        "tests": [
+            {
+                "I": "\u2027",
+                "E": "MatchError: line 1:1, expect LineSeparator"
+            },
+            {
+                "I": "\u2028",
+                "O": [{"slice":[0,3],"type":"LineSeparator"}]
+            },
+            {
+                "I": "\u2029",
+                "E": "MatchError: line 1:1, expect LineSeparator"
+            }
+        ]
+    },
+
+    {
+        "grammar": "ParagraphSeparator = [\\p{Zp}];",
+        "entry": "ParagraphSeparator",
+        "tests": [
+            {
+                "I": "\u2027",
+                "E": "MatchError: line 1:1, expect ParagraphSeparator"
+            },
+            {
+                "I": "\u2028",
+                "E": "MatchError: line 1:1, expect ParagraphSeparator"
+            },
+            {
+                "I": "\u2029",
+                "O": [{"slice":[0,3],"type":"ParagraphSeparator"}]
+            }
+        ]
+    },
+
+    {
+        "grammar": "SpaceSeparator = [\\p{Zs}];",
+        "entry": "SpaceSeparator",
+        "tests": [
+            {
+                "I": "\u0020",
+                "O": [{"slice":[0,1],"type":"SpaceSeparator"}]
+            },
+            {
+                "I": " ",
+                "O": [{"slice":[0,1],"type":"SpaceSeparator"}]
+            },
+            {
+                "I": "\u3000",
+                "O": [{"slice":[0,3],"type":"SpaceSeparator"}]
+            }
+        ]
+    },
+
+    {
+        "grammar": "Nd = [\\p{Nd}];",
+        "entry": "Nd",
+        "tests": [
+            {
+                "I": "０",
+                "O": [{"slice":[0,3],"type":"Nd"}]
+            }
+        ]
+    },
+
+    {
+        "grammar": "Nl = [\\p{Nl}];",
+        "entry": "Nl",
+        "tests": [
+            {
+                "I": "Ⅵ",
+                "O": [{"slice":[0,3],"type":"Nl"}]
+            }
+        ]
+    },
+
+    {
+        "grammar": "No = [\\p{No}];",
+        "entry": "No",
+        "tests": [
+            {
+                "I": "¼",
+                "O": [{"slice":[0,2],"type":"No"}]
+            }
+        ]
+    },
+
+    {
+        "grammar": "N = [\\p{N}];",
+        "entry": "N",
+        "tests": [
+            {
+                "I": "０",
+                "O": [{"slice":[0,3],"type":"N"}]
+            },
+            {
+                "I": "Ⅵ",
+                "O": [{"slice":[0,3],"type":"N"}]
+            },
+            {
+                "I": "¼",
+                "O": [{"slice":[0,2],"type":"N"}]
+            }
+        ]
+    }
+]

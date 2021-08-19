@@ -10,14 +10,18 @@ def test_spec():
 
     failed, total = 0, 0
     for spec in specs:
-        with open('grammar', 'w') as grammar_file:
-            grammar_file.write(spec['grammar'])
         for test in spec['tests']:
             total += 1
-            with open('input', 'w') as input_file:
-                input_file.write(test['I'])
-            command = f'{executable} ast -g grammar -e {spec["entry"]} input'
-            proc = subprocess.run(command, capture_output=True, shell=True)
+            proc = subprocess.run(
+                [
+                    executable,
+                    'ast',
+                    '--grammar', spec['grammar'],
+                    '--grammar-entry', spec['entry'],
+                ],
+                capture_output=True,
+                input=test['I'].encode('utf-8'),
+            )
             if 'O' in test:
                 if proc.returncode == 0:
                     output = json.loads(proc.stdout.decode('utf-8'))

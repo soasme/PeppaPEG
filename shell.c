@@ -48,6 +48,7 @@ struct p4_args_t {
     char* subcommand;
     bool  help;
     bool  version;
+    char* grammar_content;
     FILE* grammar_file;
     char* grammar_entry;
     size_t arguments_count;
@@ -63,8 +64,9 @@ static int subcommand_usage(const char* name) {
     printf("usage: %s [SUBCOMMAND] [OPTION]...\n\n", name);
     printf(
         "SUBCOMMAND: ast [OPTIONS]... [FILE]...\n\n"
-        "  --grammar-file/-g FILE\trequired, path to peg grammar file\n"
-        "  --grammar-entry/-e NAME\trequired, entry rule name in peg grammar\n"
+        "  --grammar/-g FILE\tpeg grammar string\n"
+        "  --grammar-file/-G FILE\tpath to peg grammar file\n"
+        "  --grammar-entry/-e NAME\tentry rule name in peg grammar\n"
         "\n"
         "OPTION:\n\n"
         "  --help/-h\t\t\tprint help information\n"
@@ -73,7 +75,7 @@ static int subcommand_usage(const char* name) {
         "EXAMPLE:\n\n"
     );
     printf("    $ %s --version\n", name);
-    printf("    $ %s ast -g json.peg -e entry data.json\n", name);
+    printf("    $ %s ast -G json.peg -e entry data.json\n", name);
     return 0;
 }
 
@@ -123,11 +125,12 @@ int init_args(p4_args_t* args, int argc, char* argv[]) {
             {"version", no_argument, 0, 'V'},
             {"help", no_argument, 0, 'h'},
             {"grammar-entry", required_argument, 0, 'e'},
-            {"grammar-file", required_argument, 0, 'g'},
+            {"grammar-file", required_argument, 0, 'G'},
+            {"grammar", required_argument, 0, 'g'},
             {0, 0, 0, 0}
         };
         int option_index = 0;
-        c = getopt_long (argc, argv, "Vhe:g:", long_options, &option_index);
+        c = getopt_long (argc, argv, "Vhe:g:G:", long_options, &option_index);
         if (c == -1) break;
         switch (c) {
             case 0:
@@ -142,6 +145,9 @@ int init_args(p4_args_t* args, int argc, char* argv[]) {
                 args->grammar_entry = optarg;
                 break;
             case 'g':
+                args->grammar_content = optarg;
+                break;
+            case 'G':
                 if (!(args->grammar_file = fopen(optarg, "r"))) {
                     perror(optarg);
                     return -1;
@@ -168,13 +174,8 @@ int subcommand_ast(p4_args_t* args) {
     char *grammar_content = NULL, *input_content = NULL;
     FILE* input_file = NULL;
 
-    if (args->arguments_count < 2) {
-        fprintf(stderr, "error: argument FILE is required\n");
-        abort(1);
-    }
-
-    if (args->grammar_file == NULL) {
-        fprintf(stderr, "error: --grammar-file/-g is required\n");
+    if (args->grammar_file == NULL && args->grammar_content == NULL) {
+        fprintf(stderr, "error: --grammar-file/-G or --grammar/-g is required\n");
         abort(1);
     }
 
@@ -183,20 +184,30 @@ int subcommand_ast(p4_args_t* args) {
         abort(1);
     }
 
-    if (!(input_file = fopen(args->arguments[1], "r"))) {
-        perror(args->arguments[1]);
-        abort(1);
+    if (args->grammar_content) {
+        grammar_content = strdup(args->grammar_content);
+    } else {
+        grammar_content = read_file(args->grammar_file);
     }
 
-    grammar_content = read_file(args->grammar_file);
-    input_content = read_file(input_file);
+    if (args->arguments_count == 1) {
+        input_content = P4_MALLOC(sizeof(char) * 1024 * 1024);
+        scanf("%1048575[^\n]", input_content);
+    } else {
+        if (!(input_file = fopen(args->arguments[1], "r"))) {
+            perror(args->arguments[1]);
+            abort(1);
+        }
+        input_content = read_file(input_file);
+    }
+
     err = print_ast(grammar_content, input_content, args->grammar_entry);
 
 finalize:
 
-    P4_FREE(input_content);
-    P4_FREE(grammar_content);
-    fclose(input_file);
+    if (input_content) P4_FREE(input_content);
+    if (grammar_content) P4_FREE(grammar_content);
+    if (input_file) fclose(input_file);
     return err;
 }
 

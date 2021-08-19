@@ -36,39 +36,45 @@
 #include <string.h>
 #include <unistd.h>
 #include <libgen.h>
+#include <getopt.h>
 #include "peppa.h"
 
 # define abort(code) do { err = (code); goto finalize; } while (0)
-# define read_arg(argc, argv, opts, c) (-1 != ((c) = getopt((argc), (argv), (opts))))
 
 typedef struct p4_args_t p4_args_t;
 
 struct p4_args_t {
     char* executable;
+    char* subcommand;
     bool  help;
-    bool  verbose;
+    bool  version;
     FILE* grammar_file;
     char* grammar_entry;
     size_t arguments_count;
     char** arguments;
 };
 
-static void version(const char* name) {
+static int subcommand_version(const char* name) {
     printf("%s version %s\n", name, P4_Version());
+    return 0;
 }
 
-static void usage(const char* name) {
-    printf("usage: %s [OPTION]... [FILE]...\n\n", name);
+static int subcommand_usage(const char* name) {
+    printf("usage: %s [SUBCOMMAND] [OPTION]...\n\n", name);
     printf(
-        "OPTION:\n"
-        "  -h\tprint help information\n"
-        "  -V\tprint version\n"
-        "  -g\trequired, path to peg grammar file\n"
-        "  -e\trequired, entry rule name in peg grammar\n"
+        "SUBCOMMAND: ast [OPTIONS]... [FILE]...\n\n"
+        "  --grammar-file/-g FILE\trequired, path to peg grammar file\n"
+        "  --grammar-entry/-e NAME\trequired, entry rule name in peg grammar\n"
+        "\n"
+        "OPTION:\n\n"
+        "  --help/-h\t\t\tprint help information\n"
+        "  --version/-V\t\t\tprint version\n"
         "\n"
         "EXAMPLE:\n\n"
     );
-    printf("    $ %s -g /path/to/grammar.peg -e entry /path/to/input.txt\n", name);
+    printf("    $ %s --version\n", name);
+    printf("    $ %s ast -g json.peg -e entry data.json\n", name);
+    return 0;
 }
 
 static char* read_file(FILE* f) {
@@ -112,10 +118,22 @@ int init_args(p4_args_t* args, int argc, char* argv[]) {
 
     args->executable = argv[0];
 
-    while (read_arg(argc, argv, "Vhg:e:", c)) {
+    while (1) {
+        static struct option long_options[] = {
+            {"version", no_argument, 0, 'V'},
+            {"help", no_argument, 0, 'h'},
+            {"grammar-entry", required_argument, 0, 'e'},
+            {"grammar-file", required_argument, 0, 'g'},
+            {0, 0, 0, 0}
+        };
+        int option_index = 0;
+        c = getopt_long (argc, argv, "Vhe:g:", long_options, &option_index);
+        if (c == -1) break;
         switch (c) {
+            case 0:
+                break;
             case 'V':
-                args->verbose = true;
+                args->version = true;
                 break;
             case 'h':
                 args->help = true;
@@ -135,42 +153,38 @@ int init_args(p4_args_t* args, int argc, char* argv[]) {
         }
     }
 
-    if (optind == 1) {
-        fprintf(stderr, "for usage try: %s -h\n", args->executable);
-        return -1;
-    }
-
     args->arguments_count = argc - optind;
     args->arguments = argv + optind;
+
+    if (args->arguments_count != 0) {
+        args->subcommand = args->arguments[0];
+    }
 
     return 0;
 }
 
-int run_cmd(p4_args_t* args) {
+int subcommand_ast(p4_args_t* args) {
     int err = 0;
     char *grammar_content = NULL, *input_content = NULL;
     FILE* input_file = NULL;
 
-    if (args->arguments_count == 0) {
+    if (args->arguments_count < 2) {
         fprintf(stderr, "error: argument FILE is required\n");
-        usage(basename(args->executable));
         abort(1);
     }
 
     if (args->grammar_file == NULL) {
-        fprintf(stderr, "error: option -g is required\n");
-        usage(basename(args->executable));
+        fprintf(stderr, "error: --grammar-file/-g is required\n");
         abort(1);
     }
 
     if (args->grammar_entry == NULL) {
-        fprintf(stderr, "error: option -e is required\n");
-        usage(basename(args->executable));
+        fprintf(stderr, "error: --grammar-entry/-e is required\n");
         abort(1);
     }
 
-    if (!(input_file = fopen(args->arguments[0], "r"))) {
-        perror(args->arguments[0]);
+    if (!(input_file = fopen(args->arguments[1], "r"))) {
+        perror(args->arguments[1]);
         abort(1);
     }
 
@@ -184,6 +198,28 @@ finalize:
     P4_FREE(grammar_content);
     fclose(input_file);
     return err;
+}
+
+int run_cmd(p4_args_t* args) {
+    if (args->help) {
+        return subcommand_usage(args->executable);
+    }
+
+    if (args->version) {
+        return subcommand_version(args->executable);
+    }
+
+    if (args->arguments_count == 0) {
+        subcommand_usage(args->executable);
+        return 1;
+    }
+
+    if (strcmp(args->subcommand, "ast") == 0) {
+        return subcommand_ast(args);
+    }
+
+    fprintf(stderr, "error: invalid command: %s\n", args->subcommand);
+    return 1;
 }
 
 void close_args(p4_args_t* args) {

@@ -1,0 +1,219 @@
+[
+    {
+        "grammar": "@squashed\nR1 = R2 R2;R2 = \"X\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "XX",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            2
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "@lifted\nR1 = R2 R2;R2 = \"X\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "XX",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            1
+                        ],
+                        "type": "R2"
+                    },
+                    {
+                        "slice": [
+                            1,
+                            2
+                        ],
+                        "type": "R2"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "@nonterminal\nR1 = R2+;R2 = \"X\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "X",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            1
+                        ],
+                        "type": "R2"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "@nonterminal\nR1 = R2+;R2 = \"X\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "XX",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            2
+                        ],
+                        "type": "R1",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    1
+                                ],
+                                "type": "R2"
+                            },
+                            {
+                                "slice": [
+                                    1,
+                                    2
+                                ],
+                                "type": "R2"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = [a-z]+;@spaced\nR2 = \" \" / \"\\t\" / \"\\r\" / \"\\n\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "xxx",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            3
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = [a-z]+;@spaced R2 = \" \";@spaced R3 = \"\\t\";@spaced R4 = \"\\r\";@spaced R5 = \"\\n\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "xxx",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            3
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = [a-z]+;@spaced @lifted\nR2 = \" \" / \"\\t\" / \"\\r\" / \"\\n\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "x   x x\t\t\nx",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            11
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "@tight\nR1 = R2 R3;R2 = [a-z]{2};@scoped\nR3 = [a-z]{2};@spaced @lifted\nR4 = \" \" / \"\\t\" / \"\\r\" / \"\\n\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "xxxx",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            4
+                        ],
+                        "type": "R1",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    2
+                                ],
+                                "type": "R2"
+                            },
+                            {
+                                "slice": [
+                                    2,
+                                    4
+                                ],
+                                "type": "R3"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "@tight\nR1 = R2 R3;R2 = [a-z]{2};@scoped\nR3 = [a-z]{2};@spaced @lifted\nR4 = \" \" / \"\\t\" / \"\\r\" / \"\\n\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "xxx  x",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            6
+                        ],
+                        "type": "R1",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    2
+                                ],
+                                "type": "R2"
+                            },
+                            {
+                                "slice": [
+                                    2,
+                                    6
+                                ],
+                                "type": "R3"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]

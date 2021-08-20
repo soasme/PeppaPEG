@@ -82,6 +82,7 @@ set(
     test_back_reference_spec
     test_dot_spec
     test_comment_spec
+    test_flags_spec
 )
 
 find_program(PYTHON python3)

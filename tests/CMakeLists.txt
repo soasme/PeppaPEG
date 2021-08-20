@@ -76,6 +76,7 @@ set(
     test_sequence_spec
     test_choice_spec
     test_lookahead_spec
+    test_cut_spec
 )
 
 find_program(PYTHON python3)

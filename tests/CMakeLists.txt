@@ -75,6 +75,7 @@ set(
     test_insensitive_spec
     test_sequence_spec
     test_choice_spec
+    test_lookahead_spec
 )
 
 find_program(PYTHON python3)

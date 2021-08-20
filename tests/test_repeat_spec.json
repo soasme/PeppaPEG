@@ -1,0 +1,278 @@
+[
+    {
+        "grammar": "R1 = ([0-9] / [a-f] / [A-F])+;",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "1A9F",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            4
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            },
+            {
+                "I": "FFFFFF",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            6
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            },
+            {
+                "I": "HHHH",
+                "E": "MatchError: line 1:1, expect R1 (insufficient repetitions)"
+            },
+            {
+                "I": "",
+                "E": "MatchError: line 1:1, expect R1 (insufficient repetitions)"
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = \"a\"*;",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "aaaaa",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            5
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            },
+            {
+                "I": "",
+                "O": []
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = \"a\"+;",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "aaaaa",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            5
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            },
+            {
+                "I": "",
+                "E": "MatchError: line 1:1, expect R1 (insufficient repetitions)"
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = \"a\"?;",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "",
+                "O": []
+            },
+            {
+                "I": "a",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            1
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = \"a\"{2,3};",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "a",
+                "E": "MatchError: line 1:2, expect R1 (insufficient repetitions)"
+            },
+            {
+                "I": "aa",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            2
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            },
+            {
+                "I": "aaa",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            3
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            },
+            {
+                "I": "aaaa",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            3
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = \"a\"{2,};",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "a",
+                "E": "MatchError: line 1:2, expect R1 (insufficient repetitions)"
+            },
+            {
+                "I": "aa",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            2
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            },
+            {
+                "I": "aaa",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            3
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = \"a\"{,3};",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "",
+                "O": []
+            },
+            {
+                "I": "a",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            1
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            },
+            {
+                "I": "aa",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            2
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            },
+            {
+                "I": "aaa",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            3
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            },
+            {
+                "I": "aaaa",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            3
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = \"a\"{3};",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "aa",
+                "E": "MatchError: line 1:3, expect R1 (insufficient repetitions)"
+            },
+            {
+                "I": "aaa",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            3
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            },
+            {
+                "I": "aaaa",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            3
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    }
+]

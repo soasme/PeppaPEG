@@ -71,7 +71,7 @@ set(
     spec_testcases
     test_literal_spec
     test_range_spec
-    test_range_unistr_spec
+    test_range_spec+unistr
     test_insensitive_spec
     test_sequence_spec
     test_choice_spec

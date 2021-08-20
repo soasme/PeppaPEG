@@ -78,6 +78,7 @@ set(
     test_lookahead_spec
     test_cut_spec
     test_repeat_spec
+    test_reference_spec
 )
 
 find_program(PYTHON python3)

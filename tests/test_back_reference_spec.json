@@ -1,0 +1,128 @@
+[
+    {
+        "grammar": "R1 = R23 \\0;R23 = \"2\" / \"3\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "22",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            2
+                        ],
+                        "type": "R1",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    1
+                                ],
+                                "type": "R23"
+                            },
+                            {
+                                "slice": [
+                                    1,
+                                    2
+                                ],
+                                "type": "R23"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = R23 \\0;R23 = \"2\" / \"3\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "23",
+                "E": "MatchError: line 1:2, expect R1 (char '2')"
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = (R2 \\0) \\0;R2 = \"2\" / \"3\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "2222",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            4
+                        ],
+                        "type": "R1",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    1
+                                ],
+                                "type": "R2"
+                            },
+                            {
+                                "slice": [
+                                    1,
+                                    2
+                                ],
+                                "type": "R2"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = R23 \\10;R23 = \"2\" / \"3\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "2222",
+                "E": "IndexError: line 1:2, expect R1 (\\10 out reached)"
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = R23 \\1;R23 = \"2\" / \"3\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "2222",
+                "E": "IndexError: line 1:2, expect R1 (\\1 out reached)"
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = R23 \\0 \\1;R23 = \"2\" / \"3\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "223",
+                "E": "PegError: line 1:3, expect R1 (backref point to backref)"
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = (\"2\" / \"3\") \\0 \\0;R23 = \"2\" / \"3\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "333",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            3
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    }
+]

@@ -1,0 +1,290 @@
+[
+    {
+        "grammar": "R1 = i\"1\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "1",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            1
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = i\"a\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "A",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            1
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = i\"hello world\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "HELLO WORLD",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            11
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = i\"こんにちは世界\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "こんにちは世界",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            21
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = i\"你好，世界\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "你好，世界",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            15
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = i\"你好, World\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "你好, World",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            13
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = i\"ﻥﺎﻤﻫﺎﯾ\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "ﻥﺎﻤﻫﺎﯾ",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            18
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = i\"Peppa PEG \ud83d\udc37\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "peppa peg \ud83d\udc37",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            14
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = i\"\\x48\\x65\\x6c\\x6c\\x6f, world\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "HELLO, WORLD",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            12
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = i\"你好, world\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "你好, WORLD",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            13
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = i\"Hello Worìd\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "HELLO WORÌD",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            12
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = i\"\\r\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "\r",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            1
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = i\"\\t\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "\t",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            1
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = i\"   \";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "   ",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            3
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = \"a\" i\\0;",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "aA",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            2
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = \"a\" i\\0;",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "aa",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            2
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    }
+]

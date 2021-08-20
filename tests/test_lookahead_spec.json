@@ -1,0 +1,86 @@
+[
+    {
+        "grammar": "R1 = !\"a\" [a-f];",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "b",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            1
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = !\"b\" [a-f];",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "b",
+                "E": "MatchError: line 1:1, expect R1"
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = &\"a\" \"apple\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "apple",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            5
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = &\"b\" \"apple\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "beef",
+                "E": "MatchError: line 1:1, expect R1 (char 'a')"
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = &\"a\" i\"apple\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "aPPLE",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            5
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = &\"a\" i\"apple\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "APPLE",
+                "E": "MatchError: line 1:1, expect R1 (char 'a')"
+            }
+        ]
+    }
+]

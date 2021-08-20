@@ -71,7 +71,18 @@ set(
     spec_testcases
     test_literal_spec
     test_range_spec
-    test_range_unistr_spec
+    test_range_spec+unistr
+    test_insensitive_spec
+    test_sequence_spec
+    test_choice_spec
+    test_lookahead_spec
+    test_cut_spec
+    test_repeat_spec
+    test_reference_spec
+    test_back_reference_spec
+    test_dot_spec
+    test_comment_spec
+    test_flags_spec
 )
 
 find_program(PYTHON python3)

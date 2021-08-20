@@ -1,0 +1,3294 @@
+[
+    {
+        "grammar_file": "./toml-v1.0.peg",
+        "entry": "toml",
+        "tests": [
+            {
+                "I": "abc = true # comment",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            20
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    10
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            10
+                                        ],
+                                        "type": "boolean"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "\"abc\" = \"\"",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            10
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    10
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            5
+                                        ],
+                                        "type": "quoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            8,
+                                            10
+                                        ],
+                                        "type": "basic_string"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "\"a\\u0031c\" = \"\"",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            15
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    15
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            10
+                                        ],
+                                        "type": "quoted_key",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    2,
+                                                    8
+                                                ],
+                                                "type": "escaped"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "slice": [
+                                            13,
+                                            15
+                                        ],
+                                        "type": "basic_string"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "a.\"b\".c = \"\"",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            12
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    12
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            7
+                                        ],
+                                        "type": "dotted_key",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    0,
+                                                    1
+                                                ],
+                                                "type": "unquoted_key"
+                                            },
+                                            {
+                                                "slice": [
+                                                    2,
+                                                    5
+                                                ],
+                                                "type": "quoted_key"
+                                            },
+                                            {
+                                                "slice": [
+                                                    6,
+                                                    7
+                                                ],
+                                                "type": "unquoted_key"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "slice": [
+                                            10,
+                                            12
+                                        ],
+                                        "type": "basic_string"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "'abc' = ''",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            10
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    10
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            5
+                                        ],
+                                        "type": "quoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            8,
+                                            10
+                                        ],
+                                        "type": "literal_string"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "a.'b'.c = ''",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            12
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    12
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            7
+                                        ],
+                                        "type": "dotted_key",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    0,
+                                                    1
+                                                ],
+                                                "type": "unquoted_key"
+                                            },
+                                            {
+                                                "slice": [
+                                                    2,
+                                                    5
+                                                ],
+                                                "type": "quoted_key"
+                                            },
+                                            {
+                                                "slice": [
+                                                    6,
+                                                    7
+                                                ],
+                                                "type": "unquoted_key"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "slice": [
+                                            10,
+                                            12
+                                        ],
+                                        "type": "literal_string"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = []",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            8
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    8
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            8
+                                        ],
+                                        "type": "array"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = [ # comment\n ]",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            20
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    20
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            20
+                                        ],
+                                        "type": "array"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = [true]",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            12
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    12
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            12
+                                        ],
+                                        "type": "array",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    7,
+                                                    11
+                                                ],
+                                                "type": "boolean"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = [true,false]",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            18
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    18
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            18
+                                        ],
+                                        "type": "array",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    7,
+                                                    11
+                                                ],
+                                                "type": "boolean"
+                                            },
+                                            {
+                                                "slice": [
+                                                    12,
+                                                    17
+                                                ],
+                                                "type": "boolean"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = [true, false]",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            19
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    19
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            19
+                                        ],
+                                        "type": "array",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    7,
+                                                    11
+                                                ],
+                                                "type": "boolean"
+                                            },
+                                            {
+                                                "slice": [
+                                                    13,
+                                                    18
+                                                ],
+                                                "type": "boolean"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = [ true, false ]",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            21
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    21
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            21
+                                        ],
+                                        "type": "array",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    8,
+                                                    12
+                                                ],
+                                                "type": "boolean"
+                                            },
+                                            {
+                                                "slice": [
+                                                    14,
+                                                    19
+                                                ],
+                                                "type": "boolean"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = { abc=true, xyz=false }",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            29
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    29
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            29
+                                        ],
+                                        "type": "inline_table",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    8,
+                                                    16
+                                                ],
+                                                "type": "keyval",
+                                                "children": [
+                                                    {
+                                                        "slice": [
+                                                            8,
+                                                            11
+                                                        ],
+                                                        "type": "unquoted_key"
+                                                    },
+                                                    {
+                                                        "slice": [
+                                                            12,
+                                                            16
+                                                        ],
+                                                        "type": "boolean"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "slice": [
+                                                    18,
+                                                    27
+                                                ],
+                                                "type": "keyval",
+                                                "children": [
+                                                    {
+                                                        "slice": [
+                                                            18,
+                                                            21
+                                                        ],
+                                                        "type": "unquoted_key"
+                                                    },
+                                                    {
+                                                        "slice": [
+                                                            22,
+                                                            27
+                                                        ],
+                                                        "type": "boolean"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "[abc]",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            5
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    5
+                                ],
+                                "type": "std_table",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            1,
+                                            4
+                                        ],
+                                        "type": "unquoted_key"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "[ a.\"b\".c ]",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            11
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    11
+                                ],
+                                "type": "std_table",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            2,
+                                            9
+                                        ],
+                                        "type": "dotted_key",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    2,
+                                                    3
+                                                ],
+                                                "type": "unquoted_key"
+                                            },
+                                            {
+                                                "slice": [
+                                                    4,
+                                                    7
+                                                ],
+                                                "type": "quoted_key"
+                                            },
+                                            {
+                                                "slice": [
+                                                    8,
+                                                    9
+                                                ],
+                                                "type": "unquoted_key"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "[[abc]]",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            7
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    7
+                                ],
+                                "type": "array_table",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            2,
+                                            5
+                                        ],
+                                        "type": "unquoted_key"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "[[ a.\"b\".c ]]",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            13
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    13
+                                ],
+                                "type": "array_table",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            3,
+                                            10
+                                        ],
+                                        "type": "dotted_key",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    3,
+                                                    4
+                                                ],
+                                                "type": "unquoted_key"
+                                            },
+                                            {
+                                                "slice": [
+                                                    5,
+                                                    8
+                                                ],
+                                                "type": "quoted_key"
+                                            },
+                                            {
+                                                "slice": [
+                                                    9,
+                                                    10
+                                                ],
+                                                "type": "unquoted_key"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = '''abc'''",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            15
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    15
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            15
+                                        ],
+                                        "type": "ml_literal_string",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    9,
+                                                    12
+                                                ],
+                                                "type": "ml_literal_body"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = '''a'b'c'''",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            17
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    17
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            17
+                                        ],
+                                        "type": "ml_literal_string",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    9,
+                                                    14
+                                                ],
+                                                "type": "ml_literal_body"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = \"\"\"abc\"\"\"",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            15
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    15
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            15
+                                        ],
+                                        "type": "ml_basic_string"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = \"\"\"a\"b\"c\"\"\"",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            17
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    17
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            17
+                                        ],
+                                        "type": "ml_basic_string"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 0",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            7
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    7
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            7
+                                        ],
+                                        "type": "integer"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 1",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            7
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    7
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            7
+                                        ],
+                                        "type": "integer"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 123_456_789",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            17
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    17
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            17
+                                        ],
+                                        "type": "integer"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = +123_456_789",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            18
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    18
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            18
+                                        ],
+                                        "type": "integer"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = -123_456_789",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            18
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    18
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            18
+                                        ],
+                                        "type": "integer"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 0x123",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            11
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    11
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            11
+                                        ],
+                                        "type": "integer"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 0b0001",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            12
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    12
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            12
+                                        ],
+                                        "type": "integer"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 0o123",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            11
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    11
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            11
+                                        ],
+                                        "type": "integer"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 1.0",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            9
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    9
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            9
+                                        ],
+                                        "type": "float"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = -1.0",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            10
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    10
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            10
+                                        ],
+                                        "type": "float"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = -123_456.0001",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            19
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    19
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            19
+                                        ],
+                                        "type": "float"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = nan",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            9
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    9
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            9
+                                        ],
+                                        "type": "float"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = inf",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            9
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    9
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            9
+                                        ],
+                                        "type": "float"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = +inf",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            10
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    10
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            10
+                                        ],
+                                        "type": "float"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = -inf",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            10
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    10
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            10
+                                        ],
+                                        "type": "float"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 00:00:00",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            14
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    14
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            14
+                                        ],
+                                        "type": "local_time",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    6,
+                                                    8
+                                                ],
+                                                "type": "time_hour"
+                                            },
+                                            {
+                                                "slice": [
+                                                    9,
+                                                    11
+                                                ],
+                                                "type": "time_minute"
+                                            },
+                                            {
+                                                "slice": [
+                                                    12,
+                                                    14
+                                                ],
+                                                "type": "time_second"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 23:59:59.999999",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            21
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    21
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            21
+                                        ],
+                                        "type": "local_time",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    6,
+                                                    8
+                                                ],
+                                                "type": "time_hour"
+                                            },
+                                            {
+                                                "slice": [
+                                                    9,
+                                                    11
+                                                ],
+                                                "type": "time_minute"
+                                            },
+                                            {
+                                                "slice": [
+                                                    12,
+                                                    14
+                                                ],
+                                                "type": "time_second"
+                                            },
+                                            {
+                                                "slice": [
+                                                    15,
+                                                    21
+                                                ],
+                                                "type": "time_secfrac"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 23:59:59.600",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            18
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    18
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            18
+                                        ],
+                                        "type": "local_time",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    6,
+                                                    8
+                                                ],
+                                                "type": "time_hour"
+                                            },
+                                            {
+                                                "slice": [
+                                                    9,
+                                                    11
+                                                ],
+                                                "type": "time_minute"
+                                            },
+                                            {
+                                                "slice": [
+                                                    12,
+                                                    14
+                                                ],
+                                                "type": "time_second"
+                                            },
+                                            {
+                                                "slice": [
+                                                    15,
+                                                    18
+                                                ],
+                                                "type": "time_secfrac"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 00:00:00.000000",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            21
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    21
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            21
+                                        ],
+                                        "type": "local_time",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    6,
+                                                    8
+                                                ],
+                                                "type": "time_hour"
+                                            },
+                                            {
+                                                "slice": [
+                                                    9,
+                                                    11
+                                                ],
+                                                "type": "time_minute"
+                                            },
+                                            {
+                                                "slice": [
+                                                    12,
+                                                    14
+                                                ],
+                                                "type": "time_second"
+                                            },
+                                            {
+                                                "slice": [
+                                                    15,
+                                                    21
+                                                ],
+                                                "type": "time_secfrac"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 2000-01-01",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            16
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    16
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            16
+                                        ],
+                                        "type": "local_date",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    6,
+                                                    10
+                                                ],
+                                                "type": "date_fullyear"
+                                            },
+                                            {
+                                                "slice": [
+                                                    11,
+                                                    13
+                                                ],
+                                                "type": "date_month"
+                                            },
+                                            {
+                                                "slice": [
+                                                    14,
+                                                    16
+                                                ],
+                                                "type": "date_mday"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 2000-12-31",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            16
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    16
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            16
+                                        ],
+                                        "type": "local_date",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    6,
+                                                    10
+                                                ],
+                                                "type": "date_fullyear"
+                                            },
+                                            {
+                                                "slice": [
+                                                    11,
+                                                    13
+                                                ],
+                                                "type": "date_month"
+                                            },
+                                            {
+                                                "slice": [
+                                                    14,
+                                                    16
+                                                ],
+                                                "type": "date_mday"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 2000-01-01T00:00:00",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            25
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    25
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            25
+                                        ],
+                                        "type": "local_date_time",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    6,
+                                                    10
+                                                ],
+                                                "type": "date_fullyear"
+                                            },
+                                            {
+                                                "slice": [
+                                                    11,
+                                                    13
+                                                ],
+                                                "type": "date_month"
+                                            },
+                                            {
+                                                "slice": [
+                                                    14,
+                                                    16
+                                                ],
+                                                "type": "date_mday"
+                                            },
+                                            {
+                                                "slice": [
+                                                    17,
+                                                    19
+                                                ],
+                                                "type": "time_hour"
+                                            },
+                                            {
+                                                "slice": [
+                                                    20,
+                                                    22
+                                                ],
+                                                "type": "time_minute"
+                                            },
+                                            {
+                                                "slice": [
+                                                    23,
+                                                    25
+                                                ],
+                                                "type": "time_second"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 2000-01-01T00:00:00.0000",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            30
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    30
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            30
+                                        ],
+                                        "type": "local_date_time",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    6,
+                                                    10
+                                                ],
+                                                "type": "date_fullyear"
+                                            },
+                                            {
+                                                "slice": [
+                                                    11,
+                                                    13
+                                                ],
+                                                "type": "date_month"
+                                            },
+                                            {
+                                                "slice": [
+                                                    14,
+                                                    16
+                                                ],
+                                                "type": "date_mday"
+                                            },
+                                            {
+                                                "slice": [
+                                                    17,
+                                                    19
+                                                ],
+                                                "type": "time_hour"
+                                            },
+                                            {
+                                                "slice": [
+                                                    20,
+                                                    22
+                                                ],
+                                                "type": "time_minute"
+                                            },
+                                            {
+                                                "slice": [
+                                                    23,
+                                                    25
+                                                ],
+                                                "type": "time_second"
+                                            },
+                                            {
+                                                "slice": [
+                                                    26,
+                                                    30
+                                                ],
+                                                "type": "time_secfrac"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 2000-01-01t00:00:00",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            25
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    25
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            25
+                                        ],
+                                        "type": "local_date_time",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    6,
+                                                    10
+                                                ],
+                                                "type": "date_fullyear"
+                                            },
+                                            {
+                                                "slice": [
+                                                    11,
+                                                    13
+                                                ],
+                                                "type": "date_month"
+                                            },
+                                            {
+                                                "slice": [
+                                                    14,
+                                                    16
+                                                ],
+                                                "type": "date_mday"
+                                            },
+                                            {
+                                                "slice": [
+                                                    17,
+                                                    19
+                                                ],
+                                                "type": "time_hour"
+                                            },
+                                            {
+                                                "slice": [
+                                                    20,
+                                                    22
+                                                ],
+                                                "type": "time_minute"
+                                            },
+                                            {
+                                                "slice": [
+                                                    23,
+                                                    25
+                                                ],
+                                                "type": "time_second"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 2000-01-01t00:00:00.0000",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            30
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    30
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            30
+                                        ],
+                                        "type": "local_date_time",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    6,
+                                                    10
+                                                ],
+                                                "type": "date_fullyear"
+                                            },
+                                            {
+                                                "slice": [
+                                                    11,
+                                                    13
+                                                ],
+                                                "type": "date_month"
+                                            },
+                                            {
+                                                "slice": [
+                                                    14,
+                                                    16
+                                                ],
+                                                "type": "date_mday"
+                                            },
+                                            {
+                                                "slice": [
+                                                    17,
+                                                    19
+                                                ],
+                                                "type": "time_hour"
+                                            },
+                                            {
+                                                "slice": [
+                                                    20,
+                                                    22
+                                                ],
+                                                "type": "time_minute"
+                                            },
+                                            {
+                                                "slice": [
+                                                    23,
+                                                    25
+                                                ],
+                                                "type": "time_second"
+                                            },
+                                            {
+                                                "slice": [
+                                                    26,
+                                                    30
+                                                ],
+                                                "type": "time_secfrac"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 2000-01-01 00:00:00",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            25
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    25
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            25
+                                        ],
+                                        "type": "local_date_time",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    6,
+                                                    10
+                                                ],
+                                                "type": "date_fullyear"
+                                            },
+                                            {
+                                                "slice": [
+                                                    11,
+                                                    13
+                                                ],
+                                                "type": "date_month"
+                                            },
+                                            {
+                                                "slice": [
+                                                    14,
+                                                    16
+                                                ],
+                                                "type": "date_mday"
+                                            },
+                                            {
+                                                "slice": [
+                                                    17,
+                                                    19
+                                                ],
+                                                "type": "time_hour"
+                                            },
+                                            {
+                                                "slice": [
+                                                    20,
+                                                    22
+                                                ],
+                                                "type": "time_minute"
+                                            },
+                                            {
+                                                "slice": [
+                                                    23,
+                                                    25
+                                                ],
+                                                "type": "time_second"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 2000-01-01 00:00:00.0000",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            30
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    30
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            30
+                                        ],
+                                        "type": "local_date_time",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    6,
+                                                    10
+                                                ],
+                                                "type": "date_fullyear"
+                                            },
+                                            {
+                                                "slice": [
+                                                    11,
+                                                    13
+                                                ],
+                                                "type": "date_month"
+                                            },
+                                            {
+                                                "slice": [
+                                                    14,
+                                                    16
+                                                ],
+                                                "type": "date_mday"
+                                            },
+                                            {
+                                                "slice": [
+                                                    17,
+                                                    19
+                                                ],
+                                                "type": "time_hour"
+                                            },
+                                            {
+                                                "slice": [
+                                                    20,
+                                                    22
+                                                ],
+                                                "type": "time_minute"
+                                            },
+                                            {
+                                                "slice": [
+                                                    23,
+                                                    25
+                                                ],
+                                                "type": "time_second"
+                                            },
+                                            {
+                                                "slice": [
+                                                    26,
+                                                    30
+                                                ],
+                                                "type": "time_secfrac"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 2000-01-01T00:00:00Z",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            26
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    26
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            26
+                                        ],
+                                        "type": "offset_date_time",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    6,
+                                                    10
+                                                ],
+                                                "type": "date_fullyear"
+                                            },
+                                            {
+                                                "slice": [
+                                                    11,
+                                                    13
+                                                ],
+                                                "type": "date_month"
+                                            },
+                                            {
+                                                "slice": [
+                                                    14,
+                                                    16
+                                                ],
+                                                "type": "date_mday"
+                                            },
+                                            {
+                                                "slice": [
+                                                    17,
+                                                    19
+                                                ],
+                                                "type": "time_hour"
+                                            },
+                                            {
+                                                "slice": [
+                                                    20,
+                                                    22
+                                                ],
+                                                "type": "time_minute"
+                                            },
+                                            {
+                                                "slice": [
+                                                    23,
+                                                    25
+                                                ],
+                                                "type": "time_second"
+                                            },
+                                            {
+                                                "slice": [
+                                                    25,
+                                                    26
+                                                ],
+                                                "type": "time_utc"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 2000-01-01T00:00:00.0000Z",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            31
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    31
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            31
+                                        ],
+                                        "type": "offset_date_time",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    6,
+                                                    10
+                                                ],
+                                                "type": "date_fullyear"
+                                            },
+                                            {
+                                                "slice": [
+                                                    11,
+                                                    13
+                                                ],
+                                                "type": "date_month"
+                                            },
+                                            {
+                                                "slice": [
+                                                    14,
+                                                    16
+                                                ],
+                                                "type": "date_mday"
+                                            },
+                                            {
+                                                "slice": [
+                                                    17,
+                                                    19
+                                                ],
+                                                "type": "time_hour"
+                                            },
+                                            {
+                                                "slice": [
+                                                    20,
+                                                    22
+                                                ],
+                                                "type": "time_minute"
+                                            },
+                                            {
+                                                "slice": [
+                                                    23,
+                                                    25
+                                                ],
+                                                "type": "time_second"
+                                            },
+                                            {
+                                                "slice": [
+                                                    26,
+                                                    30
+                                                ],
+                                                "type": "time_secfrac"
+                                            },
+                                            {
+                                                "slice": [
+                                                    30,
+                                                    31
+                                                ],
+                                                "type": "time_utc"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 2000-01-01T00:00:00+12:00",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            31
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    31
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            31
+                                        ],
+                                        "type": "offset_date_time",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    6,
+                                                    10
+                                                ],
+                                                "type": "date_fullyear"
+                                            },
+                                            {
+                                                "slice": [
+                                                    11,
+                                                    13
+                                                ],
+                                                "type": "date_month"
+                                            },
+                                            {
+                                                "slice": [
+                                                    14,
+                                                    16
+                                                ],
+                                                "type": "date_mday"
+                                            },
+                                            {
+                                                "slice": [
+                                                    17,
+                                                    19
+                                                ],
+                                                "type": "time_hour"
+                                            },
+                                            {
+                                                "slice": [
+                                                    20,
+                                                    22
+                                                ],
+                                                "type": "time_minute"
+                                            },
+                                            {
+                                                "slice": [
+                                                    23,
+                                                    25
+                                                ],
+                                                "type": "time_second"
+                                            },
+                                            {
+                                                "slice": [
+                                                    25,
+                                                    31
+                                                ],
+                                                "type": "time_numoffset",
+                                                "children": [
+                                                    {
+                                                        "slice": [
+                                                            25,
+                                                            26
+                                                        ],
+                                                        "type": "plus"
+                                                    },
+                                                    {
+                                                        "slice": [
+                                                            26,
+                                                            28
+                                                        ],
+                                                        "type": "time_hour"
+                                                    },
+                                                    {
+                                                        "slice": [
+                                                            29,
+                                                            31
+                                                        ],
+                                                        "type": "time_minute"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 2000-01-01T00:00:00.0000+12:00",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            36
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    36
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            36
+                                        ],
+                                        "type": "offset_date_time",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    6,
+                                                    10
+                                                ],
+                                                "type": "date_fullyear"
+                                            },
+                                            {
+                                                "slice": [
+                                                    11,
+                                                    13
+                                                ],
+                                                "type": "date_month"
+                                            },
+                                            {
+                                                "slice": [
+                                                    14,
+                                                    16
+                                                ],
+                                                "type": "date_mday"
+                                            },
+                                            {
+                                                "slice": [
+                                                    17,
+                                                    19
+                                                ],
+                                                "type": "time_hour"
+                                            },
+                                            {
+                                                "slice": [
+                                                    20,
+                                                    22
+                                                ],
+                                                "type": "time_minute"
+                                            },
+                                            {
+                                                "slice": [
+                                                    23,
+                                                    25
+                                                ],
+                                                "type": "time_second"
+                                            },
+                                            {
+                                                "slice": [
+                                                    26,
+                                                    30
+                                                ],
+                                                "type": "time_secfrac"
+                                            },
+                                            {
+                                                "slice": [
+                                                    30,
+                                                    36
+                                                ],
+                                                "type": "time_numoffset",
+                                                "children": [
+                                                    {
+                                                        "slice": [
+                                                            30,
+                                                            31
+                                                        ],
+                                                        "type": "plus"
+                                                    },
+                                                    {
+                                                        "slice": [
+                                                            31,
+                                                            33
+                                                        ],
+                                                        "type": "time_hour"
+                                                    },
+                                                    {
+                                                        "slice": [
+                                                            34,
+                                                            36
+                                                        ],
+                                                        "type": "time_minute"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 2000-01-01T00:00:00-07:00",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            31
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    31
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            31
+                                        ],
+                                        "type": "offset_date_time",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    6,
+                                                    10
+                                                ],
+                                                "type": "date_fullyear"
+                                            },
+                                            {
+                                                "slice": [
+                                                    11,
+                                                    13
+                                                ],
+                                                "type": "date_month"
+                                            },
+                                            {
+                                                "slice": [
+                                                    14,
+                                                    16
+                                                ],
+                                                "type": "date_mday"
+                                            },
+                                            {
+                                                "slice": [
+                                                    17,
+                                                    19
+                                                ],
+                                                "type": "time_hour"
+                                            },
+                                            {
+                                                "slice": [
+                                                    20,
+                                                    22
+                                                ],
+                                                "type": "time_minute"
+                                            },
+                                            {
+                                                "slice": [
+                                                    23,
+                                                    25
+                                                ],
+                                                "type": "time_second"
+                                            },
+                                            {
+                                                "slice": [
+                                                    25,
+                                                    31
+                                                ],
+                                                "type": "time_numoffset",
+                                                "children": [
+                                                    {
+                                                        "slice": [
+                                                            25,
+                                                            26
+                                                        ],
+                                                        "type": "minus"
+                                                    },
+                                                    {
+                                                        "slice": [
+                                                            26,
+                                                            28
+                                                        ],
+                                                        "type": "time_hour"
+                                                    },
+                                                    {
+                                                        "slice": [
+                                                            29,
+                                                            31
+                                                        ],
+                                                        "type": "time_minute"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 2000-01-01T00:00:00.0000-07:00",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            36
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    36
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            36
+                                        ],
+                                        "type": "offset_date_time",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    6,
+                                                    10
+                                                ],
+                                                "type": "date_fullyear"
+                                            },
+                                            {
+                                                "slice": [
+                                                    11,
+                                                    13
+                                                ],
+                                                "type": "date_month"
+                                            },
+                                            {
+                                                "slice": [
+                                                    14,
+                                                    16
+                                                ],
+                                                "type": "date_mday"
+                                            },
+                                            {
+                                                "slice": [
+                                                    17,
+                                                    19
+                                                ],
+                                                "type": "time_hour"
+                                            },
+                                            {
+                                                "slice": [
+                                                    20,
+                                                    22
+                                                ],
+                                                "type": "time_minute"
+                                            },
+                                            {
+                                                "slice": [
+                                                    23,
+                                                    25
+                                                ],
+                                                "type": "time_second"
+                                            },
+                                            {
+                                                "slice": [
+                                                    26,
+                                                    30
+                                                ],
+                                                "type": "time_secfrac"
+                                            },
+                                            {
+                                                "slice": [
+                                                    30,
+                                                    36
+                                                ],
+                                                "type": "time_numoffset",
+                                                "children": [
+                                                    {
+                                                        "slice": [
+                                                            30,
+                                                            31
+                                                        ],
+                                                        "type": "minus"
+                                                    },
+                                                    {
+                                                        "slice": [
+                                                            31,
+                                                            33
+                                                        ],
+                                                        "type": "time_hour"
+                                                    },
+                                                    {
+                                                        "slice": [
+                                                            34,
+                                                            36
+                                                        ],
+                                                        "type": "time_minute"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 2000-01-01T00:00:00-04:30",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            31
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    31
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            31
+                                        ],
+                                        "type": "offset_date_time",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    6,
+                                                    10
+                                                ],
+                                                "type": "date_fullyear"
+                                            },
+                                            {
+                                                "slice": [
+                                                    11,
+                                                    13
+                                                ],
+                                                "type": "date_month"
+                                            },
+                                            {
+                                                "slice": [
+                                                    14,
+                                                    16
+                                                ],
+                                                "type": "date_mday"
+                                            },
+                                            {
+                                                "slice": [
+                                                    17,
+                                                    19
+                                                ],
+                                                "type": "time_hour"
+                                            },
+                                            {
+                                                "slice": [
+                                                    20,
+                                                    22
+                                                ],
+                                                "type": "time_minute"
+                                            },
+                                            {
+                                                "slice": [
+                                                    23,
+                                                    25
+                                                ],
+                                                "type": "time_second"
+                                            },
+                                            {
+                                                "slice": [
+                                                    25,
+                                                    31
+                                                ],
+                                                "type": "time_numoffset",
+                                                "children": [
+                                                    {
+                                                        "slice": [
+                                                            25,
+                                                            26
+                                                        ],
+                                                        "type": "minus"
+                                                    },
+                                                    {
+                                                        "slice": [
+                                                            26,
+                                                            28
+                                                        ],
+                                                        "type": "time_hour"
+                                                    },
+                                                    {
+                                                        "slice": [
+                                                            29,
+                                                            31
+                                                        ],
+                                                        "type": "time_minute"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "abc = 2000-01-01T00:00:00.0000-04:30",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            36
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    36
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            3
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            6,
+                                            36
+                                        ],
+                                        "type": "offset_date_time",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    6,
+                                                    10
+                                                ],
+                                                "type": "date_fullyear"
+                                            },
+                                            {
+                                                "slice": [
+                                                    11,
+                                                    13
+                                                ],
+                                                "type": "date_month"
+                                            },
+                                            {
+                                                "slice": [
+                                                    14,
+                                                    16
+                                                ],
+                                                "type": "date_mday"
+                                            },
+                                            {
+                                                "slice": [
+                                                    17,
+                                                    19
+                                                ],
+                                                "type": "time_hour"
+                                            },
+                                            {
+                                                "slice": [
+                                                    20,
+                                                    22
+                                                ],
+                                                "type": "time_minute"
+                                            },
+                                            {
+                                                "slice": [
+                                                    23,
+                                                    25
+                                                ],
+                                                "type": "time_second"
+                                            },
+                                            {
+                                                "slice": [
+                                                    26,
+                                                    30
+                                                ],
+                                                "type": "time_secfrac"
+                                            },
+                                            {
+                                                "slice": [
+                                                    30,
+                                                    36
+                                                ],
+                                                "type": "time_numoffset",
+                                                "children": [
+                                                    {
+                                                        "slice": [
+                                                            30,
+                                                            31
+                                                        ],
+                                                        "type": "minus"
+                                                    },
+                                                    {
+                                                        "slice": [
+                                                            31,
+                                                            33
+                                                        ],
+                                                        "type": "time_hour"
+                                                    },
+                                                    {
+                                                        "slice": [
+                                                            34,
+                                                            36
+                                                        ],
+                                                        "type": "time_minute"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]

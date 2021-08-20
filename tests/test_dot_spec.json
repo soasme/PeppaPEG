@@ -1,0 +1,84 @@
+[
+    {
+        "grammar": "R1 = .;",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "\u597d",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            3
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = .;",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "a",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            1
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = \"a\"* \"b\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "aaab",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            4
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = \"a\"* !.;",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "aaab",
+                "E": "MatchError: line 1:4, expect R1"
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = \"a\"* !.;",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "aaa",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            3
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    }
+]

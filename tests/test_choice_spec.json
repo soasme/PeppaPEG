@@ -1,0 +1,66 @@
+[
+    {
+        "grammar": "R1 = \"a\" / \"b\" / \"c\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "a",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            1
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = \"a\" / \"b\" / \"c\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "b",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            1
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = \"a\" / \"b\" / \"c\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "c",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            1
+                        ],
+                        "type": "R1"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "grammar": "R1 = \"a\" / \"b\" / \"c\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "d",
+                "E": "MatchError: line 1:1, expect R1"
+            }
+        ]
+    }
+]

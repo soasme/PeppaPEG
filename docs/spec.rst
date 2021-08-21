@@ -1,4 +1,4 @@
-.. _peg:
+.. _spec:
 
 Peppa PEG Specification
 ========================

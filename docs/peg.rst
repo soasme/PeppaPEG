@@ -87,17 +87,17 @@ Unspecified expressions are invalid.
 
     rule = ; # INVALID!
 
-Expression Precedence
----------------------
+Rule Expressions
+----------------
 
 Rule expressions have the following precedence from highest to lowest:
 
-* Choice
-* Sequence
-* Repeat
 * Primary
+* Repeat
+* Sequence
+* Choice
 
-Since choice has the highest precedence, a rule expression always starts interpreting as a choice of one alternatives:
+Since choice has the lowest precedence, a rule expression always starts interpreting as a choice of one alternatives:
 
 .. code-block::
 
@@ -136,6 +136,15 @@ Grouping notion () is strongly advised which will avoid misinterpretation by cas
 
     foobar = (foo  / bar) / (goo / par);
 
+Dot
+---
+
+Single dot `.` can match any Unicode character. It's a syntax sugar for [\\u0001-\\U0010ffff].
+
+.. code-block::
+
+    any = .;
+
 Literal
 -------
 
@@ -159,13 +168,13 @@ Emoji can be encoded via Unicode so it is supported:
 
     greeting = "Peppa 🐷";
 
-You can encode ASCII characters via `\\x` followed by 2 hex digits.
+You can encode ASCII characters via \\x followed by 2 hex digits.
 
 .. code-block::
 
     greeting = "\x48\x65\x6c\x6c\x6f, world";
 
-You can encode Unicode characters via `\\u` followed by 4 hex digits or `\\U` followed by 8 hex digits.
+You can encode Unicode characters via \\u followed by 4 hex digits or \\U followed by 8 hex digits.
 The escape codes must be valid Unicode `scalar values <https://unicode.org/glossary/#unicode_scalar_value>`_.
 
 .. code-block::
@@ -175,34 +184,33 @@ The escape codes must be valid Unicode `scalar values <https://unicode.org/gloss
 Range
 ------
 
-Range **matches a single character in range**.
+Range **matches a single character in range**. Ranges are enclosed by [ and ]. The full form is:
 
-In this example, any character between `'0'` to `'9'` can match.
+.. code-block::
+
+    range = "[" (
+        (char "-" char (".." number)?)
+        / ("\p{" range_category "}")
+    ) "]";
+
+In the following example, any character between `'0'` to `'9'` can match.
 
 .. code-block::
 
     digits = [0-9];
 
 The lower and upper character of the range can be not only ASCII characters but also UTF-8 code points.
-The syntax can be `\\uXXXX` or `\\uXXXXXXXX`.
+The syntax can be \\xXX, \\uXXXX or \\uXXXXXXXX.
 
 .. code-block::
 
     digits = [\u4e00-\u9fff];
 
-A small trick to match any character is to specify the range from `\\u0001` to `\\U0010ffff`,
-which are the minimum and the maximum code point in UTF-8 encoding.
-
-.. code-block::
-
-    any = [\u0001-\U0010ffff];
-
 The value of lower must be less or equal than the upper.
 
 .. code-block::
 
-    // INVALID
-    any = [\U0010ffff-\u0001];
+    any = [\U0010ffff-\u0001]; # INVALID!!!
 
 Range supports an optional `stride` to skip certain amount of characters in the range.
 In this example, only odd number between `'0'` to `'9'` can match.
@@ -211,34 +219,33 @@ In this example, only odd number between `'0'` to `'9'` can match.
 
     digits = [0-9..2];
 
-Range also supports certain unicode character sets,  such as `C`, `Cc`, `Cf`, `Co`, `Cs`,
-`Ll`, `Lm`, `Lo`, `Lt`, `Lu`, `L`, `Nd`, `Nl`, `No`, `N`, etc.
-When the library is built with `-DENABLE_UNISTR=On`, it can support even more unicode general categories and unicode properties, such as `Id_Start`, `Id_Continue`, `Other_Id_Start`, `Other_Id_Continue`, `White space`, etc.
-They're wrapped via `\\p{}`, for example:
-
-* unicode_letter: a Unicode code point classified as "Letter" (Ll+Lm+Lo+Lt+Lu).
-* unicode_digit: a Unicode code point classified as "Number, decimal digit"(Nd).
+Range can support Unicode general categories and properties by wrapping filters with \\p{}, such as `C`, `Cc`, `Cf`, `Co`, `Cs`, `Ll`, `Lm`, `Lo`, `Lt`, `Lu`, `L`, `Nd`, `Nl`, `No`, `N`, `Id_Start`, `Id_Continue`, `Other_Id_Start`, `Other_Id_Continue`, `White space`, etc.
 
 .. code-block::
 
-    unicode_letter = [\p{L}];
-    unicode_digit  = [\p{Nd}];
+    range_category = ([a-z] / [A-Z] / [0-9] / "_" / " ")+;
 
-Dot
----
-
-Single dot `.` can match any UTF-8 code point. It's a syntax sugar for `[\\u0001-\\U0010ffff]`.
+For example,
 
 .. code-block::
 
-    any = .;
+    unicode_letter = [\p{L}];  # Any Unicode Letter (Ll, Lm, Lo, Lt, Lu).
+    unicode_digit  = [\p{Nd}]; # Any Number, decimal digit (Nd).
+
+Whether range category is supported depends on the implementations.
 
 Sequence
 --------
 
-Sequence **matches a sequence of sub-expressions in order**.
+Sequence **matches a sequence of rules in order**, e.g. a concatenation of contiguous characters.
 
-When parsing, the first sequence member is attempted. If succeeds, the second is attempted, so on and on.
+The full form is:
+
+.. code-block::
+
+    sequence = repeat+;
+
+The first sequence element is attempted. If succeeds, the second is attempted, so on and on.
 If any one of the attempts fails, the match fails.
 
 For example:
@@ -247,13 +254,32 @@ For example:
 
     greeter = "Hello" " " "world";
 
+Elements enclosed in parentheses are considered as a single element. Thus,
+
+.. code-block::
+
+    rule = prefix (foo / bar) postfix;
+
+matches either (prefix foo postfix) or (prefix bar postfix), and
+
+.. code-block::
+
+    rule = prefix foo / bar postfix;
+
+matches either (prefix foo) or (bar postfix).
 
 Choice
 -------
 
-Choice **matches one of the sub-expression.**
+Choice **matches one of the alternatives**.
 
-When parsing, the first sequence member is attempted. If fails, the second is attempted, so on and on.
+Elements in the choice separated by a forward slash (/) are alternatives. The full form of choice is:
+
+.. code-block::
+
+   choice = sequence ("/" sequence)*;
+
+The first alternative is attempted. If fails, the second is attempted, so on and on.
 If any one of the attempts succeeds, the match succeeds. If all attempts fail, the match fails.
 
 For example:
@@ -265,7 +291,11 @@ For example:
 Reference
 ---------
 
-Reference **matches a string based on the referenced grammar rule**.
+Reference **matches a string based on the referenced grammar rule**. A reference has the same specification of rule name:
+
+.. code-block::
+
+    name = ([a-z] / [A-Z] / "_") ([a-z] / [A-Z] / [0-9] / "_")*;
 
 For example, `greeter` is just a reference rule in `greeting`. When matching `greeting`, it will use the referenced grammar rule `greeter` first, e.g. `"Hello" / "你好"`, then match " world".
 
@@ -281,23 +311,33 @@ The order of defining a rule does not matter.
     greeter  = "Hello" / "你好";
     greeting = greeter " world";
 
-One should ensure all references must have corresponding rule defined, otherwise, the parse will fail with :c:enum:`P4_MatchError`.
+One should ensure all references must have corresponding rule defined, otherwise, the parse fails due to an undefined rule.
 
 Back Reference
 --------------
 
-Back Reference **matches an exact same string as previously matched in the sequence**.
+Back reference **matches an exact same string as previously matched in the sequence**.
 
-For example, \\0 matches whatever `quote` has matched, thus `"abc"` or `'abc'` are valid. But `"abc'` or `'abc"` are invalid.
+Back reference starts with a back slash, followed by a number. The number is zero-based and cannot be a number greater than or equal to the index of itself. The number indicates which previous member in the sequence should be back referenced. The full form is:
 
 .. code-block::
 
-    str = quote chars \0;
+    back_reference = "\" number;
+
+In the following example, \\0 matches whatever `quote` has matched, thus `"a"` or `'a'` are valid. But `"a'` or `'a"` are invalid.
+
+.. code-block::
+
+    str = quote [a-z] \0;
     quote = "\"" / "'";
-    chars = [a-z]*;
 
-Back Reference starts with a back slash, followed by a number. The number is zero-based and cannot be a number greater than or equal to the index of itself.
+Back reference applies only to the nearest sequence. Thus,
 
+.. code-block::
+
+    rule = "a" ("b" \0) \0;
+
+matches "abba" since the first \\0 back reference "b" and the second \\0 back reference "a".
 
 Insensitive
 -----------
@@ -325,7 +365,11 @@ Given the following rule, literal "hello world" is case-insensitive. Hence, both
 Positive
 --------
 
-Positive **tests if the sub-expression matches**.
+Positive **tests if the sub-expression matches**. Positive starts with & and followed by a primary:
+
+.. code-block::
+
+    positive = "&" primary;
 
 Positive attempts to match the sub-expression. If succeeds, the test passes. Positive does not "consume" any text.
 
@@ -338,7 +382,11 @@ Positive can be useful in limiting the possibilities of the latter member in a S
 Negative
 --------
 
-Negative **tests if the sub-expression does not match**.
+Negative **tests if the sub-expression does not match**. Negative starts with ! and followed by a primary:
+
+.. code-block::
+
+    negative = "!" primary;
 
 Negative expects the sub-expression doesn't match. If fails, the test passes. Negative does not "consume" any text.
 
@@ -454,7 +502,9 @@ If there is a `@cut` in e1, any failure after the cutting point will cause rule 
 Cut ensures the parse sticks to the current rule, even if it fails to parse.
 See ideas `1 <http://ceur-ws.org/Vol-1269/paper232.pdf>`_, `2 <https://news.ycombinator.com/item?id=20503245>`_.
 
-For example, considering the grammar below first,
+Cut starts with @ and followed by "cut", e.g. "@cut".
+
+For example, let's first consider the following grammar,
 
 .. code-block::
 
@@ -493,14 +543,12 @@ For example,
     @spaced @lifted
     ws = " " / "\t" / "\n";
 
-:seealso: :c:enum:`P4_FLAG_SPACED`, :c:enum:`P4_FLAG_SQUASHED`, :c:enum:`P4_FLAG_SCOPED`, :c:enum:`P4_FLAG_TIGHT`, :c:enum:`P4_FLAG_LIFTED`, :c:enum:`P4_FLAG_NON_TERMINAL`.
-
 @spaced
 ```````
 
-If a rule has `@spaced` decorator, it will be auto-inserted in between every element of sequences and repetitions.
+A `@spaced` rule will be auto-inserted in elements of sequences and repetitions.
 
-For example, my sequence can match "helloworld", "hello world", "hello  \t  \n world", etc.
+For example, my_sequence can match "helloworld", "hello world", "hello  \t  \n world", etc.
 
 .. code-block::
 
@@ -509,16 +557,43 @@ For example, my sequence can match "helloworld", "hello world", "hello  \t  \n w
     @spaced
     ws = " " / "\t" / "\n";
 
-@tight
-```````
-
-If a sequence or repetition rule has `@tight` decorator, no `@spaced` rules will be applied.
-
-For example, my_another_sequence can only match "helloworld".
+Rule my_sequence is in essence equivalent to:
 
 .. code-block::
 
-    my_another_sequence = "hello" "world";
+    my_sequence = "hello" (" " / "\t" / "\n")* "world";
+
+There may be multiple `@spaced` rules in the grammar. Thus,
+
+.. code-block::
+
+   my_sequence2 = "hello" "world";
+
+   @spaced
+   ws = " " / "\t" / "\n";
+
+   @spaced
+   dot = ".";
+
+Rule my_sequence is equivalent to:
+
+.. code-block::
+
+    my_sequence2 = "hello" ((" " / "\t" / "\n") / ".")* "world";
+
+The `@spaced` rules only take effects for rules having no `@tight` decorators.
+
+@tight
+```````
+
+A `@tight` rule deters any `@spaced` rule from auto-inserted.
+
+For example, my_sequence can only match "helloworld".
+
+.. code-block::
+
+    @tight
+    my_sequence = "hello" "world";
 
     @spaced
     ws = " " / "\t" / "\n";
@@ -526,54 +601,73 @@ For example, my_another_sequence can only match "helloworld".
 @lifted
 ```````
 
-If a rule has `@lifted` decorator, its children will replace the parent.
+A `@lifted` rule replaces the node with its children in the parse tree, if exists any children.
 
-In this example, the parsed tree has no node mapping to primary rule, but rather either digit or char.
+For example,
 
 .. code-block::
 
-    @lifted
-    primary = digit / char;
+    rule = lit;
 
-    number = [0-9];
-    char   = [a-z] / [A-Z];
+    @lifted
+    lit = digit / char;
+
+    number = [0-9]+;
+    char   = ([a-z] / [A-Z])+;
+
+given input "42", the parsed tree looks like:
+
+.. code-block::
+
+    {
+        "type": "rule",
+        "children": [
+            {"type": "number", "text": "4"},
+            {"type": "number", "text": "2"}
+        ]
+    }
+
+This decorator is useful for trimming some unnecessary nodes in the parse tree.
 
 @nonterminal
 ````````````
 
-If a rule has `nonterminal` decorator, and it has only one single child node, the child node will replace the parent node.
+A `@nonterminal` rule replaces the node with its children in the parse tree, if exists one child.
+If the rule produces multiple children, this decorator has no effect.
 
-If it produces multiple children, this decorator has no effect.
-
-In this example,
+For example,
 
 .. code-block::
 
-    @lifted
+    @nonterminal
     add = number ("+" number)?;
 
     number = [0-9];
 
-If we feed the input "1", the tree is like:
+given input "1", the tree is like:
 
 .. code-block::
 
-    Number(0,1)
+    {"type": "add", "text": "1"}
 
-If we feed the input "1+1", the tree is like:
+given input "1+2", the tree is like:
 
 .. code-block::
 
-    Add(0,3)
-        Number(0,1)
-        Number(1,3)
+    {
+        "type": "add",
+        "children": [
+            {"type": "number", "text": "1"},
+            {"type": "number", "text": "2"},
+        ]
+    }
 
 @squashed
 `````````
 
-If a rule has `@squashed` decorator, its children will be trimmed.
+A `@squashed` rule drops all node children in the parse tree.
 
-In this example, the rule `float` will drop all `number` nodes, leaving only one single node in the ast.
+For example,
 
 .. code-block::
 
@@ -582,10 +676,16 @@ In this example, the rule `float` will drop all `number` nodes, leaving only one
 
     number = [0-9];
 
+given input "1.0", rule `float` drops all `number` nodes, leaving only one single node in the ast:
+
+.. code-block::
+
+    {"type": "float", "text": "1.0"}
+
 @scoped
 ```````
 
-Ignore all the decorators set by upstream rules.
+A `@scoped` rule reset all decorators that inherit from upstream rules.
 
 For example, despite `greeting2` set to not using spaced rule `ws`, `greeting` can still apply to `ws` since it's under its own scope.
 
@@ -644,7 +744,7 @@ Cheatsheet
      - sequence
    * - `foo / bar`
      - choice
-   * - `\0`
+   * - \\0
      - back reference
    * - `&foo`
      - positive

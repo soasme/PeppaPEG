@@ -3735,7 +3735,7 @@ P4_Grammar* P4_CreatePegGrammar () {
         P4_CreateCut(),
         P4_CreateReference("number")
     ));
-    catch_err(P4_SetGrammarRuleFlag(grammar, "reference", P4_FLAG_TIGHT));
+    catch_err(P4_SetGrammarRuleFlag(grammar, "back_reference", P4_FLAG_TIGHT));
 
     catch_err(P4_AddSequenceWithMembers(grammar, "positive", 3,
         P4_CreateLiteral("&", true),

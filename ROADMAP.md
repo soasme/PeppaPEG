@@ -1,5 +1,7 @@
 # ROADMAP
 
+- [ ] api: support locale, utf-8, utf-16, utf-32 encoding.
+- [ ] peg: support action code `rule = a:b -> { |node| @override another = b; }; another = " ";` this can be used to override some rules in runtime and is useful when implementing Mustache tag set delimiter.
 - [ ] api: function `P4_NodeEqual(node1, node2, NULL)`: check text[slice] are the same, children count are the same, each child is the same. Third param check user data.
 - [ ] api: function `P4_FindNodeChild(node, node_name)`.
 - [ ] api: function `P4_FindNodeChildren(node, node_name)`.
@@ -8,9 +10,9 @@
 - [ ] peg: support multiple ranges in []: `[0-9a-zA-Z]`.
 - [ ] api: jsonify support pretty print (indent, newline).
 - [ ] shell: compile peg to LLVM IR/bitcode code (can use LLVM to compile to C, JS).
-- [ ] peg: @sibling_to_descdent. can be used to transform cases like toml [key1.key2], key2 should be a child of key1.
-- [ ] peg: @right_recursion.
-- [ ] peg: @left_recursion. can be used to transform cases like expression: `a=b (@left_recursion "+" b)*`.
+- [ ] peg: `@sibling_to_descdent`. can be used to transform cases like toml [key1.key2], key2 should be a child of key1.
+- [ ] peg: `@right_recursion`.
+- [ ] peg: `@left_recursion`. can be used to transform cases like expression: `a=b (@left_recursion "+" b)*`.
 - [ ] ci: support windows.
 - [ ] ci: publish binary to github release.
 - [ ] ci: publish ppa.

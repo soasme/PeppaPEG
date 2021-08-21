@@ -1,5 +1,6 @@
 # ROADMAP
 
+- [ ] peg: move decorators after "=".
 - [ ] api: support locale, utf-8, utf-16, utf-32 encoding.
 - [ ] peg: support action code `rule = a:b -> { |node| @override another = b; }; another = " ";` this can be used to override some rules in runtime and is useful when implementing Mustache tag set delimiter.
 - [ ] api: function `P4_NodeEqual(node1, node2, NULL)`: check text[slice] are the same, children count are the same, each child is the same. Third param check user data.

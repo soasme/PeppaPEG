@@ -1,33 +1,121 @@
 .. _peg:
 
-PEG APIs
-==========
+Peppa PEG Specification
+========================
 
-Grammar Rules
--------------
+Objectives
+----------
 
-The grammar is simply a list of rules with names. Rules are defined like this:
+Peppa PEG aims to be a PEG dialect that's easy to use. Peppa PEG is designed to describe a formal language by extending the original version of PEG with some already-commonly-used symbols and notations. Peppa PEG should be easy to parse source code into an abstract syntax tree for a wide variety of languages.
+
+Spec
+-----
+
+* Peppa PEG is case-sensitive.
+* A Peppa PEG grammar must be a valid UTF-8 encoded Unicode document.
+
+Comment
+-------
+
+A hash symbol following by any characters til end of line marks a comment.
+Comments are ignored and can be inserted between rules.
 
 .. code-block::
 
-    rule_1 = ... ;
-    rule_2 = ... ;
-    rule_3 = ... ;
-    (more rules)
+    @lifted @spaced
+    comment = "#" (!"\n" .)* "\n"?;
 
-On the left hand side, they are rule names.
+For example,
 
-One the right hand side, they are rule expressions, which we will cover in this rest of the document.
+.. code-block::
 
-In the middle, they are equal signs (`=`).
+    # This is a full-line comment.
 
-They should end with colons (`;`).
+    rule = "# This is not a comment."; # This is a comment at the end of a line.
 
-The first grammar rule will be assigned with rule id 1.
-The ids for the rest increase one by one.
+Rule Naming
+------------
 
-The grammar rule names must start with an alphabet or underscore,
-followed by a sequence of either alphabets or digits or underscores `_`.
+The name of a rule is a sequence of characters, beginning with an alphabet or underscore, and followed by a combination of alphabets, digits, or underscores (_).
+
+.. code-block::
+
+    name = ([a-z]/[A-Z]/"_") ([a-z]/[A-Z]/[0-9]/"_")*;
+
+Rule names are case sensitive.
+
+For example, the rule names listed below are valid:
+
+* `rule`
+* `DIGITS`
+* `oct_int`
+
+while these are invalid:
+
+* `0to9`
+* `ml-string`
+
+Rule Form
+---------
+
+The primary building block of a Peppa PEG document is the rule.
+
+A rule is defined by the following sequence:
+
+.. code-block::
+
+    rule = decorator* name "=" expression ";"
+
+where one or more rule decorators may be prefixed before rule names, rule names are on the left-hand side of the equals sign and expressions are one the right-hand side. Rules always ends up with a semicolon (;). The key, equal sign, expressions, and semicolon can be broken over multiple lines. Whitespace is ignored around rule names and between expressions.
+
+For example:
+
+.. code-block::
+
+    rule = rule2 / "expr4" / "expr5" / "expr6";
+
+    @lifted
+    rule2 = "expr1"
+          / "expr2"
+          / "expr3"
+          ;
+
+Unspecified expressions are invalid.
+
+.. code-block::
+
+    rule = ; # INVALID!
+
+Primary Rule Expressions
+----------------
+
+Primary rule expressions must have one of the following types.
+
+* Literal
+* Insensitive
+* Range
+* Reference
+* Back Reference
+* Positive
+* Negative
+* Dot
+* Cut
+
+A pair of parenthesis can wrap non-primary rule expressions to a primary one.
+
+.. code-block::
+
+    primary = literal
+            / insensitive
+            / range
+            / (reference !"=")
+            / back_reference
+            / positive
+            / negative
+            / dot
+            / cut
+            / "(" choice ")"
+            ;
 
 Literal
 -------
@@ -309,23 +397,16 @@ Given input "[", it attempts matching array first. After failed, value match is 
 
 Given input "null", it attempts matching array first. It fails before `@cut` and then failed matching array. Parser then match "null" successfully.
 
-Comment
--------
+Decorators
+----------
 
-Comment are any characters followed by a # (included) in a line.
+Decorators are characters @ followed by some selected keywords.
+Valid decorators include: `@spaced`, `@squashed`, `@scoped`, `@tight`, `@lifted` and `@nonterminal`.
 
 .. code-block::
 
-   # THIS IS A COMMENT.
-   rule = "hello"; # THIS IS ANOTHER COMMENT.
+    decorator = "@" ("squashed" / "scoped" / "spaced" / "lifted" / "nonterminal");
 
-Comments are ignored.
-
-Grammar Rule Flags
-------------------
-
-The grammar rule allows setting flags by inserting some `@decorator` (s) before the names.
-The supported decorators include: `@spaced`, `@squashed`, `@scoped`, `@tight`, `@lifted` and `@nonterminal`.
 For example,
 
 .. code-block::
@@ -439,47 +520,6 @@ For example, despite `greeting2` set to not using spaced rule `ws`, `greeting` c
 
     @spaced
     ws = " ";
-
-
-Use Peg API
-------------
-
-Function :c:func:`P4_LoadGrammar` can load a grammar from a string.
-
-.. code-block::
-
-    P4_Grammar* grammar = P4_LoadGrammar(
-        "add = int + int;"
-
-        "@squashed @tight "
-        "int = [0-9]+;"
-
-        "@spaced @lifted "
-        "ws  = \" \";";
-    );
-
-The one-statement code is somewhat equivalent to the below code written in low-level C API:
-
-.. code-block::
-
-    P4_Grammar* grammar = P4_CreateGrammar();
-
-    if (P4_Ok != P4_AddSequenceWithMembers(grammar, RuleAdd, 3,
-        P4_CreateReference(RuleInt),
-        P4_CreateLiteral("+", true),
-        P4_CreateReference(RuleInt)
-    ))
-        goto finalize;
-
-    if (P4_Ok != P4_AddOnceOrMore(grammar, RuleInt, P4_CreateRange('0', '9', 1)))
-        goto finalize;
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, RuleInt, P4_FLAG_SQUASHED|P4_FLAG_TIGHT))
-        goto finalize;
-
-    if (P4_Ok != P4_AddLiteral(grammar, RuleWs, " ", true))
-        goto finalize;
-    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, RuleWs, P4_FLAG_SPACED|P4_FLAG_LIFTED))
-        goto finalize;
 
 Cheatsheet
 ----------

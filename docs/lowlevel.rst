@@ -3,6 +3,46 @@
 Low Level APIs
 ==============
 
+Use Peg API
+------------
+
+Function :c:func:`P4_LoadGrammar` can load a grammar from a string.
+
+.. code-block::
+
+    P4_Grammar* grammar = P4_LoadGrammar(
+        "add = int + int;"
+
+        "@squashed @tight "
+        "int = [0-9]+;"
+
+        "@spaced @lifted "
+        "ws  = \" \";";
+    );
+
+The one-statement code is somewhat equivalent to the below code written in low-level C API:
+
+.. code-block::
+
+    P4_Grammar* grammar = P4_CreateGrammar();
+
+    if (P4_Ok != P4_AddSequenceWithMembers(grammar, RuleAdd, 3,
+        P4_CreateReference(RuleInt),
+        P4_CreateLiteral("+", true),
+        P4_CreateReference(RuleInt)
+    ))
+        goto finalize;
+
+    if (P4_Ok != P4_AddOnceOrMore(grammar, RuleInt, P4_CreateRange('0', '9', 1)))
+        goto finalize;
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, RuleInt, P4_FLAG_SQUASHED|P4_FLAG_TIGHT))
+        goto finalize;
+
+    if (P4_Ok != P4_AddLiteral(grammar, RuleWs, " ", true))
+        goto finalize;
+    if (P4_Ok != P4_SetGrammarRuleFlag(grammar, RuleWs, P4_FLAG_SPACED|P4_FLAG_LIFTED))
+        goto finalize;
+
 Expressions
 -----------
 

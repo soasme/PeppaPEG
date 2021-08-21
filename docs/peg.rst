@@ -18,12 +18,13 @@ Comment
 -------
 
 A hash symbol following by any characters til end of line marks a comment.
-Comments are ignored and can be inserted between rules.
 
 .. code-block::
 
-    @lifted @spaced
     comment = "#" (!"\n" .)* "\n"?;
+
+Comments are ignored and can be marked between rules.
+This is a simple way of including additional information in parallel with the specifications.
 
 For example,
 
@@ -86,8 +87,21 @@ Unspecified expressions are invalid.
 
     rule = ; # INVALID!
 
-Primary Rule Expressions
-----------------
+Expression Precedence
+---------------------
+
+Rule expressions have the following precedence from highest to lowest:
+
+* Choice
+* Sequence
+* Repeat
+* Primary
+
+Since choice has the highest precedence, a rule expression always starts interpreting as a choice of one alternatives:
+
+.. code-block::
+
+    expression = choice;
 
 Primary rule expressions must have one of the following types.
 
@@ -100,8 +114,7 @@ Primary rule expressions must have one of the following types.
 * Negative
 * Dot
 * Cut
-
-A pair of parenthesis can wrap non-primary rule expressions to a primary one.
+* Grouping
 
 .. code-block::
 
@@ -117,6 +130,12 @@ A pair of parenthesis can wrap non-primary rule expressions to a primary one.
             / "(" choice ")"
             ;
 
+Grouping notion () is strongly advised which will avoid misinterpretation by casual readers. For example,
+
+.. code-block::
+
+    foobar = (foo  / bar) / (goo / par);
+
 Literal
 -------
 
@@ -128,25 +147,13 @@ For example,
 
     greeting = "hello world";
 
-To ignore the case, insert `i` to the left quote:
-
-.. code-block::
-
-    greeting = i"hello world";
-
-The case insensitive literal applies to not only ASCII chars, but also extended ASCII chars, such as ì / Ì.
-
-.. code-block::
-
-    greeting = i"hello worìd";
-
-UTF-8 is supported:
+Unicode is supported:
 
 .. code-block::
 
     greeting = "你好，世界";
 
-Emoji is supported:
+Emoji can be encoded via Unicode so it is supported:
 
 .. code-block::
 
@@ -158,11 +165,12 @@ You can encode ASCII characters via `\\x` followed by 2 hex digits.
 
     greeting = "\x48\x65\x6c\x6c\x6f, world";
 
-You can encode UTF-8 characters via `\\u` followed by 4 hex digits or `\\U` followed by 8 hex digits.
+You can encode Unicode characters via `\\u` followed by 4 hex digits or `\\U` followed by 8 hex digits.
+The escape codes must be valid Unicode `scalar values <https://unicode.org/glossary/#unicode_scalar_value>`_.
 
 .. code-block::
 
-    greeting = "\u4f60\u597D, world\u000c";
+    greeting = "\u4f60\u597D, world\U0000000c";
 
 Range
 ------
@@ -215,7 +223,6 @@ They're wrapped via `\\p{}`, for example:
 
     unicode_letter = [\p{L}];
     unicode_digit  = [\p{Nd}];
-
 
 Dot
 ---
@@ -291,11 +298,29 @@ For example, \\0 matches whatever `quote` has matched, thus `"abc"` or `'abc'` a
 
 Back Reference starts with a back slash, followed by a number. The number is zero-based and cannot be a number greater than or equal to the index of itself.
 
-Back Reference allows a case-insensitive prefix `i`. For example, given such a rule, `a=A`, `a=a` are both valid.
+
+Insensitive
+-----------
+
+Insensitive operator starts with "i" and followed by a literal or back reference.
+
+.. code-block::
+
+    insensitive = "i" (literal / back_reference);
+
+For example,
+
+Given the following rule, back reference \\0 is case-insensitive. Hence, both `a=A` and `a=a` are valid.
 
 .. code-block::
 
     rule = [a-z] "=" i\0;
+
+Given the following rule, literal "hello world" is case-insensitive. Hence, both `ì` and `Ì` are valid.
+
+.. code-block::
+
+    rule = i"ì";
 
 Positive
 --------
@@ -323,46 +348,100 @@ Negative can be useful in limiting the possiblities of the latter member in a Se
 
     greeting = !"Hello" i"hello world";
 
-Repeat
-------
+Repetition
+----------
 
-Repeat **matches the sub-expression several times**.
+Operators `+`, `*`, `?` and `{}` followed by an expression indicates repetition.
 
-`+` match string one or more times.
+The full form of repetition is:
+
+.. code-block::
+
+    repeat = primary (onceormore / zeroormore / zerooronce / repeatexact / repeatminmax / repeatmin / repeatmax)?;
+
+1. Plus (`+`) matches string one or more times.
+
+.. code-block::
+
+    onceormore = "+";
+
+For example,
 
 .. code-block::
 
     number = [0-9]+;
 
-`*` match string zero or more times.
+2. Asterisk (`*`) matches string zero or more times.
+
+.. code-block::
+
+    zeroormore = "*";
+
+For example,
 
 .. code-block::
 
     number = [0-9] [1-9]*;
 
-`?` match string one or more times.
+3. Question (`?`) matches string one or more times.
+
+.. code-block::
+
+    zerooronce = "?";
+
+For example,
 
 .. code-block::
 
     number = [0-9] "."?;
 
-`{min,}` match string minimum `min` times.
+4. `{cnt}` matches exactly `cnt` occurrences of an expression, where cnt is a decimal value.
+
+.. code-block::
+
+    repeatexact = "{" number "}";
+
+For example,
+
+.. code-block::
+
+   unicode = "\U" ([0-9] / [a-f] / [A-F]){8};
+
+5. `{min,max}` matches an expression of at least `min` occurrences and at most `max` occurrences, where min and max are decimal values.
+
+.. code-block::
+
+    repeatminmax = "{" number "," number "}";
+
+For example,
+
+.. code-block::
+
+   hex = "\u{" ([0-9] / [a-f] / [A-F]){1,6} "}";
+
+6. `{min,}` matches an expression of at least `min` occurrences, where min is a decimal value.
+
+.. code-block::
+
+    repeatmin = "{" number "," "}";
+
+For example,
 
 .. code-block::
 
     above_hundred = [1-9] [1-9]{2,};
 
-`{,max}` match string maximum `max` times.
+7. `{,max}` matches an expression of at most `max` occurrences, where max is a decimal value.
+
+.. code-block::
+
+    repeatmax = "{" "," number "}";
+
+For example,
 
 .. code-block::
 
    below_thousand = [0-9]{,3};
-
-`{min,max}` match string minimum `min` times, maximum `max` times.
-
-.. code-block::
-
-   hex = "\u{" ([0-9] / [a-z] / [A-Z]){1,6} "}";
 
 Cut
 ---
@@ -373,7 +452,7 @@ It's used to prevent unwanted backtracking, e.g. to prevent excessive choice opt
 Backtracking means if e1 in `rule = e1 / e2;` fails, the parser returns the last position where e1 started, and tries e2.
 If there is a `@cut` in e1, any failure after the cutting point will cause rule failed immediately.
 Cut ensures the parse sticks to the current rule, even if it fails to parse.
-See ideas [1](http://ceur-ws.org/Vol-1269/paper232.pdf), [2](https://news.ycombinator.com/item?id=20503245).
+See ideas `1 <http://ceur-ws.org/Vol-1269/paper232.pdf>`_, `2 <https://news.ycombinator.com/item?id=20503245>`_.
 
 For example, considering the grammar below first,
 

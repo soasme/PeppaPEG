@@ -633,6 +633,11 @@
                 ]
             },
             {
+                "desc": "missing-separator",
+                "I": "wrong = [ 1 2 3 ]\n",
+                "E": "CutError: line 1:13, expect array_close (char ']')"
+            },
+            {
                 "desc": "mixed-int-array",
                 "I": "arrays-and-ints =  [1, [\"Arrays are not integers.\"]]\n",
                 "O": [
@@ -929,6 +934,78 @@
                 ]
             },
             {
+                "desc": "nested",
+                "I": "nest = [[\"a\"], [\"b\"]]\n",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            22
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    21
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            4
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            7,
+                                            21
+                                        ],
+                                        "type": "array",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    8,
+                                                    13
+                                                ],
+                                                "type": "array",
+                                                "children": [
+                                                    {
+                                                        "slice": [
+                                                            9,
+                                                            12
+                                                        ],
+                                                        "type": "basic_string"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "slice": [
+                                                    15,
+                                                    20
+                                                ],
+                                                "type": "array",
+                                                "children": [
+                                                    {
+                                                        "slice": [
+                                                            16,
+                                                            19
+                                                        ],
+                                                        "type": "basic_string"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
                 "desc": "nested-double",
                 "I": "nest = [\n\t[\n\t\t[\"a\"],\n\t\t[1, 2, [3]]\n\t]\n]\n",
                 "O": [
@@ -1105,76 +1182,24 @@
                 ]
             },
             {
-                "desc": "nested",
-                "I": "nest = [[\"a\"], [\"b\"]]\n",
-                "O": [
-                    {
-                        "slice": [
-                            0,
-                            22
-                        ],
-                        "type": "toml",
-                        "children": [
-                            {
-                                "slice": [
-                                    0,
-                                    21
-                                ],
-                                "type": "keyval",
-                                "children": [
-                                    {
-                                        "slice": [
-                                            0,
-                                            4
-                                        ],
-                                        "type": "unquoted_key"
-                                    },
-                                    {
-                                        "slice": [
-                                            7,
-                                            21
-                                        ],
-                                        "type": "array",
-                                        "children": [
-                                            {
-                                                "slice": [
-                                                    8,
-                                                    13
-                                                ],
-                                                "type": "array",
-                                                "children": [
-                                                    {
-                                                        "slice": [
-                                                            9,
-                                                            12
-                                                        ],
-                                                        "type": "basic_string"
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                "slice": [
-                                                    15,
-                                                    20
-                                                ],
-                                                "type": "array",
-                                                "children": [
-                                                    {
-                                                        "slice": [
-                                                            16,
-                                                            19
-                                                        ],
-                                                        "type": "basic_string"
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                "desc": "no-close",
+                "I": "long_array = [ 1, 2, 3\n",
+                "E": "CutError: line 2:1, expect array_close (char ']')"
+            },
+            {
+                "desc": "no-close-2",
+                "I": "x = [42 #\n",
+                "E": "CutError: line 2:1, expect array_close (char ']')"
+            },
+            {
+                "desc": "no-close-table",
+                "I": "x = [{ key = 42\n",
+                "E": "CutError: line 1:16, expect inline_table_close (char '}')"
+            },
+            {
+                "desc": "no-close-table-2",
+                "I": "x = [{ key = 42 #\n",
+                "E": "CutError: line 1:17, expect inline_table_close (char '}')"
             },
             {
                 "desc": "nospaces",
@@ -1238,53 +1263,6 @@
                 ]
             },
             {
-                "desc": "string-quote-comma-2",
-                "I": "title = [ \" \\\", \",]\n",
-                "O": [
-                    {
-                        "slice": [
-                            0,
-                            20
-                        ],
-                        "type": "toml",
-                        "children": [
-                            {
-                                "slice": [
-                                    0,
-                                    19
-                                ],
-                                "type": "keyval",
-                                "children": [
-                                    {
-                                        "slice": [
-                                            0,
-                                            5
-                                        ],
-                                        "type": "unquoted_key"
-                                    },
-                                    {
-                                        "slice": [
-                                            8,
-                                            19
-                                        ],
-                                        "type": "array",
-                                        "children": [
-                                            {
-                                                "slice": [
-                                                    10,
-                                                    17
-                                                ],
-                                                "type": "basic_string"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
                 "desc": "string-quote-comma",
                 "I": "title = [\n\"Client: \\\"XXXX\\\", Job: XXXX\",\n\"Code: XXXX\"\n]\n",
                 "O": [
@@ -1327,6 +1305,53 @@
                                                 "slice": [
                                                     41,
                                                     53
+                                                ],
+                                                "type": "basic_string"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "desc": "string-quote-comma-2",
+                "I": "title = [ \" \\\", \",]\n",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            20
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    19
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            5
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            8,
+                                            19
+                                        ],
+                                        "type": "array",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    10,
+                                                    17
                                                 ],
                                                 "type": "basic_string"
                                             }
@@ -1531,6 +1556,21 @@
                         ]
                     }
                 ]
+            },
+            {
+                "desc": "text-after-array-entries",
+                "I": "array = [\n  \"Is there life after an array separator?\", No\n  \"Entry\"\n]\n",
+                "E": "CutError: line 2:46, expect array_close (char ']')"
+            },
+            {
+                "desc": "text-before-array-separator",
+                "I": "array = [\n  \"Is there life before an array separator?\" No,\n  \"Entry\"\n]\n",
+                "E": "CutError: line 2:46, expect array_close (char ']')"
+            },
+            {
+                "desc": "text-in-array",
+                "I": "array = [\n  \"Entry 1\",\n  I don't belong,\n  \"Entry 2\",\n]\n",
+                "E": "CutError: line 3:3, expect array_close (char ']')"
             }
         ]
     },
@@ -1599,6 +1639,21 @@
                         ]
                     }
                 ]
+            },
+            {
+                "desc": "mixed-case",
+                "I": "valid = False\n",
+                "E": "CutError: line 1:9, expect val"
+            },
+            {
+                "desc": "wrong-case-false",
+                "I": "b = FALSE\n",
+                "E": "CutError: line 1:5, expect val"
+            },
+            {
+                "desc": "wrong-case-true",
+                "I": "a = TRUE\n",
+                "E": "CutError: line 1:5, expect val"
             }
         ]
     },
@@ -2368,6 +2423,108 @@
         ]
     },
     {
+        "desc": "Control",
+        "grammar_file": "./toml-v1.0.peg",
+        "entry": "toml",
+        "tests": [
+            {
+                "desc": "comment-lf",
+                "I": "comment-lf = \"ctrl-P\" # \u0010\n",
+                "E": "CutError: line 1:25, expect end_of_input"
+            },
+            {
+                "desc": "comment-us",
+                "I": "comment-us = \"ctrl-_\" # \u001f\n",
+                "E": "CutError: line 1:25, expect end_of_input"
+            },
+            {
+                "desc": "multi-del",
+                "I": "multi-del = \"\"\"null\u007f\"\"\"\n",
+                "E": "CutError: line 1:20, expect ml_basic_string (insufficient repetitions)"
+            },
+            {
+                "desc": "multi-lf",
+                "I": "multi-lf = \"\"\"null\u0010\"\"\"\n",
+                "E": "CutError: line 1:19, expect ml_basic_string (insufficient repetitions)"
+            },
+            {
+                "desc": "multi-null",
+                "I": "multi-null = \"\"\"null\u0000\"\"\"\n",
+                "E": "CutError: line 1:21, expect ml_basic_string (at least 3 repetitions)"
+            },
+            {
+                "desc": "multi-us",
+                "I": "multi-us = \"\"\"null\u001f\"\"\"\n",
+                "E": "CutError: line 1:19, expect ml_basic_string (insufficient repetitions)"
+            },
+            {
+                "desc": "rawmulti-del",
+                "I": "rawmulti-del = '''null\u007f'''\n",
+                "E": "CutError: line 1:23, expect ml_literal_string (insufficient repetitions)"
+            },
+            {
+                "desc": "rawmulti-lf",
+                "I": "rawmulti-lf = '''null\u0010'''\n",
+                "E": "CutError: line 1:22, expect ml_literal_string (insufficient repetitions)"
+            },
+            {
+                "desc": "rawmulti-null",
+                "I": "rawmulti-null = '''null\u0000'''\n",
+                "E": "CutError: line 1:24, expect ml_literal_string (at least 3 repetitions)"
+            },
+            {
+                "desc": "rawmulti-us",
+                "I": "rawmulti-us = '''null\u001f'''\n",
+                "E": "CutError: line 1:22, expect ml_literal_string (insufficient repetitions)"
+            },
+            {
+                "desc": "rawstring-del",
+                "I": "rawstring-del = 'null\u007f'\n",
+                "E": "CutError: line 1:17, expect val"
+            },
+            {
+                "desc": "rawstring-lf",
+                "I": "rawstring-lf = 'null\u0010'\n",
+                "E": "CutError: line 1:16, expect val"
+            },
+            {
+                "desc": "rawstring-null",
+                "I": "rawstring-null = 'null\u0000'\n",
+                "E": "CutError: line 1:18, expect val"
+            },
+            {
+                "desc": "rawstring-us",
+                "I": "rawstring-us = 'null\u001f'\n",
+                "E": "CutError: line 1:16, expect val"
+            },
+            {
+                "desc": "string-bs",
+                "I": "string-bs = \"backspace\b\"\n",
+                "E": "CutError: line 1:13, expect val"
+            },
+            {
+                "desc": "string-del",
+                "I": "string-del = \"null\u007f\"\n",
+                "E": "CutError: line 1:14, expect val"
+            },
+            {
+                "desc": "string-lf",
+                "I": "string-lf = \"null\u0010\"\n",
+                "E": "CutError: line 1:13, expect val"
+            },
+            {
+                "desc": "string-null",
+                "I": "string-null = \"null\u0000\"\n",
+                "E": "CutError: line 1:15, expect val"
+            },
+            {
+                "desc": "string-us",
+                "I": "string-us = \"null\u001f\"\n",
+                "E": "CutError: line 1:13, expect val"
+            }
+        ]
+    },
+    {
         "desc": "Datetime",
         "grammar_file": "./toml-v1.0.peg",
         "entry": "toml",
@@ -2536,179 +2693,9 @@
                 ]
             },
             {
-                "desc": "local-date",
-                "I": "bestdayever = 1987-07-05\n",
-                "O": [
-                    {
-                        "slice": [
-                            0,
-                            25
-                        ],
-                        "type": "toml",
-                        "children": [
-                            {
-                                "slice": [
-                                    0,
-                                    24
-                                ],
-                                "type": "keyval",
-                                "children": [
-                                    {
-                                        "slice": [
-                                            0,
-                                            11
-                                        ],
-                                        "type": "unquoted_key"
-                                    },
-                                    {
-                                        "slice": [
-                                            14,
-                                            24
-                                        ],
-                                        "type": "local_date",
-                                        "children": [
-                                            {
-                                                "slice": [
-                                                    14,
-                                                    18
-                                                ],
-                                                "type": "date_fullyear"
-                                            },
-                                            {
-                                                "slice": [
-                                                    19,
-                                                    21
-                                                ],
-                                                "type": "date_month"
-                                            },
-                                            {
-                                                "slice": [
-                                                    22,
-                                                    24
-                                                ],
-                                                "type": "date_mday"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "desc": "local-time",
-                "I": "besttimeever = 17:45:00\nmilliseconds = 10:32:00.555\n",
-                "O": [
-                    {
-                        "slice": [
-                            0,
-                            52
-                        ],
-                        "type": "toml",
-                        "children": [
-                            {
-                                "slice": [
-                                    0,
-                                    23
-                                ],
-                                "type": "keyval",
-                                "children": [
-                                    {
-                                        "slice": [
-                                            0,
-                                            12
-                                        ],
-                                        "type": "unquoted_key"
-                                    },
-                                    {
-                                        "slice": [
-                                            15,
-                                            23
-                                        ],
-                                        "type": "local_time",
-                                        "children": [
-                                            {
-                                                "slice": [
-                                                    15,
-                                                    17
-                                                ],
-                                                "type": "time_hour"
-                                            },
-                                            {
-                                                "slice": [
-                                                    18,
-                                                    20
-                                                ],
-                                                "type": "time_minute"
-                                            },
-                                            {
-                                                "slice": [
-                                                    21,
-                                                    23
-                                                ],
-                                                "type": "time_second"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "slice": [
-                                    24,
-                                    51
-                                ],
-                                "type": "keyval",
-                                "children": [
-                                    {
-                                        "slice": [
-                                            24,
-                                            36
-                                        ],
-                                        "type": "unquoted_key"
-                                    },
-                                    {
-                                        "slice": [
-                                            39,
-                                            51
-                                        ],
-                                        "type": "local_time",
-                                        "children": [
-                                            {
-                                                "slice": [
-                                                    39,
-                                                    41
-                                                ],
-                                                "type": "time_hour"
-                                            },
-                                            {
-                                                "slice": [
-                                                    42,
-                                                    44
-                                                ],
-                                                "type": "time_minute"
-                                            },
-                                            {
-                                                "slice": [
-                                                    45,
-                                                    47
-                                                ],
-                                                "type": "time_second"
-                                            },
-                                            {
-                                                "slice": [
-                                                    48,
-                                                    51
-                                                ],
-                                                "type": "time_secfrac"
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                "desc": "impossible-date",
+                "I": "d = 2006-01-50T00:00:00Z\n",
+                "E": "CutError: line 1:13, expect date_mday"
             },
             {
                 "desc": "local",
@@ -2924,6 +2911,181 @@
                                                     87
                                                 ],
                                                 "type": "time_second"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "desc": "local-date",
+                "I": "bestdayever = 1987-07-05\n",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            25
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    24
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            11
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            14,
+                                            24
+                                        ],
+                                        "type": "local_date",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    14,
+                                                    18
+                                                ],
+                                                "type": "date_fullyear"
+                                            },
+                                            {
+                                                "slice": [
+                                                    19,
+                                                    21
+                                                ],
+                                                "type": "date_month"
+                                            },
+                                            {
+                                                "slice": [
+                                                    22,
+                                                    24
+                                                ],
+                                                "type": "date_mday"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "desc": "local-time",
+                "I": "besttimeever = 17:45:00\nmilliseconds = 10:32:00.555\n",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            52
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    23
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            12
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            15,
+                                            23
+                                        ],
+                                        "type": "local_time",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    15,
+                                                    17
+                                                ],
+                                                "type": "time_hour"
+                                            },
+                                            {
+                                                "slice": [
+                                                    18,
+                                                    20
+                                                ],
+                                                "type": "time_minute"
+                                            },
+                                            {
+                                                "slice": [
+                                                    21,
+                                                    23
+                                                ],
+                                                "type": "time_second"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "slice": [
+                                    24,
+                                    51
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            24,
+                                            36
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            39,
+                                            51
+                                        ],
+                                        "type": "local_time",
+                                        "children": [
+                                            {
+                                                "slice": [
+                                                    39,
+                                                    41
+                                                ],
+                                                "type": "time_hour"
+                                            },
+                                            {
+                                                "slice": [
+                                                    42,
+                                                    44
+                                                ],
+                                                "type": "time_minute"
+                                            },
+                                            {
+                                                "slice": [
+                                                    45,
+                                                    47
+                                                ],
+                                                "type": "time_second"
+                                            },
+                                            {
+                                                "slice": [
+                                                    48,
+                                                    51
+                                                ],
+                                                "type": "time_secfrac"
                                             }
                                         ]
                                     }
@@ -3319,6 +3481,26 @@
                 ]
             },
             {
+                "desc": "no-leads",
+                "I": "no-leads = 1987-7-05T17:45:00Z\n",
+                "E": "CutError: line 1:17, expect date_month"
+            },
+            {
+                "desc": "no-leads-with-milli",
+                "I": "with-milli = 1987-07-5T17:45:00.12Z\n",
+                "E": "CutError: line 1:22, expect date_mday"
+            },
+            {
+                "desc": "no-secs",
+                "I": "no-secs = 1987-07-05T17:45Z\n",
+                "E": "CutError: line 1:27, expect partial_time (char ':')"
+            },
+            {
+                "desc": "no-t",
+                "I": "no-t = 1987-07-0517:45:00Z\n",
+                "E": "CutError: line 1:18, expect end_of_input"
+            },
+            {
                 "desc": "timezone",
                 "I": "utc  = 1987-07-05T17:45:56Z\npdt  = 1987-07-05T17:45:56-05:00\nnzst = 1987-07-05T17:45:56+12:00\nnzdt = 1987-07-05T17:45:56+13:00  # DST\n",
                 "O": [
@@ -3697,6 +3879,11 @@
                         ]
                     }
                 ]
+            },
+            {
+                "desc": "trailing-t",
+                "I": "d = 2006-01-30T\n",
+                "E": "CutError: line 1:15, expect end_of_input"
             }
         ]
     },
@@ -3705,6 +3892,51 @@
         "grammar_file": "./toml-v1.0.peg",
         "entry": "toml",
         "tests": [
+            {
+                "desc": "double-point-1",
+                "I": "double-point-1 = 0..1\n",
+                "E": "CutError: line 1:19, expect end_of_input"
+            },
+            {
+                "desc": "double-point-2",
+                "I": "double-point-2 = 0.1.2\n",
+                "E": "CutError: line 1:21, expect end_of_input"
+            },
+            {
+                "desc": "exp-double-e-1",
+                "I": "exp-double-e-1 = 1ee2\n",
+                "E": "CutError: line 1:19, expect end_of_input"
+            },
+            {
+                "desc": "exp-double-e-2",
+                "I": "exp-double-e-2 = 1e2e3\n",
+                "E": "CutError: line 1:21, expect end_of_input"
+            },
+            {
+                "desc": "exp-double-us",
+                "I": "exp-double-us = 1e__23\n",
+                "E": "CutError: line 1:18, expect end_of_input"
+            },
+            {
+                "desc": "exp-leading-us",
+                "I": "exp-leading-us = 1e_23\n",
+                "E": "CutError: line 1:19, expect end_of_input"
+            },
+            {
+                "desc": "exp-point-1",
+                "I": "exp-point-1 = 1e2.3\n",
+                "E": "CutError: line 1:18, expect end_of_input"
+            },
+            {
+                "desc": "exp-point-2",
+                "I": "exp-point-2 = 1.e2\n",
+                "E": "CutError: line 1:16, expect end_of_input"
+            },
+            {
+                "desc": "exp-trailing-us",
+                "I": "exp-trailing-us = 1e_23_\n",
+                "E": "CutError: line 1:20, expect end_of_input"
+            },
             {
                 "desc": "exponent",
                 "I": "lower = 3e2\nupper = 3E2\nneg = 3e-2\npos = 3E+2\nzero = 3e0\npointlower = 3.1e2\npointupper = 3.1E2\nminustenth = -1E-1\n",
@@ -4165,6 +4397,61 @@
                 ]
             },
             {
+                "desc": "inf-incomplete-1",
+                "I": "inf-incomplete-1 = in\n",
+                "E": "CutError: line 1:20, expect val"
+            },
+            {
+                "desc": "inf-incomplete-2",
+                "I": "inf-incomplete-2 = +in\n",
+                "E": "CutError: line 1:20, expect val"
+            },
+            {
+                "desc": "inf-incomplete-3",
+                "I": "inf-incomplete-3 = -in\n",
+                "E": "CutError: line 1:20, expect val"
+            },
+            {
+                "desc": "inf_underscore",
+                "I": "inf_underscore = in_f\n",
+                "E": "CutError: line 1:18, expect val"
+            },
+            {
+                "desc": "leading-point",
+                "I": "leading-point = .12345\n",
+                "E": "CutError: line 1:17, expect val"
+            },
+            {
+                "desc": "leading-point-neg",
+                "I": "leading-point-neg = -.12345\n",
+                "E": "CutError: line 1:21, expect val"
+            },
+            {
+                "desc": "leading-point-plus",
+                "I": "leading-point-plus = +.12345\n",
+                "E": "CutError: line 1:22, expect val"
+            },
+            {
+                "desc": "leading-us",
+                "I": "leading-us = _1.2\n",
+                "E": "CutError: line 1:14, expect val"
+            },
+            {
+                "desc": "leading-zero",
+                "I": "leading-zero = 03.14\n",
+                "E": "CutError: line 1:17, expect end_of_input"
+            },
+            {
+                "desc": "leading-zero-neg",
+                "I": "leading-zero-neg = -03.14\n",
+                "E": "CutError: line 1:22, expect end_of_input"
+            },
+            {
+                "desc": "leading-zero-plus",
+                "I": "leading-zero-plus = +03.14\n",
+                "E": "CutError: line 1:23, expect end_of_input"
+            },
+            {
                 "desc": "long",
                 "I": "longpi = 3.141592653589793\nneglongpi = -3.141592653589793\n",
                 "O": [
@@ -4224,6 +4511,46 @@
                         ]
                     }
                 ]
+            },
+            {
+                "desc": "nan-incomplete-1",
+                "I": "nan-incomplete-1 = na\n",
+                "E": "CutError: line 1:20, expect val"
+            },
+            {
+                "desc": "nan-incomplete-2",
+                "I": "nan-incomplete-2 = +na\n",
+                "E": "CutError: line 1:20, expect val"
+            },
+            {
+                "desc": "nan-incomplete-3",
+                "I": "nan-incomplete-3 = -na\n",
+                "E": "CutError: line 1:20, expect val"
+            },
+            {
+                "desc": "nan_underscore",
+                "I": "nan_underscore = na_n\n",
+                "E": "CutError: line 1:18, expect val"
+            },
+            {
+                "desc": "trailing-point",
+                "I": "trailing-point = 1.\n",
+                "E": "CutError: line 1:19, expect end_of_input"
+            },
+            {
+                "desc": "trailing-point-min",
+                "I": "trailing-point-min = -1.\n",
+                "E": "CutError: line 1:24, expect end_of_input"
+            },
+            {
+                "desc": "trailing-point-plus",
+                "I": "trailing-point-plus = +1.\n",
+                "E": "CutError: line 1:25, expect end_of_input"
+            },
+            {
+                "desc": "trailing-us",
+                "I": "trailing-us = 1.2_\n",
+                "E": "CutError: line 1:18, expect end_of_input"
             },
             {
                 "desc": "underscore",
@@ -4308,6 +4635,16 @@
                         ]
                     }
                 ]
+            },
+            {
+                "desc": "us-after-point",
+                "I": "us-after-point = 1._2\n",
+                "E": "CutError: line 1:19, expect end_of_input"
+            },
+            {
+                "desc": "us-before-point",
+                "I": "us-before-point = 1_.2\n",
+                "E": "CutError: line 1:20, expect end_of_input"
             },
             {
                 "desc": "zero",
@@ -4784,6 +5121,11 @@
                 ]
             },
             {
+                "desc": "double-comma",
+                "I": "t = {x=3,,y=4}\n",
+                "E": "CutError: line 1:9, expect inline_table_close (char '}')"
+            },
+            {
                 "desc": "empty",
                 "I": "empty1 = {}\nempty2 = { }\nempty_in_array = [ { not_empty = 1 }, {} ]\nempty_in_array2 = [{},{not_empty=1}]\nmany_empty = [{},{},{}]\nnested_empty = {\"empty\"={}}\n",
                 "O": [
@@ -5065,6 +5407,11 @@
                         ]
                     }
                 ]
+            },
+            {
+                "desc": "empty",
+                "I": "t = {,}\n",
+                "E": "CutError: line 1:6, expect inline_table_close (char '}')"
             },
             {
                 "desc": "end-in-bool",
@@ -6588,6 +6935,26 @@
                 ]
             },
             {
+                "desc": "linebreak-1",
+                "I": "# No newlines are allowed between the curly braces unless they are valid within\n# a value.\nsimple = { a = 1 \n}\n",
+                "E": "CutError: line 3:18, expect inline_table_close (char '}')"
+            },
+            {
+                "desc": "linebreak-2",
+                "I": "t = {a=1,\nb=2}\n",
+                "E": "CutError: line 1:9, expect inline_table_close (char '}')"
+            },
+            {
+                "desc": "linebreak-3",
+                "I": "t = {a=1\n,b=2}\n",
+                "E": "CutError: line 1:9, expect inline_table_close (char '}')"
+            },
+            {
+                "desc": "linebreak-4",
+                "I": "json_like = {\n          first = \"Tom\",\n          last = \"Preston-Werner\"\n}\n",
+                "E": "CutError: line 1:14, expect inline_table_close (char '}')"
+            },
+            {
                 "desc": "multiline",
                 "I": "tbl_multiline = { a = 1, b = \"\"\"\nmultiline\n\"\"\", c = \"\"\"and yet\nanother line\"\"\", d = 4 }\n",
                 "O": [
@@ -7223,6 +7590,16 @@
                         ]
                     }
                 ]
+            },
+            {
+                "desc": "no-comma",
+                "I": "t = {x = 3 y = 4}\n",
+                "E": "CutError: line 1:12, expect inline_table_close (char '}')"
+            },
+            {
+                "desc": "trailing-comma",
+                "I": "# A terminating comma (also called trailing comma) is not permitted after the\n# last key/value pair in an inline table\nabc = { abc = 123, }",
+                "E": "CutError: line 3:18, expect inline_table_close (char '}')"
             }
         ]
     },
@@ -7231,6 +7608,36 @@
         "grammar_file": "./toml-v1.0.peg",
         "entry": "toml",
         "tests": [
+            {
+                "desc": "capital-bin",
+                "I": "capital-bin = 0B0\n",
+                "E": "CutError: line 1:16, expect end_of_input"
+            },
+            {
+                "desc": "capital-hex",
+                "I": "capital-hex = 0X1\n",
+                "E": "CutError: line 1:16, expect end_of_input"
+            },
+            {
+                "desc": "capital-oct",
+                "I": "capital-oct = 0O0\n",
+                "E": "CutError: line 1:16, expect end_of_input"
+            },
+            {
+                "desc": "double-sign-nex",
+                "I": "double-sign-nex = --99\n",
+                "E": "CutError: line 1:19, expect val"
+            },
+            {
+                "desc": "double-sign-plus",
+                "I": "double-sign-plus = ++99\n",
+                "E": "CutError: line 1:20, expect val"
+            },
+            {
+                "desc": "double-us",
+                "I": "double-us = 1__23\n",
+                "E": "CutError: line 1:14, expect end_of_input"
+            },
             {
                 "desc": "integer",
                 "I": "answer = 42\nposanswer = +42\nneganswer = -42\nzero = 0\n",
@@ -7337,6 +7744,61 @@
                         ]
                     }
                 ]
+            },
+            {
+                "desc": "invalid-bin",
+                "I": "invalid-bin = 0b0012\n",
+                "E": "CutError: line 1:20, expect end_of_input"
+            },
+            {
+                "desc": "invalid-hex",
+                "I": "invalid-hex = 0xaafz\n",
+                "E": "CutError: line 1:20, expect end_of_input"
+            },
+            {
+                "desc": "invalid-oct",
+                "I": "invalid-oct = 0o778\n",
+                "E": "CutError: line 1:19, expect end_of_input"
+            },
+            {
+                "desc": "leading-us",
+                "I": "leading-us = _123\n",
+                "E": "CutError: line 1:14, expect val"
+            },
+            {
+                "desc": "leading-us-bin",
+                "I": "leading-us-bin = _0o1\n",
+                "E": "CutError: line 1:18, expect val"
+            },
+            {
+                "desc": "leading-us-hex",
+                "I": "leading-us-hex = _0o1\n",
+                "E": "CutError: line 1:18, expect val"
+            },
+            {
+                "desc": "leading-us-oct",
+                "I": "leading-us-oct = _0o1\n",
+                "E": "CutError: line 1:18, expect val"
+            },
+            {
+                "desc": "leading-zero-1",
+                "I": "leading-zero-1 = 01\n",
+                "E": "CutError: line 1:19, expect end_of_input"
+            },
+            {
+                "desc": "leading-zero-2",
+                "I": "leading-zero-2 = 00\n",
+                "E": "CutError: line 1:19, expect end_of_input"
+            },
+            {
+                "desc": "leading-zero-sign-1",
+                "I": "leading-zero-sign-1 = -01\n",
+                "E": "CutError: line 1:25, expect end_of_input"
+            },
+            {
+                "desc": "leading-zero-sign-2",
+                "I": "leading-zero-sign-2 = +01\n",
+                "E": "CutError: line 1:25, expect end_of_input"
             },
             {
                 "desc": "literals",
@@ -7622,6 +8084,61 @@
                 ]
             },
             {
+                "desc": "negative-bin",
+                "I": "negative-bin = -0b11010110\n",
+                "E": "CutError: line 1:18, expect end_of_input"
+            },
+            {
+                "desc": "negative-hex",
+                "I": "negative-hex = -0xff\n",
+                "E": "CutError: line 1:18, expect end_of_input"
+            },
+            {
+                "desc": "negative-oct",
+                "I": "negative-oct = -0o99\n",
+                "E": "CutError: line 1:18, expect end_of_input"
+            },
+            {
+                "desc": "positive-bin",
+                "I": "positive-bin = +0b11010110\n",
+                "E": "CutError: line 1:18, expect end_of_input"
+            },
+            {
+                "desc": "positive-hex",
+                "I": "positive-hex = +0xff\n",
+                "E": "CutError: line 1:18, expect end_of_input"
+            },
+            {
+                "desc": "positive-oct",
+                "I": "positive-oct = +0o99\n",
+                "E": "CutError: line 1:18, expect end_of_input"
+            },
+            {
+                "desc": "text-after-integer",
+                "I": "answer = 42 the ultimate answer?\n",
+                "E": "CutError: line 1:13, expect end_of_input"
+            },
+            {
+                "desc": "trailing-us",
+                "I": "trailing-us = 123_\n",
+                "E": "CutError: line 1:18, expect end_of_input"
+            },
+            {
+                "desc": "trailing-us-bin",
+                "I": "trailing-us-bin = 0b1_\n",
+                "E": "CutError: line 1:22, expect end_of_input"
+            },
+            {
+                "desc": "trailing-us-hex",
+                "I": "trailing-us-hex = 0x1_\n",
+                "E": "CutError: line 1:22, expect end_of_input"
+            },
+            {
+                "desc": "trailing-us-oct",
+                "I": "trailing-us-oct = 0o1_\n",
+                "E": "CutError: line 1:22, expect end_of_input"
+            },
+            {
                 "desc": "underscore",
                 "I": "kilo = 1_000\nx = 1_1_1_1\n",
                 "O": [
@@ -7681,6 +8198,21 @@
                         ]
                     }
                 ]
+            },
+            {
+                "desc": "us-after-bin",
+                "I": "us-after-bin = 0b_1\n",
+                "E": "CutError: line 1:17, expect end_of_input"
+            },
+            {
+                "desc": "us-after-hex",
+                "I": "us-after-hex = 0x_1\n",
+                "E": "CutError: line 1:17, expect end_of_input"
+            },
+            {
+                "desc": "us-after-oct",
+                "I": "us-after-oct = 0o_1\n",
+                "E": "CutError: line 1:17, expect end_of_input"
             },
             {
                 "desc": "zero",
@@ -7981,6 +8513,21 @@
         "entry": "toml",
         "tests": [
             {
+                "desc": "after-array",
+                "I": "[[agencies]] owner = \"S Cjelli\"\n",
+                "E": "CutError: line 1:14, expect end_of_input"
+            },
+            {
+                "desc": "after-table",
+                "I": "[error] this = \"should not be here\"\n",
+                "E": "CutError: line 1:9, expect end_of_input"
+            },
+            {
+                "desc": "after-value",
+                "I": "first = \"Tom\" last = \"Preston-Werner\" # INVALID\n",
+                "E": "CutError: line 1:15, expect end_of_input"
+            },
+            {
                 "desc": "alphanum",
                 "I": "alpha = \"a\"\n123 = \"num\"\n000111 = \"leading\"\n10e3 = \"false float\"\none1two2 = \"mixed\"\nwith-dash = \"dashed\"\nunder_score = \"___\"\n34-11 = 23\n\n[2018_10]\n001 = 1\n\n[a-a-a]\n_ = false\n",
                 "O": [
@@ -8256,6 +8803,11 @@
                         ]
                     }
                 ]
+            },
+            {
+                "desc": "bare-invalid-character",
+                "I": "bare!key = 123\n",
+                "E": "CutError: line 1:1, expect end_of_input"
             },
             {
                 "desc": "case-sensitive",
@@ -9550,6 +10102,11 @@
                 ]
             },
             {
+                "desc": "empty",
+                "I": " = 1\n",
+                "E": "CutError: line 1:2, expect end_of_input"
+            },
+            {
                 "desc": "equals-nospace",
                 "I": "answer=42\n",
                 "O": [
@@ -9586,6 +10143,11 @@
                         ]
                     }
                 ]
+            },
+            {
+                "desc": "escape",
+                "I": "\\u00c0 = \"latin capital letter A with grave\"\n",
+                "E": "CutError: line 1:1, expect end_of_input"
             },
             {
                 "desc": "escapes",
@@ -9759,6 +10321,64 @@
                 ]
             },
             {
+                "desc": "hash",
+                "I": "a# = 1\n",
+                "E": "CutError: line 1:1, expect end_of_input"
+            },
+            {
+                "desc": "multiline",
+                "I": "\"\"\"long\nkey\"\"\" = 1\n",
+                "E": "CutError: line 1:1, expect end_of_input"
+            },
+            {
+                "desc": "newline",
+                "I": "barekey\n   = 123\n",
+                "E": "CutError: line 1:1, expect end_of_input"
+            },
+            {
+                "desc": "no-eol",
+                "I": "a = 1 b = 2\n",
+                "E": "CutError: line 1:7, expect end_of_input"
+            },
+            {
+                "desc": "numeric",
+                "I": "1 = 1\n",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            6
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    5
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            1
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            4,
+                                            5
+                                        ],
+                                        "type": "integer"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
                 "desc": "numeric-dotted",
                 "I": "1.2 = 3\n",
                 "O": [
@@ -9813,42 +10433,14 @@
                 ]
             },
             {
-                "desc": "numeric",
-                "I": "1 = 1\n",
-                "O": [
-                    {
-                        "slice": [
-                            0,
-                            6
-                        ],
-                        "type": "toml",
-                        "children": [
-                            {
-                                "slice": [
-                                    0,
-                                    5
-                                ],
-                                "type": "keyval",
-                                "children": [
-                                    {
-                                        "slice": [
-                                            0,
-                                            1
-                                        ],
-                                        "type": "unquoted_key"
-                                    },
-                                    {
-                                        "slice": [
-                                            4,
-                                            5
-                                        ],
-                                        "type": "integer"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                "desc": "open-bracket",
+                "I": "[abc = 1\n",
+                "E": "CutError: line 1:6, expect std_table_close (char ']')"
+            },
+            {
+                "desc": "partial-quoted",
+                "I": "partial\"quoted\" = 5\n",
+                "E": "CutError: line 1:1, expect end_of_input"
             },
             {
                 "desc": "quoted-dots",
@@ -10052,6 +10644,11 @@
                 ]
             },
             {
+                "desc": "single-open-bracket",
+                "I": "[\n",
+                "E": "CutError: line 1:2, expect key"
+            },
+            {
                 "desc": "space",
                 "I": "\"a b\" = 1\n",
                 "O": [
@@ -10088,6 +10685,16 @@
                         ]
                     }
                 ]
+            },
+            {
+                "desc": "space",
+                "I": "a b = 1\n",
+                "E": "CutError: line 1:1, expect end_of_input"
+            },
+            {
+                "desc": "special-character",
+                "I": "\u03bc = \"greek small letter mu\"\n",
+                "E": "CutError: line 1:1, expect end_of_input"
             },
             {
                 "desc": "special-chars",
@@ -10233,6 +10840,36 @@
                         ]
                     }
                 ]
+            },
+            {
+                "desc": "start-bracket",
+                "I": "[a]\n[xyz = 5\n[b]\n",
+                "E": "CutError: line 2:6, expect std_table_close (char ']')"
+            },
+            {
+                "desc": "two-equals",
+                "I": "key= = 1\n",
+                "E": "CutError: line 1:6, expect val"
+            },
+            {
+                "desc": "two-equals2",
+                "I": "a==1\n",
+                "E": "CutError: line 1:3, expect val"
+            },
+            {
+                "desc": "two-equals3",
+                "I": "a=b=1\n",
+                "E": "CutError: line 1:3, expect val"
+            },
+            {
+                "desc": "without-value-1",
+                "I": "key\n",
+                "E": "CutError: line 1:1, expect end_of_input"
+            },
+            {
+                "desc": "without-value-2",
+                "I": "key = \n",
+                "E": "CutError: line 1:7, expect val"
             }
         ]
     },
@@ -10241,6 +10878,56 @@
         "grammar_file": "./toml-v1.0.peg",
         "entry": "toml",
         "tests": [
+            {
+                "desc": "bad-byte-escape",
+                "I": "naughty = \"\\xAg\"\n",
+                "E": "CutError: line 1:11, expect val"
+            },
+            {
+                "desc": "bad-concat",
+                "I": "no_concat = \"first\" \"second\"\n",
+                "E": "CutError: line 1:21, expect end_of_input"
+            },
+            {
+                "desc": "bad-escape",
+                "I": "invalid-escape = \"This string has a bad \\a escape character.\"\n",
+                "E": "CutError: line 1:18, expect val"
+            },
+            {
+                "desc": "bad-multiline",
+                "I": "multi = \"first line\nsecond line\"\n",
+                "E": "CutError: line 1:9, expect val"
+            },
+            {
+                "desc": "bad-slash-escape",
+                "I": "invalid-escape = \"This string has a bad \\/ escape character.\"\n",
+                "E": "CutError: line 1:18, expect val"
+            },
+            {
+                "desc": "bad-uni-esc",
+                "I": "str = \"val\\ue\"\n",
+                "E": "CutError: line 1:7, expect val"
+            },
+            {
+                "desc": "basic-byte-escapes",
+                "I": "answer = \"\\x33\"\n",
+                "E": "CutError: line 1:10, expect val"
+            },
+            {
+                "desc": "basic-multiline-quotes",
+                "I": "str5 = \"\"\"Here are three quotation marks: \"\"\".\"\"\"\n",
+                "E": "CutError: line 1:46, expect end_of_input"
+            },
+            {
+                "desc": "basic-multiline-unknown-escape",
+                "I": "a = \"\"\"\\@\"\"\"\n",
+                "E": "CutError: line 1:8, expect ml_basic_string (insufficient repetitions)"
+            },
+            {
+                "desc": "basic-unknown-escape",
+                "I": "a = \"\\@\"\n",
+                "E": "CutError: line 1:5, expect val"
+            },
             {
                 "desc": "double-quote-escape",
                 "I": "test = \"\\\"one\\\"\"\n",
@@ -10846,249 +11533,19 @@
                 ]
             },
             {
-                "desc": "multiline-quotes",
-                "I": "# Make sure that quotes inside multiline strings are allowed, including right\n# after the opening '''/\"\"\" and before the closing '''/\"\"\"\n\nlit_one = ''''one quote''''\nlit_two = '''''two quotes'''''\nlit_one_space = ''' 'one quote' '''\nlit_two_space = ''' ''two quotes'' '''\n\none = \"\"\"\"one quote\"\"\"\"\ntwo = \"\"\"\"\"two quotes\"\"\"\"\"\none_space = \"\"\" \"one quote\" \"\"\"\ntwo_space = \"\"\" \"\"two quotes\"\" \"\"\"\n\nmismatch1 = \"\"\"aaa'''bbb\"\"\"\nmismatch2 = '''aaa\"\"\"bbb'''\n",
-                "O": [
-                    {
-                        "slice": [
-                            0,
-                            448
-                        ],
-                        "type": "toml",
-                        "children": [
-                            {
-                                "slice": [
-                                    138,
-                                    165
-                                ],
-                                "type": "keyval",
-                                "children": [
-                                    {
-                                        "slice": [
-                                            138,
-                                            145
-                                        ],
-                                        "type": "unquoted_key"
-                                    },
-                                    {
-                                        "slice": [
-                                            148,
-                                            165
-                                        ],
-                                        "type": "ml_literal_string"
-                                    }
-                                ]
-                            },
-                            {
-                                "slice": [
-                                    166,
-                                    196
-                                ],
-                                "type": "keyval",
-                                "children": [
-                                    {
-                                        "slice": [
-                                            166,
-                                            173
-                                        ],
-                                        "type": "unquoted_key"
-                                    },
-                                    {
-                                        "slice": [
-                                            176,
-                                            196
-                                        ],
-                                        "type": "ml_literal_string"
-                                    }
-                                ]
-                            },
-                            {
-                                "slice": [
-                                    197,
-                                    232
-                                ],
-                                "type": "keyval",
-                                "children": [
-                                    {
-                                        "slice": [
-                                            197,
-                                            210
-                                        ],
-                                        "type": "unquoted_key"
-                                    },
-                                    {
-                                        "slice": [
-                                            213,
-                                            232
-                                        ],
-                                        "type": "ml_literal_string"
-                                    }
-                                ]
-                            },
-                            {
-                                "slice": [
-                                    233,
-                                    271
-                                ],
-                                "type": "keyval",
-                                "children": [
-                                    {
-                                        "slice": [
-                                            233,
-                                            246
-                                        ],
-                                        "type": "unquoted_key"
-                                    },
-                                    {
-                                        "slice": [
-                                            249,
-                                            271
-                                        ],
-                                        "type": "ml_literal_string"
-                                    }
-                                ]
-                            },
-                            {
-                                "slice": [
-                                    273,
-                                    296
-                                ],
-                                "type": "keyval",
-                                "children": [
-                                    {
-                                        "slice": [
-                                            273,
-                                            276
-                                        ],
-                                        "type": "unquoted_key"
-                                    },
-                                    {
-                                        "slice": [
-                                            279,
-                                            296
-                                        ],
-                                        "type": "ml_basic_string"
-                                    }
-                                ]
-                            },
-                            {
-                                "slice": [
-                                    297,
-                                    323
-                                ],
-                                "type": "keyval",
-                                "children": [
-                                    {
-                                        "slice": [
-                                            297,
-                                            300
-                                        ],
-                                        "type": "unquoted_key"
-                                    },
-                                    {
-                                        "slice": [
-                                            303,
-                                            323
-                                        ],
-                                        "type": "ml_basic_string"
-                                    }
-                                ]
-                            },
-                            {
-                                "slice": [
-                                    324,
-                                    355
-                                ],
-                                "type": "keyval",
-                                "children": [
-                                    {
-                                        "slice": [
-                                            324,
-                                            333
-                                        ],
-                                        "type": "unquoted_key"
-                                    },
-                                    {
-                                        "slice": [
-                                            336,
-                                            355
-                                        ],
-                                        "type": "ml_basic_string"
-                                    }
-                                ]
-                            },
-                            {
-                                "slice": [
-                                    356,
-                                    390
-                                ],
-                                "type": "keyval",
-                                "children": [
-                                    {
-                                        "slice": [
-                                            356,
-                                            365
-                                        ],
-                                        "type": "unquoted_key"
-                                    },
-                                    {
-                                        "slice": [
-                                            368,
-                                            390
-                                        ],
-                                        "type": "ml_basic_string"
-                                    }
-                                ]
-                            },
-                            {
-                                "slice": [
-                                    392,
-                                    419
-                                ],
-                                "type": "keyval",
-                                "children": [
-                                    {
-                                        "slice": [
-                                            392,
-                                            401
-                                        ],
-                                        "type": "unquoted_key"
-                                    },
-                                    {
-                                        "slice": [
-                                            404,
-                                            419
-                                        ],
-                                        "type": "ml_basic_string"
-                                    }
-                                ]
-                            },
-                            {
-                                "slice": [
-                                    420,
-                                    447
-                                ],
-                                "type": "keyval",
-                                "children": [
-                                    {
-                                        "slice": [
-                                            420,
-                                            429
-                                        ],
-                                        "type": "unquoted_key"
-                                    },
-                                    {
-                                        "slice": [
-                                            432,
-                                            447
-                                        ],
-                                        "type": "ml_literal_string"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                "desc": "literal-multiline-quotes-1",
+                "I": "a = '''6 apostrophes: ''''''\n\n",
+                "E": "CutError: line 1:28, expect end_of_input"
+            },
+            {
+                "desc": "literal-multiline-quotes-2",
+                "I": "a = '''15 apostrophes: ''''''''''''''''''\n",
+                "E": "CutError: line 1:29, expect end_of_input"
+            },
+            {
+                "desc": "missing-quotes",
+                "I": "name = value\n",
+                "E": "CutError: line 1:8, expect val"
             },
             {
                 "desc": "multiline",
@@ -11405,6 +11862,276 @@
                 ]
             },
             {
+                "desc": "multiline-escape-space",
+                "I": "a = \"\"\"\n  foo \\ \\n\n  bar\"\"\"\n",
+                "E": "CutError: line 2:7, expect ml_basic_string (insufficient repetitions)"
+            },
+            {
+                "desc": "multiline-no-close",
+                "I": "invalid = \"\"\"\n    this will fail\n",
+                "E": "CutError: line 3:1, expect ml_basic_string (insufficient repetitions)"
+            },
+            {
+                "desc": "multiline-no-close-2",
+                "I": "x=\"\"\"\n",
+                "E": "CutError: line 2:1, expect ml_basic_string (insufficient repetitions)"
+            },
+            {
+                "desc": "multiline-quotes",
+                "I": "# Make sure that quotes inside multiline strings are allowed, including right\n# after the opening '''/\"\"\" and before the closing '''/\"\"\"\n\nlit_one = ''''one quote''''\nlit_two = '''''two quotes'''''\nlit_one_space = ''' 'one quote' '''\nlit_two_space = ''' ''two quotes'' '''\n\none = \"\"\"\"one quote\"\"\"\"\ntwo = \"\"\"\"\"two quotes\"\"\"\"\"\none_space = \"\"\" \"one quote\" \"\"\"\ntwo_space = \"\"\" \"\"two quotes\"\" \"\"\"\n\nmismatch1 = \"\"\"aaa'''bbb\"\"\"\nmismatch2 = '''aaa\"\"\"bbb'''\n",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            448
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    138,
+                                    165
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            138,
+                                            145
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            148,
+                                            165
+                                        ],
+                                        "type": "ml_literal_string"
+                                    }
+                                ]
+                            },
+                            {
+                                "slice": [
+                                    166,
+                                    196
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            166,
+                                            173
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            176,
+                                            196
+                                        ],
+                                        "type": "ml_literal_string"
+                                    }
+                                ]
+                            },
+                            {
+                                "slice": [
+                                    197,
+                                    232
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            197,
+                                            210
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            213,
+                                            232
+                                        ],
+                                        "type": "ml_literal_string"
+                                    }
+                                ]
+                            },
+                            {
+                                "slice": [
+                                    233,
+                                    271
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            233,
+                                            246
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            249,
+                                            271
+                                        ],
+                                        "type": "ml_literal_string"
+                                    }
+                                ]
+                            },
+                            {
+                                "slice": [
+                                    273,
+                                    296
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            273,
+                                            276
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            279,
+                                            296
+                                        ],
+                                        "type": "ml_basic_string"
+                                    }
+                                ]
+                            },
+                            {
+                                "slice": [
+                                    297,
+                                    323
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            297,
+                                            300
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            303,
+                                            323
+                                        ],
+                                        "type": "ml_basic_string"
+                                    }
+                                ]
+                            },
+                            {
+                                "slice": [
+                                    324,
+                                    355
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            324,
+                                            333
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            336,
+                                            355
+                                        ],
+                                        "type": "ml_basic_string"
+                                    }
+                                ]
+                            },
+                            {
+                                "slice": [
+                                    356,
+                                    390
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            356,
+                                            365
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            368,
+                                            390
+                                        ],
+                                        "type": "ml_basic_string"
+                                    }
+                                ]
+                            },
+                            {
+                                "slice": [
+                                    392,
+                                    419
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            392,
+                                            401
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            404,
+                                            419
+                                        ],
+                                        "type": "ml_basic_string"
+                                    }
+                                ]
+                            },
+                            {
+                                "slice": [
+                                    420,
+                                    447
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            420,
+                                            429
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            432,
+                                            447
+                                        ],
+                                        "type": "ml_literal_string"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "desc": "multiline-quotes-1",
+                "I": "a = \"\"\"6 quotes: \"\"\"\"\"\"\n",
+                "E": "CutError: line 1:23, expect end_of_input"
+            },
+            {
+                "desc": "multiline-quotes-2",
+                "I": "a = \"\"\"6 quotes: \"\"\"\"\"\"\n",
+                "E": "CutError: line 1:23, expect end_of_input"
+            },
+            {
                 "desc": "nl",
                 "I": "nl_mid = \"val\\nue\"\nnl_end = \"\"\"value\\n\"\"\"\n\nlit_nl_end = '''value\\n'''\nlit_nl_mid = 'val\\nue'\nlit_nl_uni = 'val\\ue'\n",
                 "O": [
@@ -11535,88 +12262,9 @@
                 ]
             },
             {
-                "desc": "raw-multiline",
-                "I": "oneline = '''This string has a ' quote character.'''\nfirstnl = '''\nThis string has a ' quote character.'''\nmultiline = '''\nThis string\nhas ' a quote character\nand more than\none newline\nin it.'''\n",
-                "O": [
-                    {
-                        "slice": [
-                            0,
-                            195
-                        ],
-                        "type": "toml",
-                        "children": [
-                            {
-                                "slice": [
-                                    0,
-                                    52
-                                ],
-                                "type": "keyval",
-                                "children": [
-                                    {
-                                        "slice": [
-                                            0,
-                                            7
-                                        ],
-                                        "type": "unquoted_key"
-                                    },
-                                    {
-                                        "slice": [
-                                            10,
-                                            52
-                                        ],
-                                        "type": "ml_literal_string"
-                                    }
-                                ]
-                            },
-                            {
-                                "slice": [
-                                    53,
-                                    106
-                                ],
-                                "type": "keyval",
-                                "children": [
-                                    {
-                                        "slice": [
-                                            53,
-                                            60
-                                        ],
-                                        "type": "unquoted_key"
-                                    },
-                                    {
-                                        "slice": [
-                                            63,
-                                            106
-                                        ],
-                                        "type": "ml_literal_string"
-                                    }
-                                ]
-                            },
-                            {
-                                "slice": [
-                                    107,
-                                    194
-                                ],
-                                "type": "keyval",
-                                "children": [
-                                    {
-                                        "slice": [
-                                            107,
-                                            116
-                                        ],
-                                        "type": "unquoted_key"
-                                    },
-                                    {
-                                        "slice": [
-                                            119,
-                                            194
-                                        ],
-                                        "type": "ml_literal_string"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                "desc": "no-close",
+                "I": "no-ending-quote = \"One time, at band camp\n",
+                "E": "CutError: line 1:19, expect val"
             },
             {
                 "desc": "raw",
@@ -11795,6 +12443,90 @@
                 ]
             },
             {
+                "desc": "raw-multiline",
+                "I": "oneline = '''This string has a ' quote character.'''\nfirstnl = '''\nThis string has a ' quote character.'''\nmultiline = '''\nThis string\nhas ' a quote character\nand more than\none newline\nin it.'''\n",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            195
+                        ],
+                        "type": "toml",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    52
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            0,
+                                            7
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            10,
+                                            52
+                                        ],
+                                        "type": "ml_literal_string"
+                                    }
+                                ]
+                            },
+                            {
+                                "slice": [
+                                    53,
+                                    106
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            53,
+                                            60
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            63,
+                                            106
+                                        ],
+                                        "type": "ml_literal_string"
+                                    }
+                                ]
+                            },
+                            {
+                                "slice": [
+                                    107,
+                                    194
+                                ],
+                                "type": "keyval",
+                                "children": [
+                                    {
+                                        "slice": [
+                                            107,
+                                            116
+                                        ],
+                                        "type": "unquoted_key"
+                                    },
+                                    {
+                                        "slice": [
+                                            119,
+                                            194
+                                        ],
+                                        "type": "ml_literal_string"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
                 "desc": "simple",
                 "I": "answer = \"You are not drinking enough whisky.\"\n",
                 "O": [
@@ -11831,6 +12563,11 @@
                         ]
                     }
                 ]
+            },
+            {
+                "desc": "text-after-string",
+                "I": "string = \"Is there life after strings?\" No.\n",
+                "E": "CutError: line 1:41, expect end_of_input"
             },
             {
                 "desc": "unicode-escape",
@@ -11991,6 +12728,11 @@
                         ]
                     }
                 ]
+            },
+            {
+                "desc": "wrong-close",
+                "I": "bad-ending-quote = \"double and single'\n",
+                "E": "CutError: line 1:20, expect val"
             }
         ]
     },
@@ -11999,6 +12741,11 @@
         "grammar_file": "./toml-v1.0.peg",
         "entry": "toml",
         "tests": [
+            {
+                "desc": "array-empty",
+                "I": "[[]]\nname = \"Born to Run\"\n",
+                "E": "CutError: line 1:3, expect key"
+            },
             {
                 "desc": "array-implicit",
                 "I": "[[albums.songs]]\nname = \"Glory Days\"\n",
@@ -12269,6 +13016,11 @@
                         ]
                     }
                 ]
+            },
+            {
+                "desc": "array-missing-bracket",
+                "I": "[[albums]\nname = \"Born to Run\"\n",
+                "E": "CutError: line 1:9, expect array_table_close (char ']')"
             },
             {
                 "desc": "array-nest",
@@ -12911,6 +13663,21 @@
                 ]
             },
             {
+                "desc": "empty",
+                "I": "[]\n",
+                "E": "CutError: line 1:2, expect key"
+            },
+            {
+                "desc": "empty-implicit-table",
+                "I": "[naughty..naughty]\n",
+                "E": "CutError: line 1:9, expect std_table_close (char ']')"
+            },
+            {
+                "desc": "equals-sign",
+                "I": "[name=bad]\n",
+                "E": "CutError: line 1:6, expect std_table_close (char ']')"
+            },
+            {
                 "desc": "keyword",
                 "I": "[true]\n\n[false]\n\n[inf]\n\n[nan]\n\n\n",
                 "O": [
@@ -12988,6 +13755,11 @@
                         ]
                     }
                 ]
+            },
+            {
+                "desc": "llbrace",
+                "I": "[ [table]]\n",
+                "E": "CutError: line 1:3, expect key"
             },
             {
                 "desc": "names",
@@ -13296,6 +14068,16 @@
                 ]
             },
             {
+                "desc": "nested-brackets-close",
+                "I": "[a]b]\nzyx = 42\n",
+                "E": "CutError: line 1:4, expect end_of_input"
+            },
+            {
+                "desc": "nested-brackets-open",
+                "I": "[a[b]\nzyx = 42\n",
+                "E": "CutError: line 1:3, expect std_table_close (char ']')"
+            },
+            {
                 "desc": "no-eol",
                 "I": "[table]\n",
                 "O": [
@@ -13325,6 +14107,16 @@
                         ]
                     }
                 ]
+            },
+            {
+                "desc": "quoted-no-close",
+                "I": "[\"where will it end]\nname = value\n",
+                "E": "CutError: line 1:2, expect key"
+            },
+            {
+                "desc": "rrbrace",
+                "I": "[[table] ]\n",
+                "E": "CutError: line 1:8, expect array_table_close (char ']')"
             },
             {
                 "desc": "sub-empty",
@@ -13390,6 +14182,11 @@
                 ]
             },
             {
+                "desc": "text-after-table",
+                "I": "[error] this shouldn't be here\n",
+                "E": "CutError: line 1:9, expect end_of_input"
+            },
+            {
                 "desc": "whitespace",
                 "I": "[\"valid key\"]\n",
                 "O": [
@@ -13419,6 +14216,11 @@
                         ]
                     }
                 ]
+            },
+            {
+                "desc": "whitespace",
+                "I": "[invalid key]\n",
+                "E": "CutError: line 1:10, expect std_table_close (char ']')"
             },
             {
                 "desc": "with-literal-string",
@@ -13598,6 +14400,11 @@
                         ]
                     }
                 ]
+            },
+            {
+                "desc": "with-pound",
+                "I": "[key#group]\nanswer = 42\n",
+                "E": "CutError: line 1:5, expect std_table_close (char ']')"
             },
             {
                 "desc": "with-single-quotes",

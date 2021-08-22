@@ -31,7 +31,7 @@
 - [ ] peg: panic.
 - [ ] peg: rule template.
 - [ ] peg: sub grammar.
-- [ ] peg: left recursive: https://tratt.net/laurie/research/pubs/html/tratt__direct_left_recursive_parsing_expression_grammars/ https://github.com/orlandohill/peg-left-recursion. introduce @left_recursion, @right_recursion in sequence.
+- [ ] peg: left recursive: https://tratt.net/laurie/research/pubs/html/tratt__direct_left_recursive_parsing_expression_grammars/ https://github.com/orlandohill/peg-left-recursion. introduce left_recursion, right_recursion in sequence.
 - [ ] peg: describe grammar AST using ADSL-style rules.
 - [ ] perf: pre-alloc tokens.
 - [ ] perf: Cache literal len or use better string structure internally.
@@ -67,7 +67,7 @@
 - [x] ~~build: wasm. `docker run --rm -v $(pwd):/src -u $(id -u):$(id -g)   emscripten/emsdk emcc peppapeg.c -Os -s WASM=1 -s SIDE_MODULE=1 -o /src/peppapeg.wasm`.  https://gist.github.com/kripken/59c67556dc03bb6d57052fedef1e61ab https://github.com/mbasso/awesome-wasm~~ won't do it.
 - [x] docs: read [A parsing machine for PEGs](http://www.inf.puc-rio.br/~roberto/docs/ry08-4.pdf).
 - [x] ~~peg: stop on first error v/s recover from Panic.~~ e.g. cut.
-- [x] api: @cut: https://news.ycombinator.com/item?id=20502032. v1.14.0
+- [x] api: cut: https://news.ycombinator.com/item?id=20502032. v1.14.0
 - [x] api: no rule id. v1.14.0
 - [x] docs: landing page for the project doc site.
 - [x] bug: eval grammar: when failed, should produce no grammar. Fixed in v1.13.0

@@ -6,7 +6,14 @@ end_of_input = !.;
 rule = decorators name @cut "=" expression ";";
 
 decorators = decorator*;
-decorator = "@" @cut ("squashed" / "scoped" / "spaced" / "lifted" / "tight" / "nonterminal");
+decorator = "@" @cut (
+    "squashed"
+    / "scoped"
+    / "spaced"
+    / "lifted"
+    / "tight"
+    / "nonterminal"
+);
 
 @squashed
 name = reference;
@@ -21,7 +28,15 @@ choice = sequence ("/" sequence)*;
 sequence = repeat+;
 
 @nonterminal
-repeat = primary (onceormore / zeroormore / zerooronce / repeatexact / repeatminmax / repeatmin / repeatmax)?;
+repeat = primary (
+    onceormore
+    / zeroormore
+    / zerooronce
+    / repeatexact
+    / repeatminmax
+    / repeatmin
+    / repeatmax
+)?;
 onceormore = "+";
 zeroormore = "*";
 zerooronce = "?";
@@ -31,14 +46,35 @@ repeatmin = "{" number "," "}";
 repeatmax = "{" "," number "}";
 
 @lifted
-primary = literal / insensitive / range / (reference !"=") / back_reference / positive / negative / "(" choice ")" / dot / cut;
+primary = literal
+        / insensitive
+        / range
+        / (reference !"=")
+        / back_reference
+        / positive
+        / negative
+        / "(" choice ")"
+        / dot
+        / cut;
 
 @squashed @tight
 literal = "\"" @cut chars "\"";
 chars = char*;
 @squashed @tight
 char = [\x20-\x21] / [\x23-\x5b] / [\x5d-\U0010ffff] / (
-    "\\" ("\"" / "/" / "\\" / "b" / "f" / "n" / "r" / "t" / ("x" @cut two_hexdigits) / ("u" @cut four_hexdigits) / ("U" @cut eight_hexdigits))
+    "\\" (
+        "\""
+        / "/"
+        / "\\"
+        / "b"
+        / "f"
+        / "n"
+        / "r"
+        / "t"
+        / ("x" @cut two_hexdigits)
+        / ("u" @cut four_hexdigits)
+        / ("U" @cut eight_hexdigits)
+    )
 );
 
 @squashed @tight

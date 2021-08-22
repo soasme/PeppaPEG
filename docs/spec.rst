@@ -365,15 +365,15 @@ Given the following rule, literal "hello world" is case-insensitive. Hence, both
 Positive
 --------
 
-Positive **tests if the sub-expression matches**. Positive starts with & and followed by a primary:
+Positive **tests if a primary expression can match**. Positive starts with & and followed by a primary:
 
 .. code-block::
 
     positive = "&" primary;
 
-Positive attempts to match the sub-expression. If succeeds, the test passes. Positive does not "consume" any text.
+Positive attempts to match the primary expression. If succeeds, the test passes. Positive does not "consume" any text.
 
-Positive can be useful in limiting the possibilities of the latter member in a Sequence. In this example, the Sequence expression must start with "Hello", e.g. "Hello World", "Hello WORLD", "Hello world", etc, will match but "HELLO WORLD" will not match.
+Positive can be useful in limiting the possibilities of the latter member in a Sequence. In this example, the Sequence expression must start with "Hello". Given "Hello World", "Hello WORLD", "Hello world" it will match. Given "HELLO WORLD" it will not match.
 
 .. code-block::
 
@@ -382,15 +382,15 @@ Positive can be useful in limiting the possibilities of the latter member in a S
 Negative
 --------
 
-Negative **tests if the sub-expression does not match**. Negative starts with ! and followed by a primary:
+Negative **tests if a primary expression failed to match**. Negative starts with ! and followed by a primary:
 
 .. code-block::
 
     negative = "!" primary;
 
-Negative expects the sub-expression doesn't match. If fails, the test passes. Negative does not "consume" any text.
+Negative expects the primary expression doesn't match. If fails, the test passes. Negative does not "consume" any text.
 
-Negative can be useful in limiting the possiblities of the latter member in a Sequence. In this example, the Sequence expression must not start with "Hello", e.g. "HELLO World", "hello WORLD", "hello world", etc, will match but "Hello World" will not match.
+In this example, the `greeting` rule must not start with "Hello". Given "HELLO World", "hello WORLD", "hello world", it will match. Given "Hello World", it will not match.
 
 .. code-block::
 
@@ -544,7 +544,7 @@ For example,
     ws = " " / "\t" / "\n";
 
 @spaced
-```````
+-------
 
 A `@spaced` rule will be auto-inserted in elements of sequences and repetitions.
 
@@ -584,7 +584,7 @@ Rule my_sequence is equivalent to:
 The `@spaced` rules only take effects for rules having no `@tight` decorators.
 
 @tight
-```````
+-------
 
 A `@tight` rule deters any `@spaced` rule from auto-inserted.
 
@@ -599,7 +599,7 @@ For example, my_sequence can only match "helloworld".
     ws = " " / "\t" / "\n";
 
 @lifted
-```````
+-------
 
 A `@lifted` rule replaces the node with its children in the parse tree, if exists any children.
 
@@ -630,7 +630,7 @@ given input "42", the parsed tree looks like:
 This decorator is useful for trimming some unnecessary nodes in the parse tree.
 
 @nonterminal
-````````````
+-------------
 
 A `@nonterminal` rule replaces the node with its children in the parse tree, if exists one child.
 If the rule produces multiple children, this decorator has no effect.
@@ -663,7 +663,7 @@ given input "1+2", the tree is like:
     }
 
 @squashed
-`````````
+---------
 
 A `@squashed` rule drops all node children in the parse tree.
 
@@ -683,7 +683,7 @@ given input "1.0", rule `float` drops all `number` nodes, leaving only one singl
     {"type": "float", "text": "1.0"}
 
 @scoped
-```````
+---------
 
 A `@scoped` rule reset all decorators that inherit from upstream rules.
 
@@ -768,3 +768,11 @@ Cheatsheet
      - repeat exact n times
    * - `# IGNORE`
      - comment
+
+Appendix. Peppa PEG of Peppa PEG
+--------------------------------
+
+This appendix includes the full form of Peppa PEG specification.
+
+.. include:: ../tests/peppa.peg
+   :literal:

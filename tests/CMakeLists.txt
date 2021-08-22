@@ -82,6 +82,7 @@ set(
     test_dot_spec
     test_comment_spec
     test_flags_spec
+    test_peppa_spec
     test_toml_v1_0_spec
 )
 

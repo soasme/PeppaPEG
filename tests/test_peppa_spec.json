@@ -1,0 +1,47 @@
+[
+  {
+    "desc": "Primary",
+    "grammar_file": "./peppa.peg",
+    "entry": "grammar",
+    "tests": [
+      {
+        "desc": "x",
+        "I": "x = .;",
+        "O": [
+          {
+            "slice": [
+              0,
+              6
+            ],
+            "type": "grammar",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  6
+                ],
+                "type": "rule",
+                "children": [
+                  {
+                    "slice": [
+                      0,
+                      1
+                    ],
+                    "type": "name"
+                  },
+                  {
+                    "slice": [
+                      4,
+                      5
+                    ],
+                    "type": "dot"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

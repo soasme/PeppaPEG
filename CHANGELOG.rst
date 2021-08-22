@@ -4,23 +4,42 @@ Change Log
 Not Yet Released
 ----------------
 
-Code change: <https://github.com/soasme/PeppaPEG/compare/v1.14.0..HEAD>.
+Code change: <https://github.com/soasme/PeppaPEG/compare/v1.15.0..HEAD>.
+
+1.15.0 (22 Aug, 2021)
+---------------------
+
+Code change: <https://github.com/soasme/PeppaPEG/compare/v1.14.0..v1.15.0>.
+
+* [Documentation]: Upgrade Peppa PEG Specification and fixed various bugs. `#111 <https://github.com/soasme/PeppaPEG/pull/111>`_.
+* [Tests]: Introduced JSON-based TINOUT-style test specs. `#103 <https://github.com/soasme/PeppaPEG/pull/103/>`_ `#105 <https://github.com/soasme/PeppaPEG/pull/105/>`_ `#106 <https://github.com/soasme/PeppaPEG/pull/106/>`_.
+* [Feature]: New shell command: `peppa ast`. `#102 <https://github.com/soasme/PeppaPEG/pull/102/>`_ `#104 <https://github.com/soasme/PeppaPEG/pull/104/>`_.
+* [Feature]: Install a command-line utility `peppa` if `-DENABLE_CLI=On`. `#101 <https://github.com/soasme/PeppaPEG/pull/101/>`_.
+* [Enhancement]: Support installing shared library to the system via `make install`. `#100 <https://github.com/soasme/PeppaPEG/pull/100/>`_.
+* [Feature]: Extend range category to support Unicode Property & General Category. `#99 <https://github.com/soasme/PeppaPEG/pull/99/>`_.
+* [Example]: Provide an example of Peppa definition of Toml v1.0 specification. `#98 <https://github.com/soasme/PeppaPEG/pull/98/>`_ `#107 <https://github.com/soasme/PeppaPEG/pull/107/>`_ `#108 <https://github.com/soasme/PeppaPEG/pull/108/>`_ `#109 <https://github.com/soasme/PeppaPEG/pull/109/>`_.
+* [Performance]: Optimize the code to reduce the call frames in runtime. `#97 <https://github.com/soasme/PeppaPEG/pull/97/>`_.
+* [Feature]: Upgrade insensitive to support both literal and back reference. `#96 <https://github.com/soasme/PeppaPEG/pull/96/>`_.
+* [Feature]: Support back reference in Peppa specification. `#95 <https://github.com/soasme/PeppaPEG/pull/95/>`_.
+* [Enhancement]: Improved the error message. `#93 <https://github.com/soasme/PeppaPEG/pull/93/>`_ `#94 <https://github.com/soasme/PeppaPEG/pull/94/>`_.
+* [Enhancement]: Support an additional callback for `catch_err()`. This is internal. `#92 <https://github.com/soasme/PeppaPEG/pull/92/>`_.
+* [Bug Fix]: Fix wrong lineno:offset from the error output. `#91 <https://github.com/soasme/PeppaPEG/pull/91>`_.
 
 1.14.0 (8 Aug, 2021)
 ---------------------
 
 Code change: <https://github.com/soasme/PeppaPEG/compare/v1.13.0..v1.14.0>.
 
-* [Feature]: New PEG expression: `@cut`. [#90](https://github.com/soasme/PeppaPEG/pull/90).
-* [API Change]: `P4_JsonifySourceAst` now doesn't require `grammar` in the parameters. [#89](https://github.com/soasme/PeppaPEG/pull/89).
-* [Enhancement]: Wrap errors with catch_err / catch_oom in the .c implementation. [#88](https://github.com/soasme/PeppaPEG/pull/88) [#91](https://github.com/soasme/PeppaPEG/pull/91) [#92](https://github.com/soasme/PeppaPEG/pull/92).
-* [Bugfix]: Error report now can display correct lineno:offset information. [#87](https://github.com/soasme/PeppaPEG/pull/87).
-* [API Change]: `P4_RuleID` is now deprecated. Please use string (`char*`) for finding a rule. [#84](https://github.com/soasme/PeppaPEG/pull/84) [#86](https://github.com/soasme/PeppaPEG/pull/86).
+* [Feature]: New PEG expression: `@cut`. `#90 <https://github.com/soasme/PeppaPEG/pull/90>`_.
+* [API Change]: `P4_JsonifySourceAst` now doesn't require `grammar` in the parameters. `#89 <https://github.com/soasme/PeppaPEG/pull/89>`_.
+* [Enhancement]: Wrap errors with catch_err / catch_oom in the .c implementation. `#88 <https://github.com/soasme/PeppaPEG/pull/88`_ `#91 <https://github.com/soasme/PeppaPEG/pull/91`_ `#92 <https://github.com/soasme/PeppaPEG/pull/92`_.
+* [Bugfix]: Error report now can display correct lineno:offset information. `#87 <https://github.com/soasme/PeppaPEG/pull/87`_.
+* [API Change]: `P4_RuleID` is now deprecated. Please use string (`char*`) for finding a rule. `#84 <https://github.com/soasme/PeppaPEG/pull/84`_ `#86 <https://github.com/soasme/PeppaPEG/pull/86`_.
 * [API Change]: `struct P4_Grammar`, `struct P4_Expression`, `struct P4_Frame` are now private structures. However, you can still access `P4_Grammar`, `P4_Expression` as typedefs.
-* [Example]: Added a example TOML v1.0 parser. [#81](https://github.com/soasme/PeppaPEG/pull/81).
-* [Feature]: New escape type: `\xXX`. This allows terser form for ASCII chars. [#80](https://github.com/soasme/PeppaPEG/pull/80).
-* [API Change]: `\u{XXXX}` is now deprecated. Please use `\uXXXX` or `\UXXXXXXXX`. [#79](https://github.com/soasme/PeppaPEG/pull/79).
-* [API Change]: `P4_Token` is now renamed to `P4_Node`. [#78](https://github.com/soasme/PeppaPEG/pull/78).
+* [Example]: Added a example TOML v1.0 parser. `#81 <https://github.com/soasme/PeppaPEG/pull/81`_.
+* [Feature]: New escape type: `\xXX`. This allows terser form for ASCII chars. `#80 <https://github.com/soasme/PeppaPEG/pull/80`_.
+* [API Change]: `\u{XXXX}` is now deprecated. Please use `\uXXXX` or `\UXXXXXXXX`. `#79 <https://github.com/soasme/PeppaPEG/pull/79`_.
+* [API Change]: `P4_Token` is now renamed to `P4_Node`. `#78 <https://github.com/soasme/PeppaPEG/pull/78`_.
 
 1.13.0 (6 May, 2021)
 --------------------

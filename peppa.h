@@ -92,7 +92,7 @@ typedef uint32_t        ucs4_t;
 # define P4_MAJOR_VERSION 1
 
 /** Minor version number. */
-# define P4_MINOR_VERSION 14
+# define P4_MINOR_VERSION 15
 
 /** Patch version number. */
 # define P4_PATCH_VERSION 0

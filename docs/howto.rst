@@ -4,7 +4,7 @@ How-To Guides
 How to Prevent StackError?
 --------------------------
 
-Considering a json nested array: `[[[[...]]]]`. If the depth is too deep, Peppa PEG may end up with a StackError. This is due to Peppa PEG is a recursion-based parser. To prevent the stack address exhausts, one can set a limit on the recursion depth. By default, the depth is 8192.
+Considering a json nested array: `[[[[...]]]]`. If the depth is too deep, Peppa PEG may end up with a StackError since Peppa PEG is a recursion-based parser. To prevent the stack address from exhausted, one can set a limit on the recursion depth. By default, the depth is 8192. The depth tracks the frames in the stack; each expression will have a frame in the stack.
 
 If you need to adjust the depth, try :c:func:`P4_SetRecursionLimit`.
 

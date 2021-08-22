@@ -80,6 +80,6 @@ html_static_path = ['_static']
 html_extra_path = ['.nojekyll', 'landing.html']
 
 # Breathe Configuration
-breathe_projects = { "PeppaPEG": "../build/docs/xml/" }
+breathe_projects = { "PeppaPEG": "../builddocs/docs/xml/" }
 breathe_default_project = 'PeppaPEG'
 breathe_domain_by_extension = {"h": "c"}

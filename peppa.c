@@ -2403,9 +2403,8 @@ match_back_reference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Expr
     return tok;
 }
 
-void
-P4_JsonifySourceAst(FILE* stream, P4_Node* node,
-        void (*formatter)(FILE* stream, P4_Node* node)) {
+P4_PUBLIC void
+P4_JsonifySourceAst(FILE* stream, P4_Node* node, P4_Formatter formatter) {
     P4_Node* tmp = node;
 
     fprintf(stream, "[");

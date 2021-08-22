@@ -1,5 +1,8 @@
 # ROADMAP
 
+- [ ] peg: move decorators after "=".
+- [ ] api: support locale, utf-8, utf-16, utf-32 encoding.
+- [ ] peg: support action code `rule = a:b -> { |node| @override another = b; }; another = " ";` this can be used to override some rules in runtime and is useful when implementing Mustache tag set delimiter.
 - [ ] api: function `P4_NodeEqual(node1, node2, NULL)`: check text[slice] are the same, children count are the same, each child is the same. Third param check user data.
 - [ ] api: function `P4_FindNodeChild(node, node_name)`.
 - [ ] api: function `P4_FindNodeChildren(node, node_name)`.
@@ -8,9 +11,9 @@
 - [ ] peg: support multiple ranges in []: `[0-9a-zA-Z]`.
 - [ ] api: jsonify support pretty print (indent, newline).
 - [ ] shell: compile peg to LLVM IR/bitcode code (can use LLVM to compile to C, JS).
-- [ ] peg: @sibling_to_descdent. can be used to transform cases like toml [key1.key2], key2 should be a child of key1.
-- [ ] peg: @right_recursion.
-- [ ] peg: @left_recursion. can be used to transform cases like expression: `a=b (@left_recursion "+" b)*`.
+- [ ] peg: `@sibling_to_descdent`. can be used to transform cases like toml [key1.key2], key2 should be a child of key1.
+- [ ] peg: `@right_recursion`.
+- [ ] peg: `@left_recursion`. can be used to transform cases like expression: `a=b (@left_recursion "+" b)*`.
 - [ ] ci: support windows.
 - [ ] ci: publish binary to github release.
 - [ ] ci: publish ppa.
@@ -28,7 +31,7 @@
 - [ ] peg: panic.
 - [ ] peg: rule template.
 - [ ] peg: sub grammar.
-- [ ] peg: left recursive: https://tratt.net/laurie/research/pubs/html/tratt__direct_left_recursive_parsing_expression_grammars/ https://github.com/orlandohill/peg-left-recursion. introduce @left_recursion, @right_recursion in sequence.
+- [ ] peg: left recursive: https://tratt.net/laurie/research/pubs/html/tratt__direct_left_recursive_parsing_expression_grammars/ https://github.com/orlandohill/peg-left-recursion. introduce left_recursion, right_recursion in sequence.
 - [ ] peg: describe grammar AST using ADSL-style rules.
 - [ ] perf: pre-alloc tokens.
 - [ ] perf: Cache literal len or use better string structure internally.
@@ -64,7 +67,7 @@
 - [x] ~~build: wasm. `docker run --rm -v $(pwd):/src -u $(id -u):$(id -g)   emscripten/emsdk emcc peppapeg.c -Os -s WASM=1 -s SIDE_MODULE=1 -o /src/peppapeg.wasm`.  https://gist.github.com/kripken/59c67556dc03bb6d57052fedef1e61ab https://github.com/mbasso/awesome-wasm~~ won't do it.
 - [x] docs: read [A parsing machine for PEGs](http://www.inf.puc-rio.br/~roberto/docs/ry08-4.pdf).
 - [x] ~~peg: stop on first error v/s recover from Panic.~~ e.g. cut.
-- [x] api: @cut: https://news.ycombinator.com/item?id=20502032. v1.14.0
+- [x] api: cut: https://news.ycombinator.com/item?id=20502032. v1.14.0
 - [x] api: no rule id. v1.14.0
 - [x] docs: landing page for the project doc site.
 - [x] bug: eval grammar: when failed, should produce no grammar. Fixed in v1.13.0

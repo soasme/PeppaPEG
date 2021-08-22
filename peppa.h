@@ -58,14 +58,23 @@ typedef uint32_t        ucs4_t;
 # endif
 
 # ifndef P4_MALLOC
+/**
+ * The malloc function. By default, it's `malloc`.
+ */
 # define P4_MALLOC malloc
 # endif
 
 # ifndef P4_FREE
+/**
+ * The free function. By default, it's `free`.
+ */
 # define P4_FREE free
 # endif
 
 # ifndef P4_REALLOC
+/**
+ * The realloc function. By default, it's `realloc`.
+ */
 # define P4_REALLOC realloc
 # endif
 
@@ -88,6 +97,7 @@ typedef uint32_t        ucs4_t;
 /** Patch version number. */
 # define P4_PATCH_VERSION 0
 
+/** No flag. */
 # define P4_FLAG_NONE                   ((uint32_t)(0x0))
 
 /**
@@ -164,7 +174,9 @@ typedef uint32_t        ucs4_t;
  */
 # define P4_DEFAULT_RECURSION_LIMIT     8192
 
-
+/**
+ * The maximum length of a rule name.
+ */
 # define P4_MAX_RULE_NAME_LEN           32
 
 /*
@@ -236,7 +248,7 @@ typedef enum {
     P4_StackError           = 10,
     /** When the given value is not valid peg grammar. */
     P4_PegError             = 11,
-    /** When the failure occurs after a @cut operator. */
+    /** When the failure occurs after a `@cut` operator. */
     P4_CutError             = 12
 } P4_Error;
 
@@ -315,6 +327,11 @@ typedef P4_Error (*P4_MatchCallback)(P4_Grammar*, P4_Expression*, P4_Node*);
  */
 typedef P4_Error (*P4_ErrorCallback)(P4_Grammar*, P4_Expression*);
 
+/**
+ * A formatter function for the node.
+ */
+typedef void (*P4_Formatter)(FILE* stream, P4_Node* node);
+
 /*
  *
  * ░██████╗████████╗██████╗░██╗░░░██╗░█████╗░████████╗░██████╗
@@ -352,11 +369,11 @@ typedef struct P4_Position {
  *      P4_RuneRange range = { .lower='a', .upper='z', .stride=1 };
  */
 typedef struct P4_RuneRange {
-    /* The lower code point of the range (inclusive). */
+    /** The lower code point of the range (inclusive). */
     ucs4_t                 lower;
-    /* The upper code point of the range (inclusive). */
+    /** The upper code point of the range (inclusive). */
     ucs4_t                 upper;
-    /* The step to jump inside the range. */
+    /** The step to jump inside the range. */
     size_t                  stride;
 } P4_RuneRange;
 
@@ -380,6 +397,9 @@ struct P4_Slice {
     P4_Position         stop;
 };
 
+/**
+ * AST Node.
+ */
 struct P4_Node {
     /** the full text. */
     P4_String               text;
@@ -416,7 +436,7 @@ typedef struct P4_Result {
         /* The grammar result. */
         P4_Grammar*             grammar;
     };
-    /* The error message. */
+    /** The error message. */
     char                        errmsg[256];
 }                               P4_Result;
 
@@ -641,7 +661,7 @@ P4_Error       P4_AddPositive(P4_Grammar* grammar, P4_String name, P4_Expression
 /**
  * Create a P4_Negative expression.
  *
- * @param   refexpr     The negative pattern to check.
+ * @param   expr        The negative pattern to check.
  * @return  A P4_Expression.
  *
  * Example:
@@ -965,7 +985,7 @@ P4_Error       P4_AddRepeatExact(P4_Grammar* grammar, P4_String name, P4_Express
 /**
  * Create a P4_Repeat expression zero or once.
  *
- * @param   repeat_expr The repeated expression.
+ * @param   expr        The repeated expression.
  * @return  A P4_Expression.
  *
  * Example:
@@ -999,7 +1019,7 @@ P4_Error       P4_AddZeroOrOnce(P4_Grammar* grammar, P4_String name, P4_Expressi
 /**
  * Create a P4_Repeat expression zero or more times.
  *
- * @param   repeat_expr The repeated expression.
+ * @param   expr        The repeated expression.
  * @return  A P4_Expression.
  *
  * Example:
@@ -1031,7 +1051,7 @@ P4_Error       P4_AddZeroOrMore(P4_Grammar* grammar, P4_String name, P4_Expressi
 /**
  * Create a P4_Repeat expression once or more times.
  *
- * @param   repeat_expr The repeated expression.
+ * @param   expr        The repeated expression.
  * @return  A P4_Expression.
  *
  * Example:
@@ -1186,21 +1206,21 @@ P4_Expression* P4_CreateEndOfInput();
  *
  * @param   grammar     The grammar.
  * @param   name        The grammar rule name.
- * @param   joiner  A joiner literal.
- * @param   pattern The repeated pattern rule name.
+ * @param   joiner      A joiner literal.
+ * @param   reference   The repeated pattern rule name.
  * @return  The error code.
  *
  * Example:
  *
  *      P4_Expression* row = P4_AddJoin(grammar, "R1", ",", "element");
  */
-P4_Error P4_AddJoin(P4_Grammar* grammar, P4_String, const P4_String joiner, P4_String reference);
+P4_Error P4_AddJoin(P4_Grammar* grammar, P4_String name, const P4_String joiner, P4_String reference);
 
 /**
  * Create a Join expression.
  *
  * @param   joiner  A joiner literal.
- * @param   pattern The repeated pattern rule name.
+ * @param   rule_name The repeated pattern rule name.
  * @return  A P4_Expression.
  *
  * Example:
@@ -1211,7 +1231,7 @@ P4_Error P4_AddJoin(P4_Grammar* grammar, P4_String, const P4_String joiner, P4_S
  *
  *      Sequence(pattern, ZeroOrMore(Sequence(Literal(joiner), pattern)))
  */
-P4_Expression* P4_CreateJoin(const P4_String joiner, P4_String reference);
+P4_Expression* P4_CreateJoin(const P4_String joiner, P4_String rule_name);
 
 
 /**
@@ -1398,7 +1418,7 @@ size_t         P4_GetRecursionLimit(P4_Grammar* grammar);
  *
  *      P4_DeleteSource(source);
  */
-P4_Source*     P4_CreateSource(P4_String source, P4_String entry_name);
+P4_Source*     P4_CreateSource(P4_String content, P4_String entry_name);
 
 /**
  * @brief       Free the allocated memory of a source.
@@ -1489,7 +1509,7 @@ size_t          P4_GetSourcePosition(P4_Source* source);
  *      P4_Node* root = P4_GetSourceAst(source);
  *      P4_JsonifySourceAst(stdout, root);
  */
-void           P4_JsonifySourceAst(FILE* stream, P4_Node* node, void (*formatter)(FILE* stream, P4_Node* node));
+void           P4_JsonifySourceAst(FILE* stream, P4_Node* node, P4_Formatter formatter);
 
 /**
  * @brief       Inspect the node tree.

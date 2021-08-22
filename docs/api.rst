@@ -15,21 +15,9 @@ ENUMS
    :sections: enum
 
 TYPEDEFS
--------
+--------
 .. doxygenfile:: peppa.h
    :sections: typedef
-
-STRUCTS
--------
-
-.. doxygenstruct:: P4_Position
-   :members:
-
-.. doxygenstruct:: P4_Slice
-   :members:
-
-.. doxygenstruct:: P4_Node
-   :members:
 
 FUNCTIONS
 ---------

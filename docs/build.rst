@@ -31,7 +31,7 @@ If you have a difficulty having a complete development environment for Peppa PEG
 .. code-block:: console
 
     $ docker run --rm -v `pwd`:/app -it ubuntu:latest bash
-    # apt-get install git gcc gdb valgrind make cmake python3 python3-venv python3-pip doxygen
+    # apt-get install git gcc gdb valgrind make cmake libunistring-dev python3 python3-venv python3-pip doxygen
     # // you have all the dev-dependencies now.
 
 Testing Peppa PEG requires downloading the test framework `Unity`:

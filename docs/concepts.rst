@@ -24,7 +24,7 @@ Some parsers have an additional step called "tokenize" before constructing the p
 You can use Peppa PEG, Lex/Yacc, flex/bison, antlr, or even parse from scratch.
 
 What is a Grammar?
------------------
+------------------
 
 A grammar is a set of RULES instructing a parser how to parse from the input, e.g, it is the definition of the parsing process.
 
@@ -40,7 +40,7 @@ A parser generator can read a grammar in such a (or similar) notion and produce 
 
 Peppa PEG provides its own dialect of PEG for describing a grammar. It was inspired by `Pest <https://pest.rs>`_ but is more powerful and more readable.
 
-See :ref:`peg` for all of the grammar rules you can use.
+See :ref:`spec` for all of the grammar rules you can use.
 
 Parse Tree v/s Abstract Syntax Tree
 -----------------------------------

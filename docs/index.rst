@@ -49,7 +49,7 @@ API & References
    :maxdepth: 2
    :glob:
 
-   peg
+   spec
    lowlevel
    api
    build

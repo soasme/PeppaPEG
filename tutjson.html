@@ -166,7 +166,7 @@
 <li class="toctree-l1"><a class="reference internal" href="concepts.html">Concepts</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="peg.html">PEG APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spec.html">Peppa PEG Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lowlevel.html">Low Level APIs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">All APIs &amp; References</a></li>
 <li class="toctree-l1"><a class="reference internal" href="build.html">Build</a></li>
@@ -202,12 +202,14 @@
 <p>JSON, or JavaScript Object Notation, is a widely used data exchange format, using human readable text to store and transit data. As a subset of JavaScript, JSON itself is language independent.</p>
 <p>There are quite several specs trying to standardize the JSON format, such as RFC 4527, RFC 7159, RFC 8259, ECMA 262, ECMA 404, ISO/IEC 21778:2017, etc. As hinted on <a class="reference external" href="https://json.org">json.org</a>, ECMA-404 is now the JSON data interchange standard.</p>
 <p>In this tutorial, we will write a JSON parser using Peppa PEG. There are already many JSON parsers in the wild, but learning how to write a complete JSON parser gives us a better understanding of Peppa PEG. In the end, you should be able to write a parser for other grammars, as the mindset to develop any new grammar using Peppa PEG is the same.</p>
-<section id="step-1-define-ruleids">
-<h2>Step 1: Define RuleIDs<a class="headerlink" href="#step-1-define-ruleids" title="Permalink to this headline">¶</a></h2>
-<p>Let’s create a new file “json.h” and define some enums as RuleIDs.</p>
+<section id="step-1-define-grammar">
+<h2>Step 1: Define Grammar<a class="headerlink" href="#step-1-define-grammar" title="Permalink to this headline">¶</a></h2>
+<p>Let’s create a new file “json.h”.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">"peppa.h"</span><span class="cp"></span>
 </pre></div>
 </div>
+<p>We’ll create the grammar using <a class="reference internal" href="api.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a>.
+The grammar in Peppa PEG form is identical to the one described on page json.org.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span>  <span class="n">P4_CreateJSONGrammar</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="n">P4_LoadGrammar</span><span class="p">(</span>
         <span class="s2">"@lifted</span><span class="se">\n</span><span class="s2">"</span>
@@ -228,14 +230,8 @@
         <span class="s2">"false = </span><span class="se">\"</span><span class="s2">false</span><span class="se">\"</span><span class="s2">;</span><span class="se">\n</span><span class="s2">"</span>
         <span class="s2">"null = </span><span class="se">\"</span><span class="s2">null</span><span class="se">\"</span><span class="s2">;</span><span class="se">\n</span><span class="s2">"</span>
 
-</pre></div>
-</div>
-</section>
-<section id="step-2-create-grammar">
-<h2>Step 2: Create Grammar<a class="headerlink" href="#step-2-create-grammar" title="Permalink to this headline">¶</a></h2>
-<p>We’ll create the grammar using <a class="reference internal" href="api.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a>.</p>
-<p>The order of rules must be same with <cite>P4_CalcRuleID</cite>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>        <span class="s2">"number = minus? integral fractional? exponent?;</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"@tight @squashed</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"number = minus? integral fractional? exponent?;</span><span class="se">\n</span><span class="s2">"</span>
 
         <span class="s2">"@tight @squashed @lifted</span><span class="se">\n</span><span class="s2">"</span>
         <span class="s2">"escape = </span><span class="se">\"\\\\\"</span><span class="s2"> (</span><span class="se">\"\\\"\"</span><span class="s2"> / </span><span class="se">\"</span><span class="s2">/</span><span class="se">\"</span><span class="s2"> / </span><span class="se">\"\\\\\"</span><span class="s2"> / </span><span class="se">\"</span><span class="s2">b</span><span class="se">\"</span><span class="s2"> / </span><span class="se">\"</span><span class="s2">f</span><span class="se">\"</span><span class="s2"> / </span><span class="se">\"</span><span class="s2">n</span><span class="se">\"</span><span class="s2"> / </span><span class="se">\"</span><span class="s2">r</span><span class="se">\"</span><span class="s2"> / </span><span class="se">\"</span><span class="s2">t</span><span class="se">\"</span><span class="s2"> / unicode);</span><span class="se">\n</span><span class="s2">"</span>
@@ -259,18 +255,11 @@
         <span class="s2">"whitespace = </span><span class="se">\"</span><span class="s2"> </span><span class="se">\"</span><span class="s2"> / </span><span class="se">\"\\</span><span class="s2">r</span><span class="se">\"</span><span class="s2"> / </span><span class="se">\"\\</span><span class="s2">n</span><span class="se">\"</span><span class="s2"> / </span><span class="se">\"\\</span><span class="s2">t</span><span class="se">\"</span><span class="s2">;</span><span class="se">\n</span><span class="s2">"</span>
     <span class="p">);</span>
 <span class="p">}</span>
-
-<span class="c1">#ifdef __cplusplus</span>
-<span class="p">}</span>
-<span class="c1">#endif</span>
-
-<span class="c1"># endif</span>
 </pre></div>
 </div>
-<p>The rule is similar to the one described on page json.org.</p>
 </section>
-<section id="step-3-parse">
-<h2>Step 3: Parse<a class="headerlink" href="#step-3-parse" title="Permalink to this headline">¶</a></h2>
+<section id="step-2-parse">
+<h2>Step 2: Parse<a class="headerlink" href="#step-2-parse" title="Permalink to this headline">¶</a></h2>
 <p>Let’s create a new file “parse_json.c” and parse a JSON array.</p>
 <p>The main function does below things:</p>
 <ul class="simple">
@@ -358,9 +347,8 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Tutorial: JSON</a><ul>
-<li><a class="reference internal" href="#step-1-define-ruleids">Step 1: Define RuleIDs</a></li>
-<li><a class="reference internal" href="#step-2-create-grammar">Step 2: Create Grammar</a></li>
-<li><a class="reference internal" href="#step-3-parse">Step 3: Parse</a></li>
+<li><a class="reference internal" href="#step-1-define-grammar">Step 1: Define Grammar</a></li>
+<li><a class="reference internal" href="#step-2-parse">Step 2: Parse</a></li>
 </ul>
 </li>
 </ul>

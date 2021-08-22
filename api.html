@@ -166,7 +166,7 @@
 <li class="toctree-l1"><a class="reference internal" href="concepts.html">Concepts</a></li>
 </ul>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="peg.html">PEG APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spec.html">Peppa PEG Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lowlevel.html">Low Level APIs</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">All APIs &amp; References</a></li>
 <li class="toctree-l1"><a class="reference internal" href="build.html">Build</a></li>
@@ -223,15 +223,18 @@
 <dl class="c macro">
 <dt class="sig sig-object c" id="c.P4_MALLOC">
 <span class="target" id="peppa_8h_1aea41a0b413ae21bf072e2d4b20e70e4a"></span><span class="sig-name descname"><span class="n"><span class="pre">P4_MALLOC</span></span></span><a class="headerlink" href="#c.P4_MALLOC" title="Permalink to this definition">¶</a><br/></dt>
-<dd></dd></dl>
+<dd><p>The malloc function. By default, it’s <code class="docutils literal notranslate"><span class="pre">malloc</span></code>. </p>
+</dd></dl>
 <dl class="c macro">
 <dt class="sig sig-object c" id="c.P4_FREE">
 <span class="target" id="peppa_8h_1a6d308042922d787d4af9fe95186798e5"></span><span class="sig-name descname"><span class="n"><span class="pre">P4_FREE</span></span></span><a class="headerlink" href="#c.P4_FREE" title="Permalink to this definition">¶</a><br/></dt>
-<dd></dd></dl>
+<dd><p>The free function. By default, it’s <code class="docutils literal notranslate"><span class="pre">free</span></code>. </p>
+</dd></dl>
 <dl class="c macro">
 <dt class="sig sig-object c" id="c.P4_REALLOC">
 <span class="target" id="peppa_8h_1aa379875b1ff9edbb192c22ff534a2abd"></span><span class="sig-name descname"><span class="n"><span class="pre">P4_REALLOC</span></span></span><a class="headerlink" href="#c.P4_REALLOC" title="Permalink to this definition">¶</a><br/></dt>
-<dd></dd></dl>
+<dd><p>The realloc function. By default, it’s <code class="docutils literal notranslate"><span class="pre">realloc</span></code>. </p>
+</dd></dl>
 <dl class="c macro">
 <dt class="sig sig-object c" id="c.P4_MAJOR_VERSION">
 <span class="target" id="peppa_8h_1aa6b6add4b0de42496b17ad3a020eb20c"></span><span class="sig-name descname"><span class="n"><span class="pre">P4_MAJOR_VERSION</span></span></span><a class="headerlink" href="#c.P4_MAJOR_VERSION" title="Permalink to this definition">¶</a><br/></dt>
@@ -250,7 +253,8 @@
 <dl class="c macro">
 <dt class="sig sig-object c" id="c.P4_FLAG_NONE">
 <span class="target" id="peppa_8h_1a5469ac7ca57f7ab6f4d71509e5bf85e5"></span><span class="sig-name descname"><span class="n"><span class="pre">P4_FLAG_NONE</span></span></span><a class="headerlink" href="#c.P4_FLAG_NONE" title="Permalink to this definition">¶</a><br/></dt>
-<dd></dd></dl>
+<dd><p>No flag. </p>
+</dd></dl>
 <dl class="c macro">
 <dt class="sig sig-object c" id="c.P4_FLAG_SQUASHED">
 <span class="target" id="peppa_8h_1a10b825c46accb8904680349dbcb55581"></span><span class="sig-name descname"><span class="n"><span class="pre">P4_FLAG_SQUASHED</span></span></span><a class="headerlink" href="#c.P4_FLAG_SQUASHED" title="Permalink to this definition">¶</a><br/></dt>
@@ -308,7 +312,8 @@
 <dl class="c macro">
 <dt class="sig sig-object c" id="c.P4_MAX_RULE_NAME_LEN">
 <span class="target" id="peppa_8h_1af4c6c71e217ea7acc71df5f85edf997a"></span><span class="sig-name descname"><span class="n"><span class="pre">P4_MAX_RULE_NAME_LEN</span></span></span><a class="headerlink" href="#c.P4_MAX_RULE_NAME_LEN" title="Permalink to this definition">¶</a><br/></dt>
-<dd></dd></dl>
+<dd><p>The maximum length of a rule name. </p>
+</dd></dl>
 </div>
 </section>
 <section id="enums">
@@ -444,7 +449,7 @@
 <dl class="c enumerator">
 <dt class="sig sig-object c" id="c.P4_Error.P4_CutError">
 <span class="target" id="peppa_8h_1a57a1e31ea2a76eb6dc09ee1a24912e18ad3216c00ea59b9b02b7d6e5ae7809cd6"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_CutError</span></span></span><a class="headerlink" href="#c.P4_Error.P4_CutError" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>When the failure occurs after a @cut operator. </p>
+<dd><p>When the failure occurs after a <code class="docutils literal notranslate"><span class="pre">@cut</span></code> operator. </p>
 </dd></dl>
 </dd></dl>
 </div>
@@ -524,10 +529,15 @@
 <dd><p>The callback for a failure match. </p>
 </dd></dl>
 <dl class="c type">
+<dt class="sig sig-object c" id="c.P4_Formatter">
+<span class="target" id="peppa_8h_1ab90ca8c43e36c84c9c2dfc023169f6ab"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">P4_Formatter</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">FILE</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">stream</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#c.P4_Node" title="P4_Node"><span class="n"><span class="pre">P4_Node</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#c.P4_Formatter" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>A formatter function for the node. </p>
+</dd></dl>
+<dl class="c type">
 <dt class="sig sig-object c" id="c.P4_Position">
 <span class="target" id="peppa_8h_1a7d09c60769c44ca72964f8c5810b6f8b"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.P4_Position" title="P4_Position"><span class="n"><span class="pre">P4_Position</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_Position</span></span></span><a class="headerlink" href="#c.P4_Position" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>The position.</p>
-<p><a class="reference internal" href="#structP4__Position"><span class="std std-ref">P4_Position</span></a> does not hold a pointer to the string.</p>
+<p>P4_Position does not hold a pointer to the string.</p>
 <p>Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Position</span> <span class="n">pos</span> <span class="o">=</span> <span class="p">{</span> <span class="o">.</span><span class="n">pos</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="o">.</span><span class="n">lineno</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="n">offset</span><span class="o">=</span><span class="mi">2</span> <span class="p">};</span>
  <span class="n">printf</span><span class="p">(</span><span class="s2">"</span><span class="si">%u</span><span class="s2">..</span><span class="si">%u</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">pos</span><span class="o">.</span><span class="n">lineno</span><span class="p">,</span> <span class="n">pos</span><span class="o">.</span><span class="n">offset</span><span class="p">);</span>
 </pre></div>
@@ -549,106 +559,6 @@
 <dd><p>The result object that holds either value or errors. </p>
 </dd></dl>
 </div>
-</section>
-<section id="structs">
-<h2>STRUCTS<a class="headerlink" href="#structs" title="Permalink to this headline">¶</a></h2>
-<dl class="c struct">
-<dt class="sig sig-object c">
-<span class="target" id="structP4__Position"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_Position</span></span></span><br/></dt>
-<dd><p>The position.</p>
-<p><a class="reference internal" href="#structP4__Position"><span class="std std-ref">P4_Position</span></a> does not hold a pointer to the string.</p>
-<p>Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Position</span> <span class="n">pos</span> <span class="o">=</span> <span class="p">{</span> <span class="o">.</span><span class="n">pos</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="o">.</span><span class="n">lineno</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="n">offset</span><span class="o">=</span><span class="mi">2</span> <span class="p">};</span>
- <span class="n">printf</span><span class="p">(</span><span class="s2">"</span><span class="si">%u</span><span class="s2">..</span><span class="si">%u</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">pos</span><span class="o">.</span><span class="n">lineno</span><span class="p">,</span> <span class="n">pos</span><span class="o">.</span><span class="n">offset</span><span class="p">);</span>
-</pre></div>
-</div>
-</p>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
-<dl class="c var">
-<dt class="sig sig-object c" id="c.P4_Position.pos">
-<span class="target" id="structP4__Position_1a71bb774480a267618aebafa06cd68390"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pos</span></span></span><a class="headerlink" href="#c.P4_Position.pos" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>The position in the string. </p>
-</dd></dl>
-<dl class="c var">
-<dt class="sig sig-object c" id="c.P4_Position.lineno">
-<span class="target" id="structP4__Position_1a0775b37abf1ce396cd76b17b7db53dfc"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lineno</span></span></span><a class="headerlink" href="#c.P4_Position.lineno" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>The line number in the string. </p>
-</dd></dl>
-<dl class="c var">
-<dt class="sig sig-object c" id="c.P4_Position.offset">
-<span class="target" id="structP4__Position_1aa6c6ac48683978fc08cb8d98d61a82c4"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">offset</span></span></span><a class="headerlink" href="#c.P4_Position.offset" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>The col offset in the line. </p>
-</dd></dl>
-</div>
-</dd></dl>
-<dl class="c struct">
-<dt class="sig sig-object c">
-<span class="target" id="structP4__Slice"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_Slice</span></span></span><br/></dt>
-<dd><p><a class="reference internal" href="#structP4__Slice"><span class="std std-ref">P4_Slice</span></a> does not hold the pointer to the string. It only stores the start and stop position of the string.</p>
-<p>Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Slice</span> <span class="nb">slice</span> <span class="o">=</span> <span class="p">{</span>
-     <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-     <span class="n">j</span><span class="o">=</span><span class="n">strlen</span><span class="p">(</span><span class="s2">"hello world"</span><span class="p">)</span>
- <span class="p">};</span>
- <span class="n">printf</span><span class="p">(</span><span class="s2">"</span><span class="si">%u</span><span class="s2">..</span><span class="si">%u</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="nb">slice</span><span class="o">.</span><span class="n">i</span><span class="p">,</span> <span class="nb">slice</span><span class="o">.</span><span class="n">j</span><span class="p">);</span>
-</pre></div>
-</div>
-</p>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
-<dl class="c var">
-<dt class="sig sig-object c" id="c.P4_Slice.start">
-<span class="target" id="structP4__Slice_1af13047df74c14c0e548f42c40639d3f2"></span><a class="reference internal" href="#c.P4_Position" title="P4_Position"><span class="n"><span class="pre">P4_Position</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">start</span></span></span><a class="headerlink" href="#c.P4_Slice.start" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>The start position of the slice. </p>
-</dd></dl>
-<dl class="c var">
-<dt class="sig sig-object c" id="c.P4_Slice.stop">
-<span class="target" id="structP4__Slice_1ab9209a223510c44de318b2d3feddd113"></span><a class="reference internal" href="#c.P4_Position" title="P4_Position"><span class="n"><span class="pre">P4_Position</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stop</span></span></span><a class="headerlink" href="#c.P4_Slice.stop" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>The stop position of the slice. </p>
-</dd></dl>
-</div>
-</dd></dl>
-<dl class="c struct">
-<dt class="sig sig-object c">
-<span class="target" id="structP4__Node"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_Node</span></span></span><br/></dt>
-<dd><div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
-<dl class="c var">
-<dt class="sig sig-object c" id="c.P4_Node.text">
-<span class="target" id="structP4__Node_1aa2b1f0f425ed6ef383edc17f8d6e0a6e"></span><a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">text</span></span></span><a class="headerlink" href="#c.P4_Node.text" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>the full text. </p>
-</dd></dl>
-<dl class="c var">
-<dt class="sig sig-object c" id="c.P4_Node.slice">
-<span class="target" id="structP4__Node_1a84167770f5e2e74f2a14acfa25a544d8"></span><a class="reference internal" href="#c.P4_Slice" title="P4_Slice"><span class="n"><span class="pre">P4_Slice</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">slice</span></span></span><a class="headerlink" href="#c.P4_Node.slice" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>The matched substring. slice.start is the beginning (inclusive), and slice.stop is the end (exclusive). </p>
-</dd></dl>
-<dl class="c var">
-<dt class="sig sig-object c" id="c.P4_Node.rule_name">
-<span class="target" id="structP4__Node_1a8a82bd31de4fb41ca8c305de71cb3e98"></span><a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rule_name</span></span></span><a class="headerlink" href="#c.P4_Node.rule_name" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>The matched grammar rule name. </p>
-</dd></dl>
-<dl class="c var">
-<dt class="sig sig-object c" id="c.P4_Node.userdata">
-<span class="target" id="structP4__Node_1ac797d8b4fefe9579f8ced7e1995c7c32"></span><a class="reference internal" href="#c.P4_UserData" title="P4_UserData"><span class="n"><span class="pre">P4_UserData</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">userdata</span></span></span><a class="headerlink" href="#c.P4_Node.userdata" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>The user data. </p>
-</dd></dl>
-<dl class="c var">
-<dt class="sig sig-object c" id="c.P4_Node.next">
-<span class="target" id="structP4__Node_1a23ca8fa0994adb41016f13a97c1b61eb"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.P4_Node" title="P4_Node"><span class="n"><span class="pre">P4_Node</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">next</span></span></span><a class="headerlink" href="#c.P4_Node.next" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>the sibling node. NULL if not exists. </p>
-</dd></dl>
-<dl class="c var">
-<dt class="sig sig-object c" id="c.P4_Node.head">
-<span class="target" id="structP4__Node_1a255b4f26aca9066db30ae20a2e9e8114"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.P4_Node" title="P4_Node"><span class="n"><span class="pre">P4_Node</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">head</span></span></span><a class="headerlink" href="#c.P4_Node.head" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>the first child of inner nodes. NULL if not exists. </p>
-</dd></dl>
-<dl class="c var">
-<dt class="sig sig-object c" id="c.P4_Node.tail">
-<span class="target" id="structP4__Node_1ab6855fefd315ea97aaa6fb7229fdcf25"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#c.P4_Node" title="P4_Node"><span class="n"><span class="pre">P4_Node</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">tail</span></span></span><a class="headerlink" href="#c.P4_Node.tail" title="Permalink to this definition">¶</a><br/></dt>
-<dd><p>the last child of inner nodes. NULL if not exists. </p>
-</dd></dl>
-</div>
-</dd></dl>
 </section>
 <section id="functions">
 <h2>FUNCTIONS<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
@@ -966,7 +876,7 @@ Example: <div class="highlight-default notranslate"><div class="highlight"><pre>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>refexpr</strong> – The negative pattern to check. </p></li>
+<li><p><strong>expr</strong> – The negative pattern to check. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1413,7 +1323,7 @@ Example: <div class="highlight-default notranslate"><div class="highlight"><pre>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>repeat_expr</strong> – The repeated expression. </p></li>
+<li><p><strong>expr</strong> – The repeated expression. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1459,7 +1369,7 @@ Example: <div class="highlight-default notranslate"><div class="highlight"><pre>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>repeat_expr</strong> – The repeated expression. </p></li>
+<li><p><strong>expr</strong> – The repeated expression. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1504,7 +1414,7 @@ Example: <div class="highlight-default notranslate"><div class="highlight"><pre>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>repeat_expr</strong> – The repeated expression. </p></li>
+<li><p><strong>expr</strong> – The repeated expression. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1702,7 +1612,7 @@ Example: <div class="highlight-default notranslate"><div class="highlight"><pre>
 </dd></dl>
 <dl class="c function">
 <dt class="sig sig-object c" id="c.P4_AddJoin">
-<span class="target" id="peppa_8h_1a78980303651877a2bdd794fd925c0130"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="n"><span class="pre">P4_Error</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_AddJoin</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="n"><span class="pre">P4_Grammar</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">grammar</span></span>, <a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a><span class="w"> </span><span class="n"><span class="pre">joiner</span></span>, <a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a><span class="w"> </span><span class="n"><span class="pre">reference</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddJoin" title="Permalink to this definition">¶</a><br/></dt>
+<span class="target" id="peppa_8h_1af8cc4e9eef9eda9f3ddb15801b9317fa"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="n"><span class="pre">P4_Error</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_AddJoin</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="n"><span class="pre">P4_Grammar</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">grammar</span></span>, <a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a><span class="w"> </span><span class="n"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a><span class="w"> </span><span class="n"><span class="pre">joiner</span></span>, <a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a><span class="w"> </span><span class="n"><span class="pre">reference</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddJoin" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Add a Join expression as grammar rule.</p>
 <p>
 Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">row</span> <span class="o">=</span> <span class="n">P4_AddJoin</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="s2">"R1"</span><span class="p">,</span> <span class="s2">","</span><span class="p">,</span> <span class="s2">"element"</span><span class="p">);</span>
@@ -1715,7 +1625,7 @@ Example: <div class="highlight-default notranslate"><div class="highlight"><pre>
 <li><p><strong>grammar</strong> – The grammar. </p></li>
 <li><p><strong>name</strong> – The grammar rule name. </p></li>
 <li><p><strong>joiner</strong> – A joiner literal. </p></li>
-<li><p><strong>pattern</strong> – The repeated pattern rule name. </p></li>
+<li><p><strong>reference</strong> – The repeated pattern rule name. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1725,7 +1635,7 @@ Example: <div class="highlight-default notranslate"><div class="highlight"><pre>
 </dd></dl>
 <dl class="c function">
 <dt class="sig sig-object c" id="c.P4_CreateJoin">
-<span class="target" id="peppa_8h_1a3794b6186343eb6a7a7166d1af63d665"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="n"><span class="pre">P4_Expression</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">P4_CreateJoin</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a><span class="w"> </span><span class="n"><span class="pre">joiner</span></span>, <a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a><span class="w"> </span><span class="n"><span class="pre">reference</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateJoin" title="Permalink to this definition">¶</a><br/></dt>
+<span class="target" id="peppa_8h_1a2fe276ff87f2afc0fc4a039407d5cf6f"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="n"><span class="pre">P4_Expression</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">P4_CreateJoin</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a><span class="w"> </span><span class="n"><span class="pre">joiner</span></span>, <a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a><span class="w"> </span><span class="n"><span class="pre">rule_name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateJoin" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a Join expression.</p>
 <p>
 Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Expression</span><span class="o">*</span> <span class="n">row</span> <span class="o">=</span> <span class="n">P4_CreateJoin</span><span class="p">(</span><span class="s2">","</span><span class="p">,</span> <span class="s2">"element"</span><span class="p">);</span>
@@ -1740,7 +1650,7 @@ Example: <div class="highlight-default notranslate"><div class="highlight"><pre>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>joiner</strong> – A joiner literal. </p></li>
-<li><p><strong>pattern</strong> – The repeated pattern rule name. </p></li>
+<li><p><strong>rule_name</strong> – The repeated pattern rule name. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -2002,7 +1912,7 @@ Example: <div class="highlight-default notranslate"><div class="highlight"><pre>
 </dd></dl>
 <dl class="c function">
 <dt class="sig sig-object c" id="c.P4_CreateSource">
-<span class="target" id="peppa_8h_1a03665b73a0c33bf5d33bbe8655e3687d"></span><a class="reference internal" href="#c.P4_Source" title="P4_Source"><span class="n"><span class="pre">P4_Source</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">P4_CreateSource</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a><span class="w"> </span><span class="n"><span class="pre">source</span></span>, <a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a><span class="w"> </span><span class="n"><span class="pre">entry_name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateSource" title="Permalink to this definition">¶</a><br/></dt>
+<span class="target" id="peppa_8h_1a3669a6d53846c0dc204e0dd93843ceda"></span><a class="reference internal" href="#c.P4_Source" title="P4_Source"><span class="n"><span class="pre">P4_Source</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">P4_CreateSource</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a><span class="w"> </span><span class="n"><span class="pre">content</span></span>, <a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a><span class="w"> </span><span class="n"><span class="pre">entry_name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateSource" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Create a P4_Source* object. </p>
 <p>
 Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">char</span><span class="o">*</span>       <span class="n">content</span> <span class="o">=</span> <span class="o">...</span> <span class="o">//</span> <span class="n">read</span> <span class="kn">from</span> <span class="nn">some</span> <span class="n">files</span><span class="o">.</span>
@@ -2149,7 +2059,7 @@ You’re on your own now to manage the de-allocation of the source ast.</p>
 </dd></dl>
 <dl class="c function">
 <dt class="sig sig-object c" id="c.P4_JsonifySourceAst">
-<span class="target" id="peppa_8h_1a338ed9bca8547ab8edead19f6c61318e"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_JsonifySourceAst</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">FILE</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">stream</span></span>, <a class="reference internal" href="#c.P4_Node" title="P4_Node"><span class="n"><span class="pre">P4_Node</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">node</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">formatter</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="n"><span class="pre">FILE</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">stream</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#c.P4_Node" title="P4_Node"><span class="n"><span class="pre">P4_Node</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_JsonifySourceAst" title="Permalink to this definition">¶</a><br/></dt>
+<span class="target" id="peppa_8h_1a0d94f975cfddad225b3934d0102fc8b8"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_JsonifySourceAst</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">FILE</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">stream</span></span>, <a class="reference internal" href="#c.P4_Node" title="P4_Node"><span class="n"><span class="pre">P4_Node</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">node</span></span>, <a class="reference internal" href="#c.P4_Formatter" title="P4_Formatter"><span class="n"><span class="pre">P4_Formatter</span></span></a><span class="w"> </span><span class="n"><span class="pre">formatter</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_JsonifySourceAst" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Print the node tree. </p>
 <p>
 Example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">P4_Node</span><span class="o">*</span> <span class="n">root</span> <span class="o">=</span> <span class="n">P4_GetSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
@@ -2626,7 +2536,6 @@ Example: <div class="highlight-default notranslate"><div class="highlight"><pre>
 <li><a class="reference internal" href="#defines">DEFINES</a></li>
 <li><a class="reference internal" href="#enums">ENUMS</a></li>
 <li><a class="reference internal" href="#typedefs">TYPEDEFS</a></li>
-<li><a class="reference internal" href="#structs">STRUCTS</a></li>
 <li><a class="reference internal" href="#functions">FUNCTIONS</a></li>
 </ul>
 </li>

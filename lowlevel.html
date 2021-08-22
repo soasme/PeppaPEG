@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="All APIs &amp; References" href="api.html" /><link rel="prev" title="PEG APIs" href="peg.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="All APIs &amp; References" href="api.html" /><link rel="prev" title="Peppa PEG Specification" href="spec.html" />
 
     <meta name="generator" content="sphinx-4.1.2, furo 2021.08.17.beta43"/>
         <title>Low Level APIs - Peppa PEG 1.14.0 documentation</title>
@@ -166,7 +166,7 @@
 <li class="toctree-l1"><a class="reference internal" href="concepts.html">Concepts</a></li>
 </ul>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="peg.html">PEG APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spec.html">Peppa PEG Specification</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Low Level APIs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">All APIs &amp; References</a></li>
 <li class="toctree-l1"><a class="reference internal" href="build.html">Build</a></li>
@@ -199,6 +199,42 @@
         </div>
         <section id="low-level-apis">
 <span id="lowlevel"></span><h1>Low Level APIs<a class="headerlink" href="#low-level-apis" title="Permalink to this headline">¶</a></h1>
+<section id="use-peg-api">
+<h2>Use Peg API<a class="headerlink" href="#use-peg-api" title="Permalink to this headline">¶</a></h2>
+<p>Function <a class="reference internal" href="api.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a> can load a grammar from a string.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_LoadGrammar</span><span class="p">(</span>
+    <span class="s2">"add = int + int;"</span>
+
+    <span class="s2">"@squashed @tight "</span>
+    <span class="s2">"int = [0-9]+;"</span>
+
+    <span class="s2">"@spaced @lifted "</span>
+    <span class="s2">"ws  = </span><span class="se">\"</span><span class="s2"> </span><span class="se">\"</span><span class="s2">;"</span><span class="p">;</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>The one-statement code is somewhat equivalent to the below code written in low-level C API:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_CreateGrammar</span><span class="p">();</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">P4_Ok</span> <span class="o">!=</span> <span class="n">P4_AddSequenceWithMembers</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">RuleAdd</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">RuleInt</span><span class="p">),</span>
+    <span class="n">P4_CreateLiteral</span><span class="p">(</span><span class="s2">"+"</span><span class="p">,</span> <span class="n">true</span><span class="p">),</span>
+    <span class="n">P4_CreateReference</span><span class="p">(</span><span class="n">RuleInt</span><span class="p">)</span>
+<span class="p">))</span>
+    <span class="n">goto</span> <span class="n">finalize</span><span class="p">;</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">P4_Ok</span> <span class="o">!=</span> <span class="n">P4_AddOnceOrMore</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">RuleInt</span><span class="p">,</span> <span class="n">P4_CreateRange</span><span class="p">(</span><span class="s1">'0'</span><span class="p">,</span> <span class="s1">'9'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
+    <span class="n">goto</span> <span class="n">finalize</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">P4_Ok</span> <span class="o">!=</span> <span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">RuleInt</span><span class="p">,</span> <span class="n">P4_FLAG_SQUASHED</span><span class="o">|</span><span class="n">P4_FLAG_TIGHT</span><span class="p">))</span>
+    <span class="n">goto</span> <span class="n">finalize</span><span class="p">;</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">P4_Ok</span> <span class="o">!=</span> <span class="n">P4_AddLiteral</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">RuleWs</span><span class="p">,</span> <span class="s2">" "</span><span class="p">,</span> <span class="n">true</span><span class="p">))</span>
+    <span class="n">goto</span> <span class="n">finalize</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">P4_Ok</span> <span class="o">!=</span> <span class="n">P4_SetGrammarRuleFlag</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">RuleWs</span><span class="p">,</span> <span class="n">P4_FLAG_SPACED</span><span class="o">|</span><span class="n">P4_FLAG_LIFTED</span><span class="p">))</span>
+    <span class="n">goto</span> <span class="n">finalize</span><span class="p">;</span>
+</pre></div>
+</div>
+</section>
 <section id="expressions">
 <h2>Expressions<a class="headerlink" href="#expressions" title="Permalink to this headline">¶</a></h2>
 <section id="literal">
@@ -664,14 +700,14 @@ Choice: failure!
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="peg.html">
+          <a class="prev-page" href="spec.html">
               <svg><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">PEG APIs</div>
+                <div class="title">Peppa PEG Specification</div>
                 
               </div>
             </a>
@@ -706,6 +742,7 @@ Choice: failure!
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Low Level APIs</a><ul>
+<li><a class="reference internal" href="#use-peg-api">Use Peg API</a></li>
 <li><a class="reference internal" href="#expressions">Expressions</a><ul>
 <li><a class="reference internal" href="#literal">Literal</a></li>
 <li><a class="reference internal" href="#range">Range</a></li>

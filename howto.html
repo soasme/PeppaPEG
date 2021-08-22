@@ -166,7 +166,7 @@
 <li class="toctree-l1"><a class="reference internal" href="concepts.html">Concepts</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="peg.html">PEG APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spec.html">Peppa PEG Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lowlevel.html">Low Level APIs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">All APIs &amp; References</a></li>
 <li class="toctree-l1"><a class="reference internal" href="build.html">Build</a></li>
@@ -201,7 +201,7 @@
 <h1>How-To Guides<a class="headerlink" href="#how-to-guides" title="Permalink to this headline">¶</a></h1>
 <section id="how-to-prevent-stackerror">
 <h2>How to Prevent StackError?<a class="headerlink" href="#how-to-prevent-stackerror" title="Permalink to this headline">¶</a></h2>
-<p>Considering a json nested array: <cite>[[[[…]]]]</cite>. If the depth is too deep, Peppa PEG may end up with a StackError. This is due to Peppa PEG is a recursion-based parser. To prevent the stack address exhausts, one can set a limit on the recursion depth. By default, the depth is 8192.</p>
+<p>Considering a json nested array: <cite>[[[[…]]]]</cite>. If the depth is too deep, Peppa PEG may end up with a StackError since Peppa PEG is a recursion-based parser. To prevent the stack address from exhausted, one can set a limit on the recursion depth. By default, the depth is 8192. The depth tracks the frames in the stack; each expression will have a frame in the stack.</p>
 <p>If you need to adjust the depth, try <a class="reference internal" href="api.html#c.P4_SetRecursionLimit" title="P4_SetRecursionLimit"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_SetRecursionLimit()</span></code></a>.</p>
 <div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">P4_SetRecursionLimit</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span><span class="w"> </span><span class="mi">1000</span><span class="p">);</span><span class="w"></span>
 <span class="n">P4_Ok</span><span class="w"></span>

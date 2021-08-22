@@ -9,31 +9,22 @@ There are quite several specs trying to standardize the JSON format, such as RFC
 
 In this tutorial, we will write a JSON parser using Peppa PEG. There are already many JSON parsers in the wild, but learning how to write a complete JSON parser gives us a better understanding of Peppa PEG. In the end, you should be able to write a parser for other grammars, as the mindset to develop any new grammar using Peppa PEG is the same.
 
-Step 1: Define RuleIDs
+Step 1: Define Grammar
 ----------------------
 
-Let's create a new file "json.h" and define some enums as RuleIDs.
+Let's create a new file "json.h".
 
 .. code-block:: c
 
    #include "peppa.h"
 
-.. literalinclude:: ../examples/json.h
-   :lines: 42-61
-
-Step 2: Create Grammar
-----------------------
-
 We'll create the grammar using :c:func:`P4_LoadGrammar`.
-
-The order of rules must be same with `P4_CalcRuleID`.
+The grammar in Peppa PEG form is identical to the one described on page json.org.
 
 .. literalinclude:: ../examples/json.h
-   :lines: 63-107
+   :lines: 42-86
 
-The rule is similar to the one described on page json.org.
-
-Step 3: Parse
+Step 2: Parse
 -------------
 
 Let's create a new file "parse_json.c" and parse a JSON array.

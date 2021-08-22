@@ -164,7 +164,7 @@
 <li class="toctree-l1"><a class="reference internal" href="concepts.html">Concepts</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="peg.html">PEG APIs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spec.html">Peppa PEG Specification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lowlevel.html">Low Level APIs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">All APIs &amp; References</a></li>
 <li class="toctree-l1"><a class="reference internal" href="build.html">Build</a></li>
@@ -352,6 +352,8 @@
 </li>
         <li><a href="api.html#c.P4_ExpressionKind.P4_BackReference">P4_ExpressionKind.P4_BackReference (C enumerator)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api.html#c.P4_ExpressionKind.P4_Choice">P4_ExpressionKind.P4_Choice (C enumerator)</a>
 </li>
         <li><a href="api.html#c.P4_ExpressionKind.P4_Cut">P4_ExpressionKind.P4_Cut (C enumerator)</a>
@@ -366,8 +368,6 @@
 </li>
         <li><a href="api.html#c.P4_ExpressionKind.P4_Reference">P4_ExpressionKind.P4_Reference (C enumerator)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="api.html#c.P4_ExpressionKind.P4_Repeat">P4_ExpressionKind.P4_Repeat (C enumerator)</a>
 </li>
         <li><a href="api.html#c.P4_ExpressionKind.P4_Sequence">P4_ExpressionKind.P4_Sequence (C enumerator)</a>
@@ -387,6 +387,8 @@
         <li><a href="api.html#c.P4_FLAG_SQUASHED">P4_FLAG_SQUASHED (C macro)</a>
 </li>
         <li><a href="api.html#c.P4_FLAG_TIGHT">P4_FLAG_TIGHT (C macro)</a>
+</li>
+        <li><a href="api.html#c.P4_Formatter">P4_Formatter (C type)</a>
 </li>
         <li><a href="api.html#c.P4_Frame">P4_Frame (C type)</a>
 </li>
@@ -450,41 +452,13 @@
 </li>
         <li><a href="api.html#c.P4_MINOR_VERSION">P4_MINOR_VERSION (C macro)</a>
 </li>
-        <li><a href="api.html#c.P4_Node">P4_Node (C struct)</a>
-
-        <ul>
-          <li><a href="api.html#c.P4_Node">(C type)</a>
-</li>
-        </ul></li>
-        <li><a href="api.html#c.P4_Node.head">P4_Node.head (C var)</a>
-</li>
-        <li><a href="api.html#c.P4_Node.next">P4_Node.next (C var)</a>
-</li>
-        <li><a href="api.html#c.P4_Node.rule_name">P4_Node.rule_name (C var)</a>
-</li>
-        <li><a href="api.html#c.P4_Node.slice">P4_Node.slice (C var)</a>
-</li>
-        <li><a href="api.html#c.P4_Node.tail">P4_Node.tail (C var)</a>
-</li>
-        <li><a href="api.html#c.P4_Node.text">P4_Node.text (C var)</a>
-</li>
-        <li><a href="api.html#c.P4_Node.userdata">P4_Node.userdata (C var)</a>
+        <li><a href="api.html#c.P4_Node">P4_Node (C type)</a>
 </li>
         <li><a href="api.html#c.P4_Parse">P4_Parse (C function)</a>
 </li>
         <li><a href="api.html#c.P4_PATCH_VERSION">P4_PATCH_VERSION (C macro)</a>
 </li>
-        <li><a href="api.html#c.P4_Position">P4_Position (C struct)</a>
-
-        <ul>
-          <li><a href="api.html#c.P4_Position">(C type)</a>
-</li>
-        </ul></li>
-        <li><a href="api.html#c.P4_Position.lineno">P4_Position.lineno (C var)</a>
-</li>
-        <li><a href="api.html#c.P4_Position.offset">P4_Position.offset (C var)</a>
-</li>
-        <li><a href="api.html#c.P4_Position.pos">P4_Position.pos (C var)</a>
+        <li><a href="api.html#c.P4_Position">P4_Position (C type)</a>
 </li>
         <li><a href="api.html#c.P4_ReadEscapedRune">P4_ReadEscapedRune (C function)</a>
 </li>
@@ -516,15 +490,7 @@
 </li>
         <li><a href="api.html#c.P4_SetUserDataFreeFunc">P4_SetUserDataFreeFunc (C function)</a>
 </li>
-        <li><a href="api.html#c.P4_Slice">P4_Slice (C struct)</a>
-
-        <ul>
-          <li><a href="api.html#c.P4_Slice">(C type)</a>
-</li>
-        </ul></li>
-        <li><a href="api.html#c.P4_Slice.start">P4_Slice.start (C var)</a>
-</li>
-        <li><a href="api.html#c.P4_Slice.stop">P4_Slice.stop (C var)</a>
+        <li><a href="api.html#c.P4_Slice">P4_Slice (C type)</a>
 </li>
         <li><a href="api.html#c.P4_Source">P4_Source (C type)</a>
 </li>

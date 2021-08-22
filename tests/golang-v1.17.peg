@@ -1,0 +1,283 @@
+newline        = "\x0a";
+
+@spaced @lifted @squashed
+whitespace = " " / "\t" / "\r" / "\n";
+
+@spaced @lifted @squashed
+comment = "//" (!"\n" .)* "\n"?
+        / "/*" (!"*/" .)* "*/";
+
+unicode_char   = !"\x0a" .;
+unicode_letter = [\p{L}];
+unicode_digit  = [\p{Nd}];
+
+letter        = unicode_letter / "_";
+decimal_digit = [0-9];
+binary_digit  = [0-1];
+octal_digit   = [0-7];
+hex_digit     = [0-9] / [a-f] / [A-F];
+
+@tight @squashed
+identifier = letter (letter / unicode_digit)*;
+
+@lifted
+int_lit        = (binary_lit / octal_lit / hex_lit / decimal_lit) !letter;
+@tight @squashed
+decimal_lit    = "0" / ([1-9] @cut ("_"? decimal_digits)?);
+@tight @squashed
+binary_lit     = i"0b" @cut "_"? binary_digits;
+@tight @squashed
+octal_lit      = "0" i"o"? "_"? octal_digits;
+@tight @squashed
+hex_lit        = i"0x" @cut "_"? hex_digits;
+
+@tight @squashed
+decimal_digits = decimal_digit ("_"? decimal_digit)*;
+@tight @squashed
+binary_digits  = binary_digit ("_"? binary_digit)*;
+@tight @squashed
+octal_digits   = octal_digit ("_"? octal_digit)*;
+@tight @squashed
+hex_digits     = hex_digit ("_"? hex_digit)*;
+
+@tight @squashed
+float_lit         = decimal_float_lit / hex_float_lit;
+
+@tight @squashed
+decimal_float_lit = decimal_digits "." decimal_digits? decimal_exponent? /
+                    decimal_digits decimal_exponent /
+                    "." decimal_digits decimal_exponent?;
+@tight @squashed
+decimal_exponent  = i"e" ("+" / "-")? decimal_digits;
+
+@tight @squashed
+hex_float_lit     = i"0x" hex_mantissa hex_exponent;
+@tight @squashed
+hex_mantissa      = "_"? hex_digits "." hex_digits? /
+                    "_"? hex_digits /
+                    "." hex_digits;
+@tight @squashed
+hex_exponent      = i"p" ("+" / "-")? decimal_digits;
+
+@tight @squashed
+imaginary_lit = (float_lit / int_lit / decimal_digits) "i";
+
+@tight @squashed
+rune_lit         = "'" ( unicode_value / byte_value ) "'";
+unicode_value    = unicode_char / little_u_value / big_u_value / escaped_char;
+byte_value       = octal_byte_value / hex_byte_value;
+octal_byte_value = "\\" octal_digit octal_digit octal_digit ;
+hex_byte_value   = "\\" "x" hex_digit hex_digit ;
+little_u_value   = "\\" "u" hex_digit hex_digit hex_digit hex_digit ;
+big_u_value      = "\\" "U" hex_digit hex_digit hex_digit hex_digit
+                           hex_digit hex_digit hex_digit hex_digit ;
+escaped_char     = "\\" ( "a" / "b" / "f" / "n" / "r" / "t" / "v" / "\\" / "'" / "\"") ;
+
+@lifted
+string_lit             = raw_string_lit / interpreted_string_lit ;
+
+@tight @squashed
+raw_string_lit         = "`" (!"`" (unicode_char / newline))* "`" ;
+
+@tight @squashed
+interpreted_string_lit = "\"" (!"\"" (unicode_value / byte_value))* "\"";
+
+Type      = TypeName / TypeLit / "(" Type ")" ;
+TypeName  = identifier / QualifiedIdent ;
+TypeLit   = ArrayType / StructType / PointerType / FunctionType / InterfaceType / SliceType / MapType / ChannelType ;
+
+ArrayType   = "[" ArrayLength "]" ElementType ;
+ArrayLength = Expression ;
+ElementType = Type ;
+
+SliceType = "[" "]" ElementType ;
+
+StructType    = "struct" "{" ( FieldDecl ";"? )* "}" ;
+FieldDecl     = (IdentifierList Type / EmbeddedField) Tag? ;
+EmbeddedField = "*"? TypeName ;
+Tag           = string_lit ;
+
+PointerType = "*" BaseType ;
+BaseType    = Type ;
+
+FunctionType   = "func" Signature ;
+Signature      = Parameters Result? ;
+Result         = Parameters / Type ;
+Parameters     = "(" (ParameterList ","?)? ")" ;
+ParameterList  = ParameterDecl ("," ParameterDecl)* ;
+ParameterDecl  = IdentifierList? "..."? Type ;
+
+InterfaceType      = "interface" "{" (( MethodSpec / InterfaceTypeName ) ";"?)* "}" ;
+MethodSpec         = MethodName Signature ;
+MethodName         = identifier ;
+InterfaceTypeName  = TypeName ;
+
+MapType     = "map" "[" KeyType "]" ElementType ;
+KeyType     = Type ;
+
+ChannelType = ( "chan" / "chan" "<-" / "<-" "chan" ) ElementType ;
+
+Block = "{" StatementList "}" ;
+StatementList = (Statement ";"?)* ;
+
+Declaration   = ConstDecl / TypeDecl / VarDecl ;
+TopLevelDecl  = Declaration / FunctionDecl / MethodDecl ;
+
+ConstDecl      = "const" ( "(" @cut (ConstSpec ";"?)* ")" / ConstSpec) ;
+ConstSpec      = IdentifierList (Type? "=" ExpressionList)? ;
+
+IdentifierList = identifier ("," identifier)* ;
+ExpressionList = Expression ("," Expression)* ;
+
+TypeDecl = "type" ( TypeSpec / "(" (TypeSpec ";"?)* ")" ) ;
+TypeSpec = AliasDecl / TypeDef ;
+
+AliasDecl = identifier "=" Type ;
+
+TypeDef = identifier Type ;
+
+VarDecl     = "var" ( VarSpec / "(" (VarSpec ";"?)* ")" ) ;
+VarSpec     = IdentifierList ( Type ("=" ExpressionList)? / "=" ExpressionList ) ;
+
+ShortVarDecl = IdentifierList ":=" ExpressionList ;
+
+FunctionDecl = "func" FunctionName Signature FunctionBody? ;
+FunctionName = identifier ;
+FunctionBody = Block ;
+
+MethodDecl = "func" Receiver MethodName Signature FunctionBody? ;
+Receiver   = Parameters ;
+
+Operand     = Literal / OperandName / "(" Expression ")" ;
+@lifted
+Literal     = BasicLit / CompositeLit / FunctionLit ;
+@lifted
+BasicLit    = int_lit / float_lit / imaginary_lit / rune_lit / string_lit ;
+OperandName = identifier / QualifiedIdent ;
+
+QualifiedIdent = PackageName "." identifier ;
+
+CompositeLit  = LiteralType LiteralValue ;
+LiteralType   = StructType / ArrayType / "[" "..." "]" ElementType /
+                SliceType / MapType / TypeName ;
+LiteralValue  = "{" (ElementList ","?)? "}" ;
+ElementList   = KeyedElement ("," KeyedElement)* ;
+KeyedElement  = (Key ":")? Element ;
+Key           = FieldName / Expression / LiteralValue ;
+FieldName     = identifier ;
+Element       = Expression / LiteralValue ;
+
+FunctionLit = "func" Signature FunctionBody ;
+
+PrimaryExpr =
+	Operand /
+	Conversion /
+	MethodExpr /
+	PrimaryExpr Selector /
+	PrimaryExpr Index /
+	PrimaryExpr Slice /
+	PrimaryExpr TypeAssertion /
+	PrimaryExpr Arguments ;
+
+Selector       = "." identifier ;
+Index          = "[" Expression "]" ;
+Slice          = "[" Expression? ":" Expression? "]" /
+                 "[" Expression? ":" Expression ":" Expression "]" ;
+TypeAssertion  = "." "(" Type ")" ;
+Arguments      = "(" (( ExpressionList / Type ("," ExpressionList)? ) "..."? ","? )? ")" ;
+
+MethodExpr    = ReceiverType "." MethodName ;
+ReceiverType  = Type ;
+
+@nonterminal
+Expression = UnaryExpr (binary_op Expression)?;
+
+@nonterminal
+UnaryExpr  = PrimaryExpr / unary_op @cut UnaryExpr ;
+
+binary_op  = "||" / "&&" / rel_op / add_op / mul_op ;
+rel_op     = "==" / "!=" / "<" / "<=" / ">" / ">=" ;
+add_op     = "+" / "-" / "|" / "^" ;
+mul_op     = "*" / "/" / "%" / "<<" / ">>" / "&" / "&^" ;
+
+unary_op   = "+" / "-" / "!" / "^" / "*" / "&" / "<-" ;
+
+Conversion = Type "(" Expression ","? ")" ;
+
+Statement =
+	Declaration / LabeledStmt / SimpleStmt /
+	GoStmt / ReturnStmt / BreakStmt / ContinueStmt / GotoStmt /
+	FallthroughStmt / Block / IfStmt / SwitchStmt / SelectStmt / ForStmt /
+	DeferStmt ;
+
+SimpleStmt = EmptyStmt / ExpressionStmt / SendStmt / IncDecStmt / Assignment / ShortVarDecl ;
+
+EmptyStmt = &. ;
+
+LabeledStmt = Label ":" Statement ;
+Label       = identifier ;
+
+ExpressionStmt = Expression ;
+
+SendStmt = Channel "<-" Expression ;
+Channel  = Expression ;
+
+IncDecStmt = Expression ( "++" / "--" );
+
+Assignment = ExpressionList assign_op ExpressionList ;
+
+assign_op = (add_op / mul_op)? "=" ;
+
+IfStmt = "if" (SimpleStmt ";"?)? Expression Block ("else" ( IfStmt / Block ))? ;
+
+SwitchStmt = ExprSwitchStmt / TypeSwitchStmt ;
+
+ExprSwitchStmt = "switch" (SimpleStmt ";"?)?  Expression?  "{" ExprCaseClause*  "}" ;
+ExprCaseClause = ExprSwitchCase ":" StatementList ;
+ExprSwitchCase = "case" ExpressionList / "default" ;
+
+TypeSwitchStmt  = "switch" (SimpleStmt ";"?)? TypeSwitchGuard "{" TypeCaseClause*  "}" ;
+TypeSwitchGuard = (identifier ":=")? PrimaryExpr "." "(" "type" ")" ;
+TypeCaseClause  = TypeSwitchCase ":" StatementList ;
+TypeSwitchCase  = "case" TypeList / "default" ;
+TypeList        = Type ("," Type)* ;
+
+ForStmt = "for" (Condition / ForClause / RangeClause)? Block ;
+Condition = Expression ;
+
+ForClause = InitStmt?  ";"? Condition?  ";"? PostStmt?  ;
+InitStmt = SimpleStmt ;
+PostStmt = SimpleStmt ;
+
+RangeClause = (ExpressionList "=" / IdentifierList ":=")? "range" Expression ;
+
+GoStmt = "go" Expression ;
+
+SelectStmt = "select" "{" CommClause*  "}" ;
+CommClause = CommCase ":" StatementList ;
+CommCase   = "case" ( SendStmt / RecvStmt ) / "default" ;
+RecvStmt   = (ExpressionList "=" / IdentifierList ":=")? RecvExpr ;
+RecvExpr   = Expression ;
+
+ReturnStmt = "return" ExpressionList? ;
+
+BreakStmt = "break" Label?  ;
+
+ContinueStmt = "continue" Label? ;
+
+GotoStmt = "goto" Label ;
+
+FallthroughStmt = "fallthrough" ;
+
+DeferStmt = "defer" Expression ;
+
+SourceFile       = &. PackageClause ";"? (ImportDecl ";"?)* (TopLevelDecl ";"?)* !.;
+
+PackageClause  = "package" @cut PackageName ;
+PackageName    = identifier ;
+
+ImportDecl       = "import" @cut ( "(" (ImportSpec ";"?)* ")" / ImportSpec) ;
+ImportSpec       = ("." / PackageName)? ImportPath ;
+
+@squashed
+ImportPath       = string_lit ;

@@ -35,7 +35,7 @@ endif()
 
 option(ENABLE_ADDRESS_SANITIZER "Enables AddressSanitizer." OFF)
 message("-- Clang: AddressSanitizer - ${ENABLE_ADDRESS_SANITIZER}.")
-if (ENABLE_SANITIZERS)
+if (ENABLE_ADDRESS_SANITIZERS)
     list(APPEND custom_compiler_flags
         -fno-omit-frame-pointer
         -fsanitize=address

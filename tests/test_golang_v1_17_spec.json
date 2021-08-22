@@ -1,0 +1,72 @@
+[
+    {
+        "grammar_file": "./golang-v1.17.peg",
+        "entry": "Literal",
+        "tests": [
+            {
+                "I": "42",
+                "O": [{"slice": [0, 2], "type": "decimal_lit"}]
+            },
+            {
+                "I": "4_2",
+                "O": [{"slice": [0, 3], "type": "decimal_lit"}]
+            },
+            {
+                "I": "0600",
+                "O": [{"slice": [0, 4], "type": "octal_lit"}]
+            },
+            {
+                "I": "0_600",
+                "O": [{"slice": [0, 5], "type": "octal_lit"}]
+            },
+            {
+                "I": "0o600",
+                "O": [{"slice": [0, 5], "type": "octal_lit"}]
+            },
+            {
+                "I": "0O600",
+                "O": [{"slice": [0, 5], "type": "octal_lit"}]
+            },
+            {
+                "I": "0xBadFace",
+                "O": [{"slice": [0, 9], "type": "hex_lit"}]
+            },
+            {
+                "I": "0xBad_Face",
+                "O": [{"slice": [0, 10], "type": "hex_lit"}]
+            },
+            {
+                "I": "0x_67_7a_2f_cc_40_c6",
+                "O": [{"slice": [0, 20], "type": "hex_lit"}]
+            },
+            {
+                "I": "170141183460469231731687303715884105727",
+                "O": [{"slice": [0, 39], "type": "decimal_lit"}]
+            },
+            {
+                "I": "170_141183_460469_231731_687303_715884_105727",
+                "O": [{"slice": [0, 45], "type": "decimal_lit"}]
+            },
+            {
+                "I": "_42",
+                "E": "MatchError: line 1:1, expect Literal",
+                "N": "an identifier, not an integer literal"
+            },
+            {
+                "I": "42_",
+                "E": "MatchError: line 1:1, expect Literal",
+                "N": "invalid: _ must separate successive digits"
+            },
+            {
+                "I": "4__2",
+                "E": "MatchError: line 1:1, expect Literal",
+                "N": "invalid: only one _ at a time"
+            },
+            {
+                "I": "0_xBadFace",
+                "E": "MatchError: line 1:1, expect Literal",
+                "N": "invalid: _ must separate successive digits"
+            }
+        ]
+    }
+]

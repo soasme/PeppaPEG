@@ -1,5 +1,8 @@
 # ROADMAP
 
+- [ ] peg: !("key" / "word") can be optimized to use hashmap check, rather than checking one by one.
+- [ ] peg: support `@inside(XXX)`, `@outside(XXX)` decorator: it can check if XXX is in the frame stack. can support second number parameter to limit the frame stack backtrack. example: golang CompositeLit should be inside an ExpressionGroup if inside IfStmt,ForStmt,SwitchStmt, otherwise it is ambiguous: `Literal = BasicLit / @outside(IfStmt / ForStmt / SwitchStmt) CompositeLit / @inside(IfStmt / ForStmt / SwitchStmt) @inside(ExpressionGroup) CompositeLit / FunctionLit ;`.
+- [ ] peg: matching parent successfully immediately. example: semicolons in golang, autoreplace U+FFFD to U+0A in markdown. `identifier = letter (letter / unicode_digit)* (&newline @inside(Statement) @success(Statement))?;`.
 - [ ] peg: move decorators after "=".
 - [ ] api: support locale, utf-8, utf-16, utf-32 encoding.
 - [ ] peg: support action code `rule = a:b -> { |node| @override another = b; }; another = " ";` this can be used to override some rules in runtime and is useful when implementing Mustache tag set delimiter.

@@ -182,5 +182,65 @@
                 "N": "invalid: _ must separate successive digits"
             }
         ]
+    },
+
+    {
+        "desc": "Imaginary",
+        "grammar_file": "./golang-v1.17.peg",
+        "entry": "Literal",
+        "tests": [
+            {
+                "I": "0i",
+                "O": [{"slice": [0, 2], "type": "imaginary_lit"}]
+            },
+            {
+                "I": "0123i",
+                "O": [{"slice": [0, 5], "type": "imaginary_lit"}],
+                "N": "== 123i for backward-compatibility"
+            },
+            {
+                "I": "0o123i",
+                "O": [{"slice": [0, 6], "type": "imaginary_lit"}],
+                "N": "== 0o123 * 1i = 83i"
+            },
+            {
+                "I": "0xabci",
+                "O": [{"slice": [0, 6], "type": "imaginary_lit"}],
+                "N": "== 0xabc * 1i = 2748i"
+            },
+            {
+                "I": "0.i",
+                "O": [{"slice": [0, 3], "type": "imaginary_lit"}]
+            },
+            {
+                "I": "2.71828i",
+                "O": [{"slice": [0, 8], "type": "imaginary_lit"}]
+            },
+            {
+                "I": "1.e+0i",
+                "O": [{"slice": [0, 6], "type": "imaginary_lit"}]
+            },
+            {
+                "I": "6.67428e-11i",
+                "O": [{"slice": [0, 12], "type": "imaginary_lit"}]
+            },
+            {
+                "I": "1E6i",
+                "O": [{"slice": [0, 4], "type": "imaginary_lit"}]
+            },
+            {
+                "I": ".25i",
+                "O": [{"slice": [0, 4], "type": "imaginary_lit"}]
+            },
+            {
+                "I": ".12345E+5i",
+                "O": [{"slice": [0, 10], "type": "imaginary_lit"}]
+            },
+            {
+                "I": "0x1p-2i",
+                "O": [{"slice": [0, 7], "type": "imaginary_lit"}],
+                "N": "== 0x1p-2 * 1i == 0.25i"
+            }
+        ]
     }
 ]

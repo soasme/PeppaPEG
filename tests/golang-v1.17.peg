@@ -67,7 +67,7 @@ hex_mantissa      = "_"? hex_digits "." @cut hex_digits? /
 hex_exponent      = i"p" @cut ("+" / "-")? decimal_digits;
 
 @tight @squashed
-imaginary_lit = (float_lit / int_lit / decimal_digits) "i";
+imaginary_lit = (decimal_float_lit / hex_float_lit / binary_lit / octal_lit / hex_lit / decimal_lit / decimal_digits) "i";
 
 @tight @squashed
 rune_lit         = "'" ( unicode_value / byte_value ) "'";

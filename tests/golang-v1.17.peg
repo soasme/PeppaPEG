@@ -70,14 +70,17 @@ hex_exponent      = i"p" @cut ("+" / "-")? decimal_digits;
 imaginary_lit = (decimal_float_lit / hex_float_lit / binary_lit / octal_lit / hex_lit / decimal_lit / decimal_digits) "i";
 
 @tight @squashed
-rune_lit         = "'" ( unicode_value / byte_value ) "'";
-unicode_value    = unicode_char / little_u_value / big_u_value / escaped_char;
+rune_lit         = "'" @cut !"'" ( byte_value / unicode_value ) "'";
+unicode_value    = little_u_value / big_u_value / escaped_char / unicode_char;
 byte_value       = octal_byte_value / hex_byte_value;
-octal_byte_value = "\\" octal_digit octal_digit octal_digit ;
-hex_byte_value   = "\\" "x" hex_digit hex_digit ;
-little_u_value   = "\\" "u" hex_digit hex_digit hex_digit hex_digit ;
-big_u_value      = "\\" "U" hex_digit hex_digit hex_digit hex_digit
-                           hex_digit hex_digit hex_digit hex_digit ;
+octal_byte_value = "\\" octal_digit{3};
+@tight
+hex_byte_value   = "\\x" hex_digit{2};
+@tight
+little_u_value   = "\\u" hex_digit{4};
+@tight
+big_u_value      = "\\U" hex_digit{8};
+@tight
 escaped_char     = "\\" ( "a" / "b" / "f" / "n" / "r" / "t" / "v" / "\\" / "'" / "\"") ;
 
 @lifted

@@ -242,5 +242,93 @@
                 "N": "== 0x1p-2 * 1i == 0.25i"
             }
         ]
+    },
+
+    {
+        "desc": "Imaginary",
+        "grammar_file": "./golang-v1.17.peg",
+        "entry": "Literal",
+        "tests": [
+            {
+                "I": "'a'",
+                "O": [{"slice": [0, 3], "type": "rune_lit"}]
+            },
+            {
+                "I": "'ä'",
+                "O": [{"slice": [0, 4], "type": "rune_lit"}]
+            },
+            {
+                "I": "'本'",
+                "O": [{"slice": [0, 5], "type": "rune_lit"}]
+            },
+            {
+                "I": "'\\t'",
+                "O": [{"slice": [0, 4], "type": "rune_lit"}]
+            },
+            {
+                "I": "'\t'",
+                "O": [{"slice": [0, 3], "type": "rune_lit"}]
+            },
+            {
+                "I": "'\\000'",
+                "O": [{"slice": [0, 6], "type": "rune_lit"}]
+            },
+            {
+                "I": "'\\007'",
+                "O": [{"slice": [0, 6], "type": "rune_lit"}]
+            },
+            {
+                "I": "'\\377'",
+                "O": [{"slice": [0, 6], "type": "rune_lit"}]
+            },
+            {
+                "I": "'\\x07'",
+                "O": [{"slice": [0, 6], "type": "rune_lit"}]
+            },
+            {
+                "I": "'\\xff'",
+                "O": [{"slice": [0, 6], "type": "rune_lit"}]
+            },
+            {
+                "I": "'\\u12e4'",
+                "O": [{"slice": [0, 8], "type": "rune_lit"}]
+            },
+            {
+                "I": "'\\U00101234'",
+                "O": [{"slice": [0, 12], "type": "rune_lit"}]
+            },
+            {
+                "I": "'\\''",
+                "O": [{"slice": [0, 4], "type": "rune_lit"}]
+            },
+            {
+                "I": "'aa'",
+                "E": "CutError: line 1:3, expect rune_lit (char ''')",
+                "N": "illegal: too many characters"
+            },
+            {
+                "I": "'\\xa'",
+                "E": "CutError: line 1:3, expect rune_lit (char ''')",
+                "N": "illegal: too few hexadecimal digits"
+            },
+            {
+                "I": "'\\0'",
+                "E": "CutError: line 1:3, expect rune_lit (char ''')",
+                "N": "illegal: too few octal digits"
+            },
+            {
+                "I": "'''",
+                "E": "CutError: line 1:2, expect rune_lit",
+                "N": "illegal: too few octal digits"
+            },
+            {
+                "I": "'\\uDFFF'",
+                "N": "IGNORE: illegal: surrogate half but can't detect when parsing as of current Peppa PEG"
+            },
+            {
+                "I": "'\\U00110000'",
+                "N": "IGNORE: illegal: invalid code point but can't detect when parsing as of current Peppa PEG"
+            }
+        ]
     }
 ]

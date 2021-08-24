@@ -17,11 +17,18 @@ binary_digit  = [0-1];
 octal_digit   = [0-7];
 hex_digit     = [0-9] / [a-f] / [A-F];
 
+@lifted
+Keywords = "break" / "default" / "func" / "interface" / "select" /
+            "case" / "defer" / "go" / "map" / "struct" /
+            "chan" / "else" / "goto" / "package" / "switch" /
+            "const" / "fallthrough" / "if" / "range" / "type" /
+            "continue" / "for" / "import" / "return" / "var";
+
 @tight @squashed
-identifier = letter (letter / unicode_digit)*;
+identifier = !(Keywords !letter) letter (letter / unicode_digit)*;
 
 @lifted
-int_lit        = (binary_lit / octal_lit / hex_lit / decimal_lit) !letter;
+int_lit        = (binary_lit / octal_lit / hex_lit / decimal_lit) !(letter / ".");
 @tight @squashed
 decimal_lit    = "0" / ([1-9] @cut ("_"? decimal_digits)?);
 @tight @squashed
@@ -40,24 +47,24 @@ octal_digits   = octal_digit ("_"? octal_digit)*;
 @tight @squashed
 hex_digits     = hex_digit ("_"? hex_digit)*;
 
-@tight @squashed
-float_lit         = decimal_float_lit / hex_float_lit;
+@lifted
+float_lit         = (decimal_float_lit / hex_float_lit) @cut !letter;
 
 @tight @squashed
-decimal_float_lit = decimal_digits "." decimal_digits? decimal_exponent? /
+decimal_float_lit = decimal_digits "." @cut decimal_digits? decimal_exponent? /
                     decimal_digits decimal_exponent /
-                    "." decimal_digits decimal_exponent?;
+                    "." @cut decimal_digits decimal_exponent?;
 @tight @squashed
-decimal_exponent  = i"e" ("+" / "-")? decimal_digits;
+decimal_exponent  = i"e" @cut ("+" / "-")? decimal_digits;
 
 @tight @squashed
 hex_float_lit     = i"0x" hex_mantissa hex_exponent;
 @tight @squashed
-hex_mantissa      = "_"? hex_digits "." hex_digits? /
+hex_mantissa      = "_"? hex_digits "." @cut hex_digits? /
                     "_"? hex_digits /
-                    "." hex_digits;
+                    "." @cut hex_digits;
 @tight @squashed
-hex_exponent      = i"p" ("+" / "-")? decimal_digits;
+hex_exponent      = i"p" @cut ("+" / "-")? decimal_digits;
 
 @tight @squashed
 imaginary_lit = (float_lit / int_lit / decimal_digits) "i";
@@ -82,8 +89,8 @@ raw_string_lit         = "`" (!"`" (unicode_char / newline))* "`" ;
 @tight @squashed
 interpreted_string_lit = "\"" (!"\"" (unicode_value / byte_value))* "\"";
 
-Type      = TypeName / TypeLit / "(" Type ")" ;
-TypeName  = identifier / QualifiedIdent ;
+Type      = TypeLit / "(" Type ")" / TypeName;
+TypeName  = QualifiedIdent / identifier;
 TypeLit   = ArrayType / StructType / PointerType / FunctionType / InterfaceType / SliceType / MapType / ChannelType ;
 
 ArrayType   = "[" ArrayLength "]" ElementType ;
@@ -102,10 +109,17 @@ BaseType    = Type ;
 
 FunctionType   = "func" Signature ;
 Signature      = Parameters Result? ;
-Result         = Parameters / Type ;
-Parameters     = "(" (ParameterList ","?)? ")" ;
-ParameterList  = ParameterDecl ("," ParameterDecl)* ;
-ParameterDecl  = IdentifierList? "..."? Type ;
+Parameters     = "(" @cut (ParameterList ","?)? ")" ;
+@lifted
+ParameterList  = ParameterDecl ("," @cut ParameterDecl)* ;
+ParameterDecl  = IdentifierList "..."? Type / "..."? Type;
+# ParameterDecl  = IdentifierList? "..."? Type ;
+
+Result         = Type / ResultParameters;
+ResultParameters = "(" @cut (ResultParameterList ","?)? ")" ;
+@lifted
+ResultParameterList  = ResultParameterDecl ("," @cut ResultParameterDecl)* ;
+ResultParameterDecl  = IdentifierList "..."? Type / "..."? Type;
 
 InterfaceType      = "interface" "{" (( MethodSpec / InterfaceTypeName ) ";"?)* "}" ;
 MethodSpec         = MethodName Signature ;
@@ -117,17 +131,17 @@ KeyType     = Type ;
 
 ChannelType = ( "chan" / "chan" "<-" / "<-" "chan" ) ElementType ;
 
-Block = "{" StatementList "}" ;
-StatementList = (Statement ";"?)* ;
+Block = "{" @cut StatementList? "}" ;
+StatementList = (Statement ";"?)+ ;
 
 Declaration   = ConstDecl / TypeDecl / VarDecl ;
-TopLevelDecl  = Declaration / FunctionDecl / MethodDecl ;
+TopLevelDecl  = Declaration / MethodDecl / FunctionDecl ;
 
-ConstDecl      = "const" ( "(" @cut (ConstSpec ";"?)* ")" / ConstSpec) ;
+ConstDecl      = "const" @cut ( "(" @cut (ConstSpec ";"?)* ")" / ConstSpec) ;
 ConstSpec      = IdentifierList (Type? "=" ExpressionList)? ;
 
-IdentifierList = identifier ("," identifier)* ;
-ExpressionList = Expression ("," Expression)* ;
+IdentifierList = identifier ("," @cut identifier)* ;
+ExpressionList = Expression ("," @cut Expression)*;
 
 TypeDecl = "type" ( TypeSpec / "(" (TypeSpec ";"?)* ")" ) ;
 TypeSpec = AliasDecl / TypeDef ;
@@ -141,19 +155,22 @@ VarSpec     = IdentifierList ( Type ("=" ExpressionList)? / "=" ExpressionList )
 
 ShortVarDecl = IdentifierList ":=" ExpressionList ;
 
-FunctionDecl = "func" FunctionName Signature FunctionBody? ;
+FunctionDecl = "func" FunctionName @cut Signature FunctionBody? ;
 FunctionName = identifier ;
 FunctionBody = Block ;
 
-MethodDecl = "func" Receiver MethodName Signature FunctionBody? ;
-Receiver   = Parameters ;
+MethodDecl = "func" Receiver MethodName @cut Signature FunctionBody? ;
+Receiver   = "(" identifier Type ")" / "(" Type ")";
+# Receiver   = Parameters .
 
+@lifted
 Operand     = Literal / OperandName / "(" Expression ")" ;
 @lifted
 Literal     = BasicLit / CompositeLit / FunctionLit ;
 @lifted
-BasicLit    = int_lit / float_lit / imaginary_lit / rune_lit / string_lit ;
-OperandName = identifier / QualifiedIdent ;
+BasicLit    = imaginary_lit / float_lit / int_lit / rune_lit / string_lit ;
+@nonterminal
+OperandName = QualifiedIdent / identifier;
 
 QualifiedIdent = PackageName "." identifier ;
 
@@ -169,15 +186,8 @@ Element       = Expression / LiteralValue ;
 
 FunctionLit = "func" Signature FunctionBody ;
 
-PrimaryExpr =
-	Operand /
-	Conversion /
-	MethodExpr /
-	PrimaryExpr Selector /
-	PrimaryExpr Index /
-	PrimaryExpr Slice /
-	PrimaryExpr TypeAssertion /
-	PrimaryExpr Arguments ;
+@nonterminal
+PrimaryExpr = (Operand / Conversion / MethodExpr) (Selector / Index / Slice / TypeAssertion / Arguments)*;
 
 Selector       = "." identifier ;
 Index          = "[" Expression "]" ;
@@ -190,12 +200,22 @@ MethodExpr    = ReceiverType "." MethodName ;
 ReceiverType  = Type ;
 
 @nonterminal
-Expression = UnaryExpr (binary_op Expression)?;
+Expression = UnaryExpr (binary_op @cut UnaryExpr)*;
+# Expression = UnaryExpr | Expression binary_op Expression .
 
 @nonterminal
-UnaryExpr  = PrimaryExpr / unary_op @cut UnaryExpr ;
+UnaryExpr  = unary_op* PrimaryExpr;
+# UnaryExpr  = PrimaryExpr | unary_op UnaryExpr .
 
-binary_op  = "||" / "&&" / rel_op / add_op / mul_op ;
+@nonterminal
+UnambiguousExpression = UnambiguousUnaryExpr (binary_op @cut UnambiguousUnaryExpr)*;
+@nonterminal
+UnambiguousUnaryExpr  = unary_op* UnambiguousPrimaryExpr;
+@nonterminal
+UnambiguousPrimaryExpr = (UnambiguousOperand / Conversion / MethodExpr) (Selector / Index / Slice / TypeAssertion / Arguments)*;
+UnambiguousOperand = BasicLit / FunctionLit / OperandName / "(" Expression ")";
+
+binary_op  = "||" / "&&" / add_op / mul_op / rel_op;
 rel_op     = "==" / "!=" / "<" / "<=" / ">" / ">=" ;
 add_op     = "+" / "-" / "|" / "^" ;
 mul_op     = "*" / "/" / "%" / "<<" / ">>" / "&" / "&^" ;
@@ -205,12 +225,12 @@ unary_op   = "+" / "-" / "!" / "^" / "*" / "&" / "<-" ;
 Conversion = Type "(" Expression ","? ")" ;
 
 Statement =
-	Declaration / LabeledStmt / SimpleStmt /
-	GoStmt / ReturnStmt / BreakStmt / ContinueStmt / GotoStmt /
-	FallthroughStmt / Block / IfStmt / SwitchStmt / SelectStmt / ForStmt /
-	DeferStmt ;
+	IfStmt / ReturnStmt / ForStmt / Declaration / LabeledStmt /
+	GoStmt / BreakStmt / ContinueStmt / GotoStmt /
+	FallthroughStmt / SwitchStmt / SelectStmt /
+	DeferStmt / Block / SimpleStmt;
 
-SimpleStmt = EmptyStmt / ExpressionStmt / SendStmt / IncDecStmt / Assignment / ShortVarDecl ;
+SimpleStmt = SendStmt / IncDecStmt / Assignment / ShortVarDecl / ExpressionStmt;
 
 EmptyStmt = &. ;
 
@@ -228,11 +248,11 @@ Assignment = ExpressionList assign_op ExpressionList ;
 
 assign_op = (add_op / mul_op)? "=" ;
 
-IfStmt = "if" (SimpleStmt ";"?)? Expression Block ("else" ( IfStmt / Block ))? ;
+IfStmt = "if" @cut (SimpleStmt ";")? UnambiguousExpression Block ("else" ( IfStmt / Block ))? ;
 
 SwitchStmt = ExprSwitchStmt / TypeSwitchStmt ;
 
-ExprSwitchStmt = "switch" (SimpleStmt ";"?)?  Expression?  "{" ExprCaseClause*  "}" ;
+ExprSwitchStmt = "switch" (SimpleStmt ";"?)?  UnambiguousExpression?  "{" ExprCaseClause*  "}" ;
 ExprCaseClause = ExprSwitchCase ":" StatementList ;
 ExprSwitchCase = "case" ExpressionList / "default" ;
 
@@ -242,14 +262,14 @@ TypeCaseClause  = TypeSwitchCase ":" StatementList ;
 TypeSwitchCase  = "case" TypeList / "default" ;
 TypeList        = Type ("," Type)* ;
 
-ForStmt = "for" (Condition / ForClause / RangeClause)? Block ;
-Condition = Expression ;
+ForStmt = "for" @cut (RangeClause / ForClause / Condition)? Block ;
+Condition = UnambiguousExpression ;
 
-ForClause = InitStmt?  ";"? Condition?  ";"? PostStmt?  ;
+ForClause = InitStmt?  ";" Condition?  ";" PostStmt?  ;
 InitStmt = SimpleStmt ;
 PostStmt = SimpleStmt ;
 
-RangeClause = (ExpressionList "=" / IdentifierList ":=")? "range" Expression ;
+RangeClause = (ExpressionList "=" / IdentifierList ":=")? "range" UnambiguousExpression ;
 
 GoStmt = "go" Expression ;
 

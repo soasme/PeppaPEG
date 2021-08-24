@@ -1,5 +1,6 @@
 [
     {
+        "desc": "Integer",
         "grammar_file": "./golang-v1.17.peg",
         "entry": "Literal",
         "tests": [
@@ -65,6 +66,119 @@
             {
                 "I": "0_xBadFace",
                 "E": "MatchError: line 1:1, expect Literal",
+                "N": "invalid: _ must separate successive digits"
+            }
+        ]
+    },
+
+    {
+        "desc": "Float",
+        "grammar_file": "./golang-v1.17.peg",
+        "entry": "Literal",
+        "tests": [
+            {
+                "I": "0.",
+                "O": [{"slice": [0, 2], "type": "decimal_float_lit"}]
+            },
+            {
+                "I": "72.40",
+                "O": [{"slice": [0, 5], "type": "decimal_float_lit"}]
+            },
+            {
+                "I": "072.40",
+                "O": [{"slice": [0, 6], "type": "decimal_float_lit"}]
+            },
+            {
+                "I": "2.71828",
+                "O": [{"slice": [0, 7], "type": "decimal_float_lit"}]
+            },
+            {
+                "I": "1.e+0",
+                "O": [{"slice": [0, 5], "type": "decimal_float_lit"}]
+            },
+            {
+                "I": "6.67428e-11",
+                "O": [{"slice": [0, 11], "type": "decimal_float_lit"}]
+            },
+            {
+                "I": ".25",
+                "O": [{"slice": [0, 3], "type": "decimal_float_lit"}]
+            },
+            {
+                "I": ".12345E+5",
+                "O": [{"slice": [0, 9], "type": "decimal_float_lit"}]
+            },
+            {
+                "I": "1_5.",
+                "O": [{"slice": [0, 4], "type": "decimal_float_lit"}]
+            },
+            {
+                "I": "0.15e+0_2",
+                "O": [{"slice": [0, 9], "type": "decimal_float_lit"}]
+            },
+            {
+                "I": "0x1p-2",
+                "O": [{"slice": [0, 6], "type": "hex_float_lit"}]
+            },
+            {
+                "I": "0x2.p10",
+                "O": [{"slice": [0, 7], "type": "hex_float_lit"}]
+            },
+            {
+                "I": "0x1.Fp+0",
+                "O": [{"slice": [0, 8], "type": "hex_float_lit"}]
+            },
+            {
+                "I": "0X.8p-0",
+                "O": [{"slice": [0, 7], "type": "hex_float_lit"}]
+            },
+            {
+                "I": "0X_1FFFP-16",
+                "O": [{"slice": [0, 11], "type": "hex_float_lit"}]
+            },
+            {
+                "I": "0x15e-2",
+                "O": [{"slice": [0, 5], "type": "hex_lit"}],
+                "N": "== 0x15e - 2 (integer subtraction)"
+            },
+            {
+                "I": "0x.p1",
+                "E": "CutError: line 1:4, expect hex_digit",
+                "N": "invalid: mantissa has no digits"
+            },
+            {
+                "I": "1p-2",
+                "E": "MatchError: line 1:1, expect Literal",
+                "N": "invalid: p exponent requires hexadecimal mantissa"
+            },
+            {
+                "I": "0x1.5e-2",
+                "E": "MatchError: line 1:1, expect Literal",
+                "N": "invalid: hexadecimal mantissa requires p exponent"
+            },
+            {
+                "I": "1_.5",
+                "E": "MatchError: line 1:1, expect Literal",
+                "N": "invalid: _ must separate successive digits"
+            },
+            {
+                "I": "1._5",
+                "E": "CutError: line 1:3, expect float_lit",
+                "N": "invalid: _ must separate successive digits"
+            },
+            {
+                "I": "1.5_e1",
+                "E": "CutError: line 1:4, expect float_lit",
+                "N": "invalid: _ must separate successive digits"
+            },
+            {
+                "I": "1.5e_1",
+                "E": "CutError: line 1:5, expect decimal_digit",
+                "N": "invalid: _ must separate successive digits"
+            },
+            {
+                "I": "1.5e1_",
+                "E": "CutError: line 1:6, expect float_lit",
                 "N": "invalid: _ must separate successive digits"
             }
         ]

@@ -47,7 +47,7 @@
 - [ ] perf: tracer: https://pegjs.org/documentation
       https://github.com/orlandohill/peg-left-recursion
 - [ ] tests: benchmark: example: json-c. `valgrind --tool=massif --massif-out-file=massif.out ./build/tests/test_example_json && ms_print massif.out ms_print.out`.
-- [ ] match: packrat or not? http://mousepeg.sourceforge.net/index.htm
+- [ ] match: packrat or not? http://mousepeg.sourceforge.net/index.htm https://github.com/norswap/autumn/blob/master/doc/B4-debugging-tracing.md#memoization 
 - [ ] tests: add a fuzzy testing framework.
 - [ ] script: turn peg grammar into a railroad diagram.
 - [ ] shell: `p4 ast --language=cmake`. https://cmake.org/cmake/help/latest/manual/cmake-language.7.html

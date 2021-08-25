@@ -1,12 +1,16 @@
 # ROADMAP
 
+- [ ] spec: JSON as the basic types for node property.
+- [ ] spec: explain "greed", "CFG", "lateral backtracking", "vertical backtracking", "not advance in repeat" in spec. https://github.com/norswap/autumn/blob/master/doc/A3-how-autumn-works.md
 - [ ] peg: `@precedence(5)`: set precedence for operator when apply `@left_recursion`.
-- [ ] peg: !("key" / "word") can be optimized to use hashmap check, rather than checking one by one.
+- [ ] peg: `@trie keyword = "key" / "world" / ..`. Optimize to use [trie](https://en.wikipedia.org/wiki/Trie) algorithm.
+- [ ] peg: `@reserved rule = "key"`. `!("key" / "word") identifier` can be optimized to use  check registered to P4_Source , rather than checking one by one. the other way around is like process in [autumn](https://github.com/norswap/autumn/blob/master/doc/A7-reserved-words-and-identifiers.md#reserved-word-and-identifiers-in-autumn).
 - [ ] peg: support `@inside(XXX)`, `@outside(XXX)` decorator: it can check if XXX is in the frame stack. can support second number parameter to limit the frame stack backtrack. example: golang CompositeLit should be inside an ExpressionGroup if inside IfStmt,ForStmt,SwitchStmt, otherwise it is ambiguous: `Literal = BasicLit / @outside(IfStmt / ForStmt / SwitchStmt) CompositeLit / @inside(IfStmt / ForStmt / SwitchStmt) @inside(ExpressionGroup) CompositeLit / FunctionLit ;`.
 - [ ] peg: matching parent successfully immediately. example: semicolons in golang, autoreplace U+FFFD to U+0A in markdown. `identifier = letter (letter / unicode_digit)* (&newline @inside(Statement) @success(Statement))?;`.
 - [ ] peg: move decorators after "=".
 - [ ] api: support locale, utf-8, utf-16, utf-32 encoding.
-- [ ] peg: support action code `rule = a:b -> { |node| @override another = b; }; another = " ";` this can be used to override some rules in runtime and is useful when implementing Mustache tag set delimiter.
+- [ ] peg: support action code `rule = number -> { @property value = number | replace("_", "") | as_int ; }`, `rule = bool -> { @property value = bool | as_bool; }`.
+- [ ] peg: support action code `rule = a:b -> { @override another = b; }; another = " ";` this can be used to override some rules in runtime and is useful when implementing Mustache tag set delimiter.
 - [ ] api: function `P4_NodeEqual(node1, node2, NULL)`: check text[slice] are the same, children count are the same, each child is the same. Third param check user data.
 - [ ] api: function `P4_FindNodeChild(node, node_name)`.
 - [ ] api: function `P4_FindNodeChildren(node, node_name)`.
@@ -17,7 +21,7 @@
 - [ ] shell: compile peg to LLVM IR/bitcode code (can use LLVM to compile to C, JS).
 - [ ] peg: `@sibling_to_descdent`. can be used to transform cases like toml [key1.key2], key2 should be a child of key1.
 - [ ] peg: `@right_recursion`.
-- [ ] peg: `@left_recursion`. can be used to transform cases like expression: `a=b (@left_recursion "+" b)*`.
+- [ ] peg: `@left_recursion`. can be used to transform cases like expression: `a = b @left_recursion (minus/plus/mul/div) b`, the left side of `@left_recursion` is operand, the right side is infix and the other operand. Given 1+2+3, it will produce `{{1, +, 2}, + 3}`.
 - [ ] ci: support windows.
 - [ ] ci: publish binary to github release.
 - [ ] ci: publish ppa.

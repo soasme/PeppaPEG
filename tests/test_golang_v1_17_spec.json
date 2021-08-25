@@ -330,5 +330,69 @@
                 "N": "IGNORE: illegal: invalid code point but can't detect when parsing as of current Peppa PEG"
             }
         ]
+    },
+
+    {
+        "desc": "String",
+        "grammar_file": "./golang-v1.17.peg",
+        "entry": "Literal",
+        "tests": [
+            {
+                "I": "`a`",
+                "O": [{"slice": [0, 3], "type": "raw_string_lit"}]
+            },
+            {
+                "I": "`\\n\n\\n`",
+                "O": [{"slice": [0, 7], "type": "raw_string_lit"}]
+            },
+            {
+                "I": "\"\\n\"",
+                "O": [{"slice": [0, 4], "type": "interpreted_string_lit"}]
+            },
+            {
+                "I": "\"\\\"\"",
+                "O": [{"slice": [0, 4], "type": "interpreted_string_lit"}]
+            },
+            {
+                "I": "\"Hello, world!\\n\"",
+                "O": [{"slice": [0, 17], "type": "interpreted_string_lit"}]
+            },
+            {
+                "I": "\"日本語\"",
+                "O": [{"slice": [0, 11], "type": "interpreted_string_lit"}]
+            },
+            {
+                "I": "`日本語`",
+                "O": [{"slice": [0, 11], "type": "raw_string_lit"}]
+            },
+            {
+                "I": "\"\\u65e5\\u672c\\u8a9e\"",
+                "O": [{"slice": [0, 20], "type": "interpreted_string_lit"}]
+            },
+            {
+                "I": "\"\\u65e5本\\U00008a9e\"",
+                "O": [{"slice": [0, 21], "type": "interpreted_string_lit"}]
+            },
+            {
+                "I": "\"\\U000065e5\\U0000672c\\U00008a9e\"",
+                "O": [{"slice": [0, 32], "type": "interpreted_string_lit"}]
+            },
+            {
+                "I": "\"\\xe6\\x97\\xa5\\xe6\\x9c\\xac\\xe8\\xaa\\x9e\"",
+                "O": [{"slice": [0, 38], "type": "interpreted_string_lit"}]
+            },
+            {
+                "I": "\"\\xff\\u00FF\"",
+                "O": [{"slice": [0, 12], "type": "interpreted_string_lit"}]
+            },
+            {
+                "I": "\"\\uD800\"",
+                "N": "IGNORED: illegal: surrogate half. Peppa PEG can't support it currently."
+            },
+            {
+                "I": "\"\\U00110000\"",
+                "N": "IGNORED: illegal: invalid Unicode code point. Peppa PEG can't support it currently."
+            }
+        ]
     }
 ]

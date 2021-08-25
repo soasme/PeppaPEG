@@ -1,5 +1,6 @@
 # ROADMAP
 
+- [ ] spec: `@infix @left_assoc @precedence(1) compare_op = "==";`, `@infix @right_assoc power_op = "^"`; `rule = Primary (compare_op/power_op) Primary;`. https://en.wikipedia.org/wiki/Operator-precedence_parser https://eli.thegreenplace.net/2012/08/02/parsing-expressions-by-precedence-climbing https://docs.rs/peg/0.7.0/peg/
 - [ ] spec: JSON as the basic types for node property.
 - [ ] spec: explain "greed", "CFG", "lateral backtracking", "vertical backtracking", "not advance in repeat" in spec. https://github.com/norswap/autumn/blob/master/doc/A3-how-autumn-works.md
 - [ ] peg: `@precedence(5)`: set precedence for operator when apply `@left_recursion`.

@@ -1,11 +1,17 @@
 newline        = "\x0a";
 
-@spaced @lifted @squashed
+@lifted @squashed
 whitespace = " " / "\t" / "\r" / "\n";
 
-@spaced @lifted @squashed
+@lifted @squashed
 comment = "//" (!"\n" .)* "\n"?
         / "/*" (!"*/" .)* "*/";
+
+@spaced @lifted
+ws = whitespace / comment;
+
+@lifted
+linews = " " / "\t" / comment;
 
 unicode_char   = !"\x0a" .;
 unicode_letter = [\p{L}];
@@ -27,8 +33,8 @@ Keywords = "break" / "default" / "func" / "interface" / "select" /
 @tight @squashed
 identifier = !(Keywords !letter) letter (letter / unicode_digit)*;
 
-@lifted
-int_lit        = (binary_lit / octal_lit / hex_lit / decimal_lit) !(letter / ".");
+@tight @lifted
+int_lit        = (binary_lit / octal_lit / hex_lit / decimal_lit) !("_" / "." / "p");
 @tight @squashed
 decimal_lit    = "0" / ([1-9] @cut ("_"? decimal_digits)?);
 @tight @squashed
@@ -143,7 +149,9 @@ TopLevelDecl  = Declaration / MethodDecl / FunctionDecl ;
 ConstDecl      = "const" @cut ( "(" @cut (ConstSpec ";"?)* ")" / ConstSpec) ;
 ConstSpec      = IdentifierList (Type? "=" ExpressionList)? ;
 
+@scoped
 IdentifierList = identifier ("," @cut identifier)* ;
+@scoped
 ExpressionList = Expression ("," @cut Expression)*;
 
 TypeDecl = "type" ( TypeSpec / "(" (TypeSpec ";"?)* ")" ) ;
@@ -202,11 +210,11 @@ Arguments      = "(" (( ExpressionList / Type ("," ExpressionList)? ) "..."? ","
 MethodExpr    = ReceiverType "." MethodName ;
 ReceiverType  = Type ;
 
-@nonterminal
-Expression = UnaryExpr (binary_op @cut UnaryExpr)*;
+@nonterminal @tight
+Expression = UnaryExpr linews* (binary_op @cut ws* UnaryExpr)*;
 # Expression = UnaryExpr | Expression binary_op Expression .
 
-@nonterminal
+@nonterminal @scoped
 UnaryExpr  = unary_op* PrimaryExpr;
 # UnaryExpr  = PrimaryExpr | unary_op UnaryExpr .
 
@@ -272,9 +280,10 @@ ForClause = InitStmt?  ";" Condition?  ";" PostStmt?  ;
 InitStmt = SimpleStmt ;
 PostStmt = SimpleStmt ;
 
-RangeClause = (ExpressionList "=" / IdentifierList ":=")? "range" UnambiguousExpression ;
+RangeClause = (ExpressionList "=" / IdentifierList ":=")? "range" Expression;
 
-GoStmt = "go" Expression ;
+@tight
+GoStmt = "go" ws+ Expression ;
 
 SelectStmt = "select" "{" CommClause*  "}" ;
 CommClause = CommCase ":" StatementList ;
@@ -282,13 +291,17 @@ CommCase   = "case" ( SendStmt / RecvStmt ) / "default" ;
 RecvStmt   = (ExpressionList "=" / IdentifierList ":=")? RecvExpr ;
 RecvExpr   = Expression ;
 
-ReturnStmt = "return" ExpressionList? ;
+@tight
+ReturnStmt = "return" ws+ ExpressionList? ;
 
-BreakStmt = "break" Label?  ;
+@tight
+BreakStmt = "break" ws+ Label?  ;
 
-ContinueStmt = "continue" Label? ;
+@tight
+ContinueStmt = "continue" ws+ Label? ;
 
-GotoStmt = "goto" Label ;
+@tight
+GotoStmt = "goto" ws+ Label ;
 
 FallthroughStmt = "fallthrough" ;
 

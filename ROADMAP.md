@@ -9,7 +9,11 @@
 - [ ] peg: matching parent successfully immediately. example: semicolons in golang, autoreplace U+FFFD to U+0A in markdown. `identifier = letter (letter / unicode_digit)* (&newline @inside(Statement) @success(Statement))?;`.
 - [ ] peg: move decorators after "=".
 - [ ] api: support locale, utf-8, utf-16, utf-32 encoding.
-- [ ] peg: support action code `rule = number -> { @property value = number | replace("_", "") | as_int ; }`, `rule = bool -> { @property value = bool | as_bool; }`.
+- [ ] peg: support action code `-> { ...; ...; @squashed; }`: children node will be produced but eventually be squashed.
+- [ ] peg: support action code `rule = (a b) -> { some action code here }` if the action is applied to the whole sequence.
+- [ ] peg: support action code `.`, `.[]`, `.[n]`, `.[m:n]`, `.["name"]`.
+- [ ] peg: support action code `array = ("[" element* "]") -> { @property value = .[] }`.
+- [ ] peg: support action code `rule = number -> { @property value = . | replace("_", "") | as_int ; }`, `rule = bool -> { @property value = . | as_bool; }`.
 - [ ] peg: support action code `rule = a:b -> { @override another = b; }; another = " ";` this can be used to override some rules in runtime and is useful when implementing Mustache tag set delimiter.
 - [ ] api: function `P4_NodeEqual(node1, node2, NULL)`: check text[slice] are the same, children count are the same, each child is the same. Third param check user data.
 - [ ] api: function `P4_FindNodeChild(node, node_name)`.

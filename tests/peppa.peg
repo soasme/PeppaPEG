@@ -22,7 +22,7 @@ name = reference;
 expression = left_recursion;
 
 @nonterminal
-left_recursion = choice ("|" reference choice)?;
+left_recursion = choice ("|" @cut reference choice)?;
 
 @nonterminal
 choice = sequence ("/" sequence)*;

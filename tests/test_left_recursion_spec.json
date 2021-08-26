@@ -1,0 +1,100 @@
+[
+    {
+        "grammar": "A = \"a\" | A \"a\";",
+        "entry": "A",
+        "tests": [
+            {
+                "I": "a",
+                "O": [],
+                "N": "Expression \"a\" produces no node. So the result is empty."
+            },
+            {
+                "I": "aa",
+                "O": [{"slice": [0, 2], "type": "A"}],
+                "N": "Expression `A \"a\"` produces node covering two chars."
+            },
+            {
+                "I": "aaa",
+                "O": [
+                    {
+                        "slice": [0, 3],
+                        "type": "A",
+                        "children": [
+                            {
+                                "slice": [0, 2],
+                                "type": "A"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "",
+                "E": "MatchError: line 1:1, expect A"
+            }
+        ]
+    },
+
+    {
+        "grammar": "A = B | A B;\nB = \"b\";",
+        "entry": "A",
+        "tests": [
+            {
+                "I": "b",
+                "O": [{"slice": [0, 1], "type": "B"}]
+            },
+            {
+                "I": "bb",
+                "O": [
+                    {
+                        "slice": [0, 2],
+                        "type": "A",
+                        "children": [
+                            {
+                                "slice": [0, 1],
+                                "type": "B"
+                            },
+                            {
+                                "slice": [1, 2],
+                                "type": "B"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "bbb",
+                "O": [
+                    {
+                        "slice": [0, 3],
+                        "type": "A",
+                        "children": [
+                            {
+                                "slice": [0, 2],
+                                "type": "A",
+                                "children": [
+                                    {
+                                        "slice": [0, 1],
+                                        "type": "B"
+                                    },
+                                    {
+                                        "slice": [1, 2],
+                                        "type": "B"
+                                    }
+                                ]
+                            },
+                            {
+                                "slice": [2, 3],
+                                "type": "B"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "",
+                "E": "MatchError: line 1:1, expect A"
+            }
+        ]
+    }
+]

@@ -1,5 +1,22 @@
 [
   {
+    "desc": "Number",
+    "grammar_file": "./peppa.peg",
+    "entry": "number",
+    "tests": [
+      {
+        "I": "0",
+        "O": [
+          {
+            "slice": [0, 1],
+            "type": "number"
+          }
+        ]
+      }
+    ]
+  },
+
+  {
     "desc": "Primary",
     "grammar_file": "./peppa.peg",
     "entry": "grammar",
@@ -205,7 +222,105 @@
         ]
       },
       {
-        "N": "Left recursion with wrong reference is invalid. This is checked in runtime",
+        "N": "Grouping choices within left recursion is highly recommended",
+        "I": "x = (\"x\" / \"y\") | x (\"x\" / \"y\");",
+        "O": [
+          {
+            "slice": [
+              0,
+              32
+            ],
+            "type": "grammar",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  32
+                ],
+                "type": "rule",
+                "children": [
+                  {
+                    "slice": [
+                      0,
+                      1
+                    ],
+                    "type": "name"
+                  },
+                  {
+                    "slice": [
+                      4,
+                      31
+                    ],
+                    "type": "left_recursion",
+                    "children": [
+                      {
+                        "slice": [
+                          5,
+                          14
+                        ],
+                        "type": "choice",
+                        "children": [
+                          {
+                            "slice": [
+                                5,
+                                8
+                            ],
+                            "type": "literal"
+                          },
+                          {
+                            "slice": [
+                                11,
+                                14
+                            ],
+                            "type": "literal"
+                          }
+                        ]
+                      },
+                      {
+                        "slice": [
+                            18,
+                            19
+                        ],
+                        "type": "reference"
+                      },
+                      {
+                        "slice": [
+                            21,
+                            30
+                        ],
+                        "type": "choice",
+                        "children": [
+                          {
+                            "slice": [
+                                21,
+                                24
+                            ],
+                            "type": "literal"
+                          },
+                          {
+                            "slice": [
+                                27,
+                                30
+                            ],
+                            "type": "literal"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "N": "Left recursion reference must not be included in parentheses.",
+        "I": "x = \"x\" | (x \"x\");",
+        "E": "CutError: line 1:11, expect reference"
+      },
+      {
+        "N": "Left recursion with wrong reference is invalid. This is checked in runtime.",
         "I": "x = \"x\" | y \"x\"; y = \"y\";"
       }
     ]

@@ -2223,10 +2223,11 @@ match_left_recursion(P4_Source* s, P4_Expression* e) {
     P4_Node* toklhs = match_expression(s, e->lhs);
     P4_Node* tokrhs = NULL;
     P4_Node* toktmp = NULL;
+    P4_Node* whitespace = NULL;
 
     if (need_lift(s, e)) {
         P4_MatchRaisef(s, P4_PegError,
-                "rule %s is left recursion and can't be lifted", peek_rule_name(s));
+                "left recursion rule %s cannot be lifted", peek_rule_name(s));
         return NULL;
     }
 
@@ -2235,19 +2236,28 @@ match_left_recursion(P4_Source* s, P4_Expression* e) {
         goto finalize;
     }
 
-    mark_position(s, lhs_endpos);
-    toklhs = P4_CreateNode(s->content, startpos, lhs_endpos, e->name);
+    bool space = need_whitespace(s);
 
     do {
+        /* left recursion until the end of input. */
         if (is_end(s))
             break;
 
-        mark_position(s, rhs_startpos);
+        /* match implicit whitespace. */
+        mark_position(s, whitespace_startpos);
+        if (space) {
+            whitespace = match_spaced_rules(s, NULL);
+            if (!no_error(s)) goto finalize;
+        }
 
+        /* attempt to match rhs. */
         tokrhs = match_expression(s, e->rhs);
 
-        if (no_match(s))
+        /* if no match, puke the parsed whitespace, if any. */
+        if (no_match(s)) {
+            if (space) { set_position(s, whitespace_startpos); }
             break;
+        }
 
         if (!no_error(s)) {
             P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
@@ -2256,14 +2266,22 @@ match_left_recursion(P4_Source* s, P4_Expression* e) {
 
         mark_position(s, endpos);
 
-        if (tokrhs == NULL) {
-            tokrhs = P4_CreateNode(s->content, rhs_startpos, endpos, e->name);
+        /* adopt all lhs,ws,rhs tokens under the hierarchy of e. */
+        catch_oom(toktmp = P4_CreateNode(s->content, startpos, endpos, e->name));
+        P4_AdoptNode(toktmp->head, toktmp->tail, toklhs);
+        P4_AdoptNode(toktmp->head, toktmp->tail, whitespace);
+        P4_AdoptNode(toktmp->head, toktmp->tail, tokrhs);
+        whitespace = tokrhs = NULL;
+
+        /* if only one child and e is nonterminal, keep the child. */
+        if (is_non_terminal(e) && toktmp->head == toktmp->tail && toktmp->head != NULL) {
+            toklhs = toktmp->head;
+            toktmp->head = NULL;
+            P4_DeleteNode(s->grammar, toktmp);
         }
 
-        toktmp = P4_CreateNode(s->content, startpos, endpos, e->name);
-        P4_AdoptNode(toktmp->head, toktmp->tail, toklhs);
-        P4_AdoptNode(toktmp->head, toktmp->tail, tokrhs);
-
+        /* on next loop, we will use the parsed inputs as lhs and
+         * attempt to match rhs, if any. */
         toklhs = toktmp;
     } while (true);
 
@@ -2271,6 +2289,8 @@ match_left_recursion(P4_Source* s, P4_Expression* e) {
 
 finalize:
     P4_DeleteNode(s->grammar, toklhs);
+    P4_DeleteNode(s->grammar, whitespace);
+    P4_DeleteNode(s->grammar, tokrhs);
     return NULL;
 }
 

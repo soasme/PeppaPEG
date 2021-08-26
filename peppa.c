@@ -617,6 +617,7 @@ struct P4_Expression {
         struct {
             P4_Expression*          lhs;
             P4_Expression*          rhs;
+            P4_String               recur_ref;
         };
     };
 };
@@ -881,6 +882,7 @@ P4_PRIVATE(P4_Error)            P4_PegEvalRange(P4_Node* node, P4_Result* result
 P4_PRIVATE(P4_Error)            P4_PegEvalMembers(P4_Node* node, P4_Expression* expr, P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalSequence(P4_Node* node, P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalChoice(P4_Node* node, P4_Result* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalLeftRecursion(P4_Node* node, P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalPositive(P4_Node* node, P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalNegative(P4_Node* node, P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalRepeat(P4_Node* node, P4_Result* result);
@@ -2256,6 +2258,7 @@ match_left_recursion(P4_Source* s, P4_Expression* e) {
         /* if no match, puke the parsed whitespace, if any. */
         if (no_match(s)) {
             if (space) { set_position(s, whitespace_startpos); }
+            rescue_error(s);
             break;
         }
 
@@ -2684,6 +2687,7 @@ P4_CreateLeftRecursion(P4_Expression* lhs, P4_Expression* rhs) {
     expr->name = NULL;
     expr->lhs = lhs;
     expr->rhs = rhs;
+    expr->recur_ref = NULL;
     return expr;
 }
 
@@ -3417,6 +3421,7 @@ P4_DeleteExpression(P4_Expression* expr) {
         case P4_LeftRecursion:
             P4_DeleteExpression(expr->lhs);
             P4_DeleteExpression(expr->rhs);
+            if (expr->recur_ref) P4_FREE(expr->recur_ref);
         default:
             break;
     }
@@ -3938,13 +3943,24 @@ P4_Grammar* P4_CreatePegGrammar () {
     ));
     catch_err(P4_SetGrammarRuleFlag(grammar, "insensitive", P4_FLAG_TIGHT));
 
+    catch_err(P4_AddSequenceWithMembers(grammar, "left_recursion", 2,
+        P4_CreateReference("choice"),
+        P4_CreateZeroOrOnce(P4_CreateSequenceWithMembers(4,
+            P4_CreateLiteral("|", true),
+            P4_CreateCut(),
+            P4_CreateReference("reference"),
+            P4_CreateReference("choice")
+        ))
+    ));
+    catch_err(P4_SetGrammarRuleFlag(grammar, "left_recursion", P4_FLAG_NON_TERMINAL));
+
     catch_err(P4_AddJoin(grammar, "choice", "/", "sequence"));
     catch_err(P4_SetGrammarRuleFlag(grammar, "choice", P4_FLAG_NON_TERMINAL));
 
     catch_err(P4_AddOnceOrMore(grammar, "sequence", P4_CreateReference("repeat")));
     catch_err(P4_SetGrammarRuleFlag(grammar, "sequence", P4_FLAG_NON_TERMINAL));
 
-    catch_err(P4_AddReference(grammar, "expression", "choice"));
+    catch_err(P4_AddReference(grammar, "expression", "left_recursion"));
     catch_err(P4_SetGrammarRuleFlag(grammar, "expression", P4_FLAG_LIFTED));
 
     catch_err(P4_AddReference(grammar, "name", "reference"));
@@ -4305,6 +4321,36 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
+P4_PegEvalLeftRecursion(P4_Node* node, P4_Result* result) {
+    P4_Error        err = P4_Ok;
+    P4_Expression*  lhs = NULL;
+    P4_Expression*  rhs = NULL;
+    P4_String       ref = NULL;
+
+    catch_err(P4_PegEvalExpression(node->head, result));
+    lhs = unwrap_expr(result);
+
+    if (node->head->next != NULL) {
+        catch_err(P4_PegEvalRuleName(node->head->next, &ref));
+        catch_err(P4_PegEvalExpression(node->tail, result));
+        rhs = unwrap_expr(result);
+
+        catch_oom(result->expr = P4_CreateLeftRecursion(lhs, rhs));
+        result->expr->recur_ref = ref;
+    } else {
+        result->expr = lhs;
+    }
+
+    return P4_Ok;
+
+finalize:
+    P4_DeleteExpression(lhs);
+    P4_DeleteExpression(rhs);
+    P4_FREE(ref);
+    return err;
+}
+
+P4_PRIVATE(P4_Error)
 P4_PegEvalPositive(P4_Node* node, P4_Result* result) {
     P4_Error        err  = P4_Ok;
     P4_Expression*  ref  = NULL;
@@ -4611,6 +4657,9 @@ P4_PegEvalExpression(P4_Node* node, P4_Result* result) {
     if (strcmp(node->rule_name, "choice")       == 0)
         return P4_PegEvalChoice(node, result);
 
+    if (strcmp(node->rule_name, "left_recursion") == 0)
+        return P4_PegEvalLeftRecursion(node, result);
+
     if (strcmp(node->rule_name, "positive")     == 0)
         return P4_PegEvalPositive(node, result);
 
@@ -4633,7 +4682,7 @@ P4_PegEvalExpression(P4_Node* node, P4_Result* result) {
         return P4_PegEvalBackReference(node, result);
 
     UNREACHABLE();
-    panicf("Unreachable: node %p is not a peg expression", node);
+    panicf("Unreachable: node %p (%s) is not a peg expression", node, node->rule_name);
 }
 
 P4_PUBLIC P4_Error

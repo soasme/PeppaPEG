@@ -2277,12 +2277,13 @@ match_left_recursion(P4_Source* s, P4_Expression* e) {
         if (is_non_terminal(e) && toktmp->head == toktmp->tail && toktmp->head != NULL) {
             toklhs = toktmp->head;
             toktmp->head = NULL;
+            toktmp->tail = NULL;
             P4_DeleteNode(s->grammar, toktmp);
+        } else {
+            /* on next loop, we will use the parsed inputs as lhs and
+            * attempt to match rhs, if any. */
+            toklhs = toktmp;
         }
-
-        /* on next loop, we will use the parsed inputs as lhs and
-         * attempt to match rhs, if any. */
-        toklhs = toktmp;
     } while (true);
 
     return toklhs;

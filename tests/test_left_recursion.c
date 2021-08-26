@@ -247,6 +247,63 @@ void test_match_left_recursion_spaced(void) {
     P4_DeleteGrammar(grammar);
 }
 
+/**
+ * Grammar:
+ *  @nonterminal entry = A | entry ("++" / minus A);
+ *  A = "a";
+ *  minus = "-";
+ * Input:
+ *  a++
+ */
+void test_match_left_recursion_nonterminal(void) {
+    P4_Grammar* grammar = P4_CreateGrammar();
+    TEST_ASSERT_NOT_NULL(grammar);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddLeftRecursion(grammar, "entry",
+            P4_CreateReference("A"),
+            P4_CreateChoiceWithMembers(2,
+                P4_CreateLiteral("++", true),
+                P4_CreateSequenceWithMembers(2,
+                    P4_CreateReference("minus"),
+                    P4_CreateReference("A")
+                )
+            )
+        )
+    );
+    TEST_ASSERT_EQUAL(P4_Ok, P4_SetGrammarRuleFlag(grammar, "entry", P4_FLAG_NON_TERMINAL));
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddLiteral(grammar, "A", "a", true)
+    );
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_AddLiteral(grammar, "minus", "-", true)
+    );
+    P4_Source* source = P4_CreateSource("a++-a", "entry");
+    TEST_ASSERT_NOT_NULL(source);
+    TEST_ASSERT_EQUAL(
+        P4_Ok,
+        P4_Parse(grammar, source)
+    );
+
+    P4_Node* node = P4_GetSourceAst(source);
+    TEST_ASSERT_NOT_NULL(node);
+    ASSERT_EQUAL_NODE_STRING("a++-a", node);
+
+    TEST_ASSERT_NOT_NULL(node->head);
+    ASSERT_EQUAL_NODE_STRING("a", node->head); /* ++ is dropped by nonterminal. */
+
+    TEST_ASSERT_NOT_NULL(node->head->next);
+    ASSERT_EQUAL_NODE_STRING("-", node->head->next);
+
+    TEST_ASSERT_NOT_NULL(node->tail);
+    ASSERT_EQUAL_NODE_STRING("a", node->tail);
+
+    P4_DeleteSource(source);
+    P4_DeleteGrammar(grammar);
+}
+
 /** Because lifted eliminates the hierarchy of left recursion.
  *  which in essence makes the expression become (lhs rhs*).
  * */
@@ -280,6 +337,7 @@ int main(void) {
     RUN_TEST(test_match_left_recursion_references);
     RUN_TEST(test_match_left_recursion_sequence_on_rhs);
     RUN_TEST(test_match_left_recursion_spaced);
+    RUN_TEST(test_match_left_recursion_nonterminal);
     RUN_TEST(test_left_recursion_cannot_use_with_lifted);
 
     return UNITY_END();

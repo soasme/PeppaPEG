@@ -1,5 +1,15 @@
 [
     {
+        "grammar": "A = \"a\" | B \"a\"; B = \"b\";",
+        "entry": "A",
+        "tests": [
+            {
+                "I": "a",
+                "E": "grammar syntax error: PegError: unmatched left recursion rule name: A, B."
+            }
+        ]
+    },
+    {
         "grammar": "A = \"a\" | A \"a\";",
         "entry": "A",
         "tests": [
@@ -94,6 +104,362 @@
             {
                 "I": "",
                 "E": "MatchError: line 1:1, expect A"
+            }
+        ]
+    },
+
+    {
+        "grammar": "S = E | S op E; op = \"+\" / \"-\"; E = [0-9];",
+        "entry": "S",
+        "tests": [
+            {
+                "I": "1",
+                "O": [{"slice": [0, 1], "type": "E"}]
+            },
+            {
+                "I": "1+2",
+                "O": [
+                    {
+                        "slice": [0, 3],
+                        "type": "S",
+                        "children": [
+                            {"slice": [0, 1], "type": "E"},
+                            {"slice": [1, 2], "type": "op"},
+                            {"slice": [2, 3], "type": "E"}
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "1-2+3",
+                "O": [
+                    {
+                        "slice": [0, 5],
+                        "type": "S",
+                        "children": [
+                            {
+                                "slice": [0, 3],
+                                "type": "S",
+                                "children": [
+                                    {"slice": [0, 1], "type": "E"},
+                                    {"slice": [1, 2], "type": "op"},
+                                    {"slice": [2, 3], "type": "E"}
+                                ]
+                            },
+                            {"slice": [3, 4], "type": "op"},
+                            {"slice": [4, 5], "type": "E"}
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+
+    {
+        "grammar": "S = F | S addop F; F = E | F mulop E; addop = \"+\"; mulop = \"*\"; E = [0-9];",
+        "entry": "S",
+        "tests": [
+            {
+                "I": "1",
+                "O": [{"slice": [0, 1], "type": "E"}]
+            },
+            {
+                "I": "1+2+3",
+                "O": [
+                    {
+                        "slice": [0, 5],
+                        "type": "S",
+                        "children": [
+                            {
+                                "slice": [0, 3],
+                                "type": "S",
+                                "children": [
+                                    {"slice": [0, 1], "type": "E"},
+                                    {"slice": [1, 2], "type": "addop"},
+                                    {"slice": [2, 3], "type": "E"}
+                                ]
+                            },
+                            {"slice": [3, 4], "type": "addop"},
+                            {"slice": [4, 5], "type": "E"}
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "1*2+3",
+                "O": [
+                    {
+                        "slice": [0, 5],
+                        "type": "S",
+                        "children": [
+                            {
+                                "slice": [0, 3],
+                                "type": "F",
+                                "children": [
+                                    {"slice": [0, 1], "type": "E"},
+                                    {"slice": [1, 2], "type": "mulop"},
+                                    {"slice": [2, 3], "type": "E"}
+                                ]
+                            },
+                            {"slice": [3, 4], "type": "addop"},
+                            {"slice": [4, 5], "type": "E"}
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "1+2*3",
+                "O": [
+                    {
+                        "slice": [0, 5],
+                        "type": "S",
+                        "children": [
+                            {"slice": [0, 1], "type": "E"},
+                            {"slice": [1, 2], "type": "addop"},
+                            {
+                                "slice": [2, 5],
+                                "type": "F",
+                                "children": [
+                                    {"slice": [2, 3], "type": "E"},
+                                    {"slice": [3, 4], "type": "mulop"},
+                                    {"slice": [4, 5], "type": "E"}
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "1*2*3",
+                "O": [
+                    {
+                        "slice": [0, 5],
+                        "type": "F",
+                        "children": [
+                            {
+                                "slice": [0, 3],
+                                "type": "F",
+                                "children": [
+                                    {"slice": [0, 1], "type": "E"},
+                                    {"slice": [1, 2], "type": "mulop"},
+                                    {"slice": [2, 3], "type": "E"}
+                                ]
+                            },
+                            {"slice": [3, 4], "type": "mulop"},
+                            {"slice": [4, 5], "type": "E"}
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "1+2+3+4",
+                "O": [
+                    {
+                        "slice": [0, 7],
+                        "type": "S",
+                        "children": [
+                            {
+                                "slice": [0, 5],
+                                "type": "S",
+                                "children": [
+                                    {
+                                        "slice": [0, 3],
+                                        "type": "S",
+                                        "children": [
+                                            {"slice": [0, 1], "type": "E"},
+                                            {"slice": [1, 2], "type": "addop"},
+                                            {"slice": [2, 3], "type": "E"}
+                                        ]
+                                    },
+                                    {"slice": [3, 4], "type": "addop"},
+                                    {"slice": [4, 5], "type": "E"}
+                                ]
+                            },
+                            {"slice": [5, 6], "type": "addop"},
+                            {"slice": [6, 7], "type": "E"}
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "1+2+3*4",
+                "O": [
+                    {
+                        "slice": [0, 7],
+                        "type": "S",
+                        "children": [
+                            {
+                                "slice": [0, 3],
+                                "type": "S",
+                                "children": [
+                                    {"slice": [0, 1], "type": "E"},
+                                    {"slice": [1, 2], "type": "addop"},
+                                    {"slice": [2, 3], "type": "E"}
+                                ]
+                            },
+                            {"slice": [3, 4], "type": "addop"},
+                            {
+                                "slice": [4, 7],
+                                "type": "F",
+                                "children": [
+                                    {"slice": [4, 5], "type": "E"},
+                                    {"slice": [5, 6], "type": "mulop"},
+                                    {"slice": [6, 7], "type": "E"}
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "1+2*3+4",
+                "O": [
+                    {
+                        "slice": [0, 7],
+                        "type": "S",
+                        "children": [
+                            {
+                                "slice": [0, 5],
+                                "type": "S",
+                                "children": [
+                                    {"slice": [0, 1], "type": "E"},
+                                    {"slice": [1, 2], "type": "addop"},
+                                    {
+                                        "slice": [2, 5],
+                                        "type": "F",
+                                        "children": [
+                                            {"slice": [2, 3], "type": "E"},
+                                            {"slice": [3, 4], "type": "mulop"},
+                                            {"slice": [4, 5], "type": "E"}
+                                        ]
+                                    }
+                                ]
+                            },
+                            {"slice": [5, 6], "type": "addop"},
+                            {"slice": [6, 7], "type": "E"}
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "1*2+3+4",
+                "O": [
+                    {
+                        "slice": [0, 7],
+                        "type": "S",
+                        "children": [
+                            {
+                                "slice": [0, 5],
+                                "type": "S",
+                                "children": [
+                                    {
+                                        "slice": [0, 3],
+                                        "type": "F",
+                                        "children": [
+                                            {"slice": [0, 1], "type": "E"},
+                                            {"slice": [1, 2], "type": "mulop"},
+                                            {"slice": [2, 3], "type": "E"}
+                                        ]
+                                    },
+                                    {"slice": [3, 4], "type": "addop"},
+                                    {"slice": [4, 5], "type": "E"}
+                                ]
+                            },
+                            {"slice": [5, 6], "type": "addop"},
+                            {"slice": [6, 7], "type": "E"}
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "1*2*3+4",
+                "O": [
+                    {
+                        "slice": [0, 7],
+                        "type": "S",
+                        "children": [
+                            {
+                                "slice": [0, 5],
+                                "type": "F",
+                                "children": [
+                                    {
+                                        "slice": [0, 3],
+                                        "type": "F",
+                                        "children": [
+                                            {"slice": [0, 1], "type": "E"},
+                                            {"slice": [1, 2], "type": "mulop"},
+                                            {"slice": [2, 3], "type": "E"}
+                                        ]
+                                    },
+                                    {"slice": [3, 4], "type": "mulop"},
+                                    {"slice": [4, 5], "type": "E"}
+                                ]
+                            },
+                            {"slice": [5, 6], "type": "addop"},
+                            {"slice": [6, 7], "type": "E"}
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "1+2*3*4",
+                "O": [
+                    {
+                        "slice": [0, 7],
+                        "type": "S",
+                        "children": [
+                            {"slice": [0, 1], "type": "E"},
+                            {"slice": [1, 2], "type": "addop"},
+                            {
+                                "slice": [2, 7],
+                                "type": "F",
+                                "children": [
+                                    {
+                                        "slice": [2, 5],
+                                        "type": "F",
+                                        "children": [
+                                            {"slice": [2, 3], "type": "E"},
+                                            {"slice": [3, 4], "type": "mulop"},
+                                            {"slice": [4, 5], "type": "E"}
+                                        ]
+                                    },
+                                    {"slice": [5, 6], "type": "mulop"},
+                                    {"slice": [6, 7], "type": "E"}
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "1*2*3*4",
+                "O": [
+                    {
+                        "slice": [0, 7],
+                        "type": "F",
+                        "children": [
+                            {
+                                "slice": [0, 5],
+                                "type": "F",
+                                "children": [
+                                    {
+                                        "slice": [0, 3],
+                                        "type": "F",
+                                        "children": [
+                                            {"slice": [0, 1], "type": "E"},
+                                            {"slice": [1, 2], "type": "mulop"},
+                                            {"slice": [2, 3], "type": "E"}
+                                        ]
+                                    },
+                                    {"slice": [3, 4], "type": "mulop"},
+                                    {"slice": [4, 5], "type": "E"}
+                                ]
+                            },
+                            {"slice": [5, 6], "type": "mulop"},
+                            {"slice": [6, 7], "type": "E"}
+                        ]
+                    }
+                ]
             }
         ]
     }

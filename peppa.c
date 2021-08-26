@@ -4538,6 +4538,15 @@ P4_PegEvalGrammarRule(P4_Node* node, P4_Result* result) {
 
     expr = unwrap_expr(result);
     assert(expr != NULL, "failed to eval grammar rule expression");
+
+    /* special case: for left recursion, rule name must be identical to recursion referece. */
+    if (expr->kind == P4_LeftRecursion && strcmp(expr->recur_ref, rule_name) != 0) {
+        catch_err(
+            P4_PegError,
+            P4_EvalRaisef(result, "unmatched left recursion rule name: %s, %s", rule_name, expr->recur_ref)
+        );
+    }
+
     expr->name = rule_name;
     expr->flag = rule_flag;
 

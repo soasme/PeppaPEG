@@ -864,7 +864,10 @@ decorator = "@" @cut (
 name = reference;
 
 @lifted
-expression = choice;
+expression = left_recursion;
+
+@nonterminal
+left_recursion = choice ("|" @cut reference choice)?;
 
 @nonterminal
 choice = sequence ("/" sequence)*;

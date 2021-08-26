@@ -96,12 +96,13 @@ Rule expressions have the following precedence from highest to lowest:
 * Repeat
 * Sequence
 * Choice
+* Left Recursion
 
-Since choice has the lowest precedence, a rule expression always starts interpreting as a choice of one alternatives:
+Since left recursion has the lowest precedence, a rule expression always starts interpreting as a left recursion.
 
 .. code-block::
 
-    expression = choice;
+    expression = left_recursion;
 
 Primary rule expressions must have one of the following types.
 
@@ -287,6 +288,93 @@ For example:
 .. code-block::
 
    greeter = "Hello World" / "你好，世界" / "Kia Ora";
+
+Left Recursion
+--------------
+
+A left recursion starts with a lhs expression, followed by a | symbol, the same reference to the rule name, and a rhs expression. The full form of left recursion is:
+
+.. code-block::
+
+    left_recursion = lhs ("|" reference rhs)?;
+    lhs = choice;
+    rhs = choice;
+
+Left recursion expression **matches left-hand side sub-expression first, then matches right-hand side sub-expression repeatly**. Whenever a right-hand side expression is matched, together with what has matched by the left-hand side expression, a new node is left recursively added to the tree.
+
+For example, consider the following minimal arithmetic grammar rule,
+
+.. code-block::
+
+    S = E | S add_op E;
+    add_op = "+";
+    E = [0-9];
+
+Rule S is similar to `@nonterminal S = F (add_op F)*;`. Unlike the repetition form generating flat hierarchy, given input 1+2*3, it produces:
+
+.. code-block::
+
+    {
+        "slice": [0, 5],
+        "type": "S",
+        "children": [
+            {
+                "slice": [0, 3],
+                "type": "S",
+                "children": [
+                    {"slice": [0, 1], "type": "E"},
+                    {"slice": [1, 2], "type": "op"},
+                    {"slice": [2, 3], "type": "E"}
+                ]
+            },
+            {"slice": [3, 4], "type": "op"},
+            {"slice": [4, 5], "type": "E"}
+        ]
+    }
+
+Peppa PEG supports a limited form of left recursion in the sense that,
+
+1. Neither lhs nor rhs expression can have left recursion. Otherwise, the implementation may run out of stack space, resulting in stackoverflow.
+2. Indirect left recursion is not allowed, e.g. the reference followed by symbol | must be identical to the rule name.
+3. Left recursion rule cannot be wrapped into a group by using parentheses.
+
+Full adoption of left recursion may bring ambiguity into the result parsing tree, which violates one of the PEG's fundamental characteristics.
+Nonetheless, left recursion is widely used and encouraged form in some CFG parsers, such as EBNF.
+By making this practical decision, users still enjoy a similar form to the regular left recursion grammar rules.
+
+Right Recursion
+---------------
+
+PEG supports right recursion in nature by using sequence, choice and reference to the rule itself.
+
+For example:
+
+.. code-block::
+
+    pow = num "^" pow / num;
+    num = [1-9];
+
+given input 1^2^3, the parser should generate such a tree:
+
+.. code-block::
+
+    {
+        "slice": [0, 5],
+        "type": "pow",
+        "children": [
+            {"slice": [0, 1], "type": "num"},
+            {
+                "slice": [2, 5],
+                "type": "pow",
+                "children": [
+                    {"slice": [2, 3], "type": "num"},
+                    {"slice": [4, 5], "type": "num"}
+                ]
+            },
+        ]
+    }
+
+e.g. (1^(2^3)).
 
 Reference
 ---------

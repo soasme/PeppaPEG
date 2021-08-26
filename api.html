@@ -380,6 +380,11 @@
 <span class="target" id="peppa_8h_1a048293a52ef88f0da76f0ad9c7e2e340a35d9ed50392ef8b94e83fdd9d00ad15e"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_Cut</span></span></span><a class="headerlink" href="#c.P4_ExpressionKind.P4_Cut" title="Permalink to this definition">¶</a><br/></dt>
 <dd><p>Rule: Cut. </p>
 </dd></dl>
+<dl class="c enumerator">
+<dt class="sig sig-object c" id="c.P4_ExpressionKind.P4_LeftRecursion">
+<span class="target" id="peppa_8h_1a048293a52ef88f0da76f0ad9c7e2e340a50c6e57a964277bbfded1ce37d40abb1"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_LeftRecursion</span></span></span><a class="headerlink" href="#c.P4_ExpressionKind.P4_LeftRecursion" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Rule: Left Recursion. </p>
+</dd></dl>
 </dd></dl>
 <dl class="c enum">
 <dt class="sig sig-object c" id="c.P4_Error">
@@ -913,6 +918,40 @@ Example: <div class="highlight-default notranslate"><div class="highlight"><pre>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>A P4_Expression. </p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.P4_CreateLeftRecursion">
+<span class="target" id="peppa_8h_1a12b511890eee34210da96360e9b2773d"></span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="n"><span class="pre">P4_Expression</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">P4_CreateLeftRecursion</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="n"><span class="pre">P4_Expression</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">lhs</span></span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="n"><span class="pre">P4_Expression</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">rhs</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_CreateLeftRecursion" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Create a P4_LeftRecursion expression.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lhs</strong> – Left-hand side of left recursion. </p></li>
+<li><p><strong>rhs</strong> – Right-hand side of left recursion. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A P4_Expression. </p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="c function">
+<dt class="sig sig-object c" id="c.P4_AddLeftRecursion">
+<span class="target" id="peppa_8h_1a7e3ec0f4bbd24b85fd4566ae73d7a7a9"></span><a class="reference internal" href="#c.P4_Error" title="P4_Error"><span class="n"><span class="pre">P4_Error</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">P4_AddLeftRecursion</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#c.P4_Grammar" title="P4_Grammar"><span class="n"><span class="pre">P4_Grammar</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">grammar</span></span>, <a class="reference internal" href="#c.P4_String" title="P4_String"><span class="n"><span class="pre">P4_String</span></span></a><span class="w"> </span><span class="n"><span class="pre">name</span></span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="n"><span class="pre">P4_Expression</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">lhs</span></span>, <a class="reference internal" href="#c.P4_Expression" title="P4_Expression"><span class="n"><span class="pre">P4_Expression</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">rhs</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.P4_AddLeftRecursion" title="Permalink to this definition">¶</a><br/></dt>
+<dd><p>Add a P4_LeftRecursion expression as grammar rule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grammar</strong> – The grammar. </p></li>
+<li><p><strong>name</strong> – The grammar rule name. </p></li>
+<li><p><strong>lhs</strong> – Left-hand side of left recursion. </p></li>
+<li><p><strong>rhs</strong> – Right-hand side of left recursion. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The error code. </p>
 </dd>
 </dl>
 </dd></dl>

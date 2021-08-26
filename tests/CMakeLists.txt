@@ -16,6 +16,7 @@ set(
     test_flags
     test_cut
     test_back_reference
+    test_left_recursion
     test_misc
     test_peg
     test_example_mustache

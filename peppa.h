@@ -215,7 +215,9 @@ typedef enum {
      */
     P4_Repeat,
     /** Rule: Cut. */
-    P4_Cut
+    P4_Cut,
+    /** Rule: Left Recursion. */
+    P4_LeftRecursion
 } P4_ExpressionKind;
 
 /**
@@ -693,6 +695,26 @@ P4_Error       P4_AddNegative(P4_Grammar* grammar, P4_String name, P4_Expression
  *
  */
 P4_Expression* P4_CreateCut();
+
+/**
+ * Create a P4_LeftRecursion expression.
+ *
+ * @param   lhs     Left-hand side of left recursion.
+ * @param   rhs     Right-hand side of left recursion.
+ * @return  A P4_Expression.
+ */
+P4_Expression* P4_CreateLeftRecursion(P4_Expression* lhs, P4_Expression* rhs);
+
+/**
+ * Add a P4_LeftRecursion expression as grammar rule.
+ *
+ * @param   grammar     The grammar.
+ * @param   name        The grammar rule name.
+ * @param   lhs     Left-hand side of left recursion.
+ * @param   rhs     Right-hand side of left recursion.
+ * @return  The error code.
+ */
+P4_Error       P4_AddLeftRecursion(P4_Grammar* grammar, P4_String name, P4_Expression* lhs, P4_Expression* rhs);
 
 /**
  * Create a P4_Sequence expression.

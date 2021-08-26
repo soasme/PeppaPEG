@@ -14,7 +14,7 @@ def test_spec():
             print("invalid json spec")
             exit(1)
 
-    failed, total = 0, 0
+    failed, ignored, total = 0, 0, 0
     for spec in specs:
         for test in spec['tests']:
             total += 1
@@ -56,7 +56,7 @@ def test_spec():
                         f"GOT:\n{proc.stderr.decode('utf-8')}\n"
                     )
                     failed += 1
-            else:
+            elif 'E' in test:
                 assert proc.returncode != 0, proc.stderr
                 if proc.stderr.decode('utf-8').strip() != test['E']:
                     print(
@@ -66,8 +66,10 @@ def test_spec():
                         f"GOT:\n{proc.stderr.decode('utf-8')}"
                     )
                     failed += 1
+            else:
+                ignored += 1
 
-    print("total: %d, failed: %d" % (total, failed))
+    print("total: %d, failed: %d, ignored: %d" % (total, failed, ignored))
     if failed:
         exit(1)
 

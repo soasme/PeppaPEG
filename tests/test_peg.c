@@ -146,6 +146,10 @@ void test_sequence(void) {
     ASSERT_PEG_PARSE("sequence", "\"a\" \"b\"", P4_Ok, "[{\"slice\":[0,7],\"type\":\"sequence\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[4,7],\"type\":\"literal\"}]}]");
 }
 
+void test_left_recursion(void) {
+    ASSERT_PEG_PARSE("left_recursion", "\"x\" | x \"x\"", P4_Ok, "[{\"slice\":[0,11],\"type\":\"left_recursion\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[6,7],\"type\":\"reference\"},{\"slice\":[8,11],\"type\":\"literal\"}]}]");
+}
+
 void test_repeat(void) {
     ASSERT_PEG_PARSE("repeat", "\"a\"*", P4_Ok, "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"zeroormore\"}]}]");
     ASSERT_PEG_PARSE("repeat", "\"a\"+", P4_Ok, "[{\"slice\":[0,4],\"type\":\"repeat\",\"children\":[{\"slice\":[0,3],\"type\":\"literal\"},{\"slice\":[3,4],\"type\":\"onceormore\"}]}]");
@@ -433,6 +437,7 @@ int main(void) {
     RUN_TEST(test_positive);
     RUN_TEST(test_negative);
     RUN_TEST(test_choice);
+    RUN_TEST(test_left_recursion);
     RUN_TEST(test_sequence);
     RUN_TEST(test_repeat);
     RUN_TEST(test_dot);

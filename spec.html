@@ -201,7 +201,8 @@
 <span id="spec"></span><h1>Peppa PEG Specification<a class="headerlink" href="#peppa-peg-specification" title="Permalink to this headline">¶</a></h1>
 <section id="objectives">
 <h2>Objectives<a class="headerlink" href="#objectives" title="Permalink to this headline">¶</a></h2>
-<p>Peppa PEG aims to be a PEG dialect that’s easy to use. Peppa PEG is designed to describe a formal language by extending the original version of PEG with some already-commonly-used symbols and notations. Peppa PEG should be easy to parse source code into an abstract syntax tree for a wide variety of languages.</p>
+<p>Peppa PEG aims to be an opinionated PEG that is easy for parsing the source code into an AST.</p>
+<p>Peppa PEG is designed to describe a formal language by extending the original PEG formalism with some user-friendly symbols and notations, such as repetition and back reference in regular expression, cut in Python PEG Grammar , left recursion in EBNF, modifiers in Pest, etc.</p>
 </section>
 <section id="id1">
 <h2>Spec<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
@@ -434,7 +435,7 @@ rhs = choice;
 <span class="n">E</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="o">-</span><span class="mi">9</span><span class="p">];</span>
 </pre></div>
 </div>
-<p>Rule S is similar to <cite>@nonterminal S = F (add_op F)*;</cite>. Unlike the repetition form generating flat hierarchy, given input 1+2*3, it produces:</p>
+<p>Rule S is similar to <cite>@nonterminal S = F (add_op F)*;</cite>. Unlike the repetition form generating flat hierarchy, given input 1+2+3, it produces such a tree:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">"slice"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
     <span class="s2">"type"</span><span class="p">:</span> <span class="s2">"S"</span><span class="p">,</span>
@@ -456,13 +457,13 @@ rhs = choice;
 </div>
 <p>Peppa PEG supports a limited form of left recursion in the sense that,</p>
 <ol class="arabic simple">
-<li><p>Neither lhs nor rhs expression can have left recursion. Otherwise, the implementation may run out of stack space, resulting in stackoverflow.</p></li>
-<li><p>Indirect left recursion is not allowed, e.g. the reference followed by symbol | must be identical to the rule name.</p></li>
+<li><p>Neither lhs nor rhs expression can have left recursion. Otherwise, the implementation may run out of stack space, resulting in stack overflow.</p></li>
+<li><p>Indirect left recursion is not allowed, e.g, the reference followed by symbol | must be identical to the rule name.</p></li>
 <li><p>Left recursion rule cannot be wrapped into a group by using parentheses.</p></li>
 </ol>
 <p>Full adoption of left recursion may bring ambiguity into the result parsing tree, which violates one of the PEG’s fundamental characteristics.
 Nonetheless, left recursion is widely used and encouraged form in some CFG parsers, such as EBNF.
-By making this practical decision, users still enjoy a similar form to the regular left recursion grammar rules.</p>
+By making this practical decision, users can use PEG with left recursion for a certain of use cases.</p>
 </section>
 <section id="right-recursion">
 <h2>Right Recursion<a class="headerlink" href="#right-recursion" title="Permalink to this headline">¶</a></h2>
@@ -648,13 +649,15 @@ By making this practical decision, users still enjoy a similar form to the regul
 </section>
 <section id="cut">
 <h2>Cut<a class="headerlink" href="#cut" title="Permalink to this headline">¶</a></h2>
-<p>Cut is a decorator written as “@cut”. It always succeeds, but cannot be backtracked.
-It’s used to prevent unwanted backtracking, e.g. to prevent excessive choice options.</p>
+<p>Cut is a decorator written as “~”. It always succeeds, but cannot be backtracked.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cut</span> <span class="o">=</span> <span class="s2">"~"</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>It’s used to prevent unwanted backtracking, e.g. to prevent excessive choice options.</p>
 <p>Backtracking means if e1 in <cite>rule = e1 / e2;</cite> fails, the parser returns the last position where e1 started, and tries e2.
-If there is a <cite>@cut</cite> in e1, any failure after the cutting point will cause rule failed immediately.
+If there is a <cite>~</cite> in e1, any failure after the cutting point will cause rule failed immediately.
 Cut ensures the parse sticks to the current rule, even if it fails to parse.
 See ideas <a class="reference external" href="http://ceur-ws.org/Vol-1269/paper232.pdf">1</a>, <a class="reference external" href="https://news.ycombinator.com/item?id=20503245">2</a>.</p>
-<p>Cut starts with @ and followed by “cut”, e.g. “@cut”.</p>
 <p>For example, let’s first consider the following grammar,</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">value</span> <span class="o">=</span> <span class="n">array</span> <span class="o">/</span> <span class="n">null</span><span class="p">;</span>
 <span class="n">array</span> <span class="o">=</span> <span class="s2">"["</span> <span class="s2">"]"</span><span class="p">;</span>
@@ -664,12 +667,12 @@ See ideas <a class="reference external" href="http://ceur-ws.org/Vol-1269/paper2
 <p>Given input “[”, it attempts matching array first. After failed, it will try null next. At last, value match is failed.</p>
 <p>Let’s add a cut operator:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">value</span> <span class="o">=</span> <span class="n">array</span> <span class="o">/</span> <span class="n">null</span><span class="p">;</span>
-<span class="n">array</span> <span class="o">=</span> <span class="s2">"["</span> <span class="nd">@cut</span> <span class="s2">"]"</span><span class="p">;</span>
+<span class="n">array</span> <span class="o">=</span> <span class="s2">"["</span> <span class="o">~</span> <span class="s2">"]"</span><span class="p">;</span>
 <span class="n">null</span>  <span class="o">=</span> <span class="s2">"null"</span><span class="p">;</span>
 </pre></div>
 </div>
 <p>Given input “[”, it attempts matching array first. After failed, value match is failed immediately.</p>
-<p>Given input “null”, it attempts matching array first. It fails before <cite>@cut</cite> and then failed matching array. Parser then match “null” successfully.</p>
+<p>Given input “null”, it attempts matching array first. It fails before ~ and then failed matching array. Parser then match “null” successfully.</p>
 </section>
 <section id="decorators">
 <h2>Decorators<a class="headerlink" href="#decorators" title="Permalink to this headline">¶</a></h2>
@@ -884,7 +887,7 @@ number = [0-9];
 <tr class="row-even"><td><p><cite>!foo</cite></p></td>
 <td><p>negative</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>@cut</cite></p></td>
+<tr class="row-odd"><td><p><cite>~</cite></p></td>
 <td><p>prevent unwanted backtracking</p></td>
 </tr>
 <tr class="row-even"><td><p><cite>foo*</cite></p></td>
@@ -922,10 +925,10 @@ number = [0-9];
 start_of_input = &amp;.;
 end_of_input = !.;
 
-rule = decorators name @cut "=" expression ";";
+rule = decorators name ~ "=" expression ";";
 
 decorators = decorator*;
-decorator = "@" @cut (
+decorator = "@" ~ (
     "squashed"
     / "scoped"
     / "spaced"
@@ -941,7 +944,7 @@ name = reference;
 expression = left_recursion;
 
 @nonterminal
-left_recursion = choice ("|" @cut reference choice)?;
+left_recursion = choice ("|" ~ reference choice)?;
 
 @nonterminal
 choice = sequence ("/" sequence)*;
@@ -980,7 +983,7 @@ primary = literal
         / cut;
 
 @squashed @tight
-literal = "\"" @cut chars "\"";
+literal = "\"" ~ chars "\"";
 chars = char*;
 @squashed @tight
 char = [\x20-\x21] / [\x23-\x5b] / [\x5d-\U0010ffff] / (
@@ -993,9 +996,9 @@ char = [\x20-\x21] / [\x23-\x5b] / [\x5d-\U0010ffff] / (
         / "n"
         / "r"
         / "t"
-        / ("x" @cut two_hexdigits)
-        / ("u" @cut four_hexdigits)
-        / ("U" @cut eight_hexdigits)
+        / ("x" ~ two_hexdigits)
+        / ("u" ~ four_hexdigits)
+        / ("U" ~ eight_hexdigits)
     )
 );
 
@@ -1014,13 +1017,13 @@ insensitive = "i" (literal / back_reference);
 reference = ([a-z] / [A-Z] / "_") ([a-z] / [A-Z] / [0-9] / "_")*;
 
 @tight
-back_reference = "\\" @cut number;
+back_reference = "\\" ~ number;
 
-positive = "&amp;" @cut primary;
-negative = "!" @cut primary;
+positive = "&amp;" ~ primary;
+negative = "!" ~ primary;
 
 dot = ".";
-cut = "@cut";
+cut = "~";
 
 hexdigit = [0-9] / [a-f] / [A-F];
 two_hexdigits = hexdigit{2};

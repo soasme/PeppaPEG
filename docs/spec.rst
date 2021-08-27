@@ -6,7 +6,9 @@ Peppa PEG Specification
 Objectives
 ----------
 
-Peppa PEG aims to be a PEG dialect that's easy to use. Peppa PEG is designed to describe a formal language by extending the original version of PEG with some already-commonly-used symbols and notations. Peppa PEG should be easy to parse source code into an abstract syntax tree for a wide variety of languages.
+Peppa PEG aims to be an opinionated PEG that is easy for parsing the source code into an AST.
+
+Peppa PEG is designed to describe a formal language by extending the original PEG formalism with some user-friendly symbols and notations, such as repetition and back reference in regular expression, cut in Python PEG Grammar , left recursion in EBNF, modifiers in Pest, etc.
 
 Spec
 -----

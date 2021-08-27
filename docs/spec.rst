@@ -6,7 +6,9 @@ Peppa PEG Specification
 Objectives
 ----------
 
-Peppa PEG aims to be a PEG dialect that's easy to use. Peppa PEG is designed to describe a formal language by extending the original version of PEG with some already-commonly-used symbols and notations. Peppa PEG should be easy to parse source code into an abstract syntax tree for a wide variety of languages.
+Peppa PEG aims to be an opinionated PEG that is easy for parsing the source code into an AST.
+
+Peppa PEG is designed to describe a formal language by extending the original PEG formalism with some user-friendly symbols and notations, such as repetition and back reference in regular expression, cut in Python PEG Grammar , left recursion in EBNF, modifiers in Pest, etc.
 
 Spec
 -----
@@ -310,7 +312,7 @@ For example, consider the following minimal arithmetic grammar rule,
     add_op = "+";
     E = [0-9];
 
-Rule S is similar to `@nonterminal S = F (add_op F)*;`. Unlike the repetition form generating flat hierarchy, given input 1+2*3, it produces:
+Rule S is similar to `@nonterminal S = F (add_op F)*;`. Unlike the repetition form generating flat hierarchy, given input 1+2+3, it produces such a tree:
 
 .. code-block::
 
@@ -334,13 +336,13 @@ Rule S is similar to `@nonterminal S = F (add_op F)*;`. Unlike the repetition fo
 
 Peppa PEG supports a limited form of left recursion in the sense that,
 
-1. Neither lhs nor rhs expression can have left recursion. Otherwise, the implementation may run out of stack space, resulting in stackoverflow.
-2. Indirect left recursion is not allowed, e.g. the reference followed by symbol | must be identical to the rule name.
+1. Neither lhs nor rhs expression can have left recursion. Otherwise, the implementation may run out of stack space, resulting in stack overflow.
+2. Indirect left recursion is not allowed, e.g, the reference followed by symbol | must be identical to the rule name.
 3. Left recursion rule cannot be wrapped into a group by using parentheses.
 
 Full adoption of left recursion may bring ambiguity into the result parsing tree, which violates one of the PEG's fundamental characteristics.
 Nonetheless, left recursion is widely used and encouraged form in some CFG parsers, such as EBNF.
-By making this practical decision, users still enjoy a similar form to the regular left recursion grammar rules.
+By making this practical decision, users can use PEG with left recursion for a certain of use cases.
 
 Right Recursion
 ---------------
@@ -582,15 +584,18 @@ For example,
 Cut
 ---
 
-Cut is a decorator written as "@cut". It always succeeds, but cannot be backtracked.
+Cut is a decorator written as "~". It always succeeds, but cannot be backtracked.
+
+.. code-block::
+
+    cut = "~";
+
 It's used to prevent unwanted backtracking, e.g. to prevent excessive choice options.
 
 Backtracking means if e1 in `rule = e1 / e2;` fails, the parser returns the last position where e1 started, and tries e2.
-If there is a `@cut` in e1, any failure after the cutting point will cause rule failed immediately.
+If there is a `~` in e1, any failure after the cutting point will cause rule failed immediately.
 Cut ensures the parse sticks to the current rule, even if it fails to parse.
 See ideas `1 <http://ceur-ws.org/Vol-1269/paper232.pdf>`_, `2 <https://news.ycombinator.com/item?id=20503245>`_.
-
-Cut starts with @ and followed by "cut", e.g. "@cut".
 
 For example, let's first consider the following grammar,
 
@@ -607,12 +612,12 @@ Let's add a cut operator:
 .. code-block::
 
     value = array / null;
-    array = "[" @cut "]";
+    array = "[" ~ "]";
     null  = "null";
 
 Given input "[", it attempts matching array first. After failed, value match is failed immediately.
 
-Given input "null", it attempts matching array first. It fails before `@cut` and then failed matching array. Parser then match "null" successfully.
+Given input "null", it attempts matching array first. It fails before ~ and then failed matching array. Parser then match "null" successfully.
 
 Decorators
 ----------
@@ -838,7 +843,7 @@ Cheatsheet
      - positive
    * - `!foo`
      - negative
-   * - `@cut`
+   * - `~`
      - prevent unwanted backtracking
    * - `foo*`
      - zero or more

@@ -8,7 +8,6 @@
 - [ ] peg: `@reserved rule = "key"`. `!("key" / "word") identifier` can be optimized to use  check registered to P4_Source , rather than checking one by one. the other way around is like process in [autumn](https://github.com/norswap/autumn/blob/master/doc/A7-reserved-words-and-identifiers.md#reserved-word-and-identifiers-in-autumn).
 - [ ] peg: support `@inside(XXX)`, `@outside(XXX)` decorator: it can check if XXX is in the frame stack. can support second number parameter to limit the frame stack backtrack. example: golang CompositeLit should be inside an ExpressionGroup if inside IfStmt,ForStmt,SwitchStmt, otherwise it is ambiguous: `Literal = BasicLit / @outside(IfStmt / ForStmt / SwitchStmt) CompositeLit / @inside(IfStmt / ForStmt / SwitchStmt) @inside(ExpressionGroup) CompositeLit / FunctionLit ;`.
 - [ ] peg: matching parent successfully immediately. example: semicolons in golang, autoreplace U+FFFD to U+0A in markdown. `identifier = letter (letter / unicode_digit)* (&newline @inside(Statement) @success(Statement))?;`.
-- [ ] peg: move decorators after "=".
 - [ ] api: support locale, utf-8, utf-16, utf-32 encoding.
 - [ ] peg: support action code `-> { ...; ...; @squashed; }`: children node will be produced but eventually be squashed.
 - [ ] peg: support action code `rule = (a b) -> { some action code here }` if the action is applied to the whole sequence.
@@ -24,9 +23,6 @@
 - [ ] peg: support multiple ranges in []: `[0-9a-zA-Z]`.
 - [ ] api: jsonify support pretty print (indent, newline).
 - [ ] shell: compile peg to LLVM IR/bitcode code (can use LLVM to compile to C, JS).
-- [ ] peg: `@sibling_to_descdent`. can be used to transform cases like toml [key1.key2], key2 should be a child of key1.
-- [ ] peg: `@right_recursion`.
-- [ ] peg: `@left_recursion`. can be used to transform cases like expression: `a = b @left_recursion (minus/plus/mul/div) b`, the left side of `@left_recursion` is operand, the right side is infix and the other operand. Given 1+2+3, it will produce `{{1, +, 2}, + 3}`.
 - [ ] ci: support windows.
 - [ ] ci: publish binary to github release.
 - [ ] ci: publish ppa.
@@ -37,7 +33,7 @@
 - [ ] api: save backreference in source stack so it can be used outside a sequence.
 - [ ] api: until.
 - [ ] api: Sanitize `\0` to whitespace for the source input, this happens in creating the source/setting the source size. Example: Python Parser.
-- [ ] api: support UTF-8 BOM sequence (0xEF 0xBB 0xBF) at the start of source.
+- [ ] api: support UTF-8 BOM sequence (0xEF 0xBB 0xBF) at the start of source. can be done via unistring: P4_LoadSource, if s startswith these three byte marks, add pseudo slice.
 - [ ] api: register a function for matching source. This should help dealing with some inputs difficult to parse.
 - [ ] api: add `expect_rule_id`, instead of saving `errmsg`.
 - [ ] peg: numeric.
@@ -65,6 +61,9 @@
 - [ ] peg: support Python-style INDENT rule.
 - [ ] api: print grammar and/or rules.
 - [ ] refactor: move some variables to `frame` to reduce function frame size.
+- [x] peg: ~~`@sibling_to_descdent`. can be used to transform cases like toml [key1.key2], key2 should be a child of key1.~~ This can be done via right recursion: key = identifier "." key / identifier;
+- [x] peg: right_recursion. updated right recursion in spec. v1.16.0
+- [x] peg: left_recursion. can be used to transform cases like expression: `a = b @left_recursion (minus/plus/mul/div) b`, the left side of `@left_recursion` is operand, the right side is infix and the other operand. Given 1+2+3, it will produce `{{1, +, 2}, + 3}`. v1.16.0
 - [x] shell: `p4 ast --grammar --rule --input`. Return json tree in stdout or error in stderr. v1.15.0
 - [x] ~~shell: `p4 test spec.yml`. The spec contains an array of [name, grammar(/path/to/peg,./path/to/peg,toml,c99,...), rule, input, output, error].~~ this is done by `scripts/check_spec.py`. v1.15.0.
 - [x] build: binary cli - shell.c. v1.15.0

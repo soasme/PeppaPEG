@@ -310,7 +310,7 @@ For example, consider the following minimal arithmetic grammar rule,
     add_op = "+";
     E = [0-9];
 
-Rule S is similar to `@nonterminal S = F (add_op F)*;`. Unlike the repetition form generating flat hierarchy, given input 1+2*3, it produces:
+Rule S is similar to `@nonterminal S = F (add_op F)*;`. Unlike the repetition form generating flat hierarchy, given input 1+2+3, it produces such a tree:
 
 .. code-block::
 
@@ -334,13 +334,13 @@ Rule S is similar to `@nonterminal S = F (add_op F)*;`. Unlike the repetition fo
 
 Peppa PEG supports a limited form of left recursion in the sense that,
 
-1. Neither lhs nor rhs expression can have left recursion. Otherwise, the implementation may run out of stack space, resulting in stackoverflow.
-2. Indirect left recursion is not allowed, e.g. the reference followed by symbol | must be identical to the rule name.
+1. Neither lhs nor rhs expression can have left recursion. Otherwise, the implementation may run out of stack space, resulting in stack overflow.
+2. Indirect left recursion is not allowed, e.g, the reference followed by symbol | must be identical to the rule name.
 3. Left recursion rule cannot be wrapped into a group by using parentheses.
 
 Full adoption of left recursion may bring ambiguity into the result parsing tree, which violates one of the PEG's fundamental characteristics.
 Nonetheless, left recursion is widely used and encouraged form in some CFG parsers, such as EBNF.
-By making this practical decision, users still enjoy a similar form to the regular left recursion grammar rules.
+By making this practical decision, users can use PEG with left recursion for a certain of use cases.
 
 Right Recursion
 ---------------

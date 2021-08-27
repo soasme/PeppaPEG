@@ -1,11 +1,28 @@
 [
   {
+    "desc": "Number",
+    "grammar_file": "./peppa.peg",
+    "entry": "number",
+    "tests": [
+      {
+        "I": "0",
+        "O": [
+          {
+            "slice": [0, 1],
+            "type": "number"
+          }
+        ]
+      }
+    ]
+  },
+
+  {
     "desc": "Primary",
     "grammar_file": "./peppa.peg",
     "entry": "grammar",
     "tests": [
       {
-        "desc": "x",
+        "N": "Dot expression",
         "I": "x = .;",
         "O": [
           {
@@ -41,6 +58,270 @@
             ]
           }
         ]
+      }
+    ]
+  },
+
+  {
+    "desc": "Left Recursion",
+    "grammar_file": "./peppa.peg",
+    "entry": "grammar",
+    "tests": [
+      {
+        "N": "Left recursion ",
+        "I": "x = \"x\" | x \"x\";",
+        "O": [
+          {
+            "slice": [
+              0,
+              16
+            ],
+            "type": "grammar",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  16
+                ],
+                "type": "rule",
+                "children": [
+                  {
+                    "slice": [
+                      0,
+                      1
+                    ],
+                    "type": "name"
+                  },
+                  {
+                    "slice": [
+                      4,
+                      15
+                    ],
+                    "type": "left_recursion",
+                    "children": [
+                      {
+                        "slice": [
+                          4,
+                          7
+                        ],
+                        "type": "literal"
+                      },
+                      {
+                        "slice": [
+                            10,
+                            11
+                        ],
+                        "type": "reference"
+                      },
+                      {
+                        "slice": [
+                            12,
+                            15
+                        ],
+                        "type": "literal"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "N": "Left recursion precedence is lower than choice",
+        "I": "x = \"x\" / \"y\" | x \"x\" / \"y\";",
+        "O": [
+          {
+            "slice": [
+              0,
+              28
+            ],
+            "type": "grammar",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  28
+                ],
+                "type": "rule",
+                "children": [
+                  {
+                    "slice": [
+                      0,
+                      1
+                    ],
+                    "type": "name"
+                  },
+                  {
+                    "slice": [
+                      4,
+                      27
+                    ],
+                    "type": "left_recursion",
+                    "children": [
+                      {
+                        "slice": [
+                          4,
+                          14
+                        ],
+                        "type": "choice",
+                        "children": [
+                          {
+                            "slice": [
+                                4,
+                                7
+                            ],
+                            "type": "literal"
+                          },
+                          {
+                            "slice": [
+                                10,
+                                13
+                            ],
+                            "type": "literal"
+                          }
+                        ]
+                      },
+                      {
+                        "slice": [
+                            16,
+                            17
+                        ],
+                        "type": "reference"
+                      },
+                      {
+                        "slice": [
+                            18,
+                            27
+                        ],
+                        "type": "choice",
+                        "children": [
+                          {
+                            "slice": [
+                                18,
+                                21
+                            ],
+                            "type": "literal"
+                          },
+                          {
+                            "slice": [
+                                24,
+                                27
+                            ],
+                            "type": "literal"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "N": "Grouping choices within left recursion is highly recommended",
+        "I": "x = (\"x\" / \"y\") | x (\"x\" / \"y\");",
+        "O": [
+          {
+            "slice": [
+              0,
+              32
+            ],
+            "type": "grammar",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  32
+                ],
+                "type": "rule",
+                "children": [
+                  {
+                    "slice": [
+                      0,
+                      1
+                    ],
+                    "type": "name"
+                  },
+                  {
+                    "slice": [
+                      4,
+                      31
+                    ],
+                    "type": "left_recursion",
+                    "children": [
+                      {
+                        "slice": [
+                          5,
+                          14
+                        ],
+                        "type": "choice",
+                        "children": [
+                          {
+                            "slice": [
+                                5,
+                                8
+                            ],
+                            "type": "literal"
+                          },
+                          {
+                            "slice": [
+                                11,
+                                14
+                            ],
+                            "type": "literal"
+                          }
+                        ]
+                      },
+                      {
+                        "slice": [
+                            18,
+                            19
+                        ],
+                        "type": "reference"
+                      },
+                      {
+                        "slice": [
+                            21,
+                            30
+                        ],
+                        "type": "choice",
+                        "children": [
+                          {
+                            "slice": [
+                                21,
+                                24
+                            ],
+                            "type": "literal"
+                          },
+                          {
+                            "slice": [
+                                27,
+                                30
+                            ],
+                            "type": "literal"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "N": "Left recursion reference must not be included in parentheses.",
+        "I": "x = \"x\" | (x \"x\");",
+        "E": "CutError: line 1:11, expect reference"
+      },
+      {
+        "N": "Left recursion with wrong reference is invalid. This is checked in runtime.",
+        "I": "x = \"x\" | y \"x\"; y = \"y\";"
       }
     ]
   }

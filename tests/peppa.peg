@@ -3,10 +3,10 @@ grammar = start_of_input rule+ end_of_input;
 start_of_input = &.;
 end_of_input = !.;
 
-rule = decorators name @cut "=" expression ";";
+rule = decorators name ~ "=" expression ";";
 
 decorators = decorator*;
-decorator = "@" @cut (
+decorator = "@" ~ (
     "squashed"
     / "scoped"
     / "spaced"
@@ -19,7 +19,10 @@ decorator = "@" @cut (
 name = reference;
 
 @lifted
-expression = choice;
+expression = left_recursion;
+
+@nonterminal
+left_recursion = choice ("|" ~ reference choice)?;
 
 @nonterminal
 choice = sequence ("/" sequence)*;
@@ -58,7 +61,7 @@ primary = literal
         / cut;
 
 @squashed @tight
-literal = "\"" @cut chars "\"";
+literal = "\"" ~ chars "\"";
 chars = char*;
 @squashed @tight
 char = [\x20-\x21] / [\x23-\x5b] / [\x5d-\U0010ffff] / (
@@ -71,9 +74,9 @@ char = [\x20-\x21] / [\x23-\x5b] / [\x5d-\U0010ffff] / (
         / "n"
         / "r"
         / "t"
-        / ("x" @cut two_hexdigits)
-        / ("u" @cut four_hexdigits)
-        / ("U" @cut eight_hexdigits)
+        / ("x" ~ two_hexdigits)
+        / ("u" ~ four_hexdigits)
+        / ("U" ~ eight_hexdigits)
     )
 );
 
@@ -92,13 +95,13 @@ insensitive = "i" (literal / back_reference);
 reference = ([a-z] / [A-Z] / "_") ([a-z] / [A-Z] / [0-9] / "_")*;
 
 @tight
-back_reference = "\\" @cut number;
+back_reference = "\\" ~ number;
 
-positive = "&" @cut primary;
-negative = "!" @cut primary;
+positive = "&" ~ primary;
+negative = "!" ~ primary;
 
 dot = ".";
-cut = "@cut";
+cut = "~";
 
 hexdigit = [0-9] / [a-f] / [A-F];
 two_hexdigits = hexdigit{2};

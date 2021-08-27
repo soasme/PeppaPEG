@@ -16,6 +16,7 @@ set(
     test_flags
     test_cut
     test_back_reference
+    test_left_recursion
     test_misc
     test_peg
     test_example_mustache
@@ -74,6 +75,7 @@ set(
     test_insensitive_spec
     test_sequence_spec
     test_choice_spec
+    test_left_recursion_spec
     test_lookahead_spec
     test_cut_spec
     test_repeat_spec

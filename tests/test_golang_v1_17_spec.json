@@ -394,5 +394,126 @@
                 "N": "IGNORED: illegal: invalid Unicode code point. Peppa PEG can't support it currently."
             }
         ]
+    },
+
+    {
+        "desc": "FunctionLit",
+        "grammar_file": "./golang-v1.17.peg",
+        "entry": "Literal",
+        "tests": [
+            {
+                "I": "func(){}",
+                "O": [
+                    {"slice": [0, 8], "type": "FunctionLit", "children": [
+                        {"slice": [4, 6], "type": "Signature", "children": [
+                            {"slice": [4, 6], "type": "Parameters"}
+                        ]},
+                        {"slice": [6, 8], "type": "Block"}
+                    ]}
+                ]
+            }
+        ]
+    },
+
+    {
+        "desc": "StatementList",
+        "grammar_file": "./golang-v1.17.peg",
+        "entry": "StatementList",
+        "tests": [
+            {
+                "N": "EOL terminates a statement.",
+                "I": "a=1",
+                "O": [
+                    {"slice": [0, 3], "type": "StatementList", "children": [
+                        {"slice": [0, 3], "type": "Assignment", "children": [
+                            {"slice": [0, 1], "type": "identifier"},
+                            {"slice": [1, 2], "type": "assign_op"},
+                            {"slice": [2, 3], "type": "decimal_lit"}
+                        ]}
+                    ]}
+                ]
+            },
+            {
+                "N": "Semicolon terminates a statement.",
+                "I": "a=1;",
+                "O": [
+                    {"slice": [0, 4], "type": "StatementList", "children": [
+                        {"slice": [0, 3], "type": "Assignment", "children": [
+                            {"slice": [0, 1], "type": "identifier"},
+                            {"slice": [1, 2], "type": "assign_op"},
+                            {"slice": [2, 3], "type": "decimal_lit"}
+                        ]}
+                    ]}
+                ]
+            },
+            {
+                "N": "Auto-Semicolon terminates a statement.",
+                "I": "a=1\n",
+                "O": [
+                    {"slice": [0, 4], "type": "StatementList", "children": [
+                        {"slice": [0, 3], "type": "Assignment", "children": [
+                            {"slice": [0, 1], "type": "identifier"},
+                            {"slice": [1, 2], "type": "assign_op"},
+                            {"slice": [2, 3], "type": "decimal_lit"}
+                        ]}
+                    ]}
+                ]
+            },
+            {
+                "I": "a=1\nb=2",
+                "O": [
+                    {"slice": [0, 7], "type": "StatementList", "children": [
+                        {"slice": [0, 3], "type": "Assignment", "children": [
+                            {"slice": [0, 1], "type": "identifier"},
+                            {"slice": [1, 2], "type": "assign_op"},
+                            {"slice": [2, 3], "type": "decimal_lit"}
+                        ]},
+                        {"slice": [4, 7], "type": "Assignment", "children": [
+                            {"slice": [4, 5], "type": "identifier"},
+                            {"slice": [5, 6], "type": "assign_op"},
+                            {"slice": [6, 7], "type": "decimal_lit"}
+                        ]}
+                    ]}
+                ]
+            },
+            {
+                "I": "a=1\n*b=2",
+                "O": [
+                    {"slice": [0, 8], "type": "StatementList", "children": [
+                        {"slice": [0, 3], "type": "Assignment", "children": [
+                            {"slice": [0, 1], "type": "identifier"},
+                            {"slice": [1, 2], "type": "assign_op"},
+                            {"slice": [2, 3], "type": "decimal_lit"}
+                        ]},
+                        {"slice": [4, 8], "type": "Assignment", "children": [
+                            {"slice": [4, 6], "type": "UnaryExpr", "children": [
+                                {"slice": [4, 5], "type": "unary_op"},
+                                {"slice": [5, 6], "type": "identifier"}
+                            ]},
+                            {"slice": [6, 7], "type": "assign_op"},
+                            {"slice": [7, 8], "type": "decimal_lit"}
+                        ]}
+                    ]}
+                ]
+            },
+            {
+                "I": "a=1\n*b",
+                "O": [
+                    {"slice": [0, 6], "type": "StatementList", "children": [
+                        {"slice": [0, 3], "type": "Assignment", "children": [
+                            {"slice": [0, 1], "type": "identifier"},
+                            {"slice": [1, 2], "type": "assign_op"},
+                            {"slice": [2, 3], "type": "decimal_lit"}
+                        ]},
+                        {"slice": [4, 6], "type": "ExpressionStmt", "children": [
+                            {"slice": [4, 6], "type": "UnaryExpr", "children": [
+                                {"slice": [4, 5], "type": "unary_op"},
+                                {"slice": [5, 6], "type": "identifier"}
+                            ]}
+                        ]}
+                    ]}
+                ]
+            }
+        ]
     }
 ]

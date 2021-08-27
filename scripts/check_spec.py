@@ -45,7 +45,7 @@ def test_spec():
                             f"GRAMMAR:\n{spec.get('grammar') or spec.get('grammar_file')}\n"
                             f"INPUT:\n{test['I']}\n"
                             f"OUTPUT:\n{test['O']}\n"
-                            f"GOT:\n{json.dumps(output)}\n"
+                            f"GOT:\n{json.dumps(output)}{proc.stderr.decode('utf-8')}\n"
                         )
                         failed += 1
                 else:

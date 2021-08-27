@@ -1,13 +1,16 @@
-newline        = "\x0a";
+newline        = "\n";
+
+@lifted
+eol            = ";" / "\n" / !.;
 
 @lifted @squashed
 whitespace = " " / "\t" / "\r" / "\n";
 
 @lifted @squashed
-comment = "//" (!"\n" .)* "\n"?
+comment = "//" (!"\n" .)* (&"\n"/!.)
         / "/*" (!"*/" .)* "*/";
 
-@spaced @lifted
+@lifted
 ws = whitespace / comment;
 
 @lifted
@@ -141,7 +144,7 @@ KeyType     = Type ;
 ChannelType = ( "chan" / "chan" "<-" / "<-" "chan" ) ElementType ;
 
 Block = "{" ~ StatementList? "}" ;
-StatementList = (Statement ";"?)+ ;
+StatementList = (Statement linews* eol)+ ;
 
 Declaration   = ConstDecl / TypeDecl / VarDecl ;
 TopLevelDecl  = Declaration / MethodDecl / FunctionDecl ;
@@ -151,7 +154,7 @@ ConstSpec      = IdentifierList (Type? "=" ExpressionList)? ;
 
 @scoped
 IdentifierList = identifier ("," ~ identifier)* ;
-@scoped
+@scoped @nonterminal
 ExpressionList = Expression ("," ~ Expression)*;
 
 TypeDecl = "type" ( TypeSpec / "(" (TypeSpec ";"?)* ")" ) ;
@@ -168,6 +171,7 @@ ShortVarDecl = IdentifierList ":=" ExpressionList ;
 
 FunctionDecl = "func" FunctionName ~ Signature FunctionBody? ;
 FunctionName = identifier ;
+@lifted
 FunctionBody = Block ;
 
 MethodDecl = "func" Receiver MethodName ~ Signature FunctionBody? ;
@@ -180,7 +184,7 @@ Operand     = Literal / OperandName / "(" Expression ")" ;
 Literal     = BasicLit / CompositeLit / FunctionLit ;
 @lifted
 BasicLit    = imaginary_lit / float_lit / int_lit / rune_lit / string_lit ;
-@nonterminal
+@lifted
 OperandName = QualifiedIdent / identifier;
 
 QualifiedIdent = PackageName "." identifier ;
@@ -195,7 +199,7 @@ Key           = FieldName / Expression / LiteralValue ;
 FieldName     = identifier ;
 Element       = Expression / LiteralValue ;
 
-FunctionLit = "func" Signature FunctionBody ;
+FunctionLit = "func" ~ Signature FunctionBody ;
 
 @nonterminal
 PrimaryExpr = (Operand / Conversion / MethodExpr) (Selector / Index / Slice / TypeAssertion / Arguments)*;
@@ -211,7 +215,7 @@ MethodExpr    = ReceiverType "." MethodName ;
 ReceiverType  = Type ;
 
 @nonterminal @tight
-Expression = UnaryExpr linews* (binary_op ~ ws* UnaryExpr)*;
+Expression = UnaryExpr (linews* binary_op ~ ws* UnaryExpr)*;
 # Expression = UnaryExpr | Expression binary_op Expression .
 
 @nonterminal @scoped
@@ -235,12 +239,14 @@ unary_op   = "+" / "-" / "!" / "^" / "*" / "&" / "<-" ;
 
 Conversion = Type "(" Expression ","? ")" ;
 
+@lifted
 Statement =
 	IfStmt / ReturnStmt / ForStmt / Declaration / LabeledStmt /
 	GoStmt / BreakStmt / ContinueStmt / GotoStmt /
 	FallthroughStmt / SwitchStmt / SelectStmt /
 	DeferStmt / Block / SimpleStmt;
 
+@lifted
 SimpleStmt = SendStmt / IncDecStmt / Assignment / ShortVarDecl / ExpressionStmt;
 
 EmptyStmt = &. ;

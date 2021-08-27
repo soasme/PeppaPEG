@@ -1,7 +1,7 @@
 newline        = "\n";
 
 @lifted
-eol            = (" " / "\t")* (";" / "\n" / !. / line_comment);
+eol            = (" " / "\t" / block_comment)* (";" / "\n" / !. / line_comment);
 
 @lifted @squashed
 whitespace = " " / "\t" / "\r" / "\n";
@@ -149,7 +149,7 @@ KeyType     = Type ;
 ChannelType = ( "chan" / "chan" "<-" / "<-" "chan" ) ElementType ;
 
 Block = "{" ~ ws* StatementList? ws* "}" ;
-StatementList = (Statement linews* eol)+ ;
+StatementList = (linews* Statement eol+)+ ;
 
 Declaration   = ConstDecl / TypeDecl / VarDecl ;
 TopLevelDecl  = Declaration / MethodDecl / FunctionDecl ;
@@ -157,20 +157,20 @@ TopLevelDecl  = Declaration / MethodDecl / FunctionDecl ;
 ConstDecl      = "const" ~ ( "(" ~ (ConstSpec ";"?)* ")" / ConstSpec) ;
 ConstSpec      = IdentifierList (Type? "=" ExpressionList)? ;
 
-@scoped
-IdentifierList = identifier ("," ~ identifier)* ;
-@scoped @nonterminal
+IdentifierList = identifier (linews* "," ~ linews* identifier)* ;
+
+@nonterminal
 ExpressionList = Expression (linews* "," ~ linews* Expression)*;
 
-TypeDecl = "type" ( TypeSpec / "(" (TypeSpec ";"?)* ")" ) ;
+TypeDecl = "type" ~ linews+ ( TypeSpec / "(" ws* (TypeSpec linews* eol)* linews* ")" ) ;
 TypeSpec = AliasDecl / TypeDef ;
 
-AliasDecl = identifier "=" Type ;
+AliasDecl = identifier linews* "=" linews* Type ;
 
-TypeDef = identifier Type ;
+TypeDef = identifier linews+ Type ;
 
-VarDecl     = "var" ( VarSpec / "(" (VarSpec ";"?)* ")" ) ;
-VarSpec     = IdentifierList ( Type ("=" ExpressionList)? / "=" ExpressionList ) ;
+VarDecl     = "var" ~ linews+ ( VarSpec / "(" (ws* VarSpec linews* eol)* linews* ")" ) ;
+VarSpec     = IdentifierList ~ linews* ( Type (linews* "=" linews* ExpressionList)? / "=" linews* ExpressionList ) ;
 
 ShortVarDecl = IdentifierList ":=" ExpressionList ;
 
@@ -189,6 +189,7 @@ Operand     = Literal / OperandName / "(" Expression ")" ;
 Literal     = BasicLit / CompositeLit / FunctionLit ;
 @lifted
 BasicLit    = imaginary_lit / float_lit / int_lit / rune_lit / string_lit ;
+
 @lifted
 OperandName = QualifiedIdent / identifier;
 
@@ -204,7 +205,7 @@ Key           = FieldName / Expression / LiteralValue ;
 FieldName     = identifier ;
 Element       = Expression / LiteralValue ;
 
-FunctionLit = "func" ~ Signature FunctionBody ;
+FunctionLit = "func" ~ linews* Signature linews* FunctionBody ;
 
 @nonterminal
 PrimaryExpr = (Operand / Conversion / MethodExpr) (Selector / Index / Slice / TypeAssertion / Arguments)*;
@@ -266,11 +267,11 @@ Channel  = Expression ;
 
 IncDecStmt = Expression ( "++" / "--" );
 
-Assignment = ExpressionList assign_op ExpressionList ;
+Assignment = ExpressionList linews* assign_op linews* ExpressionList ;
 
 assign_op = (add_op / mul_op)? "=" ;
 
-IfStmt = "if" ~ (SimpleStmt ";")? UnambiguousExpression Block ("else" ( IfStmt / Block ))? ;
+IfStmt = "if" ~ linews+ (SimpleStmt eol)? linews* UnambiguousExpression linews* Block ("else" ws* ( IfStmt / Block ))? ;
 
 SwitchStmt = ExprSwitchStmt / TypeSwitchStmt ;
 
@@ -284,17 +285,17 @@ TypeCaseClause  = TypeSwitchCase ":" StatementList ;
 TypeSwitchCase  = "case" TypeList / "default" ;
 TypeList        = Type ("," Type)* ;
 
-ForStmt = "for" ~ (RangeClause / ForClause / Condition)? Block ;
+ForStmt = "for" ~ linews+ (RangeClause / ForClause / Condition)? linews* Block ;
 Condition = UnambiguousExpression ;
 
 ForClause = InitStmt?  ";" Condition?  ";" PostStmt?  ;
 InitStmt = SimpleStmt ;
 PostStmt = SimpleStmt ;
 
-RangeClause = (ExpressionList "=" / IdentifierList ":=")? "range" Expression;
+RangeClause = (ExpressionList linews* "=" / IdentifierList linews* ":=")? linews* "range" linews+ Expression;
 
 
-GoStmt = "go" ws+ Expression ;
+GoStmt = "go" linews+ Expression ;
 
 SelectStmt = "select" "{" CommClause*  "}" ;
 CommClause = CommCase ":" StatementList ;

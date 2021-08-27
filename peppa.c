@@ -3911,7 +3911,7 @@ P4_Grammar* P4_CreatePegGrammar () {
     catch_err(P4_SetGrammarRuleFlag(grammar, "repeat", P4_FLAG_NON_TERMINAL));
 
     catch_err(P4_AddLiteral(grammar, "dot", ".", true));
-    catch_err(P4_AddLiteral(grammar, "cut", "@cut", true));
+    catch_err(P4_AddLiteral(grammar, "cut", "~", true));
 
     catch_err(P4_AddChoiceWithMembers(grammar, "primary", 10,
         P4_CreateReference("literal"),

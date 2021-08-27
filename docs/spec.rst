@@ -582,15 +582,18 @@ For example,
 Cut
 ---
 
-Cut is a decorator written as "@cut". It always succeeds, but cannot be backtracked.
+Cut is a decorator written as "~". It always succeeds, but cannot be backtracked.
+
+.. code-block::
+
+    cut = "~";
+
 It's used to prevent unwanted backtracking, e.g. to prevent excessive choice options.
 
 Backtracking means if e1 in `rule = e1 / e2;` fails, the parser returns the last position where e1 started, and tries e2.
-If there is a `@cut` in e1, any failure after the cutting point will cause rule failed immediately.
+If there is a `~` in e1, any failure after the cutting point will cause rule failed immediately.
 Cut ensures the parse sticks to the current rule, even if it fails to parse.
 See ideas `1 <http://ceur-ws.org/Vol-1269/paper232.pdf>`_, `2 <https://news.ycombinator.com/item?id=20503245>`_.
-
-Cut starts with @ and followed by "cut", e.g. "@cut".
 
 For example, let's first consider the following grammar,
 
@@ -607,12 +610,12 @@ Let's add a cut operator:
 .. code-block::
 
     value = array / null;
-    array = "[" @cut "]";
+    array = "[" ~ "]";
     null  = "null";
 
 Given input "[", it attempts matching array first. After failed, value match is failed immediately.
 
-Given input "null", it attempts matching array first. It fails before `@cut` and then failed matching array. Parser then match "null" successfully.
+Given input "null", it attempts matching array first. It fails before ~ and then failed matching array. Parser then match "null" successfully.
 
 Decorators
 ----------
@@ -838,7 +841,7 @@ Cheatsheet
      - positive
    * - `!foo`
      - negative
-   * - `@cut`
+   * - `~`
      - prevent unwanted backtracking
    * - `foo*`
      - zero or more

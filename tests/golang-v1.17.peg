@@ -153,7 +153,7 @@ TopLevelDecl  = Declaration / MethodDecl / FunctionDecl ;
 ConstDecl      = "const" ~ linews+ ( "(" ~ ws* (ConstSpec eol+ linews*)* ws* ")" / ConstSpec) ;
 ConstSpec      = IdentifierList (linews* Type? linews* "=" linews* ExpressionList)? ;
 
-IdentifierList = identifier (linews* "," ~ linews* identifier)* ;
+IdentifierList = identifier (linews* "," linews* identifier)* ;
 
 @nonterminal
 ExpressionList = Expression (linews* "," ws* Expression)*;
@@ -233,7 +233,7 @@ UnambiguousPrimaryExpr = (UnambiguousOperand / Conversion / MethodExpr) (Selecto
 UnambiguousOperand = BasicLit / FunctionLit / OperandName / "(" linews* Expression linews* ")";
 
 binary_op  = "||" / "&&" / (add_op !"=") / (mul_op !"=") / rel_op;
-rel_op     = "==" / "!=" / "<=" / "<" !"<" / ">=" / ">" !">";
+rel_op     = "==" / "!=" / "<=" / "<" !("<" / "-") / ">=" / ">" !">";
 add_op     = "+" !"+" / "-" !"-" / "|" / "^" ;
 mul_op     = "*" / "/" / "%" / "<<" / ">>" / "&^" / "&" ;
 
@@ -293,9 +293,9 @@ RangeClause = (ExpressionList linews* "=" / IdentifierList linews* ":=")? linews
 
 GoStmt = "go" linews+ Expression ;
 
-SelectStmt = "select" linews* "{" ws* CommClause*  ws* "}" ;
-CommClause = CommCase ":" StatementList ;
-CommCase   = "case" linews+ ( SendStmt / RecvStmt ) / "default" ;
+SelectStmt = "select" linews* "{" ~ ws* CommClause*  ws* "}" ;
+CommClause = CommCase linews* ":" ~ ws* StatementList ;
+CommCase   = "case" ~ linews+ (SendStmt / RecvStmt ) / "default" ;
 RecvStmt   = (ExpressionList linews* "=" / IdentifierList linews* ":=")? linews* RecvExpr ;
 RecvExpr   = Expression ;
 

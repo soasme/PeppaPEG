@@ -107,7 +107,7 @@ interpreted_string_lit = "\"" (!"\"" (unicode_value / byte_value))* "\"";
 
 Type      = TypeLit / "(" Type ")" / TypeName;
 TypeName  = QualifiedIdent / identifier;
-TypeLit   = ArrayType / StructType / PointerType / FunctionType / InterfaceType / SliceType / MapType / ChannelType ;
+TypeLit   = ArrayType / SliceType / StructType / PointerType / FunctionType / InterfaceType / MapType / ChannelType ;
 
 ArrayType   = "[" ArrayLength "]" ElementType ;
 ArrayLength = Expression ;
@@ -115,7 +115,7 @@ ElementType = Type ;
 
 SliceType = "[" "]" ElementType ;
 
-StructType    = "struct" ~ linews* "{" ws* ((FieldDecl eol+ ws*)+ / FieldDecl)? ws* "}" ;
+StructType    = "struct" linews* "{" ~ ws* ((FieldDecl eol+ ws*)+ / FieldDecl)? ws* "}" ;
 FieldDecl     = (IdentifierList linews+ Type / EmbeddedField) (linews* Tag)?;
 EmbeddedField = "*"? linews* TypeName ;
 Tag           = string_lit ;
@@ -126,9 +126,9 @@ BaseType    = Type ;
 FunctionType   = "func" Signature ;
 Signature      = Parameters linews* Result? ;
 
-Parameters     = "(" ~ (linews* ParameterList linews* ","?)? linews* ")" ;
+Parameters     = "(" ~ (ws* ParameterList linews* ","?)? ws* ")" ;
 
-ParameterList  = ParameterDecl (linews* "," ~ linews* ParameterDecl)* ;
+ParameterList  = ParameterDecl (linews* "," ~ ws* ParameterDecl)* ;
 ParameterDecl  = IdentifierList linews* "..."? linews* Type / "..."? linews* Type;
 # ParameterDecl  = IdentifierList? linews* "..."? linews* Type ;
 
@@ -144,19 +144,19 @@ KeyType     = Type ;
 
 ChannelType = ( "chan" / "chan" linews* "<-" / "<-" linews* "chan" ) linews* ElementType ;
 
-Block = "{" ~ ws* StatementList? ws* "}" ;
-StatementList = (linews* Statement eol+)+ / Statement;
+Block = "{" ~ ws* StatementList ws* "}" ;
+StatementList = ((linews* Statement eol+)+ / Statement)?;
 
 Declaration   = ConstDecl / TypeDecl / VarDecl ;
 TopLevelDecl  = Declaration / MethodDecl / FunctionDecl ;
 
 ConstDecl      = "const" ~ linews+ ( "(" ~ ws* (ConstSpec eol+ linews*)* ws* ")" / ConstSpec) ;
-ConstSpec      = IdentifierList linews* (Type? linews* "=" linews* ExpressionList)? ;
+ConstSpec      = IdentifierList (linews* Type? linews* "=" linews* ExpressionList)? ;
 
 IdentifierList = identifier (linews* "," ~ linews* identifier)* ;
 
 @nonterminal
-ExpressionList = Expression (linews* "," ~ linews* Expression)*;
+ExpressionList = Expression (linews* "," ws* Expression)*;
 
 TypeDecl = "type" ~ linews+ ( TypeSpec / "(" ws* (TypeSpec eol+ ws*)* linews* ")" ) ;
 TypeSpec = AliasDecl / TypeDef ;
@@ -192,7 +192,7 @@ OperandName = QualifiedIdent / identifier;
 QualifiedIdent = PackageName "." identifier ;
 
 CompositeLit  = LiteralType LiteralValue ;
-LiteralType   = StructType / ArrayType / "[" "..." "]" ElementType /
+LiteralType   = StructType / "[" "..." "]" ElementType / ArrayType /
                 SliceType / MapType / TypeName ;
 LiteralValue  = "{" ~ ws* (ElementList linews* ","? ws*)? ws* "}" ;
 ElementList   = KeyedElement ws* ("," ws* KeyedElement ws*)* ;
@@ -211,7 +211,7 @@ Index          = "[" ws* Expression ws* "]" ;
 Slice          = "[" ws* Expression? ws* ":" ws* Expression? ws* "]" /
                  "[" ws* Expression? ws* ":" ws* Expression ws* ":" ws* Expression ws* "]" ;
 TypeAssertion  = "." "(" ws* Type ws* ")" ;
-Arguments      = "(" linews* (( ExpressionList / Type (linews* "," linews* ExpressionList)? ) linews* "..."? linews* ","? )? linews* ")" ;
+Arguments      = "(" ~ ws* (( ExpressionList / Type (linews* "," ws* ExpressionList)? ) linews* "..."? linews* ","? )? ws* ")" ;
 
 MethodExpr    = ReceiverType "." MethodName ;
 ReceiverType  = Type ;
@@ -233,8 +233,8 @@ UnambiguousPrimaryExpr = (UnambiguousOperand / Conversion / MethodExpr) (Selecto
 UnambiguousOperand = BasicLit / FunctionLit / OperandName / "(" linews* Expression linews* ")";
 
 binary_op  = "||" / "&&" / (add_op !"=") / (mul_op !"=") / rel_op;
-rel_op     = "==" / "!=" / "<=" / "<" / ">=" / ">";
-add_op     = "+" / "-" / "|" / "^" ;
+rel_op     = "==" / "!=" / "<=" / "<" !"<" / ">=" / ">" !">";
+add_op     = "+" !"+" / "-" !"-" / "|" / "^" ;
 mul_op     = "*" / "/" / "%" / "<<" / ">>" / "&^" / "&" ;
 
 unary_op   = "+" / "-" / "!" / "^" / "*" / "&" / "<-" ;
@@ -253,12 +253,12 @@ SimpleStmt = SendStmt / IncDecStmt / Assignment / ShortVarDecl / ExpressionStmt;
 
 EmptyStmt = &. ;
 
-LabeledStmt = Label linews* ":" linews* Statement ;
+LabeledStmt = Label linews* ":" ws* Statement ;
 Label       = identifier ;
 
 ExpressionStmt = Expression ;
 
-SendStmt = Channel linews* "<-" linews* Expression ;
+SendStmt = Channel linews* "<-" ws* Expression ;
 Channel  = Expression ;
 
 IncDecStmt = Expression linews* ( "++" / "--" );
@@ -269,15 +269,15 @@ assign_op = (add_op / mul_op)? "=" ;
 
 IfStmt = "if" ~ linews+ (SimpleStmt ";")? linews* UnambiguousExpression linews* Block (ws* "else" ~ ws* ( IfStmt / Block ))? ;
 
-SwitchStmt = ExprSwitchStmt / TypeSwitchStmt ;
+SwitchStmt = TypeSwitchStmt / ExprSwitchStmt;
 
-ExprSwitchStmt = "switch" linews+ (SimpleStmt linews* ";"?)? linews* UnambiguousExpression? linews* "{" (ws* ExprCaseClause)* ws* "}" ;
-ExprCaseClause = ExprSwitchCase linews* ":" linews* StatementList ;
+ExprSwitchStmt = "switch" linews+ (SimpleStmt linews* ";"?)? linews* UnambiguousExpression? ~ linews* "{" (ws* ExprCaseClause)* ws* "}" ;
+ExprCaseClause = ExprSwitchCase linews* ":" ws* StatementList ;
 ExprSwitchCase = "case" linews+ ~ ExpressionList / "default" ;
 
-TypeSwitchStmt  = "switch" linews+ ~ (SimpleStmt linews* ";")? linews* TypeSwitchGuard linews* "{" (ws* TypeCaseClause)* ws* "}" ;
+TypeSwitchStmt  = "switch" linews+ (SimpleStmt linews* ";")? linews* TypeSwitchGuard ~ linews* "{" (ws* TypeCaseClause)* ws* "}" ;
 TypeSwitchGuard = (identifier linews* ":=")? linews* PrimaryExpr linews* "." linews* "(" linews* "type" linews* ")" ;
-TypeCaseClause  = TypeSwitchCase linews* ":" linews* StatementList ;
+TypeCaseClause  = TypeSwitchCase linews* ":" ws* StatementList ;
 TypeSwitchCase  = "case" linews+ ~ TypeList / "default" ;
 TypeList        = Type (linews* "," linews* Type)* ;
 

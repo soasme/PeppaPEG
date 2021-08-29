@@ -1,5 +1,13 @@
 # ROADMAP
 
+- [ ] peg: error string `rule = (a b c ~ e"LiteralName form of CompositeLiteral shouldn't appear on if/for/switch statement without )]}.") expr`. By using error string with cut, a syntax error is raised.
+- [ ] shell: `peppa parse` generates dot diagram.
+- [ ] shell: `peppa ast` -> `peppa parse`.
+- [ ] spec: more tests for go grammar.
+- [ ] shell: resolve dir support special envvar: `$PEPPAPATH`, otherwise read from etc, home, cwd.
+- [ ] shell: `peppa ast` support option `--language=xxx`, which reads data from `/etc/peppa/langs.d/xxx.peg`, or `$HOME/.config/peppa/langs.d/xxx.peg`, or `$CWD/xxx.peg`.
+- [ ] shell: `peppa test spec.json` test a spec json in tinout style.
+- [ ] perf: faster spec checks - may use json-c or sorta library to compare the generated data - meanwhile, cache the grammar in memory during the session.
 - [ ] spec: `@infix @left_assoc @precedence(1) compare_op = "==";`, `@infix @right_assoc power_op = "^"`; `rule = Primary (compare_op/power_op) Primary;`. https://en.wikipedia.org/wiki/Operator-precedence_parser https://eli.thegreenplace.net/2012/08/02/parsing-expressions-by-precedence-climbing https://docs.rs/peg/0.7.0/peg/
 - [ ] spec: JSON as the basic types for node property.
 - [ ] spec: explain "greed", "CFG", "lateral backtracking", "vertical backtracking", "not advance in repeat" in spec. https://github.com/norswap/autumn/blob/master/doc/A3-how-autumn-works.md
@@ -44,7 +52,7 @@
 - [ ] peg: describe grammar AST using ADSL-style rules.
 - [ ] perf: pre-alloc tokens.
 - [ ] perf: Cache literal len or use better string structure internally.
-- [ ] perf: trace: add a tracer in P4_Source. When matching, annotate the tracer. An additional tool can aggregate data and output a DOT / compile to png.
+- [ ] perf: trace: add a tracer in P4_Source. When matching, annotate the tracer. An additional tool can aggregate data and output a DOT / compile to png. Similar: https://textx.github.io/Arpeggio/stable/debugging/#parser-debug-mode https://ohmlang.github.io/editor/
 - [ ] perf: tracer: https://pegjs.org/documentation
       https://github.com/orlandohill/peg-left-recursion
 - [ ] tests: benchmark: example: json-c. `valgrind --tool=massif --massif-out-file=massif.out ./build/tests/test_example_json && ms_print massif.out ms_print.out`.

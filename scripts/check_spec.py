@@ -45,7 +45,7 @@ def test_spec():
                             f"GRAMMAR:\n{spec.get('grammar') or spec.get('grammar_file')}\n"
                             f"INPUT:\n{test['I']}\n"
                             f"OUTPUT:\n{test['O']}\n"
-                            f"GOT:\n{json.dumps(output)}\n"
+                            f"GOT:\n{json.dumps(output)}{proc.stderr.decode('utf-8')}\n"
                         )
                         failed += 1
                 else:
@@ -53,17 +53,16 @@ def test_spec():
                         f"GRAMMAR:\n{spec.get('grammar') or spec.get('grammar_file')}\n"
                         f"INPUT:\n{test['I']}\n"
                         f"OUTPUT:\n{test['O']}\n"
-                        f"GOT:\n{proc.stderr.decode('utf-8')}\n"
+                        f"GOT:\n{proc.stderr.decode('utf-8')}{proc.stdout}\n"
                     )
                     failed += 1
             elif 'E' in test:
-                assert proc.returncode != 0, proc.stderr
                 if proc.stderr.decode('utf-8').strip() != test['E']:
                     print(
                         f"GRAMMAR:\n{spec.get('grammar') or spec.get('grammar_file')}\n"
                         f"INPUT:\n{test['I']}\n"
                         f"ERROR:\n{test['E']}\n"
-                        f"GOT:\n{proc.stderr.decode('utf-8')}"
+                        f"GOT:\n{proc.stderr.decode('utf-8')}{proc.stdout.decode('utf-8')}"
                     )
                     failed += 1
             else:

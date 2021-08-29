@@ -33,9 +33,14 @@ if (ENABLE_DEBUG)
     target_compile_options("${P4_LIB}" PRIVATE "-g")
 endif()
 
+option(ENABLE_OPTIMIZATION "Enable Optimization." Off)
+if (ENABLE_OPTIMIZATION)
+    target_compile_options("${P4_LIB}" PRIVATE "-O3")
+endif()
+
 option(ENABLE_ADDRESS_SANITIZER "Enables AddressSanitizer." OFF)
 message("-- Clang: AddressSanitizer - ${ENABLE_ADDRESS_SANITIZER}.")
-if (ENABLE_SANITIZERS)
+if (ENABLE_ADDRESS_SANITIZERS)
     list(APPEND custom_compiler_flags
         -fno-omit-frame-pointer
         -fsanitize=address

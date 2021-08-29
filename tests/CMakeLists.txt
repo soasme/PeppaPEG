@@ -86,6 +86,7 @@ set(
     test_flags_spec
     test_peppa_spec
     test_toml_v1_0_spec
+    test_golang_v1_17_spec
 )
 
 find_program(PYTHON python3)

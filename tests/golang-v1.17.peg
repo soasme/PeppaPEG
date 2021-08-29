@@ -115,7 +115,7 @@ ElementType = Type ;
 
 SliceType = "[" linews* "]" linews* ElementType ;
 
-StructType    = "struct" linews* "{" ~ ws* ((FieldDecl eol+ ws*)+ / FieldDecl)? ws* "}" ;
+StructType    = "struct" linews* "{" ~ ws* (FieldDecl (eol+ ws* FieldDecl)*)? ws* "}" ;
 FieldDecl     = (EmbeddedField &eol / IdentifierList linews+ Type / EmbeddedField) (linews* Tag)?;
 EmbeddedField = "*"? linews* TypeName ;
 Tag           = string_lit ;
@@ -128,13 +128,13 @@ Signature      = Parameters ((" "/"\t")* Result)? ;
 
 Parameters     = "(" ~ (ws* ParameterList linews* ","?)? ws* ")" ;
 
-ParameterList  = ParameterDecl (linews* "," ~ ws* ParameterDecl)* ;
+ParameterList  = ParameterDecl (linews* "," ws* ParameterDecl)* ;
 ParameterDecl  = IdentifierList linews* "..."? linews* Type / "..."? linews* Type;
 # ParameterDecl  = IdentifierList? linews* "..."? linews* Type ;
 
 Result         = Type / Parameters;
 
-InterfaceType      = "interface" ~ linews* "{" ws* ((InterfaceTypeDecl eol+ ws*)+ / InterfaceTypeDecl)? ws* "}" ;
+InterfaceType      = "interface" linews* "{" ~ ws* ((InterfaceTypeDecl eol+ ws*)+ / InterfaceTypeDecl)? ws* "}" ;
 InterfaceTypeDecl = MethodSpec / InterfaceTypeName;
 MethodSpec         = MethodName Signature ;
 MethodName         = identifier ;
@@ -143,7 +143,7 @@ InterfaceTypeName  = TypeName ;
 MapType     = "map" "[" KeyType "]" ElementType ;
 KeyType     = Type ;
 
-ChannelType = ("chan" linews* "<-" / "<-" linews* "chan" / "chan") ~ linews* ElementType ;
+ChannelType = ("chan" linews* "<-" / "<-" linews* "chan" / "chan" !(letter/unicode_digit)) ~ linews* ElementType ;
 
 Block = "{" ~ ws* StatementList ws* "}" ;
 StatementList = (Statement (eol+ ws* Statement)*)?;
@@ -154,7 +154,7 @@ TopLevelDecl  = Declaration / MethodDecl / FunctionDecl ;
 ConstDecl      = "const" linews+ ~ ( "(" ~ ws* (ConstSpec eol+ linews*)* ws* ")" / ConstSpec) ;
 ConstSpec      = IdentifierList (linews* Type? linews* "=" linews* ExpressionList)? ;
 
-IdentifierList = identifier (linews* "," linews* identifier)* ;
+IdentifierList = identifier (linews* "," ws* identifier)* ;
 
 @nonterminal
 ExpressionList = Expression (linews* "," ws* Expression)*;
@@ -166,17 +166,17 @@ AliasDecl = identifier linews* "=" linews* Type ;
 
 TypeDef = identifier linews+ Type ;
 
-VarDecl     = "var" linews+ ~ ( "(" ~ ws* ((VarSpec eol+ ws*)+ / VarSpec)? ws* ")" / VarSpec) ;
+VarDecl     = "var" linews+ ~ ( "(" ~ ws* (VarSpec (eol+ ws* VarSpec)*)? ws* ")" / VarSpec) ;
 VarSpec     = IdentifierList linews* ( Type (linews* "=" ~ ws* ExpressionList)? / "=" ~ ws* ExpressionList ) ;
 
 ShortVarDecl = IdentifierList linews* ":=" ~ ws* ExpressionList ;
 
-FunctionDecl = "func" linews+ FunctionName ~ linews* Signature linews* FunctionBody? ;
+FunctionDecl = "func" linews+ FunctionName ~ linews* Signature (linews* FunctionBody)? ;
 FunctionName = identifier ;
 @lifted
 FunctionBody = Block ;
 
-MethodDecl = "func" linews* Receiver ~ linews* MethodName linews* Signature linews* FunctionBody? ;
+MethodDecl = "func" linews* Receiver ~ linews* MethodName linews* Signature (linews* FunctionBody)? ;
 Receiver   = "(" ~ linews* (identifier linews+ Type / Type) linews* ")";
 # Receiver   = Parameters .
 
@@ -202,7 +202,7 @@ Key           = LiteralValue / Expression / FieldName;
 FieldName     = identifier ;
 Element       = Expression / LiteralValue ;
 
-FunctionLit = "func" linews* Signature ~ linews* FunctionBody ;
+FunctionLit = "func" linews* Signature linews* FunctionBody ;
 
 @nonterminal
 PrimaryExpr = (Operand / Conversion / MethodExpr) (Selector / Index / Slice / TypeAssertion / Arguments)*;
@@ -222,7 +222,7 @@ Expression = UnaryExpr ((" "/"\t"/block_comment)* binary_op ~ ws* UnaryExpr)*;
 # Expression = UnaryExpr | Expression binary_op Expression .
 
 @nonterminal @scoped
-UnaryExpr  = unary_op* PrimaryExpr;
+UnaryExpr  = PrimaryExpr / unary_op UnaryExpr;
 # UnaryExpr  = PrimaryExpr | unary_op UnaryExpr .
 
 @nonterminal
@@ -240,7 +240,7 @@ mul_op     = "*" / "/" !("/"/"*") / "%" / "<<" / ">>" / "&^" / "&" ;
 
 unary_op   = "+" / "-" / "!" / "^" / "*" / "&" / "<-" ;
 
-Conversion = Type linews* "(" linews* Expression linews* ","? linews* ")" ;
+Conversion = Type linews* "(" ws* Expression linews* ","? linews* ")" ;
 
 @lifted
 Statement =
@@ -268,18 +268,18 @@ Assignment = ExpressionList linews* assign_op ws* ExpressionList ;
 
 assign_op = (add_op / mul_op)? "=" ;
 
-IfStmt = "if" linews+ ~ (SimpleStmt linews* ";")? linews* UnambiguousExpression linews* Block (ws* "else" ~ ws* ( IfStmt / Block ))? ;
+IfStmt = "if" linews+ ~ (SimpleStmt linews* ";")? linews* UnambiguousExpression linews* Block (ws* "else" (" "/"\t"/block_comment) ~ ws* ( IfStmt / Block ))? ;
 
 SwitchStmt = TypeSwitchStmt / ExprSwitchStmt;
 
 ExprSwitchStmt = "switch" linews+ (SimpleStmt linews* ";"?)? linews* UnambiguousExpression? ~ linews* "{" (ws* ExprCaseClause)* ws* "}" ;
 ExprCaseClause = ExprSwitchCase linews* ":" ws* StatementList ;
-ExprSwitchCase = "case" linews+ ~ ExpressionList / "default" ;
+ExprSwitchCase = "case" ws+ ~ ExpressionList / "default" ;
 
 TypeSwitchStmt  = "switch" linews+ (SimpleStmt linews* ";")? linews* TypeSwitchGuard ~ linews* "{" (ws* TypeCaseClause)* ws* "}" ;
 TypeSwitchGuard = (identifier linews* ":=")? linews* PrimaryExpr linews* "." linews* "(" linews* "type" linews* ")" ;
 TypeCaseClause  = TypeSwitchCase linews* ":" ws* StatementList ;
-TypeSwitchCase  = "case" linews+ ~ TypeList / "default" ;
+TypeSwitchCase  = "case" ws+ ~ TypeList / "default" ;
 TypeList        = Type (linews* "," ws* Type)* ;
 
 ForStmt = "for" linews+ ~ (RangeClause / ForClause / Condition)? linews* Block ;
@@ -300,13 +300,11 @@ CommCase   = "case" ~ linews+ (SendStmt / RecvStmt ) / "default" ;
 RecvStmt   = (ExpressionList linews* "=" / IdentifierList linews* ":=")? linews* RecvExpr ;
 RecvExpr   = Expression ;
 
-ReturnStmt = "return" ~ (linews+ ExpressionList)? ;
+ReturnStmt = "return" !(letter/unicode_digit) ~ (linews+ ExpressionList)?;
 
-BreakStmt = "break" (linews+ Label)?  ;
+BreakStmt = "break" (linews+ Label)? &eol ;
 
-
-ContinueStmt = "continue" (linews+ Label)? ;
-
+ContinueStmt = "continue" (linews+ Label)? &eol;
 
 GotoStmt = "goto" linews+ Label ;
 
@@ -314,7 +312,7 @@ FallthroughStmt = "fallthrough" ;
 
 DeferStmt = "defer" linews+ Expression ;
 
-SourceFile       = &. ws* PackageClause eol+ (ws* ImportDecl eol+)* ws* (TopLevelDecl eol+ ws*)* ws* !.;
+SourceFile       = &. ws* PackageClause eol+ (ImportDecl (eol+ ws* ImportDecl)*)? ws* (TopLevelDecl (eol+ ws* TopLevelDecl)*)? ws* !.;
 
 PackageClause  = "package" ~ linews+ PackageName ;
 PackageName    = identifier ;

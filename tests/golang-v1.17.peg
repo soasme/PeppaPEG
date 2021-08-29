@@ -241,7 +241,7 @@ UnambiguousExpression = UnambiguousUnaryExpr (linews* binary_op ~ ws* Unambiguou
 UnambiguousUnaryExpr  = unary_op* UnambiguousPrimaryExpr;
 @nonterminal
 UnambiguousPrimaryExpr = (UnambiguousOperand / Conversion / MethodExpr) (Selector / Index / Slice / TypeAssertion / Arguments)*;
-UnambiguousOperand = BasicLit / FunctionLit / OperandName / "(" linews* Expression linews* ")";
+UnambiguousOperand = BasicLit / (!TypeName LiteralType) inlinews* LiteralValue / FunctionLit / OperandName / "(" linews* Expression linews* ")";
 
 @nonterminal
 binary_op  = "||" / "&&" / (add_op !"=") / (mul_op !"=") / rel_op;

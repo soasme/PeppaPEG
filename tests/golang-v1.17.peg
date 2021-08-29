@@ -110,21 +110,27 @@ raw_string_lit         = "`" (!"`" (unicode_char / newline))* "`" ;
 interpreted_string_lit = "\"" (!"\"" (unicode_value / byte_value))* "\"";
 
 Type      = TypeLit / "(" Type ")" / TypeName;
+@nonterminal
 TypeName  = QualifiedIdent / identifier;
+@lifted
 TypeLit   = ArrayType / SliceType / StructType / PointerType / FunctionType / InterfaceType / MapType / ChannelType ;
 
-ArrayType   = "[" ArrayLength "]" ElementType ;
+ArrayType   = "[" ws* ArrayLength ws* "]" inlinews* ElementType ;
+@lifted
 ArrayLength = Expression ;
+@lifted
 ElementType = Type ;
 
-SliceType = "[" linews* "]" linews* ElementType ;
+SliceType = "[" ws* "]" inlinews* ElementType ;
 
 StructType    = "struct" linews* "{" ~ ws* (FieldDecl (eol+ ws* FieldDecl)*)? ws* "}" ;
 FieldDecl     = (EmbeddedField &eol / IdentifierList linews+ Type / EmbeddedField) (linews* Tag)?;
-EmbeddedField = "*"? linews* TypeName ;
+EmbeddedField = Pointer? inlinews* TypeName ;
+Pointer       = "*";
 Tag           = string_lit ;
 
-PointerType = "*" BaseType ;
+PointerType = "*" inlinews* BaseType ;
+@lifted
 BaseType    = Type ;
 
 FunctionType   = "func" linews* Signature ;
@@ -158,6 +164,7 @@ TopLevelDecl  = Declaration / MethodDecl / FunctionDecl ;
 ConstDecl      = "const" linews+ ~ ( "(" ~ ws* (ConstSpec eol+ linews*)* ws* ")" / ConstSpec) ;
 ConstSpec      = IdentifierList (linews* Type? linews* "=" linews* ExpressionList)? ;
 
+@nonterminal
 IdentifierList = identifier (linews* "," ws* identifier)* ;
 
 @nonterminal
@@ -194,7 +201,7 @@ BasicLit    = imaginary_lit / float_lit / int_lit / rune_lit / string_lit ;
 @lifted
 OperandName = QualifiedIdent / identifier;
 
-QualifiedIdent = PackageName "." identifier ;
+QualifiedIdent = PackageName inlinews* "." ws* identifier ;
 
 CompositeLit  = LiteralType LiteralValue ;
 LiteralType   = StructType / "[" "..." "]" ElementType / ArrayType /
@@ -211,7 +218,7 @@ FunctionLit = "func" linews* Signature linews* FunctionBody ;
 @nonterminal
 PrimaryExpr = (Operand / Conversion / MethodExpr) (Selector / Index / Slice / TypeAssertion / Arguments)*;
 
-Selector       = "." identifier ;
+Selector       = "." ws* identifier ;
 Index          = "[" ws* Expression ws* "]" ;
 Slice          = "[" ws* Expression? ws* ":" ws* Expression? ws* "]" /
                  "[" ws* Expression? ws* ":" ws* Expression ws* ":" ws* Expression ws* "]" ;
@@ -236,6 +243,7 @@ UnambiguousUnaryExpr  = unary_op* UnambiguousPrimaryExpr;
 UnambiguousPrimaryExpr = (UnambiguousOperand / Conversion / MethodExpr) (Selector / Index / Slice / TypeAssertion / Arguments)*;
 UnambiguousOperand = BasicLit / FunctionLit / OperandName / "(" linews* Expression linews* ")";
 
+@nonterminal
 binary_op  = "||" / "&&" / (add_op !"=") / (mul_op !"=") / rel_op;
 rel_op     = "==" / "!=" / "<=" / "<" !("<" / "-") / ">=" / ">" !">";
 add_op     = "+" !"+" / "-" !"-" / "|" / "^" ;

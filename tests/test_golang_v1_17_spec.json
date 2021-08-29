@@ -1,519 +1,3102 @@
 [
-    {
-        "desc": "Integer",
-        "grammar_file": "./golang-v1.17.peg",
-        "entry": "Literal",
-        "tests": [
-            {
-                "I": "42",
-                "O": [{"slice": [0, 2], "type": "decimal_lit"}]
-            },
-            {
-                "I": "4_2",
-                "O": [{"slice": [0, 3], "type": "decimal_lit"}]
-            },
-            {
-                "I": "0600",
-                "O": [{"slice": [0, 4], "type": "octal_lit"}]
-            },
-            {
-                "I": "0_600",
-                "O": [{"slice": [0, 5], "type": "octal_lit"}]
-            },
-            {
-                "I": "0o600",
-                "O": [{"slice": [0, 5], "type": "octal_lit"}]
-            },
-            {
-                "I": "0O600",
-                "O": [{"slice": [0, 5], "type": "octal_lit"}]
-            },
-            {
-                "I": "0xBadFace",
-                "O": [{"slice": [0, 9], "type": "hex_lit"}]
-            },
-            {
-                "I": "0xBad_Face",
-                "O": [{"slice": [0, 10], "type": "hex_lit"}]
-            },
-            {
-                "I": "0x_67_7a_2f_cc_40_c6",
-                "O": [{"slice": [0, 20], "type": "hex_lit"}]
-            },
-            {
-                "I": "170141183460469231731687303715884105727",
-                "O": [{"slice": [0, 39], "type": "decimal_lit"}]
-            },
-            {
-                "I": "170_141183_460469_231731_687303_715884_105727",
-                "O": [{"slice": [0, 45], "type": "decimal_lit"}]
-            },
-            {
-                "I": "_42",
-                "E": "MatchError: line 1:1, expect Literal",
-                "N": "an identifier, not an integer literal"
-            },
-            {
-                "I": "42_",
-                "E": "MatchError: line 1:1, expect Literal",
-                "N": "invalid: _ must separate successive digits"
-            },
-            {
-                "I": "4__2",
-                "E": "MatchError: line 1:1, expect Literal",
-                "N": "invalid: only one _ at a time"
-            },
-            {
-                "I": "0_xBadFace",
-                "E": "MatchError: line 1:1, expect Literal",
-                "N": "invalid: _ must separate successive digits"
-            }
+  {
+    "desc": "Integer",
+    "grammar_file": "./golang-v1.17.peg",
+    "entry": "Literal",
+    "tests": [
+      {
+        "I": "42",
+        "O": [
+          {
+            "slice": [
+              0,
+              2
+            ],
+            "type": "decimal_lit"
+          }
         ]
-    },
-
-    {
-        "desc": "Float",
-        "grammar_file": "./golang-v1.17.peg",
-        "entry": "Literal",
-        "tests": [
-            {
-                "I": "0.",
-                "O": [{"slice": [0, 2], "type": "decimal_float_lit"}]
-            },
-            {
-                "I": "72.40",
-                "O": [{"slice": [0, 5], "type": "decimal_float_lit"}]
-            },
-            {
-                "I": "072.40",
-                "O": [{"slice": [0, 6], "type": "decimal_float_lit"}]
-            },
-            {
-                "I": "2.71828",
-                "O": [{"slice": [0, 7], "type": "decimal_float_lit"}]
-            },
-            {
-                "I": "1.e+0",
-                "O": [{"slice": [0, 5], "type": "decimal_float_lit"}]
-            },
-            {
-                "I": "6.67428e-11",
-                "O": [{"slice": [0, 11], "type": "decimal_float_lit"}]
-            },
-            {
-                "I": ".25",
-                "O": [{"slice": [0, 3], "type": "decimal_float_lit"}]
-            },
-            {
-                "I": ".12345E+5",
-                "O": [{"slice": [0, 9], "type": "decimal_float_lit"}]
-            },
-            {
-                "I": "1_5.",
-                "O": [{"slice": [0, 4], "type": "decimal_float_lit"}]
-            },
-            {
-                "I": "0.15e+0_2",
-                "O": [{"slice": [0, 9], "type": "decimal_float_lit"}]
-            },
-            {
-                "I": "0x1p-2",
-                "O": [{"slice": [0, 6], "type": "hex_float_lit"}]
-            },
-            {
-                "I": "0x2.p10",
-                "O": [{"slice": [0, 7], "type": "hex_float_lit"}]
-            },
-            {
-                "I": "0x1.Fp+0",
-                "O": [{"slice": [0, 8], "type": "hex_float_lit"}]
-            },
-            {
-                "I": "0X.8p-0",
-                "O": [{"slice": [0, 7], "type": "hex_float_lit"}]
-            },
-            {
-                "I": "0X_1FFFP-16",
-                "O": [{"slice": [0, 11], "type": "hex_float_lit"}]
-            },
-            {
-                "I": "0x15e-2",
-                "O": [{"slice": [0, 5], "type": "hex_lit"}],
-                "N": "== 0x15e - 2 (integer subtraction)"
-            },
-            {
-                "I": "0x.p1",
-                "E": "CutError: line 1:4, expect hex_digit",
-                "N": "invalid: mantissa has no digits"
-            },
-            {
-                "I": "1p-2",
-                "E": "MatchError: line 1:1, expect Literal",
-                "N": "invalid: p exponent requires hexadecimal mantissa"
-            },
-            {
-                "I": "0x1.5e-2",
-                "E": "MatchError: line 1:1, expect Literal",
-                "N": "invalid: hexadecimal mantissa requires p exponent"
-            },
-            {
-                "I": "1_.5",
-                "E": "MatchError: line 1:1, expect Literal",
-                "N": "invalid: _ must separate successive digits"
-            },
-            {
-                "I": "1._5",
-                "E": "CutError: line 1:3, expect float_lit",
-                "N": "invalid: _ must separate successive digits"
-            },
-            {
-                "I": "1.5_e1",
-                "E": "CutError: line 1:4, expect float_lit",
-                "N": "invalid: _ must separate successive digits"
-            },
-            {
-                "I": "1.5e_1",
-                "E": "CutError: line 1:5, expect decimal_digit",
-                "N": "invalid: _ must separate successive digits"
-            },
-            {
-                "I": "1.5e1_",
-                "E": "CutError: line 1:6, expect float_lit",
-                "N": "invalid: _ must separate successive digits"
-            }
+      },
+      {
+        "I": "4_2",
+        "O": [
+          {
+            "slice": [
+              0,
+              3
+            ],
+            "type": "decimal_lit"
+          }
         ]
-    },
-
-    {
-        "desc": "Imaginary",
-        "grammar_file": "./golang-v1.17.peg",
-        "entry": "Literal",
-        "tests": [
-            {
-                "I": "0i",
-                "O": [{"slice": [0, 2], "type": "imaginary_lit"}]
-            },
-            {
-                "I": "0123i",
-                "O": [{"slice": [0, 5], "type": "imaginary_lit"}],
-                "N": "== 123i for backward-compatibility"
-            },
-            {
-                "I": "0o123i",
-                "O": [{"slice": [0, 6], "type": "imaginary_lit"}],
-                "N": "== 0o123 * 1i = 83i"
-            },
-            {
-                "I": "0xabci",
-                "O": [{"slice": [0, 6], "type": "imaginary_lit"}],
-                "N": "== 0xabc * 1i = 2748i"
-            },
-            {
-                "I": "0.i",
-                "O": [{"slice": [0, 3], "type": "imaginary_lit"}]
-            },
-            {
-                "I": "2.71828i",
-                "O": [{"slice": [0, 8], "type": "imaginary_lit"}]
-            },
-            {
-                "I": "1.e+0i",
-                "O": [{"slice": [0, 6], "type": "imaginary_lit"}]
-            },
-            {
-                "I": "6.67428e-11i",
-                "O": [{"slice": [0, 12], "type": "imaginary_lit"}]
-            },
-            {
-                "I": "1E6i",
-                "O": [{"slice": [0, 4], "type": "imaginary_lit"}]
-            },
-            {
-                "I": ".25i",
-                "O": [{"slice": [0, 4], "type": "imaginary_lit"}]
-            },
-            {
-                "I": ".12345E+5i",
-                "O": [{"slice": [0, 10], "type": "imaginary_lit"}]
-            },
-            {
-                "I": "0x1p-2i",
-                "O": [{"slice": [0, 7], "type": "imaginary_lit"}],
-                "N": "== 0x1p-2 * 1i == 0.25i"
-            }
+      },
+      {
+        "I": "0600",
+        "O": [
+          {
+            "slice": [
+              0,
+              4
+            ],
+            "type": "octal_lit"
+          }
         ]
-    },
-
-    {
-        "desc": "Imaginary",
-        "grammar_file": "./golang-v1.17.peg",
-        "entry": "Literal",
-        "tests": [
-            {
-                "I": "'a'",
-                "O": [{"slice": [0, 3], "type": "rune_lit"}]
-            },
-            {
-                "I": "'ä'",
-                "O": [{"slice": [0, 4], "type": "rune_lit"}]
-            },
-            {
-                "I": "'本'",
-                "O": [{"slice": [0, 5], "type": "rune_lit"}]
-            },
-            {
-                "I": "'\\t'",
-                "O": [{"slice": [0, 4], "type": "rune_lit"}]
-            },
-            {
-                "I": "'\t'",
-                "O": [{"slice": [0, 3], "type": "rune_lit"}]
-            },
-            {
-                "I": "'\\000'",
-                "O": [{"slice": [0, 6], "type": "rune_lit"}]
-            },
-            {
-                "I": "'\\007'",
-                "O": [{"slice": [0, 6], "type": "rune_lit"}]
-            },
-            {
-                "I": "'\\377'",
-                "O": [{"slice": [0, 6], "type": "rune_lit"}]
-            },
-            {
-                "I": "'\\x07'",
-                "O": [{"slice": [0, 6], "type": "rune_lit"}]
-            },
-            {
-                "I": "'\\xff'",
-                "O": [{"slice": [0, 6], "type": "rune_lit"}]
-            },
-            {
-                "I": "'\\u12e4'",
-                "O": [{"slice": [0, 8], "type": "rune_lit"}]
-            },
-            {
-                "I": "'\\U00101234'",
-                "O": [{"slice": [0, 12], "type": "rune_lit"}]
-            },
-            {
-                "I": "'\\''",
-                "O": [{"slice": [0, 4], "type": "rune_lit"}]
-            },
-            {
-                "I": "'aa'",
-                "E": "CutError: line 1:3, expect rune_lit (char ''')",
-                "N": "illegal: too many characters"
-            },
-            {
-                "I": "'\\xa'",
-                "E": "CutError: line 1:3, expect rune_lit (char ''')",
-                "N": "illegal: too few hexadecimal digits"
-            },
-            {
-                "I": "'\\0'",
-                "E": "CutError: line 1:3, expect rune_lit (char ''')",
-                "N": "illegal: too few octal digits"
-            },
-            {
-                "I": "'''",
-                "E": "CutError: line 1:2, expect rune_lit",
-                "N": "illegal: too few octal digits"
-            },
-            {
-                "I": "'\\uDFFF'",
-                "N": "IGNORE: illegal: surrogate half but can't detect when parsing as of current Peppa PEG"
-            },
-            {
-                "I": "'\\U00110000'",
-                "N": "IGNORE: illegal: invalid code point but can't detect when parsing as of current Peppa PEG"
-            }
+      },
+      {
+        "I": "0_600",
+        "O": [
+          {
+            "slice": [
+              0,
+              5
+            ],
+            "type": "octal_lit"
+          }
         ]
-    },
-
-    {
-        "desc": "String",
-        "grammar_file": "./golang-v1.17.peg",
-        "entry": "Literal",
-        "tests": [
-            {
-                "I": "`a`",
-                "O": [{"slice": [0, 3], "type": "raw_string_lit"}]
-            },
-            {
-                "I": "`\\n\n\\n`",
-                "O": [{"slice": [0, 7], "type": "raw_string_lit"}]
-            },
-            {
-                "I": "\"\\n\"",
-                "O": [{"slice": [0, 4], "type": "interpreted_string_lit"}]
-            },
-            {
-                "I": "\"\\\"\"",
-                "O": [{"slice": [0, 4], "type": "interpreted_string_lit"}]
-            },
-            {
-                "I": "\"Hello, world!\\n\"",
-                "O": [{"slice": [0, 17], "type": "interpreted_string_lit"}]
-            },
-            {
-                "I": "\"日本語\"",
-                "O": [{"slice": [0, 11], "type": "interpreted_string_lit"}]
-            },
-            {
-                "I": "`日本語`",
-                "O": [{"slice": [0, 11], "type": "raw_string_lit"}]
-            },
-            {
-                "I": "\"\\u65e5\\u672c\\u8a9e\"",
-                "O": [{"slice": [0, 20], "type": "interpreted_string_lit"}]
-            },
-            {
-                "I": "\"\\u65e5本\\U00008a9e\"",
-                "O": [{"slice": [0, 21], "type": "interpreted_string_lit"}]
-            },
-            {
-                "I": "\"\\U000065e5\\U0000672c\\U00008a9e\"",
-                "O": [{"slice": [0, 32], "type": "interpreted_string_lit"}]
-            },
-            {
-                "I": "\"\\xe6\\x97\\xa5\\xe6\\x9c\\xac\\xe8\\xaa\\x9e\"",
-                "O": [{"slice": [0, 38], "type": "interpreted_string_lit"}]
-            },
-            {
-                "I": "\"\\xff\\u00FF\"",
-                "O": [{"slice": [0, 12], "type": "interpreted_string_lit"}]
-            },
-            {
-                "I": "\"\\uD800\"",
-                "N": "IGNORED: illegal: surrogate half. Peppa PEG can't support it currently."
-            },
-            {
-                "I": "\"\\U00110000\"",
-                "N": "IGNORED: illegal: invalid Unicode code point. Peppa PEG can't support it currently."
-            }
+      },
+      {
+        "I": "0o600",
+        "O": [
+          {
+            "slice": [
+              0,
+              5
+            ],
+            "type": "octal_lit"
+          }
         ]
-    },
-
-    {
-        "desc": "FunctionLit",
-        "grammar_file": "./golang-v1.17.peg",
-        "entry": "Literal",
-        "tests": [
-            {
-                "I": "func(){}",
-                "O": [
-                    {"slice": [0, 8], "type": "FunctionLit", "children": [
-                        {"slice": [4, 6], "type": "Signature", "children": [
-                            {"slice": [4, 6], "type": "Parameters"}
-                        ]},
-                        {"slice": [6, 8], "type": "Block"}
-                    ]}
-                ]
-            }
+      },
+      {
+        "I": "0O600",
+        "O": [
+          {
+            "slice": [
+              0,
+              5
+            ],
+            "type": "octal_lit"
+          }
         ]
-    },
-
-    {
-        "desc": "StatementList",
-        "grammar_file": "./golang-v1.17.peg",
-        "entry": "StatementList",
-        "tests": [
-            {
-                "N": "EOL terminates a statement.",
-                "I": "a=1",
-                "O": [
-                    {"slice": [0, 3], "type": "StatementList", "children": [
-                        {"slice": [0, 3], "type": "Assignment", "children": [
-                            {"slice": [0, 1], "type": "identifier"},
-                            {"slice": [1, 2], "type": "assign_op"},
-                            {"slice": [2, 3], "type": "decimal_lit"}
-                        ]}
-                    ]}
-                ]
-            },
-            {
-                "N": "Semicolon terminates a statement.",
-                "I": "a=1;",
-                "O": [
-                    {"slice": [0, 3], "type": "StatementList", "children": [
-                        {"slice": [0, 3], "type": "Assignment", "children": [
-                            {"slice": [0, 1], "type": "identifier"},
-                            {"slice": [1, 2], "type": "assign_op"},
-                            {"slice": [2, 3], "type": "decimal_lit"}
-                        ]}
-                    ]}
-                ]
-            },
-            {
-                "N": "Auto-Semicolon terminates a statement.",
-                "I": "a=1\n",
-                "O": [
-                    {"slice": [0, 3], "type": "StatementList", "children": [
-                        {"slice": [0, 3], "type": "Assignment", "children": [
-                            {"slice": [0, 1], "type": "identifier"},
-                            {"slice": [1, 2], "type": "assign_op"},
-                            {"slice": [2, 3], "type": "decimal_lit"}
-                        ]}
-                    ]}
-                ]
-            },
-            {
-                "I": "a=1\nb=2",
-                "O": [
-                    {"slice": [0, 7], "type": "StatementList", "children": [
-                        {"slice": [0, 3], "type": "Assignment", "children": [
-                            {"slice": [0, 1], "type": "identifier"},
-                            {"slice": [1, 2], "type": "assign_op"},
-                            {"slice": [2, 3], "type": "decimal_lit"}
-                        ]},
-                        {"slice": [4, 7], "type": "Assignment", "children": [
-                            {"slice": [4, 5], "type": "identifier"},
-                            {"slice": [5, 6], "type": "assign_op"},
-                            {"slice": [6, 7], "type": "decimal_lit"}
-                        ]}
-                    ]}
-                ]
-            },
-            {
-                "I": "a=1\n*b=2",
-                "O": [
-                    {"slice": [0, 8], "type": "StatementList", "children": [
-                        {"slice": [0, 3], "type": "Assignment", "children": [
-                            {"slice": [0, 1], "type": "identifier"},
-                            {"slice": [1, 2], "type": "assign_op"},
-                            {"slice": [2, 3], "type": "decimal_lit"}
-                        ]},
-                        {"slice": [4, 8], "type": "Assignment", "children": [
-                            {"slice": [4, 6], "type": "UnaryExpr", "children": [
-                                {"slice": [4, 5], "type": "unary_op"},
-                                {"slice": [5, 6], "type": "identifier"}
-                            ]},
-                            {"slice": [6, 7], "type": "assign_op"},
-                            {"slice": [7, 8], "type": "decimal_lit"}
-                        ]}
-                    ]}
-                ]
-            },
-            {
-                "I": "a=1\n*b",
-                "O": [
-                    {"slice": [0, 6], "type": "StatementList", "children": [
-                        {"slice": [0, 3], "type": "Assignment", "children": [
-                            {"slice": [0, 1], "type": "identifier"},
-                            {"slice": [1, 2], "type": "assign_op"},
-                            {"slice": [2, 3], "type": "decimal_lit"}
-                        ]},
-                        {"slice": [4, 6], "type": "ExpressionStmt", "children": [
-                            {"slice": [4, 6], "type": "UnaryExpr", "children": [
-                                {"slice": [4, 5], "type": "unary_op"},
-                                {"slice": [5, 6], "type": "identifier"}
-                            ]}
-                        ]}
-                    ]}
-                ]
-            }
+      },
+      {
+        "I": "0xBadFace",
+        "O": [
+          {
+            "slice": [
+              0,
+              9
+            ],
+            "type": "hex_lit"
+          }
         ]
-    }
+      },
+      {
+        "I": "0xBad_Face",
+        "O": [
+          {
+            "slice": [
+              0,
+              10
+            ],
+            "type": "hex_lit"
+          }
+        ]
+      },
+      {
+        "I": "0x_67_7a_2f_cc_40_c6",
+        "O": [
+          {
+            "slice": [
+              0,
+              20
+            ],
+            "type": "hex_lit"
+          }
+        ]
+      },
+      {
+        "I": "170141183460469231731687303715884105727",
+        "O": [
+          {
+            "slice": [
+              0,
+              39
+            ],
+            "type": "decimal_lit"
+          }
+        ]
+      },
+      {
+        "I": "170_141183_460469_231731_687303_715884_105727",
+        "O": [
+          {
+            "slice": [
+              0,
+              45
+            ],
+            "type": "decimal_lit"
+          }
+        ]
+      },
+      {
+        "I": "_42",
+        "E": "MatchError: line 1:1, expect Literal",
+        "N": "an identifier, not an integer literal"
+      },
+      {
+        "I": "42_",
+        "E": "MatchError: line 1:1, expect Literal",
+        "N": "invalid: _ must separate successive digits"
+      },
+      {
+        "I": "4__2",
+        "E": "MatchError: line 1:1, expect Literal",
+        "N": "invalid: only one _ at a time"
+      },
+      {
+        "I": "0_xBadFace",
+        "E": "MatchError: line 1:1, expect Literal",
+        "N": "invalid: _ must separate successive digits"
+      }
+    ]
+  },
+  {
+    "desc": "Float",
+    "grammar_file": "./golang-v1.17.peg",
+    "entry": "Literal",
+    "tests": [
+      {
+        "I": "0.",
+        "O": [
+          {
+            "slice": [
+              0,
+              2
+            ],
+            "type": "decimal_float_lit"
+          }
+        ]
+      },
+      {
+        "I": "72.40",
+        "O": [
+          {
+            "slice": [
+              0,
+              5
+            ],
+            "type": "decimal_float_lit"
+          }
+        ]
+      },
+      {
+        "I": "072.40",
+        "O": [
+          {
+            "slice": [
+              0,
+              6
+            ],
+            "type": "decimal_float_lit"
+          }
+        ]
+      },
+      {
+        "I": "2.71828",
+        "O": [
+          {
+            "slice": [
+              0,
+              7
+            ],
+            "type": "decimal_float_lit"
+          }
+        ]
+      },
+      {
+        "I": "1.e+0",
+        "O": [
+          {
+            "slice": [
+              0,
+              5
+            ],
+            "type": "decimal_float_lit"
+          }
+        ]
+      },
+      {
+        "I": "6.67428e-11",
+        "O": [
+          {
+            "slice": [
+              0,
+              11
+            ],
+            "type": "decimal_float_lit"
+          }
+        ]
+      },
+      {
+        "I": ".25",
+        "O": [
+          {
+            "slice": [
+              0,
+              3
+            ],
+            "type": "decimal_float_lit"
+          }
+        ]
+      },
+      {
+        "I": ".12345E+5",
+        "O": [
+          {
+            "slice": [
+              0,
+              9
+            ],
+            "type": "decimal_float_lit"
+          }
+        ]
+      },
+      {
+        "I": "1_5.",
+        "O": [
+          {
+            "slice": [
+              0,
+              4
+            ],
+            "type": "decimal_float_lit"
+          }
+        ]
+      },
+      {
+        "I": "0.15e+0_2",
+        "O": [
+          {
+            "slice": [
+              0,
+              9
+            ],
+            "type": "decimal_float_lit"
+          }
+        ]
+      },
+      {
+        "I": "0x1p-2",
+        "O": [
+          {
+            "slice": [
+              0,
+              6
+            ],
+            "type": "hex_float_lit"
+          }
+        ]
+      },
+      {
+        "I": "0x2.p10",
+        "O": [
+          {
+            "slice": [
+              0,
+              7
+            ],
+            "type": "hex_float_lit"
+          }
+        ]
+      },
+      {
+        "I": "0x1.Fp+0",
+        "O": [
+          {
+            "slice": [
+              0,
+              8
+            ],
+            "type": "hex_float_lit"
+          }
+        ]
+      },
+      {
+        "I": "0X.8p-0",
+        "O": [
+          {
+            "slice": [
+              0,
+              7
+            ],
+            "type": "hex_float_lit"
+          }
+        ]
+      },
+      {
+        "I": "0X_1FFFP-16",
+        "O": [
+          {
+            "slice": [
+              0,
+              11
+            ],
+            "type": "hex_float_lit"
+          }
+        ]
+      },
+      {
+        "I": "0x15e-2",
+        "O": [
+          {
+            "slice": [
+              0,
+              5
+            ],
+            "type": "hex_lit"
+          }
+        ],
+        "N": "== 0x15e - 2 (integer subtraction)"
+      },
+      {
+        "I": "0x.p1",
+        "E": "CutError: line 1:4, expect hex_digit",
+        "N": "invalid: mantissa has no digits"
+      },
+      {
+        "I": "1p-2",
+        "E": "MatchError: line 1:1, expect Literal",
+        "N": "invalid: p exponent requires hexadecimal mantissa"
+      },
+      {
+        "I": "0x1.5e-2",
+        "E": "MatchError: line 1:1, expect Literal",
+        "N": "invalid: hexadecimal mantissa requires p exponent"
+      },
+      {
+        "I": "1_.5",
+        "E": "MatchError: line 1:1, expect Literal",
+        "N": "invalid: _ must separate successive digits"
+      },
+      {
+        "I": "1._5",
+        "E": "CutError: line 1:3, expect float_lit",
+        "N": "invalid: _ must separate successive digits"
+      },
+      {
+        "I": "1.5_e1",
+        "E": "CutError: line 1:4, expect float_lit",
+        "N": "invalid: _ must separate successive digits"
+      },
+      {
+        "I": "1.5e_1",
+        "E": "CutError: line 1:5, expect decimal_digit",
+        "N": "invalid: _ must separate successive digits"
+      },
+      {
+        "I": "1.5e1_",
+        "E": "CutError: line 1:6, expect float_lit",
+        "N": "invalid: _ must separate successive digits"
+      }
+    ]
+  },
+  {
+    "desc": "Imaginary",
+    "grammar_file": "./golang-v1.17.peg",
+    "entry": "Literal",
+    "tests": [
+      {
+        "I": "0i",
+        "O": [
+          {
+            "slice": [
+              0,
+              2
+            ],
+            "type": "imaginary_lit"
+          }
+        ]
+      },
+      {
+        "I": "0123i",
+        "O": [
+          {
+            "slice": [
+              0,
+              5
+            ],
+            "type": "imaginary_lit"
+          }
+        ],
+        "N": "== 123i for backward-compatibility"
+      },
+      {
+        "I": "0o123i",
+        "O": [
+          {
+            "slice": [
+              0,
+              6
+            ],
+            "type": "imaginary_lit"
+          }
+        ],
+        "N": "== 0o123 * 1i = 83i"
+      },
+      {
+        "I": "0xabci",
+        "O": [
+          {
+            "slice": [
+              0,
+              6
+            ],
+            "type": "imaginary_lit"
+          }
+        ],
+        "N": "== 0xabc * 1i = 2748i"
+      },
+      {
+        "I": "0.i",
+        "O": [
+          {
+            "slice": [
+              0,
+              3
+            ],
+            "type": "imaginary_lit"
+          }
+        ]
+      },
+      {
+        "I": "2.71828i",
+        "O": [
+          {
+            "slice": [
+              0,
+              8
+            ],
+            "type": "imaginary_lit"
+          }
+        ]
+      },
+      {
+        "I": "1.e+0i",
+        "O": [
+          {
+            "slice": [
+              0,
+              6
+            ],
+            "type": "imaginary_lit"
+          }
+        ]
+      },
+      {
+        "I": "6.67428e-11i",
+        "O": [
+          {
+            "slice": [
+              0,
+              12
+            ],
+            "type": "imaginary_lit"
+          }
+        ]
+      },
+      {
+        "I": "1E6i",
+        "O": [
+          {
+            "slice": [
+              0,
+              4
+            ],
+            "type": "imaginary_lit"
+          }
+        ]
+      },
+      {
+        "I": ".25i",
+        "O": [
+          {
+            "slice": [
+              0,
+              4
+            ],
+            "type": "imaginary_lit"
+          }
+        ]
+      },
+      {
+        "I": ".12345E+5i",
+        "O": [
+          {
+            "slice": [
+              0,
+              10
+            ],
+            "type": "imaginary_lit"
+          }
+        ]
+      },
+      {
+        "I": "0x1p-2i",
+        "O": [
+          {
+            "slice": [
+              0,
+              7
+            ],
+            "type": "imaginary_lit"
+          }
+        ],
+        "N": "== 0x1p-2 * 1i == 0.25i"
+      }
+    ]
+  },
+  {
+    "desc": "Imaginary",
+    "grammar_file": "./golang-v1.17.peg",
+    "entry": "Literal",
+    "tests": [
+      {
+        "I": "'a'",
+        "O": [
+          {
+            "slice": [
+              0,
+              3
+            ],
+            "type": "rune_lit"
+          }
+        ]
+      },
+      {
+        "I": "'ä'",
+        "O": [
+          {
+            "slice": [
+              0,
+              4
+            ],
+            "type": "rune_lit"
+          }
+        ]
+      },
+      {
+        "I": "'本'",
+        "O": [
+          {
+            "slice": [
+              0,
+              5
+            ],
+            "type": "rune_lit"
+          }
+        ]
+      },
+      {
+        "I": "'\\t'",
+        "O": [
+          {
+            "slice": [
+              0,
+              4
+            ],
+            "type": "rune_lit"
+          }
+        ]
+      },
+      {
+        "I": "'\t'",
+        "O": [
+          {
+            "slice": [
+              0,
+              3
+            ],
+            "type": "rune_lit"
+          }
+        ]
+      },
+      {
+        "I": "'\\000'",
+        "O": [
+          {
+            "slice": [
+              0,
+              6
+            ],
+            "type": "rune_lit"
+          }
+        ]
+      },
+      {
+        "I": "'\\007'",
+        "O": [
+          {
+            "slice": [
+              0,
+              6
+            ],
+            "type": "rune_lit"
+          }
+        ]
+      },
+      {
+        "I": "'\\377'",
+        "O": [
+          {
+            "slice": [
+              0,
+              6
+            ],
+            "type": "rune_lit"
+          }
+        ]
+      },
+      {
+        "I": "'\\x07'",
+        "O": [
+          {
+            "slice": [
+              0,
+              6
+            ],
+            "type": "rune_lit"
+          }
+        ]
+      },
+      {
+        "I": "'\\xff'",
+        "O": [
+          {
+            "slice": [
+              0,
+              6
+            ],
+            "type": "rune_lit"
+          }
+        ]
+      },
+      {
+        "I": "'\\u12e4'",
+        "O": [
+          {
+            "slice": [
+              0,
+              8
+            ],
+            "type": "rune_lit"
+          }
+        ]
+      },
+      {
+        "I": "'\\U00101234'",
+        "O": [
+          {
+            "slice": [
+              0,
+              12
+            ],
+            "type": "rune_lit"
+          }
+        ]
+      },
+      {
+        "I": "'\\''",
+        "O": [
+          {
+            "slice": [
+              0,
+              4
+            ],
+            "type": "rune_lit"
+          }
+        ]
+      },
+      {
+        "I": "'aa'",
+        "E": "CutError: line 1:3, expect rune_lit (char ''')",
+        "N": "illegal: too many characters"
+      },
+      {
+        "I": "'\\xa'",
+        "E": "CutError: line 1:3, expect rune_lit (char ''')",
+        "N": "illegal: too few hexadecimal digits"
+      },
+      {
+        "I": "'\\0'",
+        "E": "CutError: line 1:3, expect rune_lit (char ''')",
+        "N": "illegal: too few octal digits"
+      },
+      {
+        "I": "'''",
+        "E": "CutError: line 1:2, expect rune_lit",
+        "N": "illegal: too few octal digits"
+      },
+      {
+        "I": "'\\uDFFF'",
+        "N": "IGNORE: illegal: surrogate half but can't detect when parsing as of current Peppa PEG"
+      },
+      {
+        "I": "'\\U00110000'",
+        "N": "IGNORE: illegal: invalid code point but can't detect when parsing as of current Peppa PEG"
+      }
+    ]
+  },
+  {
+    "desc": "String",
+    "grammar_file": "./golang-v1.17.peg",
+    "entry": "Literal",
+    "tests": [
+      {
+        "I": "`a`",
+        "O": [
+          {
+            "slice": [
+              0,
+              3
+            ],
+            "type": "raw_string_lit"
+          }
+        ]
+      },
+      {
+        "I": "`\\n\n\\n`",
+        "O": [
+          {
+            "slice": [
+              0,
+              7
+            ],
+            "type": "raw_string_lit"
+          }
+        ]
+      },
+      {
+        "I": "\"\\n\"",
+        "O": [
+          {
+            "slice": [
+              0,
+              4
+            ],
+            "type": "interpreted_string_lit"
+          }
+        ]
+      },
+      {
+        "I": "\"\\\"\"",
+        "O": [
+          {
+            "slice": [
+              0,
+              4
+            ],
+            "type": "interpreted_string_lit"
+          }
+        ]
+      },
+      {
+        "I": "\"Hello, world!\\n\"",
+        "O": [
+          {
+            "slice": [
+              0,
+              17
+            ],
+            "type": "interpreted_string_lit"
+          }
+        ]
+      },
+      {
+        "I": "\"日本語\"",
+        "O": [
+          {
+            "slice": [
+              0,
+              11
+            ],
+            "type": "interpreted_string_lit"
+          }
+        ]
+      },
+      {
+        "I": "`日本語`",
+        "O": [
+          {
+            "slice": [
+              0,
+              11
+            ],
+            "type": "raw_string_lit"
+          }
+        ]
+      },
+      {
+        "I": "\"\\u65e5\\u672c\\u8a9e\"",
+        "O": [
+          {
+            "slice": [
+              0,
+              20
+            ],
+            "type": "interpreted_string_lit"
+          }
+        ]
+      },
+      {
+        "I": "\"\\u65e5本\\U00008a9e\"",
+        "O": [
+          {
+            "slice": [
+              0,
+              21
+            ],
+            "type": "interpreted_string_lit"
+          }
+        ]
+      },
+      {
+        "I": "\"\\U000065e5\\U0000672c\\U00008a9e\"",
+        "O": [
+          {
+            "slice": [
+              0,
+              32
+            ],
+            "type": "interpreted_string_lit"
+          }
+        ]
+      },
+      {
+        "I": "\"\\xe6\\x97\\xa5\\xe6\\x9c\\xac\\xe8\\xaa\\x9e\"",
+        "O": [
+          {
+            "slice": [
+              0,
+              38
+            ],
+            "type": "interpreted_string_lit"
+          }
+        ]
+      },
+      {
+        "I": "\"\\xff\\u00FF\"",
+        "O": [
+          {
+            "slice": [
+              0,
+              12
+            ],
+            "type": "interpreted_string_lit"
+          }
+        ]
+      },
+      {
+        "I": "\"\\uD800\"",
+        "N": "IGNORED: illegal: surrogate half. Peppa PEG can't support it currently."
+      },
+      {
+        "I": "\"\\U00110000\"",
+        "N": "IGNORED: illegal: invalid Unicode code point. Peppa PEG can't support it currently."
+      }
+    ]
+  },
+  {
+    "desc": "Type",
+    "grammar_file": "./golang-v1.17.peg",
+    "entry": "Type",
+    "tests": [
+      {
+        "I": "uint8",
+        "O": [
+          {
+            "slice": [
+              0,
+              5
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  5
+                ],
+                "type": "identifier"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "uint16",
+        "O": [
+          {
+            "slice": [
+              0,
+              6
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  6
+                ],
+                "type": "identifier"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "uint32",
+        "O": [
+          {
+            "slice": [
+              0,
+              6
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  6
+                ],
+                "type": "identifier"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "uint64",
+        "O": [
+          {
+            "slice": [
+              0,
+              6
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  6
+                ],
+                "type": "identifier"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "int8",
+        "O": [
+          {
+            "slice": [
+              0,
+              4
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  4
+                ],
+                "type": "identifier"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "int16",
+        "O": [
+          {
+            "slice": [
+              0,
+              5
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  5
+                ],
+                "type": "identifier"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "int32",
+        "O": [
+          {
+            "slice": [
+              0,
+              5
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  5
+                ],
+                "type": "identifier"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "int64",
+        "O": [
+          {
+            "slice": [
+              0,
+              5
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  5
+                ],
+                "type": "identifier"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "float32",
+        "O": [
+          {
+            "slice": [
+              0,
+              7
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  7
+                ],
+                "type": "identifier"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "float64",
+        "O": [
+          {
+            "slice": [
+              0,
+              7
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  7
+                ],
+                "type": "identifier"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "complex64",
+        "O": [
+          {
+            "slice": [
+              0,
+              9
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  9
+                ],
+                "type": "identifier"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "complex128",
+        "O": [
+          {
+            "slice": [
+              0,
+              10
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  10
+                ],
+                "type": "identifier"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "byte",
+        "O": [
+          {
+            "slice": [
+              0,
+              4
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  4
+                ],
+                "type": "identifier"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "rune",
+        "O": [
+          {
+            "slice": [
+              0,
+              4
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  4
+                ],
+                "type": "identifier"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "uint",
+        "O": [
+          {
+            "slice": [
+              0,
+              4
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  4
+                ],
+                "type": "identifier"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "int",
+        "O": [
+          {
+            "slice": [
+              0,
+              3
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  3
+                ],
+                "type": "identifier"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "uintptr",
+        "O": [
+          {
+            "slice": [
+              0,
+              7
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  7
+                ],
+                "type": "identifier"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "string",
+        "O": [
+          {
+            "slice": [
+              0,
+              6
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  6
+                ],
+                "type": "identifier"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "[32]byte",
+        "O": [
+          {
+            "slice": [
+              0,
+              8
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  8
+                ],
+                "type": "ArrayType",
+                "children": [
+                  {
+                    "slice": [
+                      1,
+                      3
+                    ],
+                    "type": "decimal_lit"
+                  },
+                  {
+                    "slice": [
+                      4,
+                      8
+                    ],
+                    "type": "Type",
+                    "children": [
+                      {
+                        "slice": [
+                          4,
+                          8
+                        ],
+                        "type": "identifier"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "[2*N] struct { x, y int32 }",
+        "O": [
+          {
+            "slice": [
+              0,
+              27
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  27
+                ],
+                "type": "ArrayType",
+                "children": [
+                  {
+                    "slice": [
+                      1,
+                      4
+                    ],
+                    "type": "Expression",
+                    "children": [
+                      {
+                        "slice": [
+                          1,
+                          2
+                        ],
+                        "type": "decimal_lit"
+                      },
+                      {
+                        "slice": [
+                          2,
+                          3
+                        ],
+                        "type": "mul_op"
+                      },
+                      {
+                        "slice": [
+                          3,
+                          4
+                        ],
+                        "type": "identifier"
+                      }
+                    ]
+                  },
+                  {
+                    "slice": [
+                      6,
+                      27
+                    ],
+                    "type": "Type",
+                    "children": [
+                      {
+                        "slice": [
+                          6,
+                          27
+                        ],
+                        "type": "StructType",
+                        "children": [
+                          {
+                            "slice": [
+                              15,
+                              25
+                            ],
+                            "type": "FieldDecl",
+                            "children": [
+                              {
+                                "slice": [
+                                  15,
+                                  19
+                                ],
+                                "type": "IdentifierList",
+                                "children": [
+                                  {
+                                    "slice": [
+                                      15,
+                                      16
+                                    ],
+                                    "type": "identifier"
+                                  },
+                                  {
+                                    "slice": [
+                                      18,
+                                      19
+                                    ],
+                                    "type": "identifier"
+                                  }
+                                ]
+                              },
+                              {
+                                "slice": [
+                                  20,
+                                  25
+                                ],
+                                "type": "Type",
+                                "children": [
+                                  {
+                                    "slice": [
+                                      20,
+                                      25
+                                    ],
+                                    "type": "identifier"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "[1000]*float64",
+        "O": [
+          {
+            "slice": [
+              0,
+              14
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  14
+                ],
+                "type": "ArrayType",
+                "children": [
+                  {
+                    "slice": [
+                      1,
+                      5
+                    ],
+                    "type": "decimal_lit"
+                  },
+                  {
+                    "slice": [
+                      6,
+                      14
+                    ],
+                    "type": "Type",
+                    "children": [
+                      {
+                        "slice": [
+                          6,
+                          14
+                        ],
+                        "type": "PointerType",
+                        "children": [
+                          {
+                            "slice": [
+                              7,
+                              14
+                            ],
+                            "type": "Type",
+                            "children": [
+                              {
+                                "slice": [
+                                  7,
+                                  14
+                                ],
+                                "type": "identifier"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "[3][5]int",
+        "O": [
+          {
+            "slice": [
+              0,
+              9
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  9
+                ],
+                "type": "ArrayType",
+                "children": [
+                  {
+                    "slice": [
+                      1,
+                      2
+                    ],
+                    "type": "decimal_lit"
+                  },
+                  {
+                    "slice": [
+                      3,
+                      9
+                    ],
+                    "type": "Type",
+                    "children": [
+                      {
+                        "slice": [
+                          3,
+                          9
+                        ],
+                        "type": "ArrayType",
+                        "children": [
+                          {
+                            "slice": [
+                              4,
+                              5
+                            ],
+                            "type": "decimal_lit"
+                          },
+                          {
+                            "slice": [
+                              6,
+                              9
+                            ],
+                            "type": "Type",
+                            "children": [
+                              {
+                                "slice": [
+                                  6,
+                                  9
+                                ],
+                                "type": "identifier"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "[2][2][2]float64",
+        "O": [
+          {
+            "slice": [
+              0,
+              16
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  16
+                ],
+                "type": "ArrayType",
+                "children": [
+                  {
+                    "slice": [
+                      1,
+                      2
+                    ],
+                    "type": "decimal_lit"
+                  },
+                  {
+                    "slice": [
+                      3,
+                      16
+                    ],
+                    "type": "Type",
+                    "children": [
+                      {
+                        "slice": [
+                          3,
+                          16
+                        ],
+                        "type": "ArrayType",
+                        "children": [
+                          {
+                            "slice": [
+                              4,
+                              5
+                            ],
+                            "type": "decimal_lit"
+                          },
+                          {
+                            "slice": [
+                              6,
+                              16
+                            ],
+                            "type": "Type",
+                            "children": [
+                              {
+                                "slice": [
+                                  6,
+                                  16
+                                ],
+                                "type": "ArrayType",
+                                "children": [
+                                  {
+                                    "slice": [
+                                      7,
+                                      8
+                                    ],
+                                    "type": "decimal_lit"
+                                  },
+                                  {
+                                    "slice": [
+                                      9,
+                                      16
+                                    ],
+                                    "type": "Type",
+                                    "children": [
+                                      {
+                                        "slice": [
+                                          9,
+                                          16
+                                        ],
+                                        "type": "identifier"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "[2]([2]([2]float64))",
+        "O": [
+          {
+            "slice": [
+              0,
+              20
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  20
+                ],
+                "type": "ArrayType",
+                "children": [
+                  {
+                    "slice": [
+                      1,
+                      2
+                    ],
+                    "type": "decimal_lit"
+                  },
+                  {
+                    "slice": [
+                      3,
+                      20
+                    ],
+                    "type": "Type",
+                    "children": [
+                      {
+                        "slice": [
+                          4,
+                          19
+                        ],
+                        "type": "Type",
+                        "children": [
+                          {
+                            "slice": [
+                              4,
+                              19
+                            ],
+                            "type": "ArrayType",
+                            "children": [
+                              {
+                                "slice": [
+                                  5,
+                                  6
+                                ],
+                                "type": "decimal_lit"
+                              },
+                              {
+                                "slice": [
+                                  7,
+                                  19
+                                ],
+                                "type": "Type",
+                                "children": [
+                                  {
+                                    "slice": [
+                                      8,
+                                      18
+                                    ],
+                                    "type": "Type",
+                                    "children": [
+                                      {
+                                        "slice": [
+                                          8,
+                                          18
+                                        ],
+                                        "type": "ArrayType",
+                                        "children": [
+                                          {
+                                            "slice": [
+                                              9,
+                                              10
+                                            ],
+                                            "type": "decimal_lit"
+                                          },
+                                          {
+                                            "slice": [
+                                              11,
+                                              18
+                                            ],
+                                            "type": "Type",
+                                            "children": [
+                                              {
+                                                "slice": [
+                                                  11,
+                                                  18
+                                                ],
+                                                "type": "identifier"
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "[]T",
+        "O": [
+          {
+            "slice": [
+              0,
+              3
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  3
+                ],
+                "type": "SliceType",
+                "children": [
+                  {
+                    "slice": [
+                      2,
+                      3
+                    ],
+                    "type": "Type",
+                    "children": [
+                      {
+                        "slice": [
+                          2,
+                          3
+                        ],
+                        "type": "identifier"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "struct {}",
+        "O": [
+          {
+            "slice": [
+              0,
+              9
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  9
+                ],
+                "type": "StructType"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "struct {\n\tx, y int\n\tu float32\n\t_ float32  // padding\n\tA *[]int\n\tF func()\n}",
+        "O": [
+          {
+            "slice": [
+              0,
+              74
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  74
+                ],
+                "type": "StructType",
+                "children": [
+                  {
+                    "slice": [
+                      10,
+                      18
+                    ],
+                    "type": "FieldDecl",
+                    "children": [
+                      {
+                        "slice": [
+                          10,
+                          14
+                        ],
+                        "type": "IdentifierList",
+                        "children": [
+                          {
+                            "slice": [
+                              10,
+                              11
+                            ],
+                            "type": "identifier"
+                          },
+                          {
+                            "slice": [
+                              13,
+                              14
+                            ],
+                            "type": "identifier"
+                          }
+                        ]
+                      },
+                      {
+                        "slice": [
+                          15,
+                          18
+                        ],
+                        "type": "Type",
+                        "children": [
+                          {
+                            "slice": [
+                              15,
+                              18
+                            ],
+                            "type": "identifier"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "slice": [
+                      20,
+                      29
+                    ],
+                    "type": "FieldDecl",
+                    "children": [
+                      {
+                        "slice": [
+                          20,
+                          21
+                        ],
+                        "type": "identifier"
+                      },
+                      {
+                        "slice": [
+                          22,
+                          29
+                        ],
+                        "type": "Type",
+                        "children": [
+                          {
+                            "slice": [
+                              22,
+                              29
+                            ],
+                            "type": "identifier"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "slice": [
+                      31,
+                      40
+                    ],
+                    "type": "FieldDecl",
+                    "children": [
+                      {
+                        "slice": [
+                          31,
+                          32
+                        ],
+                        "type": "identifier"
+                      },
+                      {
+                        "slice": [
+                          33,
+                          40
+                        ],
+                        "type": "Type",
+                        "children": [
+                          {
+                            "slice": [
+                              33,
+                              40
+                            ],
+                            "type": "identifier"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "slice": [
+                      54,
+                      62
+                    ],
+                    "type": "FieldDecl",
+                    "children": [
+                      {
+                        "slice": [
+                          54,
+                          55
+                        ],
+                        "type": "identifier"
+                      },
+                      {
+                        "slice": [
+                          56,
+                          62
+                        ],
+                        "type": "Type",
+                        "children": [
+                          {
+                            "slice": [
+                              56,
+                              62
+                            ],
+                            "type": "PointerType",
+                            "children": [
+                              {
+                                "slice": [
+                                  57,
+                                  62
+                                ],
+                                "type": "Type",
+                                "children": [
+                                  {
+                                    "slice": [
+                                      57,
+                                      62
+                                    ],
+                                    "type": "SliceType",
+                                    "children": [
+                                      {
+                                        "slice": [
+                                          59,
+                                          62
+                                        ],
+                                        "type": "Type",
+                                        "children": [
+                                          {
+                                            "slice": [
+                                              59,
+                                              62
+                                            ],
+                                            "type": "identifier"
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "slice": [
+                      64,
+                      72
+                    ],
+                    "type": "FieldDecl",
+                    "children": [
+                      {
+                        "slice": [
+                          64,
+                          65
+                        ],
+                        "type": "identifier"
+                      },
+                      {
+                        "slice": [
+                          66,
+                          72
+                        ],
+                        "type": "Type",
+                        "children": [
+                          {
+                            "slice": [
+                              66,
+                              72
+                            ],
+                            "type": "FunctionType",
+                            "children": [
+                              {
+                                "slice": [
+                                  70,
+                                  72
+                                ],
+                                "type": "Signature",
+                                "children": [
+                                  {
+                                    "slice": [
+                                      70,
+                                      72
+                                    ],
+                                    "type": "Parameters"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "struct {\n\tT1        // field name is T1\n\t*T2       // field name is T2\n\tP.T3      // field name is T3\n\t*P.T4     // field name is T4\n\tx, y int  // field names are x and y\n}",
+        "O": [
+          {
+            "slice": [
+              0,
+              172
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  172
+                ],
+                "type": "StructType",
+                "children": [
+                  {
+                    "slice": [
+                      10,
+                      12
+                    ],
+                    "type": "FieldDecl",
+                    "children": [
+                      {
+                        "slice": [
+                          10,
+                          12
+                        ],
+                        "type": "EmbeddedField",
+                        "children": [
+                          {
+                            "slice": [
+                              10,
+                              12
+                            ],
+                            "type": "identifier"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "slice": [
+                      41,
+                      44
+                    ],
+                    "type": "FieldDecl",
+                    "children": [
+                      {
+                        "slice": [
+                          41,
+                          44
+                        ],
+                        "type": "EmbeddedField",
+                        "children": [
+                          {
+                            "slice": [
+                              41,
+                              42
+                            ],
+                            "type": "Pointer"
+                          },
+                          {
+                            "slice": [
+                              42,
+                              44
+                            ],
+                            "type": "identifier"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "slice": [
+                      72,
+                      76
+                    ],
+                    "type": "FieldDecl",
+                    "children": [
+                      {
+                        "slice": [
+                          72,
+                          76
+                        ],
+                        "type": "EmbeddedField",
+                        "children": [
+                          {
+                            "slice": [
+                              72,
+                              76
+                            ],
+                            "type": "QualifiedIdent",
+                            "children": [
+                              {
+                                "slice": [
+                                  72,
+                                  73
+                                ],
+                                "type": "PackageName",
+                                "children": [
+                                  {
+                                    "slice": [
+                                      72,
+                                      73
+                                    ],
+                                    "type": "identifier"
+                                  }
+                                ]
+                              },
+                              {
+                                "slice": [
+                                  74,
+                                  76
+                                ],
+                                "type": "identifier"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "slice": [
+                      103,
+                      108
+                    ],
+                    "type": "FieldDecl",
+                    "children": [
+                      {
+                        "slice": [
+                          103,
+                          108
+                        ],
+                        "type": "EmbeddedField",
+                        "children": [
+                          {
+                            "slice": [
+                              103,
+                              104
+                            ],
+                            "type": "Pointer"
+                          },
+                          {
+                            "slice": [
+                              104,
+                              108
+                            ],
+                            "type": "QualifiedIdent",
+                            "children": [
+                              {
+                                "slice": [
+                                  104,
+                                  105
+                                ],
+                                "type": "PackageName",
+                                "children": [
+                                  {
+                                    "slice": [
+                                      104,
+                                      105
+                                    ],
+                                    "type": "identifier"
+                                  }
+                                ]
+                              },
+                              {
+                                "slice": [
+                                  106,
+                                  108
+                                ],
+                                "type": "identifier"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "slice": [
+                      134,
+                      142
+                    ],
+                    "type": "FieldDecl",
+                    "children": [
+                      {
+                        "slice": [
+                          134,
+                          138
+                        ],
+                        "type": "IdentifierList",
+                        "children": [
+                          {
+                            "slice": [
+                              134,
+                              135
+                            ],
+                            "type": "identifier"
+                          },
+                          {
+                            "slice": [
+                              137,
+                              138
+                            ],
+                            "type": "identifier"
+                          }
+                        ]
+                      },
+                      {
+                        "slice": [
+                          139,
+                          142
+                        ],
+                        "type": "Type",
+                        "children": [
+                          {
+                            "slice": [
+                              139,
+                              142
+                            ],
+                            "type": "identifier"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "struct {\n\tx, y float64 \"\"  // an empty tag string is like an absent tag\n\tname string  \"any string is permitted as a tag\"\n\t_    [4]byte \"ceci n'est pas un champ de structure\"\n}",
+        "O": [
+          {
+            "slice": [
+              0,
+              175
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  175
+                ],
+                "type": "StructType",
+                "children": [
+                  {
+                    "slice": [
+                      10,
+                      25
+                    ],
+                    "type": "FieldDecl",
+                    "children": [
+                      {
+                        "slice": [
+                          10,
+                          14
+                        ],
+                        "type": "IdentifierList",
+                        "children": [
+                          {
+                            "slice": [
+                              10,
+                              11
+                            ],
+                            "type": "identifier"
+                          },
+                          {
+                            "slice": [
+                              13,
+                              14
+                            ],
+                            "type": "identifier"
+                          }
+                        ]
+                      },
+                      {
+                        "slice": [
+                          15,
+                          22
+                        ],
+                        "type": "Type",
+                        "children": [
+                          {
+                            "slice": [
+                              15,
+                              22
+                            ],
+                            "type": "identifier"
+                          }
+                        ]
+                      },
+                      {
+                        "slice": [
+                          23,
+                          25
+                        ],
+                        "type": "Tag",
+                        "children": [
+                          {
+                            "slice": [
+                              23,
+                              25
+                            ],
+                            "type": "interpreted_string_lit"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "slice": [
+                      73,
+                      120
+                    ],
+                    "type": "FieldDecl",
+                    "children": [
+                      {
+                        "slice": [
+                          73,
+                          77
+                        ],
+                        "type": "identifier"
+                      },
+                      {
+                        "slice": [
+                          78,
+                          84
+                        ],
+                        "type": "Type",
+                        "children": [
+                          {
+                            "slice": [
+                              78,
+                              84
+                            ],
+                            "type": "identifier"
+                          }
+                        ]
+                      },
+                      {
+                        "slice": [
+                          86,
+                          120
+                        ],
+                        "type": "Tag",
+                        "children": [
+                          {
+                            "slice": [
+                              86,
+                              120
+                            ],
+                            "type": "interpreted_string_lit"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "slice": [
+                      122,
+                      173
+                    ],
+                    "type": "FieldDecl",
+                    "children": [
+                      {
+                        "slice": [
+                          122,
+                          123
+                        ],
+                        "type": "identifier"
+                      },
+                      {
+                        "slice": [
+                          127,
+                          134
+                        ],
+                        "type": "Type",
+                        "children": [
+                          {
+                            "slice": [
+                              127,
+                              134
+                            ],
+                            "type": "ArrayType",
+                            "children": [
+                              {
+                                "slice": [
+                                  128,
+                                  129
+                                ],
+                                "type": "decimal_lit"
+                              },
+                              {
+                                "slice": [
+                                  130,
+                                  134
+                                ],
+                                "type": "Type",
+                                "children": [
+                                  {
+                                    "slice": [
+                                      130,
+                                      134
+                                    ],
+                                    "type": "identifier"
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "slice": [
+                          135,
+                          173
+                        ],
+                        "type": "Tag",
+                        "children": [
+                          {
+                            "slice": [
+                              135,
+                              173
+                            ],
+                            "type": "interpreted_string_lit"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "struct {\n\tmicrosec  uint64 `protobuf:\"1\"`\n\tserverIP6 uint64 `protobuf:\"2\"`\n}",
+        "O": [
+          {
+            "slice": [
+              0,
+              76
+            ],
+            "type": "Type",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  76
+                ],
+                "type": "StructType",
+                "children": [
+                  {
+                    "slice": [
+                      10,
+                      41
+                    ],
+                    "type": "FieldDecl",
+                    "children": [
+                      {
+                        "slice": [
+                          10,
+                          18
+                        ],
+                        "type": "identifier"
+                      },
+                      {
+                        "slice": [
+                          20,
+                          26
+                        ],
+                        "type": "Type",
+                        "children": [
+                          {
+                            "slice": [
+                              20,
+                              26
+                            ],
+                            "type": "identifier"
+                          }
+                        ]
+                      },
+                      {
+                        "slice": [
+                          27,
+                          41
+                        ],
+                        "type": "Tag",
+                        "children": [
+                          {
+                            "slice": [
+                              27,
+                              41
+                            ],
+                            "type": "raw_string_lit"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "slice": [
+                      43,
+                      74
+                    ],
+                    "type": "FieldDecl",
+                    "children": [
+                      {
+                        "slice": [
+                          43,
+                          52
+                        ],
+                        "type": "identifier"
+                      },
+                      {
+                        "slice": [
+                          53,
+                          59
+                        ],
+                        "type": "Type",
+                        "children": [
+                          {
+                            "slice": [
+                              53,
+                              59
+                            ],
+                            "type": "identifier"
+                          }
+                        ]
+                      },
+                      {
+                        "slice": [
+                          60,
+                          74
+                        ],
+                        "type": "Tag",
+                        "children": [
+                          {
+                            "slice": [
+                              60,
+                              74
+                            ],
+                            "type": "raw_string_lit"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "desc": "FunctionLit",
+    "grammar_file": "./golang-v1.17.peg",
+    "entry": "Literal",
+    "tests": [
+      {
+        "I": "func(){}",
+        "O": [
+          {
+            "slice": [
+              0,
+              8
+            ],
+            "type": "FunctionLit",
+            "children": [
+              {
+                "slice": [
+                  4,
+                  6
+                ],
+                "type": "Signature",
+                "children": [
+                  {
+                    "slice": [
+                      4,
+                      6
+                    ],
+                    "type": "Parameters"
+                  }
+                ]
+              },
+              {
+                "slice": [
+                  6,
+                  8
+                ],
+                "type": "Block"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "desc": "StatementList",
+    "grammar_file": "./golang-v1.17.peg",
+    "entry": "StatementList",
+    "tests": [
+      {
+        "N": "EOL terminates a statement.",
+        "I": "a=1",
+        "O": [
+          {
+            "slice": [
+              0,
+              3
+            ],
+            "type": "StatementList",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  3
+                ],
+                "type": "Assignment",
+                "children": [
+                  {
+                    "slice": [
+                      0,
+                      1
+                    ],
+                    "type": "identifier"
+                  },
+                  {
+                    "slice": [
+                      1,
+                      2
+                    ],
+                    "type": "assign_op"
+                  },
+                  {
+                    "slice": [
+                      2,
+                      3
+                    ],
+                    "type": "decimal_lit"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "N": "Semicolon terminates a statement.",
+        "I": "a=1;",
+        "O": [
+          {
+            "slice": [
+              0,
+              3
+            ],
+            "type": "StatementList",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  3
+                ],
+                "type": "Assignment",
+                "children": [
+                  {
+                    "slice": [
+                      0,
+                      1
+                    ],
+                    "type": "identifier"
+                  },
+                  {
+                    "slice": [
+                      1,
+                      2
+                    ],
+                    "type": "assign_op"
+                  },
+                  {
+                    "slice": [
+                      2,
+                      3
+                    ],
+                    "type": "decimal_lit"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "N": "Auto-Semicolon terminates a statement.",
+        "I": "a=1\n",
+        "O": [
+          {
+            "slice": [
+              0,
+              3
+            ],
+            "type": "StatementList",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  3
+                ],
+                "type": "Assignment",
+                "children": [
+                  {
+                    "slice": [
+                      0,
+                      1
+                    ],
+                    "type": "identifier"
+                  },
+                  {
+                    "slice": [
+                      1,
+                      2
+                    ],
+                    "type": "assign_op"
+                  },
+                  {
+                    "slice": [
+                      2,
+                      3
+                    ],
+                    "type": "decimal_lit"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "a=1\nb=2",
+        "O": [
+          {
+            "slice": [
+              0,
+              7
+            ],
+            "type": "StatementList",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  3
+                ],
+                "type": "Assignment",
+                "children": [
+                  {
+                    "slice": [
+                      0,
+                      1
+                    ],
+                    "type": "identifier"
+                  },
+                  {
+                    "slice": [
+                      1,
+                      2
+                    ],
+                    "type": "assign_op"
+                  },
+                  {
+                    "slice": [
+                      2,
+                      3
+                    ],
+                    "type": "decimal_lit"
+                  }
+                ]
+              },
+              {
+                "slice": [
+                  4,
+                  7
+                ],
+                "type": "Assignment",
+                "children": [
+                  {
+                    "slice": [
+                      4,
+                      5
+                    ],
+                    "type": "identifier"
+                  },
+                  {
+                    "slice": [
+                      5,
+                      6
+                    ],
+                    "type": "assign_op"
+                  },
+                  {
+                    "slice": [
+                      6,
+                      7
+                    ],
+                    "type": "decimal_lit"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "a=1\n*b=2",
+        "O": [
+          {
+            "slice": [
+              0,
+              8
+            ],
+            "type": "StatementList",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  3
+                ],
+                "type": "Assignment",
+                "children": [
+                  {
+                    "slice": [
+                      0,
+                      1
+                    ],
+                    "type": "identifier"
+                  },
+                  {
+                    "slice": [
+                      1,
+                      2
+                    ],
+                    "type": "assign_op"
+                  },
+                  {
+                    "slice": [
+                      2,
+                      3
+                    ],
+                    "type": "decimal_lit"
+                  }
+                ]
+              },
+              {
+                "slice": [
+                  4,
+                  8
+                ],
+                "type": "Assignment",
+                "children": [
+                  {
+                    "slice": [
+                      4,
+                      6
+                    ],
+                    "type": "UnaryExpr",
+                    "children": [
+                      {
+                        "slice": [
+                          4,
+                          5
+                        ],
+                        "type": "unary_op"
+                      },
+                      {
+                        "slice": [
+                          5,
+                          6
+                        ],
+                        "type": "identifier"
+                      }
+                    ]
+                  },
+                  {
+                    "slice": [
+                      6,
+                      7
+                    ],
+                    "type": "assign_op"
+                  },
+                  {
+                    "slice": [
+                      7,
+                      8
+                    ],
+                    "type": "decimal_lit"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "I": "a=1\n*b",
+        "O": [
+          {
+            "slice": [
+              0,
+              6
+            ],
+            "type": "StatementList",
+            "children": [
+              {
+                "slice": [
+                  0,
+                  3
+                ],
+                "type": "Assignment",
+                "children": [
+                  {
+                    "slice": [
+                      0,
+                      1
+                    ],
+                    "type": "identifier"
+                  },
+                  {
+                    "slice": [
+                      1,
+                      2
+                    ],
+                    "type": "assign_op"
+                  },
+                  {
+                    "slice": [
+                      2,
+                      3
+                    ],
+                    "type": "decimal_lit"
+                  }
+                ]
+              },
+              {
+                "slice": [
+                  4,
+                  6
+                ],
+                "type": "ExpressionStmt",
+                "children": [
+                  {
+                    "slice": [
+                      4,
+                      6
+                    ],
+                    "type": "UnaryExpr",
+                    "children": [
+                      {
+                        "slice": [
+                          4,
+                          5
+                        ],
+                        "type": "unary_op"
+                      },
+                      {
+                        "slice": [
+                          5,
+                          6
+                        ],
+                        "type": "identifier"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
 ]

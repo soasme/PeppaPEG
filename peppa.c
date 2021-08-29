@@ -2069,6 +2069,10 @@ match_choice(P4_Source* s, P4_Expression* e) {
     if (need_lift(s, e))
         return tok;
 
+    if (is_non_terminal(e) && tok != NULL && tok ->next == NULL) {
+        return tok;
+    }
+
     P4_Node* oneof = P4_CreateNode (s->content, startpos, endpos, e->name);
     if (oneof == NULL)
         panic("failed to create node: out of memory");

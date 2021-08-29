@@ -6,6 +6,7 @@ eol            = (" " / "\t" / block_comment)* (";" / "\n" / !. / line_comment);
 @lifted @squashed
 whitespace = " " / "\t" / "\r" / "\n";
 
+@lifted @squashed
 line_comment = "//" (!"\n" .)* ("\n" / !.);
 
 @lifted @squashed
@@ -16,6 +17,9 @@ comment = line_comment / block_comment;
 
 @lifted
 ws = whitespace / line_comment / block_comment;
+
+@lifted
+inlinews = " " / "\t" / block_comment;
 
 @lifted
 linews = " " / "\t" / comment;
@@ -124,7 +128,7 @@ PointerType = "*" BaseType ;
 BaseType    = Type ;
 
 FunctionType   = "func" linews* Signature ;
-Signature      = Parameters ((" "/"\t")* Result)? ;
+Signature      = Parameters (inlinews* Result)? ;
 
 Parameters     = "(" ~ (ws* ParameterList linews* ","?)? ws* ")" ;
 
@@ -218,12 +222,11 @@ MethodExpr    = ReceiverType "." MethodName ;
 ReceiverType  = Type ;
 
 @nonterminal 
-Expression = UnaryExpr ((" "/"\t"/block_comment)* binary_op ~ ws* UnaryExpr)*;
+Expression = UnaryExpr (inlinews* binary_op ~ ws* UnaryExpr)*;
 # Expression = UnaryExpr | Expression binary_op Expression .
 
 @nonterminal @scoped
-UnaryExpr  = PrimaryExpr / unary_op UnaryExpr;
-# UnaryExpr  = PrimaryExpr | unary_op UnaryExpr .
+UnaryExpr  = PrimaryExpr / unary_op+ PrimaryExpr;
 
 @nonterminal
 UnambiguousExpression = UnambiguousUnaryExpr (linews* binary_op ~ ws* UnambiguousUnaryExpr)*;
@@ -268,7 +271,7 @@ Assignment = ExpressionList linews* assign_op ws* ExpressionList ;
 
 assign_op = (add_op / mul_op)? "=" ;
 
-IfStmt = "if" linews+ ~ (SimpleStmt linews* ";")? linews* UnambiguousExpression linews* Block (ws* "else" (" "/"\t"/block_comment) ~ ws* ( IfStmt / Block ))? ;
+IfStmt = "if" linews+ ~ (SimpleStmt linews* ";")? linews* UnambiguousExpression linews* Block (ws* "else" inlinews ~ ws* ( IfStmt / Block ))? ;
 
 SwitchStmt = TypeSwitchStmt / ExprSwitchStmt;
 

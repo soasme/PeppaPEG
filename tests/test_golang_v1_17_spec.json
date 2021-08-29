@@ -437,7 +437,7 @@
                 "N": "Semicolon terminates a statement.",
                 "I": "a=1;",
                 "O": [
-                    {"slice": [0, 4], "type": "StatementList", "children": [
+                    {"slice": [0, 3], "type": "StatementList", "children": [
                         {"slice": [0, 3], "type": "Assignment", "children": [
                             {"slice": [0, 1], "type": "identifier"},
                             {"slice": [1, 2], "type": "assign_op"},
@@ -450,7 +450,7 @@
                 "N": "Auto-Semicolon terminates a statement.",
                 "I": "a=1\n",
                 "O": [
-                    {"slice": [0, 4], "type": "StatementList", "children": [
+                    {"slice": [0, 3], "type": "StatementList", "children": [
                         {"slice": [0, 3], "type": "Assignment", "children": [
                             {"slice": [0, 1], "type": "identifier"},
                             {"slice": [1, 2], "type": "assign_op"},

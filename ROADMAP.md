@@ -1,5 +1,6 @@
 # ROADMAP
 
+- [ ] api: better error message, report filename, lineno, offset, line, highlight error slice, error message, termcolor
 - [ ] peg: error string `rule = (a b c ~ e"LiteralName form of CompositeLiteral shouldn't appear on if/for/switch statement without )]}.") expr`. By using error string with cut, a syntax error is raised.
 - [ ] shell: `peppa parse` generates dot diagram.
 - [ ] shell: `peppa ast` -> `peppa parse`.

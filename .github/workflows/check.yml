@@ -71,4 +71,9 @@ jobs:
       run: |
         make
         sudo make install
-        ASAN_OPTIONS="detect_leaks=1" make check
+
+        if [ "${{ matrix.compiler }}" = "clang" && "${{ matrix.os }}" = "ubuntu-latest" ]; then
+          export ASAN_OPTIONS="detect_leaks=1"
+        fi
+
+        make check

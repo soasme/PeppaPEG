@@ -39,7 +39,6 @@
 - [ ] api: operate slice (copy string, get size, etc).
 - [ ] api: operate node.
 - [ ] api: set source verbose mode.
-- [ ] api: save backreference in source stack so it can be used outside a sequence.
 - [ ] api: until.
 - [ ] api: Sanitize `\0` to whitespace for the source input, this happens in creating the source/setting the source size. Example: Python Parser.
 - [ ] api: support UTF-8 BOM sequence (0xEF 0xBB 0xBF) at the start of source. can be done via unistring: P4_LoadSource, if s startswith these three byte marks, add pseudo slice.
@@ -69,8 +68,9 @@
 - [ ] peg: support Python-style INDENT rule.
 - [ ] api: print grammar and/or rules.
 - [ ] refactor: move some variables to `frame` to reduce function frame size.
-- [x] perf: Cache literal len or use better string structure internally.
-- [x] peg: ~~`@sibling_to_descdent`. can be used to transform cases like toml [key1.key2], key2 should be a child of key1.~~ This can be done via right recursion: key = identifier "." key / identifier;
+- [x] perf: only track backrefs if sequence has backref as member. v1.16.0
+- [x] perf: Cache literal len or use better string structure internally. v1.16.0
+- [x] peg: ~~`@sibling_to_descdent`. can be used to transform cases like toml [key1.key2], key2 should be a child of key1.~~ This can be done via right recursion: key = identifier "." key / identifier; see spec - right recursion. v1.16.0
 - [x] peg: right_recursion. updated right recursion in spec. v1.16.0
 - [x] peg: left_recursion. can be used to transform cases like expression: `a = b @left_recursion (minus/plus/mul/div) b`, the left side of `@left_recursion` is operand, the right side is infix and the other operand. Given 1+2+3, it will produce `{{1, +, 2}, + 3}`. v1.16.0
 - [x] shell: `p4 ast --grammar --rule --input`. Return json tree in stdout or error in stderr. v1.15.0

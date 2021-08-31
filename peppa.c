@@ -604,6 +604,7 @@ struct P4_Expression {
         struct {
             P4_Expression**         members;
             size_t                  count;
+            bool                    has_backref;
         };
 
         /** Used by P4_ZeroOrOnce..P4_RepeatExact.
@@ -1965,9 +1966,11 @@ match_sequence(P4_Source* s, P4_Expression* e) {
              *tok = NULL,
              *whitespace = NULL;
 
-    autofree P4_Slice* backrefs = P4_MALLOC(sizeof(P4_Slice) * e->count);
-    if (backrefs == NULL)
-        panic("failed to create slices: out of memory");
+    autofree P4_Slice* backrefs = NULL;
+
+    if (e->has_backref) {
+        catch_oom(backrefs = P4_MALLOC(sizeof(P4_Slice) * e->count));
+    }
 
     bool space = need_whitespace(s);
 
@@ -2015,7 +2018,7 @@ match_sequence(P4_Source* s, P4_Expression* e) {
         P4_AdoptNode(head, tail, tok);
 
         mark_position(s, member_endpos);
-        set_slice(&backrefs[i], member_startpos, member_endpos);
+        if (e->has_backref) set_slice(&backrefs[i], member_startpos, member_endpos);
     }
 
     if (need_lift(s, e))
@@ -2721,6 +2724,7 @@ P4_CreateSequence(size_t count) {
         return NULL;
 
     expr->kind = P4_Sequence;
+    expr->has_backref = false;
 
     return expr;
 }
@@ -3259,6 +3263,9 @@ P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_String name, size_t count, ...
 
         if (expr->members[i] == NULL)
             panicf("failed to set %zuth expression.", i);
+
+        if (expr->members[i]->kind == P4_BackReference)
+            expr->has_backref = true;
     }
 
     va_end (members);
@@ -3307,6 +3314,11 @@ P4_SetMember(P4_Expression* expr, size_t offset, P4_Expression* member) {
     if (expr->kind != P4_Sequence
             && expr->kind != P4_Choice) {
         return P4_ValueError;
+    }
+
+    if (expr->kind == P4_Sequence
+            && member->kind == P4_BackReference) {
+        expr->has_backref = true;
     }
 
     if (offset < 0

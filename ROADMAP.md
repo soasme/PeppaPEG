@@ -52,7 +52,6 @@
 - [ ] peg: left recursive: https://tratt.net/laurie/research/pubs/html/tratt__direct_left_recursive_parsing_expression_grammars/ https://github.com/orlandohill/peg-left-recursion. introduce left_recursion, right_recursion in sequence.
 - [ ] peg: describe grammar AST using ADSL-style rules.
 - [ ] perf: pre-alloc tokens.
-- [ ] perf: Cache literal len or use better string structure internally.
 - [ ] perf: trace: add a tracer in P4_Source. When matching, annotate the tracer. An additional tool can aggregate data and output a DOT / compile to png. Similar: https://textx.github.io/Arpeggio/stable/debugging/#parser-debug-mode https://ohmlang.github.io/editor/
 - [ ] perf: tracer: https://pegjs.org/documentation
       https://github.com/orlandohill/peg-left-recursion
@@ -70,6 +69,7 @@
 - [ ] peg: support Python-style INDENT rule.
 - [ ] api: print grammar and/or rules.
 - [ ] refactor: move some variables to `frame` to reduce function frame size.
+- [x] perf: Cache literal len or use better string structure internally.
 - [x] peg: ~~`@sibling_to_descdent`. can be used to transform cases like toml [key1.key2], key2 should be a child of key1.~~ This can be done via right recursion: key = identifier "." key / identifier;
 - [x] peg: right_recursion. updated right recursion in spec. v1.16.0
 - [x] peg: left_recursion. can be used to transform cases like expression: `a = b @left_recursion (minus/plus/mul/div) b`, the left side of `@left_recursion` is operand, the right side is infix and the other operand. Given 1+2+3, it will produce `{{1, +, 2}, + 3}`. v1.16.0

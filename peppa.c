@@ -575,6 +575,7 @@ struct P4_Expression {
         /** Used by P4_Literal and P4_BackReference. */
         struct {
             P4_String               literal;
+            size_t                  literal_len;
             bool                    sensitive;
             size_t                  backref_index;
         };
@@ -1790,9 +1791,9 @@ match_literal(P4_Source* s, P4_Expression* e) {
         return NULL;
     }
 
-    size_t len = strlen(e->literal);
-    size_t slen = strlen(str);
-    if (slen < len) {
+    size_t len = e->literal_len;
+    size_t rest = s->slice.stop.pos - s->pos;
+    if (rest < len) {
         P4_MatchRaisef(s, P4_MatchError, "expect %s (len %zu)",
                 s->frame_stack->rule->name, len);
         return NULL;
@@ -2570,6 +2571,7 @@ P4_CreateLiteral(const P4_String literal, bool sensitive) {
     expr->flag = 0;
     expr->name = NULL;
     expr->literal = STRDUP(literal);
+    expr->literal_len = strlen(literal);
     expr->sensitive = sensitive;
     return expr;
 }

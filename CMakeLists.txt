@@ -15,6 +15,20 @@ set(P4_HEADERS peppa.h)
 set(P4_SOURCES peppa.c)
 add_library("${P4_LIB}" SHARED "${P4_HEADERS}" "${P4_SOURCES}")
 
+option(ENABLE_CLI "Enable building command-line interface." On)
+if (ENABLE_CLI)
+    add_executable("${P4_BIN}" "shell.c")
+    target_link_libraries("${P4_BIN}" "${P4_LIB}")
+    install(
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/${P4_BIN}"
+        DESTINATION "${CMAKE_INSTALL_FULL_BINDIR}"
+        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
+                    GROUP_READ GROUP_EXECUTE
+                    WORLD_READ WORLD_EXECUTE
+        RENAME "peppa"
+    )
+endif()
+
 target_compile_options("${P4_LIB}" PRIVATE "-ansi")
 target_compile_options("${P4_LIB}" PRIVATE "-Wall")
 
@@ -26,21 +40,27 @@ if (ENABLE_UNISTR)
     target_compile_options("${P4_LIB}" PRIVATE "-I${UNISTR_H}")
     target_compile_options("${P4_LIB}" PRIVATE "-D ENABLE_UNISTR")
     target_link_libraries("${P4_LIB}" PUBLIC "${UNISTRING_LIB}")
+    target_compile_options("${P4_BIN}" PRIVATE "-I${UNISTR_H}")
+    target_compile_options("${P4_BIN}" PRIVATE "-D ENABLE_UNISTR")
 endif()
 
 option(ENABLE_DEBUG "Enables CC -g." OFF)
+message("-- CC: Debug - ${ENABLE_DEBUG}.")
 if (ENABLE_DEBUG)
     target_compile_options("${P4_LIB}" PRIVATE "-g")
+    target_compile_options("${P4_BIN}" PRIVATE "-g")
 endif()
 
 option(ENABLE_OPTIMIZATION "Enable Optimization." Off)
+message("-- CC: Optimization - ${ENABLE_OPTIMIZATION}.")
 if (ENABLE_OPTIMIZATION)
-    target_compile_options("${P4_LIB}" PRIVATE "-O3")
+    target_compile_options("${P4_LIB}" PRIVATE "-O2")
+    target_compile_options("${P4_BIN}" PRIVATE "-O2")
 endif()
 
 option(ENABLE_ADDRESS_SANITIZER "Enables AddressSanitizer." OFF)
 message("-- Clang: AddressSanitizer - ${ENABLE_ADDRESS_SANITIZER}.")
-if (ENABLE_ADDRESS_SANITIZERS)
+if (ENABLE_ADDRESS_SANITIZER)
     list(APPEND custom_compiler_flags
         -fno-omit-frame-pointer
         -fsanitize=address
@@ -95,22 +115,4 @@ endif()
 option(ENABLE_DOCS "Enable documentation build." OFF)
 if (ENABLE_DOCS)
     add_subdirectory(docs)
-endif()
-
-option(ENABLE_CLI "Enable building command-line interface." On)
-if (ENABLE_CLI)
-    add_executable("${P4_BIN}" "shell.c")
-    target_link_libraries("${P4_BIN}" "${P4_LIB}")
-    if (ENABLE_UNISTR)
-        target_compile_options("peppa" PRIVATE "-I${UNISTR_H}")
-        target_compile_options("peppa" PRIVATE "-DENABLE_UNISTR")
-    endif()
-    install(
-        FILES "${CMAKE_CURRENT_BINARY_DIR}/${P4_BIN}"
-        DESTINATION "${CMAKE_INSTALL_FULL_BINDIR}"
-        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                    GROUP_READ GROUP_EXECUTE
-                    WORLD_READ WORLD_EXECUTE
-        RENAME "peppa"
-    )
 endif()

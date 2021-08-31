@@ -37,6 +37,7 @@
 #include <unistd.h>
 #include <libgen.h>
 #include <getopt.h>
+#include <glob.h>
 #include "peppa.h"
 
 # define abort(code) do { err = (code); goto finalize; } while (0)
@@ -197,15 +198,38 @@ int subcommand_ast(p4_args_t* args) {
         while ((*(s++) = getchar()) != EOF && (++size) < 1024 * 1024 - 1) {
         }
         *s = '\0';
-    } else {
+
+        err = print_ast(grammar_content, input_content, args->grammar_entry);
+    } else if (strstr(args->arguments[1], "*") == NULL){
         if (!(input_file = fopen(args->arguments[1], "r"))) {
             perror(args->arguments[1]);
             abort(1);
         }
         input_content = read_file(input_file);
-    }
+        err = print_ast(grammar_content, input_content, args->grammar_entry);
+    } else {
+        glob_t globbuf = {0};
+        glob(args->arguments[1], 0, 0, &globbuf);
+        size_t i = 0;
+        for (i = 0; i < globbuf.gl_pathc; i++) {
+            char* file_path = globbuf.gl_pathv[i];
+            fprintf(stdout, "%s:\n", file_path);
+            if (!(input_file = fopen(file_path, "r"))) {
+                perror(args->arguments[1]);
+                abort(1);
+            }
+            input_content = read_file(input_file);
 
-    err = print_ast(grammar_content, input_content, args->grammar_entry);
+            err = print_ast(grammar_content, input_content, args->grammar_entry);
+            if (err != 0)
+                goto finalize;
+
+            P4_FREE(input_content);
+            input_content = NULL;
+
+            fprintf(stdout, "\n");
+        }
+    }
 
 finalize:
 

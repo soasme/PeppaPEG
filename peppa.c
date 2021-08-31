@@ -3243,8 +3243,7 @@ P4_AddNegative(P4_Grammar* grammar, P4_String name, P4_Expression* ref_expr) {
 
 P4_PUBLIC P4_Error
 P4_AddSequence(P4_Grammar* grammar, P4_String name, size_t size) {
-    P4_AddSomeGrammarRule(grammar, name, P4_CreateContainer(size));
-    P4_GetGrammarRule(grammar, name)->kind = P4_Sequence;
+    P4_AddSomeGrammarRule(grammar, name, P4_CreateSequence(size));
     return P4_Ok;
 }
 

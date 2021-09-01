@@ -2450,7 +2450,7 @@
             {
                 "desc": "multi-null",
                 "I": "multi-null = \"\"\"null\u0000\"\"\"\n",
-                "E": "CutError: line 1:21, expect ml_basic_string (at least 3 repetitions)"
+                "E": "CutError: line 1:21, expect ml_basic_string (insufficient repetitions)"
             },
             {
                 "desc": "multi-us",
@@ -2470,7 +2470,7 @@
             {
                 "desc": "rawmulti-null",
                 "I": "rawmulti-null = '''null\u0000'''\n",
-                "E": "CutError: line 1:24, expect ml_literal_string (at least 3 repetitions)"
+                "E": "CutError: line 1:24, expect ml_literal_string (insufficient repetitions)"
             },
             {
                 "desc": "rawmulti-us",

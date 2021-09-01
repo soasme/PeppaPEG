@@ -39,7 +39,7 @@
         "tests": [
             {
                 "I": "23",
-                "E": "MatchError: line 1:2, expect R1 (char '2')"
+                "E": "MatchError: line 1:2, expect R1 (back reference not match)"
             }
         ]
     },

@@ -254,6 +254,28 @@ typedef enum {
     P4_CutError             = 12
 } P4_Error;
 
+# define E_WRONG_LIT           10000
+# define E_BACKREF_OUT_REACHED 10001
+# define E_BACKREF_TO_SELF     10002
+# define E_TEXT_TOO_SHORT      10003
+# define E_OUT_RANGED          10004
+# define E_INVALID_UNICODE_CHAR    10005
+# define E_INVALID_UNICODE_PROPERTY 10006
+# define E_INVALID_UNICODE_CATEGORY 10007
+# define E_NO_SUCH_RULE        10008
+# define E_NO_ALTERNATIVE       10009
+# define E_NO_PROGRESSING       10010
+# define E_INSUFFICIENT_REPEAT  10011
+# define E_INSUFFICIENT_REPEAT2 10012
+# define E_EXCESSIVE_REPEAT     10013
+# define E_LEFT_RECUR_NO_LIFT   10014
+# define E_VIOLATE_NEGATIVE     10015
+# define E_MAX_RECURSION        10016
+# define E_INVALID_MATCH_CALLBACK 10017
+# define E_INVALID_ERROR_CALLBACK 10018
+# define E_NO_EXPR              10019
+# define E_WRONG_BACKREF        10020
+
 /*
  *
  * ████████╗██╗░░░██╗██████╗░███████╗██████╗░███████╗███████╗░██████╗

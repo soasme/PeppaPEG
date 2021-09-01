@@ -225,7 +225,9 @@ int subcommand_ast(p4_args_t* args) {
                 goto finalize;
 
             P4_FREE(input_content);
+            fclose(input_file);
             input_content = NULL;
+            input_file = NULL;
 
             fprintf(stdout, "\n");
         }

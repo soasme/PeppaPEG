@@ -2424,12 +2424,6 @@ finalize:
 
     /* clean up */
     P4_DeleteNode(s->grammar, result);
-    /*
-    if (e->name != NULL && s->errmsg[0] == 0) {
-        P4_MatchRaisef(s, s->err, "expect %s", e->name);
-    }
-    */
-
     return NULL;
 }
 

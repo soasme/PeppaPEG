@@ -59,7 +59,7 @@
             },
             {
                 "I": "",
-                "E": "MatchError: line 1:1, expect R1 (len 11)"
+                "E": "MatchError: line 1:1, expect R1 (char 'H')"
             }
         ]
     },

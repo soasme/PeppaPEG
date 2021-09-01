@@ -325,7 +325,7 @@ void test_left_recursion_cannot_use_with_lifted(void) {
         P4_PegError,
         P4_Parse(grammar, source)
     );
-    TEST_ASSERT_EQUAL_STRING("line 1:2, left recursion rule entry cannot be lifted", P4_GetErrorMessage(source));
+    TEST_ASSERT_EQUAL_STRING("line 1:2, expect entry (left recursion rule entry cannot be lifted)", P4_GetErrorMessage(source));
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
 }

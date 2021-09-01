@@ -676,6 +676,15 @@ struct P4_Source {
     /** The error message of the parse. */
     char            errmsg[120];
 
+    /** The error details. */
+    struct {
+        int             errno;
+        size_t          lineno;
+        size_t          offset;
+        P4_Expression*  rule;
+        P4_Expression*  expr;
+    } error;
+
     /** The root of abstract syntax tree. */
     P4_Node*        root;
 
@@ -793,12 +802,14 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
         }                           \
         return err;                 \
     } while (0)
-# define P4_MatchRaisef(s,e,m,...) \
+# define P4_MatchRaisef(s,e,eno) \
     do { \
         (s)->err = (e); \
-        memset((s)->errmsg, 0, sizeof((s)->errmsg)); \
-        sprintf((s)->errmsg, "line %zu:%zu, " m, \
-                (s)->lineno, (s)->offset, __VA_ARGS__); \
+        (s)->error.errno = (eno); \
+        (s)->error.lineno = (s)->lineno; \
+        (s)->error.offset = (s)->offset; \
+        (s)->error.rule = (s)->frame_stack ? (s)->frame_stack->rule : NULL; \
+        (s)->error.expr = (s)->frame_stack ? (s)->frame_stack->expr : NULL; \
     } while (0);
 # define P4_EvalRaisef(r,m,...) \
     do { \
@@ -1413,12 +1424,15 @@ u8_next_char(P4_String s, ucs4_t* c) {
         *c = (s[0] & 0b01111111);
         return 1;
     } else if ((s[0] & 0b11100000) == 0b11000000) { /* 2 byte code point */
+        if (s[0] == 0) return 0;
         *c = (s[0] & 0b00011111) << 6 | (s[1] & 0b00111111);
         return 2;
     } else if ((s[0] & 0b11110000) == 0b11100000) { /* 3 byte code point */
+        if (s[1] == 0) return 0;
         *c = (s[0] & 0b00001111) << 12 | (s[1] & 0b00111111) << 6 | (s[2] & 0b00111111);
         return 3;
     } else if ((s[0] & 0b11111000) == 0b11110000) { /* 4 byte code point */
+        if (s[2] == 0) return 0;
         *c = (s[0] & 0b00000111) << 18 | (s[1] & 0b00111111) << 12 | (s[2] & 0b00111111) << 6 | (s[3] & 0b00111111);
         return 4;
     } else {
@@ -1799,23 +1813,20 @@ match_literal(P4_Source* s, P4_Expression* e) {
     u8_next_char(e->literal, rune);
 
     if (is_end(s)) {
-        P4_MatchRaisef(s, P4_MatchError, "expect %s (char '%s')",
-                peek_rule_name(s), (char*)rune);
+        P4_MatchRaisef(s, P4_MatchError, E_WRONG_LIT);
         return NULL;
     }
 
     size_t len = e->literal_len;
     size_t rest = s->slice.stop.pos - s->pos;
     if (rest < len) {
-        P4_MatchRaisef(s, P4_MatchError, "expect %s (len %zu)",
-                s->frame_stack->rule->name, len);
+        P4_MatchRaisef(s, P4_MatchError, E_TEXT_TOO_SHORT);
         return NULL;
     }
 
     if ((!e->sensitive && P4_CaseCmpInsensitive(e->literal, str, len) != 0)
             || (e->sensitive && memcmp(e->literal, str, len) != 0)) {
-        P4_MatchRaisef(s, P4_MatchError, "expect %s (char '%s')",
-                peek_rule_name(s), (char*)rune);
+        P4_MatchRaisef(s, P4_MatchError, E_WRONG_LIT);
         return NULL;
     }
 
@@ -1838,7 +1849,7 @@ match_range(P4_Source* s, P4_Expression* e) {
 
     P4_String str = remaining_text(s);
     if (is_end(s)) {
-        P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
+        P4_MatchRaisef(s, P4_MatchError, E_TEXT_TOO_SHORT);
         return NULL;
     }
 
@@ -1859,7 +1870,7 @@ match_range(P4_Source* s, P4_Expression* e) {
     }
 
     if (!found) {
-        P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
+        P4_MatchRaisef(s, P4_MatchError, E_OUT_RANGED);
         return NULL;
     }
 
@@ -1887,17 +1898,17 @@ match_unicode_category(P4_Source* s, P4_Expression* e) {
     size_t size = u8_next_char(remaining_text(s), &uc);
 
     if (size == 0 ) {
-        P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
+        P4_MatchRaisef(s, P4_MatchError, E_INVALID_UNICODE_CHAR);
         return NULL;
     }
 
     if (uc_property_is_valid(e->unicode_property)) {
         if (!uc_is_property(uc, e->unicode_property)) {
-            P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
+            P4_MatchRaisef(s, P4_MatchError, E_INVALID_UNICODE_PROPERTY);
             return NULL;
         }
     } else if (!uc_is_general_category(uc, e->unicode_category)) {
-        P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
+        P4_MatchRaisef(s, P4_MatchError, E_INVALID_UNICODE_CATEGORY);
         return NULL;
     }
 
@@ -1914,8 +1925,7 @@ match_unicode_category(P4_Source* s, P4_Expression* e) {
     return result;
 
 # else
-    P4_MatchRaisef(s, P4_MatchError, "expect %s (unicode category not supported)",
-            peek_rule_name(s));
+    P4_MatchRaisef(s, P4_MatchError, E_INVALID_UNICODE_CATEGORY);
     return NULL;
 
 # endif
@@ -1942,7 +1952,7 @@ match_reference(P4_Source* s, P4_Expression* e) {
     }
 
     if (e->ref_expr == NULL) {
-        P4_MatchRaisef(s, P4_NameError, "expect %s", e->reference);
+        P4_MatchRaisef(s, P4_NameError, E_NO_SUCH_RULE);
         return NULL;
     }
 
@@ -2005,9 +2015,8 @@ match_sequence(P4_Source* s, P4_Expression* e) {
         switch (member->kind) {
             case P4_BackReference:
                 if (member->backref_index >= i) {
-                    P4_MatchRaisef(s, P4_IndexError,
-                        "expect %s (\\%zu out reached)",
-                        peek_rule_name(s), member->backref_index);
+                    P4_MatchRaisef(s, P4_IndexError, E_BACKREF_OUT_REACHED);
+                    s->error.expr = member;
                     goto finalize;
                 }
                 tok = match_back_reference(s, e, backrefs, member);
@@ -2075,7 +2084,7 @@ match_choice(P4_Source* s, P4_Expression* e) {
                 set_position(s, startpos);
             /* fail when the last one is a no-match. */
             } else {
-                P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
+                P4_MatchRaisef(s, P4_MatchError, E_NO_ALTERNATIVE);
                 goto finalize;
             }
         }
@@ -2129,8 +2138,7 @@ match_repeat(P4_Source* s, P4_Expression* e) {
     if (IS_PROGRESSING(e->repeat_expr->kind) ||
             (IS_REF(e->repeat_expr)
              && IS_PROGRESSING(P4_GetReference(s, e->repeat_expr)->kind))) {
-        P4_MatchRaisef(s, P4_AdvanceError,
-            "expect %s (no progressing in repetition)", peek_rule_name(s));
+        P4_MatchRaisef(s, P4_AdvanceError, E_NO_PROGRESSING);
         return NULL;
     }
 
@@ -2164,8 +2172,7 @@ match_repeat(P4_Source* s, P4_Expression* e) {
             }
 
             if (min != SIZE_MAX && repeated < min) {
-                P4_MatchRaisef(s, P4_MatchError,
-                    "expect %s (insufficient repetitions)", peek_rule_name(s));
+                P4_MatchRaisef(s, P4_MatchError, E_INSUFFICIENT_REPEAT);
                 goto finalize;
             } else {                       /* sufficient repetitions. */
                 rescue_error(s);
@@ -2177,8 +2184,7 @@ match_repeat(P4_Source* s, P4_Expression* e) {
             goto finalize;
 
         if (s->pos == whitespace_startpos->pos) {
-            P4_MatchRaisef(s, P4_MatchError,
-                    "expect %s (repetition not advancing)", peek_rule_name(s));
+            P4_MatchRaisef(s, P4_MatchError, E_NO_PROGRESSING);
             goto finalize;
         }
 
@@ -2197,16 +2203,12 @@ match_repeat(P4_Source* s, P4_Expression* e) {
 
     /* fails when attempts are excessive, e.g. repeated > max. */
     if (max != SIZE_MAX && repeated > max) {
-        P4_MatchRaisef(s, P4_MatchError,
-            "expect %s (at most %zu repetitions)",
-            peek_rule_name(s), max);
+        P4_MatchRaisef(s, P4_MatchError, E_EXCESSIVE_REPEAT);
         goto finalize;
     }
 
     if (min != SIZE_MAX && repeated < min) {
-        P4_MatchRaisef(s, P4_MatchError,
-            "expect %s (at least %zu repetitions)",
-            peek_rule_name(s), min);
+        P4_MatchRaisef(s, P4_MatchError, E_INSUFFICIENT_REPEAT);
         goto finalize;
     }
 
@@ -2248,13 +2250,11 @@ match_left_recursion(P4_Source* s, P4_Expression* e) {
     P4_Node* whitespace = NULL;
 
     if (need_lift(s, e)) {
-        P4_MatchRaisef(s, P4_PegError,
-                "left recursion rule %s cannot be lifted", peek_rule_name(s));
+        P4_MatchRaisef(s, P4_PegError, E_LEFT_RECUR_NO_LIFT);
         return NULL;
     }
 
     if (!no_error(s)) {
-        P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
         goto finalize;
     }
 
@@ -2283,7 +2283,6 @@ match_left_recursion(P4_Source* s, P4_Expression* e) {
         }
 
         if (!no_error(s)) {
-            P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
             goto finalize;
         }
 
@@ -2343,7 +2342,7 @@ match_negative(P4_Source* s, P4_Expression* e) {
 
     if (no_error(s)) {
         P4_DeleteNode(s->grammar, node);
-        P4_MatchRaisef(s, P4_MatchError, "expect %s", peek_rule_name(s));
+        P4_MatchRaisef(s, P4_MatchError, E_VIOLATE_NEGATIVE);
     } else if (s->err == P4_MatchError || s->err == P4_CutError) {
         rescue_error(s);
     }
@@ -2381,7 +2380,7 @@ match_expression(P4_Source* s, P4_Expression* e) {
     /* push the frame. */
     catch_err(
         push_frame(s, e),
-        P4_MatchRaisef(s, err, "expect %s (max recursion)", e->name)
+        P4_MatchRaisef(s, err, E_MAX_RECURSION);
     );
 
     /* match the input based on expression kind. */
@@ -2404,6 +2403,7 @@ match_expression(P4_Source* s, P4_Expression* e) {
     /* pop the frame. stops backtracking if an cut error is raised. */
     if (no_backtrack(s))
         s->err = P4_CutError;
+
     pop_frame(s);
     catch_err(s->err);
 
@@ -2417,16 +2417,18 @@ finalize:
     /* run error callback. */
     if (s->grammar->on_error != NULL) {
         err = (s->grammar->on_error)(s->grammar, e);
-        if (err != P4_Ok && s->errmsg[0] == 0) {
-            P4_MatchRaisef(s, s->err, "expect %s", e->name);
+        if (err != P4_Ok && s->error.errno == 0) {
+            P4_MatchRaisef(s, s->err, E_INVALID_ERROR_CALLBACK);
         }
     }
 
     /* clean up */
     P4_DeleteNode(s->grammar, result);
+    /*
     if (e->name != NULL && s->errmsg[0] == 0) {
         P4_MatchRaisef(s, s->err, "expect %s", e->name);
     }
+    */
 
     return NULL;
 }
@@ -2465,21 +2467,19 @@ match_back_reference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Expr
     size_t index = backref->backref_index;
 
     if (index > e->count || index < 0) {
-        P4_MatchRaisef(s, P4_IndexError,
-            "expect %s (\\%zu out of bound)",
-            peek_rule_name(s), index);
+        P4_MatchRaisef(s, P4_IndexError, E_BACKREF_OUT_REACHED);
         return NULL;
     }
 
     P4_Expression* backref_expr = e->members[index];
 
     if (backref_expr == NULL) {
-        P4_MatchRaisef(s, P4_PegError, "expect %s (null backref expr)", peek_rule_name(s));
+        P4_MatchRaisef(s, P4_PegError, E_NO_EXPR);
         return NULL;
     }
 
     if (backref_expr->kind == P4_BackReference) {
-        P4_MatchRaisef(s, P4_PegError, "expect %s (backref point to backref)", peek_rule_name(s));
+        P4_MatchRaisef(s, P4_PegError, E_BACKREF_TO_SELF);
         return NULL;
     }
 
@@ -2506,6 +2506,10 @@ match_back_reference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Expr
     set_literal_rule_name(litexpr->name, backref_expr, STRDUP);
 
     P4_Node* tok = match_literal(s, litexpr);
+
+    if (!no_error(s)) {
+        P4_MatchRaisef(s, P4_MatchError, E_WRONG_BACKREF);
+    }
 
     if (tok != NULL) {
         set_literal_rule_name(tok->rule_name, backref_expr, NO_OP);
@@ -3075,7 +3079,7 @@ P4_Parse(P4_Grammar* grammar, P4_Source* source) {
 
     P4_Expression* expr     = P4_GetGrammarRule(grammar, source->entry_name);
     if (expr == NULL) {
-        P4_MatchRaisef(source, P4_ValueError, "rule %s not found", source->entry_name);
+        P4_MatchRaisef(source, P4_ValueError, E_NO_SUCH_RULE);
         goto finalize;
     }
 
@@ -3122,8 +3126,77 @@ P4_GetErrorString(P4_Error err) {
 
 P4_PUBLIC P4_String
 P4_GetErrorMessage(P4_Source* source) {
-    if (source == NULL || source->errmsg[0] == 0)
+    if (source == NULL)
         return NULL;
+
+    memset(source->errmsg, 0, sizeof(source->errmsg));
+    sprintf(source->errmsg, "line %zu:%zu, expect %s",
+            source->error.lineno, source->error.offset,
+            source->error.rule->name);
+
+
+    switch (source->error.errno) {
+        case E_WRONG_LIT:
+        case E_TEXT_TOO_SHORT:
+        {
+            ucs4_t rune[2] = {0};
+            if (is_end(source) || u8_next_char(source->error.expr->literal, rune) == 0) {
+                strcat(source->errmsg, " (EOF)");
+            } else {
+                strcat(source->errmsg, " (char '");
+                strcat(source->errmsg, (char*)rune);
+                strcat(source->errmsg, "')");
+            }
+            break;
+        }
+        case E_LEFT_RECUR_NO_LIFT:
+            strcat(source->errmsg, " (left recursion rule entry cannot be lifted)");
+            break;
+        case E_BACKREF_OUT_REACHED:
+            sprintf(source->errmsg + strlen(source->errmsg), " (\\%lu out reached)", source->error.expr->backref_index);
+            break;
+        case E_BACKREF_TO_SELF:
+            strcat(source->errmsg, " (backref point to backref)");
+            break;
+        case E_INSUFFICIENT_REPEAT:
+            strcat(source->errmsg, " (insufficient repetitions)");
+            break;
+        case E_INSUFFICIENT_REPEAT2:
+            sprintf(source->errmsg + strlen(source->errmsg), " (at least %lu repetitions)", source->error.expr->repeat_min);
+            break;
+        case E_EXCESSIVE_REPEAT:
+            sprintf(source->errmsg + strlen(source->errmsg), " (at most %lu repetitions)", source->error.expr->repeat_max);
+            break;
+        case E_WRONG_BACKREF:
+            strcat(source->errmsg, " (back reference not match)");
+            break;
+        case E_INVALID_UNICODE_CHAR:
+            strcat(source->errmsg, " (invalid unicode char)");
+            break;
+        case E_INVALID_UNICODE_PROPERTY:
+            strcat(source->errmsg, " (invalid unicode property)");
+            break;
+        case E_INVALID_UNICODE_CATEGORY:
+            strcat(source->errmsg, " (invalid unicode category)");
+            break;
+        case E_NO_SUCH_RULE:
+            strcat(source->errmsg, " (no such rule)");
+            break;
+        case E_NO_PROGRESSING:
+            strcat(source->errmsg, " (no progressing in repetition)");
+            break;
+        case E_MAX_RECURSION:
+            strcat(source->errmsg, " (max recursion)");
+            break;
+        case E_INVALID_MATCH_CALLBACK:
+            strcat(source->errmsg, " (invalid match callback)");
+            break;
+        case E_INVALID_ERROR_CALLBACK:
+            strcat(source->errmsg, " (invalid error callback)");
+            break;
+        default:
+            break;
+    }
 
     return source->errmsg;
 }

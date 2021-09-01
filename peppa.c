@@ -3173,12 +3173,6 @@ P4_GetErrorMessage(P4_Source* source) {
         case E_INVALID_UNICODE_CHAR:
             strcat(source->errmsg, " (invalid unicode char)");
             break;
-        case E_INVALID_UNICODE_PROPERTY:
-            strcat(source->errmsg, " (invalid unicode property)");
-            break;
-        case E_INVALID_UNICODE_CATEGORY:
-            strcat(source->errmsg, " (invalid unicode category)");
-            break;
         case E_NO_SUCH_RULE:
             strcat(source->errmsg, " (no such rule)");
             break;

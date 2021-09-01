@@ -695,6 +695,8 @@ struct P4_Source {
     P4_Frame*       frame_stack;
     /** The size of frame stack. */
     size_t          frame_stack_size;
+    /** A pool of unused frame. This is for optimization. */
+    P4_Frame*       unused_frame_stack;
 };
 
 /** It indicates the function or type is for public use. */
@@ -1711,7 +1713,13 @@ push_frame(P4_Source* s, P4_Expression* e) {
     }
 
     P4_Frame* frame = NULL;
-    catch_oom(frame = P4_MALLOC(sizeof(P4_Frame)));
+
+    if (s->unused_frame_stack) {
+        frame = s->unused_frame_stack;
+        s->unused_frame_stack = frame->next;
+    } else {
+        catch_oom(frame = P4_MALLOC(sizeof(P4_Frame)));
+    }
 
     /* Set silent */
     frame->silent = false;
@@ -1767,9 +1775,13 @@ pop_frame(P4_Source* s) {
     P4_Frame* oldtop = s->frame_stack;
 
     if (oldtop) {
+        /* move oldtop out of frame stack. */
         s->frame_stack = oldtop->next;
         s->frame_stack_size--;
-        P4_FREE(oldtop);
+
+        /* move oldtop into unused frame stack. */
+        oldtop->next = s->unused_frame_stack;
+        s->unused_frame_stack = oldtop;
     }
 
     return P4_Ok;
@@ -2971,6 +2983,7 @@ P4_CreateSource(P4_String content, P4_String entry_name) {
     source->root = NULL;
     source->frame_stack = NULL;
     source->frame_stack_size = 0;
+    source->unused_frame_stack = NULL;
     source->whitespacing = false;
 
     P4_SetSourceSlice(source, 0, strlen(content));
@@ -3006,6 +3019,13 @@ P4_ResetSource(P4_Source* source) {
         tmp = source->frame_stack->next;
         P4_FREE(source->frame_stack);
         source->frame_stack = tmp;
+    }
+
+    tmp = source->unused_frame_stack;
+    while(source->unused_frame_stack) {
+        tmp = source->unused_frame_stack->next;
+        P4_FREE(source->unused_frame_stack);
+        source->unused_frame_stack = tmp;
     }
 
     rescue_error(source);

@@ -644,7 +644,7 @@ struct P4_Memo {
     /** Key (expr, pos) */
     P4_Expression*  expr;
     /** Key (expr, pos) */
-    P4_Position     pos;
+    size_t          pos;
     /** Value (node) */
     P4_Node*        node;
     /** The next Memo element in the hash table.
@@ -882,8 +882,8 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
 # define peek_rule_name(s)  ((s)->frame_stack->rule->name)
 # define remaining_text(s)  ((s)->content + (s)->pos)
 
-P4_PRIVATE(P4_Error) insert_memo(P4_Source*, P4_Expression*, P4_Node*);
-P4_PRIVATE(P4_Error) is_memoized(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Error) insert_memo(P4_Source*, P4_Expression*, size_t, P4_Node*);
+P4_PRIVATE(bool)     is_memoized(P4_Source*, P4_Expression*, P4_Node**);
 P4_PRIVATE(P4_Error) push_frame(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Error) pop_frame(P4_Source*);
 P4_PRIVATE(P4_Node*) match_expression(P4_Source*, P4_Expression*);
@@ -1741,6 +1741,53 @@ P4_DeleteNodeUserData(P4_Grammar* grammar, P4_Node* node) {
     }
 }
 
+P4_PRIVATE(P4_Error) insert_memo(P4_Source* s, P4_Expression* expr, size_t pos, P4_Node* node) {
+    P4_Memo* memo = NULL;
+
+    catch_oom(memo = P4_MALLOC(sizeof(P4_Memo)));
+
+    memo->expr = expr;
+    memo->node = node;
+    memo->pos = pos;
+
+    int kret = 0;
+    khint_t k = kh_put(memos, s->memos, pos, &kret);
+    if (kret == -1) { /* hash put operation failed. */
+        P4_FREE(memo);
+        panic("out of memory");
+    } else if (kret == 0) { /* pos present in memos */
+        memo->next = kh_value(s->memos, k);
+        kh_value(s->memos, k)= memo;
+    } else {
+        kh_value(s->memos, k)= memo;
+    }
+
+    return P4_Ok;
+}
+
+P4_PRIVATE(bool) is_memoized(P4_Source* s, P4_Expression* expr, P4_Node** node) {
+    khint_t k = kh_get(memos, s->memos, s->pos);
+    bool is_missing = (k == kh_end(s->memos));
+    if (is_missing) {
+        *node = NULL;
+        return false;
+    } else {
+        P4_Memo* head = kh_val(s->memos, k);
+        while (head) {
+            if (head == EMPTY) {
+                *node = NULL;
+                return true;
+            }
+            else if (head->expr == expr) {
+                *node = head->node;
+                return true;
+            }
+            head = head->next;
+        }
+        return false;
+    }
+}
+
 /*
  * Push e into s->frame_stack.
  */
@@ -2396,10 +2443,15 @@ match_expression(P4_Source* s, P4_Expression* e) {
     assert(e != NULL, "expression should not be null");
 
     P4_Error err = P4_Ok;
+    size_t   startpos = s->pos;
     P4_Node* result = NULL;
+
+    if (is_memoized(s, e, &result))
+        return result;
 
     /* abort match if any error has occurred. */
     catch_err(s->err);
+
 
     /* push the frame. */
     catch_err(
@@ -2429,11 +2481,15 @@ match_expression(P4_Source* s, P4_Expression* e) {
         s->err = P4_CutError;
 
     pop_frame(s);
+    insert_memo(s, e, startpos, result);
+
     catch_err(s->err);
+
 
     /* run match callback. */
     if (no_error(s) && s->grammar->on_match != NULL)
         catch_err((s->grammar->on_match)(s->grammar, e, result));
+
 
     return result;
 

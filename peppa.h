@@ -327,6 +327,12 @@ typedef struct P4_Expression P4_Expression;
 typedef struct P4_Frame P4_Frame;
 
 /**
+ * The packrat memoize table.
+ */
+typedef struct P4_Memo P4_Memo;
+
+
+/**
  * The node object of abstract syntax tree.
  */
 typedef struct P4_Node P4_Node;

@@ -542,6 +542,7 @@ typedef const char *kh_cstr_t;
 /** End of khash.h */
 
 KHASH_MAP_INIT_STR(rules, P4_Expression*)
+KHASH_MAP_INIT_INT64(memos, P4_Memo*)
 
 struct P4_Grammar {
     /** A map associating names with expressions. Type: Map<str, P4_Expression*>. */
@@ -639,6 +640,24 @@ struct P4_Frame {
     P4_Frame*       next;
 };
 
+struct P4_Memo {
+    /** Key (expr, pos) */
+    P4_Expression*  expr;
+    /** Key (expr, pos) */
+    P4_Position     pos;
+    /** Value (node) */
+    P4_Node*        node;
+    /** The next Memo element in the hash table.
+     *
+     * The Packrat memoized cache is a hashtable,
+     * position as keys, Memo linked list as values.
+     * */
+    P4_Memo*        next;
+};
+
+/** This is used when there is a match but no node is produced. */
+static struct P4_Memo* EMPTY = &(P4_Memo){0};
+
 struct P4_Source {
     /** The grammar used to parse the source. */
     P4_Grammar*     grammar;
@@ -706,6 +725,9 @@ struct P4_Source {
     size_t          frame_stack_size;
     /** A pool of unused frame. This is for optimization. */
     P4_Frame*       unused_frame_stack;
+
+    /** Packrat memoize table. */
+    khash_t(memos)* memos;
 };
 
 /** It indicates the function or type is for public use. */
@@ -860,6 +882,8 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
 # define peek_rule_name(s)  ((s)->frame_stack->rule->name)
 # define remaining_text(s)  ((s)->content + (s)->pos)
 
+P4_PRIVATE(P4_Error) insert_memo(P4_Source*, P4_Expression*, P4_Node*);
+P4_PRIVATE(P4_Error) is_memoized(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Error) push_frame(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Error) pop_frame(P4_Source*);
 P4_PRIVATE(P4_Node*) match_expression(P4_Source*, P4_Expression*);
@@ -2983,6 +3007,7 @@ P4_CreateSource(P4_String content, P4_String entry_name) {
     source->frame_stack_size = 0;
     source->unused_frame_stack = NULL;
     source->whitespacing = false;
+    source->memos = kh_init(memos);
 
     P4_SetSourceSlice(source, 0, strlen(content));
     rescue_error(source);
@@ -3026,6 +3051,16 @@ P4_ResetSource(P4_Source* source) {
         source->unused_frame_stack = tmp;
     }
 
+    P4_Memo *mhead, *mtmp= NULL;
+    kh_foreach_value(source->memos, mhead, {
+        while (mhead) {
+            mtmp = mhead->next;
+            P4_FREE(mhead);
+            mhead = mtmp;
+        }
+    });
+    kh_clear(memos, source->memos);
+
     rescue_error(source);
 
     if (source->root) {
@@ -3038,6 +3073,7 @@ P4_ResetSource(P4_Source* source) {
 P4_PUBLIC void
 P4_DeleteSource(P4_Source* source) {
     P4_ResetSource(source);
+    kh_destroy(memos, source->memos);
     P4_FREE(source->entry_name);
     P4_FREE(source);
 }

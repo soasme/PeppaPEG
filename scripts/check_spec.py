@@ -19,7 +19,7 @@ def test_spec():
         for test in spec['tests']:
             total += 1
             cmd = shlex.split(executable) + [
-                'ast',
+                'parse',
                 '--grammar-entry', spec['entry'],
             ]
             if 'grammar' in spec:

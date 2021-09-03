@@ -64,7 +64,7 @@ static int subcommand_version(const char* name) {
 static int subcommand_usage(const char* name) {
     printf("usage: %s [SUBCOMMAND] [OPTION]...\n\n", name);
     printf(
-        "SUBCOMMAND: ast [OPTIONS]... [FILE]...\n\n"
+        "SUBCOMMAND: parse [OPTIONS]... [FILE]...\n\n"
         "  --grammar-str/-g FILE\tpeg grammar string\n"
         "  --grammar-file/-G FILE\tpath to peg grammar file\n"
         "  --grammar-entry/-e NAME\tentry rule name in peg grammar\n"
@@ -76,7 +76,7 @@ static int subcommand_usage(const char* name) {
         "EXAMPLE:\n\n"
     );
     printf("    $ %s --version\n", name);
-    printf("    $ %s ast -G json.peg -e entry data.json\n", name);
+    printf("    $ %s parse -G json.peg -e entry data.json\n", name);
     return 0;
 }
 
@@ -170,7 +170,7 @@ int init_args(p4_args_t* args, int argc, char* argv[]) {
     return 0;
 }
 
-int subcommand_ast(p4_args_t* args) {
+int subcommand_parse(p4_args_t* args) {
     int err = 0;
     char *grammar_content = NULL, *input_content = NULL;
     FILE* input_file = NULL;
@@ -255,8 +255,8 @@ int run_cmd(p4_args_t* args) {
         return 1;
     }
 
-    if (strcmp(args->subcommand, "ast") == 0) {
-        return subcommand_ast(args);
+    if (strcmp(args->subcommand, "parse") == 0) {
+        return subcommand_parse(args);
     }
 
     fprintf(stderr, "error: invalid command: %s\n", args->subcommand);

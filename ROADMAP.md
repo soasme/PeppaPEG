@@ -1,9 +1,31 @@
 # ROADMAP
 
-- [ ] api: better error message, report filename, lineno, offset, line, highlight error slice, error message, termcolor
+- [ ] 
+- [ ] peg: action property can be rolled up.
+- [ ] peg: e"error message". this is useful when combining with negative + cut.
+- [ ] match: optimization for choices of all literals.
+- [ ] peg: left recursion generate a poly fill token
+- [ ] peg: runtime rules: INDENT, DEDENT, mustache opener/closer,
+- [ ] go: use left recursion for binary operations.
+- [ ] tests: more test spec for go, peppa, json, toml.
+- [ ] shell: `peppa parse` can parse multiple files.
+- [ ] shell: serialize / deserialize grammar object (cache, make loading grammar faster).
+- [ ] shell: add more meta info in peg.
+- [ ] shell: resolve config from ../etc/peppa/config.toml, /etc/peppa/config.toml, $HOME/.config/peppa/config.toml, ./config.toml.
+- [ ] shell: read PEPPAPATH.
+- [ ] package: install peg files to etc.
+- [ ] shell: read configuration from a toml file. The toml file provides grammar file and grammar entry conf for different file extensions.
+- [ ] shell: generate C code. It may share the AST structure of IR code.
+- [ ] shell: generate LLVM IR code.
+- [ ] package: add debian ppa.
+- [ ] package: add homebrew formula.
+- [ ] package: build deb.
+- [ ] package: build rpm.
+- [ ] code: split to multiple modules and use amalgamation.
+- [ ] match: use errno module for some errors, such as oom.
+- [ ] api: better error message, report filename, lineno, offset, line, highlight error slice, underline, error type, error code, error hint, error message, termcolor
 - [ ] peg: error string `rule = (a b c ~ e"LiteralName form of CompositeLiteral shouldn't appear on if/for/switch statement without )]}.") expr`. By using error string with cut, a syntax error is raised.
 - [ ] shell: `peppa parse` generates dot diagram.
-- [ ] shell: `peppa ast` -> `peppa parse`.
 - [ ] spec: more tests for go grammar.
 - [ ] shell: resolve dir support special envvar: `$PEPPAPATH`, otherwise read from etc, home, cwd.
 - [ ] shell: `peppa ast` support option `--language=xxx`, which reads data from `/etc/peppa/langs.d/xxx.peg`, or `$HOME/.config/peppa/langs.d/xxx.peg`, or `$CWD/xxx.peg`.
@@ -68,6 +90,7 @@
 - [ ] peg: support Python-style INDENT rule.
 - [ ] api: print grammar and/or rules.
 - [ ] refactor: move some variables to `frame` to reduce function frame size.
+- [x] shell: `peppa ast` -> `peppa parse`. v1.16.0
 - [x] perf: only track backrefs if sequence has backref as member. v1.16.0
 - [x] perf: Cache literal len or use better string structure internally. v1.16.0
 - [x] peg: ~~`@sibling_to_descdent`. can be used to transform cases like toml [key1.key2], key2 should be a child of key1.~~ This can be done via right recursion: key = identifier "." key / identifier; see spec - right recursion. v1.16.0

@@ -33,7 +33,7 @@ Step 1: Create Grammar
 In Peppa PEG, we always start with creating a :c:struct:`P4_Grammar`. We create such a data structure using :c:func:`P4_LoadGrammar`.
 
 .. literalinclude:: ../example.c
-   :lines: 7-11
+   :lines: 5-9
 
 Step 2: Create Source
 ---------------------
@@ -41,7 +41,7 @@ Step 2: Create Source
 We create a :c:struct:`P4_Source` using :c:func:`P4_CreateSource()`.
 
 .. literalinclude:: ../example.c
-   :lines: 4,13-17
+   :lines: 11-15
 
 The first parameter is the content of the source.
 The second parameter is the name of entry grammar rule.
@@ -54,7 +54,7 @@ Step 3: Parse
 Now the stage is setup; call :c:func:`P4_Parse`. If everything is okay, it returns a zero value - :c:enum:`P4_Ok<P4_Error>`.
 
 .. literalinclude:: ../example.c
-   :lines: 19-26
+   :lines: 17-24
 
 Step 4: Traverse AST
 ---------------------------
@@ -71,12 +71,12 @@ To traverse the AST,
 * :c:func:`P4_CopyNodeString()` returns the string the AST node covers.
 
 .. literalinclude:: ../example.c
-   :lines: 28-39
+   :lines: 26-37
 
 It may be helpful to output the source AST in JSON format:
 
 .. literalinclude:: ../example.c
-   :lines: 41
+   :lines: 39
 
 Step 5: Clean Up
 ----------------
@@ -88,7 +88,7 @@ Last but not least, don't forget to free all the allocated memory.
 
 .. literalinclude:: ../example.c
    :language: c
-   :lines: 43-44
+   :lines: 41-42
 
 Full Example Code
 -----------------

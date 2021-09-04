@@ -1,7 +1,7 @@
 [
   {
     "desc": "Integer",
-    "grammar_file": "./golang-v1.17.peg",
+    "grammar_file": "../configs/golang-v1.17.peg",
     "entry": "Literal",
     "tests": [
       {
@@ -160,7 +160,7 @@
   },
   {
     "desc": "Float",
-    "grammar_file": "./golang-v1.17.peg",
+    "grammar_file": "../configs/golang-v1.17.peg",
     "entry": "Literal",
     "tests": [
       {
@@ -400,7 +400,7 @@
   },
   {
     "desc": "Imaginary",
-    "grammar_file": "./golang-v1.17.peg",
+    "grammar_file": "../configs/golang-v1.17.peg",
     "entry": "Literal",
     "tests": [
       {
@@ -555,7 +555,7 @@
   },
   {
     "desc": "Imaginary",
-    "grammar_file": "./golang-v1.17.peg",
+    "grammar_file": "../configs/golang-v1.17.peg",
     "entry": "Literal",
     "tests": [
       {
@@ -746,7 +746,7 @@
   },
   {
     "desc": "String",
-    "grammar_file": "./golang-v1.17.peg",
+    "grammar_file": "../configs/golang-v1.17.peg",
     "entry": "Literal",
     "tests": [
       {
@@ -905,7 +905,7 @@
   },
   {
     "desc": "Type",
-    "grammar_file": "./golang-v1.17.peg",
+    "grammar_file": "../configs/golang-v1.17.peg",
     "entry": "Type",
     "tests": [
       {
@@ -2675,7 +2675,7 @@
   },
   {
     "desc": "FunctionLit",
-    "grammar_file": "./golang-v1.17.peg",
+    "grammar_file": "../configs/golang-v1.17.peg",
     "entry": "Literal",
     "tests": [
       {
@@ -2719,7 +2719,7 @@
   },
   {
     "desc": "StatementList",
-    "grammar_file": "./golang-v1.17.peg",
+    "grammar_file": "../configs/golang-v1.17.peg",
     "entry": "StatementList",
     "tests": [
       {

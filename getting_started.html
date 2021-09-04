@@ -236,8 +236,7 @@
 <section id="step-2-create-source">
 <h2>Step 2: Create Source<a class="headerlink" href="#step-2-create-source" title="Permalink to this headline">¶</a></h2>
 <p>We create a <a class="reference internal" href="api.html#c.P4_Source" title="P4_Source"><code class="xref c c-struct docutils literal notranslate"><span class="pre">P4_Source</span></code></a> using <a class="reference internal" href="api.html#c.P4_CreateSource" title="P4_CreateSource"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_CreateSource()</span></code></a>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># define ENTRY 1</span>
-    <span class="n">P4_Source</span><span class="o">*</span>  <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s2">"Hello</span><span class="se">\n</span><span class="s2">WORLD"</span><span class="p">,</span> <span class="s2">"entry"</span><span class="p">);</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">P4_Source</span><span class="o">*</span>  <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="s2">"Hello</span><span class="se">\n</span><span class="s2">WORLD"</span><span class="p">,</span> <span class="s2">"entry"</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">source</span> <span class="o">==</span> <span class="n">NULL</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">printf</span><span class="p">(</span><span class="s2">"Error: CreateSource: MemoryError.</span><span class="se">\n</span><span class="s2">"</span><span class="p">);</span>
         <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
@@ -310,8 +309,6 @@ The second parameter is the name of entry grammar rule.</p>
 <p>The complete code for this example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#include &lt;stdio.h&gt;</span>
 <span class="c1">#include &lt;peppa.h&gt;</span>
-
-<span class="c1"># define ENTRY 1</span>
 
 <span class="nb">int</span> <span class="n">main</span><span class="p">(</span><span class="nb">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
     <span class="n">P4_Grammar</span><span class="o">*</span> <span class="n">grammar</span> <span class="o">=</span> <span class="n">P4_LoadGrammar</span><span class="p">(</span><span class="s2">"entry = i</span><span class="se">\"</span><span class="s2">hello</span><span class="se">\\</span><span class="s2">nworld</span><span class="se">\"</span><span class="s2">;"</span><span class="p">);</span>

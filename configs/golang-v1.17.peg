@@ -257,25 +257,35 @@ Arguments      = "(" ~ ws* (( ExpressionList / Type (linews* "," ws* ExpressionL
 MethodExpr    = ReceiverType "." MethodName ;
 ReceiverType  = Type ;
 
-@nonterminal 
-Expression = UnaryExpr (inlinews* binary_op ~ ws* UnaryExpr)*;
+@nonterminal
+UnambiguousExpression = !(TypeName LiteralType inlinews* LiteralValue ~) Expression;
+
+@lifted
+Expression = LogicalOr;
+
+@nonterminal
+LogicalOr = LogicalAnd | LogicalOr inlinews* "||" ~ ws* LogicalAnd;
+
+@nonterminal
+LogicalAnd = Comparison | LogicalAnd inlinews* "&&" ~ ws* Comparison;
+
+@nonterminal
+Comparison = Addition | Comparison inlinews* rel_op ~ ws* Addition;
+
+@nonterminal
+Addition = Multiplication | Addition inlinews* (add_op !"=") ~ ws* Multiplication;
+
+@nonterminal
+Multiplication = UnaryExpr | Multiplication inlinews* (mul_op !"=") ~ ws* UnaryExpr;
 
 @nonterminal @scoped
 UnaryExpr  = PrimaryExpr / unary_op+ PrimaryExpr;
 
 @nonterminal
-UnambiguousExpression = UnambiguousUnaryExpr (linews* binary_op ~ ws* UnambiguousUnaryExpr)*;
-@nonterminal
-UnambiguousUnaryExpr  = unary_op* UnambiguousPrimaryExpr;
-@nonterminal
-UnambiguousPrimaryExpr = (UnambiguousOperand / Conversion / MethodExpr) (Selector / Index / Slice / TypeAssertion / Arguments)*;
-UnambiguousOperand = BasicLit / (!TypeName LiteralType) inlinews* LiteralValue / FunctionLit / OperandName / "(" linews* Expression linews* ")";
-
-@nonterminal
 binary_op  = "||" / "&&" / (add_op !"=") / (mul_op !"=") / rel_op;
 rel_op     = "==" / "!=" / "<=" / "<" !("<" / "-") / ">=" / ">" !">";
-add_op     = "+" !"+" / "-" !"-" / "|" / "^" ;
-mul_op     = "*" / "/" !("/"/"*") / "%" / "<<" / ">>" / "&^" / "&" ;
+add_op     = "+" !"+" / "-" !"-" / "|" !"|" / "^" ;
+mul_op     = "*" / "/" !("/"/"*") / "%" / "<<" / ">>" / "&^" / "&" !"&";
 
 unary_op   = "+" / "-" / "!" / "^" / "*" / "&" / "<-" ;
 

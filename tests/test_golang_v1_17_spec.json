@@ -1,7 +1,7 @@
 [
   {
     "desc": "Integer",
-    "grammar_file": "./golang-v1.17.peg",
+    "grammar_file": "../configs/golang-v1.17.peg",
     "entry": "Literal",
     "tests": [
       {
@@ -160,7 +160,7 @@
   },
   {
     "desc": "Float",
-    "grammar_file": "./golang-v1.17.peg",
+    "grammar_file": "../configs/golang-v1.17.peg",
     "entry": "Literal",
     "tests": [
       {
@@ -400,7 +400,7 @@
   },
   {
     "desc": "Imaginary",
-    "grammar_file": "./golang-v1.17.peg",
+    "grammar_file": "../configs/golang-v1.17.peg",
     "entry": "Literal",
     "tests": [
       {
@@ -555,7 +555,7 @@
   },
   {
     "desc": "Imaginary",
-    "grammar_file": "./golang-v1.17.peg",
+    "grammar_file": "../configs/golang-v1.17.peg",
     "entry": "Literal",
     "tests": [
       {
@@ -746,7 +746,7 @@
   },
   {
     "desc": "String",
-    "grammar_file": "./golang-v1.17.peg",
+    "grammar_file": "../configs/golang-v1.17.peg",
     "entry": "Literal",
     "tests": [
       {
@@ -905,7 +905,7 @@
   },
   {
     "desc": "Type",
-    "grammar_file": "./golang-v1.17.peg",
+    "grammar_file": "../configs/golang-v1.17.peg",
     "entry": "Type",
     "tests": [
       {
@@ -1354,7 +1354,7 @@
                       1,
                       4
                     ],
-                    "type": "Expression",
+                    "type": "Multiplication",
                     "children": [
                       {
                         "slice": [
@@ -2675,7 +2675,7 @@
   },
   {
     "desc": "FunctionLit",
-    "grammar_file": "./golang-v1.17.peg",
+    "grammar_file": "../configs/golang-v1.17.peg",
     "entry": "Literal",
     "tests": [
       {
@@ -2719,7 +2719,7 @@
   },
   {
     "desc": "StatementList",
-    "grammar_file": "./golang-v1.17.peg",
+    "grammar_file": "../configs/golang-v1.17.peg",
     "entry": "StatementList",
     "tests": [
       {
@@ -3090,6 +3090,153 @@
                         "type": "identifier"
                       }
                     ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "desc": "Operator Precedence",
+    "grammar_file": "../configs/golang-v1.17.peg",
+    "entry": "Expression",
+    "tests": [
+      {
+        "N": "Logical OR is lower than Logical AND",
+        "I": "true || true && true",
+        "O": [
+          {
+            "slice":[0,20],
+            "type":"LogicalOr",
+            "children":[
+              {
+                "slice":[0,4],
+                "type":"identifier"
+              },
+              {
+                "slice":[8,20],
+                "type":"LogicalAnd",
+                "children":[
+                  {
+                    "slice":[8,12],
+                    "type":"identifier"
+                  },
+                  {
+                    "slice":[16,20],
+                    "type":"identifier"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "N": "Logical AND is lower than Comparison",
+        "I": "a && b > c",
+        "O": [
+          {
+            "slice":[0,10],
+            "type":"LogicalAnd",
+            "children":[
+              {
+                "slice":[0,1],
+                "type":"identifier"
+              },
+              {
+                "slice":[5,10],
+                "type":"Comparison",
+                "children":[
+                  {
+                    "slice":[5,6],
+                    "type":"identifier"
+                  },
+                  {
+                    "slice":[7,8],
+                    "type":"rel_op"
+                  },
+                  {
+                    "slice":[9,10],
+                    "type":"identifier"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "N": "Compare is lower than Addition",
+        "I": "a > b + c",
+        "O": [
+          {
+            "slice":[0,9],
+            "type":"Comparison",
+            "children":[
+              {
+                "slice":[0,1],
+                "type":"identifier"
+              },
+              {
+                "slice":[2,3],
+                "type":"rel_op"
+              },
+              {
+                "slice":[4,9],
+                "type":"Addition",
+                "children":[
+                  {
+                    "slice":[4,5],
+                    "type":"identifier"
+                  },
+                  {
+                    "slice":[6,7],
+                    "type":"add_op"
+                  },
+                  {
+                    "slice":[8,9],
+                    "type":"identifier"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "N": "Addition is lower than Multiplication",
+        "I": "a + b * c",
+        "O": [
+          {
+            "slice":[0,9],
+            "type":"Addition",
+            "children":[
+              {
+                "slice":[0,1],
+                "type":"identifier"
+              },
+              {
+                "slice":[2,3],
+                "type":"add_op"
+              },
+              {
+                "slice":[4,9],
+                "type":"Multiplication",
+                "children":[
+                  {
+                    "slice":[4,5],
+                    "type":"identifier"
+                  },
+                  {
+                    "slice":[6,7],
+                    "type":"mul_op"
+                  },
+                  {
+                    "slice":[8,9],
+                    "type":"identifier"
                   }
                 ]
               }

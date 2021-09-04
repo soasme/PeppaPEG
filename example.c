@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <peppa.h>
 
-# define ENTRY 1
-
 int main(int argc, char* argv[]) {
     P4_Grammar* grammar = P4_LoadGrammar("entry = i\"hello\\nworld\";");
     if (grammar == NULL) {

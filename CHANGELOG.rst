@@ -4,7 +4,23 @@ Change Log
 Not Yet Released
 ----------------
 
-Code change: <https://github.com/soasme/PeppaPEG/compare/v1.15.0..HEAD>.
+Code change: <https://github.com/soasme/PeppaPEG/compare/v1.16.0..HEAD>.
+
+1.16.0 (4 Sep, 2021)
+--------------------
+
+Code change: <https://github.com/soasme/PeppaPEG/compare/v1.15.0..v1.16.0>.
+
+* [API Change]: Rename Shell subcommand `peppa ast` to `peppa parse`. `#123 <https://github.com/soasme/PeppaPEG/pull/123>`_.
+* [Performance]: Optimize the code to reduce errmsg string printf calls. `#122 <https://github.com/soasme/PeppaPEG/pull/122>`_.
+* [Performance]: Optimize the code to reduce frame malloc by keeping unused frame. `#121 <https://github.com/soasme/PeppaPEG/pull/121>`_.
+* [Performance]: Optimize the code to reduce backref malloc in sequence matching. `#120 <https://github.com/soasme/PeppaPEG/pull/120>`_.
+* [Performance]: Optimize the code to reduce strlen call in literal matching. `#119 <https://github.com/soasme/PeppaPEG/pull/119>`_.
+* [Enhancement]: Shell support reading files from a glob pattern. `#118 <https://github.com/soasme/PeppaPEG/pull/118>`.
+* [Example]: Added Golang grammar written in Peppa PEG Specification. `#117 <https://github.com/soasme/PeppaPEG/pull/117>`_.
+* [Bug Fix]: Non-terminal choice should lift the only child. `#116 <https://github.com/soasme/PeppaPEG/pull/116>`_.
+* [API Change]: Rename Cut operator to `~`. `#115 <https://github.com/soasme/PeppaPEG/pull/115>`.
+* [Feature]: Support Left Recursion. `#112 <https://github.com/soasme/PeppaPEG/pull/112>`_, `#113 <https://github.com/soasme/PeppaPEG/pull/113>`_, `#114 <https://github.com/soasme/PeppaPEG/pull/114>`_.
 
 1.15.0 (22 Aug, 2021)
 ---------------------
@@ -33,7 +49,7 @@ Code change: <https://github.com/soasme/PeppaPEG/compare/v1.13.0..v1.14.0>.
 * [Feature]: New PEG expression: `@cut`. `#90 <https://github.com/soasme/PeppaPEG/pull/90>`_.
 * [API Change]: `P4_JsonifySourceAst` now doesn't require `grammar` in the parameters. `#89 <https://github.com/soasme/PeppaPEG/pull/89>`_.
 * [Enhancement]: Wrap errors with catch_err / catch_oom in the .c implementation. `#88 <https://github.com/soasme/PeppaPEG/pull/88`_ `#91 <https://github.com/soasme/PeppaPEG/pull/91`_ `#92 <https://github.com/soasme/PeppaPEG/pull/92`_.
-* [Bugfix]: Error report now can display correct lineno:offset information. `#87 <https://github.com/soasme/PeppaPEG/pull/87`_.
+* [Bug Fix]: Error report now can display correct lineno:offset information. `#87 <https://github.com/soasme/PeppaPEG/pull/87`_.
 * [API Change]: `P4_RuleID` is now deprecated. Please use string (`char*`) for finding a rule. `#84 <https://github.com/soasme/PeppaPEG/pull/84`_ `#86 <https://github.com/soasme/PeppaPEG/pull/86`_.
 * [API Change]: `struct P4_Grammar`, `struct P4_Expression`, `struct P4_Frame` are now private structures. However, you can still access `P4_Grammar`, `P4_Expression` as typedefs.
 * [Example]: Added a example TOML v1.0 parser. `#81 <https://github.com/soasme/PeppaPEG/pull/81`_.

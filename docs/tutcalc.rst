@@ -11,18 +11,16 @@ In this tutorial, we will write a calculator. It supports
 * Subtraction operator `-`.
 * Multiplication operator `*`.
 * Division operator `/`.
-* Zero Division is invalid.
 * Parenthesis `()`.
+* Detect invalid zero division.
 
-The calculator can take arbitrary valid string calc expressions and yield the result.
+The calculator can take arbitrary valid string and yield a result.
 
 Step 1: Create Grammar
 ----------------------
 
 Let's create a new file "calc.h" and
 create the grammar using :c:func:`P4_LoadGrammar`.
-
-The order of rules must be same with `P4_CalcRuleID`.
 
 .. literalinclude:: ../examples/calc.h
    :lines: 53-82
@@ -43,7 +41,7 @@ Step 2: Eval Ast
 Next, let's evaluate the tree. We traverse the AST and calculate the result.
 
 .. literalinclude:: ../examples/calc.h
-   :lines: 84-146
+   :lines: 84-156
 
 Step 3: Parse
 -------------
@@ -67,11 +65,11 @@ Run:
     $ gcc -o calc calc.c peppa.c && ./calc
     Type statement to continue. Type ^C to quit.
 
-    1+2*3;
+    1+2*3
     [Out] 7
 
-    -1 + 4/2*3 - 1;
+    -1 + 4/2*3 - 1
     [Out] 4
 
-    5/0;
+    5/0
     error: eval: 6

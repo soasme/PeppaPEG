@@ -27,7 +27,7 @@
  *
  * Compile:
  *
- *      $ gcc examples/calc.c peppapeg.c && ./a.out
+ *      $ gcc examples/calc.c peppa.c && ./a.out
  *      1+2*3+4/2  * (1+1)
  *      11
  *      1*-1
@@ -55,13 +55,13 @@ P4_Grammar*  P4_CreateCalcGrammar() {
         "statement = term eol;\n"
 
         "@nonterminal\n"
-        "term = factor ((add / minus) factor)*;\n"
+        "term = factor | term  (add / minus) factor;\n"
 
         "@nonterminal\n"
-        "factor = unary ((mul / div) unary)*;\n"
+        "factor = unary | factor (mul / div) unary;\n"
 
         "@nonterminal\n"
-        "unary = add unary / minus unary / primary;\n"
+        "unary = primary / (add / minus)? unary;\n"
 
         "@lifted\n"
         "primary = integer / \"(\" term \")\";\n"
@@ -77,7 +77,7 @@ P4_Grammar*  P4_CreateCalcGrammar() {
         "@spaced @lifted\n"
         "whitespace = \" \" / \"\\t\";\n"
 
-        "eol = \";\";\n"
+        "eol = \"\\n\" / !.;\n"
     );
 }
 
@@ -90,34 +90,44 @@ P4_Error P4_CalcEval(P4_Node* node, long* result) {
 
     if (strcmp(node->rule_name, "statement") == 0) {
         return P4_CalcEval(node->head, result);
-    } else if (strcmp(node->rule_name, "term") == 0 || strcmp(node->rule_name, "factor") == 0) {
+    } else if (strcmp(node->rule_name, "term") == 0) {
         if ((err = P4_CalcEval(node->head, &val)) != P4_Ok)
             return err;
+
         *result = val;
-        for (tmp = node->head->next; tmp != NULL; tmp = tmp->next) {
-            if (strcmp(tmp->rule_name, "add") == 0)
-                sign = '+';
-            else if (strcmp(tmp->rule_name, "minus") == 0)
-                sign = '-';
-            else if (strcmp(tmp->rule_name, "mul") == 0)
-                sign = '*';
-            else if (strcmp(tmp->rule_name, "div") == 0)
-                sign = '/';
-            else {
-                if ((err = P4_CalcEval(tmp, &val)) != P4_Ok)
-                    return err;
-                if (sign == '+')
-                    *result += val;
-                else if (sign == '-')
-                    *result -= val;
-                else if (sign == '*')
-                    *result *= val;
-                else if (sign == '/') {
-                    if (val == 0) return P4_ValueError;
-                    *result /= val;
-                }
-            }
+
+        if ((err = P4_CalcEval(node->tail, &val)) != P4_Ok)
+            return err;
+
+        if (strcmp(node->head->next->rule_name, "add") == 0) {
+            *result += val;
+        } else if (strcmp(node->head->next->rule_name, "minus") == 0) {
+            *result -= val;
+        } else {
+            return P4_ValueError;
         }
+
+        return P4_Ok;
+    } else if (strcmp(node->rule_name, "factor") == 0) {
+        if ((err = P4_CalcEval(node->head, &val)) != P4_Ok)
+            return err;
+
+        *result = val;
+
+        if ((err = P4_CalcEval(node->tail, &val)) != P4_Ok)
+            return err;
+
+        if (strcmp(node->head->next->rule_name, "mul") == 0) {
+            *result *= val;
+        } else if (strcmp(node->head->next->rule_name, "div") == 0) {
+            if (val == 0) {
+                return P4_ValueError;
+            }
+            *result /= val;
+        } else {
+            return P4_ValueError;
+        }
+
         return P4_Ok;
     } else if (strcmp(node->rule_name, "unary") == 0) {
         if (node->head == node->tail)

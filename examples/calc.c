@@ -12,7 +12,7 @@ int main() {
     while (fgets(line, sizeof(line), stdin)) {
         source = P4_CreateSource(line, "statement");
         if ((error = P4_Parse(grammar, source)) != P4_Ok) {
-            printf("error: parse: %d\n", error);
+            printf("error: parse: %s\n", P4_GetErrorMessage(source));
         } else if ((error = P4_CalcEval(P4_GetSourceAst(source), &result)) != P4_Ok){
             printf("error: eval: %d\n", error);
         } else {

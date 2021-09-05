@@ -25,18 +25,18 @@
 } while (0);
 
 void test_eval(void) {
-    ASSERT_CALC("1;", P4_Ok, 1);
-    ASSERT_CALC("0;", P4_Ok, 0);
-    ASSERT_CALC("-1;", P4_Ok, -1);
-    ASSERT_CALC("1+1;", P4_Ok, 2);
-    ASSERT_CALC("3-1-1;", P4_Ok, 1);
-    ASSERT_CALC("2*3;", P4_Ok, 6);
-    ASSERT_CALC("2*3+1;", P4_Ok, 7);
-    ASSERT_CALC("2*3+1*2;", P4_Ok, 8);
-    ASSERT_CALC("2*3+1*2;", P4_Ok, 8);
-    ASSERT_CALC("2*(3+1)*2;", P4_Ok, 16);
-    ASSERT_CALC("2*(3+1)/4*2;", P4_Ok, 4);
-    ASSERT_CALC("2* -3  \t+1;", P4_Ok, -5);
+    ASSERT_CALC("1", P4_Ok, 1);
+    ASSERT_CALC("0", P4_Ok, 0);
+    ASSERT_CALC("-1", P4_Ok, -1);
+    ASSERT_CALC("1+1", P4_Ok, 2);
+    ASSERT_CALC("3-1-1", P4_Ok, 1);
+    ASSERT_CALC("2*3", P4_Ok, 6);
+    ASSERT_CALC("2*3+1", P4_Ok, 7);
+    ASSERT_CALC("2*3+1*2", P4_Ok, 8);
+    ASSERT_CALC("2*3+1*2", P4_Ok, 8);
+    ASSERT_CALC("2*(3+1)*2", P4_Ok, 16);
+    ASSERT_CALC("2*(3+1)/4*2", P4_Ok, 4);
+    ASSERT_CALC("2* -3  \t+1", P4_Ok, -5);
 }
 
 int main(void) {

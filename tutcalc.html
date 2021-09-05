@@ -209,27 +209,26 @@
 <li><p>Subtraction operator <cite>-</cite>.</p></li>
 <li><p>Multiplication operator <cite>*</cite>.</p></li>
 <li><p>Division operator <cite>/</cite>.</p></li>
-<li><p>Zero Division is invalid.</p></li>
 <li><p>Parenthesis <cite>()</cite>.</p></li>
+<li><p>Detect invalid zero division.</p></li>
 </ul>
-<p>The calculator can take arbitrary valid string calc expressions and yield the result.</p>
+<p>The calculator can take arbitrary valid string and yield a result.</p>
 <section id="step-1-create-grammar">
 <h2>Step 1: Create Grammar<a class="headerlink" href="#step-1-create-grammar" title="Permalink to this headline">¶</a></h2>
 <p>Let’s create a new file “calc.h” and
 create the grammar using <a class="reference internal" href="api.html#c.P4_LoadGrammar" title="P4_LoadGrammar"><code class="xref c c-func docutils literal notranslate"><span class="pre">P4_LoadGrammar()</span></code></a>.</p>
-<p>The order of rules must be same with <cite>P4_CalcRuleID</cite>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">P4_Grammar</span><span class="o">*</span>  <span class="n">P4_CreateCalcGrammar</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="n">P4_LoadGrammar</span><span class="p">(</span>
         <span class="s2">"statement = term eol;</span><span class="se">\n</span><span class="s2">"</span>
 
         <span class="s2">"@nonterminal</span><span class="se">\n</span><span class="s2">"</span>
-        <span class="s2">"term = factor ((add / minus) factor)*;</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"term = factor | term  (add / minus) factor;</span><span class="se">\n</span><span class="s2">"</span>
 
         <span class="s2">"@nonterminal</span><span class="se">\n</span><span class="s2">"</span>
-        <span class="s2">"factor = unary ((mul / div) unary)*;</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"factor = unary | factor (mul / div) unary;</span><span class="se">\n</span><span class="s2">"</span>
 
         <span class="s2">"@nonterminal</span><span class="se">\n</span><span class="s2">"</span>
-        <span class="s2">"unary = add unary / minus unary / primary;</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"unary = primary / (add / minus)? unary;</span><span class="se">\n</span><span class="s2">"</span>
 
         <span class="s2">"@lifted</span><span class="se">\n</span><span class="s2">"</span>
         <span class="s2">"primary = integer / </span><span class="se">\"</span><span class="s2">(</span><span class="se">\"</span><span class="s2"> term </span><span class="se">\"</span><span class="s2">)</span><span class="se">\"</span><span class="s2">;</span><span class="se">\n</span><span class="s2">"</span>
@@ -245,7 +244,7 @@ create the grammar using <a class="reference internal" href="api.html#c.P4_LoadG
         <span class="s2">"@spaced @lifted</span><span class="se">\n</span><span class="s2">"</span>
         <span class="s2">"whitespace = </span><span class="se">\"</span><span class="s2"> </span><span class="se">\"</span><span class="s2"> / </span><span class="se">\"\\</span><span class="s2">t</span><span class="se">\"</span><span class="s2">;</span><span class="se">\n</span><span class="s2">"</span>
 
-        <span class="s2">"eol = </span><span class="se">\"</span><span class="s2">;</span><span class="se">\"</span><span class="s2">;</span><span class="se">\n</span><span class="s2">"</span>
+        <span class="s2">"eol = </span><span class="se">\"\\</span><span class="s2">n</span><span class="se">\"</span><span class="s2"> / !.;</span><span class="se">\n</span><span class="s2">"</span>
     <span class="p">);</span>
 <span class="p">}</span>
 </pre></div>
@@ -273,34 +272,44 @@ create the grammar using <a class="reference internal" href="api.html#c.P4_LoadG
 
     <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">rule_name</span><span class="p">,</span> <span class="s2">"statement"</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">return</span> <span class="n">P4_CalcEval</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">,</span> <span class="n">result</span><span class="p">);</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">rule_name</span><span class="p">,</span> <span class="s2">"term"</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">strcmp</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">rule_name</span><span class="p">,</span> <span class="s2">"factor"</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">rule_name</span><span class="p">,</span> <span class="s2">"term"</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">if</span> <span class="p">((</span><span class="n">err</span> <span class="o">=</span> <span class="n">P4_CalcEval</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">val</span><span class="p">))</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">err</span><span class="p">;</span>
+
         <span class="o">*</span><span class="n">result</span> <span class="o">=</span> <span class="n">val</span><span class="p">;</span>
-        <span class="k">for</span> <span class="p">(</span><span class="n">tmp</span> <span class="o">=</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">head</span><span class="o">-&gt;</span><span class="nb">next</span><span class="p">;</span> <span class="n">tmp</span> <span class="o">!=</span> <span class="n">NULL</span><span class="p">;</span> <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">-&gt;</span><span class="nb">next</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">tmp</span><span class="o">-&gt;</span><span class="n">rule_name</span><span class="p">,</span> <span class="s2">"add"</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-                <span class="n">sign</span> <span class="o">=</span> <span class="s1">'+'</span><span class="p">;</span>
-            <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">tmp</span><span class="o">-&gt;</span><span class="n">rule_name</span><span class="p">,</span> <span class="s2">"minus"</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-                <span class="n">sign</span> <span class="o">=</span> <span class="s1">'-'</span><span class="p">;</span>
-            <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">tmp</span><span class="o">-&gt;</span><span class="n">rule_name</span><span class="p">,</span> <span class="s2">"mul"</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-                <span class="n">sign</span> <span class="o">=</span> <span class="s1">'*'</span><span class="p">;</span>
-            <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">tmp</span><span class="o">-&gt;</span><span class="n">rule_name</span><span class="p">,</span> <span class="s2">"div"</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-                <span class="n">sign</span> <span class="o">=</span> <span class="s1">'/'</span><span class="p">;</span>
-            <span class="k">else</span> <span class="p">{</span>
-                <span class="k">if</span> <span class="p">((</span><span class="n">err</span> <span class="o">=</span> <span class="n">P4_CalcEval</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">val</span><span class="p">))</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span>
-                    <span class="k">return</span> <span class="n">err</span><span class="p">;</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">sign</span> <span class="o">==</span> <span class="s1">'+'</span><span class="p">)</span>
-                    <span class="o">*</span><span class="n">result</span> <span class="o">+=</span> <span class="n">val</span><span class="p">;</span>
-                <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">sign</span> <span class="o">==</span> <span class="s1">'-'</span><span class="p">)</span>
-                    <span class="o">*</span><span class="n">result</span> <span class="o">-=</span> <span class="n">val</span><span class="p">;</span>
-                <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">sign</span> <span class="o">==</span> <span class="s1">'*'</span><span class="p">)</span>
-                    <span class="o">*</span><span class="n">result</span> <span class="o">*=</span> <span class="n">val</span><span class="p">;</span>
-                <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">sign</span> <span class="o">==</span> <span class="s1">'/'</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">val</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="k">return</span> <span class="n">P4_ValueError</span><span class="p">;</span>
-                    <span class="o">*</span><span class="n">result</span> <span class="o">/=</span> <span class="n">val</span><span class="p">;</span>
-                <span class="p">}</span>
-            <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">((</span><span class="n">err</span> <span class="o">=</span> <span class="n">P4_CalcEval</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">tail</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">val</span><span class="p">))</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">err</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">head</span><span class="o">-&gt;</span><span class="nb">next</span><span class="o">-&gt;</span><span class="n">rule_name</span><span class="p">,</span> <span class="s2">"add"</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="o">*</span><span class="n">result</span> <span class="o">+=</span> <span class="n">val</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">head</span><span class="o">-&gt;</span><span class="nb">next</span><span class="o">-&gt;</span><span class="n">rule_name</span><span class="p">,</span> <span class="s2">"minus"</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="o">*</span><span class="n">result</span> <span class="o">-=</span> <span class="n">val</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="n">P4_ValueError</span><span class="p">;</span>
         <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">P4_Ok</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">rule_name</span><span class="p">,</span> <span class="s2">"factor"</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">err</span> <span class="o">=</span> <span class="n">P4_CalcEval</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">head</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">val</span><span class="p">))</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">err</span><span class="p">;</span>
+
+        <span class="o">*</span><span class="n">result</span> <span class="o">=</span> <span class="n">val</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">((</span><span class="n">err</span> <span class="o">=</span> <span class="n">P4_CalcEval</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">tail</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">val</span><span class="p">))</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">err</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">head</span><span class="o">-&gt;</span><span class="nb">next</span><span class="o">-&gt;</span><span class="n">rule_name</span><span class="p">,</span> <span class="s2">"mul"</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="o">*</span><span class="n">result</span> <span class="o">*=</span> <span class="n">val</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">head</span><span class="o">-&gt;</span><span class="nb">next</span><span class="o">-&gt;</span><span class="n">rule_name</span><span class="p">,</span> <span class="s2">"div"</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">val</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="n">P4_ValueError</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="o">*</span><span class="n">result</span> <span class="o">/=</span> <span class="n">val</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="n">P4_ValueError</span><span class="p">;</span>
+        <span class="p">}</span>
+
         <span class="k">return</span> <span class="n">P4_Ok</span><span class="p">;</span>
     <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">strcmp</span><span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">rule_name</span><span class="p">,</span> <span class="s2">"unary"</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">node</span><span class="o">-&gt;</span><span class="n">head</span> <span class="o">==</span> <span class="n">node</span><span class="o">-&gt;</span><span class="n">tail</span><span class="p">)</span>
@@ -355,7 +364,7 @@ create the grammar using <a class="reference internal" href="api.html#c.P4_LoadG
     <span class="k">while</span> <span class="p">(</span><span class="n">fgets</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">sizeof</span><span class="p">(</span><span class="n">line</span><span class="p">),</span> <span class="n">stdin</span><span class="p">))</span> <span class="p">{</span>
         <span class="n">source</span> <span class="o">=</span> <span class="n">P4_CreateSource</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="s2">"statement"</span><span class="p">);</span>
         <span class="k">if</span> <span class="p">((</span><span class="n">error</span> <span class="o">=</span> <span class="n">P4_Parse</span><span class="p">(</span><span class="n">grammar</span><span class="p">,</span> <span class="n">source</span><span class="p">))</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">printf</span><span class="p">(</span><span class="s2">"error: parse: </span><span class="si">%d</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">error</span><span class="p">);</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s2">"error: parse: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">P4_GetErrorMessage</span><span class="p">(</span><span class="n">source</span><span class="p">));</span>
         <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">((</span><span class="n">error</span> <span class="o">=</span> <span class="n">P4_CalcEval</span><span class="p">(</span><span class="n">P4_GetSourceAst</span><span class="p">(</span><span class="n">source</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">result</span><span class="p">))</span> <span class="o">!=</span> <span class="n">P4_Ok</span><span class="p">){</span>
             <span class="n">printf</span><span class="p">(</span><span class="s2">"error: eval: </span><span class="si">%d</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">error</span><span class="p">);</span>
         <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
@@ -372,13 +381,13 @@ create the grammar using <a class="reference internal" href="api.html#c.P4_LoadG
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>gcc -o calc calc.c peppa.c <span class="o">&amp;&amp;</span> ./calc
 <span class="go">Type statement to continue. Type ^C to quit.</span>
 
-<span class="go">1+2*3;</span>
+<span class="go">1+2*3</span>
 <span class="go">[Out] 7</span>
 
-<span class="go">-1 + 4/2*3 - 1;</span>
+<span class="go">-1 + 4/2*3 - 1</span>
 <span class="go">[Out] 4</span>
 
-<span class="go">5/0;</span>
+<span class="go">5/0</span>
 <span class="go">error: eval: 6</span>
 </pre></div>
 </div>

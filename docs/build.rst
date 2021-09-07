@@ -35,14 +35,6 @@ If you have a difficulty having a complete development environment for Peppa PEG
     # apt-get install git gcc gdb valgrind make cmake libunistring-dev python3 python3-venv python3-pip doxygen
     # // you have all the dev-dependencies now.
 
-Testing Peppa PEG requires downloading the test framework `Unity`:
-
-.. code-block:: console
-
-    # cd /app
-    # git submodule init
-    # git submodule update
-
 If you have Valgrind installed, you can enable `ENABLE_VALGRIND`.
 
 .. code-block:: console

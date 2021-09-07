@@ -189,13 +189,6 @@ Read the documentation here: <https://soasme.com/PeppaPEG/>.
 
 ## Test
 
-Peppa PEG test requires downloading the test framework Unity:
-
-```bash
-$ git submodule init
-$ git submodule update
-```
-
 Assume you have `cmake` and `gcc` installed.
 
 ```bash

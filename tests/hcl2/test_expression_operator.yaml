@@ -196,8 +196,8 @@
   tests:
     - I: |
         t   = true ? "a" : "b"
-      O: [{"slice": [0, 22], "type": "Body", "children": [{"slice": [0, 22], "type": "Attribute", "children": [{"slice": [0, 1], "type": "Identifier"}, {"slice": [6, 22], "type": "Conditional", "children": [{"slice": [6, 10], "type": "Identifier"}, {"slice": [13, 16], "type": "QuotedTemplate"}, {"slice": [19, 22], "type": "QuotedTemplate"}]}]}]}]
+      O: [{"slice": [0, 23], "type": "Body", "children": [{"slice": [0, 23], "type": "Attribute", "children": [{"slice": [0, 1], "type": "Identifier"}, {"slice": [6, 22], "type": "Conditional", "children": [{"slice": [6, 10], "type": "Identifier"}, {"slice": [13, 16], "type": "QuotedTemplate"}, {"slice": [19, 22], "type": "QuotedTemplate"}]}]}]}]
 
     - I: |
         f   = false ? "a" : "b"
-      O: [{"slice": [0, 23], "type": "Body", "children": [{"slice": [0, 23], "type": "Attribute", "children": [{"slice": [0, 1], "type": "Identifier"}, {"slice": [6, 23], "type": "Conditional", "children": [{"slice": [6, 11], "type": "Identifier"}, {"slice": [14, 17], "type": "QuotedTemplate"}, {"slice": [20, 23], "type": "QuotedTemplate"}]}]}]}]
+      O: [{"slice": [0, 24], "type": "Body", "children": [{"slice": [0, 24], "type": "Attribute", "children": [{"slice": [0, 1], "type": "Identifier"}, {"slice": [6, 23], "type": "Conditional", "children": [{"slice": [6, 11], "type": "Identifier"}, {"slice": [14, 17], "type": "QuotedTemplate"}, {"slice": [20, 23], "type": "QuotedTemplate"}]}]}]}]

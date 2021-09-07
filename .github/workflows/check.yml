@@ -47,7 +47,7 @@ jobs:
 
     - name: Create Build Environment
       run: |
-        sudo pip install PyYAML
+        sudo python3 -mpip install PyYAML
         cmake -E make_directory ${{github.workspace}}/build
 
     - name: Configure CMake (CLANG)

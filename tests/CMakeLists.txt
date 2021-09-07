@@ -90,6 +90,8 @@ set(
     hcl2/test_expression_heredoc.yaml
     hcl2/test_expression_operator.yaml
     hcl2/test_expression_primitive.yaml
+    hcl2/test_structure_attribute.yaml
+    hcl2/test_structure_block.yaml
 )
 
 find_program(PYTHON python3)

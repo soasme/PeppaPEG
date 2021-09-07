@@ -1,0 +1,59 @@
+- desc: "block"
+  grammar_file: "../../configs/hcl2.peg"
+  entry: "Module"
+  tests:
+    - I: |
+        a {}
+      O: [{"slice": [0, 5], "type": "Body", "children": [{"slice": [0, 5], "type": "OneLineBlock", "children": [{"slice": [0, 1], "type": "Identifier"}]}]}]
+
+    - I: |
+        a {
+
+        }
+      O: [{"slice": [0, 7], "type": "Body", "children": [{"slice": [0, 7], "type": "Block", "children": [{"slice": [0, 1], "type": "Identifier"}]}]}]
+
+    - I: |
+        a { b = "foo" }
+      O: [{"slice": [0, 16], "type": "Body", "children": [{"slice": [0, 16], "type": "OneLineBlock", "children": [{"slice": [0, 1], "type": "Identifier"}, {"slice": [4, 5], "type": "Identifier"}, {"slice": [8, 13], "type": "QuotedTemplate"}]}]}]
+
+    - I: |
+        a "label" { b = "foo" }
+      O: [{"slice": [0, 24], "type": "Body", "children": [{"slice": [0, 24], "type": "OneLineBlock", "children": [{"slice": [0, 1], "type": "Identifier"}, {"slice": [2, 9], "type": "BlockLabels", "children": [{"slice": [2, 9], "type": "StringLit"}]}, {"slice": [12, 13], "type": "Identifier"}, {"slice": [16, 21], "type": "QuotedTemplate"}]}]}]
+
+    - I: |
+        a {
+          b = "foo"
+          c = "foo"
+        }
+      O: [{"slice": [0, 30], "type": "Body", "children": [{"slice": [0, 30], "type": "Block", "children": [{"slice": [0, 1], "type": "Identifier"}, {"slice": [6, 28], "type": "Body", "children": [{"slice": [6, 16], "type": "Attribute", "children": [{"slice": [6, 7], "type": "Identifier"}, {"slice": [10, 15], "type": "QuotedTemplate"}]}, {"slice": [18, 28], "type": "Attribute", "children": [{"slice": [18, 19], "type": "Identifier"}, {"slice": [22, 27], "type": "QuotedTemplate"}]}]}]}]}]
+
+    - I: |
+        a { b = "foo", c = "bar" }
+      E: "CutError: line 1:14, expect OneLineBlock (char '}')"
+
+    - I: |
+        a { b = "foo"
+          c = "bar" }
+      E: "CutError: line 1:14, expect OneLineBlock (char '}')"
+
+    - I: |
+        a { b = "foo"
+          c = "bar"
+        }
+      E: "CutError: line 1:14, expect OneLineBlock (char '}')"
+
+    - I: |
+        a { b = "foo"
+        }
+      E: "CutError: line 1:14, expect OneLineBlock (char '}')"
+
+    - I: |
+        a { b {} }
+      E: "CutError: line 1:5, expect OneLineBlock (char '}')"
+
+    - I: |
+        a {
+      E: "CutError: line 2:1, expect Block (char '}')"
+
+    - I: "a {"
+      E: "CutError: line 1:4, expect Block (char '}')"

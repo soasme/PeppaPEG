@@ -38,13 +38,19 @@ EOF = !.;
 @lifted
 Eval = Expression;
 
-Body = (Attribute / Block)*;
+@scoped
+Body = (Attribute / Block / OneLineBlock)*;
 
-Attribute = Identifier "=" ~ Expression;
+@tight
+Attribute = Identifier Whitespace* "=" ~ Whitespace* Expression Whitespace* Newline;
 
-Block = Identifier BlockLabels "{" ~ Body "}";
+@tight
+Block = Identifier Whitespace* BlockLabels Whitespace* "{" Whitespace* Newline ~ Ignore* Body Ignore* "}" Newline;
 
 BlockLabels = (Identifier / StringLit)*;
+
+@tight
+OneLineBlock = Identifier Whitespace* BlockLabels Whitespace* "{" ~ Whitespace* (Identifier Whitespace* "=" Whitespace* Expression)? Whitespace* "}" Newline;
 
 @tight @squashed
 Identifier = ([a-z] / [A-Z] / "_") ([a-z] / [A-Z] / [0-9] / "_" / "-")*;
@@ -145,7 +151,10 @@ ForElem = Identifier ("," Identifier)?;
 ForCond = "if" Expression;
 
 @squashed @lifted
-Newline = "\r" / "\n" / Comment;
+Newline = "\r" / "\n" / Comment / EOF;
+
+@squashed @lifted
+Whitespace = " " / "\t";
 
 @spaced @lifted
 Ignore = " " / "\t" / "\r" / "\n" / Comment / InlineComment;

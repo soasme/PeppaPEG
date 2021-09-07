@@ -1,0 +1,157 @@
+# Peppa PEG -  Ultra lightweight PEG Parser in ANSI C.
+#
+# MIT License
+#
+# Copyright (c) 2021 Ju
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+# @file       hcl2.peg
+# @brief      A complete grammar for HCL2.
+# @author     Ju Lin
+# @copyright  MIT
+# @date       2021
+# @see        https://github.com/soasme/PeppaPEG
+
+@lifted
+Module = &. Body EOF;
+
+@lifted
+EOF = !.;
+
+@lifted
+Eval = Expression;
+
+Body = (Attribute / Block)*;
+
+Attribute = Identifier "=" ~ Expression;
+
+Block = Identifier BlockLabels "{" ~ Body "}";
+
+BlockLabels = (Identifier / StringLit)*;
+
+@tight @squashed
+Identifier = ([a-z] / [A-Z] / "_") ([a-z] / [A-Z] / [0-9] / "_" / "-")*;
+
+@lifted
+Expression = Conditional;
+
+@nonterminal
+Conditional = Operation (Ignore* "?" Ignore* Operation Ignore* ":" Ignore* Operation)?;
+
+@lifted @scoped
+Operation = UnaryExpression / BinaryOrExpression;
+
+UnaryExpression = UnaryOp PrimaryExpression;
+UnaryOp = "-" / "!";
+
+BinaryOrExpression = BinaryAndExpression | BinaryOrExpression "||" BinaryAndExpression;
+BinaryAndExpression = BinaryEqExpression | BinaryAndExpression "&&" BinaryEqExpression;
+BinaryEqExpression = BinaryTestExpression | BinaryEqExpression BinaryEqOp BinaryTestExpression;
+BinaryEqOp = "==" / "!=";
+BinaryTestExpression = BinaryTermExpression | BinaryTestExpression BinaryTestOp BinaryTermExpression;
+BinaryTestOp = ">=" / ">" / "<=" / "<";
+BinaryTermExpression = BinaryFactorExpression | BinaryTermExpression BinaryTermOp BinaryFactorExpression;
+BinaryTermOp = "+" / "-";
+BinaryFactorExpression = PrimaryExpression | BinaryFactorExpression BinaryFactorOp PrimaryExpression;
+BinaryFactorOp = "*" / "/" / "%";
+
+PrimaryExpression = (
+    "(" Expression ")"
+    / FloatLit
+    / IntLit
+    / FunctionCall
+    / Identifier
+    / QuotedTemplate
+    / HeredocTemplate
+    / ForTupleExpr
+    / ForObjectExpr
+    / Tuple
+    / Object
+) | PrimaryExpression (Index / GetAttr / AttrSplat / FullSplat);
+
+@squashed
+QuotedTemplate = StringLit;
+
+@tight @squashed
+StringLit = "\"" (!("\"" / "${") . / Interpolation)* "\"";
+
+@scoped
+Interpolation = "${" Expression "}";
+
+@tight @squashed
+IntLit = Decimal+;
+
+@tight @squashed
+FloatLit = Decimal+ "." Decimal+ (ExpMark Decimal+)?
+    / Decimal+ ("." Decimal+)? ExpMark Decimal+;
+
+Decimal = [0-9];
+ExpMark = i"e" ("+" / "-")?;
+
+Tuple = "[" ~ (Expression ("," Expression)* ","?)? "]";
+
+@tight
+Object = "{" ~ Ignore* (Item (ItemSep Ignore* Item)* Ignore* ItemSep?)? "}";
+
+@tight
+Item = (Identifier / Expression) Ignore* ("=" / ":") Ignore* Expression;
+
+@tight @lifted @squashed
+ItemSep = Newline+ / "," Newline*;
+
+@tight
+Heredoc = ([a-z] / [A-Z]) ([a-z] / [A-Z] / [0-9] / "." / "-" / "_")+;
+
+# XXX: Currently, only "EOT" as identifier is supported.
+# Back reference capture must be supported in nested rule expressions first.
+@tight @squashed
+HeredocTemplate = "<<" "-"? "EOT" "\n" (!((" " / "\t")* "EOT" ("\n" / &.)) (!"\n" .)* "\n")* (" " / "\t")* "EOT" &("\n" / &.);
+
+FunctionCall = Identifier "(" Arguments? ")";
+Arguments = Expression ("," Expression)* ("," / Kwargs)?;
+Kwargs = "...";
+
+Index = "[" Expression "]" / "." IntLit;
+
+GetAttr = "." Identifier;
+
+AttrSplat = ".*" GetAttr;
+
+FullSplat = "[" "*" "]" (GetAttr / Index);
+
+ForTupleExpr = "[" ForIntro Expression ForCond? "]";
+ForObjectExpr = "{" ForIntro Expression "=>" Expression Kwargs? ForCond? "}";
+ForIntro = "for" ~ ForElem "in" Expression ":";
+@nonterminal
+ForElem = Identifier ("," Identifier)?;
+@tight
+ForCond = "if" Expression;
+
+@squashed @lifted
+Newline = "\r" / "\n" / Comment;
+
+@spaced @lifted
+Ignore = " " / "\t" / "\r" / "\n" / Comment / InlineComment;
+
+@squashed
+Comment = ("#" / "//") (!"\n" .)* ("\n" / !.);
+
+@squashed
+InlineComment = "/*" (!"*/" .)* "*/";

@@ -1,0 +1,203 @@
+- desc: "equality =="
+  grammar_file: "../../configs/hcl2.peg"
+  entry: "Module"
+  tests:
+    - I: |
+        exactly = "a" == "a"
+      O: [{"slice": [0, 21], "type": "Body", "children": [{"slice": [0, 21], "type": "Attribute", "children": [{"slice": [0, 7], "type": "Identifier"}, {"slice": [10, 20], "type": "BinaryEqExpression", "children": [{"slice": [10, 13], "type": "QuotedTemplate"}, {"slice": [14, 16], "type": "BinaryEqOp"}, {"slice": [17, 20], "type": "QuotedTemplate"}]}]}]}]
+
+    - I: |
+        not     = "a" == "b"
+      O: [{"slice": [0, 21], "type": "Body", "children": [{"slice": [0, 21], "type": "Attribute", "children": [{"slice": [0, 3], "type": "Identifier"}, {"slice": [10, 20], "type": "BinaryEqExpression", "children": [{"slice": [10, 13], "type": "QuotedTemplate"}, {"slice": [14, 16], "type": "BinaryEqOp"}, {"slice": [17, 20], "type": "QuotedTemplate"}]}]}]}]
+
+    - I: |
+        type_mismatch_number = "1" == 1
+      O: [{"slice": [0, 32], "type": "Body", "children": [{"slice": [0, 32], "type": "Attribute", "children": [{"slice": [0, 20], "type": "Identifier"}, {"slice": [23, 31], "type": "BinaryEqExpression", "children": [{"slice": [23, 26], "type": "QuotedTemplate"}, {"slice": [27, 29], "type": "BinaryEqOp"}, {"slice": [30, 31], "type": "IntLit"}]}]}]}]
+
+    - I: |
+        type_mismatch_bool   = "true" == true
+      O: [{"slice": [0, 38], "type": "Body", "children": [{"slice": [0, 38], "type": "Attribute", "children": [{"slice": [0, 18], "type": "Identifier"}, {"slice": [23, 37], "type": "BinaryEqExpression", "children": [{"slice": [23, 29], "type": "QuotedTemplate"}, {"slice": [30, 32], "type": "BinaryEqOp"}, {"slice": [33, 37], "type": "Identifier"}]}]}]}]
+
+
+- desc: "equality !="
+  grammar_file: "../../configs/hcl2.peg"
+  entry: "Module"
+  tests:
+    - I: |
+        exactly = "a" != "a"
+      O: [{"slice": [0, 21], "type": "Body", "children": [{"slice": [0, 21], "type": "Attribute", "children": [{"slice": [0, 7], "type": "Identifier"}, {"slice": [10, 20], "type": "BinaryEqExpression", "children": [{"slice": [10, 13], "type": "QuotedTemplate"}, {"slice": [14, 16], "type": "BinaryEqOp"}, {"slice": [17, 20], "type": "QuotedTemplate"}]}]}]}]
+    - I: |
+        not     = "a" != "b"
+      O: [{"slice": [0, 21], "type": "Body", "children": [{"slice": [0, 21], "type": "Attribute", "children": [{"slice": [0, 3], "type": "Identifier"}, {"slice": [10, 20], "type": "BinaryEqExpression", "children": [{"slice": [10, 13], "type": "QuotedTemplate"}, {"slice": [14, 16], "type": "BinaryEqOp"}, {"slice": [17, 20], "type": "QuotedTemplate"}]}]}]}]
+    - I: |
+        type_mismatch_number = "1" != 1
+      O: [{"slice": [0, 32], "type": "Body", "children": [{"slice": [0, 32], "type": "Attribute", "children": [{"slice": [0, 20], "type": "Identifier"}, {"slice": [23, 31], "type": "BinaryEqExpression", "children": [{"slice": [23, 26], "type": "QuotedTemplate"}, {"slice": [27, 29], "type": "BinaryEqOp"}, {"slice": [30, 31], "type": "IntLit"}]}]}]}]
+    - I: |
+        type_mismatch_bool   = "true" != true
+      O: 
+        [{"slice": [0, 38], "type": "Body", "children": [{"slice": [0, 38], "type": "Attribute", "children": [{"slice": [0, 18], "type": "Identifier"}, {"slice": [23, 37], "type": "BinaryEqExpression", "children": [{"slice": [23, 29], "type": "QuotedTemplate"}, {"slice": [30, 32], "type": "BinaryEqOp"}, {"slice": [33, 37], "type": "Identifier"}]}]}]}]
+
+- desc: "inequality <"
+  grammar_file: "../../configs/hcl2.peg"
+  entry: "Module"
+  tests:
+    - I: |
+        lt  = 1 < 2
+      O: [{"slice": [0, 12], "type": "Body", "children": [{"slice": [0, 12], "type": "Attribute", "children": [{"slice": [0, 2], "type": "Identifier"}, {"slice": [6, 11], "type": "BinaryTestExpression", "children": [{"slice": [6, 7], "type": "IntLit"}, {"slice": [8, 9], "type": "BinaryTestOp"}, {"slice": [10, 11], "type": "IntLit"}]}]}]}]
+
+    - I: |
+        gt  = 2 < 1
+      O: [{"slice": [0, 12], "type": "Body", "children": [{"slice": [0, 12], "type": "Attribute", "children": [{"slice": [0, 2], "type": "Identifier"}, {"slice": [6, 11], "type": "BinaryTestExpression", "children": [{"slice": [6, 7], "type": "IntLit"}, {"slice": [8, 9], "type": "BinaryTestOp"}, {"slice": [10, 11], "type": "IntLit"}]}]}]}]
+
+    - I: |
+        eq  = 1 < 1
+      O: [{"slice": [0, 12], "type": "Body", "children": [{"slice": [0, 12], "type": "Attribute", "children": [{"slice": [0, 2], "type": "Identifier"}, {"slice": [6, 11], "type": "BinaryTestExpression", "children": [{"slice": [6, 7], "type": "IntLit"}, {"slice": [8, 9], "type": "BinaryTestOp"}, {"slice": [10, 11], "type": "IntLit"}]}]}]}]
+
+- desc: "inequality <="
+  grammar_file: "../../configs/hcl2.peg"
+  entry: "Module"
+  tests:
+    - I: |
+        lt  = 1 <= 2
+      O: [{"slice": [0, 13], "type": "Body", "children": [{"slice": [0, 13], "type": "Attribute", "children": [{"slice": [0, 2], "type": "Identifier"}, {"slice": [6, 12], "type": "BinaryTestExpression", "children": [{"slice": [6, 7], "type": "IntLit"}, {"slice": [8, 10], "type": "BinaryTestOp"}, {"slice": [11, 12], "type": "IntLit"}]}]}]}]
+
+    - I: |
+        gt  = 2 <= 1
+      O: [{"slice": [0, 13], "type": "Body", "children": [{"slice": [0, 13], "type": "Attribute", "children": [{"slice": [0, 2], "type": "Identifier"}, {"slice": [6, 12], "type": "BinaryTestExpression", "children": [{"slice": [6, 7], "type": "IntLit"}, {"slice": [8, 10], "type": "BinaryTestOp"}, {"slice": [11, 12], "type": "IntLit"}]}]}]}]
+
+    - I: |
+        eq  = 1 <= 1
+      O: [{"slice": [0, 13], "type": "Body", "children": [{"slice": [0, 13], "type": "Attribute", "children": [{"slice": [0, 2], "type": "Identifier"}, {"slice": [6, 12], "type": "BinaryTestExpression", "children": [{"slice": [6, 7], "type": "IntLit"}, {"slice": [8, 10], "type": "BinaryTestOp"}, {"slice": [11, 12], "type": "IntLit"}]}]}]}]
+
+- desc: "inequality >"
+  grammar_file: "../../configs/hcl2.peg"
+  entry: "Module"
+  tests:
+    - I: |
+        lt  = 1 > 2
+      O: [{"slice": [0, 12], "type": "Body", "children": [{"slice": [0, 12], "type": "Attribute", "children": [{"slice": [0, 2], "type": "Identifier"}, {"slice": [6, 11], "type": "BinaryTestExpression", "children": [{"slice": [6, 7], "type": "IntLit"}, {"slice": [8, 9], "type": "BinaryTestOp"}, {"slice": [10, 11], "type": "IntLit"}]}]}]}]
+
+    - I: |
+        gt  = 2 > 1
+      O: [{"slice": [0, 12], "type": "Body", "children": [{"slice": [0, 12], "type": "Attribute", "children": [{"slice": [0, 2], "type": "Identifier"}, {"slice": [6, 11], "type": "BinaryTestExpression", "children": [{"slice": [6, 7], "type": "IntLit"}, {"slice": [8, 9], "type": "BinaryTestOp"}, {"slice": [10, 11], "type": "IntLit"}]}]}]}]
+
+    - I: |
+        eq  = 1 > 1
+      O: [{"slice": [0, 12], "type": "Body", "children": [{"slice": [0, 12], "type": "Attribute", "children": [{"slice": [0, 2], "type": "Identifier"}, {"slice": [6, 11], "type": "BinaryTestExpression", "children": [{"slice": [6, 7], "type": "IntLit"}, {"slice": [8, 9], "type": "BinaryTestOp"}, {"slice": [10, 11], "type": "IntLit"}]}]}]}]
+
+- desc: "inequality >="
+  grammar_file: "../../configs/hcl2.peg"
+  entry: "Module"
+  tests:
+    - I: |
+        lt  = 1 >= 2
+      O: [{"slice": [0, 13], "type": "Body", "children": [{"slice": [0, 13], "type": "Attribute", "children": [{"slice": [0, 2], "type": "Identifier"}, {"slice": [6, 12], "type": "BinaryTestExpression", "children": [{"slice": [6, 7], "type": "IntLit"}, {"slice": [8, 10], "type": "BinaryTestOp"}, {"slice": [11, 12], "type": "IntLit"}]}]}]}]
+
+    - I: |
+        gt  = 2 >= 1
+      O: [{"slice": [0, 13], "type": "Body", "children": [{"slice": [0, 13], "type": "Attribute", "children": [{"slice": [0, 2], "type": "Identifier"}, {"slice": [6, 12], "type": "BinaryTestExpression", "children": [{"slice": [6, 7], "type": "IntLit"}, {"slice": [8, 10], "type": "BinaryTestOp"}, {"slice": [11, 12], "type": "IntLit"}]}]}]}]
+
+    - I: |
+        eq  = 1 >= 1
+      O: [{"slice": [0, 13], "type": "Body", "children": [{"slice": [0, 13], "type": "Attribute", "children": [{"slice": [0, 2], "type": "Identifier"}, {"slice": [6, 12], "type": "BinaryTestExpression", "children": [{"slice": [6, 7], "type": "IntLit"}, {"slice": [8, 10], "type": "BinaryTestOp"}, {"slice": [11, 12], "type": "IntLit"}]}]}]}]
+
+- desc: "arithmetic"
+  grammar_file: "../../configs/hcl2.peg"
+  entry: "Module"
+  tests:
+    - I: |
+        add      = 2 + 3.5
+      O: [{"slice": [0, 19], "type": "Body", "children": [{"slice": [0, 19], "type": "Attribute", "children": [{"slice": [0, 3], "type": "Identifier"}, {"slice": [11, 18], "type": "BinaryTermExpression", "children": [{"slice": [11, 12], "type": "IntLit"}, {"slice": [13, 14], "type": "BinaryTermOp"}, {"slice": [15, 18], "type": "FloatLit"}]}]}]}]
+
+    - I: |
+        add_big  = 3.14159265358979323846264338327950288419716939937510582097494459 + 1
+      O: [{"slice": [0, 80], "type": "Body", "children": [{"slice": [0, 80], "type": "Attribute", "children": [{"slice": [0, 7], "type": "Identifier"}, {"slice": [11, 79], "type": "BinaryTermExpression", "children": [{"slice": [11, 75], "type": "FloatLit"}, {"slice": [76, 77], "type": "BinaryTermOp"}, {"slice": [78, 79], "type": "IntLit"}]}]}]}]
+
+    - I: |
+        sub      = 3.5 - 2
+      O: [{"slice": [0, 19], "type": "Body", "children": [{"slice": [0, 19], "type": "Attribute", "children": [{"slice": [0, 3], "type": "Identifier"}, {"slice": [11, 18], "type": "BinaryTermExpression", "children": [{"slice": [11, 14], "type": "FloatLit"}, {"slice": [15, 16], "type": "BinaryTermOp"}, {"slice": [17, 18], "type": "IntLit"}]}]}]}]
+
+    - I: |
+        sub_neg  = 2 - 3.5
+      O: [{"slice": [0, 19], "type": "Body", "children": [{"slice": [0, 19], "type": "Attribute", "children": [{"slice": [0, 7], "type": "Identifier"}, {"slice": [11, 18], "type": "BinaryTermExpression", "children": [{"slice": [11, 12], "type": "IntLit"}, {"slice": [13, 14], "type": "BinaryTermOp"}, {"slice": [15, 18], "type": "FloatLit"}]}]}]}]
+
+    - I: |
+        mul      = 2 * 4.5
+      O: [{"slice": [0, 19], "type": "Body", "children": [{"slice": [0, 19], "type": "Attribute", "children": [{"slice": [0, 3], "type": "Identifier"}, {"slice": [11, 18], "type": "BinaryFactorExpression", "children": [{"slice": [11, 12], "type": "IntLit"}, {"slice": [13, 14], "type": "BinaryFactorOp"}, {"slice": [15, 18], "type": "FloatLit"}]}]}]}]
+
+    - I: |
+        div      = 1 / 10
+      O: [{"slice": [0, 18], "type": "Body", "children": [{"slice": [0, 18], "type": "Attribute", "children": [{"slice": [0, 3], "type": "Identifier"}, {"slice": [11, 17], "type": "BinaryFactorExpression", "children": [{"slice": [11, 12], "type": "IntLit"}, {"slice": [13, 14], "type": "BinaryFactorOp"}, {"slice": [15, 17], "type": "IntLit"}]}]}]}]
+
+    - I: |
+        mod      = 11 % 5
+      O: [{"slice": [0, 18], "type": "Body", "children": [{"slice": [0, 18], "type": "Attribute", "children": [{"slice": [0, 3], "type": "Identifier"}, {"slice": [11, 17], "type": "BinaryFactorExpression", "children": [{"slice": [11, 13], "type": "IntLit"}, {"slice": [14, 15], "type": "BinaryFactorOp"}, {"slice": [16, 17], "type": "IntLit"}]}]}]}]
+
+    - I: |
+        mod_frac = 11 % 5.1
+      O: [{"slice": [0, 20], "type": "Body", "children": [{"slice": [0, 20], "type": "Attribute", "children": [{"slice": [0, 8], "type": "Identifier"}, {"slice": [11, 19], "type": "BinaryFactorExpression", "children": [{"slice": [11, 13], "type": "IntLit"}, {"slice": [14, 15], "type": "BinaryFactorOp"}, {"slice": [16, 19], "type": "FloatLit"}]}]}]}]
+
+- desc: "logical binary &&"
+  grammar_file: "../../configs/hcl2.peg"
+  entry: "Module"
+  tests:
+    - I: |
+        tt  = true && true
+      O: [{"slice": [0, 19], "type": "Body", "children": [{"slice": [0, 19], "type": "Attribute", "children": [{"slice": [0, 2], "type": "Identifier"}, {"slice": [6, 18], "type": "BinaryAndExpression", "children": [{"slice": [6, 10], "type": "Identifier"}, {"slice": [14, 18], "type": "Identifier"}]}]}]}]
+
+    - I: |
+        ft  = false && true
+      O: [{"slice": [0, 20], "type": "Body", "children": [{"slice": [0, 20], "type": "Attribute", "children": [{"slice": [0, 2], "type": "Identifier"}, {"slice": [6, 19], "type": "BinaryAndExpression", "children": [{"slice": [6, 11], "type": "Identifier"}, {"slice": [15, 19], "type": "Identifier"}]}]}]}]
+
+    - I: |
+        tf  = true && false
+      O: [{"slice": [0, 20], "type": "Body", "children": [{"slice": [0, 20], "type": "Attribute", "children": [{"slice": [0, 2], "type": "Identifier"}, {"slice": [6, 19], "type": "BinaryAndExpression", "children": [{"slice": [6, 10], "type": "Identifier"}, {"slice": [14, 19], "type": "Identifier"}]}]}]}]
+
+    - I: |
+        ff  = false && false
+      O: [{"slice": [0, 21], "type": "Body", "children": [{"slice": [0, 21], "type": "Attribute", "children": [{"slice": [0, 2], "type": "Identifier"}, {"slice": [6, 20], "type": "BinaryAndExpression", "children": [{"slice": [6, 11], "type": "Identifier"}, {"slice": [15, 20], "type": "Identifier"}]}]}]}]
+
+- desc: "logical binary ||"
+  grammar_file: "../../configs/hcl2.peg"
+  entry: "Module"
+  tests:
+    - I: |
+        tt  = true || true
+      O: [{"slice": [0, 19], "type": "Body", "children": [{"slice": [0, 19], "type": "Attribute", "children": [{"slice": [0, 2], "type": "Identifier"}, {"slice": [6, 18], "type": "BinaryOrExpression", "children": [{"slice": [6, 10], "type": "Identifier"}, {"slice": [14, 18], "type": "Identifier"}]}]}]}]
+
+    - I: |
+        ft  = false || true
+      O: [{"slice": [0, 20], "type": "Body", "children": [{"slice": [0, 20], "type": "Attribute", "children": [{"slice": [0, 2], "type": "Identifier"}, {"slice": [6, 19], "type": "BinaryOrExpression", "children": [{"slice": [6, 11], "type": "Identifier"}, {"slice": [15, 19], "type": "Identifier"}]}]}]}]
+
+    - I: |
+        tf  = true || false
+      O: [{"slice": [0, 20], "type": "Body", "children": [{"slice": [0, 20], "type": "Attribute", "children": [{"slice": [0, 2], "type": "Identifier"}, {"slice": [6, 19], "type": "BinaryOrExpression", "children": [{"slice": [6, 10], "type": "Identifier"}, {"slice": [14, 19], "type": "Identifier"}]}]}]}]
+
+    - I: |
+        ff  = false || false
+      O: [{"slice": [0, 21], "type": "Body", "children": [{"slice": [0, 21], "type": "Attribute", "children": [{"slice": [0, 2], "type": "Identifier"}, {"slice": [6, 20], "type": "BinaryOrExpression", "children": [{"slice": [6, 11], "type": "Identifier"}, {"slice": [15, 20], "type": "Identifier"}]}]}]}]
+
+- desc: "logical unary !"
+  grammar_file: "../../configs/hcl2.peg"
+  entry: "Module"
+  tests:
+    - I: |
+        t   = !true
+      O: [{"slice": [0, 12], "type": "Body", "children": [{"slice": [0, 12], "type": "Attribute", "children": [{"slice": [0, 1], "type": "Identifier"}, {"slice": [6, 11], "type": "UnaryExpression", "children": [{"slice": [6, 7], "type": "UnaryOp"}, {"slice": [7, 11], "type": "Identifier"}]}]}]}]
+
+    - I: |
+        f   = !false
+      O: [{"slice": [0, 13], "type": "Body", "children": [{"slice": [0, 13], "type": "Attribute", "children": [{"slice": [0, 1], "type": "Identifier"}, {"slice": [6, 12], "type": "UnaryExpression", "children": [{"slice": [6, 7], "type": "UnaryOp"}, {"slice": [7, 12], "type": "Identifier"}]}]}]}]
+
+
+- desc: "conditional"
+  grammar_file: "../../configs/hcl2.peg"
+  entry: "Module"
+  tests:
+    - I: |
+        t   = true ? "a" : "b"
+      O: [{"slice": [0, 22], "type": "Body", "children": [{"slice": [0, 22], "type": "Attribute", "children": [{"slice": [0, 1], "type": "Identifier"}, {"slice": [6, 22], "type": "Conditional", "children": [{"slice": [6, 10], "type": "Identifier"}, {"slice": [13, 16], "type": "QuotedTemplate"}, {"slice": [19, 22], "type": "QuotedTemplate"}]}]}]}]
+
+    - I: |
+        f   = false ? "a" : "b"
+      O: [{"slice": [0, 23], "type": "Body", "children": [{"slice": [0, 23], "type": "Attribute", "children": [{"slice": [0, 1], "type": "Identifier"}, {"slice": [6, 23], "type": "Conditional", "children": [{"slice": [6, 11], "type": "Identifier"}, {"slice": [14, 17], "type": "QuotedTemplate"}, {"slice": [20, 23], "type": "QuotedTemplate"}]}]}]}]

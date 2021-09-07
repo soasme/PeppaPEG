@@ -1,0 +1,271 @@
+- desc: "normal heredoc expression"
+  grammar_file: "../../configs/hcl2.peg"
+  entry: "Module"
+  tests:
+    - I: |
+        basic = <<EOT
+        Foo
+        Bar
+        Baz
+        EOT
+      O: [
+        {"slice": [0, 30], "type": "Body", "children": [
+          {"slice": [0, 30], "type": "Attribute", "children": [
+            {"slice": [0, 5], "type": "Identifier"},
+            {"slice": [8, 29], "type": "HeredocTemplate"}
+          ]}
+        ]}
+      ]
+
+    - I: |
+        indented = <<EOT
+          Foo
+          Bar
+          Baz
+        EOT
+      O: [
+        {"slice": [0, 39], "type": "Body", "children": [
+          {"slice": [0, 39], "type": "Attribute", "children": [
+            {"slice": [0, 8], "type": "Identifier"},
+            {"slice": [11, 38], "type": "HeredocTemplate"}
+          ]}
+        ]}
+      ]
+
+    - I: |
+        indented_more = <<EOT
+          Foo
+            Bar
+          Baz
+        EOT
+      O: [
+        {"slice": [0, 46], "type": "Body", "children": [
+          {"slice": [0, 46], "type": "Attribute", "children": [
+            {"slice": [0, 13], "type": "Identifier"},
+            {"slice": [16, 45], "type": "HeredocTemplate"}
+          ]}
+        ]}
+      ]
+
+    - I: |
+        interp = <<EOT
+          Foo
+          ${bar}
+          Baz
+        EOT
+      O: [
+        {"slice": [0, 40], "type": "Body", "children": [
+          {"slice": [0, 40], "type": "Attribute", "children": [
+            {"slice": [0, 6], "type": "Identifier"},
+            {"slice": [9, 39], "type": "HeredocTemplate"}
+          ]}
+        ]}
+      ]
+
+    - I: |
+        newlines_between = <<EOT
+        Foo
+
+        Bar
+
+        Baz
+        EOT
+      O: [
+        {"slice": [0, 43], "type": "Body", "children": [
+          {"slice": [0, 43], "type": "Attribute", "children": [
+            {"slice": [0, 16], "type": "Identifier"},
+            {"slice": [19, 42], "type": "HeredocTemplate"}
+          ]}
+        ]}
+      ]
+
+    - I: |
+        indented_newlines_between = <<EOT
+          Foo
+
+          Bar
+
+          Baz
+        EOT
+      O: [
+        {"slice": [0, 58], "type": "Body", "children": [
+          {"slice": [0, 58], "type": "Attribute", "children": [
+            {"slice": [0, 25], "type": "Identifier"},
+            {"slice": [28, 57], "type": "HeredocTemplate"}
+          ]}
+        ]}
+      ]
+
+    - I: |
+        marker_at_suffix = <<EOT
+          NOT EOT
+        EOT
+      O: [
+        {"slice": [0, 39], "type": "Body", "children": [
+          {"slice": [0, 39], "type": "Attribute", "children": [
+            {"slice": [0, 16], "type": "Identifier"},
+            {"slice": [19, 38], "type": "HeredocTemplate"}
+          ]}
+        ]}
+      ]
+
+- desc: "flush heredoc expression"
+  grammar_file: "../../configs/hcl2.peg"
+  entry: "Module"
+  tests:
+    - I: |
+        basic = <<-EOT
+        Foo
+        Bar
+        Baz
+        EOT
+      O: [
+        {"slice": [0, 31], "type": "Body", "children": [
+          {"slice": [0, 31], "type": "Attribute", "children": [
+            {"slice": [0, 5], "type": "Identifier"},
+            {"slice": [8, 30], "type": "HeredocTemplate"}
+          ]}
+        ]}
+      ]
+
+    - I: |
+        indented = <<-EOT
+          Foo
+          Bar
+          Baz
+        EOT
+      O: [
+        {"slice": [0, 40], "type": "Body", "children": [
+          {"slice": [0, 40], "type": "Attribute", "children": [
+            {"slice": [0, 8], "type": "Identifier"},
+            {"slice": [11, 39], "type": "HeredocTemplate"}
+          ]}
+        ]}
+      ]
+
+    - I: |
+        indented_more = <<-EOT
+          Foo
+            Bar
+          Baz
+        EOT
+      O: [
+        {"slice": [0, 47], "type": "Body", "children": [
+          {"slice": [0, 47], "type": "Attribute", "children": [
+            {"slice": [0, 13], "type": "Identifier"},
+            {"slice": [16, 46], "type": "HeredocTemplate"}
+          ]}
+        ]}
+      ]
+
+    - I: |
+        indented_less = <<-EOT
+          Foo
+        Bar
+          Baz
+        EOT
+      O: [
+        {"slice": [0, 43], "type": "Body", "children": [
+          {"slice": [0, 43], "type": "Attribute", "children": [
+            {"slice": [0, 13], "type": "Identifier"},
+            {"slice": [16, 42], "type": "HeredocTemplate"}
+          ]}
+        ]}
+      ]
+
+    - I: |
+        interp = <<-EOT
+          Foo
+          ${bar}
+          Baz
+        EOT
+      O: [
+        {"slice": [0, 41], "type": "Body", "children": [
+          {"slice": [0, 41], "type": "Attribute", "children": [
+            {"slice": [0, 6], "type": "Identifier"},
+            {"slice": [9, 40], "type": "HeredocTemplate"}
+          ]}
+        ]}
+      ]
+
+    - I: |
+        interp_indented_more = <<-EOT
+          Foo
+            ${bar}
+          Baz
+        EOT
+      O: [
+        {"slice": [0, 57], "type": "Body", "children": [
+          {"slice": [0, 57], "type": "Attribute", "children": [
+            {"slice": [0, 20], "type": "Identifier"},
+            {"slice": [23, 56], "type": "HeredocTemplate"}
+          ]}
+        ]}
+      ]
+
+    - I: |
+        interp_indented_less = <<-EOT
+          Foo
+        ${space_bar}
+          Baz
+        EOT
+      O: [
+        {"slice": [0, 59], "type": "Body", "children": [
+          {"slice": [0, 59], "type": "Attribute", "children": [
+            {"slice": [0, 20], "type": "Identifier"},
+            {"slice": [23, 58], "type": "HeredocTemplate"}
+          ]}
+        ]}
+      ]
+
+    - I: |
+        tabs = <<-EOT
+        Foo
+        Bar
+        Baz
+        EOT
+      O: [
+        {"slice": [0, 30], "type": "Body", "children": [
+          {"slice": [0, 30], "type": "Attribute", "children": [
+            {"slice": [0, 4], "type": "Identifier"},
+            {"slice": [7, 29], "type": "HeredocTemplate"}]}]}]
+
+    - I: |
+        unicode_spaces = <<-EOT
+          Foo (there's two "em spaces" before Foo there)
+          Bar
+          Baz
+        EOT
+      O: [
+        {"slice": [0, 93], "type": "Body", "children": [
+          {"slice": [0, 93], "type": "Attribute", "children": [
+            {"slice": [0, 14], "type": "Identifier"},
+            {"slice": [17, 92], "type": "HeredocTemplate"}]}]}]
+
+    - I: |
+        newlines_between = <<-EOT
+        Foo
+
+        Bar
+
+        Baz
+        EOT
+      O: [
+        {"slice": [0, 44], "type": "Body", "children": [
+          {"slice": [0, 44], "type": "Attribute", "children": [
+            {"slice": [0, 16], "type": "Identifier"},
+            {"slice": [19, 43], "type": "HeredocTemplate"}]}]}]
+
+    - I: |
+        indented_newlines_between = <<-EOT
+          Foo
+
+          Bar
+
+          Baz
+        EOT
+      O: [
+        {"slice": [0, 59], "type": "Body", "children": [
+          {"slice": [0, 59], "type": "Attribute", "children": [
+            {"slice": [0, 25], "type": "Identifier"},
+            {"slice": [28, 58], "type": "HeredocTemplate"}]}]}]

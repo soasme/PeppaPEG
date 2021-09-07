@@ -150,8 +150,8 @@ Newline = "\r" / "\n" / Comment;
 @spaced @lifted
 Ignore = " " / "\t" / "\r" / "\n" / Comment / InlineComment;
 
-@squashed
+@squashed @lifted
 Comment = ("#" / "//") (!"\n" .)* ("\n" / !.);
 
-@squashed
+@squashed @lifted
 InlineComment = "/*" (!"*/" .)* "*/";

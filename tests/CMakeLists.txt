@@ -69,26 +69,27 @@ endforeach()
 
 set(
     spec_testcases
-    test_literal_spec
-    test_range_spec
-    test_range_spec+unistr
-    test_insensitive_spec
-    test_sequence_spec
-    test_choice_spec
-    test_left_recursion_spec
-    test_lookahead_spec
-    test_cut_spec
-    test_repeat_spec
-    test_reference_spec
-    test_back_reference_spec
-    test_dot_spec
-    test_comment_spec
-    test_flags_spec
-    test_peppa_spec
-    test_toml_v1_0_spec
-    test_golang_v1_17_spec
-    hcl2/test_expression_heredoc
-    hcl2/test_expression_operator
+    test_literal_spec.json
+    test_range_spec.json
+    test_range_spec+unistr.json
+    test_insensitive_spec.json
+    test_sequence_spec.json
+    test_choice_spec.json
+    test_left_recursion_spec.json
+    test_lookahead_spec.json
+    test_cut_spec.json
+    test_repeat_spec.json
+    test_reference_spec.json
+    test_back_reference_spec.json
+    test_dot_spec.json
+    test_comment_spec.json
+    test_flags_spec.json
+    test_peppa_spec.json
+    test_toml_v1_0_spec.json
+    test_golang_v1_17_spec.json
+    hcl2/test_expression_heredoc.yaml
+    hcl2/test_expression_operator.yaml
+    hcl2/test_expression_primitive.yaml
 )
 
 find_program(PYTHON python3)
@@ -110,7 +111,7 @@ foreach(spec_testcase ${spec_testcases})
         COMMAND "${PYTHON}"
             "${PROJECT_SOURCE_DIR}/scripts/check_spec.py"
             "${SPEC_BIN}"
-            "${PROJECT_SOURCE_DIR}/tests/${spec_testcase}.json"
+            "${PROJECT_SOURCE_DIR}/tests/${spec_testcase}"
         WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     )
 endforeach()

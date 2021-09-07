@@ -87,6 +87,8 @@ set(
     test_peppa_spec
     test_toml_v1_0_spec
     test_golang_v1_17_spec
+    hcl2/test_expression_heredoc
+    hcl2/test_expression_operator
 )
 
 find_program(PYTHON python3)

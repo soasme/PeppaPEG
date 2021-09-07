@@ -141,6 +141,90 @@
         ]
     },
     {
+        "grammar": "R1 = [0-1] [0-1]?;@spaced\nR2 = \" \" / \"\\t\" / \"\\r\" / \"\\n\";",
+        "entry": "R1",
+        "tests": [
+            {
+                "I": "0 1",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            3
+                        ],
+                        "type": "R1",
+                        "children": [
+                            {
+                                "slice": [
+                                    1,
+                                    2
+                                ],
+                                "type": "R2"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "I": "0  1 \n",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            4
+                        ],
+                        "type": "R1",
+                        "children": [
+                            {
+                                "slice": [
+                                    1,
+                                    2
+                                ],
+                                "type": "R2"
+                            },
+                            {
+                                "slice": [
+                                    2,
+                                    3
+                                ],
+                                "type": "R2"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "N": "XXX: a better behavior is to puke extra whitespace if repetition not advancing, e.g. the root slice should be [0,1]",
+                "I": "0 \n",
+                "O": [
+                    {
+                        "slice": [
+                            0,
+                            3
+                        ],
+                        "type": "R1",
+                        "children": [
+                            {
+                                "slice": [
+                                    1,
+                                    2
+                                ],
+                                "type": "R2"
+                            },
+                            {
+                                "slice": [
+                                    2,
+                                    3
+                                ],
+                                "type": "R2"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
         "grammar": "R1 = [a-z]+;@spaced\nR2 = \" \" / \"\\t\" / \"\\r\" / \"\\n\";",
         "entry": "R1",
         "tests": [

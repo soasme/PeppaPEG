@@ -1,0 +1,51 @@
+- desc: "numbers"
+  grammar_file: "../../configs/hcl2.peg"
+  entry: "ConfigFile"
+  tests:
+    - I: |
+        whole_number                = 5
+      O: [{"slice": [0, 32], "type": "Body", "children": [{"slice": [0, 32], "type": "Attribute", "children": [{"slice": [0, 12], "type": "Identifier"}, {"slice": [30, 31], "type": "IntLit"}]}]}]
+
+    - I: |
+        fractional_number           = 3.2
+      O: [{"slice": [0, 34], "type": "Body", "children": [{"slice": [0, 34], "type": "Attribute", "children": [{"slice": [0, 17], "type": "Identifier"}, {"slice": [30, 33], "type": "FloatLit"}]}]}]
+
+    - I: |
+        fractional_number_precision = 3.14159265358979323846264338327950288419716939937510582097494459
+      O: [{"slice": [0, 95], "type": "Body", "children": [{"slice": [0, 95], "type": "Attribute", "children": [{"slice": [0, 27], "type": "Identifier"}, {"slice": [30, 94], "type": "FloatLit"}]}]}]
+
+- desc: "strings"
+  grammar_file: "../../configs/hcl2.peg"
+  entry: "ConfigFile"
+  tests:
+    - I: |
+        string_ascii           = "hello"
+      O: [{"slice": [0, 33], "type": "Body", "children": [{"slice": [0, 33], "type": "Attribute", "children": [{"slice": [0, 12], "type": "Identifier"}, {"slice": [25, 32], "type": "QuotedTemplate"}]}]}]
+
+    - I: |
+        string_unicode_bmp     = "ЖЖ"
+      O: [{"slice": [0, 32], "type": "Body", "children": [{"slice": [0, 32], "type": "Attribute", "children": [{"slice": [0, 18], "type": "Identifier"}, {"slice": [25, 31], "type": "QuotedTemplate"}]}]}]
+
+    - I: |
+        string_unicode_astral  = "👩‍👩‍👧‍👦"
+      O: [{"slice": [0, 53], "type": "Body", "children": [{"slice": [0, 53], "type": "Attribute", "children": [{"slice": [0, 21], "type": "Identifier"}, {"slice": [25, 52], "type": "QuotedTemplate"}]}]}]
+
+    - I: |
+        string_unicode_nonnorm = "años" # This is intentionally a combining tilde followed by n
+      O: [{"slice": [0, 90], "type": "Body", "children": [{"slice": [0, 90], "type": "Attribute", "children": [{"slice": [0, 22], "type": "Identifier"}, {"slice": [25, 33], "type": "QuotedTemplate"}]}]}]
+
+- desc: "bool and null"
+  grammar_file: "../../configs/hcl2.peg"
+  entry: "ConfigFile"
+  tests:
+    - I: |
+        true  = true
+      O: [{"slice": [0, 13], "type": "Body", "children": [{"slice": [0, 13], "type": "Attribute", "children": [{"slice": [0, 4], "type": "Identifier"}, {"slice": [8, 12], "type": "Identifier"}]}]}]
+
+    - I: |
+        false = false
+      O: [{"slice": [0, 14], "type": "Body", "children": [{"slice": [0, 14], "type": "Attribute", "children": [{"slice": [0, 5], "type": "Identifier"}, {"slice": [8, 13], "type": "Identifier"}]}]}]
+
+    - I: |
+        null = null
+      O: [{"slice": [0, 12], "type": "Body", "children": [{"slice": [0, 12], "type": "Attribute", "children": [{"slice": [0, 4], "type": "Identifier"}, {"slice": [7, 11], "type": "Identifier"}]}]}]

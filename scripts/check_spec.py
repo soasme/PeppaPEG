@@ -2,17 +2,26 @@ import os.path
 import subprocess
 import sys
 import json
+import yaml
 import shlex
 
 def test_spec():
     executable = sys.argv[1]
-    specs_json = sys.argv[2]
-    with open(specs_json) as f:
-        try:
-            specs = json.load(f)
-        except json.decoder.JSONDecodeError:
-            print("invalid json spec")
-            exit(1)
+    specs_file = sys.argv[2]
+    if specs_file.endswith('.json'):
+        with open(specs_file) as f:
+            try:
+                specs = json.load(f)
+            except json.decoder.JSONDecodeError:
+                print("invalid json spec")
+                exit(1)
+    elif specs_file.endswith('.yaml'):
+        with open(specs_file) as f:
+            try:
+                specs = yaml.load(f)
+            except Exception:
+                print('invalid yaml spec')
+                exit(1)
 
     failed, ignored, total = 0, 0, 0
     for spec in specs:
@@ -28,7 +37,7 @@ def test_spec():
                 if spec['grammar_file'].startswith('/'):
                     cmd.extend(['--grammar-file', spec['grammar_file']])
                 else:
-                    cmd.extend(['--grammar-file', os.path.dirname(os.path.abspath(specs_json)) + '/' + spec['grammar_file']])
+                    cmd.extend(['--grammar-file', os.path.dirname(os.path.abspath(specs_file)) + '/' + spec['grammar_file']])
             else:
                 raise ValueError('Missing grammar/grammar_file')
             proc = subprocess.run(

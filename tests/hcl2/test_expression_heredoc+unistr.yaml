@@ -1,6 +1,6 @@
 - desc: "normal heredoc expression"
   grammar_file: "../../configs/hcl2.peg"
-  entry: "Module"
+  entry: "ConfigFile"
   tests:
     - I: |
         basic = <<EOT
@@ -111,7 +111,7 @@
 
 - desc: "flush heredoc expression"
   grammar_file: "../../configs/hcl2.peg"
-  entry: "Module"
+  entry: "ConfigFile"
   tests:
     - I: |
         basic = <<-EOT

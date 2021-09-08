@@ -1,0 +1,112 @@
+- desc: "block"
+  grammar_file: "../../configs/hcl2.peg"
+  entry: "ConfigFile"
+  tests:
+    - I: |
+        a {}
+      O: [{"slice": [0, 5], "type": "Body", "children": [{"slice": [0, 5], "type": "OneLineBlock", "children": [{"slice": [0, 1], "type": "Identifier"}]}]}]
+
+    - I: |
+        a {
+
+        }
+      O: [{"slice": [0, 7], "type": "Body", "children": [{"slice": [0, 7], "type": "Block", "children": [{"slice": [0, 1], "type": "Identifier"}]}]}]
+
+    - I: |
+        a { b = "foo" }
+      O: [{"slice": [0, 16], "type": "Body", "children": [{"slice": [0, 16], "type": "OneLineBlock", "children": [{"slice": [0, 1], "type": "Identifier"}, {"slice": [4, 5], "type": "Identifier"}, {"slice": [8, 13], "type": "QuotedTemplate"}]}]}]
+
+    - I: |
+        a "label" { b = "foo" }
+      O: [{"slice": [0, 24], "type": "Body", "children": [{"slice": [0, 24], "type": "OneLineBlock", "children": [{"slice": [0, 1], "type": "Identifier"}, {"slice": [2, 9], "type": "BlockLabels", "children": [{"slice": [2, 9], "type": "StringLit"}]}, {"slice": [12, 13], "type": "Identifier"}, {"slice": [16, 21], "type": "QuotedTemplate"}]}]}]
+
+    - I: |
+        a {
+          b {}
+          c {}
+        }
+      O: [{"slice": [0, 20], "type": "Body", "children": [{"slice": [0, 20], "type": "Block", "children": [{"slice": [0, 1], "type": "Identifier"}, {"slice": [6, 18], "type": "Body", "children": [{"slice": [6, 11], "type": "OneLineBlock", "children": [{"slice": [6, 7], "type": "Identifier"}]}, {"slice": [13, 18], "type": "OneLineBlock", "children": [{"slice": [13, 14], "type": "Identifier"}]}]}]}]}]
+
+    - I: |
+        a {
+          b {
+          }
+          c {
+          }
+        }
+      O: [{"slice": [0, 26], "type": "Body", "children": [{"slice": [0, 26], "type": "Block", "children": [{"slice": [0, 1], "type": "Identifier"}, {"slice": [6, 24], "type": "Body", "children": [{"slice": [6, 14], "type": "Block", "children": [{"slice": [6, 7], "type": "Identifier"}]}, {"slice": [16, 24], "type": "Block", "children": [{"slice": [16, 17], "type": "Identifier"}]}]}]}]}]
+
+    - I: |
+        a {
+          b = {}
+          c {}
+        }
+      O: [{"slice": [0, 22], "type": "Body", "children": [{"slice": [0, 22], "type": "Block", "children": [{"slice": [0, 1], "type": "Identifier"}, {"slice": [6, 20], "type": "Body", "children": [{"slice": [6, 13], "type": "Attribute", "children": [{"slice": [6, 7], "type": "Identifier"}, {"slice": [10, 12], "type": "Object"}]}, {"slice": [15, 20], "type": "OneLineBlock", "children": [{"slice": [15, 16], "type": "Identifier"}]}]}]}]}]
+
+    - I: |
+        a {
+          b = {
+            c {}
+          }
+        }
+      E: "CutError: line 3:5, expect Object (char '}')"
+
+    - I: |
+        a {
+          b = {
+            c = {}
+          }
+        }
+      O: [{"slice": [0, 29], "type": "Body", "children": [{"slice": [0, 29], "type": "Block", "children": [{"slice": [0, 1], "type": "Identifier"}, {"slice": [6, 27], "type": "Body", "children": [{"slice": [6, 27], "type": "Attribute", "children": [{"slice": [6, 7], "type": "Identifier"}, {"slice": [10, 26], "type": "Object", "children": [{"slice": [16, 22], "type": "Item", "children": [{"slice": [16, 17], "type": "Identifier"}, {"slice": [20, 22], "type": "Object"}]}]}]}]}]}]}]
+
+    - I: |
+        a = {
+          b = 1,
+          c = 2,
+        }
+      O: [{"slice": [0, 26], "type": "Body", "children": [{"slice": [0, 26], "type": "Attribute", "children": [{"slice": [0, 1], "type": "Identifier"}, {"slice": [4, 25], "type": "Object", "children": [{"slice": [8, 13], "type": "Item", "children": [{"slice": [8, 9], "type": "Identifier"}, {"slice": [12, 13], "type": "IntLit"}]}, {"slice": [17, 22], "type": "Item", "children": [{"slice": [17, 18], "type": "Identifier"}, {"slice": [21, 22], "type": "IntLit"}]}]}]}]}]
+
+    - I: |
+        a = {
+          b = 1
+          c = 2
+        }
+      O: [{"slice": [0, 24], "type": "Body", "children": [{"slice": [0, 24], "type": "Attribute", "children": [{"slice": [0, 1], "type": "Identifier"}, {"slice": [4, 23], "type": "Object", "children": [{"slice": [8, 13], "type": "Item", "children": [{"slice": [8, 9], "type": "Identifier"}, {"slice": [12, 13], "type": "IntLit"}]}, {"slice": [16, 21], "type": "Item", "children": [{"slice": [16, 17], "type": "Identifier"}, {"slice": [20, 21], "type": "IntLit"}]}]}]}]}]
+
+    - I: |
+        a {
+          b = "foo"
+          c = "foo"
+        }
+      O: [{"slice": [0, 30], "type": "Body", "children": [{"slice": [0, 30], "type": "Block", "children": [{"slice": [0, 1], "type": "Identifier"}, {"slice": [6, 28], "type": "Body", "children": [{"slice": [6, 16], "type": "Attribute", "children": [{"slice": [6, 7], "type": "Identifier"}, {"slice": [10, 15], "type": "QuotedTemplate"}]}, {"slice": [18, 28], "type": "Attribute", "children": [{"slice": [18, 19], "type": "Identifier"}, {"slice": [22, 27], "type": "QuotedTemplate"}]}]}]}]}]
+
+    - I: |
+        a { b = "foo", c = "bar" }
+      E: "CutError: line 1:14, expect OneLineBlock (char '}')"
+
+    - I: |
+        a { b = "foo"
+          c = "bar" }
+      E: "CutError: line 1:14, expect OneLineBlock (char '}')"
+
+    - I: |
+        a { b = "foo"
+          c = "bar"
+        }
+      E: "CutError: line 1:14, expect OneLineBlock (char '}')"
+
+    - I: |
+        a { b = "foo"
+        }
+      E: "CutError: line 1:14, expect OneLineBlock (char '}')"
+
+    - I: |
+        a { b {} }
+      E: "CutError: line 1:5, expect OneLineBlock (char '}')"
+
+    - I: |
+        a {
+      E: "CutError: line 2:1, expect Block (char '}')"
+
+    - I: "a {"
+      E: "CutError: line 1:4, expect Block (char '}')"

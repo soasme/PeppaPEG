@@ -30,7 +30,7 @@
 # @see        https://github.com/soasme/PeppaPEG
 
 @lifted
-Module = &. Body EOF;
+ConfigFile = &. Body EOF;
 
 @lifted
 EOF = !.;
@@ -38,16 +38,22 @@ EOF = !.;
 @lifted
 Eval = Expression;
 
-Body = (Attribute / Block)*;
+@scoped
+Body = (Attribute / Block / OneLineBlock)*;
 
-Attribute = Identifier "=" ~ Expression;
+@tight
+Attribute = Identifier Whitespace* "=" ~ Whitespace* Expression Whitespace* Newline;
 
-Block = Identifier BlockLabels "{" ~ Body "}";
+@tight
+Block = Identifier Whitespace* BlockLabels Whitespace* "{" Whitespace* Newline ~ Ignore* Body Ignore* "}" Newline;
 
 BlockLabels = (Identifier / StringLit)*;
 
+@tight
+OneLineBlock = Identifier Whitespace* BlockLabels Whitespace* "{" ~ Whitespace* (Identifier Whitespace* "=" Whitespace* Expression)? Whitespace* "}" Newline;
+
 @tight @squashed
-Identifier = ([a-z] / [A-Z] / "_") ([a-z] / [A-Z] / [0-9] / "_" / "-")*;
+Identifier = [\p{ID_Start}] ([\p{ID_Continue}] / "-")*;
 
 @lifted
 Expression = Conditional;
@@ -58,7 +64,7 @@ Conditional = Operation (Ignore* "?" Ignore* Operation Ignore* ":" Ignore* Opera
 @lifted @scoped
 Operation = UnaryExpression / BinaryOrExpression;
 
-UnaryExpression = UnaryOp PrimaryExpression;
+UnaryExpression = UnaryOp ExprTerm;
 UnaryOp = "-" / "!";
 
 BinaryOrExpression = BinaryAndExpression | BinaryOrExpression "||" BinaryAndExpression;
@@ -69,10 +75,10 @@ BinaryTestExpression = BinaryTermExpression | BinaryTestExpression BinaryTestOp 
 BinaryTestOp = ">=" / ">" / "<=" / "<";
 BinaryTermExpression = BinaryFactorExpression | BinaryTermExpression BinaryTermOp BinaryFactorExpression;
 BinaryTermOp = "+" / "-";
-BinaryFactorExpression = PrimaryExpression | BinaryFactorExpression BinaryFactorOp PrimaryExpression;
+BinaryFactorExpression = ExprTerm | BinaryFactorExpression BinaryFactorOp ExprTerm;
 BinaryFactorOp = "*" / "/" / "%";
 
-PrimaryExpression = (
+ExprTerm = (
     "(" Expression ")"
     / FloatLit
     / IntLit
@@ -84,7 +90,7 @@ PrimaryExpression = (
     / ForObjectExpr
     / Tuple
     / Object
-) | PrimaryExpression (Index / GetAttr / AttrSplat / FullSplat);
+) | ExprTerm (Index / GetAttr / AttrSplat / FullSplat);
 
 @squashed
 QuotedTemplate = StringLit;
@@ -145,13 +151,16 @@ ForElem = Identifier ("," Identifier)?;
 ForCond = "if" Expression;
 
 @squashed @lifted
-Newline = "\r" / "\n" / Comment;
+Newline = "\r" / "\n" / Comment / EOF;
+
+@squashed @lifted
+Whitespace = " " / "\t";
 
 @spaced @lifted
 Ignore = " " / "\t" / "\r" / "\n" / Comment / InlineComment;
 
-@squashed
+@squashed @lifted
 Comment = ("#" / "//") (!"\n" .)* ("\n" / !.);
 
-@squashed
+@squashed @lifted
 InlineComment = "/*" (!"*/" .)* "*/";

@@ -1,0 +1,19 @@
+- desc: "attribute"
+  grammar_file: "../../configs/hcl2.peg"
+  entry: "ConfigFile"
+  tests:
+    - I: |
+        a = "a value"
+        b = "b value"
+        c = "c value"
+      O: [
+        {"slice": [0, 42], "type": "Body", "children": [
+          {"slice": [0, 14], "type": "Attribute", "children": [{"slice": [0, 1], "type": "Identifier"}, {"slice": [4, 13], "type": "QuotedTemplate"}]},
+          {"slice": [14, 28], "type": "Attribute", "children": [{"slice": [14, 15], "type": "Identifier"}, {"slice": [18, 27], "type": "QuotedTemplate"}]},
+          {"slice": [28, 42], "type": "Attribute", "children": [{"slice": [28, 29], "type": "Identifier"}, {"slice": [32, 41], "type": "QuotedTemplate"}]}
+        ]}
+      ]
+
+    - I: |
+        a = "a value", b = "b value"
+      E: "CutError: line 1:14, expect Newline"

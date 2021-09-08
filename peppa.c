@@ -635,6 +635,10 @@ struct P4_Frame {
     bool            silent;
     /** Whether cut is enabled to frame. */
     bool            cut;
+    /** The slices for each backref member.
+     *  This field is applicable where a sequence rule has
+     *  at least one backref descendant. */
+    P4_Slice*       backref_slices;
     /** The next frame in the stack. */
     P4_Frame*       next;
 };
@@ -858,6 +862,15 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
 # define rescue_error(s)    do { (s)->err = P4_Ok; (s)->errmsg[0] = '\0'; } while (0)
 # define peek_frame(s)      ((s)->frame_stack)
 # define peek_rule_name(s)  ((s)->frame_stack->rule->name)
+# define peek_rule_frame(s, f) \
+    P4_Frame *tmp = (s)->frame_stack; \
+    while (tmp) { \
+        if (is_rule(tmp->expr)) { \
+            (f) = tmp; \
+            break; \
+        } \
+        tmp = tmp->next; \
+    }
 # define remaining_text(s)  ((s)->content + (s)->pos)
 
 P4_PRIVATE(P4_Error) push_frame(P4_Source*, P4_Expression*);
@@ -875,12 +888,14 @@ P4_PRIVATE(P4_Node*) match_choice(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_repeat(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_left_recursion(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_spaced_rules(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*) match_back_reference(P4_Source*, P4_Expression*, P4_Slice*, P4_Expression*);
+P4_PRIVATE(P4_Node*) match_back_reference(P4_Source*, P4_Expression*, P4_Frame*, size_t, bool);
 
 P4_PRIVATE(void)                P4_DeleteNodeUserData(P4_Grammar* grammar, P4_Node* node);
 P4_PRIVATE(P4_Expression*)      P4_GetReference(P4_Source*, P4_Expression*);
 
 P4_PRIVATE(P4_String)           P4_CopySliceString(P4_String, P4_Slice*);
+
+P4_PRIVATE(bool)                P4_HasBackrefDescendant(P4_Expression*);
 
 P4_PRIVATE(P4_Error)            P4_SetWhitespaces(P4_Grammar*);
 P4_PRIVATE(P4_Expression*)      P4_GetWhitespaces(P4_Grammar*);
@@ -1771,6 +1786,9 @@ push_frame(P4_Source* s, P4_Expression* e) {
     /* Set rule */
     frame->rule = is_rule(e) ? e : top->rule;
 
+    /* Set backref_slices */
+    frame->backref_slices = NULL;
+
     /* Push stack */
     s->frame_stack_size++;
     s->frame_stack = frame;
@@ -1796,6 +1814,10 @@ pop_frame(P4_Source* s) {
         /* move oldtop into unused frame stack. */
         oldtop->next = s->unused_frame_stack;
         s->unused_frame_stack = oldtop;
+
+        /* clean up malloc fields. */
+        P4_FREE(oldtop->backref_slices);
+        oldtop->backref_slices = NULL;
     }
 
     return P4_Ok;
@@ -1943,6 +1965,32 @@ P4_GetReference(P4_Source* s, P4_Expression* e) {
     return e->ref_expr;
 }
 
+P4_PRIVATE(bool)
+P4_HasBackrefDescendant(P4_Expression* e) {
+    size_t i = 0;
+    switch (e->kind) {
+        case P4_BackReference:
+            return true;
+        case P4_Sequence:
+            if (e->has_backref)
+                return true;
+        case P4_Choice:
+            for (i = 0; i < e->count; i++)
+                if (P4_HasBackrefDescendant(e->members[i]))
+                    return true;
+            return false;
+        case P4_Positive:
+        case P4_Negative:
+            return P4_HasBackrefDescendant(e->ref_expr);
+        case P4_Repeat:
+            return P4_HasBackrefDescendant(e->repeat_expr);
+        case P4_LeftRecursion:
+            return P4_HasBackrefDescendant(e->lhs) || P4_HasBackrefDescendant(e->rhs);
+        default:
+            return false;
+    }
+}
+
 P4_PRIVATE(P4_Node*)
 match_reference(P4_Source* s, P4_Expression* e) {
     assert(no_error(s), "can't proceed due to a failed match");
@@ -1982,16 +2030,22 @@ P4_PRIVATE(P4_Node*)
 match_sequence(P4_Source* s, P4_Expression* e) {
     assert(no_error(s), "can't proceed due to a failed match");
 
-    P4_Expression *member = NULL;
-    P4_Node *head = NULL,
-             *tail = NULL,
-             *tok = NULL,
-             *whitespace = NULL;
+    P4_Expression   *member = NULL;
+    P4_Node         *head = NULL,
+                    *tail = NULL,
+                    *tok = NULL,
+                    *whitespace = NULL;
+    P4_Frame        *rule_frame = NULL;
 
-    autofree P4_Slice* backrefs = NULL;
-
+    /* malloc backref slices if it's root rule frame with backref descendant. */
     if (e->has_backref) {
-        catch_oom(backrefs = P4_MALLOC(sizeof(P4_Slice) * e->count));
+        peek_rule_frame(s, rule_frame);
+
+        if (rule_frame->backref_slices == NULL) {
+            size_t memsize = sizeof(P4_Slice) * rule_frame->expr->count;
+            catch_oom(rule_frame->backref_slices = P4_MALLOC(memsize));
+            memset(rule_frame->backref_slices, 0, memsize);
+        }
     }
 
     bool space = need_whitespace(s);
@@ -2014,12 +2068,12 @@ match_sequence(P4_Source* s, P4_Expression* e) {
 
         switch (member->kind) {
             case P4_BackReference:
-                if (member->backref_index >= i) {
+                if (member->backref_index >= rule_frame->expr->count) {
                     P4_MatchRaisef(s, P4_IndexError, E_BACKREF_OUT_REACHED);
                     s->error.expr = member;
                     goto finalize;
                 }
-                tok = match_back_reference(s, e, backrefs, member);
+                tok = match_back_reference(s, e, rule_frame, member->backref_index, member->sensitive);
                 if (!no_error(s)) goto finalize;
                 break;
             case P4_Cut:
@@ -2039,7 +2093,8 @@ match_sequence(P4_Source* s, P4_Expression* e) {
         P4_AdoptNode(head, tail, tok);
 
         mark_position(s, member_endpos);
-        if (e->has_backref) set_slice(&backrefs[i], member_startpos, member_endpos);
+        if (e->has_backref && e == rule_frame->expr)
+            set_slice(&rule_frame->backref_slices[i], member_startpos, member_endpos);
     }
 
     if (need_lift(s, e))
@@ -2455,17 +2510,18 @@ match_spaced_rules(P4_Source* s, P4_Expression* e) {
 }
 
 P4_PRIVATE(P4_Node*)
-match_back_reference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Expression* backref) {
+match_back_reference(P4_Source* s, P4_Expression* e, P4_Frame* rule_frame,
+        size_t index, bool sensitive) {
+
+    P4_Slice* backrefs = rule_frame->backref_slices;
     assert(backrefs != NULL, "backrefs should not be null");
 
-    size_t index = backref->backref_index;
-
-    if (index > e->count || index < 0) {
+    if (index >= rule_frame->expr->count || index < 0) {
         P4_MatchRaisef(s, P4_IndexError, E_BACKREF_OUT_REACHED);
         return NULL;
     }
 
-    P4_Expression* backref_expr = e->members[index];
+    P4_Expression* backref_expr = rule_frame->expr->members[index];
 
     if (backref_expr == NULL) {
         P4_MatchRaisef(s, P4_PegError, E_NO_EXPR);
@@ -2480,12 +2536,16 @@ match_back_reference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Expr
     P4_Slice* slice = &(backrefs[index]);
     /* backrefs is allocated as an array so it shouldn't be null. */
     assert(slice != NULL, "backref should not be null");
+    if (slice->start.pos == 0 && slice->stop.pos == 0) {
+        P4_MatchRaisef(s, P4_StackError, E_RECURSIVE_BACKREF);
+        return NULL;
+    }
 
     autofree P4_String litstr = NULL;
     catch_oom(litstr = P4_CopySliceString(s->content, slice));
 
     P4_Expression* litexpr = NULL;
-    catch_oom(litexpr = P4_CreateLiteral(litstr, backref->sensitive));
+    catch_oom(litexpr = P4_CreateLiteral(litstr, sensitive));
 
 # define NO_OP
 # define set_literal_rule_name(n, bref, op) \
@@ -2499,7 +2559,17 @@ match_back_reference(P4_Source* s, P4_Expression* e, P4_Slice* backrefs, P4_Expr
 
     set_literal_rule_name(litexpr->name, backref_expr, STRDUP);
 
-    P4_Node* tok = match_literal(s, litexpr);
+    /* (1) Save top frame silent. */
+    bool silent = peek_frame(s)->silent;
+
+    /* (2) Ignore backref literal token if it has no name. */
+    if (need_lift(s, litexpr))
+        peek_frame(s)->silent = true;
+
+    P4_Node* tok = match_expression(s, litexpr);
+
+    /* (3) Recover top frame silent. */
+    peek_frame(s)->silent = silent;
 
     if (!no_error(s)) {
         P4_MatchRaisef(s, P4_MatchError, E_WRONG_BACKREF);
@@ -3182,6 +3252,9 @@ P4_GetErrorMessage(P4_Source* source) {
         case E_INVALID_ERROR_CALLBACK:
             strcat(source->errmsg, " (invalid error callback)");
             break;
+        case E_RECURSIVE_BACKREF:
+            strcat(source->errmsg, " (recursive backref)");
+            break;
         default:
             break;
     }
@@ -3343,12 +3416,11 @@ P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_String name, size_t count, ...
 
         if (expr->members[i] == NULL)
             panicf("failed to set %zuth expression.", i);
-
-        if (expr->members[i]->kind == P4_BackReference)
-            expr->has_backref = true;
     }
 
     va_end (members);
+
+    expr->has_backref = P4_HasBackrefDescendant(expr);
 
     return P4_Ok;
 }
@@ -3396,9 +3468,8 @@ P4_SetMember(P4_Expression* expr, size_t offset, P4_Expression* member) {
         return P4_ValueError;
     }
 
-    if (expr->kind == P4_Sequence
-            && member->kind == P4_BackReference) {
-        expr->has_backref = true;
+    if (expr->kind == P4_Sequence) {
+        expr->has_backref = expr->has_backref || P4_HasBackrefDescendant(member);
     }
 
     if (offset < 0

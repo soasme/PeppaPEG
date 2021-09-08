@@ -122,13 +122,11 @@ Item = (Identifier / Expression) Ignore* ("=" / ":") Ignore* Expression;
 @tight @lifted @squashed
 ItemSep = Newline+ / "," Newline*;
 
-@tight
+@tight @lifted @squashed
 Heredoc = ([a-z] / [A-Z]) ([a-z] / [A-Z] / [0-9] / "." / "-" / "_")+;
 
-# XXX: Currently, only "EOT" as identifier is supported.
-# Back reference capture must be supported in nested rule expressions first.
 @tight @squashed
-HeredocTemplate = "<<" "-"? "EOT" "\n" (!((" " / "\t")* "EOT" ("\n" / &.)) (!"\n" .)* "\n")* (" " / "\t")* "EOT" &("\n" / &.);
+HeredocTemplate = "<<" "-"? Heredoc "\n" (!((" " / "\t")* \2 ("\n" / &.)) (!"\n" .)* "\n")* (" " / "\t")* \2 &("\n" / &.);
 
 FunctionCall = Identifier "(" Arguments? ")";
 Arguments = Expression ("," Expression)* ("," / Kwargs)?;

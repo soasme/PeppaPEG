@@ -17,6 +17,22 @@
         ]}
       ]
 
+    - N: arbitrary heredoc mark
+      I: |
+        basic = <<LOL
+        Foo
+        Bar
+        Baz
+        LOL
+      O: [
+        {"slice": [0, 30], "type": "Body", "children": [
+          {"slice": [0, 30], "type": "Attribute", "children": [
+            {"slice": [0, 5], "type": "Identifier"},
+            {"slice": [8, 29], "type": "HeredocTemplate"}
+          ]}
+        ]}
+      ]
+
     - I: |
         indented = <<EOT
           Foo

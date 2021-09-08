@@ -886,6 +886,8 @@ P4_PRIVATE(P4_Expression*)      P4_GetReference(P4_Source*, P4_Expression*);
 
 P4_PRIVATE(P4_String)           P4_CopySliceString(P4_String, P4_Slice*);
 
+P4_PRIVATE(bool)                P4_HasBackrefDescendant(P4_Expression*);
+
 P4_PRIVATE(P4_Error)            P4_SetWhitespaces(P4_Grammar*);
 P4_PRIVATE(P4_Expression*)      P4_GetWhitespaces(P4_Grammar*);
 
@@ -1952,6 +1954,32 @@ P4_GetReference(P4_Source* s, P4_Expression* e) {
     }
 
     return e->ref_expr;
+}
+
+P4_PRIVATE(bool)
+P4_HasBackrefDescendant(P4_Expression* e) {
+    size_t i = 0;
+    switch (e->kind) {
+        case P4_BackReference:
+            return true;
+        case P4_Sequence:
+            if (e->has_backref)
+                return true;
+        case P4_Choice:
+            for (i = 0; i < e->count; i++)
+                if (P4_HasBackrefDescendant(e->members[i]))
+                    return true;
+            return false;
+        case P4_Positive:
+        case P4_Negative:
+            return P4_HasBackrefDescendant(e->ref_expr);
+        case P4_Repeat:
+            return P4_HasBackrefDescendant(e->repeat_expr);
+        case P4_LeftRecursion:
+            return P4_HasBackrefDescendant(e->lhs) || P4_HasBackrefDescendant(e->rhs);
+        default:
+            return false;
+    }
 }
 
 P4_PRIVATE(P4_Node*)
@@ -3354,12 +3382,11 @@ P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_String name, size_t count, ...
 
         if (expr->members[i] == NULL)
             panicf("failed to set %zuth expression.", i);
-
-        if (expr->members[i]->kind == P4_BackReference)
-            expr->has_backref = true;
     }
 
     va_end (members);
+
+    expr->has_backref = P4_HasBackrefDescendant(expr);
 
     return P4_Ok;
 }
@@ -3407,9 +3434,8 @@ P4_SetMember(P4_Expression* expr, size_t offset, P4_Expression* member) {
         return P4_ValueError;
     }
 
-    if (expr->kind == P4_Sequence
-            && member->kind == P4_BackReference) {
-        expr->has_backref = true;
+    if (expr->kind == P4_Sequence) {
+        expr->has_backref = expr->has_backref || P4_HasBackrefDescendant(member);
     }
 
     if (offset < 0

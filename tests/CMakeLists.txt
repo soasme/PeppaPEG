@@ -80,7 +80,7 @@ set(
     test_cut_spec.json
     test_repeat_spec.json
     test_reference_spec.json
-    test_back_reference_spec.json
+    test_back_reference_spec.yaml
     test_dot_spec.json
     test_comment_spec.json
     test_flags_spec.json

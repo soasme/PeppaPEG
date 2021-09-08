@@ -275,6 +275,7 @@ typedef enum {
 # define E_INVALID_ERROR_CALLBACK 10018
 # define E_NO_EXPR              10019
 # define E_WRONG_BACKREF        10020
+# define E_RECURSIVE_BACKREF    10021
 
 /*
  *

@@ -1,0 +1,83 @@
+- desc: back reference
+  grammar: |
+    R1 = R23 \0;
+    R23 = "2" / "3";
+  entry: R1
+  tests:
+    - I: "22"
+      O: [
+        {"slice": [0, 2], "type": "R1", "children": [
+          {"slice": [0, 1], "type": "R23"},
+          {"slice": [1, 2], "type": "R23"}
+        ]}
+      ]
+
+    - I: "23"
+      E: "MatchError: line 1:2, expect R1 (back reference not match)"
+
+- desc: back reference to unnamed expr
+  grammar: |
+    R1 = ("2" / "3") \0 \0;
+  entry: R1
+  tests:
+    - I: "222"
+      O: [{"slice": [0, 3], "type": "R1"}]
+
+    - I: "333"
+      O: [{"slice": [0, 3], "type": "R1"}]
+
+    - I: "223"
+      E: "MatchError: line 1:3, expect R1 (back reference not match)"
+
+- desc: back reference to unnamed expr
+  grammar: |
+    R1 = ("2" / "3") ("," \0)*;
+  entry: R1
+  tests:
+    - I: "2,2,2"
+      O: [{"slice": [0, 5], "type": "R1"}]
+
+    - I: "3,3,3"
+      O: [{"slice": [0, 5], "type": "R1"}]
+
+    - I: "2,2,3"
+      O: [{"slice": [0, 3], "type": "R1"}]
+
+    - I: "2,3,3"
+      O: [{"slice": [0, 1], "type": "R1"}]
+
+- desc: recursive back reference
+  grammar: |
+    R1 = (R23 \0) \0;
+    R23 = "2" / "3";
+  entry: R1
+  tests:
+    - I: "2222"
+      E: "StackError: line 1:2, expect R1 (recursive backref)"
+
+- desc: out reached back reference
+  grammar: |
+    R1 = R23 \10;
+    R23 = "2" / "3";
+  entry: R1
+  tests:
+    - I: "2222"
+      E: "IndexError: line 1:2, expect R1 (\\10 out reached)"
+
+- desc: out reached back reference 2
+  grammar: |
+    R1 = R23 \1;
+    R23 = "2" / "3";
+  entry: R1
+  tests:
+    - I: "2222"
+      E: "PegError: line 1:2, expect R1 (backref point to backref)"
+
+- desc: back reference point to back reference
+  grammar: |
+    R1 = R23 \0 \1;
+    R23 = "2" / "3";
+  entry: R1
+  tests:
+    - I: "222"
+      E: "PegError: line 1:3, expect R1 (backref point to backref)"

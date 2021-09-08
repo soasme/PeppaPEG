@@ -421,13 +421,11 @@ In the following example, \\0 matches whatever `quote` has matched, thus `"a"` o
     str = quote [a-z] \0;
     quote = "\"" / "'";
 
-Back reference applies only to the nearest sequence. Thus,
+Back reference is applicable only to the named rule. Thus, the following rule can match "abaa" but not "abba".
 
 .. code-block::
 
     rule = "a" ("b" \0) \0;
-
-matches "abba" since the first \\0 back reference "b" and the second \\0 back reference "a".
 
 Insensitive
 -----------

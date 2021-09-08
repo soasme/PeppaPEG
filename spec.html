@@ -525,11 +525,10 @@ By making this practical decision, users can use PEG with left recursion for a c
 <span class="n">quote</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\"</span><span class="s2">"</span> <span class="o">/</span> <span class="s2">"'"</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>Back reference applies only to the nearest sequence. Thus,</p>
+<p>Back reference is applicable only to the named rule. Thus, the following rule can match “abaa” but not “abba”.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rule</span> <span class="o">=</span> <span class="s2">"a"</span> <span class="p">(</span><span class="s2">"b"</span> \<span class="mi">0</span><span class="p">)</span> \<span class="mi">0</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>matches “abba” since the first \0 back reference “b” and the second \0 back reference “a”.</p>
 </section>
 <section id="insensitive">
 <h2>Insensitive<a class="headerlink" href="#insensitive" title="Permalink to this headline">¶</a></h2>

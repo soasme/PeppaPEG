@@ -862,6 +862,15 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
 # define rescue_error(s)    do { (s)->err = P4_Ok; (s)->errmsg[0] = '\0'; } while (0)
 # define peek_frame(s)      ((s)->frame_stack)
 # define peek_rule_name(s)  ((s)->frame_stack->rule->name)
+# define peek_rule_frame(s, f) \
+    P4_Frame *tmp = (s)->frame_stack, *(f) = NULL; \
+    while (tmp) { \
+        if (is_rule(tmp->expr)) { \
+            (f) = tmp; \
+            break; \
+        } \
+        tmp = tmp->next; \
+    }
 # define remaining_text(s)  ((s)->content + (s)->pos)
 
 P4_PRIVATE(P4_Error) push_frame(P4_Source*, P4_Expression*);

@@ -1,6 +1,6 @@
 - desc: "attribute"
   grammar_file: "../../configs/hcl2.peg"
-  entry: "Module"
+  entry: "ConfigFile"
   tests:
     - I: |
         a = "a value"

@@ -87,11 +87,11 @@ set(
     test_peppa_spec.json
     test_toml_v1_0_spec.json
     test_golang_v1_17_spec.json
-    hcl2/test_expression_heredoc.yaml
-    hcl2/test_expression_operator.yaml
-    hcl2/test_expression_primitive.yaml
-    hcl2/test_structure_attribute.yaml
-    hcl2/test_structure_block.yaml
+    hcl2/test_expression_heredoc+unistr.yaml
+    hcl2/test_expression_operator+unistr.yaml
+    hcl2/test_expression_primitive+unistr.yaml
+    hcl2/test_structure_attribute+unistr.yaml
+    hcl2/test_structure_block+unistr.yaml
 )
 
 find_program(PYTHON python3)

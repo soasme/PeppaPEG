@@ -1,6 +1,6 @@
 - desc: "numbers"
   grammar_file: "../../configs/hcl2.peg"
-  entry: "Module"
+  entry: "ConfigFile"
   tests:
     - I: |
         whole_number                = 5
@@ -16,7 +16,7 @@
 
 - desc: "strings"
   grammar_file: "../../configs/hcl2.peg"
-  entry: "Module"
+  entry: "ConfigFile"
   tests:
     - I: |
         string_ascii           = "hello"
@@ -36,7 +36,7 @@
 
 - desc: "bool and null"
   grammar_file: "../../configs/hcl2.peg"
-  entry: "Module"
+  entry: "ConfigFile"
   tests:
     - I: |
         true  = true

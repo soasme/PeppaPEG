@@ -635,6 +635,10 @@ struct P4_Frame {
     bool            silent;
     /** Whether cut is enabled to frame. */
     bool            cut;
+    /** The slices for each backref member.
+     *  This field is applicable where a sequence rule has
+     *  at least one backref descendant. */
+    P4_Slice*       backref_slices;
     /** The next frame in the stack. */
     P4_Frame*       next;
 };
@@ -1771,6 +1775,9 @@ push_frame(P4_Source* s, P4_Expression* e) {
     /* Set rule */
     frame->rule = is_rule(e) ? e : top->rule;
 
+    /* Set backref_slices */
+    frame->backref_slices = NULL;
+
     /* Push stack */
     s->frame_stack_size++;
     s->frame_stack = frame;
@@ -1796,6 +1803,10 @@ pop_frame(P4_Source* s) {
         /* move oldtop into unused frame stack. */
         oldtop->next = s->unused_frame_stack;
         s->unused_frame_stack = oldtop;
+
+        /* clean up malloc fields. */
+        P4_FREE(oldtop->backref_slices);
+        oldtop->backref_slices = NULL;
     }
 
     return P4_Ok;

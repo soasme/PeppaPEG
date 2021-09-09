@@ -1,5 +1,6 @@
 # ROADMAP
 
+- [ ] package: build artifact for nix package.
 - [ ] peg: XXX: the better behavior is to puke extra whitespace if rule not advancing. a = b c?;
 - [ ] peg: action property can be rolled up.
 - [ ] peg: e"error message". this is useful when combining with negative + cut.

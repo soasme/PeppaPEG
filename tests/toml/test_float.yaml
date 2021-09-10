@@ -1,0 +1,935 @@
+- desc: "Float"
+  grammar_file: "../../configs/toml-v1.0.peg"
+  entry: "toml"
+  tests: [
+      {
+          "desc": "double-point-1",
+          "I": "double-point-1 = 0..1\n",
+          "E": "CutError: line 1:19, expect end_of_input"
+      },
+      {
+          "desc": "double-point-2",
+          "I": "double-point-2 = 0.1.2\n",
+          "E": "CutError: line 1:21, expect end_of_input"
+      },
+      {
+          "desc": "exp-double-e-1",
+          "I": "exp-double-e-1 = 1ee2\n",
+          "E": "CutError: line 1:19, expect end_of_input"
+      },
+      {
+          "desc": "exp-double-e-2",
+          "I": "exp-double-e-2 = 1e2e3\n",
+          "E": "CutError: line 1:21, expect end_of_input"
+      },
+      {
+          "desc": "exp-double-us",
+          "I": "exp-double-us = 1e__23\n",
+          "E": "CutError: line 1:18, expect end_of_input"
+      },
+      {
+          "desc": "exp-leading-us",
+          "I": "exp-leading-us = 1e_23\n",
+          "E": "CutError: line 1:19, expect end_of_input"
+      },
+      {
+          "desc": "exp-point-1",
+          "I": "exp-point-1 = 1e2.3\n",
+          "E": "CutError: line 1:18, expect end_of_input"
+      },
+      {
+          "desc": "exp-point-2",
+          "I": "exp-point-2 = 1.e2\n",
+          "E": "CutError: line 1:16, expect end_of_input"
+      },
+      {
+          "desc": "exp-trailing-us",
+          "I": "exp-trailing-us = 1e_23_\n",
+          "E": "CutError: line 1:20, expect end_of_input"
+      },
+      {
+          "desc": "exponent",
+          "I": "lower = 3e2\nupper = 3E2\nneg = 3e-2\npos = 3E+2\nzero = 3e0\npointlower = 3.1e2\npointupper = 3.1E2\nminustenth = -1E-1\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      114
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              11
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      5
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      8,
+                                      11
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              12,
+                              23
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      12,
+                                      17
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      20,
+                                      23
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              24,
+                              34
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      24,
+                                      27
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      30,
+                                      34
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              35,
+                              45
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      35,
+                                      38
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      41,
+                                      45
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              46,
+                              56
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      46,
+                                      50
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      53,
+                                      56
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              57,
+                              75
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      57,
+                                      67
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      70,
+                                      75
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              76,
+                              94
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      76,
+                                      86
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      89,
+                                      94
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              95,
+                              113
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      95,
+                                      105
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      108,
+                                      113
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "float",
+          "I": "pi = 3.14\npospi = +3.14\nnegpi = -3.14\nzero-intpart = 0.123\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      59
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              9
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      2
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      5,
+                                      9
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              10,
+                              23
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      10,
+                                      15
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      18,
+                                      23
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              24,
+                              37
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      24,
+                                      29
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      32,
+                                      37
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              38,
+                              58
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      38,
+                                      50
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      53,
+                                      58
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "inf-and-nan",
+          "I": "# We don't encode +nan and -nan back with the signs; many languages don't\n# support a sign on NaN (it doesn't really make much sense).\nnan = nan\nnan_neg = -nan\nnan_plus = +nan\ninfinity = inf\ninfinity_neg = -inf\ninfinity_plus = +inf\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      232
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              135,
+                              144
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      135,
+                                      138
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      141,
+                                      144
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              145,
+                              159
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      145,
+                                      152
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      155,
+                                      159
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              160,
+                              175
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      160,
+                                      168
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      171,
+                                      175
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              176,
+                              190
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      176,
+                                      184
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      187,
+                                      190
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              191,
+                              210
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      191,
+                                      203
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      206,
+                                      210
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              211,
+                              231
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      211,
+                                      224
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      227,
+                                      231
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "inf-incomplete-1",
+          "I": "inf-incomplete-1 = in\n",
+          "E": "CutError: line 1:20, expect val"
+      },
+      {
+          "desc": "inf-incomplete-2",
+          "I": "inf-incomplete-2 = +in\n",
+          "E": "CutError: line 1:20, expect val"
+      },
+      {
+          "desc": "inf-incomplete-3",
+          "I": "inf-incomplete-3 = -in\n",
+          "E": "CutError: line 1:20, expect val"
+      },
+      {
+          "desc": "inf_underscore",
+          "I": "inf_underscore = in_f\n",
+          "E": "CutError: line 1:18, expect val"
+      },
+      {
+          "desc": "leading-point",
+          "I": "leading-point = .12345\n",
+          "E": "CutError: line 1:17, expect val"
+      },
+      {
+          "desc": "leading-point-neg",
+          "I": "leading-point-neg = -.12345\n",
+          "E": "CutError: line 1:21, expect val"
+      },
+      {
+          "desc": "leading-point-plus",
+          "I": "leading-point-plus = +.12345\n",
+          "E": "CutError: line 1:22, expect val"
+      },
+      {
+          "desc": "leading-us",
+          "I": "leading-us = _1.2\n",
+          "E": "CutError: line 1:14, expect val"
+      },
+      {
+          "desc": "leading-zero",
+          "I": "leading-zero = 03.14\n",
+          "E": "CutError: line 1:17, expect end_of_input"
+      },
+      {
+          "desc": "leading-zero-neg",
+          "I": "leading-zero-neg = -03.14\n",
+          "E": "CutError: line 1:22, expect end_of_input"
+      },
+      {
+          "desc": "leading-zero-plus",
+          "I": "leading-zero-plus = +03.14\n",
+          "E": "CutError: line 1:23, expect end_of_input"
+      },
+      {
+          "desc": "long",
+          "I": "longpi = 3.141592653589793\nneglongpi = -3.141592653589793\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      58
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              26
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      6
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      9,
+                                      26
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              27,
+                              57
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      27,
+                                      36
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      39,
+                                      57
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "nan-incomplete-1",
+          "I": "nan-incomplete-1 = na\n",
+          "E": "CutError: line 1:20, expect val"
+      },
+      {
+          "desc": "nan-incomplete-2",
+          "I": "nan-incomplete-2 = +na\n",
+          "E": "CutError: line 1:20, expect val"
+      },
+      {
+          "desc": "nan-incomplete-3",
+          "I": "nan-incomplete-3 = -na\n",
+          "E": "CutError: line 1:20, expect val"
+      },
+      {
+          "desc": "nan_underscore",
+          "I": "nan_underscore = na_n\n",
+          "E": "CutError: line 1:18, expect val"
+      },
+      {
+          "desc": "trailing-point",
+          "I": "trailing-point = 1.\n",
+          "E": "CutError: line 1:19, expect end_of_input"
+      },
+      {
+          "desc": "trailing-point-min",
+          "I": "trailing-point-min = -1.\n",
+          "E": "CutError: line 1:24, expect end_of_input"
+      },
+      {
+          "desc": "trailing-point-plus",
+          "I": "trailing-point-plus = +1.\n",
+          "E": "CutError: line 1:25, expect end_of_input"
+      },
+      {
+          "desc": "trailing-us",
+          "I": "trailing-us = 1.2_\n",
+          "E": "CutError: line 1:18, expect end_of_input"
+      },
+      {
+          "desc": "underscore",
+          "I": "before = 3_141.5927\nafter = 3141.592_7\nexponent = 3e1_4\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      56
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              19
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      6
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      9,
+                                      19
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              20,
+                              38
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      20,
+                                      25
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      28,
+                                      38
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              39,
+                              55
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      39,
+                                      47
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      50,
+                                      55
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "us-after-point",
+          "I": "us-after-point = 1._2\n",
+          "E": "CutError: line 1:19, expect end_of_input"
+      },
+      {
+          "desc": "us-before-point",
+          "I": "us-before-point = 1_.2\n",
+          "E": "CutError: line 1:20, expect end_of_input"
+      },
+      {
+          "desc": "zero",
+          "I": "f1 = 0.0\nf2 = +0.0\nf3 = -0.0\nf4 = 0e0\nf5 = 0e00\nf6 = +0e0\nf7 = -0e0\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      68
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              8
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      2
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      5,
+                                      8
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              9,
+                              18
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      9,
+                                      11
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      14,
+                                      18
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              19,
+                              28
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      19,
+                                      21
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      24,
+                                      28
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              29,
+                              37
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      29,
+                                      31
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      34,
+                                      37
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              38,
+                              47
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      38,
+                                      40
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      43,
+                                      47
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              48,
+                              57
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      48,
+                                      50
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      53,
+                                      57
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              58,
+                              67
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      58,
+                                      60
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      63,
+                                      67
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      }
+  ]

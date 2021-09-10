@@ -1,0 +1,1361 @@
+- desc: "Datetime"
+  grammar_file: "../../configs/toml-v1.0.peg"
+  entry: "toml"
+  tests: [
+      {
+          "desc": "datetime",
+          "I": "space = 1987-07-05 17:45:00Z\nlower = 1987-07-05t17:45:00z\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      58
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              28
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      5
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      8,
+                                      28
+                                  ],
+                                  "type": "offset_date_time",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              8,
+                                              12
+                                          ],
+                                          "type": "date_fullyear"
+                                      },
+                                      {
+                                          "slice": [
+                                              13,
+                                              15
+                                          ],
+                                          "type": "date_month"
+                                      },
+                                      {
+                                          "slice": [
+                                              16,
+                                              18
+                                          ],
+                                          "type": "date_mday"
+                                      },
+                                      {
+                                          "slice": [
+                                              19,
+                                              21
+                                          ],
+                                          "type": "time_hour"
+                                      },
+                                      {
+                                          "slice": [
+                                              22,
+                                              24
+                                          ],
+                                          "type": "time_minute"
+                                      },
+                                      {
+                                          "slice": [
+                                              25,
+                                              27
+                                          ],
+                                          "type": "time_second"
+                                      },
+                                      {
+                                          "slice": [
+                                              27,
+                                              28
+                                          ],
+                                          "type": "time_utc"
+                                      }
+                                  ]
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              29,
+                              57
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      29,
+                                      34
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      37,
+                                      57
+                                  ],
+                                  "type": "offset_date_time",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              37,
+                                              41
+                                          ],
+                                          "type": "date_fullyear"
+                                      },
+                                      {
+                                          "slice": [
+                                              42,
+                                              44
+                                          ],
+                                          "type": "date_month"
+                                      },
+                                      {
+                                          "slice": [
+                                              45,
+                                              47
+                                          ],
+                                          "type": "date_mday"
+                                      },
+                                      {
+                                          "slice": [
+                                              48,
+                                              50
+                                          ],
+                                          "type": "time_hour"
+                                      },
+                                      {
+                                          "slice": [
+                                              51,
+                                              53
+                                          ],
+                                          "type": "time_minute"
+                                      },
+                                      {
+                                          "slice": [
+                                              54,
+                                              56
+                                          ],
+                                          "type": "time_second"
+                                      },
+                                      {
+                                          "slice": [
+                                              56,
+                                              57
+                                          ],
+                                          "type": "time_utc"
+                                      }
+                                  ]
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "impossible-date",
+          "I": "d = 2006-01-50T00:00:00Z\n",
+          "E": "CutError: line 1:13, expect date_mday"
+      },
+      {
+          "desc": "local",
+          "I": "local = 1987-07-05T17:45:00\nmilli = 1977-12-21T10:32:00.555\nspace = 1987-07-05 17:45:00\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      88
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              27
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      5
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      8,
+                                      27
+                                  ],
+                                  "type": "local_date_time",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              8,
+                                              12
+                                          ],
+                                          "type": "date_fullyear"
+                                      },
+                                      {
+                                          "slice": [
+                                              13,
+                                              15
+                                          ],
+                                          "type": "date_month"
+                                      },
+                                      {
+                                          "slice": [
+                                              16,
+                                              18
+                                          ],
+                                          "type": "date_mday"
+                                      },
+                                      {
+                                          "slice": [
+                                              19,
+                                              21
+                                          ],
+                                          "type": "time_hour"
+                                      },
+                                      {
+                                          "slice": [
+                                              22,
+                                              24
+                                          ],
+                                          "type": "time_minute"
+                                      },
+                                      {
+                                          "slice": [
+                                              25,
+                                              27
+                                          ],
+                                          "type": "time_second"
+                                      }
+                                  ]
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              28,
+                              59
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      28,
+                                      33
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      36,
+                                      59
+                                  ],
+                                  "type": "local_date_time",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              36,
+                                              40
+                                          ],
+                                          "type": "date_fullyear"
+                                      },
+                                      {
+                                          "slice": [
+                                              41,
+                                              43
+                                          ],
+                                          "type": "date_month"
+                                      },
+                                      {
+                                          "slice": [
+                                              44,
+                                              46
+                                          ],
+                                          "type": "date_mday"
+                                      },
+                                      {
+                                          "slice": [
+                                              47,
+                                              49
+                                          ],
+                                          "type": "time_hour"
+                                      },
+                                      {
+                                          "slice": [
+                                              50,
+                                              52
+                                          ],
+                                          "type": "time_minute"
+                                      },
+                                      {
+                                          "slice": [
+                                              53,
+                                              55
+                                          ],
+                                          "type": "time_second"
+                                      },
+                                      {
+                                          "slice": [
+                                              56,
+                                              59
+                                          ],
+                                          "type": "time_secfrac"
+                                      }
+                                  ]
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              60,
+                              87
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      60,
+                                      65
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      68,
+                                      87
+                                  ],
+                                  "type": "local_date_time",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              68,
+                                              72
+                                          ],
+                                          "type": "date_fullyear"
+                                      },
+                                      {
+                                          "slice": [
+                                              73,
+                                              75
+                                          ],
+                                          "type": "date_month"
+                                      },
+                                      {
+                                          "slice": [
+                                              76,
+                                              78
+                                          ],
+                                          "type": "date_mday"
+                                      },
+                                      {
+                                          "slice": [
+                                              79,
+                                              81
+                                          ],
+                                          "type": "time_hour"
+                                      },
+                                      {
+                                          "slice": [
+                                              82,
+                                              84
+                                          ],
+                                          "type": "time_minute"
+                                      },
+                                      {
+                                          "slice": [
+                                              85,
+                                              87
+                                          ],
+                                          "type": "time_second"
+                                      }
+                                  ]
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "local-date",
+          "I": "bestdayever = 1987-07-05\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      25
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              24
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      11
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      14,
+                                      24
+                                  ],
+                                  "type": "local_date",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              14,
+                                              18
+                                          ],
+                                          "type": "date_fullyear"
+                                      },
+                                      {
+                                          "slice": [
+                                              19,
+                                              21
+                                          ],
+                                          "type": "date_month"
+                                      },
+                                      {
+                                          "slice": [
+                                              22,
+                                              24
+                                          ],
+                                          "type": "date_mday"
+                                      }
+                                  ]
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "local-time",
+          "I": "besttimeever = 17:45:00\nmilliseconds = 10:32:00.555\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      52
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              23
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      12
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      15,
+                                      23
+                                  ],
+                                  "type": "local_time",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              15,
+                                              17
+                                          ],
+                                          "type": "time_hour"
+                                      },
+                                      {
+                                          "slice": [
+                                              18,
+                                              20
+                                          ],
+                                          "type": "time_minute"
+                                      },
+                                      {
+                                          "slice": [
+                                              21,
+                                              23
+                                          ],
+                                          "type": "time_second"
+                                      }
+                                  ]
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              24,
+                              51
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      24,
+                                      36
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      39,
+                                      51
+                                  ],
+                                  "type": "local_time",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              39,
+                                              41
+                                          ],
+                                          "type": "time_hour"
+                                      },
+                                      {
+                                          "slice": [
+                                              42,
+                                              44
+                                          ],
+                                          "type": "time_minute"
+                                      },
+                                      {
+                                          "slice": [
+                                              45,
+                                              47
+                                          ],
+                                          "type": "time_second"
+                                      },
+                                      {
+                                          "slice": [
+                                              48,
+                                              51
+                                          ],
+                                          "type": "time_secfrac"
+                                      }
+                                  ]
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "milliseconds",
+          "I": "utc1  = 1987-07-05T17:45:56.123456Z\nutc2  = 1987-07-05T17:45:56.6Z\nwita1 = 1987-07-05T17:45:56.123456+08:00\nwita2 = 1987-07-05T17:45:56.6+08:00\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      144
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              35
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      4
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      8,
+                                      35
+                                  ],
+                                  "type": "offset_date_time",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              8,
+                                              12
+                                          ],
+                                          "type": "date_fullyear"
+                                      },
+                                      {
+                                          "slice": [
+                                              13,
+                                              15
+                                          ],
+                                          "type": "date_month"
+                                      },
+                                      {
+                                          "slice": [
+                                              16,
+                                              18
+                                          ],
+                                          "type": "date_mday"
+                                      },
+                                      {
+                                          "slice": [
+                                              19,
+                                              21
+                                          ],
+                                          "type": "time_hour"
+                                      },
+                                      {
+                                          "slice": [
+                                              22,
+                                              24
+                                          ],
+                                          "type": "time_minute"
+                                      },
+                                      {
+                                          "slice": [
+                                              25,
+                                              27
+                                          ],
+                                          "type": "time_second"
+                                      },
+                                      {
+                                          "slice": [
+                                              28,
+                                              34
+                                          ],
+                                          "type": "time_secfrac"
+                                      },
+                                      {
+                                          "slice": [
+                                              34,
+                                              35
+                                          ],
+                                          "type": "time_utc"
+                                      }
+                                  ]
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              36,
+                              66
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      36,
+                                      40
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      44,
+                                      66
+                                  ],
+                                  "type": "offset_date_time",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              44,
+                                              48
+                                          ],
+                                          "type": "date_fullyear"
+                                      },
+                                      {
+                                          "slice": [
+                                              49,
+                                              51
+                                          ],
+                                          "type": "date_month"
+                                      },
+                                      {
+                                          "slice": [
+                                              52,
+                                              54
+                                          ],
+                                          "type": "date_mday"
+                                      },
+                                      {
+                                          "slice": [
+                                              55,
+                                              57
+                                          ],
+                                          "type": "time_hour"
+                                      },
+                                      {
+                                          "slice": [
+                                              58,
+                                              60
+                                          ],
+                                          "type": "time_minute"
+                                      },
+                                      {
+                                          "slice": [
+                                              61,
+                                              63
+                                          ],
+                                          "type": "time_second"
+                                      },
+                                      {
+                                          "slice": [
+                                              64,
+                                              65
+                                          ],
+                                          "type": "time_secfrac"
+                                      },
+                                      {
+                                          "slice": [
+                                              65,
+                                              66
+                                          ],
+                                          "type": "time_utc"
+                                      }
+                                  ]
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              67,
+                              107
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      67,
+                                      72
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      75,
+                                      107
+                                  ],
+                                  "type": "offset_date_time",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              75,
+                                              79
+                                          ],
+                                          "type": "date_fullyear"
+                                      },
+                                      {
+                                          "slice": [
+                                              80,
+                                              82
+                                          ],
+                                          "type": "date_month"
+                                      },
+                                      {
+                                          "slice": [
+                                              83,
+                                              85
+                                          ],
+                                          "type": "date_mday"
+                                      },
+                                      {
+                                          "slice": [
+                                              86,
+                                              88
+                                          ],
+                                          "type": "time_hour"
+                                      },
+                                      {
+                                          "slice": [
+                                              89,
+                                              91
+                                          ],
+                                          "type": "time_minute"
+                                      },
+                                      {
+                                          "slice": [
+                                              92,
+                                              94
+                                          ],
+                                          "type": "time_second"
+                                      },
+                                      {
+                                          "slice": [
+                                              95,
+                                              101
+                                          ],
+                                          "type": "time_secfrac"
+                                      },
+                                      {
+                                          "slice": [
+                                              101,
+                                              107
+                                          ],
+                                          "type": "time_numoffset",
+                                          "children": [
+                                              {
+                                                  "slice": [
+                                                      101,
+                                                      102
+                                                  ],
+                                                  "type": "plus"
+                                              },
+                                              {
+                                                  "slice": [
+                                                      102,
+                                                      104
+                                                  ],
+                                                  "type": "time_hour"
+                                              },
+                                              {
+                                                  "slice": [
+                                                      105,
+                                                      107
+                                                  ],
+                                                  "type": "time_minute"
+                                              }
+                                          ]
+                                      }
+                                  ]
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              108,
+                              143
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      108,
+                                      113
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      116,
+                                      143
+                                  ],
+                                  "type": "offset_date_time",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              116,
+                                              120
+                                          ],
+                                          "type": "date_fullyear"
+                                      },
+                                      {
+                                          "slice": [
+                                              121,
+                                              123
+                                          ],
+                                          "type": "date_month"
+                                      },
+                                      {
+                                          "slice": [
+                                              124,
+                                              126
+                                          ],
+                                          "type": "date_mday"
+                                      },
+                                      {
+                                          "slice": [
+                                              127,
+                                              129
+                                          ],
+                                          "type": "time_hour"
+                                      },
+                                      {
+                                          "slice": [
+                                              130,
+                                              132
+                                          ],
+                                          "type": "time_minute"
+                                      },
+                                      {
+                                          "slice": [
+                                              133,
+                                              135
+                                          ],
+                                          "type": "time_second"
+                                      },
+                                      {
+                                          "slice": [
+                                              136,
+                                              137
+                                          ],
+                                          "type": "time_secfrac"
+                                      },
+                                      {
+                                          "slice": [
+                                              137,
+                                              143
+                                          ],
+                                          "type": "time_numoffset",
+                                          "children": [
+                                              {
+                                                  "slice": [
+                                                      137,
+                                                      138
+                                                  ],
+                                                  "type": "plus"
+                                              },
+                                              {
+                                                  "slice": [
+                                                      138,
+                                                      140
+                                                  ],
+                                                  "type": "time_hour"
+                                              },
+                                              {
+                                                  "slice": [
+                                                      141,
+                                                      143
+                                                  ],
+                                                  "type": "time_minute"
+                                              }
+                                          ]
+                                      }
+                                  ]
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "no-leads",
+          "I": "no-leads = 1987-7-05T17:45:00Z\n",
+          "E": "CutError: line 1:17, expect date_month"
+      },
+      {
+          "desc": "no-leads-with-milli",
+          "I": "with-milli = 1987-07-5T17:45:00.12Z\n",
+          "E": "CutError: line 1:22, expect date_mday"
+      },
+      {
+          "desc": "no-secs",
+          "I": "no-secs = 1987-07-05T17:45Z\n",
+          "E": "CutError: line 1:27, expect partial_time (char ':')"
+      },
+      {
+          "desc": "no-t",
+          "I": "no-t = 1987-07-0517:45:00Z\n",
+          "E": "CutError: line 1:18, expect end_of_input"
+      },
+      {
+          "desc": "timezone",
+          "I": "utc  = 1987-07-05T17:45:56Z\npdt  = 1987-07-05T17:45:56-05:00\nnzst = 1987-07-05T17:45:56+12:00\nnzdt = 1987-07-05T17:45:56+13:00  # DST\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      134
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              27
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      3
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      7,
+                                      27
+                                  ],
+                                  "type": "offset_date_time",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              7,
+                                              11
+                                          ],
+                                          "type": "date_fullyear"
+                                      },
+                                      {
+                                          "slice": [
+                                              12,
+                                              14
+                                          ],
+                                          "type": "date_month"
+                                      },
+                                      {
+                                          "slice": [
+                                              15,
+                                              17
+                                          ],
+                                          "type": "date_mday"
+                                      },
+                                      {
+                                          "slice": [
+                                              18,
+                                              20
+                                          ],
+                                          "type": "time_hour"
+                                      },
+                                      {
+                                          "slice": [
+                                              21,
+                                              23
+                                          ],
+                                          "type": "time_minute"
+                                      },
+                                      {
+                                          "slice": [
+                                              24,
+                                              26
+                                          ],
+                                          "type": "time_second"
+                                      },
+                                      {
+                                          "slice": [
+                                              26,
+                                              27
+                                          ],
+                                          "type": "time_utc"
+                                      }
+                                  ]
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              28,
+                              60
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      28,
+                                      31
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      35,
+                                      60
+                                  ],
+                                  "type": "offset_date_time",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              35,
+                                              39
+                                          ],
+                                          "type": "date_fullyear"
+                                      },
+                                      {
+                                          "slice": [
+                                              40,
+                                              42
+                                          ],
+                                          "type": "date_month"
+                                      },
+                                      {
+                                          "slice": [
+                                              43,
+                                              45
+                                          ],
+                                          "type": "date_mday"
+                                      },
+                                      {
+                                          "slice": [
+                                              46,
+                                              48
+                                          ],
+                                          "type": "time_hour"
+                                      },
+                                      {
+                                          "slice": [
+                                              49,
+                                              51
+                                          ],
+                                          "type": "time_minute"
+                                      },
+                                      {
+                                          "slice": [
+                                              52,
+                                              54
+                                          ],
+                                          "type": "time_second"
+                                      },
+                                      {
+                                          "slice": [
+                                              54,
+                                              60
+                                          ],
+                                          "type": "time_numoffset",
+                                          "children": [
+                                              {
+                                                  "slice": [
+                                                      54,
+                                                      55
+                                                  ],
+                                                  "type": "minus"
+                                              },
+                                              {
+                                                  "slice": [
+                                                      55,
+                                                      57
+                                                  ],
+                                                  "type": "time_hour"
+                                              },
+                                              {
+                                                  "slice": [
+                                                      58,
+                                                      60
+                                                  ],
+                                                  "type": "time_minute"
+                                              }
+                                          ]
+                                      }
+                                  ]
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              61,
+                              93
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      61,
+                                      65
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      68,
+                                      93
+                                  ],
+                                  "type": "offset_date_time",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              68,
+                                              72
+                                          ],
+                                          "type": "date_fullyear"
+                                      },
+                                      {
+                                          "slice": [
+                                              73,
+                                              75
+                                          ],
+                                          "type": "date_month"
+                                      },
+                                      {
+                                          "slice": [
+                                              76,
+                                              78
+                                          ],
+                                          "type": "date_mday"
+                                      },
+                                      {
+                                          "slice": [
+                                              79,
+                                              81
+                                          ],
+                                          "type": "time_hour"
+                                      },
+                                      {
+                                          "slice": [
+                                              82,
+                                              84
+                                          ],
+                                          "type": "time_minute"
+                                      },
+                                      {
+                                          "slice": [
+                                              85,
+                                              87
+                                          ],
+                                          "type": "time_second"
+                                      },
+                                      {
+                                          "slice": [
+                                              87,
+                                              93
+                                          ],
+                                          "type": "time_numoffset",
+                                          "children": [
+                                              {
+                                                  "slice": [
+                                                      87,
+                                                      88
+                                                  ],
+                                                  "type": "plus"
+                                              },
+                                              {
+                                                  "slice": [
+                                                      88,
+                                                      90
+                                                  ],
+                                                  "type": "time_hour"
+                                              },
+                                              {
+                                                  "slice": [
+                                                      91,
+                                                      93
+                                                  ],
+                                                  "type": "time_minute"
+                                              }
+                                          ]
+                                      }
+                                  ]
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              94,
+                              126
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      94,
+                                      98
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      101,
+                                      126
+                                  ],
+                                  "type": "offset_date_time",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              101,
+                                              105
+                                          ],
+                                          "type": "date_fullyear"
+                                      },
+                                      {
+                                          "slice": [
+                                              106,
+                                              108
+                                          ],
+                                          "type": "date_month"
+                                      },
+                                      {
+                                          "slice": [
+                                              109,
+                                              111
+                                          ],
+                                          "type": "date_mday"
+                                      },
+                                      {
+                                          "slice": [
+                                              112,
+                                              114
+                                          ],
+                                          "type": "time_hour"
+                                      },
+                                      {
+                                          "slice": [
+                                              115,
+                                              117
+                                          ],
+                                          "type": "time_minute"
+                                      },
+                                      {
+                                          "slice": [
+                                              118,
+                                              120
+                                          ],
+                                          "type": "time_second"
+                                      },
+                                      {
+                                          "slice": [
+                                              120,
+                                              126
+                                          ],
+                                          "type": "time_numoffset",
+                                          "children": [
+                                              {
+                                                  "slice": [
+                                                      120,
+                                                      121
+                                                  ],
+                                                  "type": "plus"
+                                              },
+                                              {
+                                                  "slice": [
+                                                      121,
+                                                      123
+                                                  ],
+                                                  "type": "time_hour"
+                                              },
+                                              {
+                                                  "slice": [
+                                                      124,
+                                                      126
+                                                  ],
+                                                  "type": "time_minute"
+                                              }
+                                          ]
+                                      }
+                                  ]
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "trailing-t",
+          "I": "d = 2006-01-30T\n",
+          "E": "CutError: line 1:15, expect end_of_input"
+      }
+  ]

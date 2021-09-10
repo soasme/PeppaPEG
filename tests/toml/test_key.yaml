@@ -1,0 +1,2364 @@
+- desc: "Key"
+  grammar_file: "../../configs/toml-v1.0.peg"
+  entry: "toml"
+  tests: [
+      {
+          "desc": "after-array",
+          "I": "[[agencies]] owner = \"S Cjelli\"\n",
+          "E": "CutError: line 1:14, expect end_of_input"
+      },
+      {
+          "desc": "after-table",
+          "I": "[error] this = \"should not be here\"\n",
+          "E": "CutError: line 1:9, expect end_of_input"
+      },
+      {
+          "desc": "after-value",
+          "I": "first = \"Tom\" last = \"Preston-Werner\" # INVALID\n",
+          "E": "CutError: line 1:15, expect end_of_input"
+      },
+      {
+          "desc": "alphanum",
+          "I": "alpha = \"a\"\n123 = \"num\"\n000111 = \"leading\"\n10e3 = \"false float\"\none1two2 = \"mixed\"\nwith-dash = \"dashed\"\nunder_score = \"___\"\n34-11 = 23\n\n[2018_10]\n001 = 1\n\n[a-a-a]\n_ = false\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      173
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              11
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      5
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      8,
+                                      11
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              12,
+                              23
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      12,
+                                      15
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      18,
+                                      23
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              24,
+                              42
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      24,
+                                      30
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      33,
+                                      42
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              43,
+                              63
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      43,
+                                      47
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      50,
+                                      63
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              64,
+                              82
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      64,
+                                      72
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      75,
+                                      82
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              83,
+                              103
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      83,
+                                      92
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      95,
+                                      103
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              104,
+                              123
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      104,
+                                      115
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      118,
+                                      123
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              124,
+                              134
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      124,
+                                      129
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      132,
+                                      134
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              136,
+                              145
+                          ],
+                          "type": "std_table",
+                          "children": [
+                              {
+                                  "slice": [
+                                      137,
+                                      144
+                                  ],
+                                  "type": "unquoted_key"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              146,
+                              153
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      146,
+                                      149
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      152,
+                                      153
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              155,
+                              162
+                          ],
+                          "type": "std_table",
+                          "children": [
+                              {
+                                  "slice": [
+                                      156,
+                                      161
+                                  ],
+                                  "type": "unquoted_key"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              163,
+                              172
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      163,
+                                      164
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      167,
+                                      172
+                                  ],
+                                  "type": "boolean"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "bare-invalid-character",
+          "I": "bare!key = 123\n",
+          "E": "CutError: line 1:1, expect end_of_input"
+      },
+      {
+          "desc": "case-sensitive",
+          "I": "sectioN = \"NN\"\n\n[section]\nname = \"lower\"\nNAME = \"upper\"\nName = \"capitalized\"\n\n[Section]\nname = \"different section!!\"\n\"\u03bc\" = \"greek small letter mu\"\n\"\u039c\" = \"greek capital letter MU\"\nM = \"latin letter M\"\n\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      203
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              14
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      7
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      10,
+                                      14
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              16,
+                              25
+                          ],
+                          "type": "std_table",
+                          "children": [
+                              {
+                                  "slice": [
+                                      17,
+                                      24
+                                  ],
+                                  "type": "unquoted_key"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              26,
+                              40
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      26,
+                                      30
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      33,
+                                      40
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              41,
+                              55
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      41,
+                                      45
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      48,
+                                      55
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              56,
+                              76
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      56,
+                                      60
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      63,
+                                      76
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              78,
+                              87
+                          ],
+                          "type": "std_table",
+                          "children": [
+                              {
+                                  "slice": [
+                                      79,
+                                      86
+                                  ],
+                                  "type": "unquoted_key"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              88,
+                              116
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      88,
+                                      92
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      95,
+                                      116
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              117,
+                              147
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      117,
+                                      121
+                                  ],
+                                  "type": "quoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      124,
+                                      147
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              148,
+                              180
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      148,
+                                      152
+                                  ],
+                                  "type": "quoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      155,
+                                      180
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              181,
+                              201
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      181,
+                                      182
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      185,
+                                      201
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "dotted",
+          "I": "# Note: this file contains literal tab characters.\n\nname.first = \"Arthur\"\n\"name\".'last' = \"Dent\"\n\nmany.dots.here.dot.dot.dot = 42\n\n# Space are ignored, and key parts can be quoted.\ncount.a       = 1\ncount . b     = 2\n\"count\".\"c\"   = 3\n\"count\" . \"d\" = 4\n'count'.'e'   = 5\n'count' . 'f' = 6\n\"count\".'g'   = 7\n\"count\" . 'h' = 8\ncount.'i'     = 9\ncount \t.\t 'j'\t   = 10\n\"count\".k     = 11\n\"count\" . l   = 12\n\n[tbl]\na.b.c = 42.666\n\n[a.few.dots]\npolka.dot = \"again?\"\npolka.dance-with = \"Dot\"\n\n[[arr]]\na.b.c=1\na.b.d=2\n\n[[arr]]\na.b.c=3\na.b.d=4\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      535
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              52,
+                              73
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      52,
+                                      62
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              52,
+                                              56
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              57,
+                                              62
+                                          ],
+                                          "type": "unquoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      65,
+                                      73
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              74,
+                              96
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      74,
+                                      87
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              74,
+                                              80
+                                          ],
+                                          "type": "quoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              81,
+                                              87
+                                          ],
+                                          "type": "quoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      90,
+                                      96
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              98,
+                              129
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      98,
+                                      124
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              98,
+                                              102
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              103,
+                                              107
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              108,
+                                              112
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              113,
+                                              116
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              117,
+                                              120
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              121,
+                                              124
+                                          ],
+                                          "type": "unquoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      127,
+                                      129
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              181,
+                              198
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      181,
+                                      188
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              181,
+                                              186
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              187,
+                                              188
+                                          ],
+                                          "type": "unquoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      197,
+                                      198
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              199,
+                              216
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      199,
+                                      208
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              199,
+                                              204
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              207,
+                                              208
+                                          ],
+                                          "type": "unquoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      215,
+                                      216
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              217,
+                              234
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      217,
+                                      228
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              217,
+                                              224
+                                          ],
+                                          "type": "quoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              225,
+                                              228
+                                          ],
+                                          "type": "quoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      233,
+                                      234
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              235,
+                              252
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      235,
+                                      248
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              235,
+                                              242
+                                          ],
+                                          "type": "quoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              245,
+                                              248
+                                          ],
+                                          "type": "quoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      251,
+                                      252
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              253,
+                              270
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      253,
+                                      264
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              253,
+                                              260
+                                          ],
+                                          "type": "quoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              261,
+                                              264
+                                          ],
+                                          "type": "quoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      269,
+                                      270
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              271,
+                              288
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      271,
+                                      284
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              271,
+                                              278
+                                          ],
+                                          "type": "quoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              281,
+                                              284
+                                          ],
+                                          "type": "quoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      287,
+                                      288
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              289,
+                              306
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      289,
+                                      300
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              289,
+                                              296
+                                          ],
+                                          "type": "quoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              297,
+                                              300
+                                          ],
+                                          "type": "quoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      305,
+                                      306
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              307,
+                              324
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      307,
+                                      320
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              307,
+                                              314
+                                          ],
+                                          "type": "quoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              317,
+                                              320
+                                          ],
+                                          "type": "quoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      323,
+                                      324
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              325,
+                              342
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      325,
+                                      334
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              325,
+                                              330
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              331,
+                                              334
+                                          ],
+                                          "type": "quoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      341,
+                                      342
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              343,
+                              364
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      343,
+                                      356
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              343,
+                                              348
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              353,
+                                              356
+                                          ],
+                                          "type": "quoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      362,
+                                      364
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              365,
+                              383
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      365,
+                                      374
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              365,
+                                              372
+                                          ],
+                                          "type": "quoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              373,
+                                              374
+                                          ],
+                                          "type": "unquoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      381,
+                                      383
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              384,
+                              402
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      384,
+                                      395
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              384,
+                                              391
+                                          ],
+                                          "type": "quoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              394,
+                                              395
+                                          ],
+                                          "type": "unquoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      400,
+                                      402
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              404,
+                              409
+                          ],
+                          "type": "std_table",
+                          "children": [
+                              {
+                                  "slice": [
+                                      405,
+                                      408
+                                  ],
+                                  "type": "unquoted_key"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              410,
+                              424
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      410,
+                                      415
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              410,
+                                              411
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              412,
+                                              413
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              414,
+                                              415
+                                          ],
+                                          "type": "unquoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      418,
+                                      424
+                                  ],
+                                  "type": "float"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              426,
+                              438
+                          ],
+                          "type": "std_table",
+                          "children": [
+                              {
+                                  "slice": [
+                                      427,
+                                      437
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              427,
+                                              428
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              429,
+                                              432
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              433,
+                                              437
+                                          ],
+                                          "type": "unquoted_key"
+                                      }
+                                  ]
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              439,
+                              459
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      439,
+                                      448
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              439,
+                                              444
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              445,
+                                              448
+                                          ],
+                                          "type": "unquoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      451,
+                                      459
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              460,
+                              484
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      460,
+                                      476
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              460,
+                                              465
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              466,
+                                              476
+                                          ],
+                                          "type": "unquoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      479,
+                                      484
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              486,
+                              493
+                          ],
+                          "type": "array_table",
+                          "children": [
+                              {
+                                  "slice": [
+                                      488,
+                                      491
+                                  ],
+                                  "type": "unquoted_key"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              494,
+                              501
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      494,
+                                      499
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              494,
+                                              495
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              496,
+                                              497
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              498,
+                                              499
+                                          ],
+                                          "type": "unquoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      500,
+                                      501
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              502,
+                              509
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      502,
+                                      507
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              502,
+                                              503
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              504,
+                                              505
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              506,
+                                              507
+                                          ],
+                                          "type": "unquoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      508,
+                                      509
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              511,
+                              518
+                          ],
+                          "type": "array_table",
+                          "children": [
+                              {
+                                  "slice": [
+                                      513,
+                                      516
+                                  ],
+                                  "type": "unquoted_key"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              519,
+                              526
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      519,
+                                      524
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              519,
+                                              520
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              521,
+                                              522
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              523,
+                                              524
+                                          ],
+                                          "type": "unquoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      525,
+                                      526
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              527,
+                              534
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      527,
+                                      532
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              527,
+                                              528
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              529,
+                                              530
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              531,
+                                              532
+                                          ],
+                                          "type": "unquoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      533,
+                                      534
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "empty",
+          "I": "\"\" = \"blank\"\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      13
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              12
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      2
+                                  ],
+                                  "type": "quoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      5,
+                                      12
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "empty",
+          "I": " = 1\n",
+          "E": "CutError: line 1:2, expect end_of_input"
+      },
+      {
+          "desc": "equals-nospace",
+          "I": "answer=42\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      10
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              9
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      6
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      7,
+                                      9
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "escape",
+          "I": "\\u00c0 = \"latin capital letter A with grave\"\n",
+          "E": "CutError: line 1:1, expect end_of_input"
+      },
+      {
+          "desc": "escapes",
+          "I": "\"\\n\" = \"newline\"\n\"\\u00c0\" = \"latin capital letter A with grave\"\n\"\\\"\" = \"just a quote\"\n\n[\"backsp\\b\\b\"]\n\n[\"\\\"quoted\\\"\"]\nquote = true\n\n[\"a.b\".\"\\u00c0\"]\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      149
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              16
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      4
+                                  ],
+                                  "type": "quoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      7,
+                                      16
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              17,
+                              63
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      17,
+                                      25
+                                  ],
+                                  "type": "quoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      28,
+                                      63
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              64,
+                              85
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      64,
+                                      68
+                                  ],
+                                  "type": "quoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      71,
+                                      85
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              87,
+                              101
+                          ],
+                          "type": "std_table",
+                          "children": [
+                              {
+                                  "slice": [
+                                      88,
+                                      100
+                                  ],
+                                  "type": "quoted_key"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              103,
+                              117
+                          ],
+                          "type": "std_table",
+                          "children": [
+                              {
+                                  "slice": [
+                                      104,
+                                      116
+                                  ],
+                                  "type": "quoted_key"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              118,
+                              130
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      118,
+                                      123
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      126,
+                                      130
+                                  ],
+                                  "type": "boolean"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              132,
+                              148
+                          ],
+                          "type": "std_table",
+                          "children": [
+                              {
+                                  "slice": [
+                                      133,
+                                      147
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              133,
+                                              138
+                                          ],
+                                          "type": "quoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              139,
+                                              147
+                                          ],
+                                          "type": "quoted_key"
+                                      }
+                                  ]
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "hash",
+          "I": "a# = 1\n",
+          "E": "CutError: line 1:1, expect end_of_input"
+      },
+      {
+          "desc": "multiline",
+          "I": "\"\"\"long\nkey\"\"\" = 1\n",
+          "E": "CutError: line 1:1, expect end_of_input"
+      },
+      {
+          "desc": "newline",
+          "I": "barekey\n   = 123\n",
+          "E": "CutError: line 1:1, expect end_of_input"
+      },
+      {
+          "desc": "no-eol",
+          "I": "a = 1 b = 2\n",
+          "E": "CutError: line 1:7, expect end_of_input"
+      },
+      {
+          "desc": "numeric",
+          "I": "1 = 1\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      6
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              5
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      1
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      4,
+                                      5
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "numeric-dotted",
+          "I": "1.2 = 3\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      8
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              7
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      3
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              0,
+                                              1
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              2,
+                                              3
+                                          ],
+                                          "type": "unquoted_key"
+                                      }
+                                  ]
+                              },
+                              {
+                                  "slice": [
+                                      6,
+                                      7
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "open-bracket",
+          "I": "[abc = 1\n",
+          "E": "CutError: line 1:6, expect std_table_close (char ']')"
+      },
+      {
+          "desc": "partial-quoted",
+          "I": "partial\"quoted\" = 5\n",
+          "E": "CutError: line 1:1, expect end_of_input"
+      },
+      {
+          "desc": "quoted-dots",
+          "I": "plain = 1\n\"with.dot\" = 2\n\n[plain_table]\nplain = 3\n\"with.dot\" = 4\n\n[table.withdot]\nplain = 5\n\"key.with.dots\" = 6\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      112
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              9
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      5
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      8,
+                                      9
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              10,
+                              24
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      10,
+                                      20
+                                  ],
+                                  "type": "quoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      23,
+                                      24
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              26,
+                              39
+                          ],
+                          "type": "std_table",
+                          "children": [
+                              {
+                                  "slice": [
+                                      27,
+                                      38
+                                  ],
+                                  "type": "unquoted_key"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              40,
+                              49
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      40,
+                                      45
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      48,
+                                      49
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              50,
+                              64
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      50,
+                                      60
+                                  ],
+                                  "type": "quoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      63,
+                                      64
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              66,
+                              81
+                          ],
+                          "type": "std_table",
+                          "children": [
+                              {
+                                  "slice": [
+                                      67,
+                                      80
+                                  ],
+                                  "type": "dotted_key",
+                                  "children": [
+                                      {
+                                          "slice": [
+                                              67,
+                                              72
+                                          ],
+                                          "type": "unquoted_key"
+                                      },
+                                      {
+                                          "slice": [
+                                              73,
+                                              80
+                                          ],
+                                          "type": "unquoted_key"
+                                      }
+                                  ]
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              82,
+                              91
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      82,
+                                      87
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      90,
+                                      91
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              92,
+                              111
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      92,
+                                      107
+                                  ],
+                                  "type": "quoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      110,
+                                      111
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "single-open-bracket",
+          "I": "[\n",
+          "E": "CutError: line 1:2, expect key"
+      },
+      {
+          "desc": "space",
+          "I": "\"a b\" = 1\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      10
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              9
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      5
+                                  ],
+                                  "type": "quoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      8,
+                                      9
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "space",
+          "I": "a b = 1\n",
+          "E": "CutError: line 1:1, expect end_of_input"
+      },
+      {
+          "desc": "special-character",
+          "I": "\u03bc = \"greek small letter mu\"\n",
+          "E": "CutError: line 1:1, expect end_of_input"
+      },
+      {
+          "desc": "special-chars",
+          "I": "\"~!@$^&*()_+-`1234567890[]|/?><.,;:'\" = 1\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      42
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              41
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      37
+                                  ],
+                                  "type": "quoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      40,
+                                      41
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "special-word",
+          "I": "false = false\ntrue = 1\ninf = 100000000\nnan = \"ceci n'est pas un nombre\"\n\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      73
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              13
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      5
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      8,
+                                      13
+                                  ],
+                                  "type": "boolean"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              14,
+                              22
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      14,
+                                      18
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      21,
+                                      22
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              23,
+                              38
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      23,
+                                      26
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      29,
+                                      38
+                                  ],
+                                  "type": "integer"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              39,
+                              71
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      39,
+                                      42
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      45,
+                                      71
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "start-bracket",
+          "I": "[a]\n[xyz = 5\n[b]\n",
+          "E": "CutError: line 2:6, expect std_table_close (char ']')"
+      },
+      {
+          "desc": "two-equals",
+          "I": "key= = 1\n",
+          "E": "CutError: line 1:6, expect val"
+      },
+      {
+          "desc": "two-equals2",
+          "I": "a==1\n",
+          "E": "CutError: line 1:3, expect val"
+      },
+      {
+          "desc": "two-equals3",
+          "I": "a=b=1\n",
+          "E": "CutError: line 1:3, expect val"
+      },
+      {
+          "desc": "without-value-1",
+          "I": "key\n",
+          "E": "CutError: line 1:1, expect end_of_input"
+      },
+      {
+          "desc": "without-value-2",
+          "I": "key = \n",
+          "E": "CutError: line 1:7, expect val"
+      }
+  ]

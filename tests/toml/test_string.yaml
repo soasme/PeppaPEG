@@ -1,0 +1,1861 @@
+- desc: "String"
+  grammar_file: "../../configs/toml-v1.0.peg"
+  entry: "toml"
+  tests: [
+      {
+          "desc": "bad-byte-escape",
+          "I": "naughty = \"\\xAg\"\n",
+          "E": "CutError: line 1:11, expect val"
+      },
+      {
+          "desc": "bad-concat",
+          "I": "no_concat = \"first\" \"second\"\n",
+          "E": "CutError: line 1:21, expect end_of_input"
+      },
+      {
+          "desc": "bad-escape",
+          "I": "invalid-escape = \"This string has a bad \\a escape character.\"\n",
+          "E": "CutError: line 1:18, expect val"
+      },
+      {
+          "desc": "bad-multiline",
+          "I": "multi = \"first line\nsecond line\"\n",
+          "E": "CutError: line 1:9, expect val"
+      },
+      {
+          "desc": "bad-slash-escape",
+          "I": "invalid-escape = \"This string has a bad \\/ escape character.\"\n",
+          "E": "CutError: line 1:18, expect val"
+      },
+      {
+          "desc": "bad-uni-esc",
+          "I": "str = \"val\\ue\"\n",
+          "E": "CutError: line 1:7, expect val"
+      },
+      {
+          "desc": "basic-byte-escapes",
+          "I": "answer = \"\\x33\"\n",
+          "E": "CutError: line 1:10, expect val"
+      },
+      {
+          "desc": "basic-multiline-quotes",
+          "I": "str5 = \"\"\"Here are three quotation marks: \"\"\".\"\"\"\n",
+          "E": "CutError: line 1:46, expect end_of_input"
+      },
+      {
+          "desc": "basic-multiline-unknown-escape",
+          "I": "a = \"\"\"\\@\"\"\"\n",
+          "E": "CutError: line 1:8, expect ml_basic_string (insufficient repetitions)"
+      },
+      {
+          "desc": "basic-unknown-escape",
+          "I": "a = \"\\@\"\n",
+          "E": "CutError: line 1:5, expect val"
+      },
+      {
+          "desc": "double-quote-escape",
+          "I": "test = \"\\\"one\\\"\"\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      17
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              16
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      4
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      7,
+                                      16
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "empty",
+          "I": "answer = \"\"\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      12
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              11
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      6
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      9,
+                                      11
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "escape-tricky",
+          "I": "end_esc = \"String does not end here\\\" but ends here\\\\\"\nlit_end_esc = 'String ends here\\'\n\nmultiline_unicode = \"\"\"\n\\u00a0\"\"\"\n\nmultiline_not_unicode = \"\"\"\n\\\\u0041\"\"\"\n\nmultiline_end_esc = \"\"\"When will it end? \\\"\"\"...\"\"\\\" should be here\\\"\"\"\"\n\nlit_multiline_not_unicode = '''\n\\u007f'''\n\nlit_multiline_end = '''There is no escape\\'''\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      328
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              54
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      7
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      10,
+                                      54
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              55,
+                              88
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      55,
+                                      66
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      69,
+                                      88
+                                  ],
+                                  "type": "literal_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              90,
+                              123
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      90,
+                                      107
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      110,
+                                      123
+                                  ],
+                                  "type": "ml_basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              125,
+                              163
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      125,
+                                      146
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      149,
+                                      163
+                                  ],
+                                  "type": "ml_basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              165,
+                              237
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      165,
+                                      182
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      185,
+                                      237
+                                  ],
+                                  "type": "ml_basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              239,
+                              280
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      239,
+                                      264
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      267,
+                                      280
+                                  ],
+                                  "type": "ml_literal_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              282,
+                              327
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      282,
+                                      299
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      302,
+                                      327
+                                  ],
+                                  "type": "ml_literal_string"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "escaped-escape",
+          "I": "answer = \"\\\\x64\"\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      17
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              16
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      6
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      9,
+                                      16
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "escapes",
+          "I": "backspace = \"This string has a \\b backspace character.\"\ntab = \"This string has a \\t tab character.\"\nnewline = \"This string has a \\n new line character.\"\nformfeed = \"This string has a \\f form feed character.\"\ncarriage = \"This string has a \\r carriage return character.\"\nquote = \"This string has a \\\" quote character.\"\nbackslash = \"This string has a \\\\ backslash character.\"\nnotunicode1 = \"This string does not have a unicode \\\\u escape.\"\nnotunicode2 = \"This string does not have a unicode \\u005Cu escape.\"\nnotunicode3 = \"This string does not have a unicode \\\\u0075 escape.\"\nnotunicode4 = \"This string does not have a unicode \\\\\\u0075 escape.\"\ndelete = \"This string has a \\u007F delete control code.\"\nunitseparator = \"This string has a \\u001F unit separator control code.\"\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      771
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              55
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      9
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      12,
+                                      55
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              56,
+                              99
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      56,
+                                      59
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      62,
+                                      99
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              100,
+                              152
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      100,
+                                      107
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      110,
+                                      152
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              153,
+                              207
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      153,
+                                      161
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      164,
+                                      207
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              208,
+                              268
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      208,
+                                      216
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      219,
+                                      268
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              269,
+                              316
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      269,
+                                      274
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      277,
+                                      316
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              317,
+                              372
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      317,
+                                      326
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      329,
+                                      372
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              373,
+                              436
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      373,
+                                      384
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      387,
+                                      436
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              437,
+                              504
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      437,
+                                      448
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      451,
+                                      504
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              505,
+                              572
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      505,
+                                      516
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      519,
+                                      572
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              573,
+                              641
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      573,
+                                      584
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      587,
+                                      641
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              642,
+                              698
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      642,
+                                      648
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      651,
+                                      698
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              699,
+                              770
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      699,
+                                      712
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      715,
+                                      770
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "literal-multiline-quotes-1",
+          "I": "a = '''6 apostrophes: ''''''\n\n",
+          "E": "CutError: line 1:28, expect end_of_input"
+      },
+      {
+          "desc": "literal-multiline-quotes-2",
+          "I": "a = '''15 apostrophes: ''''''''''''''''''\n",
+          "E": "CutError: line 1:29, expect end_of_input"
+      },
+      {
+          "desc": "missing-quotes",
+          "I": "name = value\n",
+          "E": "CutError: line 1:8, expect val"
+      },
+      {
+          "desc": "multiline",
+          "I": "# NOTE: this file includes some literal tab characters.\n\nmultiline_empty_one = \"\"\"\"\"\"\nmultiline_empty_two = \"\"\"\n\"\"\"\nmultiline_empty_three = \"\"\"\\\n    \"\"\"\nmultiline_empty_four = \"\"\"\\\n   \\\n   \\  \n   \"\"\"\n\nequivalent_one = \"The quick brown fox jumps over the lazy dog.\"\nequivalent_two = \"\"\"\nThe quick brown \\\n\n\n  fox jumps over \\\n    the lazy dog.\"\"\"\n\nequivalent_three = \"\"\"\\\n       The quick brown \\\n       fox jumps over \\\n       the lazy dog.\\\n       \"\"\"\n\nwhitespace-after-bs = \"\"\"\\\n       The quick brown \\\n       fox jumps over \\   \n       the lazy dog.\\\t\n       \"\"\"\n\nno-space = \"\"\"a\\\n    b\"\"\"\n\nkeep-ws-before = \"\"\"a   \t\\\n   b\"\"\"\n\nescape-bs-1 = \"\"\"a \\\\\nb\"\"\"\n\nescape-bs-2 = \"\"\"a \\\\\\\nb\"\"\"\n\nescape-bs-3 = \"\"\"a \\\\\\\\\n  b\"\"\"\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      719
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              57,
+                              85
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      57,
+                                      76
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      79,
+                                      85
+                                  ],
+                                  "type": "ml_basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              86,
+                              115
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      86,
+                                      105
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      108,
+                                      115
+                                  ],
+                                  "type": "ml_basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              116,
+                              152
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      116,
+                                      137
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      140,
+                                      152
+                                  ],
+                                  "type": "ml_basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              153,
+                              199
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      153,
+                                      173
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      176,
+                                      199
+                                  ],
+                                  "type": "ml_basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              201,
+                              264
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      201,
+                                      215
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      218,
+                                      264
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              265,
+                              345
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      265,
+                                      279
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      282,
+                                      345
+                                  ],
+                                  "type": "ml_basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              347,
+                              452
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      347,
+                                      363
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      366,
+                                      452
+                                  ],
+                                  "type": "ml_basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              454,
+                              566
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      454,
+                                      473
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      476,
+                                      566
+                                  ],
+                                  "type": "ml_basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              568,
+                              593
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      568,
+                                      576
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      579,
+                                      593
+                                  ],
+                                  "type": "ml_basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              595,
+                              629
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      595,
+                                      609
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      612,
+                                      629
+                                  ],
+                                  "type": "ml_basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              631,
+                              657
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      631,
+                                      642
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      645,
+                                      657
+                                  ],
+                                  "type": "ml_basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              659,
+                              686
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      659,
+                                      670
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      673,
+                                      686
+                                  ],
+                                  "type": "ml_basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              688,
+                              718
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      688,
+                                      699
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      702,
+                                      718
+                                  ],
+                                  "type": "ml_basic_string"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "multiline-escape-space",
+          "I": "a = \"\"\"\n  foo \\ \\n\n  bar\"\"\"\n",
+          "E": "CutError: line 2:7, expect ml_basic_string (insufficient repetitions)"
+      },
+      {
+          "desc": "multiline-no-close",
+          "I": "invalid = \"\"\"\n    this will fail\n",
+          "E": "CutError: line 3:1, expect ml_basic_string (insufficient repetitions)"
+      },
+      {
+          "desc": "multiline-no-close-2",
+          "I": "x=\"\"\"\n",
+          "E": "CutError: line 2:1, expect ml_basic_string (insufficient repetitions)"
+      },
+      {
+          "desc": "multiline-quotes",
+          "I": "# Make sure that quotes inside multiline strings are allowed, including right\n# after the opening '''/\"\"\" and before the closing '''/\"\"\"\n\nlit_one = ''''one quote''''\nlit_two = '''''two quotes'''''\nlit_one_space = ''' 'one quote' '''\nlit_two_space = ''' ''two quotes'' '''\n\none = \"\"\"\"one quote\"\"\"\"\ntwo = \"\"\"\"\"two quotes\"\"\"\"\"\none_space = \"\"\" \"one quote\" \"\"\"\ntwo_space = \"\"\" \"\"two quotes\"\" \"\"\"\n\nmismatch1 = \"\"\"aaa'''bbb\"\"\"\nmismatch2 = '''aaa\"\"\"bbb'''\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      448
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              138,
+                              165
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      138,
+                                      145
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      148,
+                                      165
+                                  ],
+                                  "type": "ml_literal_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              166,
+                              196
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      166,
+                                      173
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      176,
+                                      196
+                                  ],
+                                  "type": "ml_literal_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              197,
+                              232
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      197,
+                                      210
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      213,
+                                      232
+                                  ],
+                                  "type": "ml_literal_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              233,
+                              271
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      233,
+                                      246
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      249,
+                                      271
+                                  ],
+                                  "type": "ml_literal_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              273,
+                              296
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      273,
+                                      276
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      279,
+                                      296
+                                  ],
+                                  "type": "ml_basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              297,
+                              323
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      297,
+                                      300
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      303,
+                                      323
+                                  ],
+                                  "type": "ml_basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              324,
+                              355
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      324,
+                                      333
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      336,
+                                      355
+                                  ],
+                                  "type": "ml_basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              356,
+                              390
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      356,
+                                      365
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      368,
+                                      390
+                                  ],
+                                  "type": "ml_basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              392,
+                              419
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      392,
+                                      401
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      404,
+                                      419
+                                  ],
+                                  "type": "ml_basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              420,
+                              447
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      420,
+                                      429
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      432,
+                                      447
+                                  ],
+                                  "type": "ml_literal_string"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "multiline-quotes-1",
+          "I": "a = \"\"\"6 quotes: \"\"\"\"\"\"\n",
+          "E": "CutError: line 1:23, expect end_of_input"
+      },
+      {
+          "desc": "multiline-quotes-2",
+          "I": "a = \"\"\"6 quotes: \"\"\"\"\"\"\n",
+          "E": "CutError: line 1:23, expect end_of_input"
+      },
+      {
+          "desc": "nl",
+          "I": "nl_mid = \"val\\nue\"\nnl_end = \"\"\"value\\n\"\"\"\n\nlit_nl_end = '''value\\n'''\nlit_nl_mid = 'val\\nue'\nlit_nl_uni = 'val\\ue'\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      115
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              18
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      6
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      9,
+                                      18
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              19,
+                              41
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      19,
+                                      25
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      28,
+                                      41
+                                  ],
+                                  "type": "ml_basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              43,
+                              69
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      43,
+                                      53
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      56,
+                                      69
+                                  ],
+                                  "type": "ml_literal_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              70,
+                              92
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      70,
+                                      80
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      83,
+                                      92
+                                  ],
+                                  "type": "literal_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              93,
+                              114
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      93,
+                                      103
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      106,
+                                      114
+                                  ],
+                                  "type": "literal_string"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "no-close",
+          "I": "no-ending-quote = \"One time, at band camp\n",
+          "E": "CutError: line 1:19, expect val"
+      },
+      {
+          "desc": "raw",
+          "I": "backspace = 'This string has a \\b backspace character.'\ntab = 'This string has a \\t tab character.'\nnewline = 'This string has a \\n new line character.'\nformfeed = 'This string has a \\f form feed character.'\ncarriage = 'This string has a \\r carriage return character.'\nslash = 'This string has a \\/ slash character.'\nbackslash = 'This string has a \\\\ backslash character.'\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      373
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              55
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      9
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      12,
+                                      55
+                                  ],
+                                  "type": "literal_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              56,
+                              99
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      56,
+                                      59
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      62,
+                                      99
+                                  ],
+                                  "type": "literal_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              100,
+                              152
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      100,
+                                      107
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      110,
+                                      152
+                                  ],
+                                  "type": "literal_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              153,
+                              207
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      153,
+                                      161
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      164,
+                                      207
+                                  ],
+                                  "type": "literal_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              208,
+                              268
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      208,
+                                      216
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      219,
+                                      268
+                                  ],
+                                  "type": "literal_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              269,
+                              316
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      269,
+                                      274
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      277,
+                                      316
+                                  ],
+                                  "type": "literal_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              317,
+                              372
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      317,
+                                      326
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      329,
+                                      372
+                                  ],
+                                  "type": "literal_string"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "raw-multiline",
+          "I": "oneline = '''This string has a ' quote character.'''\nfirstnl = '''\nThis string has a ' quote character.'''\nmultiline = '''\nThis string\nhas ' a quote character\nand more than\none newline\nin it.'''\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      195
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              52
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      7
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      10,
+                                      52
+                                  ],
+                                  "type": "ml_literal_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              53,
+                              106
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      53,
+                                      60
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      63,
+                                      106
+                                  ],
+                                  "type": "ml_literal_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              107,
+                              194
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      107,
+                                      116
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      119,
+                                      194
+                                  ],
+                                  "type": "ml_literal_string"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "simple",
+          "I": "answer = \"You are not drinking enough whisky.\"\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      47
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              46
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      6
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      9,
+                                      46
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "text-after-string",
+          "I": "string = \"Is there life after strings?\" No.\n",
+          "E": "CutError: line 1:41, expect end_of_input"
+      },
+      {
+          "desc": "unicode-escape",
+          "I": "answer4 = \"\\u03B4\"\nanswer8 = \"\\U000003B4\"\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      42
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              18
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      7
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      10,
+                                      18
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              19,
+                              41
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      19,
+                                      26
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      29,
+                                      41
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "unicode-literal",
+          "I": "answer = \"\u03b4\"\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      14
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              13
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      6
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      9,
+                                      13
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "with-pound",
+          "I": "pound = \"We see no # comments here.\"\npoundcomment = \"But there are # some comments here.\" # Did I # mess you up?\n",
+          "O": [
+              {
+                  "slice": [
+                      0,
+                      113
+                  ],
+                  "type": "toml",
+                  "children": [
+                      {
+                          "slice": [
+                              0,
+                              36
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      0,
+                                      5
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      8,
+                                      36
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      },
+                      {
+                          "slice": [
+                              37,
+                              89
+                          ],
+                          "type": "keyval",
+                          "children": [
+                              {
+                                  "slice": [
+                                      37,
+                                      49
+                                  ],
+                                  "type": "unquoted_key"
+                              },
+                              {
+                                  "slice": [
+                                      52,
+                                      89
+                                  ],
+                                  "type": "basic_string"
+                              }
+                          ]
+                      }
+                  ]
+              }
+          ]
+      },
+      {
+          "desc": "wrong-close",
+          "I": "bad-ending-quote = \"double and single'\n",
+          "E": "CutError: line 1:20, expect val"
+      }
+  ]

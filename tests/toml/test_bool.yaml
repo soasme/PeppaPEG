@@ -1,0 +1,81 @@
+- desc: "Array"
+  grammar_file: "../../configs/toml-v1.0.peg"
+  entry: "toml"
+  tests: [
+      {
+        "desc": "bool",
+        "I": "t = true\nf = false\n",
+        "O": [
+            {
+                "slice": [
+                    0,
+                    19
+                ],
+                "type": "toml",
+                "children": [
+                    {
+                        "slice": [
+                            0,
+                            8
+                        ],
+                        "type": "keyval",
+                        "children": [
+                            {
+                                "slice": [
+                                    0,
+                                    1
+                                ],
+                                "type": "unquoted_key"
+                            },
+                            {
+                                "slice": [
+                                    4,
+                                    8
+                                ],
+                                "type": "boolean"
+                            }
+                        ]
+                    },
+                    {
+                        "slice": [
+                            9,
+                            18
+                        ],
+                        "type": "keyval",
+                        "children": [
+                            {
+                                "slice": [
+                                    9,
+                                    10
+                                ],
+                                "type": "unquoted_key"
+                            },
+                            {
+                                "slice": [
+                                    13,
+                                    18
+                                ],
+                                "type": "boolean"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "desc": "mixed-case",
+        "I": "valid = False\n",
+        "E": "CutError: line 1:9, expect val"
+    },
+    {
+        "desc": "wrong-case-false",
+        "I": "b = FALSE\n",
+        "E": "CutError: line 1:5, expect val"
+    },
+    {
+        "desc": "wrong-case-true",
+        "I": "a = TRUE\n",
+        "E": "CutError: line 1:5, expect val"
+    }
+  ]

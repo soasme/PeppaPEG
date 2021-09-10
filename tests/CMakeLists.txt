@@ -85,13 +85,23 @@ set(
     test_comment_spec.json
     test_flags_spec.json
     test_peppa_spec.json
-    test_toml_v1_0_spec.json
     test_golang_v1_17_spec.json
     hcl2/test_expression_heredoc+unistr.yaml
     hcl2/test_expression_operator+unistr.yaml
     hcl2/test_expression_primitive+unistr.yaml
     hcl2/test_structure_attribute+unistr.yaml
     hcl2/test_structure_block+unistr.yaml
+    toml/test_array.yaml
+    toml/test_bool.yaml
+    toml/test_comment.yaml
+    toml/test_control.yaml
+    toml/test_datetime.yaml
+    toml/test_float.yaml
+    toml/test_inline_table.yaml
+    toml/test_integer.yaml
+    toml/test_key.yaml
+    toml/test_string.yaml
+    toml/test_table.yaml
 )
 
 find_program(PYTHON python3)

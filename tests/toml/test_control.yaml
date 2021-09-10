@@ -1,0 +1,100 @@
+- desc: "Control"
+  grammar_file: "../../configs/toml-v1.0.peg"
+  entry: "toml"
+  tests: [
+    {
+        "desc": "comment-lf",
+        "I": "comment-lf = \"ctrl-P\" # \u0010\n",
+        "E": "CutError: line 1:25, expect end_of_input"
+    },
+    {
+        "desc": "comment-us",
+        "I": "comment-us = \"ctrl-_\" # \u001f\n",
+        "E": "CutError: line 1:25, expect end_of_input"
+    },
+    {
+        "desc": "multi-del",
+        "I": "multi-del = \"\"\"null\u007f\"\"\"\n",
+        "E": "CutError: line 1:20, expect ml_basic_string (insufficient repetitions)"
+    },
+    {
+        "desc": "multi-lf",
+        "I": "multi-lf = \"\"\"null\u0010\"\"\"\n",
+        "E": "CutError: line 1:19, expect ml_basic_string (insufficient repetitions)"
+    },
+    {
+        "desc": "multi-null",
+        "I": "multi-null = \"\"\"null\u0000\"\"\"\n",
+        "E": "CutError: line 1:21, expect ml_basic_string (insufficient repetitions)"
+    },
+    {
+        "desc": "multi-us",
+        "I": "multi-us = \"\"\"null\u001f\"\"\"\n",
+        "E": "CutError: line 1:19, expect ml_basic_string (insufficient repetitions)"
+    },
+    {
+        "desc": "rawmulti-del",
+        "I": "rawmulti-del = '''null\u007f'''\n",
+        "E": "CutError: line 1:23, expect ml_literal_string (insufficient repetitions)"
+    },
+    {
+        "desc": "rawmulti-lf",
+        "I": "rawmulti-lf = '''null\u0010'''\n",
+        "E": "CutError: line 1:22, expect ml_literal_string (insufficient repetitions)"
+    },
+    {
+        "desc": "rawmulti-null",
+        "I": "rawmulti-null = '''null\u0000'''\n",
+        "E": "CutError: line 1:24, expect ml_literal_string (insufficient repetitions)"
+    },
+    {
+        "desc": "rawmulti-us",
+        "I": "rawmulti-us = '''null\u001f'''\n",
+        "E": "CutError: line 1:22, expect ml_literal_string (insufficient repetitions)"
+    },
+    {
+        "desc": "rawstring-del",
+        "I": "rawstring-del = 'null\u007f'\n",
+        "E": "CutError: line 1:17, expect val"
+    },
+    {
+        "desc": "rawstring-lf",
+        "I": "rawstring-lf = 'null\u0010'\n",
+        "E": "CutError: line 1:16, expect val"
+    },
+    {
+        "desc": "rawstring-null",
+        "I": "rawstring-null = 'null\u0000'\n",
+        "E": "CutError: line 1:18, expect val"
+    },
+    {
+        "desc": "rawstring-us",
+        "I": "rawstring-us = 'null\u001f'\n",
+        "E": "CutError: line 1:16, expect val"
+    },
+    {
+        "desc": "string-bs",
+        "I": "string-bs = \"backspace\b\"\n",
+        "E": "CutError: line 1:13, expect val"
+    },
+    {
+        "desc": "string-del",
+        "I": "string-del = \"null\u007f\"\n",
+        "E": "CutError: line 1:14, expect val"
+    },
+    {
+        "desc": "string-lf",
+        "I": "string-lf = \"null\u0010\"\n",
+        "E": "CutError: line 1:13, expect val"
+    },
+    {
+        "desc": "string-null",
+        "I": "string-null = \"null\u0000\"\n",
+        "E": "CutError: line 1:15, expect val"
+    },
+    {
+        "desc": "string-us",
+        "I": "string-us = \"null\u001f\"\n",
+        "E": "CutError: line 1:13, expect val"
+    }
+  ]

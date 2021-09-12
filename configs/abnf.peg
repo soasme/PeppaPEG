@@ -1,0 +1,150 @@
+# Peppa PEG -  Ultra lightweight PEG Parser in ANSI C.
+#
+# MIT License
+#
+# Copyright (c) 2021 Ju
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+# @file       abnf.peg
+# @brief      A complete grammar for ABNF (RFC 5234) <http://tools.ietf.org/html/rfc5234>.
+# @author     Ju Lin
+# @copyright  MIT
+# @date       2021
+# @see        https://github.com/soasme/PeppaPEG
+
+# 4. ABNF
+
+RuleList = &. (Rule / (CWsp* CNl))+ EOF;
+EOF = !.;
+
+Rule = RuleName ~ DefinedAs Elements CNl;
+
+@squashed
+RuleName = ALPHA (ALPHA / DIGIT / "-")*;
+
+@lifted
+DefinedAs = CWsp* ("=/" / "=") CWsp*;
+
+@lifted
+Elements = Alternation CWsp*;
+
+@lifted @squashed
+CWsp = WSP / CNl WSP;
+
+@lifted @squashed
+CNl = Comment / CRLF / LF;
+
+@lifted @squashed
+Comment = ";" ~ (WSP / VCHAR)* (CRLF / LF / EOF);
+
+@nonterminal
+Alternation = Concatenation (CWsp* "/" CWsp* Concatenation)*;
+
+@nonterminal
+Concatenation = Repetition (CWsp+ Repetition)*;
+
+@nonterminal
+Repetition = Repeat? Element;
+
+Repeat = (MinOccurance "*" MaxOccurance) / Occurance;
+
+@squashed
+MinOccurance = DIGIT*;
+@squashed
+MaxOccurance = DIGIT*;
+@squashed
+Occurance = DIGIT+;
+
+@lifted
+Element = RuleName / Group / Option / CharVal / NumVal / ProseVal;
+
+@lifted
+Group = "(" ~ CWsp* Alternation CWsp* ")";
+
+Option = "[" ~ CWsp* Alternation CWsp* "]";
+
+# quoted string of SP and VCHAR without DQUOTE
+@squashed
+CharVal = DQUOTE ([\x20-\x21] / [\x23-\x7e])* DQUOTE;
+
+@lifted
+NumVal = "%" ~ ("b" ~ BinVal / "d" ~ DecVal / "x" ~ HexVal);
+
+@squashed
+BinVal = BIT+ (("." BIT+)+ / ("-" BIT+))?;
+
+@squashed
+DecVal = DIGIT+ (("." DIGIT+)+ / ("-" DIGIT+))?;
+
+@squashed
+HexVal = HEXDIG+ (("." HEXDIG+)+ / ("-" HEXDIG+))?;
+
+@lifted
+ProseVal = "<" ~ ProseRuleName ">";
+
+@squashed
+ProseRuleName = ([\x20-\x3d] / [\x3f-\x7e])*;
+
+# B.1 Core Rules
+
+ALPHA = [a-z] / [A-Z];
+
+BIT = "0" / "1";
+
+# any 7-bit US-ASCII character, excluding NUL
+CHAR = [\x01-\x7f];
+
+# carriage return
+CR = "\x0d";
+
+# Internet standard newline
+@squashed
+CRLF = CR LF;
+
+# controls
+CTL = [\x01-\x1f] / "\x7f";
+
+DIGIT = [0-9];
+
+# double quote
+DQUOTE = "\x22";
+
+HEXDIG = [0-9] / [A-F];
+
+# horizontal tab
+HTAB = "\x09";
+
+# linefeed
+LF = "\x0a";
+
+# linear-white-space
+@squashed
+LWSP = (WSP / CRLF WSP / LF WSP);
+
+# 8 bits of data
+OCTET = [\x01-\xff];
+
+SP = "\x20";
+
+# visible (printing) characters
+VCHAR = [\x21-\x7e];
+
+# white space
+WSP = SP / HTAB;

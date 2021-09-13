@@ -66,7 +66,6 @@
 - [ ] api: Sanitize `\0` to whitespace for the source input, this happens in creating the source/setting the source size. Example: Python Parser.
 - [ ] api: support UTF-8 BOM sequence (0xEF 0xBB 0xBF) at the start of source. can be done via unistring: P4_LoadSource, if s startswith these three byte marks, add pseudo slice.
 - [ ] api: register a function for matching source. This should help dealing with some inputs difficult to parse.
-- [ ] api: add `expect_rule_id`, instead of saving `errmsg`.
 - [ ] peg: numeric.
 - [ ] peg: panic.
 - [ ] peg: rule template.
@@ -91,6 +90,7 @@
 - [ ] peg: support Python-style INDENT rule.
 - [ ] api: print grammar and/or rules.
 - [ ] refactor: move some variables to `frame` to reduce function frame size.
+- [x] api: add `expect_rule_id`, instead of saving `errmsg`.
 - [x] shell: `peppa ast` -> `peppa parse`. v1.16.0
 - [x] perf: only track backrefs if sequence has backref as member. v1.16.0
 - [x] perf: Cache literal len or use better string structure internally. v1.16.0

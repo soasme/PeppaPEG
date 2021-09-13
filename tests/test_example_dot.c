@@ -9,12 +9,15 @@
     P4_Source* source = P4_CreateSource((input), (entry)); \
     TEST_ASSERT_EQUAL_MESSAGE((code), P4_Parse(grammar, source), "unexpected parse grammar return code"); \
     P4_Node* root = P4_GetSourceAst(source); \
-    FILE *f = fopen("check.json","w"); \
+    char filename[30] = {0};\
+    sprintf(filename, "test-example-dot-%d.json", __LINE__); \
+    FILE *f = fopen(filename,"w"); \
     P4_JsonifySourceAst(f, root, NULL); \
     fclose(f); \
-    P4_String s = read_file("check.json"); \
+    P4_String s = read_file(filename); \
     TEST_ASSERT_EQUAL_STRING((output), s); \
     free(s); \
+    remove(filename); \
     P4_DeleteSource(source); \
     P4_DeleteGrammar(grammar); \
 } while (0);

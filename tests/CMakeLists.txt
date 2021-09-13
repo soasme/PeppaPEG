@@ -103,6 +103,7 @@ set(
     toml/test_key.yaml
     toml/test_string.yaml
     toml/test_table.yaml
+    abnf/test_rfc5234.yaml
 )
 
 find_program(PYTHON python3)

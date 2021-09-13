@@ -1,0 +1,2081 @@
+- desc: "RFC 5234"
+  grammar_file: "../../configs/abnf.peg"
+  entry: "RuleList"
+  tests:
+    - I: |
+        rulelist       =  1*( rule / (*c-wsp c-nl) )
+
+        rule           =  rulename defined-as elements c-nl
+                        ; continues if next line starts
+                        ;  with white space
+
+        rulename       =  ALPHA *(ALPHA / DIGIT / "-")
+
+        defined-as     =  *c-wsp ("=" / "=/") *c-wsp
+                                        ; basic rules definition and
+                                        ;  incremental alternatives
+
+        elements       =  alternation *c-wsp
+
+        c-wsp          =  WSP / (c-nl WSP)
+
+        c-nl           =  comment / CRLF
+                            ; comment or newline
+
+        comment        =  ";" *(WSP / VCHAR) CRLF
+
+        alternation    =  concatenation
+                        *(*c-wsp "/" *c-wsp concatenation)
+
+        concatenation  =  repetition *(1*c-wsp repetition)
+
+        repetition     =  [repeat] element
+
+        repeat         =  1*DIGIT / (*DIGIT "*" *DIGIT)
+
+        element        =  rulename / group / option /
+                        char-val / num-val / prose-val
+
+        group          =  "(" *c-wsp alternation *c-wsp ")"
+
+        option         =  "[" *c-wsp alternation *c-wsp "]"
+
+        char-val       =  DQUOTE *(%x20-21 / %x23-7E) DQUOTE
+                            ; quoted string of SP and VCHAR
+                            ;  without DQUOTE
+
+        num-val        =  "%" (bin-val / dec-val / hex-val)
+
+        bin-val        =  "b" 1*BIT
+                        [ 1*("." 1*BIT) / ("-" 1*BIT) ]
+                            ; series of concatenated bit values
+                            ;  or single ONEOF range
+
+        dec-val        =  "d" 1*DIGIT
+                        [ 1*("." 1*DIGIT) / ("-" 1*DIGIT) ]
+
+        hex-val        =  "x" 1*HEXDIG
+                        [ 1*("." 1*HEXDIG) / ("-" 1*HEXDIG) ]
+
+        prose-val      =  "<" *(%x20-3D / %x3F-7E) ">"
+                            ; bracketed string of SP and VCHAR
+                            ;  without angles
+                            ; prose description, to be used as
+                            ;  last resort
+      O: [
+        {
+          "slice": [
+            0,
+            1785
+          ],
+          "type": "RuleList",
+          "children": [
+            {
+              "slice": [
+                0,
+                45
+              ],
+              "type": "Rule",
+              "children": [
+                {
+                  "slice": [
+                    0,
+                    8
+                  ],
+                  "type": "RuleName"
+                },
+                {
+                  "slice": [
+                    18,
+                    44
+                  ],
+                  "type": "Repetition",
+                  "children": [
+                    {
+                      "slice": [
+                        18,
+                        20
+                      ],
+                      "type": "Repeat",
+                      "children": [
+                        {
+                          "slice": [
+                            18,
+                            19
+                          ],
+                          "type": "MinOccurance"
+                        }
+                      ]
+                    },
+                    {
+                      "slice": [
+                        22,
+                        42
+                      ],
+                      "type": "Alternation",
+                      "children": [
+                        {
+                          "slice": [
+                            22,
+                            26
+                          ],
+                          "type": "RuleName"
+                        },
+                        {
+                          "slice": [
+                            30,
+                            41
+                          ],
+                          "type": "Concatenation",
+                          "children": [
+                            {
+                              "slice": [
+                                30,
+                                36
+                              ],
+                              "type": "Repetition",
+                              "children": [
+                                {
+                                  "slice": [
+                                    30,
+                                    31
+                                  ],
+                                  "type": "Repeat"
+                                },
+                                {
+                                  "slice": [
+                                    31,
+                                    36
+                                  ],
+                                  "type": "RuleName"
+                                }
+                              ]
+                            },
+                            {
+                              "slice": [
+                                37,
+                                41
+                              ],
+                              "type": "RuleName"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "slice": [
+                46,
+                182
+              ],
+              "type": "Rule",
+              "children": [
+                {
+                  "slice": [
+                    46,
+                    50
+                  ],
+                  "type": "RuleName"
+                },
+                {
+                  "slice": [
+                    64,
+                    97
+                  ],
+                  "type": "Concatenation",
+                  "children": [
+                    {
+                      "slice": [
+                        64,
+                        72
+                      ],
+                      "type": "RuleName"
+                    },
+                    {
+                      "slice": [
+                        73,
+                        83
+                      ],
+                      "type": "RuleName"
+                    },
+                    {
+                      "slice": [
+                        84,
+                        92
+                      ],
+                      "type": "RuleName"
+                    },
+                    {
+                      "slice": [
+                        93,
+                        97
+                      ],
+                      "type": "RuleName"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "slice": [
+                183,
+                230
+              ],
+              "type": "Rule",
+              "children": [
+                {
+                  "slice": [
+                    183,
+                    191
+                  ],
+                  "type": "RuleName"
+                },
+                {
+                  "slice": [
+                    201,
+                    229
+                  ],
+                  "type": "Concatenation",
+                  "children": [
+                    {
+                      "slice": [
+                        201,
+                        206
+                      ],
+                      "type": "RuleName"
+                    },
+                    {
+                      "slice": [
+                        207,
+                        229
+                      ],
+                      "type": "Repetition",
+                      "children": [
+                        {
+                          "slice": [
+                            207,
+                            208
+                          ],
+                          "type": "Repeat"
+                        },
+                        {
+                          "slice": [
+                            209,
+                            228
+                          ],
+                          "type": "Alternation",
+                          "children": [
+                            {
+                              "slice": [
+                                209,
+                                214
+                              ],
+                              "type": "RuleName"
+                            },
+                            {
+                              "slice": [
+                                217,
+                                222
+                              ],
+                              "type": "RuleName"
+                            },
+                            {
+                              "slice": [
+                                225,
+                                228
+                              ],
+                              "type": "CharVal"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "slice": [
+                231,
+                397
+              ],
+              "type": "Rule",
+              "children": [
+                {
+                  "slice": [
+                    231,
+                    241
+                  ],
+                  "type": "RuleName"
+                },
+                {
+                  "slice": [
+                    249,
+                    275
+                  ],
+                  "type": "Concatenation",
+                  "children": [
+                    {
+                      "slice": [
+                        249,
+                        255
+                      ],
+                      "type": "Repetition",
+                      "children": [
+                        {
+                          "slice": [
+                            249,
+                            250
+                          ],
+                          "type": "Repeat"
+                        },
+                        {
+                          "slice": [
+                            250,
+                            255
+                          ],
+                          "type": "RuleName"
+                        }
+                      ]
+                    },
+                    {
+                      "slice": [
+                        257,
+                        267
+                      ],
+                      "type": "Alternation",
+                      "children": [
+                        {
+                          "slice": [
+                            257,
+                            260
+                          ],
+                          "type": "CharVal"
+                        },
+                        {
+                          "slice": [
+                            263,
+                            267
+                          ],
+                          "type": "CharVal"
+                        }
+                      ]
+                    },
+                    {
+                      "slice": [
+                        269,
+                        275
+                      ],
+                      "type": "Repetition",
+                      "children": [
+                        {
+                          "slice": [
+                            269,
+                            270
+                          ],
+                          "type": "Repeat"
+                        },
+                        {
+                          "slice": [
+                            270,
+                            275
+                          ],
+                          "type": "RuleName"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "slice": [
+                398,
+                435
+              ],
+              "type": "Rule",
+              "children": [
+                {
+                  "slice": [
+                    398,
+                    406
+                  ],
+                  "type": "RuleName"
+                },
+                {
+                  "slice": [
+                    416,
+                    434
+                  ],
+                  "type": "Concatenation",
+                  "children": [
+                    {
+                      "slice": [
+                        416,
+                        427
+                      ],
+                      "type": "RuleName"
+                    },
+                    {
+                      "slice": [
+                        428,
+                        434
+                      ],
+                      "type": "Repetition",
+                      "children": [
+                        {
+                          "slice": [
+                            428,
+                            429
+                          ],
+                          "type": "Repeat"
+                        },
+                        {
+                          "slice": [
+                            429,
+                            434
+                          ],
+                          "type": "RuleName"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "slice": [
+                436,
+                471
+              ],
+              "type": "Rule",
+              "children": [
+                {
+                  "slice": [
+                    436,
+                    441
+                  ],
+                  "type": "RuleName"
+                },
+                {
+                  "slice": [
+                    454,
+                    470
+                  ],
+                  "type": "Alternation",
+                  "children": [
+                    {
+                      "slice": [
+                        454,
+                        457
+                      ],
+                      "type": "RuleName"
+                    },
+                    {
+                      "slice": [
+                        461,
+                        469
+                      ],
+                      "type": "Concatenation",
+                      "children": [
+                        {
+                          "slice": [
+                            461,
+                            465
+                          ],
+                          "type": "RuleName"
+                        },
+                        {
+                          "slice": [
+                            466,
+                            469
+                          ],
+                          "type": "RuleName"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "slice": [
+                472,
+                546
+              ],
+              "type": "Rule",
+              "children": [
+                {
+                  "slice": [
+                    472,
+                    476
+                  ],
+                  "type": "RuleName"
+                },
+                {
+                  "slice": [
+                    490,
+                    504
+                  ],
+                  "type": "Alternation",
+                  "children": [
+                    {
+                      "slice": [
+                        490,
+                        497
+                      ],
+                      "type": "RuleName"
+                    },
+                    {
+                      "slice": [
+                        500,
+                        504
+                      ],
+                      "type": "RuleName"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "slice": [
+                547,
+                589
+              ],
+              "type": "Rule",
+              "children": [
+                {
+                  "slice": [
+                    547,
+                    554
+                  ],
+                  "type": "RuleName"
+                },
+                {
+                  "slice": [
+                    565,
+                    588
+                  ],
+                  "type": "Concatenation",
+                  "children": [
+                    {
+                      "slice": [
+                        565,
+                        568
+                      ],
+                      "type": "CharVal"
+                    },
+                    {
+                      "slice": [
+                        569,
+                        583
+                      ],
+                      "type": "Repetition",
+                      "children": [
+                        {
+                          "slice": [
+                            569,
+                            570
+                          ],
+                          "type": "Repeat"
+                        },
+                        {
+                          "slice": [
+                            571,
+                            582
+                          ],
+                          "type": "Alternation",
+                          "children": [
+                            {
+                              "slice": [
+                                571,
+                                574
+                              ],
+                              "type": "RuleName"
+                            },
+                            {
+                              "slice": [
+                                577,
+                                582
+                              ],
+                              "type": "RuleName"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "slice": [
+                        584,
+                        588
+                      ],
+                      "type": "RuleName"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "slice": [
+                590,
+                673
+              ],
+              "type": "Rule",
+              "children": [
+                {
+                  "slice": [
+                    590,
+                    601
+                  ],
+                  "type": "RuleName"
+                },
+                {
+                  "slice": [
+                    608,
+                    672
+                  ],
+                  "type": "Concatenation",
+                  "children": [
+                    {
+                      "slice": [
+                        608,
+                        621
+                      ],
+                      "type": "RuleName"
+                    },
+                    {
+                      "slice": [
+                        638,
+                        672
+                      ],
+                      "type": "Repetition",
+                      "children": [
+                        {
+                          "slice": [
+                            638,
+                            639
+                          ],
+                          "type": "Repeat"
+                        },
+                        {
+                          "slice": [
+                            640,
+                            671
+                          ],
+                          "type": "Concatenation",
+                          "children": [
+                            {
+                              "slice": [
+                                640,
+                                646
+                              ],
+                              "type": "Repetition",
+                              "children": [
+                                {
+                                  "slice": [
+                                    640,
+                                    641
+                                  ],
+                                  "type": "Repeat"
+                                },
+                                {
+                                  "slice": [
+                                    641,
+                                    646
+                                  ],
+                                  "type": "RuleName"
+                                }
+                              ]
+                            },
+                            {
+                              "slice": [
+                                647,
+                                650
+                              ],
+                              "type": "CharVal"
+                            },
+                            {
+                              "slice": [
+                                651,
+                                657
+                              ],
+                              "type": "Repetition",
+                              "children": [
+                                {
+                                  "slice": [
+                                    651,
+                                    652
+                                  ],
+                                  "type": "Repeat"
+                                },
+                                {
+                                  "slice": [
+                                    652,
+                                    657
+                                  ],
+                                  "type": "RuleName"
+                                }
+                              ]
+                            },
+                            {
+                              "slice": [
+                                658,
+                                671
+                              ],
+                              "type": "RuleName"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "slice": [
+                674,
+                725
+              ],
+              "type": "Rule",
+              "children": [
+                {
+                  "slice": [
+                    674,
+                    687
+                  ],
+                  "type": "RuleName"
+                },
+                {
+                  "slice": [
+                    692,
+                    724
+                  ],
+                  "type": "Concatenation",
+                  "children": [
+                    {
+                      "slice": [
+                        692,
+                        702
+                      ],
+                      "type": "RuleName"
+                    },
+                    {
+                      "slice": [
+                        703,
+                        724
+                      ],
+                      "type": "Repetition",
+                      "children": [
+                        {
+                          "slice": [
+                            703,
+                            704
+                          ],
+                          "type": "Repeat"
+                        },
+                        {
+                          "slice": [
+                            705,
+                            723
+                          ],
+                          "type": "Concatenation",
+                          "children": [
+                            {
+                              "slice": [
+                                705,
+                                712
+                              ],
+                              "type": "Repetition",
+                              "children": [
+                                {
+                                  "slice": [
+                                    705,
+                                    707
+                                  ],
+                                  "type": "Repeat",
+                                  "children": [
+                                    {
+                                      "slice": [
+                                        705,
+                                        706
+                                      ],
+                                      "type": "MinOccurance"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "slice": [
+                                    707,
+                                    712
+                                  ],
+                                  "type": "RuleName"
+                                }
+                              ]
+                            },
+                            {
+                              "slice": [
+                                713,
+                                723
+                              ],
+                              "type": "RuleName"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "slice": [
+                726,
+                761
+              ],
+              "type": "Rule",
+              "children": [
+                {
+                  "slice": [
+                    726,
+                    736
+                  ],
+                  "type": "RuleName"
+                },
+                {
+                  "slice": [
+                    744,
+                    760
+                  ],
+                  "type": "Concatenation",
+                  "children": [
+                    {
+                      "slice": [
+                        744,
+                        752
+                      ],
+                      "type": "Option",
+                      "children": [
+                        {
+                          "slice": [
+                            745,
+                            751
+                          ],
+                          "type": "RuleName"
+                        }
+                      ]
+                    },
+                    {
+                      "slice": [
+                        753,
+                        760
+                      ],
+                      "type": "RuleName"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "slice": [
+                762,
+                810
+              ],
+              "type": "Rule",
+              "children": [
+                {
+                  "slice": [
+                    762,
+                    768
+                  ],
+                  "type": "RuleName"
+                },
+                {
+                  "slice": [
+                    780,
+                    809
+                  ],
+                  "type": "Alternation",
+                  "children": [
+                    {
+                      "slice": [
+                        780,
+                        787
+                      ],
+                      "type": "Repetition",
+                      "children": [
+                        {
+                          "slice": [
+                            780,
+                            782
+                          ],
+                          "type": "Repeat",
+                          "children": [
+                            {
+                              "slice": [
+                                780,
+                                781
+                              ],
+                              "type": "MinOccurance"
+                            }
+                          ]
+                        },
+                        {
+                          "slice": [
+                            782,
+                            787
+                          ],
+                          "type": "RuleName"
+                        }
+                      ]
+                    },
+                    {
+                      "slice": [
+                        791,
+                        808
+                      ],
+                      "type": "Concatenation",
+                      "children": [
+                        {
+                          "slice": [
+                            791,
+                            797
+                          ],
+                          "type": "Repetition",
+                          "children": [
+                            {
+                              "slice": [
+                                791,
+                                792
+                              ],
+                              "type": "Repeat"
+                            },
+                            {
+                              "slice": [
+                                792,
+                                797
+                              ],
+                              "type": "RuleName"
+                            }
+                          ]
+                        },
+                        {
+                          "slice": [
+                            798,
+                            801
+                          ],
+                          "type": "CharVal"
+                        },
+                        {
+                          "slice": [
+                            802,
+                            808
+                          ],
+                          "type": "Repetition",
+                          "children": [
+                            {
+                              "slice": [
+                                802,
+                                803
+                              ],
+                              "type": "Repeat"
+                            },
+                            {
+                              "slice": [
+                                803,
+                                808
+                              ],
+                              "type": "RuleName"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "slice": [
+                811,
+                904
+              ],
+              "type": "Rule",
+              "children": [
+                {
+                  "slice": [
+                    811,
+                    818
+                  ],
+                  "type": "RuleName"
+                },
+                {
+                  "slice": [
+                    829,
+                    903
+                  ],
+                  "type": "Alternation",
+                  "children": [
+                    {
+                      "slice": [
+                        829,
+                        837
+                      ],
+                      "type": "RuleName"
+                    },
+                    {
+                      "slice": [
+                        840,
+                        845
+                      ],
+                      "type": "RuleName"
+                    },
+                    {
+                      "slice": [
+                        848,
+                        854
+                      ],
+                      "type": "RuleName"
+                    },
+                    {
+                      "slice": [
+                        873,
+                        881
+                      ],
+                      "type": "RuleName"
+                    },
+                    {
+                      "slice": [
+                        884,
+                        891
+                      ],
+                      "type": "RuleName"
+                    },
+                    {
+                      "slice": [
+                        894,
+                        903
+                      ],
+                      "type": "RuleName"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "slice": [
+                905,
+                957
+              ],
+              "type": "Rule",
+              "children": [
+                {
+                  "slice": [
+                    905,
+                    910
+                  ],
+                  "type": "RuleName"
+                },
+                {
+                  "slice": [
+                    923,
+                    956
+                  ],
+                  "type": "Concatenation",
+                  "children": [
+                    {
+                      "slice": [
+                        923,
+                        926
+                      ],
+                      "type": "CharVal"
+                    },
+                    {
+                      "slice": [
+                        927,
+                        933
+                      ],
+                      "type": "Repetition",
+                      "children": [
+                        {
+                          "slice": [
+                            927,
+                            928
+                          ],
+                          "type": "Repeat"
+                        },
+                        {
+                          "slice": [
+                            928,
+                            933
+                          ],
+                          "type": "RuleName"
+                        }
+                      ]
+                    },
+                    {
+                      "slice": [
+                        934,
+                        945
+                      ],
+                      "type": "RuleName"
+                    },
+                    {
+                      "slice": [
+                        946,
+                        952
+                      ],
+                      "type": "Repetition",
+                      "children": [
+                        {
+                          "slice": [
+                            946,
+                            947
+                          ],
+                          "type": "Repeat"
+                        },
+                        {
+                          "slice": [
+                            947,
+                            952
+                          ],
+                          "type": "RuleName"
+                        }
+                      ]
+                    },
+                    {
+                      "slice": [
+                        953,
+                        956
+                      ],
+                      "type": "CharVal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "slice": [
+                958,
+                1010
+              ],
+              "type": "Rule",
+              "children": [
+                {
+                  "slice": [
+                    958,
+                    964
+                  ],
+                  "type": "RuleName"
+                },
+                {
+                  "slice": [
+                    976,
+                    1009
+                  ],
+                  "type": "Concatenation",
+                  "children": [
+                    {
+                      "slice": [
+                        976,
+                        979
+                      ],
+                      "type": "CharVal"
+                    },
+                    {
+                      "slice": [
+                        980,
+                        986
+                      ],
+                      "type": "Repetition",
+                      "children": [
+                        {
+                          "slice": [
+                            980,
+                            981
+                          ],
+                          "type": "Repeat"
+                        },
+                        {
+                          "slice": [
+                            981,
+                            986
+                          ],
+                          "type": "RuleName"
+                        }
+                      ]
+                    },
+                    {
+                      "slice": [
+                        987,
+                        998
+                      ],
+                      "type": "RuleName"
+                    },
+                    {
+                      "slice": [
+                        999,
+                        1005
+                      ],
+                      "type": "Repetition",
+                      "children": [
+                        {
+                          "slice": [
+                            999,
+                            1000
+                          ],
+                          "type": "Repeat"
+                        },
+                        {
+                          "slice": [
+                            1000,
+                            1005
+                          ],
+                          "type": "RuleName"
+                        }
+                      ]
+                    },
+                    {
+                      "slice": [
+                        1006,
+                        1009
+                      ],
+                      "type": "CharVal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "slice": [
+                1011,
+                1154
+              ],
+              "type": "Rule",
+              "children": [
+                {
+                  "slice": [
+                    1011,
+                    1019
+                  ],
+                  "type": "RuleName"
+                },
+                {
+                  "slice": [
+                    1029,
+                    1063
+                  ],
+                  "type": "Concatenation",
+                  "children": [
+                    {
+                      "slice": [
+                        1029,
+                        1035
+                      ],
+                      "type": "RuleName"
+                    },
+                    {
+                      "slice": [
+                        1036,
+                        1056
+                      ],
+                      "type": "Repetition",
+                      "children": [
+                        {
+                          "slice": [
+                            1036,
+                            1037
+                          ],
+                          "type": "Repeat"
+                        },
+                        {
+                          "slice": [
+                            1038,
+                            1055
+                          ],
+                          "type": "Alternation",
+                          "children": [
+                            {
+                              "slice": [
+                                1040,
+                                1045
+                              ],
+                              "type": "HexVal"
+                            },
+                            {
+                              "slice": [
+                                1050,
+                                1055
+                              ],
+                              "type": "HexVal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "slice": [
+                        1057,
+                        1063
+                      ],
+                      "type": "RuleName"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "slice": [
+                1155,
+                1207
+              ],
+              "type": "Rule",
+              "children": [
+                {
+                  "slice": [
+                    1155,
+                    1162
+                  ],
+                  "type": "RuleName"
+                },
+                {
+                  "slice": [
+                    1173,
+                    1206
+                  ],
+                  "type": "Concatenation",
+                  "children": [
+                    {
+                      "slice": [
+                        1173,
+                        1176
+                      ],
+                      "type": "CharVal"
+                    },
+                    {
+                      "slice": [
+                        1178,
+                        1205
+                      ],
+                      "type": "Alternation",
+                      "children": [
+                        {
+                          "slice": [
+                            1178,
+                            1185
+                          ],
+                          "type": "RuleName"
+                        },
+                        {
+                          "slice": [
+                            1188,
+                            1195
+                          ],
+                          "type": "RuleName"
+                        },
+                        {
+                          "slice": [
+                            1198,
+                            1205
+                          ],
+                          "type": "RuleName"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "slice": [
+                1208,
+                1385
+              ],
+              "type": "Rule",
+              "children": [
+                {
+                  "slice": [
+                    1208,
+                    1215
+                  ],
+                  "type": "RuleName"
+                },
+                {
+                  "slice": [
+                    1226,
+                    1283
+                  ],
+                  "type": "Concatenation",
+                  "children": [
+                    {
+                      "slice": [
+                        1226,
+                        1229
+                      ],
+                      "type": "CharVal"
+                    },
+                    {
+                      "slice": [
+                        1230,
+                        1235
+                      ],
+                      "type": "Repetition",
+                      "children": [
+                        {
+                          "slice": [
+                            1230,
+                            1232
+                          ],
+                          "type": "Repeat",
+                          "children": [
+                            {
+                              "slice": [
+                                1230,
+                                1231
+                              ],
+                              "type": "MinOccurance"
+                            }
+                          ]
+                        },
+                        {
+                          "slice": [
+                            1232,
+                            1235
+                          ],
+                          "type": "RuleName"
+                        }
+                      ]
+                    },
+                    {
+                      "slice": [
+                        1252,
+                        1283
+                      ],
+                      "type": "Option",
+                      "children": [
+                        {
+                          "slice": [
+                            1254,
+                            1281
+                          ],
+                          "type": "Alternation",
+                          "children": [
+                            {
+                              "slice": [
+                                1254,
+                                1267
+                              ],
+                              "type": "Repetition",
+                              "children": [
+                                {
+                                  "slice": [
+                                    1254,
+                                    1256
+                                  ],
+                                  "type": "Repeat",
+                                  "children": [
+                                    {
+                                      "slice": [
+                                        1254,
+                                        1255
+                                      ],
+                                      "type": "MinOccurance"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "slice": [
+                                    1257,
+                                    1266
+                                  ],
+                                  "type": "Concatenation",
+                                  "children": [
+                                    {
+                                      "slice": [
+                                        1257,
+                                        1260
+                                      ],
+                                      "type": "CharVal"
+                                    },
+                                    {
+                                      "slice": [
+                                        1261,
+                                        1266
+                                      ],
+                                      "type": "Repetition",
+                                      "children": [
+                                        {
+                                          "slice": [
+                                            1261,
+                                            1263
+                                          ],
+                                          "type": "Repeat",
+                                          "children": [
+                                            {
+                                              "slice": [
+                                                1261,
+                                                1262
+                                              ],
+                                              "type": "MinOccurance"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "slice": [
+                                            1263,
+                                            1266
+                                          ],
+                                          "type": "RuleName"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "slice": [
+                                1271,
+                                1280
+                              ],
+                              "type": "Concatenation",
+                              "children": [
+                                {
+                                  "slice": [
+                                    1271,
+                                    1274
+                                  ],
+                                  "type": "CharVal"
+                                },
+                                {
+                                  "slice": [
+                                    1275,
+                                    1280
+                                  ],
+                                  "type": "Repetition",
+                                  "children": [
+                                    {
+                                      "slice": [
+                                        1275,
+                                        1277
+                                      ],
+                                      "type": "Repeat",
+                                      "children": [
+                                        {
+                                          "slice": [
+                                            1275,
+                                            1276
+                                          ],
+                                          "type": "MinOccurance"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "slice": [
+                                        1277,
+                                        1280
+                                      ],
+                                      "type": "RuleName"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "slice": [
+                1386,
+                1468
+              ],
+              "type": "Rule",
+              "children": [
+                {
+                  "slice": [
+                    1386,
+                    1393
+                  ],
+                  "type": "RuleName"
+                },
+                {
+                  "slice": [
+                    1404,
+                    1467
+                  ],
+                  "type": "Concatenation",
+                  "children": [
+                    {
+                      "slice": [
+                        1404,
+                        1407
+                      ],
+                      "type": "CharVal"
+                    },
+                    {
+                      "slice": [
+                        1408,
+                        1415
+                      ],
+                      "type": "Repetition",
+                      "children": [
+                        {
+                          "slice": [
+                            1408,
+                            1410
+                          ],
+                          "type": "Repeat",
+                          "children": [
+                            {
+                              "slice": [
+                                1408,
+                                1409
+                              ],
+                              "type": "MinOccurance"
+                            }
+                          ]
+                        },
+                        {
+                          "slice": [
+                            1410,
+                            1415
+                          ],
+                          "type": "RuleName"
+                        }
+                      ]
+                    },
+                    {
+                      "slice": [
+                        1432,
+                        1467
+                      ],
+                      "type": "Option",
+                      "children": [
+                        {
+                          "slice": [
+                            1434,
+                            1465
+                          ],
+                          "type": "Alternation",
+                          "children": [
+                            {
+                              "slice": [
+                                1434,
+                                1449
+                              ],
+                              "type": "Repetition",
+                              "children": [
+                                {
+                                  "slice": [
+                                    1434,
+                                    1436
+                                  ],
+                                  "type": "Repeat",
+                                  "children": [
+                                    {
+                                      "slice": [
+                                        1434,
+                                        1435
+                                      ],
+                                      "type": "MinOccurance"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "slice": [
+                                    1437,
+                                    1448
+                                  ],
+                                  "type": "Concatenation",
+                                  "children": [
+                                    {
+                                      "slice": [
+                                        1437,
+                                        1440
+                                      ],
+                                      "type": "CharVal"
+                                    },
+                                    {
+                                      "slice": [
+                                        1441,
+                                        1448
+                                      ],
+                                      "type": "Repetition",
+                                      "children": [
+                                        {
+                                          "slice": [
+                                            1441,
+                                            1443
+                                          ],
+                                          "type": "Repeat",
+                                          "children": [
+                                            {
+                                              "slice": [
+                                                1441,
+                                                1442
+                                              ],
+                                              "type": "MinOccurance"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "slice": [
+                                            1443,
+                                            1448
+                                          ],
+                                          "type": "RuleName"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "slice": [
+                                1453,
+                                1464
+                              ],
+                              "type": "Concatenation",
+                              "children": [
+                                {
+                                  "slice": [
+                                    1453,
+                                    1456
+                                  ],
+                                  "type": "CharVal"
+                                },
+                                {
+                                  "slice": [
+                                    1457,
+                                    1464
+                                  ],
+                                  "type": "Repetition",
+                                  "children": [
+                                    {
+                                      "slice": [
+                                        1457,
+                                        1459
+                                      ],
+                                      "type": "Repeat",
+                                      "children": [
+                                        {
+                                          "slice": [
+                                            1457,
+                                            1458
+                                          ],
+                                          "type": "MinOccurance"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "slice": [
+                                        1459,
+                                        1464
+                                      ],
+                                      "type": "RuleName"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "slice": [
+                1469,
+                1554
+              ],
+              "type": "Rule",
+              "children": [
+                {
+                  "slice": [
+                    1469,
+                    1476
+                  ],
+                  "type": "RuleName"
+                },
+                {
+                  "slice": [
+                    1487,
+                    1553
+                  ],
+                  "type": "Concatenation",
+                  "children": [
+                    {
+                      "slice": [
+                        1487,
+                        1490
+                      ],
+                      "type": "CharVal"
+                    },
+                    {
+                      "slice": [
+                        1491,
+                        1499
+                      ],
+                      "type": "Repetition",
+                      "children": [
+                        {
+                          "slice": [
+                            1491,
+                            1493
+                          ],
+                          "type": "Repeat",
+                          "children": [
+                            {
+                              "slice": [
+                                1491,
+                                1492
+                              ],
+                              "type": "MinOccurance"
+                            }
+                          ]
+                        },
+                        {
+                          "slice": [
+                            1493,
+                            1499
+                          ],
+                          "type": "RuleName"
+                        }
+                      ]
+                    },
+                    {
+                      "slice": [
+                        1516,
+                        1553
+                      ],
+                      "type": "Option",
+                      "children": [
+                        {
+                          "slice": [
+                            1518,
+                            1551
+                          ],
+                          "type": "Alternation",
+                          "children": [
+                            {
+                              "slice": [
+                                1518,
+                                1534
+                              ],
+                              "type": "Repetition",
+                              "children": [
+                                {
+                                  "slice": [
+                                    1518,
+                                    1520
+                                  ],
+                                  "type": "Repeat",
+                                  "children": [
+                                    {
+                                      "slice": [
+                                        1518,
+                                        1519
+                                      ],
+                                      "type": "MinOccurance"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "slice": [
+                                    1521,
+                                    1533
+                                  ],
+                                  "type": "Concatenation",
+                                  "children": [
+                                    {
+                                      "slice": [
+                                        1521,
+                                        1524
+                                      ],
+                                      "type": "CharVal"
+                                    },
+                                    {
+                                      "slice": [
+                                        1525,
+                                        1533
+                                      ],
+                                      "type": "Repetition",
+                                      "children": [
+                                        {
+                                          "slice": [
+                                            1525,
+                                            1527
+                                          ],
+                                          "type": "Repeat",
+                                          "children": [
+                                            {
+                                              "slice": [
+                                                1525,
+                                                1526
+                                              ],
+                                              "type": "MinOccurance"
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "slice": [
+                                            1527,
+                                            1533
+                                          ],
+                                          "type": "RuleName"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "slice": [
+                                1538,
+                                1550
+                              ],
+                              "type": "Concatenation",
+                              "children": [
+                                {
+                                  "slice": [
+                                    1538,
+                                    1541
+                                  ],
+                                  "type": "CharVal"
+                                },
+                                {
+                                  "slice": [
+                                    1542,
+                                    1550
+                                  ],
+                                  "type": "Repetition",
+                                  "children": [
+                                    {
+                                      "slice": [
+                                        1542,
+                                        1544
+                                      ],
+                                      "type": "Repeat",
+                                      "children": [
+                                        {
+                                          "slice": [
+                                            1542,
+                                            1543
+                                          ],
+                                          "type": "MinOccurance"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "slice": [
+                                        1544,
+                                        1550
+                                      ],
+                                      "type": "RuleName"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "slice": [
+                1555,
+                1785
+              ],
+              "type": "Rule",
+              "children": [
+                {
+                  "slice": [
+                    1555,
+                    1564
+                  ],
+                  "type": "RuleName"
+                },
+                {
+                  "slice": [
+                    1573,
+                    1601
+                  ],
+                  "type": "Concatenation",
+                  "children": [
+                    {
+                      "slice": [
+                        1573,
+                        1576
+                      ],
+                      "type": "CharVal"
+                    },
+                    {
+                      "slice": [
+                        1577,
+                        1597
+                      ],
+                      "type": "Repetition",
+                      "children": [
+                        {
+                          "slice": [
+                            1577,
+                            1578
+                          ],
+                          "type": "Repeat"
+                        },
+                        {
+                          "slice": [
+                            1579,
+                            1596
+                          ],
+                          "type": "Alternation",
+                          "children": [
+                            {
+                              "slice": [
+                                1581,
+                                1586
+                              ],
+                              "type": "HexVal"
+                            },
+                            {
+                              "slice": [
+                                1591,
+                                1596
+                              ],
+                              "type": "HexVal"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "slice": [
+                        1598,
+                        1601
+                      ],
+                      "type": "CharVal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]

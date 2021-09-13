@@ -77,4 +77,5 @@ jobs:
           export ASAN_OPTIONS="detect_leaks=1"
         fi
 
+        export CTEST_PARALLEL_LEVEL=10
         make check

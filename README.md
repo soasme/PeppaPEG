@@ -23,6 +23,15 @@ References: [GitHub](https://github.com/soasme/PeppaPEG)
 | [Project Home Page](https://soasme.com/PeppaPEG/landing.html)
 | [Project Documentation Pages](https://soasme.com/PeppaPEG/).
 
+Current Peppa PEG supports parsing the following languages:
+
+* [ABNF](configs/abnf.peg) ([RFC 5234](https://tools.ietf.org/html/rfc5234)).
+* [Golang v1.17](configs/golang-v1.17.peg).
+* [HCL 2](configs/hcl2.peg).
+* [JSON](configs/json.peg) ([ECMA-404](https://www.ecma-international.org/publications-and-standards/standards/ecma-404/)).
+* [Lua v5.3](configs/lua-v5.3.peg).
+* [TOML v1.0](configs/toml-v1.0.peg).
+
 ## Installation
 
 Assume your system has `cmake` installed, run

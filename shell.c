@@ -243,6 +243,7 @@ int subcommand_parse(p4_args_t* args) {
 
             if (!args->quiet) fprintf(stdout, "\n");
         }
+        globfree(&globbuf);
     }
 
 finalize:

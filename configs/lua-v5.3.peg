@@ -37,20 +37,21 @@ EOF = !.;
 @scoped
 Block = Stat* RetStat?;
 
+@lifted
 Stat = ";"
     / Label
     / KeywordBreak
-    / KeywordGoto ~ Name
+    / GotoStmt
     / DoStmt
-    / KeywordWhile ~ Exp KeywordDo Block KeywordEnd
-    / KeywordRepeat ~ Block KeywordUntil Exp
+    / WhileStmt
+    / RepeatStmt
     / IfStmt
-    / KeywordFor Name "=" ~ Exp "," Exp ("," Exp)? "do" Block KeywordEnd
-    / KeywordFor ~ NameList KeywordIn ExpList KeywordDo Block KeywordEnd
-    / KeywordLocal KeywordFunction ~ Name FuncBody
-    / KeywordLocal NameList ~ ("=" ~ ExpList)?
-    / KeywordFunction FuncName FuncBody
-    / VarList "=" ~ ExpList
+    / ForPairStmt
+    / ForInStmt
+    / LocalFunctionDefStmt
+    / LocalAssignStmt
+    / FunctionDefStmt
+    / AssignStmt
     / FunctionCall
     ;
 
@@ -59,6 +60,24 @@ RetStat = KeywordReturn ExpList? ";"?;
 DoStmt = KeywordDo ~ Block "end";
 
 IfStmt = KeywordIf ~ Exp KeywordThen Block (KeywordElseIf Exp KeywordThen Block)* (KeywordElse Block)? KeywordEnd;
+
+GotoStmt = KeywordGoto ~ Name;
+
+WhileStmt = KeywordWhile ~ Exp KeywordDo Block KeywordEnd;
+
+RepeatStmt = KeywordRepeat ~ Block KeywordUntil Exp;
+
+AssignStmt = VarList "=" ~ ExpList;
+
+ForPairStmt = KeywordFor Name "=" ~ Exp "," Exp ("," Exp)? "do" Block KeywordEnd;
+
+ForInStmt = KeywordFor ~ NameList KeywordIn ExpList KeywordDo Block KeywordEnd;
+
+LocalAssignStmt = KeywordLocal NameList ~ ("=" ~ ExpList)?;
+
+LocalFunctionDefStmt = KeywordLocal KeywordFunction ~ Name FuncBody;
+
+FunctionDefStmt = KeywordFunction FuncName FuncBody;
 
 Label = "::" Name "::";
 
@@ -120,13 +139,14 @@ BinOp = "+"/"-"/"*"/ "//" / "/" / "^" / "%"
     / "&" / "~" / "|" / ".."
     / "and" / "or";
 
+@nonterminal
 UnOp = "-" / KeywordNot / "#" / "~";
 
 Keyword = "and"/"break"/"do"/"elseif"/"else"/"end"/"false"/"for"
     /"function"/"goto"/"if"/"in"/"local"/"nil"/"not"/"or"/"repeat"
     /"return"/"then"/"true"/"until"/"while";
 
-@tight
+@tight @squashed
 Name = !(Keyword !([a-z]/[A-Z]/[0-9]/"_")) ([a-z] / [A-Z] / "_") ([a-z] / [A-Z] / [0-9] / "_")*;
 
 @lifted

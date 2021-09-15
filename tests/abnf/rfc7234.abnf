@@ -1,0 +1,30 @@
+; Collected rules from RFC 7234
+; https://tools.ietf.org/html/rfc7234
+
+Age = delta-seconds
+
+Cache-Control = *( "," OWS ) cache-directive *( OWS "," [ OWS cache-directive ] )
+
+Expires = HTTP-date
+
+Pragma = *( "," OWS ) pragma-directive *( OWS "," [ OWS pragma-directive ] )
+
+Warning = *( "," OWS ) warning-value *( OWS "," [ OWS warning-value ] )
+
+cache-directive = token [ "=" ( token / quoted-string ) ]
+
+delta-seconds = 1*DIGIT
+
+extension-pragma = token [ "=" ( token / quoted-string ) ]
+
+pragma-directive = "no-cache" / extension-pragma
+
+warn-agent = ( uri-host [ ":" port ] ) / pseudonym
+
+warn-code = 3DIGIT
+
+warn-date = DQUOTE HTTP-date DQUOTE
+
+warn-text = quoted-string
+
+warning-value = warn-code SP warn-agent SP warn-text [ SP warn-date ]

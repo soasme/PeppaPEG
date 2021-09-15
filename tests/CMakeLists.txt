@@ -130,6 +130,22 @@ foreach(spec_testcase ${spec_testcases})
     )
 endforeach()
 
+set(
+    realcode_testcases
+    "${CMAKE_SOURCE_DIR}/configs/lua-v5.3.peg" Chunk "lua-5.3.2" lua
+    "${CMAKE_SOURCE_DIR}/configs/abnf.peg" RuleList "abnf" abnf
+)
+while(realcode_testcases)
+    list(POP_FRONT realcode_testcases GRAMMAR_FILE GRAMMAR_ENTRY TEST_DIR TEST_SUFFIX)
+    add_test(
+        NAME "${TEST_DIR}/*.${TEST_SUFFIX}"
+        COMMAND "${P4_BIN}" "parse"
+            "--grammar-file" "${GRAMMAR_FILE}"
+            "--grammar-entry" "${GRAMMAR_ENTRY}"
+            "--quiet"
+            "${CMAKE_CURRENT_SOURCE_DIR}/${TEST_DIR}/*.${TEST_SUFFIX}")
+endwhile()
+
 add_custom_target(
     check
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_SOURCE_DIR}/json_test_parsing ${CMAKE_CURRENT_BINARY_DIR}/json_test_parsing

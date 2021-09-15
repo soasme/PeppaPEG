@@ -1,0 +1,16 @@
+; Collected rules from RFC 8187
+; https://tools.ietf.org/html/rfc8187
+
+ext-value = charset "'" [ language ] "'" value-chars
+
+charset = "UTF-8" / mime-charset
+
+mime-charset = 1*mime-charsetc
+
+mime-charsetc = ALPHA / DIGIT  / "!" / "#" / "$" / "%" / "&"  / "+" / "-" / "^" / "_" / "`"  / "{" / "}" / "~"
+
+value-chars = *( pct-encoded / attr-char )
+
+pct-encoded = "%" HEXDIG HEXDIG
+
+attr-char = ALPHA / DIGIT  / "!" / "#" / "$" / "&" / "+" / "-" / "."  / "^" / "_" / "`" / "|" / "~"

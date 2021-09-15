@@ -1,0 +1,272 @@
+# Peppa PEG -  Ultra lightweight PEG Parser in ANSI C.
+#
+# MIT License
+#
+# Copyright (c) 2021 Ju
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+# @file       lua-v5.3.peg
+# @brief      A complete grammar for Lua 5.3 <http://www.lua.org/manual/5.3/manual.html>.
+# @author     Ju Lin
+# @copyright  MIT
+# @date       2021
+# @see        https://github.com/soasme/PeppaPEG
+
+# 9 – The Complete Syntax of Lua
+
+Chunk = &. Shebang? Block EOF;
+EOF = !.;
+
+@scoped
+Block = Stat* RetStat?;
+
+@lifted
+Stat = ";"
+    / Label
+    / KeywordBreak
+    / GotoStmt
+    / DoStmt
+    / WhileStmt
+    / RepeatStmt
+    / IfStmt
+    / ForPairStmt
+    / ForInStmt
+    / LocalFunctionDefStmt
+    / LocalAssignStmt
+    / FunctionDefStmt
+    / AssignStmt
+    / FunctionCall
+    ;
+
+RetStat = KeywordReturn ExpList? ";"?;
+
+DoStmt = KeywordDo ~ Block "end";
+
+IfStmt = KeywordIf ~ Exp KeywordThen Block (KeywordElseIf Exp KeywordThen Block)* (KeywordElse Block)? KeywordEnd;
+
+GotoStmt = KeywordGoto ~ Name;
+
+WhileStmt = KeywordWhile ~ Exp KeywordDo Block KeywordEnd;
+
+RepeatStmt = KeywordRepeat ~ Block KeywordUntil Exp;
+
+AssignStmt = VarList "=" ~ ExpList;
+
+ForPairStmt = KeywordFor Name "=" ~ Exp "," Exp ("," Exp)? "do" Block KeywordEnd;
+
+ForInStmt = KeywordFor ~ NameList KeywordIn ExpList KeywordDo Block KeywordEnd;
+
+LocalAssignStmt = KeywordLocal NameList ~ ("=" ~ ExpList)?;
+
+LocalFunctionDefStmt = KeywordLocal KeywordFunction ~ Name FuncBody;
+
+FunctionDefStmt = KeywordFunction FuncName FuncBody;
+
+Label = "::" Name "::";
+
+FuncName = Name ("." Name)* (":" Name)?;
+
+@nonterminal
+VarList = Var ("," Var)*;
+
+PrefixExp = VarOrExp NameAndArgs*;
+FunctionCall = VarOrExp NameAndArgs NameAndArgs*;
+
+@lifted
+VarOrExp = Var / "(" Exp ")";
+
+@nonterminal
+Var = (Name / "(" Exp ")" VarSuffix) VarSuffix*;
+
+VarSuffix = NameAndArgs* ("[" Exp "]" / "." Name);
+NameAndArgs = (!"::" ":" ~ Name)? Args;
+
+@nonterminal
+NameList = Name ("," Name)*;
+
+@nonterminal
+ExpList = Exp ("," Exp)*;
+
+@nonterminal
+Exp = UnExp | Exp BinOp UnExp;
+
+@nonterminal
+UnExp = PrimaryExp / UnOp UnExp;
+
+@lifted
+PrimaryExp = KeywordNil / KeywordFalse / KeywordTrue / Numeral / LiteralString / Eclipse
+    / FunctionLiteral / PrefixExp / TableConstructor;
+
+Eclipse = "...";
+
+Args = "(" ~ ExpList? ")" / TableConstructor / LiteralString;
+
+FunctionLiteral = "function" ~ FuncBody;
+
+FuncBody = "(" ParList? ")" Block KeywordEnd;
+
+ParList = NameList ("," "...")? / "...";
+
+TableConstructor = "{" ~ FieldList? "}";
+
+FieldList = Field (FieldSep Field)* FieldSep?;
+
+Field = "[" Exp "]" "=" Exp
+    / Name "=" Exp
+    / Exp;
+
+FieldSep = "," / ";";
+
+BinOp = "+"/"-"/"*"/ "//" / "/" / "^" / "%"
+    / "<=" / "<<" / "<" / ">=" / ">>" / ">" / "==" / "~="
+    / "&" / "~" / "|" / ".."
+    / "and" / "or";
+
+@nonterminal
+UnOp = "-" / KeywordNot / "#" / "~";
+
+Keyword = "and"/"break"/"do"/"elseif"/"else"/"end"/"false"/"for"
+    /"function"/"goto"/"if"/"in"/"local"/"nil"/"not"/"or"/"repeat"
+    /"return"/"then"/"true"/"until"/"while";
+
+@tight @squashed
+Name = !(Keyword !([a-z]/[A-Z]/[0-9]/"_")) ([a-z] / [A-Z] / "_") ([a-z] / [A-Z] / [0-9] / "_")*;
+
+@lifted
+LiteralString = NormalString / CharString / LongString;
+
+@tight @squashed
+NormalString = "\"" ~ (EscapeSequence / (!"\"" .))* "\"";
+
+@tight @squashed
+CharString = "'" ~ (EscapeSequence / (!"'" .))* "'";
+
+@tight @squashed
+LongString = "[" "="* "[" (!("]" \1 "]") .)* "]" \1 "]";
+
+@tight
+Numeral = HexFloat / Float / Hex / Int;
+
+Int = Digit+;
+Hex = "0" i"x" HexDigit+;
+Float = Digit+ "." Digit* ExponentPart?
+    / "." Digit+ ExponentPart?
+    / Digit+ ExponentPart;
+HexFloat = "0" i"x" HexDigit+ "." HexDigit* HexExponentPart?
+    / "0" i"x" "." HexDigit+ HexExponentPart?
+    / "0" i"x" HexDigit+ HexExponentPart;
+ExponentPart = i"e" ("+"/"-")? Digit+;
+HexExponentPart = i"p" ("+"/"-")? Digit+;
+EscapeSequence = UtfEscape / HexEscape / DecimalEscape / "\\" "\r"? "\n"
+    / "\\a" / "\\b" / "\\f" / "\\n" / "\\r" / "\\t" / "\\v" / "\\z"
+    / "\\\"" / "\\'" / "\\\\";
+DecimalEscape = "\\" ([0-2]? Digit{2} / Digit);
+HexEscape = "\\x{" HexDigit{2} "}";
+UtfEscape = "\\u{" HexDigit+ "}";
+
+Digit = [0-9];
+
+HexDigit = [0-9] / [a-f] / [A-F];
+
+Newline = "\n" / "\r";
+
+@spaced @squashed @lifted
+Ws = "\n" / "\r" / "\t" / " ";
+
+@tight @squashed @lifted
+Shebang = "#" "!"? (!Newline .)* (Newline / EOF);
+
+@spaced @squashed @lifted
+Comment = "--[" "="* "[" (!("]" \1 "]") .)* "]" \1 "]";
+
+@spaced @squashed @lifted
+LineComment = "--" (
+    "[" "="* (!("=" / "[" / "\r" / "\n") .) (!Newline .)*
+    / "[" "="*
+    / !("[" / "\r" / "\n") (!Newline .)*
+)? (Newline / EOF);
+
+NestedStr = "="* "[" (!("]" \0) .)* ("]" \0);
+
+@tight
+KeywordAnd = "and" !([a-z]/[A-Z]/[0-9]/"_");
+
+@tight
+KeywordBreak = "break" !([a-z]/[A-Z]/[0-9]/"_");
+
+@tight
+KeywordDo = "do" !([a-z]/[A-Z]/[0-9]/"_");
+
+@tight
+KeywordEnd = "end" !([a-z]/[A-Z]/[0-9]/"_");
+
+@tight
+KeywordElseIf = "elseif" !([a-z]/[A-Z]/[0-9]/"_");
+
+@tight
+KeywordElse = "else" !([a-z]/[A-Z]/[0-9]/"_");
+
+@tight
+KeywordFalse = "false" !([a-z]/[A-Z]/[0-9]/"_");
+
+@tight
+KeywordFor = "for" !([a-z]/[A-Z]/[0-9]/"_");
+
+@tight
+KeywordFunction = "function" !([a-z]/[A-Z]/[0-9]/"_");
+
+@tight
+KeywordGoto = "goto" !([a-z]/[A-Z]/[0-9]/"_");
+
+@tight
+KeywordIf = "if" !([a-z]/[A-Z]/[0-9]/"_");
+
+@tight
+KeywordIn = "in" !([a-z]/[A-Z]/[0-9]/"_");
+
+@tight
+KeywordLocal = "local" !([a-z]/[A-Z]/[0-9]/"_");
+
+@tight
+KeywordNil = "nil" !([a-z]/[A-Z]/[0-9]/"_");
+
+@tight
+KeywordNot = "not" !([a-z]/[A-Z]/[0-9]/"_");
+
+@tight
+KeywordOr = "or" !([a-z]/[A-Z]/[0-9]/"_");
+
+@tight
+KeywordRepeat  = "repeat" !([a-z]/[A-Z]/[0-9]/"_");
+
+@tight
+KeywordReturn = "return" !([a-z]/[A-Z]/[0-9]/"_");
+
+@tight
+KeywordThen = "then" !([a-z]/[A-Z]/[0-9]/"_");
+
+@tight
+KeywordTrue = "true" !([a-z]/[A-Z]/[0-9]/"_");
+
+@tight
+KeywordUntil = "until" !([a-z]/[A-Z]/[0-9]/"_");
+
+@tight
+KeywordWhile = "while" !([a-z]/[A-Z]/[0-9]/"_");

@@ -54,6 +54,7 @@ struct p4_args_t {
     char* grammar_entry;
     size_t arguments_count;
     char** arguments;
+    bool quiet;
 };
 
 static int subcommand_version(const char* name) {
@@ -68,6 +69,7 @@ static int subcommand_usage(const char* name) {
         "  --grammar-str/-g FILE\tpeg grammar string\n"
         "  --grammar-file/-G FILE\tpath to peg grammar file\n"
         "  --grammar-entry/-e NAME\tentry rule name in peg grammar\n"
+        "  --quiet/-q\t\tno ast output\n"
         "\n"
         "OPTION:\n\n"
         "  --help/-h\t\t\tprint help information\n"
@@ -91,9 +93,11 @@ static char* read_file(FILE* f) {
 }
 
 static int print_ast(
+        const char* file_path,
         const char* grammar_content,
         const char* input_content,
-        const char* entry) {
+        const char* entry,
+        bool quiet) {
     int code = 0;
     P4_Grammar* grammar = P4_LoadGrammar((char*)grammar_content);
     P4_Source*  source = P4_CreateSource((char*)input_content, (char*)entry);
@@ -104,12 +108,16 @@ static int print_ast(
     }
     if (P4_Parse(grammar, source) != P4_Ok) {
         code = 1;
+        if (strcmp(file_path, "") != 0)
+            fprintf(stderr, "%s:\n", file_path);
         fprintf(stderr, "%s: %s\n", P4_GetErrorString(P4_GetError(source)), P4_GetErrorMessage(source));
         goto finalize;
     }
-    P4_Node*    root = P4_GetSourceAst(source);
-    P4_JsonifySourceAst(stdout, root, NULL);
-    fprintf(stdout, "\n");
+    if (!quiet) {
+        P4_Node*    root = P4_GetSourceAst(source);
+        P4_JsonifySourceAst(stdout, root, NULL);
+        fprintf(stdout, "\n");
+    }
 finalize:
     P4_DeleteSource(source);
     P4_DeleteGrammar(grammar);
@@ -125,13 +133,14 @@ int init_args(p4_args_t* args, int argc, char* argv[]) {
         static struct option long_options[] = {
             {"version", no_argument, 0, 'V'},
             {"help", no_argument, 0, 'h'},
+            {"quiet", no_argument, 0, 'q'},
             {"grammar-entry", required_argument, 0, 'e'},
             {"grammar-file", required_argument, 0, 'G'},
             {"grammar-str", required_argument, 0, 'g'},
             {0, 0, 0, 0}
         };
         int option_index = 0;
-        c = getopt_long (argc, argv, "Vhe:g:G:", long_options, &option_index);
+        c = getopt_long (argc, argv, "Vhqe:g:G:", long_options, &option_index);
         if (c == -1) break;
         switch (c) {
             case 0:
@@ -141,6 +150,9 @@ int init_args(p4_args_t* args, int argc, char* argv[]) {
                 break;
             case 'h':
                 args->help = true;
+                break;
+            case 'q':
+                args->quiet = true;
                 break;
             case 'e':
                 args->grammar_entry = optarg;
@@ -199,37 +211,37 @@ int subcommand_parse(p4_args_t* args) {
         }
         *s = '\0';
 
-        err = print_ast(grammar_content, input_content, args->grammar_entry);
+        err = print_ast("", grammar_content, input_content, args->grammar_entry, args->quiet);
     } else if (strstr(args->arguments[1], "*") == NULL){
         if (!(input_file = fopen(args->arguments[1], "r"))) {
             perror(args->arguments[1]);
             abort(1);
         }
         input_content = read_file(input_file);
-        err = print_ast(grammar_content, input_content, args->grammar_entry);
+        err = print_ast(args->arguments[1], grammar_content, input_content, args->grammar_entry, args->quiet);
     } else {
         glob_t globbuf = {0};
         glob(args->arguments[1], 0, 0, &globbuf);
         size_t i = 0;
         for (i = 0; i < globbuf.gl_pathc; i++) {
             char* file_path = globbuf.gl_pathv[i];
-            fprintf(stdout, "%s:\n", file_path);
+            if (!args->quiet) fprintf(stdout, "%s:\n", file_path);
             if (!(input_file = fopen(file_path, "r"))) {
                 perror(args->arguments[1]);
                 abort(1);
             }
             input_content = read_file(input_file);
 
-            err = print_ast(grammar_content, input_content, args->grammar_entry);
-            if (err != 0)
-                goto finalize;
+            int ferr = print_ast(file_path, grammar_content, input_content, args->grammar_entry, args->quiet);
+            if (err == 0 && ferr != 0)
+                err = ferr;
 
             P4_FREE(input_content);
             fclose(input_file);
             input_content = NULL;
             input_file = NULL;
 
-            fprintf(stdout, "\n");
+            if (!args->quiet) fprintf(stdout, "\n");
         }
     }
 

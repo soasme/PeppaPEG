@@ -132,7 +132,7 @@ endforeach()
 
 set(
     realcode_testcases
-    "${CMAKE_SOURCE_DIR}/configs/lua-v5.3.peg" Chunk "lua-5.3.2" lua
+    "${CMAKE_SOURCE_DIR}/configs/lua-v5.4.peg" Chunk "lua-5.4.3" lua
     "${CMAKE_SOURCE_DIR}/configs/abnf.peg" RuleList "abnf" abnf
 )
 while(realcode_testcases)

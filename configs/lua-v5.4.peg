@@ -23,7 +23,8 @@
 # SOFTWARE.
 #
 # @file       lua-v5.3.peg
-# @brief      A complete grammar for Lua 5.3 <http://www.lua.org/manual/5.3/manual.html>.
+# @brief      A complete grammar for Lua 5.4 <https://www.lua.org/manual/5.4/manual.html>.
+#             The grammar passes test suite <https://www.lua.org/tests/>.
 # @author     Ju Lin
 # @copyright  MIT
 # @date       2021
@@ -108,11 +109,44 @@ NameList = Name ("," Name)*;
 @nonterminal
 ExpList = Exp ("," Exp)*;
 
-@nonterminal
-Exp = UnExp | Exp BinOp UnExp;
+@lifted
+Exp = OrExp;
 
 @nonterminal
-UnExp = PrimaryExp / UnOp UnExp;
+OrExp = AndExp | OrExp KeywordOr ~ AndExp;
+
+@nonterminal
+AndExp = CompareExp | AndExp KeywordAnd ~ CompareExp;
+
+@nonterminal
+CompareExp = BitOrExp | CompareExp CompareOp ~ BitOrExp;
+
+@nonterminal
+BitOrExp = BitNotExp | BitOrExp BitwiseOrOp ~ BitNotExp;
+
+@nonterminal
+BitNotExp = BitAndExp | BitNotExp BitwiseNotOp ~ BitAndExp;
+
+@nonterminal
+BitAndExp = BitShiftExp | BitAndExp BitwiseAndOp ~ BitShiftExp;
+
+@nonterminal
+BitShiftExp = ConcatExp | BitShiftExp BitwiseShiftOp ~ ConcatExp;
+
+@nonterminal
+ConcatExp = AddExp | ConcatExp ConcatOp ~ AddExp;
+
+@nonterminal
+AddExp = MulExp | AddExp AddOp ~ MulExp;
+
+@nonterminal
+MulExp = ExponentExp | MulExp MulOp ~ ExponentExp;
+
+@nonterminal
+ExponentExp = UnExp ExponentiationOp ~ ExponentExp / UnExp;
+
+@nonterminal
+UnExp = PrimaryExp / UnOp ~ UnExp;
 
 @lifted
 PrimaryExp = KeywordNil / KeywordFalse / KeywordTrue / Numeral / LiteralString / Eclipse
@@ -144,7 +178,7 @@ BinOp = "+"/"-"/"*"/ "//" / "/" / "^" / "%"
     / "and" / "or";
 
 @nonterminal
-UnOp = "-" / KeywordNot / "#" / "~";
+UnOp = "-" / KeywordNot / "#" / "~" !"=";
 
 Keyword = "and"/"break"/"do"/"elseif"/"else"/"end"/"false"/"for"
     /"function"/"goto"/"if"/"in"/"local"/"nil"/"not"/"or"/"repeat"
@@ -274,3 +308,13 @@ KeywordUntil = "until" !([a-z]/[A-Z]/[0-9]/"_");
 
 @tight
 KeywordWhile = "while" !([a-z]/[A-Z]/[0-9]/"_");
+
+CompareOp = ">=" / "<=" / "==" / "~=" / ">" !">" / "<" !"<";
+BitwiseOrOp = "|";
+BitwiseNotOp = "~" !"=";
+BitwiseAndOp = "&";
+BitwiseShiftOp = "<<" / ">>";
+ConcatOp = "..";
+AddOp = "+" / "-";
+MulOp = "*" / "//" / "/" / "%";
+ExponentiationOp = "^";

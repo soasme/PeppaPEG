@@ -892,6 +892,44 @@ P4_Error       P4_AddChoice(P4_Grammar* grammar, P4_String name, size_t count);
 P4_Error       P4_AddChoiceWithMembers(P4_Grammar* grammar, P4_String name, size_t count, ...);
 
 /**
+ * Create a P4_Precedence expression.
+ *
+ * @param   count       The number of precedence members.
+ * @return  A P4_Expression.
+ *
+ * Example:
+ *
+ *      P4_Expression* expr = P4_CreatePrecedence(3);
+ *
+ * Note that such an expression is useless as its members are all empty.
+ * Please set members using P4_SetMembers.
+ *
+ * This function can be useful if you need to add members dynamically.
+ *
+ *
+ */
+P4_Expression* P4_CreatePrecedence(size_t count);
+
+/**
+ * Add a precedence expression as grammar rule.
+ *
+ * @param   grammar     The grammar.
+ * @param   name        The grammar rule name.
+ * @param   count       The number of precedence members.
+ * @param   ...         The members.
+ * @return  The error code.
+ *
+ * Example:
+ *
+ *      P4_AddPrecedenceWithMembers(grammar, "R1", 3,
+ *          P4_CreateReference("atom"),
+ *          P4_CreateReference("plus_minus"),
+ *          P4_CreateReference("mul_div")
+ *      );
+ */
+P4_Expression* P4_CreatePrecedenceWithMembers(size_t count, ...);
+
+/**
  * Create a P4_Repeat expression minimal min times and maximal max times.
  *
  * @param   repeat_expr The repeated expression.

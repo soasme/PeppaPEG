@@ -2825,6 +2825,21 @@ P4_CreateChoice(size_t count) {
 }
 
 P4_PUBLIC P4_Expression*
+P4_CreatePrecedence(size_t count) {
+    if (count == 0)
+        return NULL;
+
+    P4_Expression* expr = P4_CreateContainer(count);
+
+    if (expr == NULL)
+        return NULL;
+
+    expr->kind = P4_Precedence;
+
+    return expr;
+}
+
+P4_PUBLIC P4_Expression*
 P4_CreateSequenceWithMembers(size_t count, ...) {
     if (count == 0)
         return NULL;
@@ -2861,6 +2876,37 @@ P4_CreateChoiceWithMembers(size_t count, ...) {
         return NULL;
 
     P4_Expression* expr = P4_CreateChoice(count);
+
+    if (expr == NULL)
+        return NULL;
+
+    va_list members;
+    size_t i;
+    va_start (members, count);
+
+    for (i = 0; i < count; i++) {
+        expr->members[i] = va_arg(members, P4_Expression*);
+
+        if (expr->members[i] == NULL) {
+            goto finalize;
+        }
+    }
+
+    va_end (members);
+
+    return expr;
+
+finalize:
+    P4_DeleteExpression(expr);
+    return NULL;
+}
+
+P4_PUBLIC P4_Expression*
+P4_CreatePrecedenceWithMembers(size_t count, ...) {
+    if (count == 0)
+        return NULL;
+
+    P4_Expression* expr = P4_CreatePrecedence(count);
 
     if (expr == NULL)
         return NULL;

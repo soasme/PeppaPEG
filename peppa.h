@@ -217,7 +217,9 @@ typedef enum {
     /** Rule: Cut. */
     P4_Cut,
     /** Rule: Left Recursion. */
-    P4_LeftRecursion
+    P4_LeftRecursion,
+    /** Rule: Precedence Climbing. */
+    P4_Precedence
 } P4_ExpressionKind;
 
 /**

@@ -885,6 +885,7 @@ P4_PRIVATE(P4_Node*) match_negative(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_cut(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_sequence(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_choice(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*) match_precedence(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_repeat(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_left_recursion(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_spaced_rules(P4_Source*, P4_Expression*);
@@ -2166,6 +2167,11 @@ finalize:
     return NULL;
 }
 
+P4_PRIVATE(P4_Node*)
+match_precedence(P4_Source* s, P4_Expression* e) {
+    return NULL;
+}
+
 /*
  * Repetition matcher function.
  *
@@ -2446,6 +2452,7 @@ match_expression(P4_Source* s, P4_Expression* e) {
         case P4_Reference:     result = match_reference(s, e); break;
         case P4_Sequence:      result = match_sequence(s, e);  break;
         case P4_Choice:        result = match_choice(s, e);    break;
+        case P4_Precedence:    result = match_precedence(s, e); break;
         case P4_Positive:      result = match_positive(s, e);  break;
         case P4_Negative:      result = match_negative(s, e);  break;
         case P4_Repeat:        result = match_repeat(s, e);    break;

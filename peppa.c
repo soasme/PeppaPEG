@@ -3472,6 +3472,34 @@ P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_String name, size_t count, ...
 }
 
 P4_PUBLIC P4_Error
+P4_AddPrecedence(P4_Grammar* grammar, P4_String name, size_t size) {
+    P4_AddSomeGrammarRule(grammar, name, P4_CreatePrecedence(size));
+    return P4_Ok;
+}
+
+P4_PUBLIC P4_Error
+P4_AddPrecedenceWithMembers(P4_Grammar* grammar, P4_String name, size_t count, ...) {
+    P4_AddSomeGrammarRule(grammar, name, P4_CreatePrecedence(count));
+
+    size_t i = 0;
+    P4_Expression* expr = P4_GetGrammarRule(grammar, name);
+
+    va_list members;
+    va_start (members, count);
+
+    for (i = 0; i < count; i++) {
+        expr->members[i] = va_arg(members, P4_Expression*);
+
+        if (expr->members[i] == NULL)
+            panicf("failed to set %zuth expression.", i);
+    }
+
+    va_end (members);
+
+    return P4_Ok;
+}
+
+P4_PUBLIC P4_Error
 P4_AddChoice(P4_Grammar* grammar, P4_String name, size_t size) {
     P4_AddSomeGrammarRule(grammar, name, P4_CreateContainer(size));
     P4_GetGrammarRule(grammar, name)->kind = P4_Choice;

@@ -854,6 +854,44 @@ P4_Expression* P4_CreateChoice(size_t count);
 P4_Expression* P4_CreateChoiceWithMembers(size_t count, ...);
 
 /**
+ * Add a precedence expression as grammar rule.
+ *
+ * @param   grammar     The grammar.
+ * @param   name        The grammar rule name.
+ * @param   count       The number of precedence members.
+ * @return  The error code.
+ *
+ * Example:
+ *
+ *      P4_AddPrecedence(grammar, "R1", 3);
+ *
+ * Note that such an expression is useless as its members are all empty.
+ * Please set members using P4_SetMembers.
+ *
+ * This function can be useful if you need to add members dynamically.
+ */
+P4_Error       P4_AddPrecedence(P4_Grammar* grammar, P4_String name, size_t count);
+
+/**
+ * Add a choice expression as grammar rule.
+ *
+ * @param   grammar     The grammar.
+ * @param   name        The grammar rule name.
+ * @param   count       The number of choice members.
+ * @param   ...         The members.
+ * @return  The error code.
+ *
+ * Example:
+ *
+ *      P4_AddPrecedenceWithMembers(grammar, "R1", 3,
+ *          P4_CreateReference("atom"),
+ *          P4_CreateReference("plus_minus"),
+ *          P4_CreateReference("mul_div")
+ *      );
+ */
+P4_Error       P4_AddPrecedenceWithMembers(P4_Grammar* grammar, P4_String name, size_t count, ...);
+
+/**
  * Add a choice expression as grammar rule.
  *
  * @param   grammar     The grammar.

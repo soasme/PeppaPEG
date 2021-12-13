@@ -52,7 +52,6 @@ release = '.'.join([str(v) for v in _version])
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'furo',
     'breathe',
 ]
 

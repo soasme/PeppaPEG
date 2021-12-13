@@ -38,17 +38,17 @@ Code change: <https://github.com/soasme/PeppaPEG/compare/v1.14.0..v1.15.0>.
 * [Feature]: Upgrade insensitive to support both literal and back reference. `#96 <https://github.com/soasme/PeppaPEG/pull/96/>`_.
 * [Feature]: Support back reference in Peppa specification. `#95 <https://github.com/soasme/PeppaPEG/pull/95/>`_.
 * [Enhancement]: Improved the error message. `#93 <https://github.com/soasme/PeppaPEG/pull/93/>`_ `#94 <https://github.com/soasme/PeppaPEG/pull/94/>`_.
-* [Enhancement]: Support an additional callback for `catch_err()`. This is internal. `#92 <https://github.com/soasme/PeppaPEG/pull/92/>`_.
-* [Bug Fix]: Fix wrong lineno:offset from the error output. `#91 <https://github.com/soasme/PeppaPEG/pull/91>`_.
 
 1.14.0 (8 Aug, 2021)
 ---------------------
 
 Code change: <https://github.com/soasme/PeppaPEG/compare/v1.13.0..v1.14.0>.
 
+* [Enhancement]: Support an additional callback for `catch_err()`. This is internal. `#92 <https://github.com/soasme/PeppaPEG/pull/92/>`_.
+* [Bug Fix]: Fix wrong lineno:offset from the error output. `#91 <https://github.com/soasme/PeppaPEG/pull/91>`_.
 * [Feature]: New PEG expression: `@cut`. `#90 <https://github.com/soasme/PeppaPEG/pull/90>`_.
 * [API Change]: `P4_JsonifySourceAst` now doesn't require `grammar` in the parameters. `#89 <https://github.com/soasme/PeppaPEG/pull/89>`_.
-* [Enhancement]: Wrap errors with catch_err / catch_oom in the .c implementation. `#88 <https://github.com/soasme/PeppaPEG/pull/88>`_ `#91 <https://github.com/soasme/PeppaPEG/pull/91>`_ `#92 <https://github.com/soasme/PeppaPEG/pull/92>`_.
+* [Enhancement]: Wrap errors with catch_err / catch_oom in the .c implementation. `#88 <https://github.com/soasme/PeppaPEG/pull/88>`_
 * [Bug Fix]: Error report now can display correct lineno:offset information. `#87 <https://github.com/soasme/PeppaPEG/pull/87>`_.
 * [API Change]: `P4_RuleID` is now deprecated. Please use string (`char*`) for finding a rule. `#84 <https://github.com/soasme/PeppaPEG/pull/84>`_ `#86 <https://github.com/soasme/PeppaPEG/pull/86>`_.
 * [API Change]: `struct P4_Grammar`, `struct P4_Expression`, `struct P4_Frame` are now private structures. However, you can still access `P4_Grammar`, `P4_Expression` as typedefs.

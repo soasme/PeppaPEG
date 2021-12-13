@@ -18,7 +18,7 @@ def test_spec():
     elif specs_file.endswith('.yaml'):
         with open(specs_file) as f:
             try:
-                specs = yaml.load(f)
+                specs = yaml.load(f, Loader=yaml.Loader)
             except Exception:
                 print('invalid yaml spec')
                 exit(1)

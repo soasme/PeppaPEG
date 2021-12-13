@@ -3196,7 +3196,7 @@ P4_GetErrorMessage(P4_Source* source) {
     memset(source->errmsg, 0, sizeof(source->errmsg));
     sprintf(source->errmsg, "line %zu:%zu, expect %s",
             source->error.lineno, source->error.offset,
-            source->error.rule->name);
+            source->error.rule ? source->error.rule->name : source->entry_name);
 
 
     switch (source->error.errno) {

@@ -42,7 +42,8 @@ def test_spec():
                 raise ValueError('Missing grammar/grammar_file')
             proc = subprocess.run(
                 cmd,
-                capture_output=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
                 input=test['I'].encode('utf-8'),
             )
             if 'O' in test:

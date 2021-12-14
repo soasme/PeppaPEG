@@ -23,9 +23,12 @@ More Cmake options include:
 * `-DENABLE_DEBUG=On`: Enable building with CC -g (debug) option.
 * `-DENABLE_OPTIMIZATION=On`: Enable building with CC -O2.
 * `-DENABLE_CLI=On`: Enable building command-line interface (utility peppa).
+* `-DENABLE_VALGRIND=On`: Enable building with valgrind.
 
 Development
 ------------
+
+Running the test suite requires Python3.6+.
 
 If you have a difficulty having a complete development environment for Peppa PEG, try Docker:
 

@@ -296,6 +296,7 @@ typedef uint32_t        P4_ExpressionFlag;
  * The C string type in locale encoding, by default utf-8.
  **/
 typedef char*           P4_String;
+typedef const char*     P4_CosntString;
 
 /**
  * The utf-8 string type.
@@ -427,7 +428,7 @@ struct P4_Slice {
  */
 struct P4_Node {
     /** the full text. */
-    P4_String               text;
+    P4_CosntString               text;
     /** The matched substring.
      * slice.start is the beginning (inclusive), and slice.stop is the end (exclusive).
      */
@@ -1463,7 +1464,7 @@ size_t         P4_GetRecursionLimit(P4_Grammar* grammar);
  *
  *      P4_DeleteSource(source);
  */
-P4_Source*     P4_CreateSource(P4_String content, P4_String entry_name);
+P4_Source*     P4_CreateSource(P4_CosntString content, P4_CosntString entry_name);
 
 /**
  * @brief       Free the allocated memory of a source.
@@ -1662,7 +1663,7 @@ P4_String      P4_GetErrorMessage(P4_Source* source);
  *
  *      P4_DeleteNode(grammar, node);
  */
-P4_Node*      P4_CreateNode(P4_String text, P4_Position* start, P4_Position* stop, P4_String rule);
+P4_Node*      P4_CreateNode(P4_CosntString text, P4_Position* start, P4_Position* stop, P4_String rule);
 
 /**
  * @brief       Delete the node.
@@ -1781,7 +1782,7 @@ P4_Grammar*    P4_CreatePegGrammar ();
  *          printf("%s\n", result.errmsg);
  *      }
  */
-P4_Error P4_LoadGrammarResult(P4_String rules, P4_Result* result);
+P4_Error P4_LoadGrammarResult(P4_CosntString rules, P4_Result* result);
 
 /**
  * @brief       Load PEG grammar written in string.
@@ -1803,7 +1804,7 @@ P4_Error P4_LoadGrammarResult(P4_String rules, P4_Result* result);
  * This function exits the program when an error occurs.
  *
  */
-P4_Grammar*     P4_LoadGrammar(P4_String rules);
+P4_Grammar*     P4_LoadGrammar(P4_CosntString rules);
 
 /**
  * @brief       Get the rule name.

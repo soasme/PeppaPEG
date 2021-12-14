@@ -650,7 +650,7 @@ struct P4_Source {
     P4_String       entry_name;
 
     /** The content of the source. */
-    P4_String       content;
+    P4_CosntString       content;
     /** The length of the source. */
     P4_Slice        slice;
 
@@ -769,7 +769,7 @@ static void cleanup_freep (void *p) { /* clean a malloc-ed variable. */
 
 P4_PRIVATE(int)          P4_CaseCmpInsensitive(const void*, const void*, size_t n);
 
-P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size_t offset, P4_Position* stop);
+P4_PRIVATE(void)         P4_DiffPosition(P4_CosntString str, P4_Position* start, size_t offset, P4_Position* stop);
 
 # define P4_AdoptNode(head, tail, list) \
     do { \
@@ -893,7 +893,7 @@ P4_PRIVATE(P4_Node*) match_back_reference(P4_Source*, P4_Expression*, P4_Frame*,
 P4_PRIVATE(void)                P4_DeleteNodeUserData(P4_Grammar* grammar, P4_Node* node);
 P4_PRIVATE(P4_Expression*)      P4_GetReference(P4_Source*, P4_Expression*);
 
-P4_PRIVATE(P4_String)           P4_CopySliceString(P4_String, P4_Slice*);
+P4_PRIVATE(P4_String)           P4_CopySliceString(P4_CosntString, P4_Slice*);
 
 P4_PRIVATE(bool)                P4_HasBackrefDescendant(P4_Expression*);
 
@@ -1432,7 +1432,7 @@ static P4_RuneRange _Zs[] = {
  *     0x4f60 20320
  */
 size_t
-u8_next_char(P4_String s, ucs4_t* c) {
+u8_next_char(P4_CosntString s, ucs4_t* c) {
     *c = 0;
 
     if ((s[0] & 0b10000000) == 0) { /* 1 byte code point, ASCII */
@@ -1498,7 +1498,7 @@ void* u8_append_char(void *str, ucs4_t chr, size_t n) {
   return s;
 }
 
-size_t u8_next_escaped_char(char* text, ucs4_t* rune) {
+size_t u8_next_escaped_char(const char* text, ucs4_t* rune) {
     char ch0 = *text;
 
     if (ch0 == '\0') {
@@ -1542,7 +1542,7 @@ size_t u8_next_escaped_char(char* text, ucs4_t* rune) {
     }
 }
 
-size_t P4_ReadRuneRange(char* text, P4_Slice* slice, size_t* count, P4_RuneRange** ranges) {
+size_t P4_ReadRuneRange(const char* text, P4_Slice* slice, size_t* count, P4_RuneRange** ranges) {
     size_t len = get_slice_size(slice);
 
 # define READ_RUNE_RANGE(p,l) \
@@ -1642,7 +1642,7 @@ P4_CaseCmpInsensitive(const void* src1, const void* src2, size_t n) {
  * Initialize a node.
  */
 P4_Node*
-P4_CreateNode (const P4_String     str,
+P4_CreateNode (P4_CosntString     str,
                P4_Position*        start,
                P4_Position*        stop,
                P4_String           rule_name) {
@@ -1830,7 +1830,7 @@ match_literal(P4_Source* s, P4_Expression* e) {
 
     mark_position(s, startpos);
 
-    P4_String str = remaining_text(s);
+    P4_CosntString str = remaining_text(s);
     ucs4_t rune[2] = {0};
     u8_next_char(e->literal, rune);
 
@@ -1869,7 +1869,7 @@ P4_PRIVATE(P4_Node*)
 match_range(P4_Source* s, P4_Expression* e) {
     assert(no_error(s), "can't proceed due to a failed match");
 
-    P4_String str = remaining_text(s);
+    P4_CosntString str = remaining_text(s);
     if (is_end(s)) {
         P4_MatchRaisef(s, P4_MatchError, E_TEXT_TOO_SHORT);
         return NULL;
@@ -3041,7 +3041,7 @@ P4_AddGrammarRule(P4_Grammar* grammar, P4_String name, P4_Expression* expr) {
 }
 
 P4_PUBLIC P4_Source*
-P4_CreateSource(P4_String content, P4_String entry_name) {
+P4_CreateSource(P4_CosntString content, P4_CosntString entry_name) {
     P4_Source* source = P4_MALLOC(sizeof(P4_Source));
     source->content = content;
     source->entry_name = STRDUP(entry_name);
@@ -3329,7 +3329,7 @@ P4_SetExpressionFlag(P4_Expression* e, P4_ExpressionFlag f) {
 }
 
 P4_PRIVATE(void)
-P4_DiffPosition(P4_String str, P4_Position* start, size_t offset, P4_Position* stop) {
+P4_DiffPosition(P4_CosntString str, P4_Position* start, size_t offset, P4_Position* stop) {
     size_t start_pos = start->pos;
     size_t stop_pos = start_pos + offset;
     size_t stop_lineno = start->lineno;
@@ -3703,7 +3703,7 @@ P4_GetNodeChildrenCount(P4_Node* node) {
 }
 
 P4_PRIVATE(P4_String)
-P4_CopySliceString(P4_String s, P4_Slice* slice) {
+P4_CopySliceString(P4_CosntString s, P4_Slice* slice) {
     /* return the string covered by the slice.
      * note that caller should free the copied string. */
 
@@ -4211,7 +4211,7 @@ finalize:
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalFlag(P4_Node* node, P4_ExpressionFlag *flag) {
-    P4_String node_str = node->text + node->slice.start.pos;
+    P4_CosntString node_str = node->text + node->slice.start.pos;
     size_t    node_len = get_slice_size(&node->slice);
 
     if (node_len == 9 && memcmp("@squashed", node_str, node_len) == 0)
@@ -4864,7 +4864,7 @@ P4_PegEvalExpression(P4_Node* node, P4_Result* result) {
 }
 
 P4_PUBLIC P4_Error
-P4_LoadGrammarResult(P4_String rules, P4_Result* result) {
+P4_LoadGrammarResult(P4_CosntString rules, P4_Result* result) {
     P4_Grammar*       bootstrap = NULL;
     P4_Source*        rules_src = NULL;
     P4_Node*          rules_tok = NULL;
@@ -4908,7 +4908,7 @@ finalize:
 }
 
 P4_PUBLIC P4_Grammar*
-P4_LoadGrammar(P4_String rules) {
+P4_LoadGrammar(P4_CosntString rules) {
     P4_Error    err     = P4_Ok;
     P4_Result*  result  = &(P4_Result){0};
 

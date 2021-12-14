@@ -37,7 +37,9 @@
 #include <unistd.h>
 #include <libgen.h>
 #include <getopt.h>
+#ifndef _WIN32
 #include <glob.h>
+#endif
 #include "peppa.h"
 
 # define abort(code) do { err = (code); goto finalize; } while (0)
@@ -99,7 +101,9 @@ static char* read_file(FILE* f) {
     long length = ftell(f);
     fseek (f, 0, SEEK_SET);
     char* buf = P4_MALLOC((length+2) * sizeof(char));
-    fread(buf, sizeof(char), length, f);
+    size_t rsz = fread(buf, sizeof(char), length, f);
+    if(rsz != length)
+        fprintf(stderr, "error reading file\n");
     buf[length] = '\0';
     return buf;
 }
@@ -260,6 +264,9 @@ int subcommand_parse(p4_args_t* args) {
         input_content = read_file(input_file);
         err = print_ast(args->arguments[1], grammar_content, input_content, args);
     } else {
+#ifdef _WIN32
+        fprintf(stderr, "not supported on windows\n");
+#else
         glob_t globbuf = {0};
         glob(args->arguments[1], 0, 0, &globbuf);
         size_t i = 0;
@@ -284,6 +291,7 @@ int subcommand_parse(p4_args_t* args) {
             if (!args->quiet) fprintf(stdout, "\n");
         }
         globfree(&globbuf);
+#endif
     }
 
 finalize:

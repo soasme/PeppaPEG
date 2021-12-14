@@ -682,7 +682,7 @@ struct P4_Source {
 
     /** The error details. */
     struct {
-        int             errno;
+        int             ierrno;
         P4_size_t       lineno;
         P4_size_t       offset;
         P4_Expression*  rule;
@@ -826,7 +826,7 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_ConstString str, P4_Position* start,
 # define P4_MatchRaisef(s,e,eno) \
     do { \
         (s)->err = (e); \
-        (s)->error.errno = (eno); \
+        (s)->error.ierrno = (eno); \
         (s)->error.lineno = (s)->lineno; \
         (s)->error.offset = (s)->offset; \
         (s)->error.rule = (s)->frame_stack ? (s)->frame_stack->rule : NULL; \
@@ -2560,7 +2560,7 @@ finalize:
     /* run error callback. */
     if (s->grammar->on_error != NULL) {
         err = (s->grammar->on_error)(s->grammar, e);
-        if (err != P4_Ok && s->error.errno == 0) {
+        if (err != P4_Ok && s->error.ierrno == 0) {
             P4_MatchRaisef(s, s->err, E_INVALID_ERROR_CALLBACK);
         }
     }
@@ -3449,7 +3449,7 @@ P4_GetErrorMessage(P4_Source* source) {
             source->error.rule ? source->error.rule->name : source->entry_name);
 
 
-    switch (source->error.errno) {
+    switch (source->error.ierrno) {
         case E_WRONG_LIT:
         case E_TEXT_TOO_SHORT:
         {

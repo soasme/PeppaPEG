@@ -304,6 +304,21 @@ typedef const char*     P4_CosntString;
 typedef uint8_t*        P4_Utf8;
 
 /**
+ * The size type.
+ */
+#ifdef P4_SIZE_T_UINT
+typedef unsigned int        P4_size_t;
+#define P4_SIZE_T_FMT "%u"
+#define P4_SIZE_T_XFMT "%ux"
+#define P4_SIZE_MAX UINT_MAX
+#else
+typedef size_t        P4_size_t;
+#define P4_SIZE_T_FMT "%zu"
+#define P4_SIZE_T_XFMT "%zx"
+#define P4_SIZE_MAX SIZE_MAX
+#endif
+
+/**
  * The reference of user data.
  */
 typedef void*   P4_UserData;
@@ -380,11 +395,11 @@ typedef void (*P4_Formatter)(FILE* stream, P4_Node* node);
  */
 typedef struct P4_Position {
     /** The position in the string. */
-    size_t              pos;
+    P4_size_t              pos;
     /** The line number in the string. */
-    size_t              lineno;
+    P4_size_t              lineno;
     /** The col offset in the line. */
-    size_t              offset;
+    P4_size_t              offset;
 } P4_Position;
 
 /**
@@ -400,7 +415,7 @@ typedef struct P4_RuneRange {
     /** The upper code point of the range (inclusive). */
     ucs4_t                 upper;
     /** The step to jump inside the range. */
-    size_t                  stride;
+    P4_size_t                  stride;
 } P4_RuneRange;
 
 /**
@@ -454,8 +469,8 @@ struct P4_Node {
 typedef struct P4_Result {
     union {
         P4_String               str;
-        ucs4_t                 rune;
-        size_t                  num;
+        ucs4_t                  rune;
+        P4_size_t               num;
         P4_ExpressionFlag       flag;
         /* The expression result. */
         P4_Expression*          expr;
@@ -492,7 +507,7 @@ P4_String      P4_Version(void);
 /**
  * Read a single code point (rune) from an UTF-8 string.
  */
-size_t         P4_ReadRune(P4_String s, ucs4_t* c);
+P4_size_t         P4_ReadRune(P4_String s, ucs4_t* c);
 
 /**
  * Read an escaped single code point (rune) from an UTF-8 string.
@@ -506,7 +521,7 @@ size_t         P4_ReadRune(P4_String s, ucs4_t* c);
  *      ucs4_t rune;
  *      P4_ReadEscapedRune("\\u000D", rune); // 0xd
  */
-size_t         P4_ReadEscapedRune(char* text, ucs4_t* rune);
+P4_size_t         P4_ReadEscapedRune(char* text, ucs4_t* rune);
 
 /**
  * Append a rune to str (in-place).
@@ -516,7 +531,7 @@ size_t         P4_ReadEscapedRune(char* text, ucs4_t* rune);
  * @param       n       The size of rune. Should be 1, 2, 3, 4.
  * @return      The string starting from appended rune.
  */
-void*          P4_ConcatRune(void* str, ucs4_t chr, size_t n);
+void*          P4_ConcatRune(void* str, ucs4_t chr, P4_size_t n);
 
 /**
  * Create a P4_Literal expression.
@@ -572,7 +587,7 @@ P4_Error       P4_AddLiteral(P4_Grammar* grammar, P4_String name, const P4_Strin
  *
  *
  */
-P4_Expression* P4_CreateRange(ucs4_t lower, ucs4_t upper, size_t stride);
+P4_Expression* P4_CreateRange(ucs4_t lower, ucs4_t upper, P4_size_t stride);
 
 /**
  * Create a P4_Range expression that holds multiple ranges.
@@ -588,7 +603,7 @@ P4_Expression* P4_CreateRange(ucs4_t lower, ucs4_t upper, size_t stride);
  *          alphadigits
  *      );
  */
-P4_Expression* P4_CreateRanges(size_t count, P4_RuneRange* ranges);
+P4_Expression* P4_CreateRanges(P4_size_t count, P4_RuneRange* ranges);
 
 /**
  * Add a range expression as grammar rule.
@@ -606,7 +621,7 @@ P4_Expression* P4_CreateRanges(size_t count, P4_RuneRange* ranges);
  *
  *      P4_AddRange(grammar, "R1", 0x4E00, 0x9FFF, 1);
  */
-P4_Error       P4_AddRange(P4_Grammar* grammar, P4_String name, ucs4_t lower, ucs4_t upper, size_t stride);
+P4_Error       P4_AddRange(P4_Grammar* grammar, P4_String name, ucs4_t lower, ucs4_t upper, P4_size_t stride);
 
 /**
  * Add sub-ranges expression as grammar rule.
@@ -625,7 +640,7 @@ P4_Error       P4_AddRange(P4_Grammar* grammar, P4_String name, ucs4_t lower, uc
  *          alphadigits
  *      );
  */
-P4_Error       P4_AddRanges(P4_Grammar* grammar, P4_String name, size_t count, P4_RuneRange* ranges);
+P4_Error       P4_AddRanges(P4_Grammar* grammar, P4_String name, P4_size_t count, P4_RuneRange* ranges);
 
 /**
  * Create a P4_Reference expression.
@@ -757,7 +772,7 @@ P4_Error       P4_AddLeftRecursion(P4_Grammar* grammar, P4_String name, P4_Expre
  *
  *
  */
-P4_Expression* P4_CreateSequence(size_t count);
+P4_Expression* P4_CreateSequence(P4_size_t count);
 
 /**
  * Create a P4_Sequence expression.
@@ -775,7 +790,7 @@ P4_Expression* P4_CreateSequence(size_t count);
  *          P4_CreateLiteral("}")
  *      );
  */
-P4_Expression* P4_CreateSequenceWithMembers(size_t count, ...);
+P4_Expression* P4_CreateSequenceWithMembers(P4_size_t count, ...);
 
 /**
  * Add a sequence expression as grammar rule.
@@ -794,7 +809,7 @@ P4_Expression* P4_CreateSequenceWithMembers(size_t count, ...);
  *
  * This function can be useful if you need to add members dynamically.
  */
-P4_Error       P4_AddSequence(P4_Grammar* grammar, P4_String name, size_t count);
+P4_Error       P4_AddSequence(P4_Grammar* grammar, P4_String name, P4_size_t count);
 
 /**
  * Add a sequence expression as grammar rule.
@@ -813,7 +828,7 @@ P4_Error       P4_AddSequence(P4_Grammar* grammar, P4_String name, size_t count)
  *          P4_CreateLiteral("}")
  *      );
  */
-P4_Error       P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_String name, size_t count, ...);
+P4_Error       P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_String name, P4_size_t count, ...);
 
 /**
  * Create a P4_Choice expression.
@@ -832,7 +847,7 @@ P4_Error       P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_String name, si
  *
  *
  */
-P4_Expression* P4_CreateChoice(size_t count);
+P4_Expression* P4_CreateChoice(P4_size_t count);
 
 /**
  * Create a P4_Choice expression.
@@ -850,7 +865,7 @@ P4_Expression* P4_CreateChoice(size_t count);
  *          P4_CreateLiteral("\n")
  *      );
  */
-P4_Expression* P4_CreateChoiceWithMembers(size_t count, ...);
+P4_Expression* P4_CreateChoiceWithMembers(P4_size_t count, ...);
 
 /**
  * Add a choice expression as grammar rule.
@@ -869,7 +884,7 @@ P4_Expression* P4_CreateChoiceWithMembers(size_t count, ...);
  *
  * This function can be useful if you need to add members dynamically.
  */
-P4_Error       P4_AddChoice(P4_Grammar* grammar, P4_String name, size_t count);
+P4_Error       P4_AddChoice(P4_Grammar* grammar, P4_String name, P4_size_t count);
 
 /**
  * Add a choice expression as grammar rule.
@@ -888,7 +903,7 @@ P4_Error       P4_AddChoice(P4_Grammar* grammar, P4_String name, size_t count);
  *          P4_CreateLiteral("\n")
  *      );
  */
-P4_Error       P4_AddChoiceWithMembers(P4_Grammar* grammar, P4_String name, size_t count, ...);
+P4_Error       P4_AddChoiceWithMembers(P4_Grammar* grammar, P4_String name, P4_size_t count, ...);
 
 /**
  * Create a P4_Repeat expression minimal min times and maximal max times.
@@ -906,7 +921,7 @@ P4_Error       P4_AddChoiceWithMembers(P4_Grammar* grammar, P4_String name, size
  *          1, 3
  *      );
  */
-P4_Expression* P4_CreateRepeatMinMax(P4_Expression* repeat_expr, size_t min, size_t max);
+P4_Expression* P4_CreateRepeatMinMax(P4_Expression* repeat_expr, P4_size_t min, P4_size_t max);
 
 /**
  * Create a P4_Repeat expression minimal min times and maximal max times.
@@ -926,7 +941,7 @@ P4_Expression* P4_CreateRepeatMinMax(P4_Expression* repeat_expr, size_t min, siz
  *          1, 3
  *      );
  */
-P4_Error       P4_AddRepeatMinMax(P4_Grammar* grammar, P4_String name, P4_Expression* repeat_expr, size_t min, size_t max);
+P4_Error       P4_AddRepeatMinMax(P4_Grammar* grammar, P4_String name, P4_Expression* repeat_expr, P4_size_t min, P4_size_t max);
 
 /**
  * Create a P4_Repeat expression minimal min times and maximal SIZE_MAX times.
@@ -943,7 +958,7 @@ P4_Error       P4_AddRepeatMinMax(P4_Grammar* grammar, P4_String name, P4_Expres
  * It's equivalent to P4_CreateRepeatMinMax(expr, min, SIZE_MAX);
  *
  */
-P4_Expression* P4_CreateRepeatMin(P4_Expression* repeat_expr, size_t min);
+P4_Expression* P4_CreateRepeatMin(P4_Expression* repeat_expr, P4_size_t min);
 
 /**
  * Create a RepeatMin expression as grammar rule.
@@ -959,7 +974,7 @@ P4_Expression* P4_CreateRepeatMin(P4_Expression* repeat_expr, size_t min);
  *      // It can match string "a", "aa", "aaa", ....
  *      P4_AddRepeatMin(grammar, "R1", P4_CreateLiteral("a", true), 1);
  */
-P4_Error       P4_AddRepeatMin(P4_Grammar* grammar, P4_String name, P4_Expression* repeat_expr, size_t min);
+P4_Error       P4_AddRepeatMin(P4_Grammar* grammar, P4_String name, P4_Expression* repeat_expr, P4_size_t min);
 
 /**
  * Create a P4_Repeat expression maximal max times.
@@ -976,7 +991,7 @@ P4_Error       P4_AddRepeatMin(P4_Grammar* grammar, P4_String name, P4_Expressio
  * It's equivalent to P4_CreateRepeatMinMax(expr, 0, max);
  *
  */
-P4_Expression* P4_CreateRepeatMax(P4_Expression* repeat_expr, size_t max);
+P4_Expression* P4_CreateRepeatMax(P4_Expression* repeat_expr, P4_size_t max);
 
 /**
  * Add a RepeatMax expression as grammar rule.
@@ -992,7 +1007,7 @@ P4_Expression* P4_CreateRepeatMax(P4_Expression* repeat_expr, size_t max);
  *      // It can match string "", "a", "aa", "aaa".
  *      P4_AddRepeatMax(grammar, "name", P4_CreateLiteral("a", true), 3);
  */
-P4_Error       P4_AddRepeatMax(P4_Grammar* grammar, P4_String name, P4_Expression* repeat_expr, size_t max);
+P4_Error       P4_AddRepeatMax(P4_Grammar* grammar, P4_String name, P4_Expression* repeat_expr, P4_size_t max);
 
 /**
  * Create a P4_Repeat expression exact N times.
@@ -1010,7 +1025,7 @@ P4_Error       P4_AddRepeatMax(P4_Grammar* grammar, P4_String name, P4_Expressio
  *
  *
  */
-P4_Expression* P4_CreateRepeatExact(P4_Expression* repeat_expr, size_t times);
+P4_Expression* P4_CreateRepeatExact(P4_Expression* repeat_expr, P4_size_t times);
 
 /**
  * Add a RepeatExact expression as grammar rule.
@@ -1026,7 +1041,7 @@ P4_Expression* P4_CreateRepeatExact(P4_Expression* repeat_expr, size_t times);
  *      // It can match string "aaa".
  *      P4_AddRepeatExact(grammar, "R1", P4_CreateLiteral("a", true), 3);
  */
-P4_Error       P4_AddRepeatExact(P4_Grammar* grammar, P4_String name, P4_Expression* repeat_expr, size_t times);
+P4_Error       P4_AddRepeatExact(P4_Grammar* grammar, P4_String name, P4_Expression* repeat_expr, P4_size_t times);
 
 /**
  * Create a P4_Repeat expression zero or once.
@@ -1142,7 +1157,7 @@ P4_Error       P4_AddOnceOrMore(P4_Grammar* grammar, P4_String name, P4_Expressi
  *          P4_CreateBackReference(0, true)
  *      );
  */
-P4_Expression* P4_CreateBackReference(size_t backref_index, bool sensitive);
+P4_Expression* P4_CreateBackReference(P4_size_t backref_index, bool sensitive);
 
 /**
  * Set the member of Sequence/Choice at a given index.
@@ -1163,7 +1178,7 @@ P4_Expression* P4_CreateBackReference(size_t backref_index, bool sensitive);
  *          // handle error.
  *      }
  */
-P4_Error       P4_SetMember(P4_Expression* expr, size_t index, P4_Expression* member);
+P4_Error       P4_SetMember(P4_Expression* expr, P4_size_t index, P4_Expression* member);
 
 /**
  * Set the referenced member of Sequence/Choice at a given index.
@@ -1177,7 +1192,7 @@ P4_Error       P4_SetMember(P4_Expression* expr, size_t index, P4_Expression* me
  *
  *      P4_SetMember(expr, index, P4_CreateReference("member_n"));
  */
-P4_Error       P4_SetReferenceMember(P4_Expression* expr, size_t index, P4_String name);
+P4_Error       P4_SetReferenceMember(P4_Expression* expr, P4_size_t index, P4_String name);
 
 /**
  * Get the total number members for sequence/choice.
@@ -1186,9 +1201,9 @@ P4_Error       P4_SetReferenceMember(P4_Expression* expr, size_t index, P4_Strin
  * @return  The number. If something goes wrong, it returns 0.
  *
  *      P4_Expression* expr = P4_CreateSequence(3);
- *      size_t  count = P4_GetMembers(expr); // 3
+ *      P4_size_t  count = P4_GetMembers(expr); // 3
  */
-size_t         P4_GetMembersCount(P4_Expression* expr);
+P4_size_t         P4_GetMembersCount(P4_Expression* expr);
 
 /**
  * Get the member of sequence/choice at a given index.
@@ -1201,7 +1216,7 @@ size_t         P4_GetMembersCount(P4_Expression* expr);
  *
  *      P4_Expression* member = P4_GetMember(expr, 0);
  */
-P4_Expression* P4_GetMember(P4_Expression* expr, size_t index);
+P4_Expression* P4_GetMember(P4_Expression* expr, P4_size_t index);
 
 /**
  * Create an Start-Of-Input expression.
@@ -1426,7 +1441,7 @@ P4_Error       P4_SetGrammarRuleFlag(P4_Grammar* grammar, P4_String name, P4_Exp
  *      // on a machine with large memory.
  *      P4_SetRecursionLimit(grammar, 1024*20);
  */
-P4_Error       P4_SetRecursionLimit(P4_Grammar* grammar, size_t limit);
+P4_Error       P4_SetRecursionLimit(P4_Grammar* grammar, P4_size_t limit);
 
 /**
  * @brief       Set free function for the user data.
@@ -1443,10 +1458,10 @@ P4_Error       P4_SetUserDataFreeFunc(P4_Grammar* grammar, P4_UserDataFreeFunc f
  *
  * Example:
  *
- *      size_t  limit = P4_GetRecursionLimit(grammar);
+ *      P4_size_t  limit = P4_GetRecursionLimit(grammar);
  *      printf("limit=%u\n", limit);
  */
-size_t         P4_GetRecursionLimit(P4_Grammar* grammar);
+P4_size_t         P4_GetRecursionLimit(P4_Grammar* grammar);
 
 /**
  * @brief       Create a \ref P4_Source* object.
@@ -1510,7 +1525,7 @@ void           P4_ResetSource(P4_Source* source);
  *      if (P4_Ok != P4_SetSourceSlice(source, 1, 2)) // only parse "a"
  *          printf("set buf size error\n");
  */
-P4_Error       P4_SetSourceSlice(P4_Source* source, size_t start, size_t stop);
+P4_Error       P4_SetSourceSlice(P4_Source* source, P4_size_t start, P4_size_t stop);
 
 /**
  * @brief       Get the root node of abstract syntax tree of the source.
@@ -1542,7 +1557,7 @@ P4_Node*      P4_AcquireSourceAst(P4_Source* source);
  * @param       source  The source.
  * @return      The position in the input.
  */
-size_t          P4_GetSourcePosition(P4_Source* source);
+P4_size_t          P4_GetSourcePosition(P4_Source* source);
 
 /**
  * @brief       Print the node tree.
@@ -1653,8 +1668,8 @@ P4_String      P4_GetErrorMessage(P4_Source* source);
  * Example:
  *
  *      P4_String       str     = "Hello world";
- *      size_t          start   = 0;
- *      size_t          stop    = 11;
+ *      P4_size_t       start   = 0;
+ *      P4_size_t       stop    = 11;
  *      P4_String       rule    = "entry"
  *
  *      P4_Node* node = P4_CreateNode(text, start, stop, rule);
@@ -1712,10 +1727,10 @@ P4_Slice*      P4_GetNodeSlice(P4_Node* node);
  * Example:
  *
  *      P4_Node* root = P4_GetSourceAst(source);
- *      size_t count = P4_GetNodeChildrenCount(root);
+ *      P4_size_t count = P4_GetNodeChildrenCount(root);
  *      printf("There are %lu children for root node\n", count);
  */
-size_t         P4_GetNodeChildrenCount(P4_Node* node);
+P4_size_t         P4_GetNodeChildrenCount(P4_Node* node);
 
 /**
  * @brief       Copy the string that the node covers.

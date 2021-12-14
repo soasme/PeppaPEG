@@ -1480,6 +1480,7 @@ P4_size_t         P4_GetRecursionLimit(P4_Grammar* grammar);
  *      P4_DeleteSource(source);
  */
 P4_Source*     P4_CreateSource(P4_CosntString content, P4_CosntString entry_name);
+void           P4_SetDebugSource(P4_Source *src, bool debug, P4_size_t line_start, P4_size_t line_end);
 
 /**
  * @brief       Free the allocated memory of a source.

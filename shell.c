@@ -73,6 +73,9 @@ static int subcommand_usage(const char* name) {
         "  --grammar-str/-g FILE\tpeg grammar string\n"
         "  --grammar-file/-G FILE\tpath to peg grammar file\n"
         "  --grammar-entry/-e NAME\tentry rule name in peg grammar\n"
+#ifndef WITHOUT_DEBUG_INFO
+        "  --debug/-d\t\toutput debug info\n"
+#endif
         "  --json/-j\t\tjson ast output\n"
         "  --json2/-J\t\tjson ast output with only arrays\n"
         "  --text/-t\t\ttext ast output [default]\n"
@@ -112,8 +115,10 @@ static int print_ast(
         fprintf(stderr, "out of memory");
         goto finalize;
     }
+    P4_SetDebugSource(source, args->debug, 0, 0);
     if (P4_Parse(grammar, source) != P4_Ok) {
         code = 1;
+        fflush(stdout);
         if (strcmp(file_path, "") != 0)
             fprintf(stderr, "%s:\n", file_path);
         fprintf(stderr, "%s: %s\n", P4_GetErrorString(P4_GetError(source)), P4_GetErrorMessage(source));

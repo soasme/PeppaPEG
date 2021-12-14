@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
     printf("root tail: %p\n", root->tail);
     printf("root text: %s\n", text);
 
-    free(text);
+    P4_FREE(text);
 
     P4_JsonifySourceAst(stdout, root, NULL);
 

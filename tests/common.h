@@ -13,7 +13,7 @@ cleanup_freep (void *p)
 {
   void **pp = (void **) p;
   if (*pp)
-    free (*pp);
+    P4_FREE (*pp);
 }
 
 # define ASSERT_EQUAL_SLICE(s, i, j) do { \

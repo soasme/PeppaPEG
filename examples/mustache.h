@@ -79,14 +79,14 @@ P4_Error P4_MustacheCallback(P4_Grammar* grammar, P4_Expression* rule, P4_Node* 
         node->head->rule_name  = P4_GetRuleName(opener_expr);
         node->tail->rule_name  = P4_GetRuleName(closer_expr);
 
-        free(opener);
-        free(closer);
+        P4_FREE(opener);
+        P4_FREE(closer);
 
         return P4_Ok;
 
 finalize_set_delimiter:
-        free(opener);
-        free(closer);
+        P4_FREE(opener);
+        P4_FREE(closer);
         P4_DeleteExpression(opener_expr);
         P4_DeleteExpression(closer_expr);
         return P4_MemoryError;

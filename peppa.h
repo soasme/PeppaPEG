@@ -78,6 +78,13 @@ typedef uint32_t        ucs4_t;
 # define P4_REALLOC realloc
 # endif
 
+# ifndef P4_CALLOC
+/**
+ * The realloc function. By default, it's `realloc`.
+ */
+# define P4_CALLOC calloc
+# endif
+
 /*
  *
  * ███████╗██╗░░░░░░█████╗░░██████╗░░██████╗

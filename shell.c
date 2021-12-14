@@ -58,6 +58,7 @@ struct p4_args_t {
     bool json;
     bool json2;
     bool text;
+    bool naked;
     bool debug;
 };
 
@@ -78,6 +79,7 @@ static int subcommand_usage(const char* name) {
 #endif
         "  --json/-j\t\tjson ast output\n"
         "  --json2/-J\t\tjson ast output with only arrays\n"
+        "  --naked/-n\t\tdump naked grammar\n"
         "  --text/-t\t\ttext ast output [default]\n"
         "  --quiet/-q\t\tno ast output\n"
         "\n"
@@ -130,6 +132,8 @@ static int print_ast(
             P4_Jsonify2SourceAst(stdout, root, 0);
         else if(args->json)
             P4_JsonifySourceAst(stdout, root, 0);
+        else if(args->naked)
+            P4_NakedSourceAst(stdout, root, 0, " ");
         else
             P4_TxtSourceAst(stdout, root, 0);
         fprintf(stdout, "\n");
@@ -152,6 +156,7 @@ int init_args(p4_args_t* args, int argc, char* argv[]) {
             {"quiet", no_argument, 0, 'q'},
             {"json", no_argument, 0, 'j'},
             {"json2", no_argument, 0, 'J'},
+            {"naked", no_argument, 0, 'n'},
             {"text", no_argument, 0, 't'},
             {"debug", no_argument, 0, 'd'},
             {"grammar-entry", required_argument, 0, 'e'},
@@ -160,7 +165,7 @@ int init_args(p4_args_t* args, int argc, char* argv[]) {
             {0, 0, 0, 0}
         };
         int option_index = 0;
-        c = getopt_long (argc, argv, "VhqjJtde:g:G:", long_options, &option_index);
+        c = getopt_long (argc, argv, "VhqjJntde:g:G:", long_options, &option_index);
         if (c == -1) break;
         switch (c) {
             case 0:
@@ -182,6 +187,9 @@ int init_args(p4_args_t* args, int argc, char* argv[]) {
                 break;
             case 'J':
                 args->json2 = true;
+                break;
+            case 'n':
+                args->naked = true;
                 break;
             case 't':
                 args->text = true;

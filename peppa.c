@@ -2728,6 +2728,120 @@ P4_TxtSourceAst(FILE* stream, P4_Node* node, int depth) {
     }
 }
 
+P4_PUBLIC void
+P4_NakedSourceAst(FILE* stream, P4_Node* node, int depth, const char *sep) {
+	P4_size_t child_count, sep_count = 0;
+	P4_ConstString rule_name;
+	P4_Node *tmp_node = node;
+	while (tmp_node) {
+            P4_String node_string = P4_CopyNodeString(tmp_node);
+            rule_name = tmp_node->rule_name;
+            if(strcmp(rule_name, "choice") == 0) {
+                fprintf(stream, "%s", (sep_count++ ? sep : ""));
+                child_count = P4_GetNodeChildrenCount(tmp_node);
+                if(depth && child_count > 1) fprintf(stream, " ( ");
+                P4_NakedSourceAst(stream, tmp_node->head, depth+1, " / ");
+                if(depth && child_count > 1) fprintf(stream, " )");
+            }
+            else if(strcmp(rule_name, "cut") == 0) {
+                fprintf(stream, " /*%s*/", node_string);
+            }
+            else if(strcmp(rule_name, "decorator") == 0) {
+                fprintf(stream, "/*%s*/ ", node_string);
+            }
+            else if(strcmp(rule_name, "decorators") == 0) {
+                P4_NakedSourceAst(stream, tmp_node->head, 0, " ");
+            }
+            else if(strcmp(rule_name, "dot") == 0) {
+                fprintf(stream, ".");
+            }
+            else if(strcmp(rule_name, "grammar") == 0) {
+                P4_NakedSourceAst(stream, tmp_node->head, 0, " ");
+            }
+            else if(strcmp(rule_name, "back_reference") == 0
+                || strcmp(rule_name, "insensitive") == 0
+                || strcmp(rule_name, "char") == 0
+                || strcmp(rule_name, "reference") == 0
+                || strcmp(rule_name, "number") == 0
+                || strcmp(rule_name, "literal") == 0) {
+                fprintf(stream, "%s%s", (sep_count++ ? sep : ""), node_string);
+            }
+            else if(strcmp(rule_name, "left_recursion") == 0) {
+                P4_FREE(node_string);
+                node_string = P4_CopyNodeString(tmp_node->head);
+                fprintf(stream, "%s%s /*|*/ / ", (sep_count++ ? sep : ""), node_string);
+                P4_NakedSourceAst(stream, tmp_node->head->next, depth+1, " ");
+            }
+            else if(strcmp(rule_name, "name") == 0) {
+                fprintf(stream, "%s =\n\t", node_string);
+                sep_count = 0;
+            }
+            else if(strcmp(rule_name, "negative") == 0) {
+                fprintf(stream, "%s!", (sep_count++ ? sep : ""));
+                P4_NakedSourceAst(stream, tmp_node->head, depth+1, sep);
+            }
+            else if(strcmp(rule_name, "positive") == 0) {
+                fprintf(stream, "%s&", (sep_count++ ? sep : ""));
+                P4_NakedSourceAst(stream, tmp_node->head, depth+1, sep);
+            }
+            else if(strcmp(rule_name, "range") == 0) {
+                fprintf(stream, "%s[", (sep_count++ ? sep : ""));
+                P4_NakedSourceAst(stream, tmp_node->head, depth+1, "-");
+                fprintf(stream, "]");
+            }
+            else if(strcmp(rule_name, "range_category") == 0) {
+                fprintf(stream, "\\p{%s}", node_string);
+            }
+            else if(strcmp(rule_name, "repeat") == 0) {
+                fprintf(stream, "%s", (sep_count++ ? sep : ""));
+                P4_NakedSourceAst(stream, tmp_node->head, depth+1, " ");
+            }
+            else if(strcmp(rule_name, "rule") == 0) {
+                fprintf(stream, "\n");
+                P4_NakedSourceAst(stream, tmp_node->head, depth+1, " ");
+                fprintf(stream, " ;");
+            }
+            else if(strcmp(rule_name, "sequence") == 0) {
+                fprintf(stream, "%s", (sep_count++ ? sep : ""));
+                child_count = P4_GetNodeChildrenCount(tmp_node);
+                if(depth && child_count > 1) fprintf(stream, " ( ");
+                P4_NakedSourceAst(stream, tmp_node->head, depth+1, " ");
+                if(depth && child_count > 1) fprintf(stream, " )");
+            }
+            else if(strcmp(rule_name, "onceormore") == 0) { fprintf(stream, "+ "); }
+            else if(strcmp(rule_name, "zeroormore") == 0) { fprintf(stream, "* "); }
+            else if(strcmp(rule_name, "zerooronce") == 0) { fprintf(stream, "? "); }
+            else if(strcmp(rule_name, "repeatexact") == 0) {
+                fprintf(stream, "{");
+                P4_NakedSourceAst(stream, tmp_node->head, depth+1, " ");
+                fprintf(stream, "} ");
+            }
+            else if(strcmp(rule_name, "repeatmin") == 0) {
+                fprintf(stream, "{");
+                P4_NakedSourceAst(stream, tmp_node->head, depth+1, " ");
+                fprintf(stream, ",} ");
+            }
+            else if(strcmp(rule_name, "repeatmax") == 0) {
+                fprintf(stream, "{,");
+                P4_NakedSourceAst(stream, tmp_node->head, depth+1, " ");
+                fprintf(stream, "} ");
+            }
+            else if(strcmp(rule_name, "repeatminmax") == 0) {
+                fprintf(stream, "{");
+                P4_NakedSourceAst(stream, tmp_node->head, depth+1, ",");
+                fprintf(stream, "} ");
+            }
+            else {
+                P4_FREE(node_string);
+                fprintf(stream, "\n\n***Unknown rule name: %s\n", rule_name);
+                return;
+            }
+            tmp_node = tmp_node->next;
+            P4_FREE(node_string);
+	}
+	if(depth == 0)
+            fprintf(stream, "\n");
+}
 
 P4_PUBLIC P4_Error
 P4_InspectSourceAst(P4_Node* node, void* userdata, P4_Error (*inspector)(P4_Node*, void*)) {

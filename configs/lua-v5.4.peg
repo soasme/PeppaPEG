@@ -115,10 +115,10 @@ Exp = UnExp | Exp BinOp UnExp;
 UnExp = PrimaryExp / UnOp UnExp;
 
 @lifted
-PrimaryExp = KeywordNil / KeywordFalse / KeywordTrue / Numeral / LiteralString / Eclipse
+PrimaryExp = KeywordNil / KeywordFalse / KeywordTrue / Numeral / LiteralString / Elipse
     / FunctionLiteral / PrefixExp / TableConstructor;
 
-Eclipse = "...";
+Elipse = "...";
 
 Args = "(" ~ ExpList? ")" / TableConstructor / LiteralString;
 
@@ -126,7 +126,7 @@ FunctionLiteral = "function" ~ FuncBody;
 
 FuncBody = "(" ParList? ")" Block KeywordEnd;
 
-ParList = NameList ("," "...")? / "...";
+ParList = NameList ("," Elipse)? / Elipse;
 
 TableConstructor = "{" ~ FieldList? "}";
 
@@ -151,7 +151,7 @@ Keyword = "and"/"break"/"do"/"elseif"/"else"/"end"/"false"/"for"
     /"return"/"then"/"true"/"until"/"while";
 
 @tight @squashed
-Name = !(Keyword !([a-z]/[A-Z]/[0-9]/"_")) ([a-z] / [A-Z] / "_") ([a-z] / [A-Z] / [0-9] / "_")*;
+Name = !(Keyword !IdentChars) ([a-z] / [A-Z] / "_") ([a-z] / [A-Z] / [0-9] / "_")*;
 
 @lifted
 LiteralString = NormalString / CharString / LongString;
@@ -210,67 +210,69 @@ LineComment = "--" (
 NestedStr = "="* "[" (!("]" \0) .)* ("]" \0);
 
 @tight
-KeywordAnd = "and" !([a-z]/[A-Z]/[0-9]/"_");
+KeywordAnd = "and" !IdentChars;
 
 @tight
-KeywordBreak = "break" !([a-z]/[A-Z]/[0-9]/"_");
+KeywordBreak = "break" !IdentChars;
 
 @tight
-KeywordDo = "do" !([a-z]/[A-Z]/[0-9]/"_");
+KeywordDo = "do" !IdentChars;
 
 @tight
-KeywordEnd = "end" !([a-z]/[A-Z]/[0-9]/"_");
+KeywordEnd = "end" !IdentChars;
 
 @tight
-KeywordElseIf = "elseif" !([a-z]/[A-Z]/[0-9]/"_");
+KeywordElseIf = "elseif" !IdentChars;
 
 @tight
-KeywordElse = "else" !([a-z]/[A-Z]/[0-9]/"_");
+KeywordElse = "else" !IdentChars;
 
 @tight
-KeywordFalse = "false" !([a-z]/[A-Z]/[0-9]/"_");
+KeywordFalse = "false" !IdentChars;
 
 @tight
-KeywordFor = "for" !([a-z]/[A-Z]/[0-9]/"_");
+KeywordFor = "for" !IdentChars;
 
 @tight
-KeywordFunction = "function" !([a-z]/[A-Z]/[0-9]/"_");
+KeywordFunction = "function" !IdentChars;
 
 @tight
-KeywordGoto = "goto" !([a-z]/[A-Z]/[0-9]/"_");
+KeywordGoto = "goto" !IdentChars;
 
 @tight
-KeywordIf = "if" !([a-z]/[A-Z]/[0-9]/"_");
+KeywordIf = "if" !IdentChars;
 
 @tight
-KeywordIn = "in" !([a-z]/[A-Z]/[0-9]/"_");
+KeywordIn = "in" !IdentChars;
 
 @tight
-KeywordLocal = "local" !([a-z]/[A-Z]/[0-9]/"_");
+KeywordLocal = "local" !IdentChars;
 
 @tight
-KeywordNil = "nil" !([a-z]/[A-Z]/[0-9]/"_");
+KeywordNil = "nil" !IdentChars;
 
 @tight
-KeywordNot = "not" !([a-z]/[A-Z]/[0-9]/"_");
+KeywordNot = "not" !IdentChars;
 
 @tight
-KeywordOr = "or" !([a-z]/[A-Z]/[0-9]/"_");
+KeywordOr = "or" !IdentChars;
 
 @tight
-KeywordRepeat  = "repeat" !([a-z]/[A-Z]/[0-9]/"_");
+KeywordRepeat  = "repeat" !IdentChars;
 
 @tight
-KeywordReturn = "return" !([a-z]/[A-Z]/[0-9]/"_");
+KeywordReturn = "return" !IdentChars;
 
 @tight
-KeywordThen = "then" !([a-z]/[A-Z]/[0-9]/"_");
+KeywordThen = "then" !IdentChars;
 
 @tight
-KeywordTrue = "true" !([a-z]/[A-Z]/[0-9]/"_");
+KeywordTrue = "true" !IdentChars;
 
 @tight
-KeywordUntil = "until" !([a-z]/[A-Z]/[0-9]/"_");
+KeywordUntil = "until" !IdentChars;
 
 @tight
-KeywordWhile = "while" !([a-z]/[A-Z]/[0-9]/"_");
+KeywordWhile = "while" !IdentChars;
+
+IdentChars = [a-z]/[A-Z]/[0-9]/"_";

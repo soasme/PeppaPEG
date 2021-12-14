@@ -25,7 +25,7 @@ expression = left_recursion;
 left_recursion = choice ("|" ~ reference choice)?;
 
 @nonterminal
-choice = sequence ("/" sequence)*;
+choice = sequence (!("//" / "/*") "/" sequence)*;
 
 @nonterminal
 sequence = repeat+;
@@ -74,6 +74,7 @@ char = [\x20-\x21] / [\x23-\x5b] / [\x5d-\U0010ffff] / (
         / "n"
         / "r"
         / "t"
+        / "v"
         / ("x" ~ two_hexdigits)
         / ("u" ~ four_hexdigits)
         / ("U" ~ eight_hexdigits)
@@ -111,7 +112,9 @@ eight_hexdigits = hexdigit{8};
 @squashed @tight
 number = "0" / [1-9] [0-9]*;
 @lifted @spaced
-comment = "#" (!"\n" .)* "\n"?;
+comment =
+	("#" / "//") (!"\n" .)* "\n"?
+	/ "/*" (!"*/" .)* "*/" ;
 
 @lifted @spaced
 whitespace = " " / "\t" / "\r" / "\n";

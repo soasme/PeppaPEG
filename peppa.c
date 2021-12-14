@@ -2606,6 +2606,41 @@ P4_JsonifySourceAst(FILE* stream, P4_Node* node, P4_Formatter formatter) {
 }
 
 
+P4_PUBLIC void
+P4_Jsonify2SourceAst(FILE* stream, P4_Node* node, P4_Formatter formatter) {
+    P4_Node* tmp = node;
+
+    while (tmp != NULL) {
+        fprintf(stream, "[\"%s\"," P4_SIZE_T_FMT "," P4_SIZE_T_FMT, tmp->rule_name, tmp->slice.start.pos, tmp->slice.stop.pos);
+        if (formatter != NULL) {
+            formatter(stream, tmp);
+        }
+        if (tmp->head != NULL) {
+            fprintf(stream, ",[");
+            P4_Jsonify2SourceAst(stream, tmp->head, formatter);
+            fprintf(stream, "]");
+        }
+        if (tmp->next != NULL) fprintf(stream, "],");
+        else fprintf(stream, "]");
+        tmp = tmp->next;
+    }
+}
+
+
+P4_PUBLIC void
+P4_TxtSourceAst(FILE* stream, P4_Node* node, int depth) {
+    P4_Node* tmp = node;
+
+    while (tmp != NULL) {
+        fprintf(stream, "%*s\"%s\"," P4_SIZE_T_FMT "," P4_SIZE_T_FMT "\n", depth, "| ", tmp->rule_name, tmp->slice.start.pos, tmp->slice.stop.pos);
+        if (tmp->head != NULL) {
+            P4_TxtSourceAst(stream, tmp->head, depth+2);
+        }
+        tmp = tmp->next;
+    }
+}
+
+
 P4_PUBLIC P4_Error
 P4_InspectSourceAst(P4_Node* node, void* userdata, P4_Error (*inspector)(P4_Node*, void*)) {
     P4_Node* tmp = node;

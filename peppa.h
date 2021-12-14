@@ -1571,6 +1571,8 @@ P4_size_t          P4_GetSourcePosition(P4_Source* source);
  *      P4_JsonifySourceAst(stdout, root);
  */
 void           P4_JsonifySourceAst(FILE* stream, P4_Node* node, P4_Formatter formatter);
+void           P4_Jsonify2SourceAst(FILE* stream, P4_Node* node, P4_Formatter formatter);
+void           P4_TxtSourceAst(FILE* stream, P4_Node* node, int depth);
 
 /**
  * @brief       Inspect the node tree.

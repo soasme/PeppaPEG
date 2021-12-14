@@ -55,6 +55,10 @@ struct p4_args_t {
     size_t arguments_count;
     char** arguments;
     bool quiet;
+    bool json;
+    bool json2;
+    bool text;
+    bool debug;
 };
 
 static int subcommand_version(const char* name) {
@@ -69,6 +73,9 @@ static int subcommand_usage(const char* name) {
         "  --grammar-str/-g FILE\tpeg grammar string\n"
         "  --grammar-file/-G FILE\tpath to peg grammar file\n"
         "  --grammar-entry/-e NAME\tentry rule name in peg grammar\n"
+        "  --json/-j\t\tjson ast output\n"
+        "  --json2/-J\t\tjson ast output with only arrays\n"
+        "  --text/-t\t\ttext ast output [default]\n"
         "  --quiet/-q\t\tno ast output\n"
         "\n"
         "OPTION:\n\n"
@@ -96,11 +103,10 @@ static int print_ast(
         const char* file_path,
         const char* grammar_content,
         const char* input_content,
-        const char* entry,
-        bool quiet) {
+        p4_args_t *args) {
     int code = 0;
-    P4_Grammar* grammar = P4_LoadGrammar((char*)grammar_content);
-    P4_Source*  source = P4_CreateSource((char*)input_content, (char*)entry);
+    P4_Grammar* grammar = P4_LoadGrammar(grammar_content);
+    P4_Source*  source = P4_CreateSource(input_content, args->grammar_entry);
     if (source == NULL) {
         code = 1;
         fprintf(stderr, "out of memory");
@@ -113,9 +119,14 @@ static int print_ast(
         fprintf(stderr, "%s: %s\n", P4_GetErrorString(P4_GetError(source)), P4_GetErrorMessage(source));
         goto finalize;
     }
-    if (!quiet) {
+    if (!args->quiet) {
         P4_Node*    root = P4_GetSourceAst(source);
-        P4_JsonifySourceAst(stdout, root, NULL);
+        if(args->json2)
+            P4_Jsonify2SourceAst(stdout, root, 0);
+        else if(args->json)
+            P4_JsonifySourceAst(stdout, root, 0);
+        else
+            P4_TxtSourceAst(stdout, root, 0);
         fprintf(stdout, "\n");
     }
 finalize:
@@ -134,13 +145,17 @@ int init_args(p4_args_t* args, int argc, char* argv[]) {
             {"version", no_argument, 0, 'V'},
             {"help", no_argument, 0, 'h'},
             {"quiet", no_argument, 0, 'q'},
+            {"json", no_argument, 0, 'j'},
+            {"json2", no_argument, 0, 'J'},
+            {"text", no_argument, 0, 't'},
+            {"debug", no_argument, 0, 'd'},
             {"grammar-entry", required_argument, 0, 'e'},
             {"grammar-file", required_argument, 0, 'G'},
             {"grammar-str", required_argument, 0, 'g'},
             {0, 0, 0, 0}
         };
         int option_index = 0;
-        c = getopt_long (argc, argv, "Vhqe:g:G:", long_options, &option_index);
+        c = getopt_long (argc, argv, "VhqjJtde:g:G:", long_options, &option_index);
         if (c == -1) break;
         switch (c) {
             case 0:
@@ -153,6 +168,18 @@ int init_args(p4_args_t* args, int argc, char* argv[]) {
                 break;
             case 'q':
                 args->quiet = true;
+                break;
+            case 'd':
+                args->debug = true;
+                break;
+            case 'j':
+                args->json = true;
+                break;
+            case 'J':
+                args->json2 = true;
+                break;
+            case 't':
+                args->text = true;
                 break;
             case 'e':
                 args->grammar_entry = optarg;
@@ -211,14 +238,14 @@ int subcommand_parse(p4_args_t* args) {
         }
         *s = '\0';
 
-        err = print_ast("", grammar_content, input_content, args->grammar_entry, args->quiet);
+        err = print_ast("", grammar_content, input_content, args);
     } else if (strstr(args->arguments[1], "*") == NULL){
         if (!(input_file = fopen(args->arguments[1], "r"))) {
             perror(args->arguments[1]);
             abort(1);
         }
         input_content = read_file(input_file);
-        err = print_ast(args->arguments[1], grammar_content, input_content, args->grammar_entry, args->quiet);
+        err = print_ast(args->arguments[1], grammar_content, input_content, args);
     } else {
         glob_t globbuf = {0};
         glob(args->arguments[1], 0, 0, &globbuf);
@@ -232,7 +259,7 @@ int subcommand_parse(p4_args_t* args) {
             }
             input_content = read_file(input_file);
 
-            int ferr = print_ast(file_path, grammar_content, input_content, args->grammar_entry, args->quiet);
+            int ferr = print_ast(file_path, grammar_content, input_content, args);
             if (err == 0 && ferr != 0)
                 err = ferr;
 

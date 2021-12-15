@@ -1600,6 +1600,7 @@ P4_size_t u8_next_escaped_char(const char* text, ucs4_t* rune) {
         case 'b': *rune = 0x8; return 2;
         case 't': *rune = 0x9; return 2;
         case 'n': *rune = 0xa; return 2;
+        case 'v': *rune = 0xb; return 2;
         case 'f': *rune = 0xc; return 2;
         case 'r': *rune = 0xd; return 2;
         case '"': *rune = 0x22; return 2;

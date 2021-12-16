@@ -147,7 +147,7 @@ P4_Error P4_CalcEval(P4_Node* node, long* result) {
     } else if (strcmp(node->rule_name, "integer") == 0) {
         intstr = P4_CopyNodeString(node);
         *result = atol(intstr);
-        free(intstr);
+        P4_FREE(intstr);
         return P4_Ok;
     } else {
         return P4_ValueError;

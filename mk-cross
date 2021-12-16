@@ -1,0 +1,19 @@
+#!/bin/sh
+
+SOURCES="-O2 shell.c peppa.c -o peppa"
+
+####linux
+gcc ${SOURCES}-linux64
+gcc -m32 ${SOURCES}-linux32
+
+### windows
+x86_64-w64-mingw32-gcc  ${SOURCES}-win64
+i686-w64-mingw32-gcc  ${SOURCES}-win32
+
+### osx
+osxcross-env gcc ${SOURCES}-darwin64
+osxcross-env gcc -m32 ${SOURCES}-darwin32
+
+### linux powerpc64le
+powerpc64le-linux-gnu-gcc ${SOURCES}-ppc64
+#powerpc64le-linux-gnu-gcc -m32 ${SOURCES}-ppc32

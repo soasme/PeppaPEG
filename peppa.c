@@ -294,16 +294,16 @@ typedef khint_t khiter_t;
 #endif
 
 #ifndef kcalloc
-#define kcalloc(N,Z) calloc(N,Z)
+#define kcalloc(N,Z) P4_CALLOC(N,Z)
 #endif
 #ifndef kmalloc
-#define kmalloc(Z) malloc(Z)
+#define kmalloc(Z) P4_MALLOC(Z)
 #endif
 #ifndef krealloc
-#define krealloc(P,Z) realloc(P,Z)
+#define krealloc(P,Z) P4_REALLOC(P,Z)
 #endif
 #ifndef kfree
-#define kfree(P) free(P)
+#define kfree(P) P4_FREE(P)
 #endif
 
 static const double __ac_HASH_UPPER = 0.77;
@@ -546,12 +546,12 @@ KHASH_MAP_INIT_STR(rules, P4_Expression*)
 struct P4_Grammar {
     /** A map associating names with expressions. Type: Map<str, P4_Expression*>. */
     khash_t(rules)*         rules;
-    /** The total number of spaced rules. */
-    size_t                  spaced_count;
     /** The repetition rule for spaced rules. */
     P4_Expression*          spaced_rules;
+    /** The total number of spaced rules. */
+    P4_size_t                  spaced_count;
     /** The recursion limit, or maximum allowed nested rules. */
-    size_t                  depth;
+    P4_size_t                  depth;
     /** The callback after a match for an expression is successful. */
     P4_MatchCallback        on_match;
     /** The callback after a match for an expression is failed. */
@@ -570,14 +570,14 @@ struct P4_Expression {
 
     union {
         /** Used by P4_Numeric. */
-        size_t                      num;
+        P4_size_t                   num;
 
         /** Used by P4_Literal and P4_BackReference. */
         struct {
             P4_String               literal;
-            size_t                  literal_len;
+            P4_size_t               literal_len;
+            P4_size_t               backref_index;
             bool                    sensitive;
-            size_t                  backref_index;
         };
 
         /** Used by P4_Reference..P4_Negative. */
@@ -588,7 +588,7 @@ struct P4_Expression {
 
         /** Used by P4_Range. */
         struct {
-            size_t                  ranges_count;
+            P4_size_t               ranges_count;
             struct P4_RuneRange*    ranges;
         };
 
@@ -603,7 +603,7 @@ struct P4_Expression {
         /** Used by P4_Sequence..P4_Choice. */
         struct {
             P4_Expression**         members;
-            size_t                  count;
+            P4_size_t               count;
             bool                    has_backref;
         };
 
@@ -611,8 +611,8 @@ struct P4_Expression {
          * repeat the expr for n times, n >= min and n <= max. */
         struct {
             P4_Expression*          repeat_expr; /* maybe we can merge it with ref_expr? */
-            size_t                  repeat_min;
-            size_t                  repeat_max;
+            P4_size_t               repeat_min;
+            P4_size_t               repeat_max;
         };
 
         /** Used by P4_LeftRecursion. */
@@ -650,7 +650,7 @@ struct P4_Source {
     P4_String       entry_name;
 
     /** The content of the source. */
-    P4_String       content;
+    P4_ConstString       content;
     /** The length of the source. */
     P4_Slice        slice;
 
@@ -665,15 +665,15 @@ struct P4_Source {
      * and An EOI is Negative(Range(1, 0x10ffff)). When the rule is wrapped,
      * the input is guaranteed to be parsed until all bits are consumed.
      * */
-    size_t          pos;
+    P4_size_t          pos;
     /**
      * The line number of the unconsumed input. Min: 1, Max: countlines(content).
      */
-    size_t          lineno;
+    P4_size_t          lineno;
     /**
      * The bytes offset of the line in the unconsumed input.
      */
-    size_t          offset;
+    P4_size_t          offset;
 
     /** The error code of the parse. */
     P4_Error        err;
@@ -682,9 +682,9 @@ struct P4_Source {
 
     /** The error details. */
     struct {
-        int             errno;
-        size_t          lineno;
-        size_t          offset;
+        int             ierrno;
+        P4_size_t       lineno;
+        P4_size_t       offset;
         P4_Expression*  rule;
         P4_Expression*  expr;
     } error;
@@ -707,10 +707,27 @@ struct P4_Source {
     /** The top frame in the stack. */
     P4_Frame*       frame_stack;
     /** The size of frame stack. */
-    size_t          frame_stack_size;
+    P4_size_t          frame_stack_size;
     /** A pool of unused frame. This is for optimization. */
     P4_Frame*       unused_frame_stack;
+#ifndef WITHOUT_DEBUG_INFO
+    bool show_debug_info;
+    P4_size_t          show_debug_info_line_start;
+    P4_size_t          show_debug_info_line_stop;
+#endif
 };
+
+#ifndef WITHOUT_DEBUG_INFO
+#define SHOW_DEBUG_INFO(src) \
+    if(src->show_debug_info \
+        && src->lineno >= src->show_debug_info_line_start \
+        && (src->show_debug_info_line_stop ? (src->lineno <= src->show_debug_info_line_stop): 1)) \
+        printf("===> %4d %s -> %s : " P4_SIZE_T_FMT "\n", rdepth, __FUNCTION__, \
+            src->frame_stack ? src->frame_stack->rule->name : "", \
+            src->lineno);
+#else
+#define SHOW_DEBUG_INFO(src)
+#endif
 
 /** It indicates the function or type is for public use. */
 # define P4_PUBLIC
@@ -767,9 +784,9 @@ static void cleanup_freep (void *p) { /* clean a malloc-ed variable. */
   if (*pp) P4_FREE(*pp);
 }
 
-P4_PRIVATE(int)          P4_CaseCmpInsensitive(const void*, const void*, size_t n);
+P4_PRIVATE(int)          P4_CaseCmpInsensitive(const void*, const void*, P4_size_t n);
 
-P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size_t offset, P4_Position* stop);
+P4_PRIVATE(void)         P4_DiffPosition(P4_ConstString str, P4_Position* start, P4_size_t offset, P4_Position* stop);
 
 # define P4_AdoptNode(head, tail, list) \
     do { \
@@ -809,7 +826,7 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
 # define P4_MatchRaisef(s,e,eno) \
     do { \
         (s)->err = (e); \
-        (s)->error.errno = (eno); \
+        (s)->error.ierrno = (eno); \
         (s)->error.lineno = (s)->lineno; \
         (s)->error.offset = (s)->offset; \
         (s)->error.rule = (s)->frame_stack ? (s)->frame_stack->rule : NULL; \
@@ -873,27 +890,37 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
     }
 # define remaining_text(s)  ((s)->content + (s)->pos)
 
+#ifndef WITHOUT_DEBUG_INFO
+#define MATCH_DECL_EPARAM , int rdepth
+#define MATCH_EPARAM0 int rdepth = 0;
+#define MATCH_EPARAM , rdepth+1
+#else
+#define MATCH_DECL_EPARAM
+#define MATCH_EPARAM0
+#define MATCH_EPARAM
+#endif
+
 P4_PRIVATE(P4_Error) push_frame(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Error) pop_frame(P4_Source*);
-P4_PRIVATE(P4_Node*) match_expression(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*) match_literal(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*) match_range(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*) match_unicode_category(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*) match_reference(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*) match_positive(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*) match_negative(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*) match_cut(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*) match_sequence(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*) match_choice(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*) match_repeat(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*) match_left_recursion(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*) match_spaced_rules(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*) match_back_reference(P4_Source*, P4_Expression*, P4_Frame*, size_t, bool);
+P4_PRIVATE(P4_Node*) match_expression(P4_Source*, P4_Expression* MATCH_DECL_EPARAM);
+P4_PRIVATE(P4_Node*) match_literal(P4_Source*, P4_Expression* MATCH_DECL_EPARAM);
+P4_PRIVATE(P4_Node*) match_range(P4_Source*, P4_Expression* MATCH_DECL_EPARAM);
+P4_PRIVATE(P4_Node*) match_unicode_category(P4_Source*, P4_Expression* MATCH_DECL_EPARAM);
+P4_PRIVATE(P4_Node*) match_reference(P4_Source*, P4_Expression* MATCH_DECL_EPARAM);
+P4_PRIVATE(P4_Node*) match_positive(P4_Source*, P4_Expression* MATCH_DECL_EPARAM);
+P4_PRIVATE(P4_Node*) match_negative(P4_Source*, P4_Expression* MATCH_DECL_EPARAM);
+P4_PRIVATE(P4_Node*) match_cut(P4_Source*, P4_Expression* MATCH_DECL_EPARAM);
+P4_PRIVATE(P4_Node*) match_sequence(P4_Source*, P4_Expression* MATCH_DECL_EPARAM);
+P4_PRIVATE(P4_Node*) match_choice(P4_Source*, P4_Expression* MATCH_DECL_EPARAM);
+P4_PRIVATE(P4_Node*) match_repeat(P4_Source*, P4_Expression* MATCH_DECL_EPARAM);
+P4_PRIVATE(P4_Node*) match_left_recursion(P4_Source*, P4_Expression* MATCH_DECL_EPARAM);
+P4_PRIVATE(P4_Node*) match_spaced_rules(P4_Source*, P4_Expression* MATCH_DECL_EPARAM);
+P4_PRIVATE(P4_Node*) match_back_reference(P4_Source*, P4_Expression*, P4_Frame*, P4_size_t, bool MATCH_DECL_EPARAM);
 
 P4_PRIVATE(void)                P4_DeleteNodeUserData(P4_Grammar* grammar, P4_Node* node);
 P4_PRIVATE(P4_Expression*)      P4_GetReference(P4_Source*, P4_Expression*);
 
-P4_PRIVATE(P4_String)           P4_CopySliceString(P4_String, P4_Slice*);
+P4_PRIVATE(P4_String)           P4_CopySliceString(P4_ConstString, P4_Slice*);
 
 P4_PRIVATE(bool)                P4_HasBackrefDescendant(P4_Expression*);
 
@@ -904,7 +931,7 @@ P4_PRIVATE(P4_Error)            P4_RefreshReference(P4_Expression*, P4_String);
 
 P4_PRIVATE(P4_Error)            P4_PegEvalFlag(P4_Node* node, P4_ExpressionFlag *flag);
 P4_PRIVATE(P4_Error)            P4_PegEvalRuleFlags(P4_Node* node, P4_ExpressionFlag* flag);
-P4_PRIVATE(P4_Error)            P4_PegEvalNumber(P4_Node* node, size_t* num);
+P4_PRIVATE(P4_Error)            P4_PegEvalNumber(P4_Node* node, P4_size_t* num);
 P4_PRIVATE(P4_Error)            P4_PegEvalChar(P4_Node* node, ucs4_t* rune);
 P4_PRIVATE(P4_Error)            P4_PegEvalLiteral(P4_Node* node, P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalInsensitive(P4_Node* node, P4_Result* result);
@@ -1316,6 +1343,61 @@ static P4_RuneRange _Lu[] = {
     {0x1d670, 0x1d689, 1}, {0x1d6a8, 0x1d6c0, 1}, {0x1d6e2, 0x1d6fa, 1}, {0x1d71c, 0x1d734, 1},
     {0x1d756, 0x1d76e, 1}, {0x1d790, 0x1d7a8, 1}, {0x1d7ca, 0x1e900, 4406}, {0x1e901, 0x1e921, 1},
 };
+static P4_RuneRange _Mc[] = {
+    {0x093e, 0x0940, 2},{0x0949, 0x094c, 3},{0x094e, 0x094f, 1},{0x0982, 0x0983, 1},
+    {0x09be, 0x09c0, 2},{0x09c7, 0x09c8, 1},{0x09cb, 0x09cc, 1},{0x0a3e, 0x0a40, 2},
+    {0x0abe, 0x0ac0, 2},{0x0acb, 0x0acc, 1},{0x0b02, 0x0b03, 1},{0x0b47, 0x0b48, 1},
+    {0x0b4b, 0x0b4c, 1},{0x0bbe, 0x0bbf, 1},{0x0bc1, 0x0bc2, 1},{0x0bc6, 0x0bc8, 2},
+    {0x0bca, 0x0bcc, 2},{0x0c01, 0x0c03, 2},{0x0c41, 0x0c44, 3},{0x0c82, 0x0c83, 1},
+    {0x0cc0, 0x0cc4, 4},{0x0cc7, 0x0cc8, 1},{0x0cca, 0x0ccb, 1},{0x0cd5, 0x0cd6, 1},
+    {0x0d02, 0x0d03, 1},{0x0d3e, 0x0d40, 2},{0x0d46, 0x0d48, 2},{0x0d4a, 0x0d4c, 2},
+    {0x0d82, 0x0d83, 1},{0x0dcf, 0x0dd1, 2},{0x0dd8, 0x0ddf, 7},{0x0df2, 0x0df3, 1},
+    {0x0f3e, 0x0f3f, 1},{0x102b, 0x102c, 1},{0x103b, 0x103c, 1},{0x1056, 0x1057, 1},
+    {0x1062, 0x1064, 2},{0x1067, 0x106d, 6},{0x1083, 0x1084, 1},{0x1087, 0x108c, 5},
+    {0x109a, 0x109c, 2},{0x17be, 0x17c5, 7},{0x17c7, 0x17c8, 1},{0x1923, 0x1926, 3},
+    {0x1929, 0x192b, 2},{0x1930, 0x1931, 1},{0x1933, 0x1938, 5},{0x1a19, 0x1a1a, 1},
+    {0x1a63, 0x1a64, 1},{0x1a6d, 0x1a72, 5},{0x1b3d, 0x1b41, 4},{0x1b43, 0x1b44, 1},
+    {0x1ba6, 0x1ba7, 1},{0x1bea, 0x1bec, 2},{0x1bf2, 0x1bf3, 1},{0x1c24, 0x1c2b, 7},
+    {0x1c34, 0x1c35, 1},{0x1cf2, 0x1cf3, 1},{0x302e, 0x302f, 1},{0xa823, 0xa824, 1},
+    {0xa880, 0xa881, 1},{0xa8b4, 0xa8c3, 15},{0xa952, 0xa953, 1},{0xa9b4, 0xa9b5, 1},
+    {0xa9ba, 0xa9bb, 1},{0xa9bd, 0xa9c0, 3},{0xaa2f, 0xaa30, 1},{0xaa33, 0xaa34, 1},
+    {0xaaee, 0xaaef, 1},{0xabe3, 0xabe4, 1},{0xabe6, 0xabe7, 1},{0xabe9, 0xabea, 1},
+};
+static P4_RuneRange _Mn[] = {
+    {0x0300, 0x036f, 111},{0x0483, 0x0487, 4},{0x0591, 0x05bd, 44},{0x05c1, 0x05c2, 1},
+    {0x05c4, 0x05c5, 1},{0x0610, 0x061a, 10},{0x064b, 0x065f, 20},{0x06d6, 0x06dc, 6},
+    {0x06df, 0x06e4, 5},{0x06e7, 0x06e8, 1},{0x06ea, 0x06ed, 3},{0x0730, 0x074a, 26},
+    {0x07a6, 0x07b0, 10},{0x07eb, 0x07f3, 8},{0x0816, 0x0819, 3},{0x081b, 0x0823, 8},
+    {0x0825, 0x0827, 2},{0x0829, 0x082d, 4},{0x0859, 0x085b, 2},{0x08d3, 0x08e1, 14},
+    {0x08e3, 0x0902, 31},{0x0941, 0x0948, 7},{0x0951, 0x0957, 6},{0x0962, 0x0963, 1},
+    {0x09c1, 0x09c4, 3},{0x09e2, 0x09e3, 1},{0x0a01, 0x0a02, 1},{0x0a41, 0x0a42, 1},
+    {0x0a47, 0x0a48, 1},{0x0a4b, 0x0a4d, 2},{0x0a70, 0x0a71, 1},{0x0a81, 0x0a82, 1},
+    {0x0ac1, 0x0ac5, 4},{0x0ac7, 0x0ac8, 1},{0x0ae2, 0x0ae3, 1},{0x0afa, 0x0aff, 5},
+    {0x0b41, 0x0b44, 3},{0x0b62, 0x0b63, 1},{0x0c3e, 0x0c40, 2},{0x0c46, 0x0c48, 2},
+    {0x0c4a, 0x0c4d, 3},{0x0c55, 0x0c56, 1},{0x0c62, 0x0c63, 1},{0x0ccc, 0x0ccd, 1},
+    {0x0ce2, 0x0ce3, 1},{0x0d00, 0x0d01, 1},{0x0d3b, 0x0d3c, 1},{0x0d41, 0x0d44, 3},
+    {0x0d62, 0x0d63, 1},{0x0dd2, 0x0dd4, 2},{0x0e34, 0x0e3a, 6},{0x0e47, 0x0e4e, 7},
+    {0x0eb4, 0x0eb9, 5},{0x0ebb, 0x0ebc, 1},{0x0ec8, 0x0ecd, 5},{0x0f18, 0x0f19, 1},
+    {0x0f71, 0x0f7e, 13},{0x0f80, 0x0f84, 4},{0x0f86, 0x0f87, 1},{0x0f8d, 0x0f97, 10},
+    {0x0f99, 0x0fbc, 35},{0x102d, 0x1030, 3},{0x1032, 0x1037, 5},{0x1039, 0x103a, 1},
+    {0x103d, 0x103e, 1},{0x1058, 0x1059, 1},{0x105e, 0x1060, 2},{0x1071, 0x1074, 3},
+    {0x1085, 0x1086, 1},{0x135d, 0x135f, 2},{0x1712, 0x1714, 2},{0x1732, 0x1734, 2},
+    {0x1752, 0x1753, 1},{0x1772, 0x1773, 1},{0x17b4, 0x17b5, 1},{0x17b7, 0x17bd, 6},
+    {0x17c9, 0x17d3, 10},{0x180b, 0x180d, 2},{0x1885, 0x1886, 1},{0x1920, 0x1922, 2},
+    {0x1927, 0x1928, 1},{0x1939, 0x193b, 2},{0x1a17, 0x1a18, 1},{0x1a58, 0x1a5e, 6},
+    {0x1a65, 0x1a6c, 7},{0x1a73, 0x1a7c, 9},{0x1ab0, 0x1abd, 13},{0x1b00, 0x1b03, 3},
+    {0x1b36, 0x1b3a, 4},{0x1b6b, 0x1b73, 8},{0x1b80, 0x1b81, 1},{0x1ba2, 0x1ba5, 3},
+    {0x1ba8, 0x1ba9, 1},{0x1bab, 0x1bad, 2},{0x1be8, 0x1be9, 1},{0x1bef, 0x1bf1, 2},
+    {0x1c2c, 0x1c33, 7},{0x1c36, 0x1c37, 1},{0x1cd0, 0x1cd2, 2},{0x1cd4, 0x1ce0, 12},
+    {0x1ce2, 0x1ce8, 6},{0x1cf8, 0x1cf9, 1},{0x1dc0, 0x1df9, 57},{0x1dfb, 0x1dff, 4},
+    {0x20d0, 0x20dc, 12},{0x20e5, 0x20f0, 11},{0x2cef, 0x2cf1, 2},{0x2de0, 0x2dff, 31},
+    {0x302a, 0x302d, 3},{0x3099, 0x309a, 1},{0xa674, 0xa67d, 9},{0xa69e, 0xa69f, 1},
+    {0xa6f0, 0xa6f1, 1},{0xa825, 0xa826, 1},{0xa8c4, 0xa8c5, 1},{0xa8e0, 0xa8f1, 17},
+    {0xa926, 0xa92d, 7},{0xa947, 0xa951, 10},{0xa980, 0xa982, 2},{0xa9b6, 0xa9b9, 3},
+    {0xaa29, 0xaa2e, 5},{0xaa31, 0xaa32, 1},{0xaa35, 0xaa36, 1},{0xaab2, 0xaab4, 2},
+    {0xaab7, 0xaab8, 1},{0xaabe, 0xaabf, 1},{0xaaec, 0xaaed, 1},{0xfe00, 0xfe0f, 15},
+    {0xfe20, 0xfe2f, 15},
+};
 static P4_RuneRange _N[] = {
     {0x0030, 0x0039, 1}, {0x00b2, 0x00b3, 1}, {0x00b9, 0x00bc, 3}, {0x00bd, 0x00be, 1},
     {0x0660, 0x0669, 1}, {0x06f0, 0x06f9, 1}, {0x07c0, 0x07c9, 1}, {0x0966, 0x096f, 1},
@@ -1395,6 +1477,9 @@ static P4_RuneRange _Nd[] = {
     {0x11da0, 0x11da9, 1}, {0x16a60, 0x16a69, 1}, {0x16b50, 0x16b59, 1}, {0x1d7ce, 0x1d7ff, 1},
     {0x1e140, 0x1e149, 1}, {0x1e2f0, 0x1e2f9, 1}, {0x1e950, 0x1e959, 1}, {0x1fbf0, 0x1fbf9, 1},
 };
+static P4_RuneRange _Pc[] = {
+    {0x203f, 0x2040, 1},{0xfe33, 0xfe34, 1},{0xfe4d, 0xfe4f, 2},
+};
 static P4_RuneRange _Z[] = {
     {0x0020, 0x00a0, 128}, {0x1680, 0x2000, 2432}, {0x2001, 0x200a, 1}, {0x2028, 0x2029, 1},
     {0x202f, 0x205f, 48}, {0x3000, 0x3000, 1},
@@ -1431,8 +1516,8 @@ static P4_RuneRange _Zs[] = {
  *     > printf("%p %d\n", c, c)
  *     0x4f60 20320
  */
-size_t
-u8_next_char(P4_String s, ucs4_t* c) {
+P4_size_t
+u8_next_char(P4_ConstString s, ucs4_t* c) {
     *c = 0;
 
     if ((s[0] & 0b10000000) == 0) { /* 1 byte code point, ASCII */
@@ -1456,7 +1541,7 @@ u8_next_char(P4_String s, ucs4_t* c) {
     }
 }
 
-void* u8_append_char(void *str, ucs4_t chr, size_t n) {
+void* u8_append_char(void *str, ucs4_t chr, P4_size_t n) {
   char *s = (char *)str;
 
   if (0 == ((ucs4_t)0xffffff80 & chr)) {
@@ -1498,7 +1583,7 @@ void* u8_append_char(void *str, ucs4_t chr, size_t n) {
   return s;
 }
 
-size_t u8_next_escaped_char(char* text, ucs4_t* rune) {
+P4_size_t u8_next_escaped_char(const char* text, ucs4_t* rune) {
     char ch0 = *text;
 
     if (ch0 == '\0') {
@@ -1515,6 +1600,7 @@ size_t u8_next_escaped_char(char* text, ucs4_t* rune) {
         case 'b': *rune = 0x8; return 2;
         case 't': *rune = 0x9; return 2;
         case 'n': *rune = 0xa; return 2;
+        case 'v': *rune = 0xb; return 2;
         case 'f': *rune = 0xc; return 2;
         case 'r': *rune = 0xd; return 2;
         case '"': *rune = 0x22; return 2;
@@ -1542,8 +1628,8 @@ size_t u8_next_escaped_char(char* text, ucs4_t* rune) {
     }
 }
 
-size_t P4_ReadRuneRange(char* text, P4_Slice* slice, size_t* count, P4_RuneRange** ranges) {
-    size_t len = get_slice_size(slice);
+P4_size_t P4_ReadRuneRange(const char* text, P4_Slice* slice, P4_size_t* count, P4_RuneRange** ranges) {
+    P4_size_t len = get_slice_size(slice);
 
 # define READ_RUNE_RANGE(p,l) \
     if (len == (l) && memcmp(text+slice->start.pos, #p , len) == 0) {\
@@ -1563,10 +1649,13 @@ size_t P4_ReadRuneRange(char* text, P4_Slice* slice, size_t* count, P4_RuneRange
     READ_RUNE_RANGE(Lt, 2);
     READ_RUNE_RANGE(Lu, 2);
     READ_RUNE_RANGE(L, 1);
+    READ_RUNE_RANGE(Mc, 2);
+    READ_RUNE_RANGE(Mn, 2);
     READ_RUNE_RANGE(Nd, 2);
     READ_RUNE_RANGE(Nl, 2);
     READ_RUNE_RANGE(No, 2);
     READ_RUNE_RANGE(N, 1);
+    READ_RUNE_RANGE(Pc, 2);
     READ_RUNE_RANGE(Zl, 2);
     READ_RUNE_RANGE(Zp, 2);
     READ_RUNE_RANGE(Zs, 2);
@@ -1583,7 +1672,7 @@ size_t P4_ReadRuneRange(char* text, P4_Slice* slice, size_t* count, P4_RuneRange
  * Modified from https://github.com/sheredom/utf8.h
  */
 P4_PRIVATE(int)
-P4_CaseCmpInsensitive(const void* src1, const void* src2, size_t n) {
+P4_CaseCmpInsensitive(const void* src1, const void* src2, P4_size_t n) {
     ucs4_t src1_lwr_cp, src2_lwr_cp, src1_upr_cp, src2_upr_cp, src1_orig_cp, src2_orig_cp;
 
     do {
@@ -1642,7 +1731,7 @@ P4_CaseCmpInsensitive(const void* src1, const void* src2, size_t n) {
  * Initialize a node.
  */
 P4_Node*
-P4_CreateNode (const P4_String     str,
+P4_CreateNode (P4_ConstString     str,
                P4_Position*        start,
                P4_Position*        stop,
                P4_String           rule_name) {
@@ -1825,12 +1914,12 @@ pop_frame(P4_Source* s) {
 
 
 P4_PRIVATE(P4_Node*)
-match_literal(P4_Source* s, P4_Expression* e) {
+match_literal(P4_Source* s, P4_Expression* e MATCH_DECL_EPARAM) {
     assert(no_error(s), "can't proceed due to a failed match");
-
+    SHOW_DEBUG_INFO(s);
     mark_position(s, startpos);
 
-    P4_String str = remaining_text(s);
+    P4_ConstString str = remaining_text(s);
     ucs4_t rune[2] = {0};
     u8_next_char(e->literal, rune);
 
@@ -1839,8 +1928,8 @@ match_literal(P4_Source* s, P4_Expression* e) {
         return NULL;
     }
 
-    size_t len = e->literal_len;
-    size_t rest = s->slice.stop.pos - s->pos;
+    P4_size_t len = e->literal_len;
+    P4_size_t rest = s->slice.stop.pos - s->pos;
     if (rest < len) {
         P4_MatchRaisef(s, P4_MatchError, E_TEXT_TOO_SHORT);
         return NULL;
@@ -1866,10 +1955,10 @@ match_literal(P4_Source* s, P4_Expression* e) {
 }
 
 P4_PRIVATE(P4_Node*)
-match_range(P4_Source* s, P4_Expression* e) {
+match_range(P4_Source* s, P4_Expression* e MATCH_DECL_EPARAM) {
     assert(no_error(s), "can't proceed due to a failed match");
-
-    P4_String str = remaining_text(s);
+    SHOW_DEBUG_INFO(s);
+    P4_ConstString str = remaining_text(s);
     if (is_end(s)) {
         P4_MatchRaisef(s, P4_MatchError, E_TEXT_TOO_SHORT);
         return NULL;
@@ -1878,8 +1967,8 @@ match_range(P4_Source* s, P4_Expression* e) {
     mark_position(s, startpos);
 
     ucs4_t rune = 0x0;
-    size_t size = u8_next_char(str, &rune);
-    size_t i = 0;
+    P4_size_t size = u8_next_char(str, &rune);
+    P4_size_t i = 0;
     bool found = false;
 
     for (i = 0; i < e->ranges_count; i++) {
@@ -1910,14 +1999,14 @@ match_range(P4_Source* s, P4_Expression* e) {
 }
 
 P4_PRIVATE(P4_Node*)
-match_unicode_category(P4_Source* s, P4_Expression* e) {
+match_unicode_category(P4_Source* s, P4_Expression* e MATCH_DECL_EPARAM) {
     assert(no_error(s), "can't proceed due to a failed match");
-
+    SHOW_DEBUG_INFO(s);
 # ifdef ENABLE_UNISTR
     mark_position(s, startpos);
 
     ucs4_t uc = 0x0;
-    size_t size = u8_next_char(remaining_text(s), &uc);
+    P4_size_t size = u8_next_char(remaining_text(s), &uc);
 
     if (size == 0 ) {
         P4_MatchRaisef(s, P4_MatchError, E_INVALID_UNICODE_CHAR);
@@ -1967,7 +2056,7 @@ P4_GetReference(P4_Source* s, P4_Expression* e) {
 
 P4_PRIVATE(bool)
 P4_HasBackrefDescendant(P4_Expression* e) {
-    size_t i = 0;
+    P4_size_t i = 0;
     switch (e->kind) {
         case P4_BackReference:
             return true;
@@ -1992,9 +2081,9 @@ P4_HasBackrefDescendant(P4_Expression* e) {
 }
 
 P4_PRIVATE(P4_Node*)
-match_reference(P4_Source* s, P4_Expression* e) {
+match_reference(P4_Source* s, P4_Expression* e MATCH_DECL_EPARAM) {
     assert(no_error(s), "can't proceed due to a failed match");
-
+    SHOW_DEBUG_INFO(s);
     if (e->ref_expr == NULL && e->reference != NULL) {
         e->ref_expr = P4_GetGrammarRule(s->grammar, e->reference);
     }
@@ -2005,7 +2094,7 @@ match_reference(P4_Source* s, P4_Expression* e) {
     }
 
     mark_position(s, startpos);
-    P4_Node* reftok = match_expression(s, e->ref_expr);
+    P4_Node* reftok = match_expression(s, e->ref_expr MATCH_EPARAM);
     mark_position(s, endpos);
 
     /* Ref matching is terminated when error occurred. */
@@ -2027,9 +2116,9 @@ match_reference(P4_Source* s, P4_Expression* e) {
 }
 
 P4_PRIVATE(P4_Node*)
-match_sequence(P4_Source* s, P4_Expression* e) {
+match_sequence(P4_Source* s, P4_Expression* e MATCH_DECL_EPARAM) {
     assert(no_error(s), "can't proceed due to a failed match");
-
+    SHOW_DEBUG_INFO(s);
     P4_Expression   *member = NULL;
     P4_Node         *head = NULL,
                     *tail = NULL,
@@ -2042,7 +2131,7 @@ match_sequence(P4_Source* s, P4_Expression* e) {
         peek_rule_frame(s, rule_frame);
 
         if (rule_frame->backref_slices == NULL) {
-            size_t memsize = sizeof(P4_Slice) * rule_frame->expr->count;
+            P4_size_t memsize = sizeof(P4_Slice) * rule_frame->expr->count;
             catch_oom(rule_frame->backref_slices = P4_MALLOC(memsize));
             memset(rule_frame->backref_slices, 0, memsize);
         }
@@ -2052,14 +2141,14 @@ match_sequence(P4_Source* s, P4_Expression* e) {
 
     mark_position(s, startpos);
 
-    size_t i = 0;
+    P4_size_t i = 0;
 
     for (i = 0; i < e->count; i++) {
         member = e->members[i];
 
         /* Optional `WHITESPACE` and `COMMENT` are inserted between every member. */
         if (space && i > 0) {
-            whitespace = match_spaced_rules(s, NULL);
+            whitespace = match_spaced_rules(s, NULL MATCH_EPARAM);
             if (!no_error(s)) goto finalize;
             P4_AdoptNode(head, tail, whitespace);
         }
@@ -2073,14 +2162,14 @@ match_sequence(P4_Source* s, P4_Expression* e) {
                     s->error.expr = member;
                     goto finalize;
                 }
-                tok = match_back_reference(s, e, rule_frame, member->backref_index, member->sensitive);
+                tok = match_back_reference(s, e, rule_frame, member->backref_index, member->sensitive MATCH_EPARAM);
                 if (!no_error(s)) goto finalize;
                 break;
             case P4_Cut:
-                tok = match_cut(s, e);
+                tok = match_cut(s, e MATCH_EPARAM);
                 break;
             default:
-                tok = match_expression(s, member);
+                tok = match_expression(s, member MATCH_EPARAM);
                 break;
         }
 
@@ -2120,17 +2209,17 @@ finalize:
 }
 
 P4_PRIVATE(P4_Node*)
-match_choice(P4_Source* s, P4_Expression* e) {
+match_choice(P4_Source* s, P4_Expression* e MATCH_DECL_EPARAM) {
     P4_Node* tok = NULL;
     P4_Expression* member = NULL;
-
+    SHOW_DEBUG_INFO(s);
     /* A member is attempted if previous yields no match. */
     /* The oneof match matches successfully immediately if any match passes. */
     mark_position(s, startpos);
-    size_t i;
+    P4_size_t i;
     for (i = 0; i < e->count; i++) {
         member = e->members[i];
-        tok = match_expression(s, member);
+        tok = match_expression(s, member MATCH_EPARAM);
         if (no_error(s)) break;
         if (no_match(s)) {
             /* retry until the last one. */
@@ -2174,9 +2263,9 @@ finalize:
  * There are seven repetition mode: zeroormore, zerooronce,
  */
 P4_PRIVATE(P4_Node*)
-match_repeat(P4_Source* s, P4_Expression* e) {
-    size_t min = SIZE_MAX, max = SIZE_MAX, repeated = 0;
-
+match_repeat(P4_Source* s, P4_Expression* e MATCH_DECL_EPARAM) {
+    P4_size_t min = P4_SIZE_MAX, max = P4_SIZE_MAX, repeated = 0;
+    SHOW_DEBUG_INFO(s);
     assert(e->repeat_min != min || e->repeat_max != max,
             "need at least one of min/max");
     assert(e->repeat_expr != NULL, "need repeat expression");
@@ -2209,12 +2298,12 @@ match_repeat(P4_Source* s, P4_Expression* e) {
 
         /* SPACED rule expressions are inserted between every repetition. */
         if (space && repeated > 0 ) {
-            whitespace = match_spaced_rules(s, NULL);
+            whitespace = match_spaced_rules(s, NULL MATCH_EPARAM);
             if (!no_error(s)) goto finalize;
             P4_AdoptNode(head, tail, whitespace);
         }
 
-        tok = match_expression(s, e->repeat_expr);
+        tok = match_expression(s, e->repeat_expr MATCH_EPARAM);
 
         if (no_match(s)) {
             assert(tok == NULL, "failed match should not produce a token");
@@ -2226,7 +2315,7 @@ match_repeat(P4_Source* s, P4_Expression* e) {
                                                /*           ^ now we are here */
             }
 
-            if (min != SIZE_MAX && repeated < min) {
+            if (min != P4_SIZE_MAX && repeated < min) {
                 P4_MatchRaisef(s, P4_MatchError, E_INSUFFICIENT_REPEAT);
                 goto finalize;
             } else {                       /* sufficient repetitions. */
@@ -2246,7 +2335,7 @@ match_repeat(P4_Source* s, P4_Expression* e) {
         repeated++;
         P4_AdoptNode(head, tail, tok);
 
-        if (max != SIZE_MAX && repeated == max) { /* enough attempts */
+        if (max != P4_SIZE_MAX && repeated == max) { /* enough attempts */
             rescue_error(s);
             break;
         }
@@ -2257,12 +2346,12 @@ match_repeat(P4_Source* s, P4_Expression* e) {
     assert(no_error(s), "can't proceed due to a failed match");
 
     /* fails when attempts are excessive, e.g. repeated > max. */
-    if (max != SIZE_MAX && repeated > max) {
+    if (max != P4_SIZE_MAX && repeated > max) {
         P4_MatchRaisef(s, P4_MatchError, E_EXCESSIVE_REPEAT);
         goto finalize;
     }
 
-    if (min != SIZE_MAX && repeated < min) {
+    if (min != P4_SIZE_MAX && repeated < min) {
         P4_MatchRaisef(s, P4_MatchError, E_INSUFFICIENT_REPEAT);
         goto finalize;
     }
@@ -2294,12 +2383,12 @@ finalize:
 }
 
 P4_PRIVATE(P4_Node*)
-match_left_recursion(P4_Source* s, P4_Expression* e) {
+match_left_recursion(P4_Source* s, P4_Expression* e MATCH_DECL_EPARAM) {
     assert(no_error(s), "can't proceed due to a failed match");
-
+    SHOW_DEBUG_INFO(s);
     mark_position(s, startpos);
 
-    P4_Node* toklhs = match_expression(s, e->lhs);
+    P4_Node* toklhs = match_expression(s, e->lhs MATCH_EPARAM);
     P4_Node* tokrhs = NULL;
     P4_Node* toktmp = NULL;
     P4_Node* whitespace = NULL;
@@ -2323,12 +2412,12 @@ match_left_recursion(P4_Source* s, P4_Expression* e) {
         /* match implicit whitespace. */
         mark_position(s, whitespace_startpos);
         if (space) {
-            whitespace = match_spaced_rules(s, NULL);
+            whitespace = match_spaced_rules(s, NULL MATCH_EPARAM);
             if (!no_error(s)) goto finalize;
         }
 
         /* attempt to match rhs. */
-        tokrhs = match_expression(s, e->rhs);
+        tokrhs = match_expression(s, e->rhs MATCH_EPARAM);
 
         /* if no match, puke the parsed whitespace, if any. */
         if (no_match(s)) {
@@ -2373,12 +2462,12 @@ finalize:
 }
 
 P4_PRIVATE(P4_Node*)
-match_positive(P4_Source* s, P4_Expression* e) {
+match_positive(P4_Source* s, P4_Expression* e MATCH_DECL_EPARAM) {
     assert(no_error(s) && e->ref_expr != NULL, "expression should not be null");
-
+    SHOW_DEBUG_INFO(s);
     mark_position(s, startpos);
 
-    P4_Node* node = match_expression(s, e->ref_expr);
+    P4_Node* node = match_expression(s, e->ref_expr MATCH_EPARAM);
     if (node != NULL)
         P4_DeleteNode(s->grammar, node);
 
@@ -2388,11 +2477,11 @@ match_positive(P4_Source* s, P4_Expression* e) {
 }
 
 P4_PRIVATE(P4_Node*)
-match_negative(P4_Source* s, P4_Expression* e) {
+match_negative(P4_Source* s, P4_Expression* e MATCH_DECL_EPARAM) {
     assert(no_error(s) && e->ref_expr != NULL, "expression should not be null");
-
+    SHOW_DEBUG_INFO(s);
     mark_position(s, startpos);
-    P4_Node* node = match_expression(s, e->ref_expr);
+    P4_Node* node = match_expression(s, e->ref_expr MATCH_EPARAM);
     set_position(s, startpos);
 
     if (no_error(s)) {
@@ -2406,7 +2495,7 @@ match_negative(P4_Source* s, P4_Expression* e) {
 }
 
 P4_PRIVATE(P4_Node*)
-match_cut(P4_Source* s, P4_Expression* e) {
+match_cut(P4_Source* s, P4_Expression* e MATCH_DECL_EPARAM) {
     /* enable flag cut in the top frame. */
     P4_Frame* frame = peek_frame(s);
     frame->cut = true;
@@ -2423,9 +2512,9 @@ match_cut(P4_Source* s, P4_Expression* e) {
  * It propagate the failed match up to the top level.
  */
 P4_Node*
-match_expression(P4_Source* s, P4_Expression* e) {
+match_expression(P4_Source* s, P4_Expression* e MATCH_DECL_EPARAM) {
     assert(e != NULL, "expression should not be null");
-
+    SHOW_DEBUG_INFO(s);
     P4_Error err = P4_Ok;
     P4_Node* result = NULL;
 
@@ -2440,19 +2529,19 @@ match_expression(P4_Source* s, P4_Expression* e) {
 
     /* match the input based on expression kind. */
     switch (e->kind) {
-        case P4_Literal:       result = match_literal(s, e);   break;
-        case P4_Range:         result = match_range(s, e);     break;
-        case P4_UnicodeCategory: result = match_unicode_category(s, e); break;
-        case P4_Reference:     result = match_reference(s, e); break;
-        case P4_Sequence:      result = match_sequence(s, e);  break;
-        case P4_Choice:        result = match_choice(s, e);    break;
-        case P4_Positive:      result = match_positive(s, e);  break;
-        case P4_Negative:      result = match_negative(s, e);  break;
-        case P4_Repeat:        result = match_repeat(s, e);    break;
-        case P4_LeftRecursion: result = match_left_recursion(s, e); break;
+        case P4_Literal:       result = match_literal(s, e MATCH_EPARAM);   break;
+        case P4_Range:         result = match_range(s, e MATCH_EPARAM);     break;
+        case P4_UnicodeCategory: result = match_unicode_category(s, e MATCH_EPARAM); break;
+        case P4_Reference:     result = match_reference(s, e MATCH_EPARAM); break;
+        case P4_Sequence:      result = match_sequence(s, e MATCH_EPARAM);  break;
+        case P4_Choice:        result = match_choice(s, e MATCH_EPARAM);    break;
+        case P4_Positive:      result = match_positive(s, e MATCH_EPARAM);  break;
+        case P4_Negative:      result = match_negative(s, e MATCH_EPARAM);  break;
+        case P4_Repeat:        result = match_repeat(s, e MATCH_EPARAM);    break;
+        case P4_LeftRecursion: result = match_left_recursion(s, e MATCH_EPARAM); break;
         case P4_Cut:           panic("cut can be applied only in sequence.");
         case P4_BackReference: panic("backreference can be applied only in sequence.");
-        default:               panicf("invalid dispatch kind: %zu.", e->kind);
+        default:               panicf("invalid dispatch kind: " P4_SIZE_T_FMT ".", e->kind);
     }
 
     /* pop the frame. stops backtracking if an cut error is raised. */
@@ -2472,7 +2561,7 @@ finalize:
     /* run error callback. */
     if (s->grammar->on_error != NULL) {
         err = (s->grammar->on_error)(s->grammar, e);
-        if (err != P4_Ok && s->error.errno == 0) {
+        if (err != P4_Ok && s->error.ierrno == 0) {
             P4_MatchRaisef(s, s->err, E_INVALID_ERROR_CALLBACK);
         }
     }
@@ -2483,7 +2572,7 @@ finalize:
 }
 
 P4_PRIVATE(P4_Node*)
-match_spaced_rules(P4_Source* s, P4_Expression* e) {
+match_spaced_rules(P4_Source* s, P4_Expression* e MATCH_DECL_EPARAM) {
     /* implicit whitespace is guaranteed to be an unnamed rule. */
     /* state flag is guaranteed to be none. */
     assert(no_error(s), "can't proceed due to a failed match");
@@ -2499,7 +2588,7 @@ match_spaced_rules(P4_Source* s, P4_Expression* e) {
 
     /* (2) Perform implicit whitespace checks. */
     /*     We won't do implicit whitespace inside an implicit whitespace expr. */
-    P4_Node* result = match_expression(s, implicit_whitespace);
+    P4_Node* result = match_expression(s, implicit_whitespace MATCH_EPARAM);
     if (no_match(s))
         rescue_error(s);
 
@@ -2511,7 +2600,7 @@ match_spaced_rules(P4_Source* s, P4_Expression* e) {
 
 P4_PRIVATE(P4_Node*)
 match_back_reference(P4_Source* s, P4_Expression* e, P4_Frame* rule_frame,
-        size_t index, bool sensitive) {
+        P4_size_t index, bool sensitive MATCH_DECL_EPARAM) {
 
     P4_Slice* backrefs = rule_frame->backref_slices;
     assert(backrefs != NULL, "backrefs should not be null");
@@ -2566,7 +2655,7 @@ match_back_reference(P4_Source* s, P4_Expression* e, P4_Frame* rule_frame,
     if (need_lift(s, litexpr))
         peek_frame(s)->silent = true;
 
-    P4_Node* tok = match_expression(s, litexpr);
+    P4_Node* tok = match_expression(s, litexpr MATCH_EPARAM);
 
     /* (3) Recover top frame silent. */
     peek_frame(s)->silent = silent;
@@ -2589,7 +2678,7 @@ P4_JsonifySourceAst(FILE* stream, P4_Node* node, P4_Formatter formatter) {
 
     fprintf(stream, "[");
     while (tmp != NULL) {
-        fprintf(stream, "{\"slice\":[%lu,%lu]", tmp->slice.start.pos, tmp->slice.stop.pos);
+        fprintf(stream, "{\"slice\":[" P4_SIZE_T_FMT "," P4_SIZE_T_FMT "]", tmp->slice.start.pos, tmp->slice.stop.pos);
         fprintf(stream, ",\"type\":\"%s\"", tmp->rule_name);
         if (formatter != NULL) {
             formatter(stream, tmp);
@@ -2605,6 +2694,155 @@ P4_JsonifySourceAst(FILE* stream, P4_Node* node, P4_Formatter formatter) {
     fprintf(stream, "]");
 }
 
+
+P4_PUBLIC void
+P4_Jsonify2SourceAst(FILE* stream, P4_Node* node, P4_Formatter formatter) {
+    P4_Node* tmp = node;
+
+    while (tmp != NULL) {
+        fprintf(stream, "[\"%s\"," P4_SIZE_T_FMT "," P4_SIZE_T_FMT, tmp->rule_name, tmp->slice.start.pos, tmp->slice.stop.pos);
+        if (formatter != NULL) {
+            formatter(stream, tmp);
+        }
+        if (tmp->head != NULL) {
+            fprintf(stream, ",[");
+            P4_Jsonify2SourceAst(stream, tmp->head, formatter);
+            fprintf(stream, "]");
+        }
+        if (tmp->next != NULL) fprintf(stream, "],");
+        else fprintf(stream, "]");
+        tmp = tmp->next;
+    }
+}
+
+
+P4_PUBLIC void
+P4_TxtSourceAst(FILE* stream, P4_Node* node, int depth) {
+    P4_Node* tmp = node;
+
+    while (tmp != NULL) {
+        fprintf(stream, "%*s\"%s\"," P4_SIZE_T_FMT "," P4_SIZE_T_FMT "\n", depth, "| ", tmp->rule_name, tmp->slice.start.pos, tmp->slice.stop.pos);
+        if (tmp->head != NULL) {
+            P4_TxtSourceAst(stream, tmp->head, depth+2);
+        }
+        tmp = tmp->next;
+    }
+}
+
+P4_PUBLIC void
+P4_NakedSourceAst(FILE* stream, P4_Node* node, int depth, const char *sep) {
+	P4_size_t child_count, sep_count = 0;
+	P4_ConstString rule_name;
+	P4_Node *tmp_node = node;
+	while (tmp_node) {
+            P4_String node_string = P4_CopyNodeString(tmp_node);
+            rule_name = tmp_node->rule_name;
+            if(strcmp(rule_name, "choice") == 0) {
+                fprintf(stream, "%s", (sep_count++ ? sep : ""));
+                child_count = P4_GetNodeChildrenCount(tmp_node);
+                if(depth && child_count > 1) fprintf(stream, " ( ");
+                P4_NakedSourceAst(stream, tmp_node->head, depth+1, " / ");
+                if(depth && child_count > 1) fprintf(stream, " )");
+            }
+            else if(strcmp(rule_name, "cut") == 0) {
+                fprintf(stream, " /*%s*/", node_string);
+            }
+            else if(strcmp(rule_name, "decorator") == 0) {
+                fprintf(stream, "/*%s*/ ", node_string);
+            }
+            else if(strcmp(rule_name, "decorators") == 0) {
+                P4_NakedSourceAst(stream, tmp_node->head, 0, " ");
+            }
+            else if(strcmp(rule_name, "dot") == 0) {
+                fprintf(stream, ".");
+            }
+            else if(strcmp(rule_name, "grammar") == 0) {
+                P4_NakedSourceAst(stream, tmp_node->head, 0, " ");
+            }
+            else if(strcmp(rule_name, "back_reference") == 0
+                || strcmp(rule_name, "insensitive") == 0
+                || strcmp(rule_name, "char") == 0
+                || strcmp(rule_name, "reference") == 0
+                || strcmp(rule_name, "number") == 0
+                || strcmp(rule_name, "literal") == 0) {
+                fprintf(stream, "%s%s", (sep_count++ ? sep : ""), node_string);
+            }
+            else if(strcmp(rule_name, "left_recursion") == 0) {
+                P4_FREE(node_string);
+                node_string = P4_CopyNodeString(tmp_node->head);
+                fprintf(stream, "%s%s /*|*/ / ", (sep_count++ ? sep : ""), node_string);
+                P4_NakedSourceAst(stream, tmp_node->head->next, depth+1, " ");
+            }
+            else if(strcmp(rule_name, "name") == 0) {
+                fprintf(stream, "%s =\n\t", node_string);
+                sep_count = 0;
+            }
+            else if(strcmp(rule_name, "negative") == 0) {
+                fprintf(stream, "%s!", (sep_count++ ? sep : ""));
+                P4_NakedSourceAst(stream, tmp_node->head, depth+1, sep);
+            }
+            else if(strcmp(rule_name, "positive") == 0) {
+                fprintf(stream, "%s&", (sep_count++ ? sep : ""));
+                P4_NakedSourceAst(stream, tmp_node->head, depth+1, sep);
+            }
+            else if(strcmp(rule_name, "range") == 0) {
+                fprintf(stream, "%s[", (sep_count++ ? sep : ""));
+                P4_NakedSourceAst(stream, tmp_node->head, depth+1, "-");
+                fprintf(stream, "]");
+            }
+            else if(strcmp(rule_name, "range_category") == 0) {
+                fprintf(stream, "\\p{%s}", node_string);
+            }
+            else if(strcmp(rule_name, "repeat") == 0) {
+                fprintf(stream, "%s", (sep_count++ ? sep : ""));
+                P4_NakedSourceAst(stream, tmp_node->head, depth+1, " ");
+            }
+            else if(strcmp(rule_name, "rule") == 0) {
+                fprintf(stream, "\n");
+                P4_NakedSourceAst(stream, tmp_node->head, depth+1, " ");
+                fprintf(stream, " ;");
+            }
+            else if(strcmp(rule_name, "sequence") == 0) {
+                fprintf(stream, "%s", (sep_count++ ? sep : ""));
+                child_count = P4_GetNodeChildrenCount(tmp_node);
+                if(depth && child_count > 1) fprintf(stream, " ( ");
+                P4_NakedSourceAst(stream, tmp_node->head, depth+1, " ");
+                if(depth && child_count > 1) fprintf(stream, " )");
+            }
+            else if(strcmp(rule_name, "onceormore") == 0) { fprintf(stream, "+ "); }
+            else if(strcmp(rule_name, "zeroormore") == 0) { fprintf(stream, "* "); }
+            else if(strcmp(rule_name, "zerooronce") == 0) { fprintf(stream, "? "); }
+            else if(strcmp(rule_name, "repeatexact") == 0) {
+                fprintf(stream, "{");
+                P4_NakedSourceAst(stream, tmp_node->head, depth+1, " ");
+                fprintf(stream, "} ");
+            }
+            else if(strcmp(rule_name, "repeatmin") == 0) {
+                fprintf(stream, "{");
+                P4_NakedSourceAst(stream, tmp_node->head, depth+1, " ");
+                fprintf(stream, ",} ");
+            }
+            else if(strcmp(rule_name, "repeatmax") == 0) {
+                fprintf(stream, "{,");
+                P4_NakedSourceAst(stream, tmp_node->head, depth+1, " ");
+                fprintf(stream, "} ");
+            }
+            else if(strcmp(rule_name, "repeatminmax") == 0) {
+                fprintf(stream, "{");
+                P4_NakedSourceAst(stream, tmp_node->head, depth+1, ",");
+                fprintf(stream, "} ");
+            }
+            else {
+                P4_FREE(node_string);
+                fprintf(stream, "\n\n***Unknown rule name: %s\n", rule_name);
+                return;
+            }
+            tmp_node = tmp_node->next;
+            P4_FREE(node_string);
+	}
+	if(depth == 0)
+            fprintf(stream, "\n");
+}
 
 P4_PUBLIC P4_Error
 P4_InspectSourceAst(P4_Node* node, void* userdata, P4_Error (*inspector)(P4_Node*, void*)) {
@@ -2636,7 +2874,7 @@ P4_Version(void) {
 
 /*
 P4_PUBLIC P4_Expression*
-P4_CreateNumeric(size_t num) {
+P4_CreateNumeric(P4_size_t num) {
     P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
     expr->kind = P4_Numeric;
     expr->num = num;
@@ -2660,7 +2898,7 @@ P4_CreateLiteral(const P4_String literal, bool sensitive) {
 }
 
 P4_PUBLIC P4_Expression*
-P4_CreateRange(ucs4_t lower, ucs4_t upper, size_t stride) {
+P4_CreateRange(ucs4_t lower, ucs4_t upper, P4_size_t stride) {
     if (lower > upper || lower > 0x10ffff || upper > 0x10ffff || lower == 0 || upper == 0)
         return NULL;
 
@@ -2677,7 +2915,7 @@ P4_CreateRange(ucs4_t lower, ucs4_t upper, size_t stride) {
 }
 
 P4_PUBLIC P4_Expression*
-P4_CreateRanges(size_t count, P4_RuneRange* ranges) {
+P4_CreateRanges(P4_size_t count, P4_RuneRange* ranges) {
     P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
     expr->kind = P4_Range;
     expr->flag = 0;
@@ -2685,7 +2923,7 @@ P4_CreateRanges(size_t count, P4_RuneRange* ranges) {
     expr->ranges_count = count;
     expr->ranges = P4_MALLOC(sizeof(P4_RuneRange) * count);
 
-    size_t i = 0;
+    P4_size_t i = 0;
     for (i = 0; i < count; i++) {
         expr->ranges[i].lower = ranges[i].lower;
         expr->ranges[i].upper = ranges[i].upper;
@@ -2781,7 +3019,7 @@ P4_CreateLeftRecursion(P4_Expression* lhs, P4_Expression* rhs) {
 }
 
 P4_PRIVATE(P4_Expression*)
-P4_CreateContainer(size_t count) {
+P4_CreateContainer(P4_size_t count) {
     if (count == 0)
         return NULL;
 
@@ -2794,7 +3032,7 @@ P4_CreateContainer(size_t count) {
 }
 
 P4_PUBLIC P4_Expression*
-P4_CreateSequence(size_t count) {
+P4_CreateSequence(P4_size_t count) {
     if (count == 0)
         return NULL;
 
@@ -2810,7 +3048,7 @@ P4_CreateSequence(size_t count) {
 }
 
 P4_PUBLIC P4_Expression*
-P4_CreateChoice(size_t count) {
+P4_CreateChoice(P4_size_t count) {
     if (count == 0)
         return NULL;
 
@@ -2825,7 +3063,7 @@ P4_CreateChoice(size_t count) {
 }
 
 P4_PUBLIC P4_Expression*
-P4_CreateSequenceWithMembers(size_t count, ...) {
+P4_CreateSequenceWithMembers(P4_size_t count, ...) {
     if (count == 0)
         return NULL;
 
@@ -2835,7 +3073,7 @@ P4_CreateSequenceWithMembers(size_t count, ...) {
         return NULL;
 
     va_list members;
-    size_t i;
+    P4_size_t i;
     va_start (members, count);
 
     for (i = 0; i < count; i++) {
@@ -2856,7 +3094,7 @@ finalize:
 }
 
 P4_PUBLIC P4_Expression*
-P4_CreateChoiceWithMembers(size_t count, ...) {
+P4_CreateChoiceWithMembers(P4_size_t count, ...) {
     if (count == 0)
         return NULL;
 
@@ -2866,7 +3104,7 @@ P4_CreateChoiceWithMembers(size_t count, ...) {
         return NULL;
 
     va_list members;
-    size_t i;
+    P4_size_t i;
     va_start (members, count);
 
     for (i = 0; i < count; i++) {
@@ -2887,7 +3125,7 @@ finalize:
 }
 
 P4_PUBLIC P4_Expression*
-P4_CreateRepeatMinMax(P4_Expression* repeat, size_t min, size_t max) {
+P4_CreateRepeatMinMax(P4_Expression* repeat, P4_size_t min, P4_size_t max) {
     if (repeat == NULL)
         return NULL;
 
@@ -2902,17 +3140,17 @@ P4_CreateRepeatMinMax(P4_Expression* repeat, size_t min, size_t max) {
 }
 
 P4_PUBLIC P4_Expression*
-P4_CreateRepeatMin(P4_Expression* repeat, size_t min) {
-    return P4_CreateRepeatMinMax(repeat, min, SIZE_MAX);
+P4_CreateRepeatMin(P4_Expression* repeat, P4_size_t min) {
+    return P4_CreateRepeatMinMax(repeat, min, P4_SIZE_MAX);
 }
 
 P4_PUBLIC P4_Expression*
-P4_CreateRepeatMax(P4_Expression* repeat, size_t max) {
-    return P4_CreateRepeatMinMax(repeat, SIZE_MAX, max);
+P4_CreateRepeatMax(P4_Expression* repeat, P4_size_t max) {
+    return P4_CreateRepeatMinMax(repeat, P4_SIZE_MAX, max);
 }
 
 P4_PUBLIC P4_Expression*
-P4_CreateRepeatExact(P4_Expression* repeat, size_t minmax) {
+P4_CreateRepeatExact(P4_Expression* repeat, P4_size_t minmax) {
     return P4_CreateRepeatMinMax(repeat, minmax, minmax);
 }
 
@@ -2923,16 +3161,16 @@ P4_CreateZeroOrOnce(P4_Expression* repeat) {
 
 P4_PUBLIC P4_Expression*
 P4_CreateZeroOrMore(P4_Expression* repeat) {
-    return P4_CreateRepeatMinMax(repeat, 0, SIZE_MAX);
+    return P4_CreateRepeatMinMax(repeat, 0, P4_SIZE_MAX);
 }
 
 P4_PUBLIC P4_Expression*
 P4_CreateOnceOrMore(P4_Expression* repeat) {
-    return P4_CreateRepeatMinMax(repeat, 1, SIZE_MAX);
+    return P4_CreateRepeatMinMax(repeat, 1, P4_SIZE_MAX);
 }
 
 P4_PUBLIC P4_Expression*
-P4_CreateBackReference(size_t index, bool sensitive) {
+P4_CreateBackReference(P4_size_t index, bool sensitive) {
     P4_Expression* expr = P4_MALLOC(sizeof(P4_Expression));
     expr->kind = P4_BackReference;
     expr->flag = 0;
@@ -2953,7 +3191,7 @@ P4_IsRule(P4_Expression* e) {
 P4_PUBLIC P4_Grammar*    P4_CreateGrammar(void) {
     P4_Grammar* grammar = P4_MALLOC(sizeof(P4_Grammar));
     grammar->rules = kh_init(rules);
-    grammar->spaced_count = SIZE_MAX;
+    grammar->spaced_count = P4_SIZE_MAX;
     grammar->spaced_rules = NULL;
     grammar->depth = P4_DEFAULT_RECURSION_LIMIT;
     grammar->on_match = NULL;
@@ -2994,7 +3232,7 @@ P4_SetGrammarRuleFlag(P4_Grammar* grammar, P4_String name, P4_ExpressionFlag fla
 }
 
 P4_PUBLIC P4_Error
-P4_SetRecursionLimit(P4_Grammar* grammar, size_t limit) {
+P4_SetRecursionLimit(P4_Grammar* grammar, P4_size_t limit) {
     if (grammar == NULL)
         return P4_NullError;
 
@@ -3003,7 +3241,7 @@ P4_SetRecursionLimit(P4_Grammar* grammar, size_t limit) {
     return P4_Ok;
 }
 
-P4_PUBLIC size_t
+P4_PUBLIC P4_size_t
 P4_GetRecursionLimit(P4_Grammar* grammar) {
     return grammar == NULL ? 0 : grammar->depth;
 }
@@ -3041,7 +3279,7 @@ P4_AddGrammarRule(P4_Grammar* grammar, P4_String name, P4_Expression* expr) {
 }
 
 P4_PUBLIC P4_Source*
-P4_CreateSource(P4_String content, P4_String entry_name) {
+P4_CreateSource(P4_ConstString content, P4_ConstString entry_name) {
     P4_Source* source = P4_MALLOC(sizeof(P4_Source));
     source->content = content;
     source->entry_name = STRDUP(entry_name);
@@ -3053,15 +3291,27 @@ P4_CreateSource(P4_String content, P4_String entry_name) {
     source->frame_stack_size = 0;
     source->unused_frame_stack = NULL;
     source->whitespacing = false;
-
+#ifndef WITHOUT_DEBUG_INFO
+    source->show_debug_info = false;
+    source->show_debug_info_line_start = 0;
+    source->show_debug_info_line_stop = 0;
+#endif
     P4_SetSourceSlice(source, 0, strlen(content));
     rescue_error(source);
 
     return source;
 }
 
+P4_PUBLIC void
+P4_SetDebugSource(P4_Source *src, bool debug, P4_size_t line_start, P4_size_t line_end)
+{
+    src->show_debug_info = debug;
+    src->show_debug_info_line_start = line_start;
+    src->show_debug_info_line_stop = line_end;
+}
+
 P4_Error
-P4_SetSourceSlice(P4_Source* source, size_t start, size_t stop) {
+P4_SetSourceSlice(P4_Source* source, P4_size_t start, P4_size_t stop) {
     if (source == 0)
         return P4_NullError;
 
@@ -3125,7 +3375,7 @@ P4_AcquireSourceAst(P4_Source* source) {
     return root;
 }
 
-P4_PUBLIC size_t
+P4_PUBLIC P4_size_t
 P4_GetSourcePosition(P4_Source* source) {
     return source == NULL ? 0 : source->pos;
 }
@@ -3133,6 +3383,7 @@ P4_GetSourcePosition(P4_Source* source) {
 P4_PUBLIC P4_Error
 P4_Parse(P4_Grammar* grammar, P4_Source* source) {
     P4_Error err = P4_Ok;
+    MATCH_EPARAM0;
 
     catch_err(source->err);
 
@@ -3146,8 +3397,8 @@ P4_Parse(P4_Grammar* grammar, P4_Source* source) {
         P4_MatchRaisef(source, P4_ValueError, E_NO_SUCH_RULE);
         goto finalize;
     }
-
-    P4_Node*       tok      = match_expression(source, expr);
+    SHOW_DEBUG_INFO(source);
+    P4_Node*       tok      = match_expression(source, expr MATCH_EPARAM);
 
     source->root            = tok;
 
@@ -3194,12 +3445,12 @@ P4_GetErrorMessage(P4_Source* source) {
         return NULL;
 
     memset(source->errmsg, 0, sizeof(source->errmsg));
-    sprintf(source->errmsg, "line %zu:%zu, expect %s",
+    sprintf(source->errmsg, "line " P4_SIZE_T_FMT ":" P4_SIZE_T_FMT ", expect %s",
             source->error.lineno, source->error.offset,
             source->error.rule ? source->error.rule->name : source->entry_name);
 
 
-    switch (source->error.errno) {
+    switch (source->error.ierrno) {
         case E_WRONG_LIT:
         case E_TEXT_TOO_SHORT:
         {
@@ -3217,7 +3468,7 @@ P4_GetErrorMessage(P4_Source* source) {
             strcat(source->errmsg, " (left recursion rule entry cannot be lifted)");
             break;
         case E_BACKREF_OUT_REACHED:
-            sprintf(source->errmsg + strlen(source->errmsg), " (\\%lu out reached)", source->error.expr->backref_index);
+            sprintf(source->errmsg + strlen(source->errmsg), " (\\" P4_SIZE_T_FMT " out reached)", source->error.expr->backref_index);
             break;
         case E_BACKREF_TO_SELF:
             strcat(source->errmsg, " (backref point to backref)");
@@ -3226,10 +3477,10 @@ P4_GetErrorMessage(P4_Source* source) {
             strcat(source->errmsg, " (insufficient repetitions)");
             break;
         case E_INSUFFICIENT_REPEAT2:
-            sprintf(source->errmsg + strlen(source->errmsg), " (at least %lu repetitions)", source->error.expr->repeat_min);
+            sprintf(source->errmsg + strlen(source->errmsg), " (at least " P4_SIZE_T_FMT " repetitions)", source->error.expr->repeat_min);
             break;
         case E_EXCESSIVE_REPEAT:
-            sprintf(source->errmsg + strlen(source->errmsg), " (at most %lu repetitions)", source->error.expr->repeat_max);
+            sprintf(source->errmsg + strlen(source->errmsg), " (at most " P4_SIZE_T_FMT " repetitions)", source->error.expr->repeat_max);
             break;
         case E_WRONG_BACKREF:
             strcat(source->errmsg, " (back reference not match)");
@@ -3268,7 +3519,7 @@ P4_SetWhitespaces(P4_Grammar* grammar) {
     P4_Expression   *rule = NULL, *rule_ref = NULL;
 
     /* Get the total number of SPACED rules */
-    size_t          count = 0;
+    P4_size_t          count = 0;
     kh_foreach_value(grammar->rules, rule, {
         if (is_spaced(rule)) count++;
     });
@@ -3285,7 +3536,7 @@ P4_SetWhitespaces(P4_Grammar* grammar) {
     catch_oom(repeat = P4_CreateChoice(count));
 
     /* Add all SPACED rules to the repeat expression. */
-    size_t j = 0;
+    P4_size_t j = 0;
     kh_foreach_value(grammar->rules, rule, {
         if (is_spaced(rule)) {
             catch_oom(rule_ref = P4_CreateReference(rule->name));
@@ -3306,7 +3557,7 @@ finalize:
     }
 
     grammar->spaced_rules = NULL;
-    grammar->spaced_count = SIZE_MAX;
+    grammar->spaced_count = P4_SIZE_MAX;
 
     return err;
 }
@@ -3316,7 +3567,7 @@ P4_GetWhitespaces(P4_Grammar* g) {
     if (g == NULL)
         return NULL;
 
-    if (g->spaced_count == SIZE_MAX)
+    if (g->spaced_count == P4_SIZE_MAX)
         P4_SetWhitespaces(g);
 
     return g->spaced_rules;
@@ -3329,13 +3580,13 @@ P4_SetExpressionFlag(P4_Expression* e, P4_ExpressionFlag f) {
 }
 
 P4_PRIVATE(void)
-P4_DiffPosition(P4_String str, P4_Position* start, size_t offset, P4_Position* stop) {
-    size_t start_pos = start->pos;
-    size_t stop_pos = start_pos + offset;
-    size_t stop_lineno = start->lineno;
-    size_t stop_offset = start->offset;
+P4_DiffPosition(P4_ConstString str, P4_Position* start, P4_size_t offset, P4_Position* stop) {
+    P4_size_t start_pos = start->pos;
+    P4_size_t stop_pos = start_pos + offset;
+    P4_size_t stop_lineno = start->lineno;
+    P4_size_t stop_offset = start->offset;
 
-    size_t n = 0;
+    P4_size_t n = 0;
     bool eol = false;
     for (n = start_pos; n < stop_pos; n++) {
         if (str[n] == '\n') {
@@ -3367,13 +3618,13 @@ P4_AddLiteral(P4_Grammar* grammar, P4_String name, const P4_String literal, bool
 }
 
 P4_PUBLIC P4_Error
-P4_AddRange(P4_Grammar* grammar, P4_String name, ucs4_t lower, ucs4_t upper, size_t stride) {
+P4_AddRange(P4_Grammar* grammar, P4_String name, ucs4_t lower, ucs4_t upper, P4_size_t stride) {
     P4_AddSomeGrammarRule(grammar, name, P4_CreateRange(lower, upper, stride));
     return P4_Ok;
 }
 
 P4_PUBLIC P4_Error
-P4_AddRanges(P4_Grammar* grammar, P4_String name, size_t count, P4_RuneRange* ranges) {
+P4_AddRanges(P4_Grammar* grammar, P4_String name, P4_size_t count, P4_RuneRange* ranges) {
     P4_AddSomeGrammarRule(grammar, name, P4_CreateRanges(count, ranges));
     return P4_Ok;
 }
@@ -3396,16 +3647,16 @@ P4_AddNegative(P4_Grammar* grammar, P4_String name, P4_Expression* ref_expr) {
 }
 
 P4_PUBLIC P4_Error
-P4_AddSequence(P4_Grammar* grammar, P4_String name, size_t size) {
+P4_AddSequence(P4_Grammar* grammar, P4_String name, P4_size_t size) {
     P4_AddSomeGrammarRule(grammar, name, P4_CreateSequence(size));
     return P4_Ok;
 }
 
 P4_PUBLIC P4_Error
-P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_String name, size_t count, ...) {
+P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_String name, P4_size_t count, ...) {
     P4_AddSomeGrammarRule(grammar, name, P4_CreateSequence(count));
 
-    size_t i = 0;
+    P4_size_t i = 0;
     P4_Expression* expr = P4_GetGrammarRule(grammar, name);
 
     va_list members;
@@ -3415,7 +3666,7 @@ P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_String name, size_t count, ...
         expr->members[i] = va_arg(members, P4_Expression*);
 
         if (expr->members[i] == NULL)
-            panicf("failed to set %zuth expression.", i);
+            panicf("failed to set " P4_SIZE_T_FMT "th expression.", i);
     }
 
     va_end (members);
@@ -3426,18 +3677,18 @@ P4_AddSequenceWithMembers(P4_Grammar* grammar, P4_String name, size_t count, ...
 }
 
 P4_PUBLIC P4_Error
-P4_AddChoice(P4_Grammar* grammar, P4_String name, size_t size) {
+P4_AddChoice(P4_Grammar* grammar, P4_String name, P4_size_t size) {
     P4_AddSomeGrammarRule(grammar, name, P4_CreateContainer(size));
     P4_GetGrammarRule(grammar, name)->kind = P4_Choice;
     return P4_Ok;
 }
 
 P4_PUBLIC P4_Error
-P4_AddChoiceWithMembers(P4_Grammar* grammar, P4_String name, size_t count, ...) {
+P4_AddChoiceWithMembers(P4_Grammar* grammar, P4_String name, P4_size_t count, ...) {
     P4_AddSomeGrammarRule(grammar, name, P4_CreateChoice(count));
 
     P4_Expression* expr = P4_GetGrammarRule(grammar, name);
-    size_t i = 0;
+    P4_size_t i = 0;
 
     va_list members;
     va_start (members, count);
@@ -3446,7 +3697,7 @@ P4_AddChoiceWithMembers(P4_Grammar* grammar, P4_String name, size_t count, ...) 
         expr->members[i] = va_arg(members, P4_Expression*);
 
         if (expr->members[i] == NULL)
-            panicf("failed to set %zuth expression.", i);
+            panicf("failed to set " P4_SIZE_T_FMT "th expression.", i);
     }
 
     va_end (members);
@@ -3455,7 +3706,7 @@ P4_AddChoiceWithMembers(P4_Grammar* grammar, P4_String name, size_t count, ...) 
 }
 
 P4_PUBLIC P4_Error
-P4_SetMember(P4_Expression* expr, size_t offset, P4_Expression* member) {
+P4_SetMember(P4_Expression* expr, P4_size_t offset, P4_Expression* member) {
     if (expr == NULL
             || member == NULL
             || expr->members == NULL
@@ -3482,7 +3733,7 @@ P4_SetMember(P4_Expression* expr, size_t offset, P4_Expression* member) {
 }
 
 P4_PUBLIC P4_Error
-P4_SetReferenceMember(P4_Expression* expr, size_t offset, P4_String ref) {
+P4_SetReferenceMember(P4_Expression* expr, P4_size_t offset, P4_String ref) {
     /* this functions allows adding a member which is simply a reference. */
 
     P4_Error       err      = P4_Ok;
@@ -3495,14 +3746,14 @@ finalize:
     return err;
 }
 
-P4_PUBLIC size_t
+P4_PUBLIC P4_size_t
 P4_GetMembersCount(P4_Expression* expr) {
     return expr == NULL ? 0 : expr->count;
 }
 
 
 P4_PUBLIC P4_Expression*
-P4_GetMember(P4_Expression* expr, size_t offset) {
+P4_GetMember(P4_Expression* expr, P4_size_t offset) {
     if (expr == NULL
             || expr->members == NULL
             || expr->count == 0) {
@@ -3552,7 +3803,7 @@ P4_DeleteExpression(P4_Expression* expr) {
     if (expr == NULL)
         return;
 
-    size_t i;
+    P4_size_t i;
 
     switch (expr->kind) {
         case P4_Literal:
@@ -3639,7 +3890,7 @@ P4_AddOnceOrMore(P4_Grammar* grammar, P4_String name, P4_Expression* repeat) {
 }
 
 P4_PUBLIC P4_Error
-P4_AddRepeatMin(P4_Grammar* grammar, P4_String name, P4_Expression* repeat, size_t min) {
+P4_AddRepeatMin(P4_Grammar* grammar, P4_String name, P4_Expression* repeat, P4_size_t min) {
     if (repeat == NULL)
         return P4_NullError;
 
@@ -3648,7 +3899,7 @@ P4_AddRepeatMin(P4_Grammar* grammar, P4_String name, P4_Expression* repeat, size
 }
 
 P4_PUBLIC P4_Error
-P4_AddRepeatMax(P4_Grammar* grammar, P4_String name, P4_Expression* repeat, size_t max) {
+P4_AddRepeatMax(P4_Grammar* grammar, P4_String name, P4_Expression* repeat, P4_size_t max) {
     if (repeat == NULL)
         return P4_NullError;
 
@@ -3657,7 +3908,7 @@ P4_AddRepeatMax(P4_Grammar* grammar, P4_String name, P4_Expression* repeat, size
 }
 
 P4_PUBLIC P4_Error
-P4_AddRepeatMinMax(P4_Grammar* grammar, P4_String name, P4_Expression* repeat, size_t min, size_t max) {
+P4_AddRepeatMinMax(P4_Grammar* grammar, P4_String name, P4_Expression* repeat, P4_size_t min, P4_size_t max) {
     if (repeat == NULL)
         return P4_NullError;
 
@@ -3666,7 +3917,7 @@ P4_AddRepeatMinMax(P4_Grammar* grammar, P4_String name, P4_Expression* repeat, s
 }
 
 P4_PUBLIC P4_Error
-P4_AddRepeatExact(P4_Grammar* grammar, P4_String name, P4_Expression* repeat, size_t num) {
+P4_AddRepeatExact(P4_Grammar* grammar, P4_String name, P4_Expression* repeat, P4_size_t num) {
     if (repeat == NULL)
         return P4_NullError;
 
@@ -3692,10 +3943,10 @@ P4_GetNodeSlice(P4_Node* node) {
     return &(node->slice);
 }
 
-P4_PUBLIC size_t
+P4_PUBLIC P4_size_t
 P4_GetNodeChildrenCount(P4_Node* node) {
     P4_Node* child = NULL;
-    size_t   count = 0;
+    P4_size_t   count = 0;
     foreach_child(node, child, {
         count++;
     });
@@ -3703,11 +3954,11 @@ P4_GetNodeChildrenCount(P4_Node* node) {
 }
 
 P4_PRIVATE(P4_String)
-P4_CopySliceString(P4_String s, P4_Slice* slice) {
+P4_CopySliceString(P4_ConstString s, P4_Slice* slice) {
     /* return the string covered by the slice.
      * note that caller should free the copied string. */
 
-    size_t    len = get_slice_size(slice);
+    P4_size_t    len = get_slice_size(slice);
     P4_String str = P4_MALLOC(len+1);
     strncpy(str, s + slice->start.pos, len);
     str[len] = '\0';
@@ -3819,7 +4070,7 @@ P4_RefreshReference(P4_Expression* expr, P4_String name) {
     if (expr == NULL || name == NULL)
         return P4_NullError;
 
-    size_t i = 0;
+    P4_size_t i = 0;
     P4_Error err = P4_Ok;
 
     switch(expr->kind) {
@@ -3928,7 +4179,7 @@ P4_Grammar* P4_CreatePegGrammar () {
         P4_CreateRange(0x5d, 0x10ffff, 1),
         P4_CreateSequenceWithMembers(2,
             P4_CreateLiteral("\\", true),
-            P4_CreateChoiceWithMembers(11,
+            P4_CreateChoiceWithMembers(12,
                 P4_CreateLiteral("\"", true),
                 P4_CreateLiteral("/", true),
                 P4_CreateLiteral("\\", true),
@@ -3937,6 +4188,7 @@ P4_Grammar* P4_CreatePegGrammar () {
                 P4_CreateLiteral("n", true),
                 P4_CreateLiteral("r", true),
                 P4_CreateLiteral("t", true),
+                P4_CreateLiteral("v", true),
                 P4_CreateSequenceWithMembers(3,
                     P4_CreateLiteral("x", true),
                     P4_CreateCut(),
@@ -4123,7 +4375,21 @@ P4_Grammar* P4_CreatePegGrammar () {
     ));
     catch_err(P4_SetGrammarRuleFlag(grammar, "left_recursion", P4_FLAG_NON_TERMINAL));
 
-    catch_err(P4_AddJoin(grammar, "choice", "/", "sequence"));
+    catch_err(P4_AddSequenceWithMembers(grammar, "choice", 2,
+        P4_CreateReference("sequence"),
+        P4_CreateZeroOrMore(
+            P4_CreateSequenceWithMembers(3,
+                P4_CreateNegative(
+                    P4_CreateChoiceWithMembers(2,
+                        P4_CreateLiteral("//", true),
+                        P4_CreateLiteral("/*", true)
+                    )
+                ),
+                P4_CreateLiteral("/", true),
+                P4_CreateReference("sequence")
+            )
+        )
+    ));
     catch_err(P4_SetGrammarRuleFlag(grammar, "choice", P4_FLAG_NON_TERMINAL));
 
     catch_err(P4_AddOnceOrMore(grammar, "sequence", P4_CreateReference("repeat")));
@@ -4178,15 +4444,30 @@ P4_Grammar* P4_CreatePegGrammar () {
         P4_FLAG_LIFTED | P4_FLAG_SPACED
     ));
 
-    catch_err(P4_AddSequenceWithMembers(grammar, "comment", 3,
-        P4_CreateLiteral("#", true),
-        P4_CreateZeroOrMore(
-            P4_CreateSequenceWithMembers(2,
-                P4_CreateNegative(P4_CreateLiteral("\n", true)),
-                P4_CreateRange(0x1, 0x10ffff, 1)
-            )
+    catch_err(P4_AddChoiceWithMembers(grammar, "comment", 2,
+        P4_CreateSequenceWithMembers(3,
+            P4_CreateChoiceWithMembers(2,
+                P4_CreateLiteral("#", true),
+                P4_CreateLiteral("//", true)
+            ),
+            P4_CreateZeroOrMore(
+                P4_CreateSequenceWithMembers(2,
+                    P4_CreateNegative(P4_CreateLiteral("\n", true)),
+                    P4_CreateRange(0x1, 0x10ffff, 1)
+                )
+            ),
+            P4_CreateZeroOrOnce(P4_CreateLiteral("\n", true))
         ),
-        P4_CreateZeroOrOnce(P4_CreateLiteral("\n", true))
+        P4_CreateSequenceWithMembers(3,
+            P4_CreateLiteral("/*", true),
+            P4_CreateZeroOrMore(
+                P4_CreateSequenceWithMembers(2,
+                    P4_CreateNegative(P4_CreateLiteral("*/", true)),
+                    P4_CreateRange(0x1, 0x10ffff, 1)
+                )
+            ),
+            P4_CreateLiteral("*/", true)
+        )
     ));
 
     catch_err(P4_SetGrammarRuleFlag(grammar, "comment",
@@ -4201,7 +4482,7 @@ finalize:
 }
 
 # define MIN(a,b) ((a) < (b) ? (a) : (b))
-# define NODE_ERROR_HINT_FMT "char %zu-%zu: %.*s"
+# define NODE_ERROR_HINT_FMT "char " P4_SIZE_T_FMT "-" P4_SIZE_T_FMT ": %.*s"
 # define NODE_ERROR_HINT \
                 node->slice.start.pos, \
                 node->slice.stop.pos, \
@@ -4211,8 +4492,8 @@ finalize:
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalFlag(P4_Node* node, P4_ExpressionFlag *flag) {
-    P4_String node_str = node->text + node->slice.start.pos;
-    size_t    node_len = get_slice_size(&node->slice);
+    P4_ConstString node_str = node->text + node->slice.start.pos;
+    P4_size_t    node_len = get_slice_size(&node->slice);
 
     if (node_len == 9 && memcmp("@squashed", node_str, node_len) == 0)
         *flag = P4_FLAG_SQUASHED;
@@ -4254,7 +4535,7 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalNumber(P4_Node* node, size_t* num) {
+P4_PegEvalNumber(P4_Node* node, P4_size_t* num) {
     P4_String str = NULL;
     catch_oom(str = P4_CopyNodeString(node));
     *num = atol(str);
@@ -4264,7 +4545,7 @@ P4_PegEvalNumber(P4_Node* node, size_t* num) {
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalChar(P4_Node* node, ucs4_t* rune) {
-    size_t size = u8_next_escaped_char(node->text+node->slice.start.pos, rune);
+    P4_size_t size = u8_next_escaped_char(node->text+node->slice.start.pos, rune);
 
     if (size == 0)
         return P4_ValueError;
@@ -4277,7 +4558,7 @@ P4_PegEvalChar(P4_Node* node, ucs4_t* rune) {
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalLiteral(P4_Node* node, P4_Result* result) {
-    size_t         i    = 0,
+    P4_size_t         i    = 0,
                    size = 0,
                    idx  = 0;
     P4_Error       err  = P4_Ok;
@@ -4286,7 +4567,7 @@ P4_PegEvalLiteral(P4_Node* node, P4_Result* result) {
                    cur  = NULL;
     P4_Expression* expr = NULL;
 
-    size_t len = get_slice_size(&node->slice) - 2; /* - 2: remove two quotes */
+    P4_size_t len = get_slice_size(&node->slice) - 2; /* - 2: remove two quotes */
     if (len <= 0) {
         catch_err(P4_PegError, P4_EvalRaisef(result,
             "literal rule should have at least one character. "
@@ -4303,7 +4584,7 @@ P4_PegEvalLiteral(P4_Node* node, P4_Result* result) {
                 (size == 0) ||
                 (i + size > node->slice.stop.pos-1)) {
             catch_err(P4_PegError, P4_EvalRaisef(result,
-                "char %lu is invalid. " NODE_ERROR_HINT_FMT,
+                "char " P4_SIZE_T_FMT " is invalid. " NODE_ERROR_HINT_FMT,
                 idx, NODE_ERROR_HINT));
         }
 
@@ -4366,7 +4647,7 @@ P4_PegEvalUnicodeCategory(P4_Node* node, P4_Result* result) {
 
 # else
     P4_RuneRange* ranges = NULL;
-    size_t count = 0;
+    P4_size_t count = 0;
 
     if (P4_ReadRuneRange(node->head->text, &node->head->slice, &count, &ranges) == 0) {
         catch_err(P4_PegError, P4_EvalRaisef(result,
@@ -4392,7 +4673,7 @@ P4_PegEvalRange(P4_Node* node, P4_Result* result) {
         return P4_PegEvalUnicodeCategory(node, result);
     } else { /* two to three children - [lower-upper] or [lower-upper..stride] */
         ucs4_t lower = 0, upper = 0;
-        size_t stride = 1;
+        P4_size_t stride = 1;
 
         P4_Node* lower_node = node->head;
         P4_Node* upper_node = lower_node->next;
@@ -4410,7 +4691,7 @@ P4_PegEvalRange(P4_Node* node, P4_Result* result) {
 
         if ((lower == 0) || (upper == 0) || (stride == 0)) {
             catch_err(P4_PegError, P4_EvalRaisef(result,
-                "range lower 0x%x, upper 0x%x, stride 0x%lx "
+                "range lower 0x%x, upper 0x%x, stride 0x" P4_SIZE_T_XFMT " "
                 "must be all non-zeros. " NODE_ERROR_HINT_FMT,
                 lower, upper, stride, NODE_ERROR_HINT));
         }
@@ -4434,7 +4715,7 @@ finalize:
 
 P4_PRIVATE(P4_Error)
 P4_PegEvalMembers(P4_Node* node, P4_Expression* expr, P4_Result* result) {
-    size_t   i     = 0;
+    P4_size_t   i     = 0;
     P4_Error err   = P4_Ok;
     P4_Node* child = NULL;
 
@@ -4449,7 +4730,7 @@ finalize:
     /* crash if failed to eval & set members. */
     if (err)
         panicf(
-            "%s: failed to set %zuth member. " NODE_ERROR_HINT_FMT,
+            "%s: failed to set " P4_SIZE_T_FMT "th member. " NODE_ERROR_HINT_FMT,
             P4_GetErrorString(err), i, NODE_ERROR_HINT
         );
     return err;
@@ -4568,8 +4849,8 @@ P4_PegEvalRepeat(P4_Node* node, P4_Result* result) {
     P4_Error        err  = P4_Ok;
     P4_Expression*  ref  = NULL;
     P4_Expression*  expr = NULL;
-    size_t          min  = 0,
-                    max  = SIZE_MAX;
+    P4_size_t       min  = 0,
+                    max  = P4_SIZE_MAX;
 
     /* eval repeated expr. */
     catch_err(P4_PegEvalExpression(node->head, result));
@@ -4578,11 +4859,11 @@ P4_PegEvalRepeat(P4_Node* node, P4_Result* result) {
     /* eval repeat min/max. */
     P4_String       rule_name = node->head->next->rule_name;
     if (strcmp(rule_name, "zeroormore") == 0) {
-        min = 0; max = SIZE_MAX;
+        min = 0; max = P4_SIZE_MAX;
     } else if (strcmp(rule_name, "zerooronce") == 0) {
         min = 0; max = 1;
     } else if (strcmp(rule_name, "onceormore") == 0) {
-        min = 1; max = SIZE_MAX;
+        min = 1; max = P4_SIZE_MAX;
     } else if (strcmp(rule_name, "repeatmin") == 0) {
         catch_err(P4_PegEvalNumber(node->head->next->head, &min));
     } else if (strcmp(rule_name, "repeatmax") == 0) {
@@ -4602,7 +4883,7 @@ P4_PegEvalRepeat(P4_Node* node, P4_Result* result) {
     /* repeat min should be greater than max. */
     if (min > max) {
         catch_err(P4_PegError, P4_EvalRaisef(result,
-            "repeat min %lu is greater than max %lu. "
+            "repeat min " P4_SIZE_T_FMT " is greater than max " P4_SIZE_T_FMT ". "
             NODE_ERROR_HINT_FMT, min, max, NODE_ERROR_HINT));
     }
 
@@ -4633,7 +4914,7 @@ P4_PegEvalCut(P4_Node* node, P4_Result* result) {
 P4_PRIVATE(P4_Error)
 P4_PegEvalRuleName(P4_Node* node, P4_String* result) {
     /* get the rule name string length. */
-    size_t len = get_slice_size(&node->slice);
+    P4_size_t len = get_slice_size(&node->slice);
     assert(len > 0, "Node slice size should be greater than zero.");
 
     /* malloc a new string for the rule name. */
@@ -4670,7 +4951,7 @@ P4_PRIVATE(P4_Error)
 P4_PegEvalBackReference(P4_Node* node, P4_Result* result) {
     P4_Error       err  = P4_Ok;
     P4_Expression* expr = NULL;
-    size_t         idx  = SIZE_MAX;
+    P4_size_t         idx  = P4_SIZE_MAX;
 
     catch_err(P4_PegEvalNumber(node->head, &idx));
     catch_oom(expr = P4_CreateBackReference(idx, false));
@@ -4737,7 +5018,7 @@ P4_PegEvalGrammarReferences(
     if ((e)) \
         return P4_PegEvalGrammarReferences(grammar, (e), result);
 
-    size_t   i   = 0;
+    P4_size_t   i   = 0;
     P4_Error err = P4_Ok;
 
     assert(expr != NULL, "reference expr is NULL.");
@@ -4864,7 +5145,7 @@ P4_PegEvalExpression(P4_Node* node, P4_Result* result) {
 }
 
 P4_PUBLIC P4_Error
-P4_LoadGrammarResult(P4_String rules, P4_Result* result) {
+P4_LoadGrammarResult(P4_ConstString rules, P4_Result* result) {
     P4_Grammar*       bootstrap = NULL;
     P4_Source*        rules_src = NULL;
     P4_Node*          rules_tok = NULL;
@@ -4908,7 +5189,7 @@ finalize:
 }
 
 P4_PUBLIC P4_Grammar*
-P4_LoadGrammar(P4_String rules) {
+P4_LoadGrammar(P4_ConstString rules) {
     P4_Error    err     = P4_Ok;
     P4_Result*  result  = &(P4_Result){0};
 

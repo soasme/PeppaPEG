@@ -80,7 +80,7 @@ static int subcommand_usage(const char* name) {
         "  --debug/-d\t\toutput debug info\n"
 #endif
         "  --json/-j\t\tjson ast output\n"
-        "  --json2/-J\t\tjson ast output with only arrays\n"
+        "  --jsonArray/-J\t\tjson ast output with only arrays\n"
         "  --naked/-n\t\tdump naked grammar\n"
         "  --text/-t\t\ttext ast output [default]\n"
         "  --quiet/-q\t\tno ast output\n"
@@ -138,6 +138,8 @@ static int print_ast(
             P4_JsonifySourceAst(stdout, root, 0);
         else if(args->naked)
             P4_NakedSourceAst(stdout, root, 0, " ");
+        else if(args->text)
+            P4_TxtSourceAst(stdout, root, 0);
         else
             P4_TxtSourceAst(stdout, root, 0);
         fprintf(stdout, "\n");
@@ -159,7 +161,7 @@ int init_args(p4_args_t* args, int argc, char* argv[]) {
             {"help", no_argument, 0, 'h'},
             {"quiet", no_argument, 0, 'q'},
             {"json", no_argument, 0, 'j'},
-            {"json2", no_argument, 0, 'J'},
+            {"jsonArray", no_argument, 0, 'J'},
             {"naked", no_argument, 0, 'n'},
             {"text", no_argument, 0, 't'},
             {"debug", no_argument, 0, 'd'},

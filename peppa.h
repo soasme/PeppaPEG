@@ -80,7 +80,7 @@ typedef uint32_t        ucs4_t;
 
 # ifndef P4_CALLOC
 /**
- * The realloc function. By default, it's `realloc`.
+ * The calloc function. By default, it's `calloc`.
  */
 # define P4_CALLOC calloc
 # endif

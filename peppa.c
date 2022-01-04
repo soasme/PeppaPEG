@@ -4919,7 +4919,7 @@ finalize:
     panicf("grammar syntax error: %s\n", result->errmsg);
 }
 
-P4_PUBLIC const P4_String
+P4_PUBLIC P4_ConstString
 P4_GetRuleName(P4_Expression* expr) {
     return expr->name;
 }

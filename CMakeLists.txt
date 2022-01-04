@@ -31,6 +31,8 @@ endif()
 
 target_compile_options("${P4_LIB}" PRIVATE "-ansi")
 target_compile_options("${P4_LIB}" PRIVATE "-Wall")
+target_compile_options("${P4_LIB}" PRIVATE "-Werror")
+target_compile_options("${P4_LIB}" PRIVATE "-Wextra")
 
 option(ENABLE_UNISTR "Enables libunistring." OFF)
 message("-- Optional Dependency: libunistring - ${ENABLE_UNISTR}.")

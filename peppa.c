@@ -1972,9 +1972,9 @@ P4_HasBackrefDescendant(P4_Expression* e) {
         case P4_BackReference:
             return true;
         case P4_Sequence:
-            if (e->has_backref)
-                return true;
         case P4_Choice:
+            if (e->kind == P4_Sequence && e->has_backref)
+                return true;
             for (i = 0; i < e->count; i++)
                 if (P4_HasBackrefDescendant(e->members[i]))
                     return true;

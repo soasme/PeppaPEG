@@ -2516,7 +2516,7 @@ match_back_reference(P4_Source* s, P4_Expression* e, P4_Frame* rule_frame,
     P4_Slice* backrefs = rule_frame->backref_slices;
     assert(backrefs != NULL, "backrefs should not be null");
 
-    if (index >= rule_frame->expr->count || index < 0) {
+    if (index >= rule_frame->expr->count) {
         P4_MatchRaisef(s, P4_IndexError, E_BACKREF_OUT_REACHED);
         return NULL;
     }
@@ -3472,8 +3472,7 @@ P4_SetMember(P4_Expression* expr, size_t offset, P4_Expression* member) {
         expr->has_backref = expr->has_backref || P4_HasBackrefDescendant(member);
     }
 
-    if (offset < 0
-            || offset >= expr->count) {
+    if (offset >= expr->count) {
         return P4_IndexError;
     }
 
@@ -3513,8 +3512,7 @@ P4_GetMember(P4_Expression* expr, size_t offset) {
         return NULL;
     }
 
-    if (offset < 0
-            || offset >= expr->count) {
+    if (offset >= expr->count) {
         return NULL;
     }
 

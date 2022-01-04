@@ -2,13 +2,18 @@
 #include <peppa.h>
 
 int main(int argc, char* argv[]) {
-    P4_Grammar* grammar = P4_LoadGrammar("entry = i\"hello\\nworld\";");
+    P4_Grammar* grammar;
+    P4_Source* source;
+    P4_Node* root;
+    char* text;
+
+    grammar = P4_LoadGrammar("entry = i\"hello\\nworld\";");
     if (grammar == NULL) {
         printf("Error: CreateGrammar: Error.\n");
         return 1;
     }
 
-    P4_Source*  source = P4_CreateSource("Hello\nWORLD", "entry");
+    source = P4_CreateSource("Hello\nWORLD", "entry");
     if (source == NULL) {
         printf("Error: CreateSource: MemoryError.\n");
         return 1;
@@ -23,8 +28,8 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    P4_Node*    root = P4_GetSourceAst(source);
-    char*       text = P4_CopyNodeString(root);
+    root = P4_GetSourceAst(source);
+    text = P4_CopyNodeString(root);
 
     printf("root span: [%lu %lu]\n", root->slice.start.pos, root->slice.stop.pos);
     printf("root start: line=%lu offset=%lu\n", root->slice.start.lineno, root->slice.start.offset);

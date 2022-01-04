@@ -878,7 +878,11 @@ P4_PRIVATE(P4_Error) pop_frame(P4_Source*);
 P4_PRIVATE(P4_Node*) match_expression(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_literal(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_range(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*) match_unicode_category(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*) match_unicode_category(P4_Source*
+# ifdef ENABLE_UNISTR
+        , P4_Expression*
+# endif
+);
 P4_PRIVATE(P4_Node*) match_reference(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_positive(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_negative(P4_Source*, P4_Expression*);
@@ -1910,7 +1914,11 @@ match_range(P4_Source* s, P4_Expression* e) {
 }
 
 P4_PRIVATE(P4_Node*)
-match_unicode_category(P4_Source* s, P4_Expression* e) {
+match_unicode_category(P4_Source* s
+# ifdef ENABLE_UNISTR
+        , P4_Expression* e
+# endif
+        ) {
     assert(no_error(s), "can't proceed due to a failed match");
 
 # ifdef ENABLE_UNISTR
@@ -2442,7 +2450,11 @@ match_expression(P4_Source* s, P4_Expression* e) {
     switch (e->kind) {
         case P4_Literal:       result = match_literal(s, e);   break;
         case P4_Range:         result = match_range(s, e);     break;
-        case P4_UnicodeCategory: result = match_unicode_category(s, e); break;
+        case P4_UnicodeCategory: result = match_unicode_category(s
+# ifdef ENABLE_UNISTR
+                                         , e
+# endif
+                                         ); break;
         case P4_Reference:     result = match_reference(s, e); break;
         case P4_Sequence:      result = match_sequence(s, e);  break;
         case P4_Choice:        result = match_choice(s, e);    break;

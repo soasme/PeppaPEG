@@ -1435,23 +1435,23 @@ size_t
 u8_next_char(P4_String s, ucs4_t* c) {
     *c = 0;
 
-    if ((s[0] & 0b10000000) == 0) { /* 1 byte code point, ASCII */
-        *c = (s[0] & 0b01111111);
+    if ((s[0] & 128) == 0) { /* 1 byte code point, ASCII, s[0] & 0b10000000 */
+        *c = (s[0] & 127);
         return 1;
-    } else if ((s[0] & 0b11100000) == 0b11000000) { /* 2 byte code point */
+    } else if ((s[0] & 224) == 192) { /* 2 byte code point, s[0] & 0b11100000 == 0b11000000 */
         if (s[0] == 0) return 0;
-        *c = (s[0] & 0b00011111) << 6 | (s[1] & 0b00111111);
+        *c = (s[0] & 31) << 6 | (s[1] & 63);
         return 2;
-    } else if ((s[0] & 0b11110000) == 0b11100000) { /* 3 byte code point */
+    } else if ((s[0] & 240) == 224) { /* 3 byte code point */
         if (s[1] == 0) return 0;
-        *c = (s[0] & 0b00001111) << 12 | (s[1] & 0b00111111) << 6 | (s[2] & 0b00111111);
+        *c = (s[0] & 15) << 12 | (s[1] & 63) << 6 | (s[2] & 63);
         return 3;
-    } else if ((s[0] & 0b11111000) == 0b11110000) { /* 4 byte code point */
+    } else if ((s[0] & 248) == 240) { /* 4 byte code point */
         if (s[2] == 0) return 0;
-        *c = (s[0] & 0b00000111) << 18 | (s[1] & 0b00111111) << 12 | (s[2] & 0b00111111) << 6 | (s[3] & 0b00111111);
+        *c = (s[0] & 7) << 18 | (s[1] & 63) << 12 | (s[2] & 63) << 6 | (s[3] & 63);
         return 4;
     } else {
-        *c = 0x0;
+        *c = 0;
         return 0;
     }
 }

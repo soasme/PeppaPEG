@@ -3768,7 +3768,7 @@ P4_IsScoped(P4_Expression* e) {
  */
 P4_PUBLIC void
 P4_SetSquashed(P4_Expression* e) {
-    return P4_SetExpressionFlag(e, P4_FLAG_SQUASHED);
+    P4_SetExpressionFlag(e, P4_FLAG_SQUASHED);
 }
 
 /*
@@ -3776,7 +3776,7 @@ P4_SetSquashed(P4_Expression* e) {
  */
 P4_PUBLIC void
 P4_SetLifted(P4_Expression* e) {
-    return P4_SetExpressionFlag(e, P4_FLAG_LIFTED);
+    P4_SetExpressionFlag(e, P4_FLAG_LIFTED);
 }
 
 /*
@@ -3784,7 +3784,7 @@ P4_SetLifted(P4_Expression* e) {
  */
 P4_PUBLIC void
 P4_SetTight(P4_Expression* e) {
-    return P4_SetExpressionFlag(e, P4_FLAG_TIGHT);
+    P4_SetExpressionFlag(e, P4_FLAG_TIGHT);
 }
 
 /*
@@ -3792,7 +3792,7 @@ P4_SetTight(P4_Expression* e) {
  */
 P4_PUBLIC void
 P4_SetSpaced(P4_Expression* e) {
-    return P4_SetExpressionFlag(e, P4_FLAG_SPACED);
+    P4_SetExpressionFlag(e, P4_FLAG_SPACED);
 }
 
 /*
@@ -3800,7 +3800,7 @@ P4_SetSpaced(P4_Expression* e) {
  */
 P4_PUBLIC void
 P4_SetScoped(P4_Expression* e) {
-    return P4_SetExpressionFlag(e, P4_FLAG_SCOPED);
+    P4_SetExpressionFlag(e, P4_FLAG_SCOPED);
 }
 
 P4_PUBLIC P4_Error

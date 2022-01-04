@@ -33,7 +33,7 @@ Step 1: Create Grammar
 In Peppa PEG, we always start with creating a :c:struct:`P4_Grammar`. We create such a data structure using :c:func:`P4_LoadGrammar`.
 
 .. literalinclude:: ../example.c
-   :lines: 5-9
+   :lines: 10-14
 
 Step 2: Create Source
 ---------------------
@@ -41,7 +41,7 @@ Step 2: Create Source
 We create a :c:struct:`P4_Source` using :c:func:`P4_CreateSource()`.
 
 .. literalinclude:: ../example.c
-   :lines: 11-15
+   :lines: 16-20
 
 The first parameter is the content of the source.
 The second parameter is the name of entry grammar rule.
@@ -54,7 +54,7 @@ Step 3: Parse
 Now the stage is setup; call :c:func:`P4_Parse`. If everything is okay, it returns a zero value - :c:enum:`P4_Ok<P4_Error>`.
 
 .. literalinclude:: ../example.c
-   :lines: 17-24
+   :lines: 22-29
 
 Step 4: Traverse AST
 ---------------------------
@@ -71,12 +71,12 @@ To traverse the AST,
 * :c:func:`P4_CopyNodeString()` returns the string the AST node covers.
 
 .. literalinclude:: ../example.c
-   :lines: 26-37
+   :lines: 31-40
 
 It may be helpful to output the source AST in JSON format:
 
 .. literalinclude:: ../example.c
-   :lines: 39
+   :lines: 44
 
 Step 5: Clean Up
 ----------------
@@ -88,7 +88,7 @@ Last but not least, don't forget to free all the allocated memory.
 
 .. literalinclude:: ../example.c
    :language: c
-   :lines: 41-42
+   :lines: 46-47
 
 Full Example Code
 -----------------
@@ -106,9 +106,9 @@ The output of the example looks like:
     root span: [0 11]
     root start: line=1 offset=1
     root stop: line=2 offset=6
-    root next: 0x0
-    root head: 0x0
-    root tail: 0x0
+    root next: (nil)
+    root head: (nil)
+    root tail: (nil)
     root text: Hello
     WORLD
     [{"slice":[0,11],"type":"entry"}]

@@ -296,6 +296,7 @@ typedef uint32_t        P4_ExpressionFlag;
  * The C string type in locale encoding, by default utf-8.
  **/
 typedef char*           P4_String;
+typedef const char*     P4_ConstString;
 
 /**
  * The utf-8 string type.
@@ -1812,9 +1813,9 @@ P4_Grammar*     P4_LoadGrammar(P4_String rules);
  *
  * Example:
  *
- *      const P4_String name = P4_GetRuleName(expr);
+ *      P4_String name = P4_GetRuleName(expr);
  */
-const P4_String P4_GetRuleName(P4_Expression* expr);
+P4_ConstString  P4_GetRuleName(P4_Expression* expr);
 
 #ifdef __cplusplus
 }

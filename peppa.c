@@ -878,17 +878,21 @@ P4_PRIVATE(P4_Error) pop_frame(P4_Source*);
 P4_PRIVATE(P4_Node*) match_expression(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_literal(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_range(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*) match_unicode_category(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*) match_unicode_category(P4_Source*
+# ifdef ENABLE_UNISTR
+        , P4_Expression*
+# endif
+);
 P4_PRIVATE(P4_Node*) match_reference(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_positive(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_negative(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*) match_cut(P4_Source*, P4_Expression*);
+P4_PRIVATE(P4_Node*) match_cut(P4_Source*);
 P4_PRIVATE(P4_Node*) match_sequence(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_choice(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_repeat(P4_Source*, P4_Expression*);
 P4_PRIVATE(P4_Node*) match_left_recursion(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*) match_spaced_rules(P4_Source*, P4_Expression*);
-P4_PRIVATE(P4_Node*) match_back_reference(P4_Source*, P4_Expression*, P4_Frame*, size_t, bool);
+P4_PRIVATE(P4_Node*) match_spaced_rules(P4_Source*);
+P4_PRIVATE(P4_Node*) match_back_reference(P4_Source*, P4_Frame*, size_t, bool);
 
 P4_PRIVATE(void)                P4_DeleteNodeUserData(P4_Grammar* grammar, P4_Node* node);
 P4_PRIVATE(P4_Expression*)      P4_GetReference(P4_Source*, P4_Expression*);
@@ -916,7 +920,7 @@ P4_PRIVATE(P4_Error)            P4_PegEvalLeftRecursion(P4_Node* node, P4_Result
 P4_PRIVATE(P4_Error)            P4_PegEvalPositive(P4_Node* node, P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalNegative(P4_Node* node, P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalRepeat(P4_Node* node, P4_Result* result);
-P4_PRIVATE(P4_Error)            P4_PegEvalDot(P4_Node* node, P4_Result* result);
+P4_PRIVATE(P4_Error)            P4_PegEvalDot(P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalReference(P4_Node* node, P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalBackReference(P4_Node* node, P4_Result* result);
 P4_PRIVATE(P4_Error)            P4_PegEvalExpression(P4_Node* node, P4_Result* result);
@@ -1435,23 +1439,23 @@ size_t
 u8_next_char(P4_String s, ucs4_t* c) {
     *c = 0;
 
-    if ((s[0] & 0b10000000) == 0) { /* 1 byte code point, ASCII */
-        *c = (s[0] & 0b01111111);
+    if ((s[0] & 128) == 0) { /* 1 byte code point, ASCII, s[0] & 0b10000000 */
+        *c = (s[0] & 127);
         return 1;
-    } else if ((s[0] & 0b11100000) == 0b11000000) { /* 2 byte code point */
+    } else if ((s[0] & 224) == 192) { /* 2 byte code point, s[0] & 0b11100000 == 0b11000000 */
         if (s[0] == 0) return 0;
-        *c = (s[0] & 0b00011111) << 6 | (s[1] & 0b00111111);
+        *c = (s[0] & 31) << 6 | (s[1] & 63);
         return 2;
-    } else if ((s[0] & 0b11110000) == 0b11100000) { /* 3 byte code point */
+    } else if ((s[0] & 240) == 224) { /* 3 byte code point */
         if (s[1] == 0) return 0;
-        *c = (s[0] & 0b00001111) << 12 | (s[1] & 0b00111111) << 6 | (s[2] & 0b00111111);
+        *c = (s[0] & 15) << 12 | (s[1] & 63) << 6 | (s[2] & 63);
         return 3;
-    } else if ((s[0] & 0b11111000) == 0b11110000) { /* 4 byte code point */
+    } else if ((s[0] & 248) == 240) { /* 4 byte code point */
         if (s[2] == 0) return 0;
-        *c = (s[0] & 0b00000111) << 18 | (s[1] & 0b00111111) << 12 | (s[2] & 0b00111111) << 6 | (s[3] & 0b00111111);
+        *c = (s[0] & 7) << 18 | (s[1] & 63) << 12 | (s[2] & 63) << 6 | (s[3] & 63);
         return 4;
     } else {
-        *c = 0x0;
+        *c = 0;
         return 0;
     }
 }
@@ -1615,8 +1619,8 @@ P4_CaseCmpInsensitive(const void* src1, const void* src2, size_t n) {
             else return 0;
         }
 
-        src1 = src1 + u8_next_char((P4_String)src1, &src1_orig_cp);
-        src2 = src2 + u8_next_char((P4_String)src2, &src2_orig_cp);
+        src1 = (void*)((uint8_t*) src1 + u8_next_char((P4_String)src1, &src1_orig_cp));
+        src2 = (void*)((uint8_t*) src2 + u8_next_char((P4_String)src2, &src2_orig_cp));
         n -= u8_bytes(src1_orig_cp);
 
         src1_lwr_cp = uc_tolower(src1_orig_cp);
@@ -1910,7 +1914,11 @@ match_range(P4_Source* s, P4_Expression* e) {
 }
 
 P4_PRIVATE(P4_Node*)
-match_unicode_category(P4_Source* s, P4_Expression* e) {
+match_unicode_category(P4_Source* s
+# ifdef ENABLE_UNISTR
+        , P4_Expression* e
+# endif
+        ) {
     assert(no_error(s), "can't proceed due to a failed match");
 
 # ifdef ENABLE_UNISTR
@@ -1972,9 +1980,9 @@ P4_HasBackrefDescendant(P4_Expression* e) {
         case P4_BackReference:
             return true;
         case P4_Sequence:
-            if (e->has_backref)
-                return true;
         case P4_Choice:
+            if (e->kind == P4_Sequence && e->has_backref)
+                return true;
             for (i = 0; i < e->count; i++)
                 if (P4_HasBackrefDescendant(e->members[i]))
                     return true;
@@ -2059,7 +2067,7 @@ match_sequence(P4_Source* s, P4_Expression* e) {
 
         /* Optional `WHITESPACE` and `COMMENT` are inserted between every member. */
         if (space && i > 0) {
-            whitespace = match_spaced_rules(s, NULL);
+            whitespace = match_spaced_rules(s);
             if (!no_error(s)) goto finalize;
             P4_AdoptNode(head, tail, whitespace);
         }
@@ -2073,11 +2081,11 @@ match_sequence(P4_Source* s, P4_Expression* e) {
                     s->error.expr = member;
                     goto finalize;
                 }
-                tok = match_back_reference(s, e, rule_frame, member->backref_index, member->sensitive);
+                tok = match_back_reference(s, rule_frame, member->backref_index, member->sensitive);
                 if (!no_error(s)) goto finalize;
                 break;
             case P4_Cut:
-                tok = match_cut(s, e);
+                tok = match_cut(s);
                 break;
             default:
                 tok = match_expression(s, member);
@@ -2209,7 +2217,7 @@ match_repeat(P4_Source* s, P4_Expression* e) {
 
         /* SPACED rule expressions are inserted between every repetition. */
         if (space && repeated > 0 ) {
-            whitespace = match_spaced_rules(s, NULL);
+            whitespace = match_spaced_rules(s);
             if (!no_error(s)) goto finalize;
             P4_AdoptNode(head, tail, whitespace);
         }
@@ -2323,7 +2331,7 @@ match_left_recursion(P4_Source* s, P4_Expression* e) {
         /* match implicit whitespace. */
         mark_position(s, whitespace_startpos);
         if (space) {
-            whitespace = match_spaced_rules(s, NULL);
+            whitespace = match_spaced_rules(s);
             if (!no_error(s)) goto finalize;
         }
 
@@ -2406,7 +2414,7 @@ match_negative(P4_Source* s, P4_Expression* e) {
 }
 
 P4_PRIVATE(P4_Node*)
-match_cut(P4_Source* s, P4_Expression* e) {
+match_cut(P4_Source* s) {
     /* enable flag cut in the top frame. */
     P4_Frame* frame = peek_frame(s);
     frame->cut = true;
@@ -2442,7 +2450,11 @@ match_expression(P4_Source* s, P4_Expression* e) {
     switch (e->kind) {
         case P4_Literal:       result = match_literal(s, e);   break;
         case P4_Range:         result = match_range(s, e);     break;
-        case P4_UnicodeCategory: result = match_unicode_category(s, e); break;
+        case P4_UnicodeCategory: result = match_unicode_category(s
+# ifdef ENABLE_UNISTR
+                                         , e
+# endif
+                                         ); break;
         case P4_Reference:     result = match_reference(s, e); break;
         case P4_Sequence:      result = match_sequence(s, e);  break;
         case P4_Choice:        result = match_choice(s, e);    break;
@@ -2483,7 +2495,7 @@ finalize:
 }
 
 P4_PRIVATE(P4_Node*)
-match_spaced_rules(P4_Source* s, P4_Expression* e) {
+match_spaced_rules(P4_Source* s) {
     /* implicit whitespace is guaranteed to be an unnamed rule. */
     /* state flag is guaranteed to be none. */
     assert(no_error(s), "can't proceed due to a failed match");
@@ -2510,13 +2522,13 @@ match_spaced_rules(P4_Source* s, P4_Expression* e) {
 }
 
 P4_PRIVATE(P4_Node*)
-match_back_reference(P4_Source* s, P4_Expression* e, P4_Frame* rule_frame,
+match_back_reference(P4_Source* s, P4_Frame* rule_frame,
         size_t index, bool sensitive) {
 
     P4_Slice* backrefs = rule_frame->backref_slices;
     assert(backrefs != NULL, "backrefs should not be null");
 
-    if (index >= rule_frame->expr->count || index < 0) {
+    if (index >= rule_frame->expr->count) {
         P4_MatchRaisef(s, P4_IndexError, E_BACKREF_OUT_REACHED);
         return NULL;
     }
@@ -3472,8 +3484,7 @@ P4_SetMember(P4_Expression* expr, size_t offset, P4_Expression* member) {
         expr->has_backref = expr->has_backref || P4_HasBackrefDescendant(member);
     }
 
-    if (offset < 0
-            || offset >= expr->count) {
+    if (offset >= expr->count) {
         return P4_IndexError;
     }
 
@@ -3513,8 +3524,7 @@ P4_GetMember(P4_Expression* expr, size_t offset) {
         return NULL;
     }
 
-    if (offset < 0
-            || offset >= expr->count) {
+    if (offset >= expr->count) {
         return NULL;
     }
 
@@ -3768,7 +3778,7 @@ P4_IsScoped(P4_Expression* e) {
  */
 P4_PUBLIC void
 P4_SetSquashed(P4_Expression* e) {
-    return P4_SetExpressionFlag(e, P4_FLAG_SQUASHED);
+    P4_SetExpressionFlag(e, P4_FLAG_SQUASHED);
 }
 
 /*
@@ -3776,7 +3786,7 @@ P4_SetSquashed(P4_Expression* e) {
  */
 P4_PUBLIC void
 P4_SetLifted(P4_Expression* e) {
-    return P4_SetExpressionFlag(e, P4_FLAG_LIFTED);
+    P4_SetExpressionFlag(e, P4_FLAG_LIFTED);
 }
 
 /*
@@ -3784,7 +3794,7 @@ P4_SetLifted(P4_Expression* e) {
  */
 P4_PUBLIC void
 P4_SetTight(P4_Expression* e) {
-    return P4_SetExpressionFlag(e, P4_FLAG_TIGHT);
+    P4_SetExpressionFlag(e, P4_FLAG_TIGHT);
 }
 
 /*
@@ -3792,7 +3802,7 @@ P4_SetTight(P4_Expression* e) {
  */
 P4_PUBLIC void
 P4_SetSpaced(P4_Expression* e) {
-    return P4_SetExpressionFlag(e, P4_FLAG_SPACED);
+    P4_SetExpressionFlag(e, P4_FLAG_SPACED);
 }
 
 /*
@@ -3800,7 +3810,7 @@ P4_SetSpaced(P4_Expression* e) {
  */
 P4_PUBLIC void
 P4_SetScoped(P4_Expression* e) {
-    return P4_SetExpressionFlag(e, P4_FLAG_SCOPED);
+    P4_SetExpressionFlag(e, P4_FLAG_SCOPED);
 }
 
 P4_PUBLIC P4_Error
@@ -4619,13 +4629,13 @@ finalize:
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalDot(P4_Node* node, P4_Result* result) {
+P4_PegEvalDot(P4_Result* result) {
     catch_oom(result->expr = P4_CreateRange(0x1, 0x10ffff, 1));
     return P4_Ok;
 }
 
 P4_PRIVATE(P4_Error)
-P4_PegEvalCut(P4_Node* node, P4_Result* result) {
+P4_PegEvalCut(P4_Result* result) {
     catch_oom(result->expr = P4_CreateCut());
     return P4_Ok;
 }
@@ -4848,10 +4858,10 @@ P4_PegEvalExpression(P4_Node* node, P4_Result* result) {
         return P4_PegEvalRepeat(node, result);
 
     if (strcmp(node->rule_name, "dot")          == 0)
-        return P4_PegEvalDot(node, result);
+        return P4_PegEvalDot(result);
 
     if (strcmp(node->rule_name, "cut")          == 0)
-        return P4_PegEvalCut(node, result);
+        return P4_PegEvalCut(result);
 
     if (strcmp(node->rule_name, "reference")    == 0)
         return P4_PegEvalReference(node, result);
@@ -4921,7 +4931,7 @@ finalize:
     panicf("grammar syntax error: %s\n", result->errmsg);
 }
 
-P4_PUBLIC const P4_String
+P4_PUBLIC P4_ConstString
 P4_GetRuleName(P4_Expression* expr) {
     return expr->name;
 }

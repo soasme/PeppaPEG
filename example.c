@@ -29,9 +29,9 @@ int main(int argc, char* argv[]) {
     printf("root span: [%lu %lu]\n", root->slice.start.pos, root->slice.stop.pos);
     printf("root start: line=%lu offset=%lu\n", root->slice.start.lineno, root->slice.start.offset);
     printf("root stop: line=%lu offset=%lu\n", root->slice.stop.lineno, root->slice.stop.offset);
-    printf("root next: %p\n", root->next);
-    printf("root head: %p\n", root->head);
-    printf("root tail: %p\n", root->tail);
+    printf("root next: %p\n", (void *)root->next);
+    printf("root head: %p\n", (void *)root->head);
+    printf("root tail: %p\n", (void *)root->tail);
     printf("root text: %s\n", text);
 
     free(text);

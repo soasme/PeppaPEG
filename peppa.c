@@ -1615,8 +1615,8 @@ P4_CaseCmpInsensitive(const void* src1, const void* src2, size_t n) {
             else return 0;
         }
 
-        src1 = src1 + u8_next_char((P4_String)src1, &src1_orig_cp);
-        src2 = src2 + u8_next_char((P4_String)src2, &src2_orig_cp);
+        src1 = (void*)((uint8_t*) src1 + u8_next_char((P4_String)src1, &src1_orig_cp));
+        src2 = (void*)((uint8_t*) src2 + u8_next_char((P4_String)src2, &src2_orig_cp));
         n -= u8_bytes(src1_orig_cp);
 
         src1_lwr_cp = uc_tolower(src1_orig_cp);

@@ -812,8 +812,8 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
         (s)->error.errno = (eno); \
         (s)->error.lineno = (s)->lineno; \
         (s)->error.offset = (s)->offset; \
-        (s)->error.rule = (s)->frame_stack ? (s)->frame_stack->rule : NULL; \
-        (s)->error.expr = (s)->frame_stack ? (s)->frame_stack->expr : NULL; \
+        (s)->error.rule = (s)->frame_stack[(s)->frame_stack_size-1].rule; \
+        (s)->error.expr = (s)->frame_stack[(s)->frame_stack_size-1].expr; \
     } while (0);
 # define P4_EvalRaisef(r,m,...) \
     do { \
@@ -828,9 +828,9 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
 # define is_lifted(e) (((e)->flag & P4_FLAG_LIFTED) != 0)
 # define is_non_terminal(e) (((e)->flag & P4_FLAG_NON_TERMINAL) != 0)
 # define is_rule(e) ((e)->name != NULL)
-# define is_cut(s) ((s)->frame_stack->cut)
-# define need_silent(s) ((s)->frame_stack ? (s)->frame_stack->silent : false)
-# define need_whitespace(s) (!(s)->whitespacing && ((s)->frame_stack ? (s)->frame_stack->space : false))
+# define is_cut(s) ((s)->frame_stack[(s)->frame_stack_size-1].cut)
+# define need_silent(s) ((s)->frame_stack[(s)->frame_stack_size-1].silent)
+# define need_whitespace(s) (!(s)->whitespacing && ((s)->frame_stack[(s)->frame_stack_size-1].space))
 # define need_lift(s,e) (!is_rule(e) || is_lifted(e) || need_silent(s))
 # define no_backtrack(s) (no_match(s) && is_cut(s) && !(s)->whitespacing)
 # define no_error(s) ((s)->err == P4_Ok)
@@ -860,16 +860,15 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
         code; \
     }
 # define rescue_error(s)    do { (s)->err = P4_Ok; (s)->errmsg[0] = '\0'; } while (0)
-# define peek_frame(s)      ((s)->frame_stack)
-# define peek_rule_name(s)  ((s)->frame_stack->rule->name)
+# define peek_frame(s)      ((s)->frame_stack_size > 0 ? &(s)->frame_stack[(s)->frame_stack_size-1] : NULL)
+# define peek_rule_name(s)  ((s)->frame_stack[s->frame_stack_size-1].rule->name)
 # define peek_rule_frame(s, f) \
-    P4_Frame *tmp = (s)->frame_stack; \
-    while (tmp) { \
-        if (is_rule(tmp->expr)) { \
-            (f) = tmp; \
+    size_t _i; \
+    for (_i = s->frame_stack_size - 1; _i >= 0; _i--) { \
+        if (is_rule(s->frame_stack[_i].expr)) { \
+            (f) = &s->frame_stack[_i]; \
             break; \
-        } \
-        tmp = tmp->next; \
+        }\
     }
 # define remaining_text(s)  ((s)->content + (s)->pos)
 
@@ -1745,13 +1744,12 @@ push_frame(P4_Source* s, P4_Expression* e) {
         return P4_StackError;
     }
 
-    P4_Frame* frame = NULL;
-
-    catch_oom(frame = P4_MALLOC(sizeof(P4_Frame)));
+    /* TBD: double stack */
+    P4_Frame* frame = &s->frame_stack[s->frame_stack_size];
 
     /* Set silent */
     frame->silent = false;
-    P4_Frame* top = s->frame_stack;
+    P4_Frame* top = s->frame_stack_size > 0 ? &s->frame_stack[s->frame_stack_size-1] : NULL;
     if (!is_scoped(e)) {
         if (
             (top && is_squashed(top->rule))
@@ -1777,7 +1775,6 @@ push_frame(P4_Source* s, P4_Expression* e) {
 
     /* Set expr & next */
     frame->expr = e;
-    frame->next = top;
 
     /* Set cut */
     frame->cut = false;
@@ -1790,7 +1787,6 @@ push_frame(P4_Source* s, P4_Expression* e) {
 
     /* Push stack */
     s->frame_stack_size++;
-    s->frame_stack = frame;
 
     return P4_Ok;
 }
@@ -1801,20 +1797,10 @@ push_frame(P4_Source* s, P4_Expression* e) {
  */
 P4_PRIVATE(P4_Error)
 pop_frame(P4_Source* s) {
-    assert(s->frame_stack != NULL, "frame should not be empty");
-
-    P4_Frame* oldtop = s->frame_stack;
-
-    if (oldtop) {
-        /* move oldtop out of frame stack. */
-        s->frame_stack = oldtop->next;
-        s->frame_stack_size--;
-
-        /* clean up malloc fields. */
-        P4_FREE(oldtop->backref_slices);
-        oldtop->backref_slices = NULL;
-    }
-
+    assert(s->frame_stack_size != 0, "frame should not be empty");
+    P4_FREE(s->frame_stack[s->frame_stack_size-1].backref_slices);
+    s->frame_stack[s->frame_stack_size-1].backref_slices = NULL;
+    s->frame_stack_size--;
     return P4_Ok;
 }
 
@@ -2562,17 +2548,20 @@ match_back_reference(P4_Source* s, P4_Frame* rule_frame,
 
     set_literal_rule_name(litexpr->name, backref_expr, STRDUP);
 
+    P4_Frame* peek = peek_frame(s);
+    assert(peek != NULL, "peek should not be null");
+
     /* (1) Save top frame silent. */
-    bool silent = peek_frame(s)->silent;
+    bool silent = peek->silent;
 
     /* (2) Ignore backref literal token if it has no name. */
     if (need_lift(s, litexpr))
-        peek_frame(s)->silent = true;
+        peek->silent = true;
 
     P4_Node* tok = match_expression(s, litexpr);
 
     /* (3) Recover top frame silent. */
-    peek_frame(s)->silent = silent;
+    peek->silent = silent;
 
     if (!no_error(s)) {
         P4_MatchRaisef(s, P4_MatchError, E_WRONG_BACKREF);
@@ -3052,9 +3041,9 @@ P4_CreateSource(P4_String content, P4_String entry_name) {
     source->lineno = 1;
     source->offset = 1;
     source->root = NULL;
-    source->frame_stack = NULL;
+    source->frame_stack_cap = 1024;
+    source->frame_stack = P4_MALLOC(sizeof(P4_Frame) * 1024);
     source->frame_stack_size = 0;
-    source->frame_stack_cap = 0;
     source->whitespacing = false;
 
     P4_SetSourceSlice(source, 0, strlen(content));
@@ -3085,12 +3074,11 @@ P4_ResetSource(P4_Source* source) {
     if (source == NULL)
         return;
 
-    P4_Frame* tmp = source->frame_stack;
-    while(source->frame_stack) {
-        tmp = source->frame_stack->next;
-        P4_FREE(source->frame_stack);
-        source->frame_stack = tmp;
+    size_t i;
+    for (i = 0; i < source->frame_stack_size; i++) {
+        P4_FREE(source->frame_stack[i].backref_slices);
     }
+    source->frame_stack_size = 0;
 
     rescue_error(source);
 

@@ -1744,7 +1744,12 @@ push_frame(P4_Source* s, P4_Expression* e) {
         return P4_StackError;
     }
 
-    /* TBD: double stack */
+    if (s->frame_stack_size + 1 >= s->frame_stack_cap) {
+        s->frame_stack_cap = s->frame_stack_cap << 1;
+        s->frame_stack = realloc(s->frame_stack, s->frame_stack_cap);
+        assert(s->frame_stack == NULL, "out of memory when allocating frame stack");
+    }
+
     P4_Frame* frame = &s->frame_stack[s->frame_stack_size];
 
     /* Set silent */

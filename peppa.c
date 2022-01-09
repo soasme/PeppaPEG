@@ -864,9 +864,9 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
 # define peek_rule_name(s)  ((s)->frame_stack[s->frame_stack_size-1].rule->name)
 # define peek_rule_frame(s, f) \
     size_t _i; \
-    for (_i = s->frame_stack_size - 1; _i >= 0; _i--) { \
-        if (is_rule(s->frame_stack[_i].expr)) { \
-            (f) = &s->frame_stack[_i]; \
+    for (_i = 0; _i < s->frame_stack_size; _i++) { \
+        if (is_rule(s->frame_stack[s->frame_stack_size - _i - 1].expr)) { \
+            (f) = &s->frame_stack[s->frame_stack_size - _i - 1]; \
             break; \
         }\
     }

@@ -818,8 +818,7 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
 # define P4_EvalRaisef(r,m,...) \
     do { \
         memset((r)->errmsg, 0, sizeof((r)->errmsg)); \
-        if (snprintf((r)->errmsg, sizeof((r)->errmsg), (m), __VA_ARGS__) < 0) \
-            (r)->errmsg[0] = '\0'; \
+        sprintf((r)->errmsg, (m), __VA_ARGS__); \
     } while (0);
 # define is_end(s) ((s)->pos >= (s)->slice.stop.pos)
 # define is_tight(e) (((e)->flag & P4_FLAG_TIGHT) != 0)
@@ -4903,7 +4902,9 @@ P4_LoadGrammarResult(P4_String rules, P4_Result* result) {
 
     /* eval grammar rule parse tree to grammar object. */
     catch_err(P4_PegEvalGrammar(rules_tok, evalres), {
-        P4_EvalRaisef(result, "%s: %s.", P4_GetErrorString(err), evalres->errmsg);
+        /* precision bounds the copied errmsg so the total output always
+         * fits result->errmsg; snprintf is unavailable under -ansi. */
+        P4_EvalRaisef(result, "%s: %.230s.", P4_GetErrorString(err), evalres->errmsg);
     });
 
 finalize:

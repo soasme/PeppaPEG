@@ -16,14 +16,17 @@ on:
 
 jobs:
   job:
-    name: ${{ matrix.os }}-make-check
+    name: ${{ matrix.os }}-${{ matrix.compiler }}-unistr-${{ matrix.unistr }}-make-check
     runs-on: ${{ matrix.os }}
     if: "!contains(github.event.head_commit.message, 'skip check')"
     strategy:
       fail-fast: false
       matrix:
+        # ubuntu-latest / ubuntu-24.04-arm cover x86_64 / aarch64 Linux;
+        # macos-latest runs on arm64.
         os:
           - ubuntu-latest
+          - ubuntu-24.04-arm
           - macos-latest
         compiler:
           - gcc
@@ -33,7 +36,7 @@ jobs:
           - Off
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         submodules: true
 
@@ -73,7 +76,7 @@ jobs:
         make
         sudo make install
 
-        if [ "${{ matrix.compiler }}" = "clang" && "${{ matrix.os }}" = "ubuntu-latest" ]; then
+        if [[ "${{ matrix.compiler }}" = "clang" && "${{ matrix.os }}" == ubuntu* ]]; then
           export ASAN_OPTIONS="detect_leaks=1"
         fi
 

@@ -818,7 +818,8 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
 # define P4_EvalRaisef(r,m,...) \
     do { \
         memset((r)->errmsg, 0, sizeof((r)->errmsg)); \
-        sprintf((r)->errmsg, (m), __VA_ARGS__); \
+        if (snprintf((r)->errmsg, sizeof((r)->errmsg), (m), __VA_ARGS__) < 0) \
+            (r)->errmsg[0] = '\0'; \
     } while (0);
 # define is_end(s) ((s)->pos >= (s)->slice.stop.pos)
 # define is_tight(e) (((e)->flag & P4_FLAG_TIGHT) != 0)

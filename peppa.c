@@ -31,6 +31,12 @@
  * @see        https://github.com/soasme/PeppaPEG
 */
 
+/* glibc declares snprintf only for C99 and later; this exposes it when
+ * compiling with -ansi. Must be defined before any system header. */
+#ifndef _ISOC99_SOURCE
+# define _ISOC99_SOURCE 1
+#endif
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -818,7 +824,7 @@ P4_PRIVATE(void)         P4_DiffPosition(P4_String str, P4_Position* start, size
 # define P4_EvalRaisef(r,m,...) \
     do { \
         memset((r)->errmsg, 0, sizeof((r)->errmsg)); \
-        sprintf((r)->errmsg, (m), __VA_ARGS__); \
+        snprintf((r)->errmsg, sizeof((r)->errmsg), (m), __VA_ARGS__); \
     } while (0);
 # define is_end(s) ((s)->pos >= (s)->slice.stop.pos)
 # define is_tight(e) (((e)->flag & P4_FLAG_TIGHT) != 0)
@@ -2642,7 +2648,7 @@ finalize:
 P4_PUBLIC P4_String
 P4_Version(void) {
     static char version[15];
-    sprintf(version, "%i.%i.%i", P4_MAJOR_VERSION, P4_MINOR_VERSION, P4_PATCH_VERSION);
+    snprintf(version, sizeof(version), "%i.%i.%i", P4_MAJOR_VERSION, P4_MINOR_VERSION, P4_PATCH_VERSION);
     return version;
 }
 
@@ -3206,7 +3212,7 @@ P4_GetErrorMessage(P4_Source* source) {
         return NULL;
 
     memset(source->errmsg, 0, sizeof(source->errmsg));
-    sprintf(source->errmsg, "line %zu:%zu, expect %s",
+    snprintf(source->errmsg, sizeof(source->errmsg), "line %zu:%zu, expect %s",
             source->error.lineno, source->error.offset,
             source->error.rule ? source->error.rule->name : source->entry_name);
 
@@ -3229,7 +3235,9 @@ P4_GetErrorMessage(P4_Source* source) {
             strcat(source->errmsg, " (left recursion rule entry cannot be lifted)");
             break;
         case E_BACKREF_OUT_REACHED:
-            sprintf(source->errmsg + strlen(source->errmsg), " (\\%lu out reached)", source->error.expr->backref_index);
+            snprintf(source->errmsg + strlen(source->errmsg),
+                    sizeof(source->errmsg) - strlen(source->errmsg),
+                    " (\\%lu out reached)", source->error.expr->backref_index);
             break;
         case E_BACKREF_TO_SELF:
             strcat(source->errmsg, " (backref point to backref)");
@@ -3238,10 +3246,14 @@ P4_GetErrorMessage(P4_Source* source) {
             strcat(source->errmsg, " (insufficient repetitions)");
             break;
         case E_INSUFFICIENT_REPEAT2:
-            sprintf(source->errmsg + strlen(source->errmsg), " (at least %lu repetitions)", source->error.expr->repeat_min);
+            snprintf(source->errmsg + strlen(source->errmsg),
+                    sizeof(source->errmsg) - strlen(source->errmsg),
+                    " (at least %lu repetitions)", source->error.expr->repeat_min);
             break;
         case E_EXCESSIVE_REPEAT:
-            sprintf(source->errmsg + strlen(source->errmsg), " (at most %lu repetitions)", source->error.expr->repeat_max);
+            snprintf(source->errmsg + strlen(source->errmsg),
+                    sizeof(source->errmsg) - strlen(source->errmsg),
+                    " (at most %lu repetitions)", source->error.expr->repeat_max);
             break;
         case E_WRONG_BACKREF:
             strcat(source->errmsg, " (back reference not match)");
@@ -4902,7 +4914,9 @@ P4_LoadGrammarResult(P4_String rules, P4_Result* result) {
 
     /* eval grammar rule parse tree to grammar object. */
     catch_err(P4_PegEvalGrammar(rules_tok, evalres), {
-        P4_EvalRaisef(result, "%s: %s.", P4_GetErrorString(err), evalres->errmsg);
+        /* precision bounds the copied errmsg so the total output always
+         * fits result->errmsg; snprintf is unavailable under -ansi. */
+        P4_EvalRaisef(result, "%s: %.230s.", P4_GetErrorString(err), evalres->errmsg);
     });
 
 finalize:
